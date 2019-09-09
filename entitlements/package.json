@@ -1,0 +1,18 @@
+{
+  "name": "bqds-entitlement-engine",
+  "version": "0.0.1",
+  "description": "BQDS entitlement-engine",
+  "license": "Apache-2.0",
+  "repository": {},
+  "main": "main.js",
+  "bin": {
+    "entitlement-engine": "main.js"
+  },
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {
+    "bqdsEntitlements": "file:./bqdsEntitlements",
+    "minimist": "^1.2.0"
+  }
+}

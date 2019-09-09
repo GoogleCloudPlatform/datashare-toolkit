@@ -1,0 +1,14 @@
+{
+    "name": "processUpload",
+    "version": "0.0.1",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "@google-cloud/bigquery": "^3.0.0",
+        "@google-cloud/functions-framework": "^1.1.1",
+        "@google-cloud/storage": "^2.0.0"
+    },
+    "scripts": {
+        "start": "functions-framework --target=processEvent",
+        "deploy": "gcloud functions deploy processUpload  --memory=256MB --source=. --runtime=nodejs8 --entry-point=processEvent --timeout=540s"
+    }
+}
