@@ -174,8 +174,10 @@ Lastly, you will need to populate the ```groups``` and ```groupEntitlements``` t
 
 A configuration can be created in either JSON or YAML format. You can find examples in the Git repository within the [examples](../examples) folder.
 
-- [JSON example](../examples/config.json)
-- [YAML example](../examples/config.yaml)
+- [JSON simple example](../examples/MLB/config/simple.json)
+- [YAML simple example](../examples/MLB/config/simple.yaml)
+- [JSON complex example](../examples/MLB/config/complex.json)
+- [YAML complex example](../examples/MLB/config/complex.yaml)
 
 ## Text Replacements
 There are some properties that can use replacement tokens for populating values at runtime. The fields that currently support this are:
