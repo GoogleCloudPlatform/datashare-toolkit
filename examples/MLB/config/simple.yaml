@@ -21,10 +21,10 @@ accessControl:
 groups:
 - name: newyork_users
   access:
-  - userByEmail: bqds.alphatrader.1@gmail.com
+  - userByEmail: benjentargaryen.327201@gmail.com
 - name: chicago_users
   access:
-  - userByEmail: bqds.betatrader.1@gmail.com
+  - userByEmail: melisandresnow.388027@gmail.com
 datasets:
 - name: ny_fans
   groupNames:
@@ -54,9 +54,11 @@ views:
       enabled: true
       datasetEnabled: true
       labelColumn: label
+      labelColumnDelimiter: "|"
     publicAccess:
       enabled: true
       queryFilter: h_game_number = 1 or v_game_number = 1
+      limit: 20
 - datasetNames:
   - chicago_fans
   name: away_game_logs

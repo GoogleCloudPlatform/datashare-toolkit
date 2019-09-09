@@ -21,10 +21,10 @@ accessControl:
 groups:
 - name: newyork_users
   access:
-  - userByEmail: bqds.alphatrader.1@gmail.com
+  - userByEmail: benjentargaryen.327201@gmail.com
 - name: chicago_users
   access:
-  - userByEmail: bqds.betatrader.1@gmail.com
+  - userByEmail: melisandresnow.388027@gmail.com
 datasets:
 - name: ny_fans_c
   groupNames:
@@ -63,15 +63,15 @@ views:
     query: "with scores as (\n  SELECT\n    h_name as team_abbrev,\n    sum(h_score)
       as score,\n    sum(h_game_number) as game_number,\n    count(distinct concat(cast(game_date
       as string), cast(h_game_number as string), h_name)) as number_of_games\n  FROM
-      `sferrazza-cloud-sandbox.mlb.game_logs`\n  group by h_name\n  union all\n  SELECT\n
-      \   v_name,\n    sum(v_score),\n    sum(v_game_number),\n    count(distinct
-      concat(cast(game_date as string), cast(v_game_number as string), v_name))\n
-      \ FROM `sferrazza-cloud-sandbox.mlb.game_logs`\n  group by v_name\n),\nteam_scores
-      as (\n  select\n    t.team_name,\n    `from`,\n    `to`, \n    sum(s.score)
-      as score,\n    number_of_games,\n    case when `to` - `from` = 0 then 1 else
-      `to` - `from` end as years_active\n  from scores s\n  join `sferrazza-cloud-sandbox.mlb.teams`
-      t on s.team_abbrev = t.abbrev\n  group by t.team_name, `from`, `to`, number_of_games\n)\nselect\n
-      \ team_name,\n  `from`,\n  `to`,\n  score,\n  years_active,\n  score / years_active
-      as avg_runs_per_year\nfrom team_scores\norder by avg_runs_per_year desc"
+      `${projectId}.mlb.game_logs`\n  group by h_name\n  union all\n  SELECT\n    v_name,\n
+      \   sum(v_score),\n    sum(v_game_number),\n    count(distinct concat(cast(game_date
+      as string), cast(v_game_number as string), v_name))\n  FROM `${projectId}.mlb.game_logs`\n
+      \ group by v_name\n),\nteam_scores as (\n  select\n    t.team_name,\n    `from`,\n
+      \   `to`, \n    sum(s.score) as score,\n    number_of_games,\n    case when
+      `to` - `from` = 0 then 1 else `to` - `from` end as years_active\n  from scores
+      s\n  join `${projectId}.mlb.teams` t on s.team_abbrev = t.abbrev\n  group by
+      t.team_name, `from`, `to`, number_of_games\n)\nselect\n  team_name,\n  `from`,\n
+      \ `to`,\n  score,\n  years_active,\n  score / years_active as avg_runs_per_year\nfrom
+      team_scores\norder by avg_runs_per_year desc"
     authorizeFromDatasetIds:
     - mlb
