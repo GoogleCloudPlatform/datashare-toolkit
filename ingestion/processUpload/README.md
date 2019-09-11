@@ -292,10 +292,12 @@ ingested from GCS) will contain a distinct batch ID.
 The data stored within the ```bqds_batch_id``` column is of a
 ```STRING``` type that adheres to the following convention:
 
-```<UNIX timestamp in milliseconds denoting the time of the batch's
+```
+<UNIX timestamp in milliseconds denoting the time of the batch's
 execution>:<event ID of the processUpload trigger from the GCS
 bucket>:<storage bucket name where file was uploaded>:<uploaded file
-name that was processed>```
+name that was processed>
+```
 
 ## Required IAM roles
 
