@@ -172,7 +172,7 @@ Lastly, you will need to populate the ```groups``` and ```groupEntitlements``` t
 
 ## Example configurations
 
-A configuration can be created in either JSON or YAML format. You can find examples in the Git repository within the [examples](../examples) folder.
+A configuration can be created in either JSON or YAML format. You can find examples in the Git repository within the [examples](../examples/MLB/config) folder.
 
 - [JSON simple example](../examples/MLB/config/simple.json)
 - [YAML simple example](../examples/MLB/config/simple.yaml)
