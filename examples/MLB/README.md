@@ -8,7 +8,7 @@ For this BQDS example, we configure and load MLB [1871-2018 Game Logs](https://w
 ## Injestion
 - [Ballparks](./data/mlb.ballpark.txt) - Raw data for ballparks available at [Retrosheet](https://www.retrosheet.org/parkcode.txt).
 - [Teams](./data/mlb.teams.txt) - Raw data for ballparks available at [Retrosheet](https://www.retrosheet.org/TeamIDs.htm).
-- 1871-2018 Game Logs - Raw data for 1871-2018 Game Logs available at [Retrosheet](https://www.retrosheet.org/gamelogs/gl1871_2018.zip).
+- 1871-2018 Game Logs - Raw data for 1871-2018 Game Logs available at [Retrosheet](https://www.retrosheet.org/gamelogs/index.html).
 
 ## Entitlements
 - [JSON simple example](./config/simple.json)
@@ -22,4 +22,4 @@ The following directories are included in the example:
 - [data](./data) - Contains raw data and license used for the example.
 
 ## License
-The license for the [Retrosheet](https://www.retrosheet.org) data is available [here](https://www.retrosheet.org/notice.txt), or can be found locally in this repository [here](./data/RETROSHEET_LICENSE.txt).
+The license for [Retrosheet](https://www.retrosheet.org) data is available [here](https://www.retrosheet.org/notice.txt), or can be found locally in this repository [here](./data/RETROSHEET_LICENSE.txt).
