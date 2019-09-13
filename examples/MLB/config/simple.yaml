@@ -43,7 +43,7 @@ datasets:
 views:
 - datasetNames:
   - ny_fans
-  name: game_logs
+  name: ny_game_logs
   expiration:
     delete: true
     time: 1597944246000
@@ -61,7 +61,7 @@ views:
       limit: 20
 - datasetNames:
   - chicago_fans
-  name: game_logs
+  name: chicago_game_logs
   source:
     datasetId: mlb
     tableId: game_logs
