@@ -1,0 +1,810 @@
+{
+    "delimiter": ",",
+    "fields": [
+	{
+	    "type": "STRING",
+	    "name": "date",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "number_of_game",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "day_of_week",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_league",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_game_number",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_league",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_game_number",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_score",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_score",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "length_outs",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "day_night",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "completion",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "forefeit",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "protest",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "park_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "attendance",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "length_minutes",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_line_score",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_line_score",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_at_bats",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_hits",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_doubles",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_triples",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_homeruns",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_rbi",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_sacrifice_hits",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_sacrifice_flies",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_hit_by_pitch",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_walks",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_intentional_walks",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_strikeouts",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_stolen_bases",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_caught_stealing",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_grounded_into_double",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_first_catcher_interference",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_left_on_base",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_pitchers_used",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_individual_earned_runs",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_team_earned_runs",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_wild_pitches",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_balks",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_putouts",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_assists",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_errors",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_passed_balls",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_double_plays",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_triple_plays",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_at_bats",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_hits",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_doubles",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_triples",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_homeruns",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_rbi",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_sacrifice_hits",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_sacrifice_flies",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_hit_by_pitch",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_walks",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_intentional_walks",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_strikeouts",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_stolen_bases",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_caught_stealing",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_grounded_into_double",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_first_catcher_interference",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_left_on_base",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_pitchers_used",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_individual_earned_runs",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_team_earned_runs",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_wild_pitches",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_balks",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_putouts",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_assists",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_errors",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_passed_balls",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_double_plays",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_triple_plays",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "hp_umpire_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "hp_umpire_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "_1b_umpire_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "_1b_umpire_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "_2b_umpire_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "_2b_umpire_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "_3b_umpire_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "_3b_umpire_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "lf_umpire_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "lf_umpire_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "rf_umpire_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "rf_umpire_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_manager_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_manager_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_manager_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_manager_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "winning_pitcher_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "winning_pitcher_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "losing_pitcher_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "losing_pitcher_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "saving_pitcher_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "saving_pitcher_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "winning_rbi_batter_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "winning_rbi_batter_id_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_starting_pitcher_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_starting_pitcher_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_starting_pitcher_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_starting_pitcher_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_1_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_1_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_player_1_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_2_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_2_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_player_2_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_3_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_3_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_player_3_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_4_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_4_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_player_4_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_5_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_5_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_player_5_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_6_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_6_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_player_6_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_7_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_7_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_player_7_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_8_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_8_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_player_8_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_9_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "v_player_9_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "v_player_9_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_1_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_1_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_player_1_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_2_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_2_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_player_2_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_3_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_3_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_player_3_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_4_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_4_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_player_4_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_5_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_5_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_player_5_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_6_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_6_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_player_6_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_7_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_7_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_player_7_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_8_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_8_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_player_8_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_9_id",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "h_player_9_name",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "INTEGER",
+	    "name": "h_player_9_def_pos",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "STRING",
+	    "name": "additional_info",
+	    "mode": "NULLABLE"
+	},
+	{
+	    "type": "BOOLEAN",
+	    "name": "acquisition_info",
+	    "mode": "NULLABLE"
+	}
+    ]
+}
