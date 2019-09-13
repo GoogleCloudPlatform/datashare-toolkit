@@ -27,9 +27,9 @@ For this BQDS example, we configure and load MLB [1871-2018 Game Logs](https://w
         ```
 
 ## Entitlements
-- Simple Example - [JSON](./config/simple.json) [YAML](./config/simple.yaml)
+- Simple Example - [JSON](./config/simple.json) | [YAML](./config/simple.yaml)
     - In the Simple example, there are two audiences - New York Fans, and Chicago Fans. We create two datasets to manage separate permissions for each - ny_fans and chicago_fans. We create two views, both have accessControl enabled, and are filtering rows by the team column label. For the `ny_game_logs` view we also configured `publicAccess` which allows a user with view access but no row-level access to view rows where the game_numer is 1 - limited to 20 results.
-- Complex Example - [JSON](./config/complex.json) [YAML](./config/complex.yaml)
+- Complex Example - [JSON](./config/complex.json) | [YAML](./config/complex.yaml)
     - For the complex example, we configured custom queries for each of three configured views. Additionally, we added the `authorizeFromDatasetIds` property within `custom` to ensure that the `mlb` dataset is authorized for access by these newly created views.
 
 ## Directories
