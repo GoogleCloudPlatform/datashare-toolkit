@@ -43,7 +43,7 @@ datasets:
 views:
 - datasetNames:
   - ny_fans
-  name: home_game_logs
+  name: game_logs
   expiration:
     delete: true
     time: 1597944246000
@@ -52,7 +52,7 @@ views:
     tableId: game_logs
     accessControl:
       enabled: true
-      datasetEnabled: true
+      datasetEnabled: false
       labelColumn: label
       labelColumnDelimiter: "|"
     publicAccess:
@@ -61,7 +61,7 @@ views:
       limit: 20
 - datasetNames:
   - chicago_fans
-  name: away_game_logs
+  name: game_logs
   source:
     datasetId: mlb
     tableId: game_logs

@@ -44,7 +44,7 @@
       "datasetNames": [
         "ny_fans"
       ],
-      "name": "home_game_logs",
+      "name": "ny_game_logs",
       "expiration": {
         "delete": true,
         "time": 1597944246000
@@ -54,7 +54,7 @@
         "tableId": "game_logs",
         "accessControl": {
           "enabled": true,
-          "datasetEnabled": true,
+          "datasetEnabled": false,
           "labelColumn": "label",
           "labelColumnDelimiter": "|"
         },
@@ -69,7 +69,7 @@
       "datasetNames": [
         "chicago_fans"
       ],
-      "name": "away_game_logs",
+      "name": "chicago_game_logs",
       "source": {
         "datasetId": "mlb",
         "tableId": "game_logs",
