@@ -35,6 +35,8 @@ For this BQDS example, we configure and load MLB [1871-2018 Game Logs](https://w
 ## Directories
 The following directories are included in the example:
 - [config](./config) - Contains injestion configuration files and entitlement-engine configuration files.
+    - [ingestion](./config/ingestion) - Contains the ingestion configuration files.
+    - [entitlements](./config/entitlements) - Contains the entitlement-engine configuration files.
 - [data](./data) - Contains raw data and license used for the example.
 
 ## License
