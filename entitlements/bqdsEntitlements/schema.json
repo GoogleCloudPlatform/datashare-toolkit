@@ -208,7 +208,8 @@
           "type": "string"
         },
         "limit": {
-          "type": "integer"
+          "type": "integer",
+          "minimum": "1"
         }
       },
       "required": [
