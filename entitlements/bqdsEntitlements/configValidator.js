@@ -180,7 +180,7 @@ async function validateSchema(config) {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-            "delete": { "type": "bool" },
+            "delete": { "type": "boolean" },
             "time": { "type": "integer" }
         },
         "required": ["time"]
@@ -193,7 +193,7 @@ async function validateSchema(config) {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-            "enabled": { "type": "bool" },
+            "enabled": { "type": "boolean" },
             "queryFilter": { "type": "string" },
             "limit": { "type": "integer" }
         },
@@ -229,8 +229,8 @@ async function validateSchema(config) {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-            "enabled": { "type": "bool" },
-            "datasetEnabled": { "type": "bool" },
+            "enabled": { "type": "boolean" },
+            "datasetEnabled": { "type": "boolean" },
             "labelColumn": { "type": "string" },
             "labelColumnDelimiter": { "type": "string" },
             "labels": {
