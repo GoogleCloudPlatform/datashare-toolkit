@@ -84,10 +84,12 @@
       "additionalProperties": false,
       "properties": {
         "userByEmail": {
-          "type": "string"
+          "type": "string",
+          "format": "email"
         },
         "groupByEmail": {
-          "type": "string"
+          "type": "string",
+          "format": "email"
         },
         "domain": {
           "type": "string"
