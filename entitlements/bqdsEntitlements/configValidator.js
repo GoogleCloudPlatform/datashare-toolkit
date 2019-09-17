@@ -103,6 +103,10 @@ async function validate(config) {
 async function validateSchema(config) {
     var v = new Validator();
     var schema = require("./schema.json");
+
+    // Set the minimum time
+    schema.definitions.expiration.properties.time.minimum = (new Date()).getTime();
+    
     let validationResult = v.validate(config, schema);
 
     if (RuntimeConfiguration.VERBOSE_MODE) {
