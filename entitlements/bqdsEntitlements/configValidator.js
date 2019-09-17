@@ -117,31 +117,6 @@ async function validateSchema(config) {
 }
 
 /**
- * @param  {} input
- * This could be made into a custom validation rather than using a format validator to make the error message more descriptive.
- * TODO: Duplicate check for access items across dataset and groups.
- */
-Validator.prototype.customFormats.accessValidator = function (input) {
-    var isValid = true;
-    const validKeys = [
-        "userByEmail",
-        "groupByEmail",
-        "domain",
-        "specialGroup",
-        "iamMember"
-    ];
-
-    const keys = Object.keys(input);
-    keys.forEach(function (key) {
-        if (!validKeys.includes(key)) {
-            isValid = false;
-        }
-    });
-
-    return isValid && keys.length === 1;
-};
-
-/**
  * @param  {} config
  */
 async function validateRoot(config) {

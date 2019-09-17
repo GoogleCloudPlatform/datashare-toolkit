@@ -99,7 +99,33 @@
           "type": "string"
         }
       },
-      "format": "accessValidator"
+      "oneOf": [
+        {
+          "required": [
+            "userByEmail"
+          ]
+        },
+        {
+          "required": [
+            "groupByEmail"
+          ]
+        },
+        {
+          "required": [
+            "domain"
+          ]
+        },
+        {
+          "required": [
+            "specialGroup"
+          ]
+        },
+        {
+          "required": [
+            "iamMember"
+          ]
+        }
+      ]
     },
     "group": {
       "id": "/group",
