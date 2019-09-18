@@ -51,7 +51,8 @@
       "additionalProperties": false,
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 1024
         },
         "accessControlLabels": {
           "type": "array",
@@ -157,12 +158,14 @@
       "additionalProperties": false,
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 1024
         },
         "datasetNames": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 1024
           },
           "uniqueItems": true
         },
@@ -224,22 +227,26 @@
       "additionalProperties": false,
       "properties": {
         "datasetId": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 1024
         },
         "tableId": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 1024
         },
         "visibleColumns": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 128
           },
           "uniqueItems": true
         },
         "hiddenColumns": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 128
           },
           "uniqueItems": true
         },
@@ -270,7 +277,8 @@
           "type": "boolean"
         },
         "labelColumn": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 128
         },
         "labelColumnDelimiter": {
           "type": "string"
@@ -298,7 +306,8 @@
         "authorizeFromDatasetIds": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 1024
           },
           "uniqueItems": true
         }
@@ -313,10 +322,12 @@
       "additionalProperties": false,
       "properties": {
         "datasetId": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 1024
         },
         "viewId": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 1024
         }
       },
       "required": [
