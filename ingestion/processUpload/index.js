@@ -19,7 +19,7 @@
 const { BigQuery } = require('@google-cloud/bigquery');
 const { Storage } = require('@google-cloud/storage');
 const path = require('path');
-// TODO: Add StackDriver client libraries for alerting
+// TODO(b/139874392): Add StackDriver logging for ingestion and entitlement events
 const bigqueryClient = new BigQuery();
 const storageClient = new Storage();
 let datasetId;
@@ -32,6 +32,10 @@ const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
 const stagingTableExpiryDays = 2;
 const processPrefix = "bqds";
 
+/**
+ * @param  {} event
+ * @param  {} context
+ */
 exports.processEvent = async (event, context) => {
     console.log(`Object notification arrived for gs://${event.bucket}/${event.name}`);
     if (canProcess(event.name)) {
@@ -53,6 +57,10 @@ exports.processEvent = async (event, context) => {
     return;
 }
 
+/**
+ * @param  {} event
+ * @param  {} context
+ */
 async function extractConfiguration(event, context) {
     const config = {};
     const dest = getDestination(event.name).split('.');
@@ -66,7 +74,10 @@ async function extractConfiguration(event, context) {
     return config;
 }
 
-/** determine whether a file suffix is recognized for ingestion */
+/**
+ * Determine whether a file suffix is recognized for ingestion.
+ * @param  {} fileName
+ */
 function canProcess(fileName) {
     const parts = fileName.split('.');
     if (parts[0] &&
@@ -80,6 +91,10 @@ function canProcess(fileName) {
     }
 }
 
+/**
+ * Generates the batch Id.
+ * @param  {} config
+ */
 function generateBatchId(config) {
     return [
         new Date().getTime(),
@@ -89,10 +104,14 @@ function generateBatchId(config) {
     ].join(':');
 }
 
+/**
+ * Exceutes the sql transformation.
+ * @param  {} config
+ */
 async function transform(config) {
     const batchId = generateBatchId(config);
     const transformQuery = await fromStorage(config.bucket,
-                                             `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
+        `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
     const dataset = await bigqueryClient.dataset(config.dataset);
     const exists = tableExists(config.dataset, config.destinationTable)
     if (!exists) {
@@ -108,6 +127,11 @@ async function transform(config) {
     return;
 }
 
+/**
+ * Deletes a BQ table.
+ * @param  {} dataset
+ * @param  {} tableName
+ */
 async function deleteTable(dataset, tableName) {
     const ds = await bigqueryClient.dataset(dataset);
     console.log('Deleting temp table ' + tableName);
@@ -116,6 +140,10 @@ async function deleteTable(dataset, tableName) {
     console.log("delete table: " + JSON.stringify(response));
 }
 
+/**
+ * Loads data into BQ staging table.
+ * @param  {} config
+ */
 async function stageFile(config) {
     console.log(`using meta ` + JSON.stringify(config.metadata));
     const dataset = bigqueryClient.dataset(config.dataset);
@@ -144,6 +172,10 @@ async function stageFile(config) {
     return;
 }
 
+/**
+ * @param  {} bucket
+ * @param  {} file
+ */
 async function fromStorage(bucket, file) {
     try {
         return await storageClient
@@ -156,6 +188,11 @@ async function fromStorage(bucket, file) {
     }
 }
 
+/**
+ * Returns value indicating if a BQ table exists.
+ * @param  {} datasetId
+ * @param  {} tableName
+ */
 async function tableExists(datasetId, tableName) {
     const dataset = bigqueryClient.dataset(datasetId);
     const table = dataset.table(tableName);
@@ -163,6 +200,10 @@ async function tableExists(datasetId, tableName) {
     return await table.exists();
 }
 
+/**
+ * Returns value indicating if a BQ dataset exists.
+ * @param  {} datasetId
+ */
 async function datasetExists(datasetId) {
     const dataset = bigqueryClient.dataset(datasetId);
     let results = await dataset.exists();
@@ -170,11 +211,21 @@ async function datasetExists(datasetId) {
     return results.length > 0 ? results[0] : false;
 }
 
+/**
+ * Creates a dataset.
+ * @param  {} datasetId
+ */
 async function createDataset(datasetId) {
     let dataset = bigqueryClient.dataset(datasetId);
     return await dataset.create()
 }
 
+/**
+ * Creates query job for the transformation query.
+ * @param  {} datasetId
+ * @param  {} destTableId
+ * @param  {} query
+ */
 async function runTransform(datasetId, destTableId, query) {
     const options = {
         location: defaultLocation,
@@ -194,6 +245,10 @@ async function runTransform(datasetId, destTableId, query) {
     return await bigqueryClient.createQueryJob(options);
 }
 
+/**
+ * @param  {} bucket
+ * @param  {} schemaFileName
+ */
 async function getMetadata(bucket, schemaFileName) {
     const meta = {
         sourceFormat: 'CSV', // This doesn't seem to matter?
@@ -213,6 +268,9 @@ async function getMetadata(bucket, schemaFileName) {
     }
 }
 
+/**
+ * @param  {} fileName
+ */
 function getDestination(fileName) {
     let name = fileName.indexOf('/') >= 0 ?
         fileName.substring(fileName.lastIndexOf('/') + 1) :
@@ -228,6 +286,9 @@ function getDestination(fileName) {
     return name;
 }
 
+/**
+ * @param  {} message
+ */
 function log(message) {
     console.log(JSON.stringify(message, undefined, 1));
 }
