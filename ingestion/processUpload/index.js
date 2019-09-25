@@ -39,7 +39,7 @@ const processPrefix = "bqds";
 exports.processEvent = async (event, context) => {
     console.log(`Object notification arrived for gs://${event.bucket}/${event.name}`);
     if (canProcess(event.name)) {
-        const config = await extractConfiguration(event, context);
+        const config = await getConfiguration(event, context);
         const haveDataset = await datasetExists(config.dataset);
         if (!haveDataset) {
             console.log(`Dataset ${config.dataset} not found, creating...`);
@@ -61,7 +61,7 @@ exports.processEvent = async (event, context) => {
  * @param  {} event
  * @param  {} context
  */
-async function extractConfiguration(event, context) {
+async function getConfiguration(event, context) {
     const config = {};
     const dest = getDestination(event.name).split('.');
     config.dataset = dest[0];
@@ -71,6 +71,7 @@ async function extractConfiguration(event, context) {
     config.sourceFile = event.name;
     config.bucket = event.bucket;
     config.eventId = context.eventId;
+    console.log("configuration: " + JSON.stringify(config));
     return config;
 }
 
@@ -121,7 +122,7 @@ async function transform(config) {
     const table = dataset.table(config.destinationTable);
     const transform = `SELECT ${transformQuery}, '${batchId}' AS ${processPrefix}_batch_id FROM \`${config.dataset}.${config.stagingTable}\``;
     console.log(`executing transform query: ${transform}`);
-    const job = await runTransform(config.dataset, config.destinationTable, transform, config.metadata === undefined);
+    const job = await runTransform(config, transform);
     console.log(`${job[0].metadata.id} ${job[0].metadata.statistics.query.statementType} ${job[0].metadata.configuration.jobType} ${job[0].metadata.status.state}`);
     console.log("processing done");
     return;
@@ -145,10 +146,8 @@ async function deleteTable(dataset, tableName) {
  * @param  {} config
  */
 async function stageFile(config) {
-    console.log(`using meta ` + JSON.stringify(config.metadata));
+    console.log(`using config ` + JSON.stringify(config));
     const dataset = bigqueryClient.dataset(config.dataset);
-    log(config);
-
     const today = new Date();
     today.setDate(today.getDate() + stagingTableExpiryDays);
     const expiryTime = today.getTime();
@@ -178,10 +177,12 @@ async function stageFile(config) {
  */
 async function fromStorage(bucket, file) {
     try {
-        return await storageClient
+        let content = await storageClient
             .bucket(bucket)
             .file(file)
             .download();
+        console.log(`found gs://${bucket}/${file}: ${content}`);
+        return content;
     } catch (error) {
         console.info(`file ${file} not found in bucket ${bucket}`);
         return undefined;
@@ -206,7 +207,7 @@ async function tableExists(datasetId, tableName) {
  */
 async function datasetExists(datasetId) {
     const dataset = bigqueryClient.dataset(datasetId);
-    let results = await dataset.exists();
+    const results = await dataset.exists();
     console.log('dataset exists?: ' + JSON.stringify(results));
     return results.length > 0 ? results[0] : false;
 }
@@ -216,32 +217,33 @@ async function datasetExists(datasetId) {
  * @param  {} datasetId
  */
 async function createDataset(datasetId) {
-    let dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigqueryClient.dataset(datasetId);
     return await dataset.create()
 }
 
 /**
  * Creates query job for the transformation query.
- * @param  {} datasetId
- * @param  {} destTableId
+ * @param  {} config
  * @param  {} query
  */
-async function runTransform(datasetId, destTableId, query) {
+async function runTransform(config, query) {
+    console.log("configuration for runTransform: " + JSON.stringify(config));
     const options = {
         location: defaultLocation,
         destinationTable: {
             projectId: process.env.GCP_PROJECT,
-            datasetId: datasetId,
-            tableId: destTableId
+            datasetId: config.dataset,
+            tableId: config.destinationTable
         },
         createDisposition: "CREATE_IF_NEEDED",
-        writeDisposition: "WRITE_APPEND",
+        writeDisposition: (config.metadata.truncate ? "WRITE_TRUNCATE" : "WRITE_APPEND"),
         query: query,
         jobPrefix: `${processPrefix}_`,
         timePartitioning: {
             type: 'DAY'
         }
     };
+    console.log("BigQuery options: " + JSON.stringify(options));
     return await bigqueryClient.createQueryJob(options);
 }
 
@@ -250,20 +252,20 @@ async function runTransform(datasetId, destTableId, query) {
  * @param  {} schemaFileName
  */
 async function getMetadata(bucket, schemaFileName) {
-    const meta = {
-        sourceFormat: 'CSV', // This doesn't seem to matter?
-        skipLeadingRows: 1,
-        maxBadRecords: 0,
-        location: defaultLocation
-    };
-    let schema = await fromStorage(bucket, schemaFileName);
-    if (!schema) {
+    const schemaConfig = await fromStorage(bucket, schemaFileName);
+    console.log("schema.json: " + schemaConfig);
+    if (!schemaConfig) {
+        console.log("No metadata found");
         return undefined;
     } else {
-        let config = JSON.parse(schema);
-        meta.fields = config.fields;
-        meta.fieldDelimiter = config.delimiter;
-        log(meta);
+        const config = JSON.parse(schemaConfig);
+        const meta = config.metadata;
+        meta.truncate = config.truncate;
+        meta.sourceFormat = 'CSV'; // This doesn't seem to matter?
+        meta.skipLeadingRows = 1;
+        meta.maxBadRecords = 0;
+        meta.location = defaultLocation;
+        console.log("using metadata: " + JSON.stringify(meta));
         return meta;
     }
 }

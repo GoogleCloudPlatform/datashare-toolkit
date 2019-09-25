@@ -14,8 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Execute an iteration of the BQDS end-to-end scenario 
 #
+# Execute a hermetic iteration of the BQDS end-to-end scenario 
+#
+# Script will use current project but will create all other
+# necessary objects from the source repository. Will require 
+# administrator privileges for Cloud Functions, Cloud Storage
+# and BigWuery
 
 if [ "$(basename `pwd`)" != "bin" ]
 then
@@ -100,7 +105,7 @@ then
 fi
 
 echo "Executing query: ${QUERY}"
-BQ_COUNT=$(echo "${QUERY}" | bq query --format=json --quiet | json -a .count)
+BQ_COUNT=$(echo "${QUERY}" | bq query --format=json --quiet --headless --use_legacy_sql=false| json -a .count)
 if [ $? -ne 0 ]
 then
     echo "!!!!!!!!!!!!!!!!!!!!!"
