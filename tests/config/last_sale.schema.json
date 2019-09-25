@@ -1,5 +1,6 @@
 {
     "delimiter": ",",
+    "truncate": "true",
     "fields": [
         {"type":"INT64","name":"timestamp","mode":"REQUIRED"},
         {"type":"STRING","name":"symbol","mode":"REQUIRED"},

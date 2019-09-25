@@ -121,7 +121,7 @@ async function transform(config) {
     const table = dataset.table(config.destinationTable);
     const transform = `SELECT ${transformQuery}, '${batchId}' AS ${processPrefix}_batch_id FROM \`${config.dataset}.${config.stagingTable}\``;
     console.log(`executing transform query: ${transform}`);
-    const job = await runTransform(config.dataset, config.destinationTable, transform, config.metadata === undefined);
+    const job = await runTransform(config, transform);
     console.log(`${job[0].metadata.id} ${job[0].metadata.statistics.query.statementType} ${job[0].metadata.configuration.jobType} ${job[0].metadata.status.state}`);
     console.log("processing done");
     return;
@@ -178,10 +178,11 @@ async function stageFile(config) {
  */
 async function fromStorage(bucket, file) {
     try {
-        return await storageClient
+        let content = await storageClient
             .bucket(bucket)
             .file(file)
             .download();
+        console.log(`${bucket}/${file}: ${content}`);
     } catch (error) {
         console.info(`file ${file} not found in bucket ${bucket}`);
         return undefined;
@@ -222,26 +223,26 @@ async function createDataset(datasetId) {
 
 /**
  * Creates query job for the transformation query.
- * @param  {} datasetId
- * @param  {} destTableId
+ * @param  {} config
  * @param  {} query
  */
-async function runTransform(datasetId, destTableId, query) {
+async function runTransform(config, query) {
     const options = {
         location: defaultLocation,
         destinationTable: {
             projectId: process.env.GCP_PROJECT,
-            datasetId: datasetId,
-            tableId: destTableId
+            datasetId: config.datasetId,
+            tableId: config.destinationTable
         },
         createDisposition: "CREATE_IF_NEEDED",
-        writeDisposition: "WRITE_APPEND",
+        writeDisposition: config.truncate ? "WRITE_TRUNCATE" : "WRITE_APPEND",
         query: query,
         jobPrefix: `${processPrefix}_`,
         timePartitioning: {
             type: 'DAY'
         }
     };
+    console.log("BigQuery options: " + JSON.stringify(options));
     return await bigqueryClient.createQueryJob(options);
 }
 
