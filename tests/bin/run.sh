@@ -105,7 +105,7 @@ then
 fi
 
 echo "Executing query: ${QUERY}"
-BQ_COUNT=$(echo "${QUERY}" | bq query --format=csv --quiet | tail -1)
+BQ_COUNT=$(echo "${QUERY}" | bq query --format=json --quiet --headless --use_legacy_sql=false| json -a .count)
 if [ $? -ne 0 ]
 then
     echo "!!!!!!!!!!!!!!!!!!!!!"
