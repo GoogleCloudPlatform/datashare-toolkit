@@ -71,6 +71,7 @@ async function extractConfiguration(event, context) {
     config.sourceFile = event.name;
     config.bucket = event.bucket;
     config.eventId = context.eventId;
+    console.log("configuration: " + JSON.stringify(config));
     return config;
 }
 
@@ -182,7 +183,7 @@ async function fromStorage(bucket, file) {
             .bucket(bucket)
             .file(file)
             .download();
-        console.log(`${bucket}/${file}: ${content}`);
+        console.log(`gs://${bucket}/${file}: ${content}`);
     } catch (error) {
         console.info(`file ${file} not found in bucket ${bucket}`);
         return undefined;
@@ -207,7 +208,7 @@ async function tableExists(datasetId, tableName) {
  */
 async function datasetExists(datasetId) {
     const dataset = bigqueryClient.dataset(datasetId);
-    let results = await dataset.exists();
+    const results = await dataset.exists();
     console.log('dataset exists?: ' + JSON.stringify(results));
     return results.length > 0 ? results[0] : false;
 }
@@ -217,7 +218,7 @@ async function datasetExists(datasetId) {
  * @param  {} datasetId
  */
 async function createDataset(datasetId) {
-    let dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigqueryClient.dataset(datasetId);
     return await dataset.create()
 }
 
@@ -227,6 +228,7 @@ async function createDataset(datasetId) {
  * @param  {} query
  */
 async function runTransform(config, query) {
+    console.log("configuration for runTransform: " + JSON.stringify(config));
     const options = {
         location: defaultLocation,
         destinationTable: {
@@ -235,7 +237,7 @@ async function runTransform(config, query) {
             tableId: config.destinationTable
         },
         createDisposition: "CREATE_IF_NEEDED",
-        writeDisposition: config.truncate ? "WRITE_TRUNCATE" : "WRITE_APPEND",
+        writeDisposition: (config.metadata.truncate ? "WRITE_TRUNCATE" : "WRITE_APPEND"),
         query: query,
         jobPrefix: `${processPrefix}_`,
         timePartitioning: {
@@ -251,20 +253,23 @@ async function runTransform(config, query) {
  * @param  {} schemaFileName
  */
 async function getMetadata(bucket, schemaFileName) {
-    const meta = {
-        sourceFormat: 'CSV', // This doesn't seem to matter?
-        skipLeadingRows: 1,
-        maxBadRecords: 0,
-        location: defaultLocation
-    };
-    let schema = await fromStorage(bucket, schemaFileName);
+    const schema = await fromStorage(bucket, schemaFileName);
+    console.log("schema.json: " + schema);
     if (!schema) {
+        console.log("No metadata found");
         return undefined;
     } else {
-        let config = JSON.parse(schema);
+        const config = JSON.parse(schema);
+        const meta = {
+            sourceFormat: 'CSV', // This doesn't seem to matter?
+            skipLeadingRows: 1,
+            maxBadRecords: 0,
+            location: defaultLocation
+        };
         meta.fields = config.fields;
         meta.fieldDelimiter = config.delimiter;
-        log(meta);
+        meta.truncate = config.truncate;
+        console.log("using metadata: " + JSON.stringify(meta));
         return meta;
     }
 }
