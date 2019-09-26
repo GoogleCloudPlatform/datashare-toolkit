@@ -1,4 +1,4 @@
-[Back to BQDS](../../README.md)
+uto_[Back to BQDS](../../README.md)
 
 # ```processUpload```: ingestion Cloud Function for batch data uploads
 
@@ -15,19 +15,21 @@ specified BigQuery dataset and table for that file.
 A summary of the logic within the ```processUpload``` Cloud Function
 is:
 
-1. Parse the dataset and table name from the bucket's inbound file
+0. If the file is not a configuration under `gs://<bucket>/bqds`, and
+   is of a recognized file type...
+1. Extract the dataset and table names from the bucket's inbound file
+   name, determined by the first two tokens delimited by `.` in the
+   file name, e.g. `mydataset.mytable.upload.1.csv`
 2. Determine whether the dataset exists and, if not, create it
-3. Look for `<table_name>.schema.json` to get the delimiter and field
-   schema. If it does not exist, instruct the BigQuery job to
-   auto-detect the schema and delimiters.
-4. Execute a job to load the file's contents, using the determined schema,
-into a temporary table
-5. Look for `<table_name>.transform.sql`, if it doesn't exist, default
-to `*`
+3. Look for `<table_name>.schema.json` to get the delimiter, field
+   definitions, and write disposition. If it these do not exist, instruct the BigQuery job to
+   auto-detect the schema and delimiters and apply a null transform to
+   the data.
+4. Execute a BigQuery job to load the file's contents into a temporary table
 6. Execute SQL that uses the `SELECT` clause specified
-   in`<table_name>.transform.sql` (or `*`), saving the results (either
-   creating or appending) into `<table_name>`
-7. Delete the temporary table
+   in`<table_name>.transform.sql` (or  the null transform`*`), saving the results (creating or appending) into the specified destination tablex
+7. Delete the temporary table after a successful transformation
+   stage (temporary tables otherwise expire in 2 days).
    
 ## Ingestion architecture
 
@@ -35,7 +37,7 @@ to `*`
 
 ## Processing
 
-The ingestion process starts when a file is uploaded to the source
+The ingestion process starts after a file has been uploaded to the source
 bucket where data files will be uploaded. The configured Cloud
 Function trigger will be invoked with a pointer to the new file.
 
@@ -103,13 +105,15 @@ used to delimit columns in each row of the CSV file. An example
 
 ```
 {
-    "delimiter": "|",
-    "fields": [
-        {"name": "ts_ms", "type": "integer"},
-        {"name": "object", "type": "string"},
-        {"name": "weight", "type": "float"},
-        {"name": "unit_of_measurement", "type": "string"}
-    ]
+    "metadata": {
+        "fieldDelimiter": "|",
+            "fields": [
+                {"name": "ts_ms", "type": "integer"},
+                {"name": "object", "type": "string"},
+                {"name": "weight", "type": "float"},
+                {"name": "unit_of_measurement", "type": "string"}
+            ]
+    }
 }
 ```
 
@@ -251,14 +255,38 @@ be less necessity to transform the data.
 
 ## Configuring ingestion
 
-Two files can be used to instrument the ingestion of data files, both of which
+Two configuration files are used to instrument the ingestion of data files, both of which
 are optional.
 
 - ```*.schema.json```
 
 ```<table_name>.schema.json``` files are placed in the ```bqds```
-subdirectory of the storage bucket, one each per destination table. The file specifies the delimiter to be used on the source data, as well as the column names and types for the
-inbound file, using the same format as BigQuery's schema definitions.
+subdirectory of the storage bucket, one each per destination
+table. The file specifies the delimiter to be used on the source data,
+as well as the column names and types for the inbound file, which
+inherits the same format as BigQuery's schema definitions. By default,
+the records in each individual file will be appended to the
+destination table (if that table already exists - the table will be
+created if it does not). If you prefer to
+have existing table data cleared out for each data load (for example, when you
+have tables that represent a complete set of the relevant data and it
+needs to be replaced wholesale each time), add a `"truncate": "true"`
+property to the JSON configuration:
+
+```
+{
+    "metadata": {
+        "fieldDelimiter": "|",
+            "fields": [
+                {"name": "ts_ms", "type": "integer"},
+                {"name": "object", "type": "string"},
+                {"name": "weight", "type": "float"},
+                {"name": "unit_of_measurement", "type": "string"}
+            ]
+        },
+        "truncate": "true"
+}
+```
 
 - ```*.transform.sql```
 
