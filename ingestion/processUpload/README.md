@@ -1,4 +1,4 @@
-uto_[Back to BQDS](../../README.md)
+[Back to BQDS](../../README.md)
 
 # ```processUpload```: ingestion Cloud Function for batch data uploads
 
