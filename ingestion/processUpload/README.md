@@ -97,8 +97,8 @@ transformation from the originally specified schema. The
 ```EXAMPLE.schema.json``` file can also be omitted, in which case BigQuery
 will attempt to autodetect the schema from the file contents.
 
-The content within ```EXAMPLE.schema.json``` is a JSON object with two properties. The
-```fields``` property is identical in format to BigQuery's JSON-based
+The content within ```EXAMPLE.schema.json``` is a JSON object representation. The
+```metadata``` property is identical in format to BigQuery's JSON-based
 [schema representation ](https://cloud.google.com/bigquery/docs/schemas). The ```delimiter``` property specifies the single character
 used to delimit columns in each row of the CSV file. An example
 ```.schema.json```  might resemble:
@@ -107,12 +107,12 @@ used to delimit columns in each row of the CSV file. An example
 {
     "metadata": {
         "fieldDelimiter": "|",
-            "fields": [
-                {"name": "ts_ms", "type": "integer"},
-                {"name": "object", "type": "string"},
-                {"name": "weight", "type": "float"},
-                {"name": "unit_of_measurement", "type": "string"}
-            ]
+        "fields": [
+            {"name": "ts_ms", "type": "integer"},
+            {"name": "object", "type": "string"},
+            {"name": "weight", "type": "float"},
+            {"name": "unit_of_measurement", "type": "string"}
+        ]
     }
 }
 ```
@@ -138,13 +138,13 @@ will fail to process, since BigQuery only interprets string DATEs in the format 
 
 Provided that you ultimately want the data represented as a DATE type,
 the source data destined for ```DS.EXAMPLE``` requires transformation from
-the original data file schemas - and these per-column transformations are
+the original data file schemas. These per-column transformations are
 specified in ```EXAMPLE.transform.sql``` (stored witin the source
-bucket's ```bqds``` subdirectory..
+bucket's ```bqds``` subdirectory).
 
 The format of ```EXAMPLE.transform.sql``` is simply a SQL fragment
 that queries the original schema, either auto-detected or defined by
-``` EXAMPLE.schema.json```. In ```EXAMPLE.transform.sql`, the SQL
+``` EXAMPLE.schema.json```. In ```EXAMPLE.transform.sql```, the SQL
 fragment is essentially the ```SELECT``` clause (including aggregate
 or synthetic columns) of a statement that queries the temporary table,
 but omitting the literal ```SELECT``` and everything following and inclusive of the ```WHERE``` clause of the query.
