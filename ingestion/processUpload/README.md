@@ -172,11 +172,11 @@ weight,
 unit_of_measurement
 ```
 
-Hence, ```DS.EXAMPLE```'s schema is inferred at runtime by the
+Hence, ```DS.EXAMPLE```'s  ultimate schema is inferred at runtime by the
 contents of ```EXAMPLE.transform.sql``` and not explicitly as it is
 for the temporary table staging the CSV file.
 
-The configuration files are placed in the
+Configuration files are placed in the
 ```gs:.//example-bucket/bqds``` subdirectory of the source
 bucket. They are recognized by the Cloud Function as special, so it
 won't treat them as normal data files to process. They can be copied to the source bucket with this command:
@@ -186,12 +186,12 @@ won't treat them as normal data files to process. They can be copied to the sour
 ## Transformation options
 
 There are generally two ways of transforming data from the
-representation in your data file to the target representation you
-expose to consumers. If you know the schema in advance, you can author
+representation in your data file to the target representation that is
+available to consumers. If you know the schema in advance, you can author
 a ```<table>.schema.json``` file that embeds the schema in BigQuey
 format.
 
-If you do not know or do not wish to author the schema in advance, the
+If the schema is not available in advance, the
 data can be autodetected and, in the worst case scenario, be staged
 with all columns representing ```STRING```s. In this case, you can
 author a ```<table>..transform.sql``` with SQL-based transformations
@@ -210,7 +210,7 @@ The ```fields``` array of ```closing_prices.schema.json``` for this might be:
 ```
 {"name": "date", "type": "string"},
 {"name": "symbol", "type": "string"},
-{"name": "price", "type": "float"}
+{"name": "price", "type": "float64"}
 ```
 
 When ```schema.json``` is omitted, BigQuery's autodetect infers this as:
@@ -225,7 +225,7 @@ It is straightforward to transform either of these to a BigQuery ```DATE```
 type, but the integer representation requires a casting to
 ```STRING``` before running the ```SUBSTR``` function to further
 transform it into a
-```DATE``` within the ultimate destination table's column. Two different
+```DATE``` in the ultimate destination table's associated column. Two different
 ```closing_prices.transform.sql``` configurations illustrate this:
 
 ```
@@ -249,8 +249,6 @@ general, omitting a schema configuration and relying on auto-detect
 might require more transformations. If your source data is clean and
 wholly interpretable by BigQuery using a specific schema, there might
 be less necessity to transform the data.
-
-
 
 
 ## Configuring ingestion
