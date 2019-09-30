@@ -236,7 +236,9 @@ async function runTransform(config, query) {
             tableId: config.destinationTable
         },
         createDisposition: "CREATE_IF_NEEDED",
-        writeDisposition: (config.metadata.truncate ? "WRITE_TRUNCATE" : "WRITE_APPEND"),
+        writeDisposition: (config.metadata && config.metadata.truncate)
+            ? "WRITE_TRUNCATE"
+            : "WRITE_APPEND",
         query: query,
         jobPrefix: `${processPrefix}_`,
         timePartitioning: {
