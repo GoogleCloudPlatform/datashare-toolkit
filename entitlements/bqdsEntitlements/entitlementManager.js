@@ -21,8 +21,9 @@ const bigqueryUtil = require("./bigqueryUtil")
 const configUtil = require("./configUtil")
 const sqlBuilder = require("./sqlBuilder")
 const configValidator = require("./configValidator")
-var RuntimeConfiguration = require("./runtimeConfiguration");
+var RuntimeConfiguration = require("./runtimeConfiguration")
 const YAML = require('yaml')
+const uuidv4 = require('uuid/v4')
 
 /**
  * @param  {} path
@@ -110,6 +111,12 @@ async function processEntitlementConfig(config) {
     console.log("-------------------START - removeStaleObjects-------------------");
     await removeStaleObjects(config);
     console.log("-------------------END - removeStaleObjects-------------------\n");
+
+    if (RuntimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE) {
+        console.log("-------------------START - refreshDatasetPermissionTable-------------------");
+        await refreshDatasetPermissionTable(config);
+        console.log("-------------------END - refreshDatasetPermissionTable-------------------\n");
+    }
 }
 
 /**
@@ -135,8 +142,7 @@ async function setupPrerequisites(config) {
                 "name": "accessControlLabel",
                 "type": "STRING",
                 "mode": "REQUIRED"
-            }
-            ];
+            }];
             await bigqueryUtil.createTable(config.accessControl.datasetId, "groupEntitlements", groupEntitlementSchema);
         }
         if (await bigqueryUtil.tableExists(config.projectId, config.accessControl.datasetId, "groups") === false) {
@@ -154,13 +160,56 @@ async function setupPrerequisites(config) {
                 "name": "user",
                 "type": "STRING",
                 "mode": "REQUIRED"
-            }
-            ];
+            }];
             await bigqueryUtil.createTable(config.accessControl.datasetId, "groups", groupsSchema);
         }
         if (await bigqueryUtil.viewExists(config.projectId, config.accessControl.datasetId, config.accessControl.viewId) === false) {
             let viewSql = `select lower(g.viewName) as viewName, e.accessControlLabel\nfrom \`${config.projectId}.${config.accessControl.datasetId}.groups\` g\njoin \`${config.projectId}.${config.accessControl.datasetId}.groupEntitlements\` e on lower(g.groupName) = lower(e.groupName)\nwhere lower(g.user) = lower(session_user())`;
             await bigqueryUtil.createView(config.projectId, config.accessControl.datasetId, config.accessControl.viewId, viewSql, true, null, null);
+        }
+    }
+
+    if (RuntimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE === true) {
+        if (await bigqueryUtil.tableExists(config.projectId, config.accessControl.datasetId, "datasetPermissions") === false) {
+            let userPermissionsSchema = [{
+                "name": "uuid",
+                "type": "STRING",
+                "mode": "REQUIRED"
+            },
+            {
+                "name": "configurationName",
+                "type": "STRING",
+                "mode": "REQUIRED"
+            }, {
+                "name": "datasetId",
+                "type": "STRING",
+                "mode": "REQUIRED"
+            },
+            {
+                "name": "accessType",
+                "type": "STRING",
+                "mode": "REQUIRED"
+            },
+            {
+                "name": "accessId",
+                "type": "STRING",
+                "mode": "REQUIRED"
+            },
+            {
+                "name": "role",
+                "type": "STRING",
+                "mode": "REQUIRED"
+            },
+            {
+                "name": "lastUpdated",
+                "type": "TIMESTAMP",
+                "mode": "REQUIRED"
+            }];
+            await bigqueryUtil.createTable(config.accessControl.datasetId, "datasetPermissions", userPermissionsSchema);
+        }
+        if (await bigqueryUtil.viewExists(config.projectId, config.accessControl.datasetId, "latestDatasetPermissions") === false) {
+            let viewSql = `WITH RANKED AS (\n  select\n    configurationName,\n    uuid,\n    DENSE_RANK() OVER (PARTITION BY configurationName ORDER BY lastUpdated) as rank\n  from \`${config.projectId}.${config.accessControl.datasetId}.datasetPermissions\`\n),\nROWIDENTIFIERS AS (\n  SELECT r.uuid\n  from RANKED r\n  where r.rank = (select max(r2.rank) from RANKED r2 where r2.configurationName = r.configurationName)\n)\nSELECT\n * EXCEPT(uuid)\nFROM \`${config.projectId}.${config.accessControl.datasetId}.datasetPermissions\` t\nWHERE EXISTS (SELECT 1 from ROWIDENTIFIERS r WHERE t.uuid = r.uuid)`;
+            await bigqueryUtil.createView(config.projectId, config.accessControl.datasetId, "latestDatasetPermissions", viewSql, true, null, null);
         }
     }
 }
@@ -468,6 +517,33 @@ async function removeStaleObjects(config) {
     }
 }
 
+/**
+ * @param  {} config
+ */
+async function refreshDatasetPermissionTable(config) {
+    const uuid = uuidv4();
+    const [datasets] = await bigqueryUtil.getDatasets();
+    var accessRecords = [];
+    const date = new Date();
+    for (const ds of datasets) {
+        var dsMetadata = await bigqueryUtil.getDatasetMetadata(ds.id);
+        if (dsMetadata.labels && dsMetadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] == config.name) {
+            if (dsMetadata.access && dsMetadata.access.length > 0) {
+                dsMetadata.access.forEach(function (a) {
+                    const keys = Object.keys(a);
+                    if (keys.length == 2) {
+                        const accessType = keys[1];
+                        const accessId = a[accessType];
+                        // console.log(`Role: ${a.role} AccessType: ${accessType} AccessId: ${accessId}`);
+                        accessRecords.push({ uuid: uuid, configurationName: config.name, datasetId: ds.id, accessType: accessType, accessId: accessId, role: a.role, lastUpdated: date });
+                    }
+                });
+            }
+        }
+    }
+    await bigqueryUtil.insertRows(config.accessControl.datasetId, "datasetPermissions", accessRecords);
+}
+
 module.exports = {
-    processEntitlementConfigFile: processEntitlementConfigFile
+    processEntitlementConfigFile
 }
