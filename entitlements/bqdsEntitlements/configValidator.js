@@ -106,7 +106,7 @@ async function validateSchema(config) {
 
     // Set the minimum time
     schema.definitions.expiration.properties.time.minimum = (new Date()).getTime();
-    
+
     let validationResult = v.validate(config, schema);
 
     if (RuntimeConfiguration.VERBOSE_MODE) {
@@ -128,6 +128,12 @@ async function validateRoot(config) {
     // The way it's 'validated' now is by initializing the BigQuery client. If the projectId supplied does not exist an exception will be thrown.
     if (!config.projectId) {
         logIssue(IssueType.ERROR, "'projectId' not provided");
+    }
+
+    if (RuntimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE == true) {
+        if (!config.accessControl || !config.accessControl.datasetId || config.accessControl.datasetId.length == 0) {
+            logIssue(IssueType.ERROR, `'config.accessControl.datasetId' must be provided`);
+        }
     }
 }
 
