@@ -538,7 +538,7 @@ async function getTableLabelValue(datasetId, tableId, labelKey) {
 async function insertRows(datasetId, tableId, rows) {
     const dataset = bigqueryClient.dataset(datasetId);
     const table = dataset.table(tableId);
-    console.log(JSON.stringify(await table.insert(rows)));
+    await table.insert(rows);
 }
 
 module.exports = {
