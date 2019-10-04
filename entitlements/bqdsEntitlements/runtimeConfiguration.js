@@ -22,6 +22,7 @@ class RuntimeConfiguration {
         this.labelValidation = true;
         this.dryRun = false;
         this.prerequisiteSetupOnly = false;
+        this.refreshDatasetPermissionTable = true;
 
         var packageDescription = require('./package').description
         if (packageDescription) {
@@ -59,6 +60,13 @@ class RuntimeConfiguration {
     }
     set PREREQUISITE_SETUP_ONLY(flag) {
         this.prerequisiteSetupOnly = flag;
+    }
+
+    get REFRESH_DATASET_PERMISSION_TABLE() {
+        return this.refreshDatasetPermissionTable;
+    }
+    set REFRESH_DATASET_PERMISSION_TABLE(flag) {
+        this.refreshDatasetPermissionTable = flag;
     }
 }
 

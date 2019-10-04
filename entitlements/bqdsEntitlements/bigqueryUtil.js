@@ -535,6 +535,12 @@ async function getTableLabelValue(datasetId, tableId, labelKey) {
     return null;
 }
 
+async function insertRows(datasetId, tableId, rows) {
+    const dataset = bigqueryClient.dataset(datasetId);
+    const table = dataset.table(tableId);
+    await table.insert(rows);
+}
+
 module.exports = {
     init: init,
     validateQuery: validateQuery,
@@ -555,5 +561,6 @@ module.exports = {
     getDatasetLabelValue: getDatasetLabelValue,
     getTableLabelValue: getTableLabelValue,
     setDatasetMetadata: setDatasetMetadata,
-    setTableMetadata: setTableMetadata
+    setTableMetadata: setTableMetadata,
+    insertRows: insertRows
 }
