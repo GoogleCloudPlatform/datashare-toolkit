@@ -56,7 +56,7 @@ async function validateQuery(sql, limit) {
     if (limit && limit > 0) {
         var regex = /(.+limit\s)([\d]+)$/gi;
         var found = _sql.match(regex);
-        if (found != null) {
+        if (found !== null) {
             // If "limit n$" exists at the end of the string, update the limit count
             _sql = _sql.replace(regex, `$1${limit}`);
         }
@@ -129,7 +129,7 @@ async function objectExists(projectId, datasetId, tableId, tableType) {
             params: { _tableType: tableType, _tableName: tableId },
         };
         const [rows] = await executeQuery(options);
-        if (rows.length == 1 && rows[0].count == 1) {
+        if (rows.length === 1 && rows[0].count === 1) {
             return true;
         }
     } catch (error) {
@@ -158,9 +158,7 @@ async function datasetExists(datasetId, datasets) {
         [datasetList] = await bigqueryClient.getDatasets();
     }
     var found = datasetList.find((dataset) => {
-        if (dataset.id.toLowerCase() === datasetId.toLowerCase()) {
-            return true
-        }
+        return dataset.id.toLowerCase() === datasetId.toLowerCase();
     });
     return found !== undefined;
 }
@@ -172,7 +170,7 @@ async function datasetExists(datasetId, datasets) {
 async function findUsersInRole(metadata, accessType, role) {
     var users = [];
     metadata.access.forEach((a) => {
-        if (a[accessType] && a.role && a.role.toLowerCase() == role.toLowerCase()) {
+        if (a[accessType] && a.role && a.role.toLowerCase() === role.toLowerCase()) {
             users.push(a[accessType]);
         }
     });
@@ -513,7 +511,7 @@ async function setTableMetadata(datasetId, tableId, metadata) {
  */
 async function getDatasetLabelValue(datasetId, labelKey) {
     const metadata = await getDatasetMetadata(datasetId);
-    if (metadata != undefined && metadata.labels) {
+    if (metadata !== undefined && metadata.labels) {
         let labelValue = metadata.labels[labelKey];
         return labelValue;
     }
@@ -528,7 +526,7 @@ async function getDatasetLabelValue(datasetId, labelKey) {
 async function getTableLabelValue(datasetId, tableId, labelKey) {
     const tableMeta = await getTableMetadata(datasetId, tableId);
     const metadata = tableMeta.metadata;
-    if (metadata != undefined && metadata.labels) {
+    if (metadata !== undefined && metadata.labels) {
         let labelValue = metadata.labels[labelKey];
         return labelValue;
     }
