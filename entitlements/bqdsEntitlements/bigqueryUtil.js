@@ -17,7 +17,7 @@
 'use strict';
 
 const { BigQuery } = require('@google-cloud/bigquery');
-var RuntimeConfiguration = require("./runtimeConfiguration")
+const RuntimeConfiguration = require("./runtimeConfiguration")
 
 const TableType = {
     BASE_TABLE: 'BASE TABLE',
@@ -52,10 +52,10 @@ async function executeQuery(options) {
  * @param  {} sql
  */
 async function validateQuery(sql, limit) {
-    var _sql = sql.trim();
+    let _sql = sql.trim();
     if (limit && limit > 0) {
-        var regex = /(.+limit\s)([\d]+)$/gi;
-        var found = _sql.match(regex);
+        let regex = /(.+limit\s)([\d]+)$/gi;
+        let found = _sql.match(regex);
         if (found !== null) {
             // If "limit n$" exists at the end of the string, update the limit count
             _sql = _sql.replace(regex, `$1${limit}`);
@@ -91,7 +91,7 @@ async function tableColumns(datasetId, tableId) {
         params: { _tableName: tableId },
     };
     const [rows] = await executeQuery(options);
-    var columns = [];
+    let columns = [];
     rows.forEach(row => columns.push(row.column_name));
     return columns;
 }
@@ -150,14 +150,14 @@ async function getDatasets() {
  * @param  {} datasetId
  */
 async function datasetExists(datasetId, datasets) {
-    var [datasetList] = [];
+    let [datasetList] = [];
     if (datasets) {
         datasetList = datasets;
     }
     if (!datasetList) {
         [datasetList] = await bigqueryClient.getDatasets();
     }
-    var found = datasetList.find((dataset) => {
+    let found = datasetList.find((dataset) => {
         return dataset.id.toLowerCase() === datasetId.toLowerCase();
     });
     return found !== undefined;
@@ -168,7 +168,7 @@ async function datasetExists(datasetId, datasets) {
  * @param  {} role
  */
 async function findUsersInRole(metadata, accessType, role) {
-    var users = [];
+    let users = [];
     metadata.access.forEach((a) => {
         if (a[accessType] && a.role && a.role.toLowerCase() === role.toLowerCase()) {
             users.push(a[accessType]);
@@ -182,7 +182,7 @@ async function findUsersInRole(metadata, accessType, role) {
  */
 async function getDatasetMetadata(datasetId) {
     const dataset = bigqueryClient.dataset(datasetId);
-    var _metadata;
+    let _metadata;
 
     // https://cloud.google.com/nodejs/docs/reference/bigquery/3.0.x/Dataset#getMetadata
     await dataset.getMetadata().then((data) => {
@@ -208,12 +208,12 @@ async function getTableMetadata(datasetId, tableId) {
     const dataset = bigqueryClient.dataset(datasetId);
     const table = dataset.table(tableId);
 
-    var metadata;
-    var exists = true;
-    var datasetExists = true;
-    var tableExists = true;
-    var error = false;
-    var errorMessage;
+    let metadata;
+    let exists = true;
+    let datasetExists = true;
+    let tableExists = true;
+    let error = false;
+    let errorMessage;
 
     try {
         // https://cloud.google.com/nodejs/docs/reference/bigquery/1.3.x/Table#getMetadata
@@ -263,7 +263,7 @@ async function createView(projectId, datasetId, tableId, query, deleteIfExists, 
     }
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
-    var options = {
+    let options = {
         location: 'US',
         view: {
             query: query,
@@ -349,14 +349,14 @@ async function shareAuthorizeView(sourceDatasetId, authorizeProject, authorizeDa
     console.log(`Authorizing dataset '${sourceDatasetId}' granting object '${authorizeProject}.${authorizeDataset}.${authorizeView}' access`);
 
     // We need to remove any views for which the authorized views no longer exist, otherwise we'll run into an exception when saving
-    var metadata = await getDatasetMetadata(sourceDatasetId);
-    var isViewAlreadyAdded = false;
+    let metadata = await getDatasetMetadata(sourceDatasetId);
+    let isViewAlreadyAdded = false;
     if (metadata.access) {
-        var updatedRequired = false;
+        let updatedRequired = false;
         // Remove and save authorized view
-        var i = metadata.access.length;
+        let i = metadata.access.length;
         while (i--) {
-            var a = metadata.access[i];
+            let a = metadata.access[i];
             if (a.view && a.view.projectId && a.view.datasetId && a.view.tableId) {
                 // If there is already an entry for the view that we're authorizing, it's stale and we need to remove it, and re-add it
                 if (a.view.projectId.toLowerCase() === authorizeProject.toLowerCase() && a.view.datasetId.toLowerCase() === authorizeDataset.toLowerCase() && a.view.tableId.toLowerCase() === authorizeView.toLowerCase()) {
@@ -417,7 +417,7 @@ async function shareAuthorizeView(sourceDatasetId, authorizeProject, authorizeDa
  * @param  {} metadata
  */
 async function setDatasetMetadata(datasetId, metadata) {
-    var success = false;
+    let success = false;
     const dataset = bigqueryClient.dataset(datasetId);
 
     if (RuntimeConfiguration.VERBOSE_MODE) {
@@ -442,7 +442,7 @@ async function setDatasetMetadata(datasetId, metadata) {
  */
 async function createDataset(datasetName, configurationName) {
     try {
-        var options;
+        let options;
         if (configurationName) {
             options = {
                 labels: {},
@@ -487,10 +487,10 @@ async function deleteDataset(datasetId) {
  * @param  {} metadata
  */
 async function setTableMetadata(datasetId, tableId, metadata) {
-    var success = false;
+    let success = false;
     const dataset = bigqueryClient.dataset(datasetId);
     const table = dataset.table(tableId);
-    var _metadata;
+    let _metadata;
 
     if (RuntimeConfiguration.VERBOSE_MODE) {
         console.log(`Setting metadata for table '${datasetId}.${tableId}': ${JSON.stringify(metadata, null, 2)}`);

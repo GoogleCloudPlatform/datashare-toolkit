@@ -59,7 +59,7 @@ function configurationContainsDataset(config, datasetId) {
  */
 async function configurationContainsView(config, datasetId, viewId) {
     for (const view of config.views) {
-        var dsFound = view.datasetNames.find((d) => {
+        const dsFound = view.datasetNames.find((d) => {
             return d.toLowerCase() === datasetId.toLowerCase()
         });
         if (dsFound !== undefined) {
@@ -90,7 +90,7 @@ function findDataset(config, datasetId) {
  */
 function findGroup(config, groupName) {
     if (config.groups && config.groups.length > 0) {
-        var groupFound = config.groups.find((g) => {
+        const groupFound = config.groups.find((g) => {
             return g.name === groupName;
         });
         if (groupFound !== undefined) {
@@ -104,7 +104,7 @@ function findGroup(config, groupName) {
  * @param  {} config
  */
 function isAccessControlDatasetUsed(config) {
-    var accessControlDatasetUsed = false;
+    let accessControlDatasetUsed = false;
     if (config.views && config.views.length > 0) {
         for (const v of config.views) {
             let source = v.source;
@@ -125,7 +125,7 @@ function isAccessControlDatasetUsed(config) {
  */
 function concatentateAccessItems(config, ds) {
     // Create array to hold the list of configured access items
-    var accessRecords = [];
+    let accessRecords = [];
 
     // Add access records from dataset
     if (ds.access && ds.access.length > 0) {
@@ -135,7 +135,7 @@ function concatentateAccessItems(config, ds) {
     // Iterate to get access for any groups that exist
     if (ds.groupNames && ds.groupNames.length > 0) {
         ds.groupNames.forEach((groupName) => {
-            var foundGroup = findGroup(config, groupName);
+            const foundGroup = findGroup(config, groupName);
             if (foundGroup && foundGroup.access && foundGroup.access.length > 0) {
                 accessRecords = accessRecords.concat(foundGroup.access);
             }

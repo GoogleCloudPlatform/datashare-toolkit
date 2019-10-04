@@ -38,7 +38,7 @@ async function processEntitlementConfigFile(filePath) {
     let path = require('path')
     let extension = path.extname(filePath).toLowerCase();
 
-    var config;
+    let config;
     if (extension === ".json") {
         if (configValidator.isJsonString(data) === false) {
             console.log("Configuration is not valid JSON");
@@ -235,12 +235,12 @@ async function processConfiguration(config) {
             }
 
             const viewSql = await sqlBuilder.generateSql(config, ds, view);
-            var metadataResult = await bigqueryUtil.getTableMetadata(ds, view.name);
+            let metadataResult = await bigqueryUtil.getTableMetadata(ds, view.name);
 
-            var _viewMetadata = metadataResult.metadata;
+            let _viewMetadata = metadataResult.metadata;
             const _viewExists = metadataResult.exists;
 
-            var createViewResult;
+            let createViewResult;
             let configuredExpirationTime = view.expiration && view.expiration.delete === true ? view.expiration.time : null;
 
             // Check if the view exists
@@ -270,7 +270,7 @@ async function processConfiguration(config) {
                     }
                 }
 
-                var currentExpiryTime = _viewMetadata.expirationTime;
+                const currentExpiryTime = _viewMetadata.expirationTime;
 
                 if (RuntimeConfiguration.VERBOSE_MODE) {
                     console.log(`expirationTime for view '${view.name}' is ${currentExpiryTime}`);
@@ -299,7 +299,7 @@ async function processConfiguration(config) {
                 createViewResult = await bigqueryUtil.createView(config.projectId, ds, view.name, viewSql, false, config.name, configuredExpirationTime);
             }
 
-            var viewCreated = createViewResult && createViewResult.success;
+            let viewCreated = createViewResult && createViewResult.success;
             console.log("Authorizing view objects for access from other datasets");
             if (!view.hasOwnProperty('custom')) {
                 let source = view.source;
@@ -357,10 +357,10 @@ async function processAccessPermissions(config) {
         // Iterate through the configured access groups to add any that are not in the metadata
         configuredAccessRecords.forEach((c) => {
             // Add role to the record as we currently set it to 'READER' by default
-            var newRecord = c;
+            let newRecord = c;
             newRecord["role"] = _role;
 
-            var found = metadata.access.find((bq) => {
+            const found = metadata.access.find((bq) => {
                 return configUtil.accessItemsEqual(newRecord, bq);
             });
             if (!found) {
@@ -381,7 +381,7 @@ async function processAccessPermissions(config) {
             }
             let found = configuredAccessRecords.find((c) => {
                 // Add role to the record as we currently set it to 'READER' by default
-                var newRecord = c;
+                let newRecord = c;
                 newRecord["role"] = _role;
                 return configUtil.accessItemsEqual(newRecord, bq);
             });

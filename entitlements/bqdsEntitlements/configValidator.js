@@ -19,9 +19,9 @@
 const configUtil = require("./configUtil")
 const bigqueryUtil = require("./bigqueryUtil")
 const sqlBuilder = require("./sqlBuilder")
-var RuntimeConfiguration = require("./runtimeConfiguration")
+const RuntimeConfiguration = require("./runtimeConfiguration")
 const YAML = require('yaml')
-var Validator = require('jsonschema').Validator;
+const Validator = require('jsonschema').Validator;
 
 const IssueType = {
     // Informational only
@@ -73,7 +73,7 @@ async function validate(config) {
         console.log("-------------------END - validateQueries-------------------\n");
     }
 
-    var _isValid = true;
+    let _isValid = true;
     console.log("-------------------START - Validation Result-------------------");
     if (issues.length > 0) {
         issues.forEach((i) => {
@@ -101,8 +101,8 @@ async function validate(config) {
  * TODO: Remove duplicate validations that are now performed by the jsonschema package.
  */
 async function validateSchema(config) {
-    var v = new Validator();
-    var schema = require("./schema.json");
+    let v = new Validator();
+    let schema = require("./schema.json");
 
     // Set the minimum time
     schema.definitions.expiration.properties.time.minimum = (new Date()).getTime();
@@ -150,7 +150,7 @@ function validateGroups(config) {
         return;
     }
 
-    var groupNames = [];
+    let groupNames = [];
     config.groups.forEach((g) => {
         if (!g.name) {
             logIssue(IssueType.ERROR, "'group' 'name' not provided");
@@ -170,7 +170,7 @@ function validateGroups(config) {
         else if (g.access.length === 0) {
             logIssue(IssueType.ERROR, `'access' collection is empty in group '${g.name}'`);
         }
-        var dsReferenced = false;
+        let dsReferenced = false;
         if (config.datasets && config.datasets.length > 0) {
             // Check if group is referenced by any dataset
             for (const d of config.datasets) {
@@ -206,7 +206,7 @@ function validateDatasets(config) {
         return;
     }
 
-    var datasetIds = [];
+    let datasetIds = [];
     config.datasets.forEach((d) => {
         if (!d.hasOwnProperty('name') || !d.name) {
             logIssue(IssueType.ERROR, "dataset 'name' not provided");
@@ -230,7 +230,7 @@ function validateDatasets(config) {
             findDuplicates(d.accessControlLabels, `duplicate accessControlLabel in dataset '${d.name}'`);
         }
 
-        var userContextProvided = false;
+        let userContextProvided = false;
 
         if (!d.hasOwnProperty('access')) {
             // logIssue(IssueType.INFORMATION, `access not provided in dataset '${d.name}'`);
@@ -260,10 +260,10 @@ function validateDatasets(config) {
                     }
                     else {
                         // Check for duplicates for access across both arrays.
-                        var accessRecords = configUtil.concatentateAccessItems(config, d);
-                        var duplicateCheck = [];
+                        let accessRecords = configUtil.concatentateAccessItems(config, d);
+                        let duplicateCheck = [];
                         accessRecords.forEach((a) => {
-                            var dupFound = false;
+                            let dupFound = false;
                             duplicateCheck.forEach((dup) => {
                                 if (configUtil.accessItemsEqual(a, dup)) {
                                     dupFound = true;
@@ -285,7 +285,7 @@ function validateDatasets(config) {
         }
 
         // Check for unreferenced datasets. Exists in datasets collection but not referenced by any view.
-        var dsReferenced = false;
+        let dsReferenced = false;
         if (config.views && config.views.length > 0) {
             for (const v of config.views) {
                 if (v.datasetNames && v.datasetNames.length > 0) {
@@ -320,7 +320,7 @@ async function validateViews(config) {
         return;
     }
 
-    var viewNames = [];
+    let viewNames = [];
     for (const v of config.views) {
         if (!v.name) {
             logIssue(IssueType.ERROR, "'name' not provided");
@@ -336,7 +336,7 @@ async function validateViews(config) {
 
         findDuplicates(v.datasetNames, `duplicate dataset name in view '${v.name}'`);
 
-        var _validTableName = false;
+        let _validTableName = false;
 
         // Using source
         if (v.hasOwnProperty('source')) {
@@ -353,7 +353,7 @@ async function validateViews(config) {
                 _validTableName = true;
             }
 
-            var _tableExists = false;
+            let _tableExists = false;
             if (_validTableName === true) {
                 // Check if table exists
                 _tableExists = await bigqueryUtil.tableExists(config.projectId, source.datasetId, source.tableId);
@@ -417,7 +417,7 @@ async function validateViews(config) {
                     else {
                         // Default is local configuration for accessControlLabel.
                         // Check if accessControlLabel is provided in the view or at the dataset.
-                        var _hasViewAccessControlLabels = true;
+                        let _hasViewAccessControlLabels = true;
                         if (!accessControl.hasOwnProperty('labels')) {
                             logIssue(IssueType.INFORMATION, `'accessControl.labels' not provided in view '${v.name}'`);
                             _hasViewAccessControlLabels = false;
@@ -430,7 +430,7 @@ async function validateViews(config) {
                         // Iterate all associated datasets and find accessControlLabel collections that are empty where accessControlLabels is not provided in the view.
                         if (_hasViewAccessControlLabels === false && v.datasetNames && v.datasetNames.length > 0) {
                             v.datasetNames.forEach((d) => {
-                                var dsFound = config.datasets.find((c) => {
+                                const dsFound = config.datasets.find((c) => {
                                     return c.name === d;
                                 });
                                 if (dsFound !== undefined) {
@@ -552,7 +552,7 @@ async function validateLabels(config) {
 /**
  */
 async function isValid() {
-    var _isValid = true;
+    let _isValid = true;
     if (issues.length > 0) {
         issues.forEach((i) => {
             if (i.issueType === IssueType.ERROR) {
@@ -567,7 +567,7 @@ async function isValid() {
  * @param  {} config
  */
 async function validateQueries(config) {
-    var _isValid = await isValid();
+    const _isValid = await isValid();
     if (_isValid === true) {
         for (const v of config.views) {
             for (const d of v.datasetNames) {
@@ -604,8 +604,8 @@ function findDuplicates(array, message) {
     if (!array) {
         return [];
     }
-    var allObjects = [];
-    var duplicates = [];
+    let allObjects = [];
+    let duplicates = [];
     array.forEach((s) => {
         if (allObjects.indexOf(s.toLowerCase()) > -1) {
             logIssue(IssueType.ERROR, `${message}: '${s}'`);
@@ -627,10 +627,10 @@ async function areAllColumnsAvailable(columns, dataset, table, message) {
     if (!columns) {
         return [];
     }
-    var missingColumns = [];
+    let missingColumns = [];
     let availableColumns = await bigqueryUtil.tableColumns(dataset, table);
     for (const col of columns) {
-        var found = availableColumns.find((c) => {
+        const found = availableColumns.find((c) => {
             return col.toLowerCase() === c.toLowerCase();
         });
         if (found === undefined) {
