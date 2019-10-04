@@ -42,5 +42,5 @@ function printDebugInfo(obj) {
 }
 
 module.exports = {
-    printDebugInfo: printDebugInfo
+    printDebugInfo
 }

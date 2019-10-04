@@ -667,7 +667,7 @@ function isYamlString(str) {
 }
 
 module.exports = {
-    validate: validate,
-    isJsonString: isJsonString,
-    isYamlString: isYamlString
+    validate,
+    isJsonString,
+    isYamlString
 }

@@ -185,13 +185,13 @@ function performTextVariableReplacements(config, view, text) {
 }
 
 module.exports = {
-    isPublicAccessEnabled: isPublicAccessEnabled,
-    configurationContainsDataset: configurationContainsDataset,
-    findDataset: findDataset,
-    configurationContainsView: configurationContainsView,
-    findGroup: findGroup,
-    isAccessControlDatasetUsed: isAccessControlDatasetUsed,
-    performTextVariableReplacements: performTextVariableReplacements,
-    concatentateAccessItems: concatentateAccessItems,
-    accessItemsEqual: accessItemsEqual
+    isPublicAccessEnabled,
+    configurationContainsDataset,
+    findDataset,
+    configurationContainsView,
+    findGroup,
+    isAccessControlDatasetUsed,
+    performTextVariableReplacements,
+    concatentateAccessItems,
+    accessItemsEqual
 }
