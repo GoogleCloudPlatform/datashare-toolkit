@@ -21,6 +21,7 @@ const util = require('util');
 /**
  * Compares all objects and types and returns unique objects only.
  */
+/* eslint-disable no-extend-native */
 Array.prototype.unique = function () {
     var a = this.concat();
     for (var i = 0; i < a.length; ++i) {

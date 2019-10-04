@@ -157,12 +157,12 @@ async function datasetExists(datasetId, datasets) {
     if (!datasetList) {
         [datasetList] = await bigqueryClient.getDatasets();
     }
-    var found = datasetList.find(function (dataset) {
-        if (dataset.id.toLowerCase() == datasetId.toLowerCase()) {
+    var found = datasetList.find((dataset) => {
+        if (dataset.id.toLowerCase() === datasetId.toLowerCase()) {
             return true
         }
     });
-    return found != undefined;
+    return found !== undefined;
 }
 
 /**
@@ -171,7 +171,7 @@ async function datasetExists(datasetId, datasets) {
  */
 async function findUsersInRole(metadata, accessType, role) {
     var users = [];
-    metadata.access.forEach(function (a) {
+    metadata.access.forEach((a) => {
         if (a[accessType] && a.role && a.role.toLowerCase() == role.toLowerCase()) {
             users.push(a[accessType]);
         }
