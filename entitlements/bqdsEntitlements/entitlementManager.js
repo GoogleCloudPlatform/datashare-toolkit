@@ -64,7 +64,7 @@ async function processEntitlementConfigFile(filePath) {
 async function processEntitlementConfig(config) {
     await bigqueryUtil.init(config.projectId);
 
-    var prerequisiteComplete = false;
+    let prerequisiteComplete = false;
     if (RuntimeConfiguration.DRY_RUN === false) {
         console.log("-------------------START - setupPrerequisites-------------------");
         await setupPrerequisites(config);
@@ -346,13 +346,13 @@ async function processAccessPermissions(config) {
         console.log(`Dataset: '${ds.name}' - current access: ${JSON.stringify(configuredAccessRecords)}`);
 
         // Get the metadata for the current dataset
-        var metadata = await bigqueryUtil.getDatasetMetadata(ds.name);
+        let metadata = await bigqueryUtil.getDatasetMetadata(ds.name);
 
         if (!metadata.access) {
             metadata.access = [];
         }
 
-        var hasChanges = false;
+        let hasChanges = false;
 
         // Iterate through the configured access groups to add any that are not in the metadata
         configuredAccessRecords.forEach((c) => {
@@ -371,15 +371,15 @@ async function processAccessPermissions(config) {
         });
 
         // Iterate through the metadata to remove any users no longer in the configuration
-        var i = metadata.access.length;
+        let i = metadata.access.length;
         while (i--) {
-            var bq = metadata.access[i];
+            let bq = metadata.access[i];
 
             // Skip non-READER roles
             if (bq.role !== _role) {
                 continue;
             }
-            var found = configuredAccessRecords.find((c) => {
+            let found = configuredAccessRecords.find((c) => {
                 // Add role to the record as we currently set it to 'READER' by default
                 var newRecord = c;
                 newRecord["role"] = _role;
@@ -416,17 +416,17 @@ async function removeStaleObjects(config) {
     const entitlementDataset = config.accessControl ? config.accessControl.datasetId : null;
 
     for (const ds of datasets) {
-        var isEntitlementDataset = false;
+        let isEntitlementDataset = false;
         if (entitlementDataset && ds.id.toLowerCase() === entitlementDataset.toLowerCase()) {
             isEntitlementDataset = true;
         }
 
-        var isDatasetRequired = true;
-        var hasManagedTables = false;
-        var hasNonManagedTables = false;
-        var isDatasetMetadataUpdateRequired = false;
+        let isDatasetRequired = true;
+        let hasManagedTables = false;
+        let hasNonManagedTables = false;
+        let isDatasetMetadataUpdateRequired = false;
 
-        var dsMetadata = await bigqueryUtil.getDatasetMetadata(ds.id);
+        let dsMetadata = await bigqueryUtil.getDatasetMetadata(ds.id);
 
         if (isEntitlementDataset === true) {
             // Remove authorized views for which the view object doesn't exist anymore
