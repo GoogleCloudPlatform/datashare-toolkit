@@ -35,7 +35,7 @@ async function processEntitlementConfigFile(filePath) {
     }
 
     let data = fs.readFileSync(filePath, { encoding: 'utf8' });
-    var path = require('path')
+    let path = require('path')
     let extension = path.extname(filePath).toLowerCase();
 
     var config;
