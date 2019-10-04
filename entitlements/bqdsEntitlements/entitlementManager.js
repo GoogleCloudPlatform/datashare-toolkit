@@ -39,14 +39,14 @@ async function processEntitlementConfigFile(filePath) {
     let extension = path.extname(filePath).toLowerCase();
 
     var config;
-    if (extension == ".json") {
+    if (extension === ".json") {
         if (configValidator.isJsonString(data) === false) {
             console.log("Configuration is not valid JSON");
             return;
         }
         config = JSON.parse(data);
     }
-    else if (extension == ".yaml") {
+    else if (extension === ".yaml") {
         if (configValidator.isYamlString(data) === false) {
             console.log("Configuration is not valid YAML");
             return;

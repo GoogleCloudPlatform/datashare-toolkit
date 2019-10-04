@@ -78,7 +78,7 @@ async function validate(config) {
     if (issues.length > 0) {
         issues.forEach((i) => {
             console.log(`${i.issueType}: ${i.message}`);
-            if (i.issueType == IssueType.ERROR) {
+            if (i.issueType === IssueType.ERROR) {
                 _isValid = false;
             }
         });
@@ -130,8 +130,8 @@ async function validateRoot(config) {
         logIssue(IssueType.ERROR, "'projectId' not provided");
     }
 
-    if (RuntimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE == true) {
-        if (!config.accessControl || !config.accessControl.datasetId || config.accessControl.datasetId.length == 0) {
+    if (RuntimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE === true) {
+        if (!config.accessControl || !config.accessControl.datasetId || config.accessControl.datasetId.length === 0) {
             logIssue(IssueType.ERROR, `'config.accessControl.datasetId' must be provided`);
         }
     }
@@ -145,7 +145,7 @@ function validateGroups(config) {
         logIssue(IssueType.INFORMATION, "'groups' not provided");
         return;
     }
-    else if (config.groups.length == 0) {
+    else if (config.groups.length === 0) {
         logIssue(IssueType.WARNING, "'groups' collection is empty");
         return;
     }
@@ -167,7 +167,7 @@ function validateGroups(config) {
         if (!g.hasOwnProperty('access')) {
             // logIssue(IssueType.ERROR, `'access' not provided in 'group' '${g.name}'`);
         }
-        else if (g.access.length == 0) {
+        else if (g.access.length === 0) {
             logIssue(IssueType.ERROR, `'access' collection is empty in group '${g.name}'`);
         }
         var dsReferenced = false;
@@ -201,7 +201,7 @@ function validateDatasets(config) {
         logIssue(IssueType.ERROR, "datasets not provided");
         return;
     }
-    else if (config.datasets.length == 0) {
+    else if (config.datasets.length === 0) {
         logIssue(IssueType.ERROR, "datasets collection is empty");
         return;
     }
@@ -223,7 +223,7 @@ function validateDatasets(config) {
         if (!d.hasOwnProperty('accessControlLabels')) {
             // logIssue(IssueType.INFORMATION, `'accessControlLabels' not provided in dataset '${d.name}'`);
         }
-        else if (d.accessControlLabels.length == 0) {
+        else if (d.accessControlLabels.length === 0) {
             logIssue(IssueType.WARNING, `'accessControlLabels' collection is empty in dataset '${d.name}'`);
         }
         else {
@@ -235,7 +235,7 @@ function validateDatasets(config) {
         if (!d.hasOwnProperty('access')) {
             // logIssue(IssueType.INFORMATION, `access not provided in dataset '${d.name}'`);
         }
-        else if (d.access.length == 0) {
+        else if (d.access.length === 0) {
             logIssue(IssueType.WARNING, `access collection is empty in dataset '${d.name}'`);
         }
         else {
@@ -245,7 +245,7 @@ function validateDatasets(config) {
         if (!d.hasOwnProperty('groupNames')) {
             logIssue(IssueType.INFORMATION, `'groupNames' not provided in dataset '${d.name}'`);
         }
-        else if (d.groupNames.length == 0) {
+        else if (d.groupNames.length === 0) {
             logIssue(IssueType.WARNING, `'groupNames' collection is empty in dataset '${d.name}'`);
         }
         else {
@@ -315,7 +315,7 @@ async function validateViews(config) {
         logIssue(IssueType.ERROR, "views not provided");
         return;
     }
-    else if (config.views.length == 0) {
+    else if (config.views.length === 0) {
         logIssue(IssueType.ERROR, "views collection is empty");
         return;
     }
@@ -374,7 +374,7 @@ async function validateViews(config) {
                 if (_tableExists === true) {
                     await areAllColumnsAvailable(source.visibleColumns, source.datasetId, source.tableId, `View '${v.name}' has a visibleColumn defined that is not available in source table '${source.datasetId}.${source.tableId}'`);
                 }
-                if (source.visibleColumns.length == 0) {
+                if (source.visibleColumns.length === 0) {
                     logIssue(IssueType.ERROR, `at least one visible column must be defined for view '${v.name}'`);
                 }
             }
@@ -383,7 +383,7 @@ async function validateViews(config) {
                 if (_tableExists === true) {
                     await areAllColumnsAvailable(source.hiddenColumns, source.datasetId, source.tableId, `View '${v.name}' has a hiddenColumn defined that is not available in source table '${source.datasetId}.${source.tableId}'`);
                 }
-                if (source.hiddenColumns.length == 0) {
+                if (source.hiddenColumns.length === 0) {
                     logIssue(IssueType.WARNING, `no hidden column(s) are defined for view '${v.name}'`);
                 }
             }
@@ -394,7 +394,7 @@ async function validateViews(config) {
 
                 // If accessControlEnabled is true, than accessControlLabelColumn must be provided.
                 if (accessControl.enabled && accessControl.enabled === true) {
-                    if (!accessControl.labelColumn || accessControl.labelColumn.length == 0) {
+                    if (!accessControl.labelColumn || accessControl.labelColumn.length === 0) {
                         logIssue(IssueType.ERROR, `'accessControl.labelColumn' must be provided for view '${v.name}'`);
                     }
 
@@ -403,10 +403,10 @@ async function validateViews(config) {
 
                     if (accessControl.datasetEnabled && accessControl.datasetEnabled === true) {
                         // If accessControl.datasetEnabled is true, than config.accessControl.datasetId and config.accessControl.viewId must be provided.
-                        if (!config.accessControl || !config.accessControl.datasetId || config.accessControl.datasetId.length == 0) {
+                        if (!config.accessControl || !config.accessControl.datasetId || config.accessControl.datasetId.length === 0) {
                             logIssue(IssueType.ERROR, `'config.accessControl.datasetId' must be provided`);
                         }
-                        if (!config.accessControl || !config.accessControl.viewId || config.accessControl.viewId.length == 0) {
+                        if (!config.accessControl || !config.accessControl.viewId || config.accessControl.viewId.length === 0) {
                             logIssue(IssueType.ERROR, `'config.accessControl.viewId' must be provided`);
                         }
 
@@ -422,7 +422,7 @@ async function validateViews(config) {
                             logIssue(IssueType.INFORMATION, `'accessControl.labels' not provided in view '${v.name}'`);
                             _hasViewAccessControlLabels = false;
                         }
-                        else if (accessControl.labels.length == 0) {
+                        else if (accessControl.labels.length === 0) {
                             logIssue(IssueType.WARNING, `'accessControl.labels' collection is empty in view '${v.name}'`);
                             _hasViewAccessControlLabels = false;
                         }
@@ -431,15 +431,13 @@ async function validateViews(config) {
                         if (_hasViewAccessControlLabels === false && v.datasetNames && v.datasetNames.length > 0) {
                             v.datasetNames.forEach((d) => {
                                 var dsFound = config.datasets.find((c) => {
-                                    if (c.name === d) {
-                                        return true;
-                                    }
+                                    return c.name === d;
                                 });
-                                if (dsFound != undefined) {
+                                if (dsFound !== undefined) {
                                     if (!dsFound.hasOwnProperty('accessControlLabels')) {
                                         logIssue(IssueType.ERROR, `'accessControlLabels' must be defined for the view '${v.name}' or in related dataset '${d}'`);
                                     }
-                                    else if (dsFound.accessControlLabels.length == 0) {
+                                    else if (dsFound.accessControlLabels.length === 0) {
                                         logIssue(IssueType.ERROR, `'accessControlLabels' must be defined for the view '${v.name}' or in related dataset '${d}'`);
                                     }
                                 }
@@ -460,7 +458,7 @@ async function validateViews(config) {
                     if (!publicAccess.hasOwnProperty('queryFilter')) {
                         logIssue(IssueType.ERROR, `'publicAccess.queryFilter' not provided for view '${v.name}'`);
                     }
-                    else if (publicAccess.queryFilter.length == 0) {
+                    else if (publicAccess.queryFilter.length === 0) {
                         logIssue(IssueType.ERROR, `'publicAccess.queryFilter' provided for view '${v.name}' is empty`);
                     }
                 }
@@ -480,7 +478,7 @@ async function validateViews(config) {
             if (!custom.hasOwnProperty('query')) {
                 logIssue(IssueType.ERROR, `'query' not provided in 'custom' for view '${v.name}'`);
             }
-            else if (!custom.query || custom.query.trim().length == 0) {
+            else if (!custom.query || custom.query.trim().length === 0) {
                 logIssue(IssueType.ERROR, `'query' is empty in 'custom' for view '${v.name}'`);
             }
 
@@ -522,7 +520,7 @@ async function validateLabels(config) {
         for (const d of config.datasets) {
             if (await bigqueryUtil.datasetExists(d.name, datasets) === true) {
                 let labelValue = await bigqueryUtil.getDatasetLabelValue(d.name, RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY);
-                if (labelValue != config.name) {
+                if (labelValue !== config.name) {
                     logIssue(IssueType.ERROR, `An existing dataset exists for '${config.projectId}.${d.name}'. In order to modify this dataset, the label '${RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY}' must be defined on the dataset with current configuration value '${config.name}'. You may also resolve the issue by giving the dataset a unique name that does not currently exist in BigQuery.`);
                 }
             }
@@ -538,7 +536,7 @@ async function validateLabels(config) {
                 for (const d of v.datasetNames) {
                     if (await bigqueryUtil.viewExists(config.projectId, d, v.name) === true) {
                         let labelValue = await bigqueryUtil.getTableLabelValue(d, v.name, RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY);
-                        if (labelValue != config.name) {
+                        if (labelValue !== config.name) {
                             logIssue(IssueType.ERROR, `An existing view exists for '${config.projectId}.${d}.${v.name}'. In order to modify this view, the label '${RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY}' must be defined on the view with current configuration value '${config.name}'. You may also resolve the issue by giving the view a unique name that does not currently exist in BigQuery.`);
                         }
                     }
@@ -557,7 +555,7 @@ async function isValid() {
     var _isValid = true;
     if (issues.length > 0) {
         issues.forEach((i) => {
-            if (i.issueType == IssueType.ERROR) {
+            if (i.issueType === IssueType.ERROR) {
                 _isValid = false;
             }
         });
@@ -604,7 +602,7 @@ function logIssue(issueType, message) {
  */
 function findDuplicates(array, message) {
     if (!array) {
-        return;
+        return [];
     }
     var allObjects = [];
     var duplicates = [];
@@ -627,17 +625,15 @@ function findDuplicates(array, message) {
  */
 async function areAllColumnsAvailable(columns, dataset, table, message) {
     if (!columns) {
-        return;
+        return [];
     }
     var missingColumns = [];
     let availableColumns = await bigqueryUtil.tableColumns(dataset, table);
     for (const col of columns) {
         var found = availableColumns.find((c) => {
-            if (col.toLowerCase() === c.toLowerCase()) {
-                return true;
-            }
+            return col.toLowerCase() === c.toLowerCase();
         });
-        if (found == undefined) {
+        if (found === undefined) {
             logIssue(IssueType.ERROR, `${message}: '${col}'`);
             missingColumns.push(col);
         }

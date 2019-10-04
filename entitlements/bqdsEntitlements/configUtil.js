@@ -39,13 +39,13 @@ async function isPublicAccessEnabled(view) {
 function configurationContainsDataset(config, datasetId) {
     for (const view of config.views) {
         for (const ds of view.datasetNames) {
-            if (ds.toLowerCase() == datasetId.toLowerCase()) {
+            if (ds.toLowerCase() === datasetId.toLowerCase()) {
                 return true;
             }
         }
     }
     for (const ds of config.datasets) {
-        if (ds.name.toLowerCase() == datasetId.toLowerCase()) {
+        if (ds.name.toLowerCase() === datasetId.toLowerCase()) {
             console.log(`datasetId: ${ds.name} exists in the configuration datasets array, but there are no configured views that reference the datasetId`);
             return true;
         }
@@ -60,14 +60,10 @@ function configurationContainsDataset(config, datasetId) {
 async function configurationContainsView(config, datasetId, viewId) {
     for (const view of config.views) {
         var dsFound = view.datasetNames.find((d) => {
-            if (d.toLowerCase() === datasetId.toLowerCase()) {
-                return true;
-            }
+            return d.toLowerCase() === datasetId.toLowerCase()
         });
-        if (dsFound != undefined) {
-            if (view.name.toLowerCase() == viewId.toLowerCase()) {
-                return true;
-            }
+        if (dsFound !== undefined) {
+            return view.name.toLowerCase() === viewId.toLowerCase()
         }
     }
     return false;
@@ -80,7 +76,7 @@ async function configurationContainsView(config, datasetId, viewId) {
 function findDataset(config, datasetId) {
     if (config.datasets && config.datasets.length > 0) {
         for (const ds of config.datasets) {
-            if (ds.name && datasetId && ds.name.toLowerCase() == datasetId.toLowerCase()) {
+            if (ds.name && datasetId && ds.name.toLowerCase() === datasetId.toLowerCase()) {
                 return ds;
             }
         }
@@ -95,11 +91,9 @@ function findDataset(config, datasetId) {
 function findGroup(config, groupName) {
     if (config.groups && config.groups.length > 0) {
         var groupFound = config.groups.find((g) => {
-            if (g.name === groupName) {
-                return true;
-            }
+            return g.name === groupName;
         });
-        if (groupFound != undefined) {
+        if (groupFound !== undefined) {
             return groupFound;
         }
     }
@@ -156,12 +150,12 @@ function concatentateAccessItems(config, ds) {
  * @param  {} access2
  */
 function accessItemsEqual(access1, access2) {
-    if (access1.role == access2.role &&
-        access1.userByEmail == access2.userByEmail &&
-        access1.groupByEmail == access2.groupByEmail &&
-        access1.domain == access2.domain &&
-        access1.specialGroup == access2.specialGroup &&
-        access1.iamMember == access2.iamMember) {
+    if (access1.role === access2.role &&
+        access1.userByEmail === access2.userByEmail &&
+        access1.groupByEmail === access2.groupByEmail &&
+        access1.domain === access2.domain &&
+        access1.specialGroup === access2.specialGroup &&
+        access1.iamMember === access2.iamMember) {
         return true;
     }
     return false;

@@ -221,10 +221,10 @@ async function getTableMetadata(datasetId, tableId) {
             const apiResponse = data[1];
             metadata = _metadata;
         });
-    } catch (error) {
+    } catch (err) {
         exists = false;
         error = true;
-        errorMessage = error.message;
+        errorMessage = err.message;
         if (errorMessage) {
             if (errorMessage.startsWith('Not found: Dataset ')) {
                 datasetExists = false;
