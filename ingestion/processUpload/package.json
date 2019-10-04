@@ -5,10 +5,17 @@
     "dependencies": {
         "@google-cloud/bigquery": "^3.0.0",
         "@google-cloud/functions-framework": "^1.1.1",
-        "@google-cloud/storage": "^2.0.0"
+        "@google-cloud/storage": "^2.0.0",
+        "lint": "^0.7.0"
     },
     "scripts": {
         "start": "functions-framework --target=processEvent",
-        "deploy": "gcloud functions deploy processUpload --region=us-east1 --memory=256MB --source=. --runtime=nodejs8 --entry-point=processEvent --timeout=540s"
+        "deploy": "gcloud functions deploy processUpload --region=us-east1 --memory=256MB --source=. --runtime=nodejs8 --entry-point=processEvent --timeout=540s",
+        "lint": "eslint ."
+    },
+    "devDependencies": {
+        "eslint": "^5.12.0",
+        "eslint-plugin-promise": "^4.0.1",
+        "firebase-functions-test": "^0.1.6"
     }
 }

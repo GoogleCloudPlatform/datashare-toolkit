@@ -39,13 +39,13 @@ async function isPublicAccessEnabled(view) {
 function configurationContainsDataset(config, datasetId) {
     for (const view of config.views) {
         for (const ds of view.datasetNames) {
-            if (ds.toLowerCase() == datasetId.toLowerCase()) {
+            if (ds.toLowerCase() === datasetId.toLowerCase()) {
                 return true;
             }
         }
     }
     for (const ds of config.datasets) {
-        if (ds.name.toLowerCase() == datasetId.toLowerCase()) {
+        if (ds.name.toLowerCase() === datasetId.toLowerCase()) {
             console.log(`datasetId: ${ds.name} exists in the configuration datasets array, but there are no configured views that reference the datasetId`);
             return true;
         }
@@ -59,15 +59,11 @@ function configurationContainsDataset(config, datasetId) {
  */
 async function configurationContainsView(config, datasetId, viewId) {
     for (const view of config.views) {
-        var dsFound = view.datasetNames.find(function (d) {
-            if (d.toLowerCase() === datasetId.toLowerCase()) {
-                return true;
-            }
+        const dsFound = view.datasetNames.find((d) => {
+            return d.toLowerCase() === datasetId.toLowerCase()
         });
-        if (dsFound != undefined) {
-            if (view.name.toLowerCase() == viewId.toLowerCase()) {
-                return true;
-            }
+        if (dsFound !== undefined) {
+            return view.name.toLowerCase() === viewId.toLowerCase()
         }
     }
     return false;
@@ -80,7 +76,7 @@ async function configurationContainsView(config, datasetId, viewId) {
 function findDataset(config, datasetId) {
     if (config.datasets && config.datasets.length > 0) {
         for (const ds of config.datasets) {
-            if (ds.name && datasetId && ds.name.toLowerCase() == datasetId.toLowerCase()) {
+            if (ds.name && datasetId && ds.name.toLowerCase() === datasetId.toLowerCase()) {
                 return ds;
             }
         }
@@ -94,12 +90,10 @@ function findDataset(config, datasetId) {
  */
 function findGroup(config, groupName) {
     if (config.groups && config.groups.length > 0) {
-        var groupFound = config.groups.find(function (g) {
-            if (g.name === groupName) {
-                return true;
-            }
+        const groupFound = config.groups.find((g) => {
+            return g.name === groupName;
         });
-        if (groupFound != undefined) {
+        if (groupFound !== undefined) {
             return groupFound;
         }
     }
@@ -110,7 +104,7 @@ function findGroup(config, groupName) {
  * @param  {} config
  */
 function isAccessControlDatasetUsed(config) {
-    var accessControlDatasetUsed = false;
+    let accessControlDatasetUsed = false;
     if (config.views && config.views.length > 0) {
         for (const v of config.views) {
             let source = v.source;
@@ -131,7 +125,7 @@ function isAccessControlDatasetUsed(config) {
  */
 function concatentateAccessItems(config, ds) {
     // Create array to hold the list of configured access items
-    var accessRecords = [];
+    let accessRecords = [];
 
     // Add access records from dataset
     if (ds.access && ds.access.length > 0) {
@@ -140,8 +134,8 @@ function concatentateAccessItems(config, ds) {
 
     // Iterate to get access for any groups that exist
     if (ds.groupNames && ds.groupNames.length > 0) {
-        ds.groupNames.forEach(function (groupName) {
-            var foundGroup = findGroup(config, groupName);
+        ds.groupNames.forEach((groupName) => {
+            const foundGroup = findGroup(config, groupName);
             if (foundGroup && foundGroup.access && foundGroup.access.length > 0) {
                 accessRecords = accessRecords.concat(foundGroup.access);
             }
@@ -156,12 +150,12 @@ function concatentateAccessItems(config, ds) {
  * @param  {} access2
  */
 function accessItemsEqual(access1, access2) {
-    if (access1.role == access2.role &&
-        access1.userByEmail == access2.userByEmail &&
-        access1.groupByEmail == access2.groupByEmail &&
-        access1.domain == access2.domain &&
-        access1.specialGroup == access2.specialGroup &&
-        access1.iamMember == access2.iamMember) {
+    if (access1.role === access2.role &&
+        access1.userByEmail === access2.userByEmail &&
+        access1.groupByEmail === access2.groupByEmail &&
+        access1.domain === access2.domain &&
+        access1.specialGroup === access2.specialGroup &&
+        access1.iamMember === access2.iamMember) {
         return true;
     }
     return false;
@@ -191,13 +185,13 @@ function performTextVariableReplacements(config, view, text) {
 }
 
 module.exports = {
-    isPublicAccessEnabled: isPublicAccessEnabled,
-    configurationContainsDataset: configurationContainsDataset,
-    findDataset: findDataset,
-    configurationContainsView: configurationContainsView,
-    findGroup: findGroup,
-    isAccessControlDatasetUsed: isAccessControlDatasetUsed,
-    performTextVariableReplacements: performTextVariableReplacements,
-    concatentateAccessItems: concatentateAccessItems,
-    accessItemsEqual: accessItemsEqual
+    isPublicAccessEnabled,
+    configurationContainsDataset,
+    findDataset,
+    configurationContainsView,
+    findGroup,
+    isAccessControlDatasetUsed,
+    performTextVariableReplacements,
+    concatentateAccessItems,
+    accessItemsEqual
 }

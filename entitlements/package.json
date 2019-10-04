@@ -9,10 +9,16 @@
     "entitlement-engine": "main.js"
   },
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+    "lint": "eslint ."
   },
   "dependencies": {
     "bqdsEntitlements": "file:./bqdsEntitlements",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "lint": "^0.7.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.0",
+    "eslint-plugin-promise": "^4.0.1"
   }
 }

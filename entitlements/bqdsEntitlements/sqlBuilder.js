@@ -27,7 +27,7 @@ const endOfLine = require('os').EOL;
  * @param  {} view
  */
 async function generateSql(config, viewDatasetId, view) {
-    var sql;
+    let sql;
     if (view.hasOwnProperty('custom')) {
         console.log(`Generating query using custom SQL for view '${view.name}'`);
         sql = prepareCustomSql(config, view);
@@ -46,8 +46,8 @@ async function generateSql(config, viewDatasetId, view) {
     // http://b/139288516 Add support time-based entitlements
     // If expiration is specified and delete is non-existant or false
     if (view.hasOwnProperty('expiration') && view.expiration && !view.expiration.delete) {
-        var paddedSql = await prependLines(sql.trim(), "\t", 1);
-        var expirySql = `SELECT * FROM (\n${paddedSql}\n)\nWHERE TIMESTAMP_MILLIS(${view.expiration.time}) > CURRENT_TIMESTAMP()`;
+        const paddedSql = await prependLines(sql.trim(), "\t", 1);
+        const expirySql = `SELECT * FROM (\n${paddedSql}\n)\nWHERE TIMESTAMP_MILLIS(${view.expiration.time}) > CURRENT_TIMESTAMP()`;
         return expirySql.trim();
     }
     else {
@@ -82,42 +82,38 @@ async function generateSelectStatement(config, view, includeFrom, availableColum
     const hiddenColumns = source.hiddenColumns;
 
     // TODO: The config validation will ensure all columns exist. This can be removed.
-    var vColumns = [];
+    let vColumns = [];
     if (visibleColumns) {
-        visibleColumns.forEach(function (col) {
-            var found = availableColumns.find(function (c) {
-                if (col.toLowerCase() === c.toLowerCase()) {
-                    return true;
-                }
+        visibleColumns.forEach((col) => {
+            const found = availableColumns.find((c) => {
+                return col.toLowerCase() === c.toLowerCase();
             });
-            if (found != undefined) {
+            if (found !== undefined) {
                 vColumns.push(col)
             }
         });
     }
 
     // TODO: The config validation will ensure all columns exist. This can be removed.
-    var hColumns = [];
+    let hColumns = [];
     if (hiddenColumns) {
-        hiddenColumns.forEach(function (col) {
-            var found = availableColumns.find(function (c) {
-                if (col.toLowerCase() === c.toLowerCase()) {
-                    return true;
-                }
+        hiddenColumns.forEach((col) => {
+            const found = availableColumns.find((c) => {
+                return col.toLowerCase() === c.toLowerCase();
             });
-            if (found != undefined) {
+            if (found !== undefined) {
                 hColumns.push(col)
             }
         });
     }
 
-    var sql = "";
+    let sql = "";
     if (vColumns.length > 0) {
         // Column selects
         sql += "select\n";
-        var i;
+        let i;
         for (i = 0; i < vColumns.length; i++) {
-            if (i != 0) {
+            if (i !== 0) {
                 // Not the last item in the collection
                 sql += ",\n";
             }
@@ -159,8 +155,8 @@ async function generateDatasetEntitySubquery(config, view, viewDatasetId, availa
 
     if (accessControlEnabled === true && accessControlDatasetEnabled === true &&
         accessControlLabelColumn && config.accessControl.datasetId && config.accessControl.viewId) {
-        var sql = "exists (\n";
-        var query = "";
+        let sql = "exists (\n";
+        let query = "";
         let useNesting = accessControlLabelColumnDelimiter && accessControlLabelColumnDelimiter.length > 0;
         if (useNesting === true) {
             query += `select 1 from unnest(split(s.${accessControlLabelColumn}, "${accessControlLabelColumnDelimiter}")) as flattenedLabel\n`;
@@ -192,33 +188,29 @@ async function generateLocalEntitySubquery(config, view, viewDatasetId, availabl
     const accessControlLabelColumnDelimiter = source.accessControlLabelColumnDelimiter;
 
     if (accessControlEnabled === true && accessControlLabelColumn) {
-        var found = availableColumns.find(function (c) {
-            if (accessControlLabelColumn.toLowerCase() === c.toLowerCase()) {
-                return true;
-            }
+        const found = availableColumns.find((c) => {
+            return accessControlLabelColumn.toLowerCase() === c.toLowerCase();
         });
-        if (found != undefined) {
+        if (found !== undefined) {
             let viewAccessControlLabels = source.accessControl.labels || [];
-            let dataset = config.datasets.find(function (d) {
-                if (d.name.toLowerCase() === viewDatasetId.toLowerCase()) {
-                    return true;
-                }
+            let dataset = config.datasets.find((d) => {
+                return d.name.toLowerCase() === viewDatasetId.toLowerCase();
             }) || [];
 
             let allLabels = viewAccessControlLabels.concat(dataset.accessControlLabels);
             let uniqueLabels = allLabels.unique();
             console.log(`uniqueLabels: ${uniqueLabels}`);
 
-            if (uniqueLabels.length == 0) {
+            if (uniqueLabels.length === 0) {
                 throw new Error("No accessControlLabels were supplied");
             }
 
-            var sql = "";
+            let sql = "";
 
             let useExistsClause = accessControlLabelColumnDelimiter && accessControlLabelColumnDelimiter.length > 0;
             if (useExistsClause === true) {
                 sql += "exists (\n";
-                var select = `select 1 from unnest(split(s.${accessControlLabelColumn}, "${accessControlLabelColumnDelimiter}")) as flattenedLabel\n`;
+                let select = `select 1 from unnest(split(s.${accessControlLabelColumn}, "${accessControlLabelColumnDelimiter}")) as flattenedLabel\n`;
                 select += "where upper(flattenedLabel) in (";
                 sql += await prependLines(select, "\t", 1);
             }
@@ -226,8 +218,8 @@ async function generateLocalEntitySubquery(config, view, viewDatasetId, availabl
                 sql += `upper(s.${accessControlLabelColumn}) in (`;
             }
 
-            var first = true;
-            uniqueLabels.forEach(function (label) {
+            let first = true;
+            uniqueLabels.forEach((label) => {
                 if (!label) {
                     return
                 }
@@ -262,25 +254,25 @@ async function generateLocalEntitySubquery(config, view, viewDatasetId, availabl
  * @param  {} occurences
  */
 async function prependLines(inputText, prepend, occurences) {
-    var readline = require('readline');
-    var stream = require('stream');
+    let readline = require('readline');
+    let stream = require('stream');
 
-    var buf = new Buffer.from(inputText);
-    var bufferStream = new stream.PassThrough();
+    let buf = new Buffer.from(inputText);
+    let bufferStream = new stream.PassThrough();
     bufferStream.end(buf);
 
-    var rl = readline.createInterface({
+    let rl = readline.createInterface({
         input: bufferStream
     });
 
-    var prependText = "";
-    var i;
+    let prependText = "";
+    let i;
     for (i = 0; i < occurences; i++) {
         prependText += prepend;
     }
 
-    var output = "";
-    var count = 0;
+    let output = "";
+    let count = 0;
     rl.on('line', (line) => {
         count++;
         if (line.length > 0) {
@@ -290,7 +282,7 @@ async function prependLines(inputText, prepend, occurences) {
 
     function getOutput() {
         return new Promise((resolve, reject) => {
-            rl.on('close', function () {
+            rl.on('close', () => {
                 resolve(output);
             });
         });
@@ -310,7 +302,7 @@ async function prependLines(inputText, prepend, occurences) {
 async function generateSqlWithPublicAccess(config, viewDatasetId, view) {
     let source = view.source;
 
-    var sql = "with filteredSourceData as (\n"
+    let sql = "with filteredSourceData as (\n"
     const availableColumns = await bigqueryUtil.tableColumns(source.datasetId, source.tableId);
     let selectSql = await generateSelectStatement(config, view, true, availableColumns);
     sql += await prependLines(selectSql, "\t", 1);
@@ -328,7 +320,7 @@ async function generateSqlWithPublicAccess(config, viewDatasetId, view) {
     sql += "\n),"
     sql += "\npublicData as (\n";
 
-    var publicSql = selectSql;
+    let publicSql = selectSql;
     publicSql += `\nwhere ${source.publicAccess.queryFilter.trim()}`;
 
     if (source.publicAccess.limit) {
@@ -354,10 +346,10 @@ async function generateSqlWithPublicAccess(config, viewDatasetId, view) {
  */
 async function generateWhereClause(config, view, viewDatasetId, availableColumns) {
     let source = view.source;
-    var sql = "";
-    var whereAdded = false;
+    let sql = "";
+    let whereAdded = false;
     const sqlFilter = source.queryFilter;
-    if (sqlFilter != undefined && sqlFilter.trim().length > 0) {
+    if (sqlFilter !== undefined && sqlFilter.trim().length > 0) {
         sql += `where ${sqlFilter}`;
         whereAdded = true;
     }
@@ -387,10 +379,10 @@ async function generateWhereClause(config, view, viewDatasetId, availableColumns
  * @param  {} view
  */
 function prepareCustomSql(config, view) {
-    var sql = view.custom.query;
+    const sql = view.custom.query;
     return configUtil.performTextVariableReplacements(config, view, sql);
 }
 
 module.exports = {
-    generateSql: generateSql
+    generateSql
 }
