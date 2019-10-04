@@ -8,6 +8,9 @@
     ],
     "extends": "eslint:recommended",
     "rules": {
+      // 4 spaces for indenting
+      "indent": ["error", 4],
+
       // Removed rule "disallow the use of console" from recommended eslint rules
       "no-console": "off",
   

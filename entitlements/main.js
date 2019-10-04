@@ -21,35 +21,35 @@
 var RuntimeConfiguration = require("./bqdsEntitlements/runtimeConfiguration");
 const bqdsEntitlements = require("bqdsEntitlements")
 const args = require('minimist')(process.argv.slice(2), {
-	alias: {
-		c: 'configurationFilePath',
-		v: 'verbose',
-		p: 'prerequisiteSetup'
-	}
+    alias: {
+        c: 'configurationFilePath',
+        v: 'verbose',
+        p: 'prerequisiteSetup'
+    }
 });
 
 if (args.verbose) {
-	console.log("Command line args");
-	console.log(args);
-	RuntimeConfiguration.VERBOSE_MODE = true;
-	console.log("-verbose is enabled");
+    console.log("Command line args");
+    console.log(args);
+    RuntimeConfiguration.VERBOSE_MODE = true;
+    console.log("-verbose is enabled");
 }
 
 if (args["dry-run"]) {
-	RuntimeConfiguration.DRY_RUN = true;
-	console.log("--dry-run is enabled");
+    RuntimeConfiguration.DRY_RUN = true;
+    console.log("--dry-run is enabled");
 }
 
 if (args.prerequisiteSetup) {
-	RuntimeConfiguration.PREREQUISITE_SETUP_ONLY = true;
-	console.log("-prerequisiteSetup is enabled");
+    RuntimeConfiguration.PREREQUISITE_SETUP_ONLY = true;
+    console.log("-prerequisiteSetup is enabled");
 }
 
 if (args.configurationFilePath) {
-	var configFilePath = args.c.trim();
-	bqdsEntitlements.processEntitlementConfigFile(configFilePath);
+    var configFilePath = args.c.trim();
+    bqdsEntitlements.processEntitlementConfigFile(configFilePath);
 }
 else {
-	console.log("Please provide the configuration file path using -c.");
-	process.exit(1);
+    console.log("Please provide the configuration file path using -c.");
+    process.exit(1);
 }
