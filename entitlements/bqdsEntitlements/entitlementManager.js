@@ -21,7 +21,7 @@ const bigqueryUtil = require("./bigqueryUtil")
 const configUtil = require("./configUtil")
 const sqlBuilder = require("./sqlBuilder")
 const configValidator = require("./configValidator")
-var RuntimeConfiguration = require("./runtimeConfiguration")
+const RuntimeConfiguration = require("./runtimeConfiguration")
 const YAML = require('yaml')
 const uuidv4 = require('uuid/v4')
 
@@ -133,7 +133,7 @@ async function setupPrerequisites(config) {
         }
 
         if (await bigqueryUtil.tableExists(config.projectId, config.accessControl.datasetId, "groupEntitlements") === false) {
-            let groupEntitlementSchema = [{
+            const groupEntitlementSchema = [{
                 "name": "groupName",
                 "type": "STRING",
                 "mode": "REQUIRED"
@@ -146,7 +146,7 @@ async function setupPrerequisites(config) {
             await bigqueryUtil.createTable(config.accessControl.datasetId, "groupEntitlements", groupEntitlementSchema);
         }
         if (await bigqueryUtil.tableExists(config.projectId, config.accessControl.datasetId, "groups") === false) {
-            let groupsSchema = [{
+            const groupsSchema = [{
                 "name": "groupName",
                 "type": "STRING",
                 "mode": "REQUIRED"
@@ -164,14 +164,14 @@ async function setupPrerequisites(config) {
             await bigqueryUtil.createTable(config.accessControl.datasetId, "groups", groupsSchema);
         }
         if (await bigqueryUtil.viewExists(config.projectId, config.accessControl.datasetId, config.accessControl.viewId) === false) {
-            let viewSql = `select lower(g.viewName) as viewName, e.accessControlLabel\nfrom \`${config.projectId}.${config.accessControl.datasetId}.groups\` g\njoin \`${config.projectId}.${config.accessControl.datasetId}.groupEntitlements\` e on lower(g.groupName) = lower(e.groupName)\nwhere lower(g.user) = lower(session_user())`;
+            const viewSql = `select lower(g.viewName) as viewName, e.accessControlLabel\nfrom \`${config.projectId}.${config.accessControl.datasetId}.groups\` g\njoin \`${config.projectId}.${config.accessControl.datasetId}.groupEntitlements\` e on lower(g.groupName) = lower(e.groupName)\nwhere lower(g.user) = lower(session_user())`;
             await bigqueryUtil.createView(config.projectId, config.accessControl.datasetId, config.accessControl.viewId, viewSql, true, null, null);
         }
     }
 
     if (RuntimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE === true) {
         if (await bigqueryUtil.tableExists(config.projectId, config.accessControl.datasetId, "datasetPermissions") === false) {
-            let userPermissionsSchema = [{
+            const userPermissionsSchema = [{
                 "name": "uuid",
                 "type": "STRING",
                 "mode": "REQUIRED"
@@ -208,7 +208,7 @@ async function setupPrerequisites(config) {
             await bigqueryUtil.createTable(config.accessControl.datasetId, "datasetPermissions", userPermissionsSchema);
         }
         if (await bigqueryUtil.viewExists(config.projectId, config.accessControl.datasetId, "latestDatasetPermissions") === false) {
-            let viewSql = `WITH RANKED AS (\n  select\n    configurationName,\n    uuid,\n    DENSE_RANK() OVER (PARTITION BY configurationName ORDER BY lastUpdated) as rank\n  from \`${config.projectId}.${config.accessControl.datasetId}.datasetPermissions\`\n),\nROWIDENTIFIERS AS (\n  SELECT r.uuid\n  from RANKED r\n  where r.rank = (select max(r2.rank) from RANKED r2 where r2.configurationName = r.configurationName)\n)\nSELECT\n * EXCEPT(uuid)\nFROM \`${config.projectId}.${config.accessControl.datasetId}.datasetPermissions\` t\nWHERE EXISTS (SELECT 1 from ROWIDENTIFIERS r WHERE t.uuid = r.uuid)`;
+            const viewSql = `WITH RANKED AS (\n  select\n    configurationName,\n    uuid,\n    DENSE_RANK() OVER (PARTITION BY configurationName ORDER BY lastUpdated) as rank\n  from \`${config.projectId}.${config.accessControl.datasetId}.datasetPermissions\`\n),\nROWIDENTIFIERS AS (\n  SELECT r.uuid\n  from RANKED r\n  where r.rank = (select max(r2.rank) from RANKED r2 where r2.configurationName = r.configurationName)\n)\nSELECT\n * EXCEPT(uuid)\nFROM \`${config.projectId}.${config.accessControl.datasetId}.datasetPermissions\` t\nWHERE EXISTS (SELECT 1 from ROWIDENTIFIERS r WHERE t.uuid = r.uuid)`;
             await bigqueryUtil.createView(config.projectId, config.accessControl.datasetId, "latestDatasetPermissions", viewSql, true, null, null);
         }
     }
@@ -523,10 +523,10 @@ async function removeStaleObjects(config) {
 async function refreshDatasetPermissionTable(config) {
     const uuid = uuidv4();
     const [datasets] = await bigqueryUtil.getDatasets();
-    var accessRecords = [];
+    let accessRecords = [];
     const date = new Date();
     for (const ds of datasets) {
-        var dsMetadata = await bigqueryUtil.getDatasetMetadata(ds.id);
+        const dsMetadata = await bigqueryUtil.getDatasetMetadata(ds.id);
         if (dsMetadata.labels && dsMetadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] == config.name) {
             if (dsMetadata.access && dsMetadata.access.length > 0) {
                 dsMetadata.access.forEach(function (a) {
