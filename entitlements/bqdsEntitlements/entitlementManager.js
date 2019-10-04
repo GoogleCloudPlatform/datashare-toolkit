@@ -35,18 +35,18 @@ async function processEntitlementConfigFile(filePath) {
     }
 
     let data = fs.readFileSync(filePath, { encoding: 'utf8' });
-    var path = require('path')
+    let path = require('path')
     let extension = path.extname(filePath).toLowerCase();
 
-    var config;
-    if (extension == ".json") {
+    let config;
+    if (extension === ".json") {
         if (configValidator.isJsonString(data) === false) {
             console.log("Configuration is not valid JSON");
             return;
         }
         config = JSON.parse(data);
     }
-    else if (extension == ".yaml") {
+    else if (extension === ".yaml") {
         if (configValidator.isYamlString(data) === false) {
             console.log("Configuration is not valid YAML");
             return;
@@ -64,7 +64,7 @@ async function processEntitlementConfigFile(filePath) {
 async function processEntitlementConfig(config) {
     await bigqueryUtil.init(config.projectId);
 
-    var prerequisiteComplete = false;
+    let prerequisiteComplete = false;
     if (RuntimeConfiguration.DRY_RUN === false) {
         console.log("-------------------START - setupPrerequisites-------------------");
         await setupPrerequisites(config);
@@ -235,13 +235,12 @@ async function processConfiguration(config) {
             }
 
             const viewSql = await sqlBuilder.generateSql(config, ds, view);
-            var metadataResult = await bigqueryUtil.getTableMetadata(ds, view.name);
+            let metadataResult = await bigqueryUtil.getTableMetadata(ds, view.name);
 
-            var _viewMetadata = metadataResult.metadata;
+            let _viewMetadata = metadataResult.metadata;
             const _viewExists = metadataResult.exists;
 
-            var createViewResult;
-            var viewCreated = false;
+            let createViewResult;
             let configuredExpirationTime = view.expiration && view.expiration.delete === true ? view.expiration.time : null;
 
             // Check if the view exists
@@ -271,7 +270,7 @@ async function processConfiguration(config) {
                     }
                 }
 
-                var currentExpiryTime = _viewMetadata.expirationTime;
+                const currentExpiryTime = _viewMetadata.expirationTime;
 
                 if (RuntimeConfiguration.VERBOSE_MODE) {
                     console.log(`expirationTime for view '${view.name}' is ${currentExpiryTime}`);
@@ -279,7 +278,7 @@ async function processConfiguration(config) {
 
                 // Update expirationTime for view
                 // Deleting the property doesn't remove it from metadata, setting it to null removes it
-                if (configuredExpirationTime != currentExpiryTime) {
+                if (configuredExpirationTime !== currentExpiryTime) {
                     console.log(`Configured expirationTime is different than the value for view '${view.name}'`);
                     _viewMetadata.expirationTime = configuredExpirationTime;
                     await bigqueryUtil.setTableMetadata(ds, view.name, _viewMetadata);
@@ -300,7 +299,7 @@ async function processConfiguration(config) {
                 createViewResult = await bigqueryUtil.createView(config.projectId, ds, view.name, viewSql, false, config.name, configuredExpirationTime);
             }
 
-            var viewCreated = createViewResult && createViewResult.success;
+            let viewCreated = createViewResult && createViewResult.success;
             console.log("Authorizing view objects for access from other datasets");
             if (!view.hasOwnProperty('custom')) {
                 let source = view.source;
@@ -347,24 +346,22 @@ async function processAccessPermissions(config) {
         console.log(`Dataset: '${ds.name}' - current access: ${JSON.stringify(configuredAccessRecords)}`);
 
         // Get the metadata for the current dataset
-        var metadata = await bigqueryUtil.getDatasetMetadata(ds.name);
+        let metadata = await bigqueryUtil.getDatasetMetadata(ds.name);
 
         if (!metadata.access) {
             metadata.access = [];
         }
 
-        var hasChanges = false;
+        let hasChanges = false;
 
         // Iterate through the configured access groups to add any that are not in the metadata
-        configuredAccessRecords.forEach(function (c) {
+        configuredAccessRecords.forEach((c) => {
             // Add role to the record as we currently set it to 'READER' by default
-            var newRecord = c;
+            let newRecord = c;
             newRecord["role"] = _role;
 
-            var found = metadata.access.find(function (bq) {
-                if (configUtil.accessItemsEqual(newRecord, bq)) {
-                    return true;
-                }
+            const found = metadata.access.find((bq) => {
+                return configUtil.accessItemsEqual(newRecord, bq);
             });
             if (!found) {
                 // Push it into the array
@@ -374,21 +371,19 @@ async function processAccessPermissions(config) {
         });
 
         // Iterate through the metadata to remove any users no longer in the configuration
-        var i = metadata.access.length;
+        let i = metadata.access.length;
         while (i--) {
-            var bq = metadata.access[i];
+            let bq = metadata.access[i];
 
             // Skip non-READER roles
-            if (bq.role != _role) {
+            if (bq.role !== _role) {
                 continue;
             }
-            var found = configuredAccessRecords.find(function (c) {
+            let found = configuredAccessRecords.find((c) => {
                 // Add role to the record as we currently set it to 'READER' by default
-                var newRecord = c;
+                let newRecord = c;
                 newRecord["role"] = _role;
-                if (configUtil.accessItemsEqual(newRecord, bq)) {
-                    return true;
-                }
+                return configUtil.accessItemsEqual(newRecord, bq);
             });
 
             if (!found) {
@@ -421,23 +416,23 @@ async function removeStaleObjects(config) {
     const entitlementDataset = config.accessControl ? config.accessControl.datasetId : null;
 
     for (const ds of datasets) {
-        var isEntitlementDataset = false;
+        let isEntitlementDataset = false;
         if (entitlementDataset && ds.id.toLowerCase() === entitlementDataset.toLowerCase()) {
             isEntitlementDataset = true;
         }
 
-        var isDatasetRequired = true;
-        var hasManagedTables = false;
-        var hasNonManagedTables = false;
-        var isDatasetMetadataUpdateRequired = false;
+        let isDatasetRequired = true;
+        let hasManagedTables = false;
+        let hasNonManagedTables = false;
+        let isDatasetMetadataUpdateRequired = false;
 
-        var dsMetadata = await bigqueryUtil.getDatasetMetadata(ds.id);
+        let dsMetadata = await bigqueryUtil.getDatasetMetadata(ds.id);
 
-        if (isEntitlementDataset == true) {
+        if (isEntitlementDataset === true) {
             // Remove authorized views for which the view object doesn't exist anymore
-            var i = dsMetadata.access.length;
+            let i = dsMetadata.access.length;
             while (i--) {
-                var a = dsMetadata.access[i];
+                let a = dsMetadata.access[i];
                 if (a.view && a.view.projectId && a.view.datasetId && a.view.tableId) {
                     const _viewExists = await bigqueryUtil.viewExists(a.view.projectId, a.view.datasetId, a.view.tableId);
                     if (_viewExists === false) {
@@ -447,22 +442,22 @@ async function removeStaleObjects(config) {
                 }
             }
         }
-        else if (dsMetadata.labels && dsMetadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] == config.name) {
+        else if (dsMetadata.labels && dsMetadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] === config.name) {
             console.log(`Dataset is managed: '${ds.id}'`);
 
             // If within a dataset, check it's authorized views and remove invalid objects?
             const isConfigured = configUtil.configurationContainsDataset(config, ds.id);
 
-            if (isConfigured == false) {
+            if (isConfigured === false) {
                 // Delete the dataset if there are no non-managed objects within
                 isDatasetRequired = false;
                 console.log(`Dataset '${ds.id}' is not required by the configuration`);
             }
 
             // Remove authorized views for which the view object doesn't exist anymore
-            var i = dsMetadata.access.length;
+            let i = dsMetadata.access.length;
             while (i--) {
-                var a = dsMetadata.access[i];
+                let a = dsMetadata.access[i];
                 if (a.view && a.view.projectId && a.view.datasetId && a.view.tableId) {
                     const _viewExists = await bigqueryUtil.viewExists(a.view.projectId, a.view.datasetId, a.view.tableId);
                     if (_viewExists === false) {
@@ -478,7 +473,7 @@ async function removeStaleObjects(config) {
 
         const [tables] = await ds.getTables();
         for (const table of tables) {
-            if (table.metadata.labels && table.metadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] == config.name) {
+            if (table.metadata.labels && table.metadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] === config.name) {
                 console.log(`View is managed: '${table.id}'`);
                 const isConfigured = await configUtil.configurationContainsView(config, ds.id, table.id);
 
@@ -527,11 +522,11 @@ async function refreshDatasetPermissionTable(config) {
     const date = new Date();
     for (const ds of datasets) {
         const dsMetadata = await bigqueryUtil.getDatasetMetadata(ds.id);
-        if (dsMetadata.labels && dsMetadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] == config.name) {
+        if (dsMetadata.labels && dsMetadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] === config.name) {
             if (dsMetadata.access && dsMetadata.access.length > 0) {
-                dsMetadata.access.forEach(function (a) {
+                dsMetadata.access.forEach((a) => {
                     const keys = Object.keys(a);
-                    if (keys.length == 2) {
+                    if (keys.length === 2) {
                         const accessType = keys[1];
                         const accessId = a[accessType];
                         // console.log(`Role: ${a.role} AccessType: ${accessType} AccessId: ${accessId}`);

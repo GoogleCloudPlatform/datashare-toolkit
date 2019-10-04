@@ -24,7 +24,7 @@ class RuntimeConfiguration {
         this.prerequisiteSetupOnly = false;
         this.refreshDatasetPermissionTable = true;
 
-        var packageDescription = require('./package').description
+        let packageDescription = require('./package').description
         if (packageDescription) {
             this.productName = packageDescription;
         }

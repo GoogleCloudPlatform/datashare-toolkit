@@ -20,8 +20,8 @@ jobs:
     - name: npm install, build, and test
       run: |
         cd entitlements
-        npm run lint
+        npm install & npm run lint
         cd ../ingestion/processUpload
-        npm run lint
+        npm install & npm run lint
       env:
         CI: true
