@@ -30,7 +30,7 @@ let bigqueryClient;
  * @param {} projectId
  */
 async function init(projectId) {
-    if (bigqueryClient == undefined) {
+    if (bigqueryClient === undefined) {
         bigqueryClient = new BigQuery({
             projectId: projectId,
         });
@@ -542,25 +542,25 @@ async function insertRows(datasetId, tableId, rows) {
 }
 
 module.exports = {
-    init: init,
-    validateQuery: validateQuery,
-    tableColumns: tableColumns,
-    viewExists: viewExists,
-    tableExists: tableExists,
-    getDatasetMetadata: getDatasetMetadata,
-    getTableMetadata: getTableMetadata,
-    getDatasets: getDatasets,
-    findUsersInRole: findUsersInRole,
-    datasetExists: datasetExists,
-    createDataset: createDataset,
-    deleteDataset: deleteDataset,
-    createTable: createTable,
-    deleteTable: deleteTable,
-    createView: createView,
-    shareAuthorizeView: shareAuthorizeView,
-    getDatasetLabelValue: getDatasetLabelValue,
-    getTableLabelValue: getTableLabelValue,
-    setDatasetMetadata: setDatasetMetadata,
-    setTableMetadata: setTableMetadata,
-    insertRows: insertRows
+    init,
+    validateQuery,
+    tableColumns,
+    viewExists,
+    tableExists,
+    getDatasetMetadata,
+    getTableMetadata,
+    getDatasets,
+    findUsersInRole,
+    datasetExists,
+    createDataset,
+    deleteDataset,
+    createTable,
+    deleteTable,
+    createView,
+    shareAuthorizeView,
+    getDatasetLabelValue,
+    getTableLabelValue,
+    setDatasetMetadata,
+    setTableMetadata,
+    insertRows
 }
