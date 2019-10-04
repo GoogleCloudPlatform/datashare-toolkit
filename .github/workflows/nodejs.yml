@@ -1,4 +1,4 @@
-name: Node CI
+name: Node Lint CI
 
 on: [push]
 
@@ -20,6 +20,8 @@ jobs:
     - name: npm install, build, and test
       run: |
         cd entitlements
+        npm run lint
+        cd ../ingestion/processUpload
         npm run lint
       env:
         CI: true
