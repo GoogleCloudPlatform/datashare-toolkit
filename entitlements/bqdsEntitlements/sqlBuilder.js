@@ -86,11 +86,9 @@ async function generateSelectStatement(config, view, includeFrom, availableColum
     if (visibleColumns) {
         visibleColumns.forEach((col) => {
             var found = availableColumns.find((c) => {
-                if (col.toLowerCase() === c.toLowerCase()) {
-                    return true;
-                }
+                return col.toLowerCase() === c.toLowerCase();
             });
-            if (found != undefined) {
+            if (found !== undefined) {
                 vColumns.push(col)
             }
         });
@@ -101,11 +99,9 @@ async function generateSelectStatement(config, view, includeFrom, availableColum
     if (hiddenColumns) {
         hiddenColumns.forEach((col) => {
             var found = availableColumns.find((c) => {
-                if (col.toLowerCase() === c.toLowerCase()) {
-                    return true;
-                }
+                return col.toLowerCase() === c.toLowerCase();
             });
-            if (found != undefined) {
+            if (found !== undefined) {
                 hColumns.push(col)
             }
         });
@@ -117,7 +113,7 @@ async function generateSelectStatement(config, view, includeFrom, availableColum
         sql += "select\n";
         var i;
         for (i = 0; i < vColumns.length; i++) {
-            if (i != 0) {
+            if (i !== 0) {
                 // Not the last item in the collection
                 sql += ",\n";
             }
@@ -193,23 +189,19 @@ async function generateLocalEntitySubquery(config, view, viewDatasetId, availabl
 
     if (accessControlEnabled === true && accessControlLabelColumn) {
         var found = availableColumns.find((c) => {
-            if (accessControlLabelColumn.toLowerCase() === c.toLowerCase()) {
-                return true;
-            }
+            return accessControlLabelColumn.toLowerCase() === c.toLowerCase();
         });
-        if (found != undefined) {
+        if (found !== undefined) {
             let viewAccessControlLabels = source.accessControl.labels || [];
             let dataset = config.datasets.find((d) => {
-                if (d.name.toLowerCase() === viewDatasetId.toLowerCase()) {
-                    return true;
-                }
+                return d.name.toLowerCase() === viewDatasetId.toLowerCase();
             }) || [];
 
             let allLabels = viewAccessControlLabels.concat(dataset.accessControlLabels);
             let uniqueLabels = allLabels.unique();
             console.log(`uniqueLabels: ${uniqueLabels}`);
 
-            if (uniqueLabels.length == 0) {
+            if (uniqueLabels.length === 0) {
                 throw new Error("No accessControlLabels were supplied");
             }
 
@@ -357,7 +349,7 @@ async function generateWhereClause(config, view, viewDatasetId, availableColumns
     var sql = "";
     var whereAdded = false;
     const sqlFilter = source.queryFilter;
-    if (sqlFilter != undefined && sqlFilter.trim().length > 0) {
+    if (sqlFilter !== undefined && sqlFilter.trim().length > 0) {
         sql += `where ${sqlFilter}`;
         whereAdded = true;
     }

@@ -241,7 +241,6 @@ async function processConfiguration(config) {
             const _viewExists = metadataResult.exists;
 
             var createViewResult;
-            var viewCreated = false;
             let configuredExpirationTime = view.expiration && view.expiration.delete === true ? view.expiration.time : null;
 
             // Check if the view exists
@@ -279,7 +278,7 @@ async function processConfiguration(config) {
 
                 // Update expirationTime for view
                 // Deleting the property doesn't remove it from metadata, setting it to null removes it
-                if (configuredExpirationTime != currentExpiryTime) {
+                if (configuredExpirationTime !== currentExpiryTime) {
                     console.log(`Configured expirationTime is different than the value for view '${view.name}'`);
                     _viewMetadata.expirationTime = configuredExpirationTime;
                     await bigqueryUtil.setTableMetadata(ds, view.name, _viewMetadata);
@@ -362,9 +361,7 @@ async function processAccessPermissions(config) {
             newRecord["role"] = _role;
 
             var found = metadata.access.find((bq) => {
-                if (configUtil.accessItemsEqual(newRecord, bq)) {
-                    return true;
-                }
+                return configUtil.accessItemsEqual(newRecord, bq);
             });
             if (!found) {
                 // Push it into the array
@@ -379,16 +376,14 @@ async function processAccessPermissions(config) {
             var bq = metadata.access[i];
 
             // Skip non-READER roles
-            if (bq.role != _role) {
+            if (bq.role !== _role) {
                 continue;
             }
             var found = configuredAccessRecords.find((c) => {
                 // Add role to the record as we currently set it to 'READER' by default
                 var newRecord = c;
                 newRecord["role"] = _role;
-                if (configUtil.accessItemsEqual(newRecord, bq)) {
-                    return true;
-                }
+                return configUtil.accessItemsEqual(newRecord, bq);
             });
 
             if (!found) {
@@ -433,11 +428,11 @@ async function removeStaleObjects(config) {
 
         var dsMetadata = await bigqueryUtil.getDatasetMetadata(ds.id);
 
-        if (isEntitlementDataset == true) {
+        if (isEntitlementDataset === true) {
             // Remove authorized views for which the view object doesn't exist anymore
-            var i = dsMetadata.access.length;
+            let i = dsMetadata.access.length;
             while (i--) {
-                var a = dsMetadata.access[i];
+                let a = dsMetadata.access[i];
                 if (a.view && a.view.projectId && a.view.datasetId && a.view.tableId) {
                     const _viewExists = await bigqueryUtil.viewExists(a.view.projectId, a.view.datasetId, a.view.tableId);
                     if (_viewExists === false) {
@@ -447,22 +442,22 @@ async function removeStaleObjects(config) {
                 }
             }
         }
-        else if (dsMetadata.labels && dsMetadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] == config.name) {
+        else if (dsMetadata.labels && dsMetadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] === config.name) {
             console.log(`Dataset is managed: '${ds.id}'`);
 
             // If within a dataset, check it's authorized views and remove invalid objects?
             const isConfigured = configUtil.configurationContainsDataset(config, ds.id);
 
-            if (isConfigured == false) {
+            if (isConfigured === false) {
                 // Delete the dataset if there are no non-managed objects within
                 isDatasetRequired = false;
                 console.log(`Dataset '${ds.id}' is not required by the configuration`);
             }
 
             // Remove authorized views for which the view object doesn't exist anymore
-            var i = dsMetadata.access.length;
+            let i = dsMetadata.access.length;
             while (i--) {
-                var a = dsMetadata.access[i];
+                let a = dsMetadata.access[i];
                 if (a.view && a.view.projectId && a.view.datasetId && a.view.tableId) {
                     const _viewExists = await bigqueryUtil.viewExists(a.view.projectId, a.view.datasetId, a.view.tableId);
                     if (_viewExists === false) {
@@ -478,7 +473,7 @@ async function removeStaleObjects(config) {
 
         const [tables] = await ds.getTables();
         for (const table of tables) {
-            if (table.metadata.labels && table.metadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] == config.name) {
+            if (table.metadata.labels && table.metadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] === config.name) {
                 console.log(`View is managed: '${table.id}'`);
                 const isConfigured = await configUtil.configurationContainsView(config, ds.id, table.id);
 
@@ -527,11 +522,11 @@ async function refreshDatasetPermissionTable(config) {
     const date = new Date();
     for (const ds of datasets) {
         const dsMetadata = await bigqueryUtil.getDatasetMetadata(ds.id);
-        if (dsMetadata.labels && dsMetadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] == config.name) {
+        if (dsMetadata.labels && dsMetadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] === config.name) {
             if (dsMetadata.access && dsMetadata.access.length > 0) {
                 dsMetadata.access.forEach((a) => {
                     const keys = Object.keys(a);
-                    if (keys.length == 2) {
+                    if (keys.length === 2) {
                         const accessType = keys[1];
                         const accessId = a[accessType];
                         // console.log(`Role: ${a.role} AccessType: ${accessType} AccessId: ${accessId}`);

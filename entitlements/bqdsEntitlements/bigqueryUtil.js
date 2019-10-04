@@ -189,6 +189,7 @@ async function getDatasetMetadata(datasetId) {
         const metadata = data[0];
         const apiResponse = data[1];
         _metadata = metadata;
+        return;
     });
 
     // Should have boolean return, handling errors or throwing to caller
@@ -220,6 +221,7 @@ async function getTableMetadata(datasetId, tableId) {
             const _metadata = data[0];
             const apiResponse = data[1];
             metadata = _metadata;
+            return;
         });
     } catch (err) {
         exists = false;
@@ -426,6 +428,7 @@ async function setDatasetMetadata(datasetId, metadata) {
     await dataset.setMetadata(metadata).then((data) => {
         const apiResponse = data[0];
         success = true;
+        return;
     });
 
     // Should have boolean return, handling errors or throwing to caller
@@ -498,6 +501,7 @@ async function setTableMetadata(datasetId, tableId, metadata) {
         const metadataResponse = data[0];
         const apiResponse = data[1];
         _metadata = metadataResponse;
+        return;
     });
 
     // Should have boolean return, handling errors or throwing to caller
