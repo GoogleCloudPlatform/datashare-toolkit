@@ -76,7 +76,7 @@ async function validate(config) {
     var _isValid = true;
     console.log("-------------------START - Validation Result-------------------");
     if (issues.length > 0) {
-        issues.forEach(function (i) {
+        issues.forEach((i) => {
             console.log(`${i.issueType}: ${i.message}`);
             if (i.issueType == IssueType.ERROR) {
                 _isValid = false;
@@ -151,7 +151,7 @@ function validateGroups(config) {
     }
 
     var groupNames = [];
-    config.groups.forEach(function (g) {
+    config.groups.forEach((g) => {
         if (!g.name) {
             logIssue(IssueType.ERROR, "'group' 'name' not provided");
         }
@@ -207,7 +207,7 @@ function validateDatasets(config) {
     }
 
     var datasetIds = [];
-    config.datasets.forEach(function (d) {
+    config.datasets.forEach((d) => {
         if (!d.hasOwnProperty('name') || !d.name) {
             logIssue(IssueType.ERROR, "dataset 'name' not provided");
         }
@@ -253,7 +253,7 @@ function validateDatasets(config) {
             findDuplicates(d.groupNames, `duplicate 'groupNames' in dataset '${d.name}'`);
 
             if (d.groupNames && d.groupNames.length > 0) {
-                d.groupNames.forEach(function (g) {
+                d.groupNames.forEach((g) => {
                     const group = configUtil.findGroup(config, g);
                     if (!group) {
                         logIssue(IssueType.ERROR, `group '${g}' referenced in dataset '${d.name}' is not defined in the 'groups' collection`);
@@ -262,9 +262,9 @@ function validateDatasets(config) {
                         // Check for duplicates for access across both arrays.
                         var accessRecords = configUtil.concatentateAccessItems(config, d);
                         var duplicateCheck = [];
-                        accessRecords.forEach(function (a) {
+                        accessRecords.forEach((a) => {
                             var dupFound = false;
-                            duplicateCheck.forEach(function (dup) {
+                            duplicateCheck.forEach((dup) => {
                                 if (configUtil.accessItemsEqual(a, dup)) {
                                     dupFound = true;
                                     logIssue(IssueType.ERROR, `Duplicate access item found for dataset: '${d.name}' and group: '${g}': '${JSON.stringify(a)}'`);
@@ -429,8 +429,8 @@ async function validateViews(config) {
 
                         // Iterate all associated datasets and find accessControlLabel collections that are empty where accessControlLabels is not provided in the view.
                         if (_hasViewAccessControlLabels === false && v.datasetNames && v.datasetNames.length > 0) {
-                            v.datasetNames.forEach(function (d) {
-                                var dsFound = config.datasets.find(function (c) {
+                            v.datasetNames.forEach((d) => {
+                                var dsFound = config.datasets.find((c) => {
                                     if (c.name === d) {
                                         return true;
                                     }
@@ -502,7 +502,7 @@ async function validateViews(config) {
 
         if (v.datasetNames && v.datasetNames.length > 0) {
             // Ensure dependent datasetName exists.
-            v.datasetNames.forEach(function (d) {
+            v.datasetNames.forEach((d) => {
                 if (!configUtil.findDataset(config, d)) {
                     logIssue(IssueType.ERROR, `datasetName '${d}' referenced in view '${v.name}' is not defined in the datasets collection`);
                 }
@@ -556,7 +556,7 @@ async function validateLabels(config) {
 async function isValid() {
     var _isValid = true;
     if (issues.length > 0) {
-        issues.forEach(function (i) {
+        issues.forEach((i) => {
             if (i.issueType == IssueType.ERROR) {
                 _isValid = false;
             }
@@ -608,7 +608,7 @@ function findDuplicates(array, message) {
     }
     var allObjects = [];
     var duplicates = [];
-    array.forEach(function (s) {
+    array.forEach((s) => {
         if (allObjects.indexOf(s.toLowerCase()) > -1) {
             logIssue(IssueType.ERROR, `${message}: '${s}'`);
             duplicates.push(s);
@@ -632,7 +632,7 @@ async function areAllColumnsAvailable(columns, dataset, table, message) {
     var missingColumns = [];
     let availableColumns = await bigqueryUtil.tableColumns(dataset, table);
     for (const col of columns) {
-        var found = availableColumns.find(function (c) {
+        var found = availableColumns.find((c) => {
             if (col.toLowerCase() === c.toLowerCase()) {
                 return true;
             }

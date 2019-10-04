@@ -84,8 +84,8 @@ async function generateSelectStatement(config, view, includeFrom, availableColum
     // TODO: The config validation will ensure all columns exist. This can be removed.
     var vColumns = [];
     if (visibleColumns) {
-        visibleColumns.forEach(function (col) {
-            var found = availableColumns.find(function (c) {
+        visibleColumns.forEach((col) => {
+            var found = availableColumns.find((c) => {
                 if (col.toLowerCase() === c.toLowerCase()) {
                     return true;
                 }
@@ -99,8 +99,8 @@ async function generateSelectStatement(config, view, includeFrom, availableColum
     // TODO: The config validation will ensure all columns exist. This can be removed.
     var hColumns = [];
     if (hiddenColumns) {
-        hiddenColumns.forEach(function (col) {
-            var found = availableColumns.find(function (c) {
+        hiddenColumns.forEach((col) => {
+            var found = availableColumns.find((c) => {
                 if (col.toLowerCase() === c.toLowerCase()) {
                     return true;
                 }
@@ -192,14 +192,14 @@ async function generateLocalEntitySubquery(config, view, viewDatasetId, availabl
     const accessControlLabelColumnDelimiter = source.accessControlLabelColumnDelimiter;
 
     if (accessControlEnabled === true && accessControlLabelColumn) {
-        var found = availableColumns.find(function (c) {
+        var found = availableColumns.find((c) => {
             if (accessControlLabelColumn.toLowerCase() === c.toLowerCase()) {
                 return true;
             }
         });
         if (found != undefined) {
             let viewAccessControlLabels = source.accessControl.labels || [];
-            let dataset = config.datasets.find(function (d) {
+            let dataset = config.datasets.find((d) => {
                 if (d.name.toLowerCase() === viewDatasetId.toLowerCase()) {
                     return true;
                 }
@@ -227,7 +227,7 @@ async function generateLocalEntitySubquery(config, view, viewDatasetId, availabl
             }
 
             var first = true;
-            uniqueLabels.forEach(function (label) {
+            uniqueLabels.forEach((label) => {
                 if (!label) {
                     return
                 }
@@ -290,7 +290,7 @@ async function prependLines(inputText, prepend, occurences) {
 
     function getOutput() {
         return new Promise((resolve, reject) => {
-            rl.on('close', function () {
+            rl.on('close', () => {
                 resolve(output);
             });
         });

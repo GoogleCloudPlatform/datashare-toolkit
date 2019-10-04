@@ -59,7 +59,7 @@ function configurationContainsDataset(config, datasetId) {
  */
 async function configurationContainsView(config, datasetId, viewId) {
     for (const view of config.views) {
-        var dsFound = view.datasetNames.find(function (d) {
+        var dsFound = view.datasetNames.find((d) => {
             if (d.toLowerCase() === datasetId.toLowerCase()) {
                 return true;
             }
@@ -94,7 +94,7 @@ function findDataset(config, datasetId) {
  */
 function findGroup(config, groupName) {
     if (config.groups && config.groups.length > 0) {
-        var groupFound = config.groups.find(function (g) {
+        var groupFound = config.groups.find((g) => {
             if (g.name === groupName) {
                 return true;
             }
@@ -140,7 +140,7 @@ function concatentateAccessItems(config, ds) {
 
     // Iterate to get access for any groups that exist
     if (ds.groupNames && ds.groupNames.length > 0) {
-        ds.groupNames.forEach(function (groupName) {
+        ds.groupNames.forEach((groupName) => {
             var foundGroup = findGroup(config, groupName);
             if (foundGroup && foundGroup.access && foundGroup.access.length > 0) {
                 accessRecords = accessRecords.concat(foundGroup.access);

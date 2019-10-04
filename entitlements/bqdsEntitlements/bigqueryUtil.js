@@ -496,7 +496,7 @@ async function setTableMetadata(datasetId, tableId, metadata) {
     }
 
     // https://cloud.google.com/nodejs/docs/reference/bigquery/1.3.x/Table#setMetadata
-    await table.setMetadata(metadata).then(function (data) {
+    await table.setMetadata(metadata).then((data) => {
         const metadataResponse = data[0];
         const apiResponse = data[1];
         _metadata = metadataResponse;

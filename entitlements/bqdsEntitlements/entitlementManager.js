@@ -356,12 +356,12 @@ async function processAccessPermissions(config) {
         var hasChanges = false;
 
         // Iterate through the configured access groups to add any that are not in the metadata
-        configuredAccessRecords.forEach(function (c) {
+        configuredAccessRecords.forEach((c) => {
             // Add role to the record as we currently set it to 'READER' by default
             var newRecord = c;
             newRecord["role"] = _role;
 
-            var found = metadata.access.find(function (bq) {
+            var found = metadata.access.find((bq) => {
                 if (configUtil.accessItemsEqual(newRecord, bq)) {
                     return true;
                 }
@@ -382,7 +382,7 @@ async function processAccessPermissions(config) {
             if (bq.role != _role) {
                 continue;
             }
-            var found = configuredAccessRecords.find(function (c) {
+            var found = configuredAccessRecords.find((c) => {
                 // Add role to the record as we currently set it to 'READER' by default
                 var newRecord = c;
                 newRecord["role"] = _role;
@@ -529,7 +529,7 @@ async function refreshDatasetPermissionTable(config) {
         const dsMetadata = await bigqueryUtil.getDatasetMetadata(ds.id);
         if (dsMetadata.labels && dsMetadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] == config.name) {
             if (dsMetadata.access && dsMetadata.access.length > 0) {
-                dsMetadata.access.forEach(function (a) {
+                dsMetadata.access.forEach((a) => {
                     const keys = Object.keys(a);
                     if (keys.length == 2) {
                         const accessType = keys[1];
