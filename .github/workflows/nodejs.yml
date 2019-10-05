@@ -22,7 +22,7 @@ jobs:
         cd entitlements/bqdsEntitlements
         npm install --loglevel verbose
         npm run lint
-        cd ../ingestion/processUpload
+        cd ../../ingestion/processUpload
         npm install --loglevel verbose
         npm run lint
       env:
