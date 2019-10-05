@@ -2,11 +2,9 @@ FROM node:latest
 
 WORKDIR /app
 
-ADD ./bqdsEntitlements /app/bqdsEntitlements
-ADD main.js /app
-ADD package.json /app
+ADD ./bqdsEntitlements /app
 
-RUN npm install --unsafe-perm
+RUN npm install -g
 
 # Downloading gcloud package
 RUN curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz

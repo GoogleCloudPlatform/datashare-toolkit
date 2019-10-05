@@ -24,17 +24,17 @@ class RuntimeConfiguration {
         this.prerequisiteSetupOnly = false;
         this.refreshDatasetPermissionTable = true;
 
-        let packageDescription = require('./package').description
-        if (packageDescription) {
-            this.productName = packageDescription;
-        }
-        else {
-            this.productName = "BQDS entitlement-engine";
-        }
+        const _package = require('./package');
+        this.productName = _package.description;
+        this.productVersion = _package.version;
     }
 
     get PRODUCT_NAME() {
         return this.productName;
+    }
+
+    get PRODUCT_VERSION() {
+        return this.productVersion;
     }
 
     get BQDS_CONFIGURATION_NAME_LABEL_KEY() {

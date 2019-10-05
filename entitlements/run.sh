@@ -33,7 +33,7 @@ echo "CONFIG_FILE_NAME=${CONFIG_FILE_NAME}"
 docker build -t entitlement-engine:v1 .
 
 IMAGE_CONFIG_FILE_PATH="/app/configuration/${CONFIG_FILE_NAME}"
-echo "\nTo update using the mounted configuration file: '${CONFIG_FILE_PATH}', run the following command:\n\n\tnode main.js -c '${IMAGE_CONFIG_FILE_PATH}'\n\n"
+echo "\nTo update using the mounted configuration file: '${CONFIG_FILE_PATH}', run the following command:\n\n\tentitlement-engine -c '${IMAGE_CONFIG_FILE_PATH}'\n\n"
 
 docker run -it \
     -v "${CONFIG_FILE_PATH}":"${IMAGE_CONFIG_FILE_PATH}" \

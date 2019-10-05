@@ -26,7 +26,7 @@ gcloud source repos clone bqds --project=<project>
 cd bqds
 
 # Install entitlement-engine as a global package
-npm install -g ./entitlements
+npm install -g ./entitlements/bqdsEntitlements
 
 # Change to the examples directory
 cd examples
