@@ -28,7 +28,7 @@ const uuidv4 = require('uuid/v4')
 /**
  * @param  {} path
  */
-async function processEntitlementConfigFile(filePath) {
+async function processConfiguration(filePath) {
     if (!fs.existsSync(filePath)) {
         console.log(`Configuration file not found at '${filePath}'`);
         return;
@@ -101,7 +101,7 @@ async function processEntitlementConfig(config) {
     }
 
     console.log("-------------------START - processConfiguration-------------------");
-    await processConfiguration(config);
+    await processConfig(config);
     console.log("-------------------END - processConfiguration-------------------\n");
 
     console.log("-------------------START - processAccessPermissions-------------------");
@@ -217,7 +217,7 @@ async function setupPrerequisites(config) {
 /**
  * @param  {} configuration
  */
-async function processConfiguration(config) {
+async function processConfig(config) {
     let views = config.views;
     console.log("Project name is '%s'", config.projectId);
 
@@ -540,5 +540,5 @@ async function refreshDatasetPermissionTable(config) {
 }
 
 module.exports = {
-    processEntitlementConfigFile
+    processConfiguration
 }

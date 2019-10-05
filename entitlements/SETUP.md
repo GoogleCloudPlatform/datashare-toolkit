@@ -15,7 +15,7 @@ git clone ssh://<account>@source.developers.google.com:2022/p/<project>/r/bqds
 cd bqds
 
 # Install entitlement-engine as a global package
-npm install -g ./entitlements
+npm install -g ./entitlements/bqdsEntitlements
 
 # Change to the examples directory
 cd examples

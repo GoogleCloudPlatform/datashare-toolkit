@@ -19,7 +19,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: npm install, and lint for entitlements and processUpload
       run: |
-        cd entitlements
+        cd entitlements/bqdsEntitlements
         npm install --loglevel verbose
         npm run lint
         cd ../ingestion/processUpload
