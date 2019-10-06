@@ -42,7 +42,7 @@ After the Dockerfile builds the image it will launch the bash. Then you can exec
 ```
 To update using the mounted configuration file: '/Users/pvenkman/Git/bqds/examples/config.json', run the following command:
 
-	node entitlement-engine -c '/app/configuration/config.json'
+	entitlement-engine -c '/app/configuration/config.json'
 ```
 
 ## GOOGLE_APPLICATION_CREDENTIALS setup
