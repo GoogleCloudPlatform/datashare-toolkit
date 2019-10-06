@@ -44,6 +44,7 @@ If you prefer to run entitlement-engine outside of Google Cloud Shell, documenta
 |--dry-run|When specified only configuration validation is performed. No objects are created or modified|
 |-p|Setup prerequisite objects only (access control if configured)|
 |-v|Enable verbose logging|
+|--version|Get current product version|
 
 ## Entitling resources and data
 There are four main methodologies available for entitling resources and data through ```BQDS```:
