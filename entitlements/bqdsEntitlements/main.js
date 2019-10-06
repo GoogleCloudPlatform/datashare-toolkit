@@ -37,7 +37,7 @@ if (args["verbose"]) {
     console.log("Command line args");
     console.log(args);
     RuntimeConfiguration.VERBOSE_MODE = true;
-    console.log("-verbose is enabled");
+    console.log("--verbose is enabled");
 }
 
 if (args["dry-run"]) {
@@ -47,7 +47,7 @@ if (args["dry-run"]) {
 
 if (args["prerequisiteSetup"]) {
     RuntimeConfiguration.PREREQUISITE_SETUP_ONLY = true;
-    console.log("-prerequisiteSetup is enabled");
+    console.log("--prerequisiteSetup is enabled");
 }
 
 if (args["configurationFilePath"]) {
