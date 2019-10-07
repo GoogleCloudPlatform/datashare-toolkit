@@ -67,7 +67,8 @@ specified destination table.
 
 The Cloud Storage bucket you will use to stage data is specified as an option to the `processUpload`
 function's deploy command. This bucket must be created in advance of
-installing the Cloud Function.
+installing the Cloud Function. There are several options pertaining to
+buckets, such as class of storage and region(s) in which to store the 
 
 ## Specifications for uploaded files
 
