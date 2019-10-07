@@ -83,7 +83,7 @@ function canProcess(fileName) {
     const parts = fileName.split('.');
     if (parts[0] &&
         (parts[0].startsWith(processPrefix)
-         || parts[0].startsWith(`/${processPrefix}`))) {
+            || parts[0].startsWith(`/${processPrefix}`))) {
         return false;
     } else {
         const ext = parts[parts.length - 1];
@@ -112,7 +112,7 @@ function generateBatchId(config) {
 async function transform(config) {
     const batchId = generateBatchId(config);
     const transformQuery = await fromStorage(config.bucket,
-                                             `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
+        `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
     const dataset = await bigqueryClient.dataset(config.dataset);
     const exists = tableExists(config.dataset, config.destinationTable)
     if (!exists) {
@@ -156,8 +156,8 @@ async function stageFile(config) {
     const fields = (config.metadata && config.metadata.fields) || undefined;
 
     const cfg = fields
-          ? { schema: fields, expirationTime: expiryTime }
-          : { autodetect: true, expirationTime: expiryTime };
+        ? { schema: fields, expirationTime: expiryTime }
+        : { autodetect: true, expirationTime: expiryTime };
 
     await dataset.createTable(config.stagingTable, cfg);
 
@@ -165,7 +165,7 @@ async function stageFile(config) {
     console.log(`created table ${config.stagingTable}`);
     console.log(`executing load for ${config.sourceFile} with ` + JSON.stringify(config.metadata));
     const [job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile),
-                                   config.metadata || { autodetect: true });
+        config.metadata || { autodetect: true });
 
     console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
     return;
