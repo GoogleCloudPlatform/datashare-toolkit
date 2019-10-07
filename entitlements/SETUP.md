@@ -15,7 +15,7 @@ git clone ssh://<account>@source.developers.google.com:2022/p/<project>/r/bqds
 cd bqds
 
 # Install entitlement-engine as a global package
-npm install -g ./entitlements
+npm install -g ./entitlements/bqdsEntitlements
 
 # Change to the examples directory
 cd examples
@@ -42,7 +42,7 @@ After the Dockerfile builds the image it will launch the bash. Then you can exec
 ```
 To update using the mounted configuration file: '/Users/pvenkman/Git/bqds/examples/config.json', run the following command:
 
-	node main.js -c '/app/configuration/config.json'
+	entitlement-engine -c '/app/configuration/config.json'
 ```
 
 ## GOOGLE_APPLICATION_CREDENTIALS setup
