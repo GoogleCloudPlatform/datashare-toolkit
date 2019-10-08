@@ -648,6 +648,7 @@ function isJsonString(str) {
     try {
         JSON.parse(str);
     } catch (e) {
+        console.log(e);
         return false;
     }
     return true;
