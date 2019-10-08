@@ -27,4 +27,4 @@ function printDebugInfo(obj) {
 
 module.exports = {
     printDebugInfo
-}
+};

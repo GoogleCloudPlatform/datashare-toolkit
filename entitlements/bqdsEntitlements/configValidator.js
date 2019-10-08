@@ -16,11 +16,11 @@
 
 'use strict';
 
-const configUtil = require("./configUtil")
-const bigqueryUtil = require("./bigqueryUtil")
-const sqlBuilder = require("./sqlBuilder")
-const RuntimeConfiguration = require("./runtimeConfiguration")
-const YAML = require('yaml')
+const configUtil = require("./configUtil");
+const bigqueryUtil = require("./bigqueryUtil");
+const sqlBuilder = require("./sqlBuilder");
+const RuntimeConfiguration = require("./runtimeConfiguration");
+const YAML = require('yaml');
 const Validator = require('jsonschema').Validator;
 
 const IssueType = {
@@ -670,4 +670,4 @@ module.exports = {
     validate,
     isJsonString,
     isYamlString
-}
+};

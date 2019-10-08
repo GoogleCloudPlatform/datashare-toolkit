@@ -17,7 +17,7 @@
 'use strict';
 
 const { BigQuery } = require('@google-cloud/bigquery');
-const RuntimeConfiguration = require("./runtimeConfiguration")
+const RuntimeConfiguration = require("./runtimeConfiguration");
 
 const TableType = {
     BASE_TABLE: 'BASE TABLE',
@@ -396,7 +396,7 @@ async function shareAuthorizeView(sourceDatasetId, authorizeProject, authorizeDa
         }
     }
     else {
-        console.log("metadata.access array does not exist, creating now.")
+        console.log("metadata.access array does not exist, creating now.");
         metadata.access = [];
     }
 
@@ -560,4 +560,4 @@ module.exports = {
     setDatasetMetadata,
     setTableMetadata,
     insertRows
-}
+};

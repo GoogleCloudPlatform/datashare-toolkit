@@ -16,11 +16,11 @@
 
 'use strict';
 
-const commonUtil = require("./commonUtil")
-const configUtil = require("./configUtil")
-const bigqueryUtil = require("./bigqueryUtil")
+const commonUtil = require("./commonUtil");
+const configUtil = require("./configUtil");
+const bigqueryUtil = require("./bigqueryUtil");
 const endOfLine = require('os').EOL;
-const underscore = require("underscore")
+const underscore = require("underscore");
 
 /**
  * @param  {} config
@@ -90,7 +90,7 @@ async function generateSelectStatement(config, view, includeFrom, availableColum
                 return col.toLowerCase() === c.toLowerCase();
             });
             if (found !== undefined) {
-                vColumns.push(col)
+                vColumns.push(col);
             }
         });
     }
@@ -103,7 +103,7 @@ async function generateSelectStatement(config, view, includeFrom, availableColum
                 return col.toLowerCase() === c.toLowerCase();
             });
             if (found !== undefined) {
-                hColumns.push(col)
+                hColumns.push(col);
             }
         });
     }
@@ -125,8 +125,8 @@ async function generateSelectStatement(config, view, includeFrom, availableColum
         sql += "select *";
 
         if (hColumns.length > 0) {
-            sql += " except ("
-            sql += hColumns.join(", ")
+            sql += " except (";
+            sql += hColumns.join(", ");
             sql += ")";
         }
     }
@@ -222,7 +222,7 @@ async function generateLocalEntitySubquery(config, view, viewDatasetId, availabl
             let first = true;
             uniqueLabels.forEach((label) => {
                 if (!label) {
-                    return
+                    return;
                 }
                 if (first === true) {
                     first = false;
@@ -303,7 +303,7 @@ async function prependLines(inputText, prepend, occurences) {
 async function generateSqlWithPublicAccess(config, viewDatasetId, view) {
     let source = view.source;
 
-    let sql = "with filteredSourceData as (\n"
+    let sql = "with filteredSourceData as (\n";
     const availableColumns = await bigqueryUtil.tableColumns(source.datasetId, source.tableId);
     let selectSql = await generateSelectStatement(config, view, true, availableColumns);
     sql += await prependLines(selectSql, "\t", 1);
@@ -318,7 +318,7 @@ async function generateSqlWithPublicAccess(config, viewDatasetId, view) {
 
     sql += ",\nrecordCount as (\n";
     sql += "\tselect count(*) as count from filteredSourceData";
-    sql += "\n),"
+    sql += "\n),";
     sql += "\npublicData as (\n";
 
     let publicSql = selectSql;
@@ -331,7 +331,7 @@ async function generateSqlWithPublicAccess(config, viewDatasetId, view) {
     sql += await prependLines(publicSql, "\t", 1);
     sql += "\n)";
 
-    sql += "\nselect * from filteredSourceData"
+    sql += "\nselect * from filteredSourceData";
 
     sql += "\nunion all\n";
     sql += "select * from publicData\nwhere (select sum(count) from recordCount) = 0";
@@ -386,4 +386,4 @@ function prepareCustomSql(config, view) {
 
 module.exports = {
     generateSql
-}
+};

@@ -25,7 +25,7 @@ const storageClient = new Storage();
 let datasetId;
 const schemaFileName = "schema.json";
 const transformFileName = "transform.sql";
-const defaultLocation = 'US'
+const defaultLocation = 'US';
 const defaultTransformQuery = "*";
 const util = require('util');
 const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
@@ -55,7 +55,7 @@ exports.processEvent = async (event, context) => {
         console.log("ignoring file " + event.name + ", exiting");
     }
     return;
-}
+};
 
 /**
  * @param  {} event
@@ -66,7 +66,7 @@ async function getConfiguration(event, context) {
     const dest = getDestination(event.name).split('.');
     config.dataset = dest[0];
     config.destinationTable = dest[1];
-    config.metadata = await getMetadata(event.bucket, `${processPrefix}/${config.destinationTable}.${schemaFileName}`)
+    config.metadata = await getMetadata(event.bucket, `${processPrefix}/${config.destinationTable}.${schemaFileName}`);
     config.stagingTable = `TMP_${config.destinationTable}_${context.eventId}`;
     config.sourceFile = event.name;
     config.bucket = event.bucket;
@@ -114,7 +114,7 @@ async function transform(config) {
     const transformQuery = await fromStorage(config.bucket,
         `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
     const dataset = await bigqueryClient.dataset(config.dataset);
-    const exists = tableExists(config.dataset, config.destinationTable)
+    const exists = tableExists(config.dataset, config.destinationTable);
     if (!exists) {
         console.log(`creating table ${config.destinationTable} with ${config.metadata.fields}`);
         await dataset.createTable(config.destinationTable, { schema: config.metadata.fields });
@@ -218,7 +218,7 @@ async function datasetExists(datasetId) {
  */
 async function createDataset(datasetId) {
     const dataset = bigqueryClient.dataset(datasetId);
-    return await dataset.create()
+    return await dataset.create();
 }
 
 /**

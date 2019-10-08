@@ -17,13 +17,13 @@
 'use strict';
 
 const fs = require('fs');
-const bigqueryUtil = require("./bigqueryUtil")
-const configUtil = require("./configUtil")
-const sqlBuilder = require("./sqlBuilder")
-const configValidator = require("./configValidator")
-const RuntimeConfiguration = require("./runtimeConfiguration")
-const YAML = require('yaml')
-const uuidv4 = require('uuid/v4')
+const bigqueryUtil = require("./bigqueryUtil");
+const configUtil = require("./configUtil");
+const sqlBuilder = require("./sqlBuilder");
+const configValidator = require("./configValidator");
+const RuntimeConfiguration = require("./runtimeConfiguration");
+const YAML = require('yaml');
+const uuidv4 = require('uuid/v4');
 
 /**
  * @param  {} path
@@ -35,7 +35,7 @@ async function processConfiguration(filePath) {
     }
 
     let data = fs.readFileSync(filePath, { encoding: 'utf8' });
-    let path = require('path')
+    let path = require('path');
     let extension = path.extname(filePath).toLowerCase();
 
     let config;
@@ -96,7 +96,7 @@ async function processEntitlementConfig(config) {
         }
     }
     else if (isValid === false) {
-        console.log("Configuration is invalid, exiting now.")
+        console.log("Configuration is invalid, exiting now.");
         process.exit(1);
     }
 
@@ -541,4 +541,4 @@ async function refreshDatasetPermissionTable(config) {
 
 module.exports = {
     processConfiguration
-}
+};

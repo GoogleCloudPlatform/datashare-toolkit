@@ -11,6 +11,10 @@
       // 4 spaces for indenting
       "indent": ["error", 4],
       
+      // https://eslint.org/docs/1.0.0/rules/semi
+      // Require semicolons.
+      "semi": [2, "always"],
+      
       // Removed rule "disallow the use of console" from recommended eslint rules
       "no-console": "off",
   

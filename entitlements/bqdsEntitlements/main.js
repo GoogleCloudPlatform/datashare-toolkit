@@ -19,7 +19,8 @@
 'use strict';
 
 var RuntimeConfiguration = require("./runtimeConfiguration");
-const entitlementManager = require("./entitlementManager")
+const entitlementManager = require("./entitlementManager");
+
 const args = require('minimist')(process.argv.slice(2), {
     alias: {
         c: 'configurationFilePath',
