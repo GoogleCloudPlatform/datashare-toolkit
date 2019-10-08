@@ -61,9 +61,8 @@ async function generateSql(config, viewDatasetId, view) {
  * @param  {} view
  */
 async function generateSqlWithoutPublicAccess(config, viewDatasetId, view) {
-    const availableColumns = await bigqueryUtil.tableColumns(view.source.datasetId, view.source.tableId);
     let sql = await generateSelectStatement(config, view, true);
-    let whereClause = await generateWhereClause(config, view, viewDatasetId, availableColumns);
+    let whereClause = await generateWhereClause(config, view, viewDatasetId);
     if (whereClause) {
         sql += `\n${whereClause}`;
     }
@@ -118,8 +117,9 @@ async function generateSelectStatement(config, view, includeFrom) {
 /**
  * @param  {} config
  * @param  {} view
+ * @param  {} viewDatasetId
  */
-async function generateDatasetEntitySubquery(config, view, viewDatasetId, availableColumns) {
+async function generateDatasetEntitySubquery(config, view, viewDatasetId) {
     let source = view.source;
     const accessControlEnabled = source.accessControl.enabled || false;
     const accessControlDatasetEnabled = source.accessControl.datasetEnabled || false;
@@ -152,71 +152,61 @@ async function generateDatasetEntitySubquery(config, view, viewDatasetId, availa
  * @param  {} config
  * @param  {} view
  * @param  {} viewDatasetId
- * @param  {} availableColumns
  */
-async function generateLocalEntitySubquery(config, view, viewDatasetId, availableColumns) {
+async function generateLocalEntitySubquery(config, view, viewDatasetId) {
     let source = view.source;
     const accessControlEnabled = source.accessControl.enabled || false;
     const accessControlLabelColumn = source.accessControl.labelColumn;
     const accessControlLabelColumnDelimiter = source.accessControlLabelColumnDelimiter;
 
     if (accessControlEnabled === true && accessControlLabelColumn) {
-        const found = availableColumns.find((c) => {
-            return accessControlLabelColumn.toLowerCase() === c.toLowerCase();
-        });
-        if (found !== undefined) {
-            let viewAccessControlLabels = source.accessControl.labels || [];
-            let dataset = config.datasets.find((d) => {
-                return d.name.toLowerCase() === viewDatasetId.toLowerCase();
-            }) || [];
+        let viewAccessControlLabels = source.accessControl.labels || [];
+        let dataset = config.datasets.find((d) => {
+            return d.name.toLowerCase() === viewDatasetId.toLowerCase();
+        }) || [];
 
-            let allLabels = viewAccessControlLabels.concat(dataset.accessControlLabels);
-            let uniqueLabels = underscore.uniq(allLabels);
-            console.log(`uniqueLabels: ${uniqueLabels}`);
+        let allLabels = viewAccessControlLabels.concat(dataset.accessControlLabels);
+        let uniqueLabels = underscore.uniq(allLabels);
+        console.log(`uniqueLabels: ${uniqueLabels}`);
 
-            if (uniqueLabels.length === 0) {
-                throw new Error("No accessControlLabels were supplied");
-            }
+        if (uniqueLabels.length === 0) {
+            throw new Error("No accessControlLabels were supplied");
+        }
 
-            let sql = "";
+        let sql = "";
 
-            let useExistsClause = accessControlLabelColumnDelimiter && accessControlLabelColumnDelimiter.length > 0;
-            if (useExistsClause === true) {
-                sql += "exists (\n";
-                let select = `select 1 from unnest(split(s.${accessControlLabelColumn}, "${accessControlLabelColumnDelimiter}")) as flattenedLabel\n`;
-                select += "where upper(flattenedLabel) in (";
-                sql += await prependLines(select, "\t", 1);
-            }
-            else {
-                sql += `upper(s.${accessControlLabelColumn}) in (`;
-            }
-
-            let first = true;
-            uniqueLabels.forEach((label) => {
-                if (!label) {
-                    return;
-                }
-                if (first === true) {
-                    first = false;
-                }
-                else {
-                    sql += ",";
-                }
-                sql += `'${label.toUpperCase()}'`;
-            });
-
-            sql += ")";
-            if (useExistsClause === true) {
-                sql += "\n";
-                sql += ")";
-            }
-
-            return sql;
+        let useExistsClause = accessControlLabelColumnDelimiter && accessControlLabelColumnDelimiter.length > 0;
+        if (useExistsClause === true) {
+            sql += "exists (\n";
+            let select = `select 1 from unnest(split(s.${accessControlLabelColumn}, "${accessControlLabelColumnDelimiter}")) as flattenedLabel\n`;
+            select += "where upper(flattenedLabel) in (";
+            sql += await prependLines(select, "\t", 1);
         }
         else {
-            // Throw an error
-            console.log("Unable to apply entity label entitlements because column doesn't exist");
+            sql += `upper(s.${accessControlLabelColumn}) in (`;
         }
+
+        let first = true;
+        uniqueLabels.forEach((label) => {
+            if (!label) {
+                return;
+            }
+            if (first === true) {
+                first = false;
+            }
+            else {
+                sql += ",";
+            }
+            sql += `'${label.toUpperCase()}'`;
+        });
+
+        sql += ")";
+        if (useExistsClause === true) {
+            sql += "\n";
+            sql += ")";
+        }
+
+        return sql;
     }
     return null;
 }
@@ -276,11 +266,10 @@ async function generateSqlWithPublicAccess(config, viewDatasetId, view) {
     let source = view.source;
 
     let sql = "with filteredSourceData as (\n";
-    const availableColumns = await bigqueryUtil.tableColumns(source.datasetId, source.tableId);
     let selectSql = await generateSelectStatement(config, view, true);
     sql += await prependLines(selectSql, "\t", 1);
 
-    let whereClause = await generateWhereClause(config, view, viewDatasetId, availableColumns);
+    let whereClause = await generateWhereClause(config, view, viewDatasetId);
     if (whereClause) {
         sql += `\n${await prependLines(whereClause, "\t", 1)}`;
     }
@@ -315,9 +304,8 @@ async function generateSqlWithPublicAccess(config, viewDatasetId, view) {
  * @param  {} config
  * @param  {} view
  * @param  {} viewDatasetId
- * @param  {} availableColumns
  */
-async function generateWhereClause(config, view, viewDatasetId, availableColumns) {
+async function generateWhereClause(config, view, viewDatasetId) {
     let source = view.source;
     let sql = "";
     let whereAdded = false;
@@ -331,14 +319,14 @@ async function generateWhereClause(config, view, viewDatasetId, availableColumns
     const accessControlDatasetEnabled = (source.accessControl && source.accessControl.datasetEnabled) || false;
     if (accessControlEnabled === true && accessControlDatasetEnabled === true) {
         console.log("Using dataset entitlements");
-        let entityFilter = await generateDatasetEntitySubquery(config, view, viewDatasetId, availableColumns);
+        let entityFilter = await generateDatasetEntitySubquery(config, view, viewDatasetId);
         if (entityFilter) {
             sql += (whereAdded ? " and " : "where ") + entityFilter;
         }
     }
     else if (accessControlEnabled === true && accessControlDatasetEnabled === false) {
         console.log("Using local entitlements");
-        let entityFilter = await generateLocalEntitySubquery(config, view, viewDatasetId, availableColumns);
+        let entityFilter = await generateLocalEntitySubquery(config, view, viewDatasetId);
         if (entityFilter) {
             sql += (whereAdded ? " and " : "where ") + entityFilter;
         }
