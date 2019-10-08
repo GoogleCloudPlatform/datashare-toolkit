@@ -21,7 +21,7 @@ const bigqueryUtil = require("./bigqueryUtil");
 const configUtil = require("./configUtil");
 const sqlBuilder = require("./sqlBuilder");
 const configValidator = require("./configValidator");
-const RuntimeConfiguration = require("./runtimeConfiguration");
+const runtimeConfiguration = require("./runtimeConfiguration");
 const YAML = require('yaml');
 const uuidv4 = require('uuid/v4');
 
@@ -65,7 +65,7 @@ async function processEntitlementConfig(config) {
     await bigqueryUtil.init(config.projectId);
 
     let prerequisiteComplete = false;
-    if (RuntimeConfiguration.DRY_RUN === false) {
+    if (runtimeConfiguration.DRY_RUN === false) {
         console.log("-------------------START - setupPrerequisites-------------------");
         await setupPrerequisites(config);
         console.log("-------------------END - setupPrerequisites-------------------\n");
@@ -75,7 +75,7 @@ async function processEntitlementConfig(config) {
         console.log("Prerequisite setup was skipped because --dry-run is enabled");
     }
 
-    if (RuntimeConfiguration.PREREQUISITE_SETUP_ONLY) {
+    if (runtimeConfiguration.PREREQUISITE_SETUP_ONLY) {
         if (prerequisiteComplete) {
             console.log("Prerequisite setup is completed");
         }
@@ -86,7 +86,7 @@ async function processEntitlementConfig(config) {
     let isValid = await configValidator.validate(config);
     console.log("-------------------END - configValidator-------------------\n");
 
-    if (RuntimeConfiguration.DRY_RUN) {
+    if (runtimeConfiguration.DRY_RUN) {
         console.log("Dry-run validation is completed");
         if (isValid) {
             process.exit(0);
@@ -112,7 +112,7 @@ async function processEntitlementConfig(config) {
     await removeStaleObjects(config);
     console.log("-------------------END - removeStaleObjects-------------------\n");
 
-    if (RuntimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE) {
+    if (runtimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE) {
         console.log("-------------------START - refreshDatasetPermissionTable-------------------");
         await refreshDatasetPermissionTable(config);
         console.log("-------------------END - refreshDatasetPermissionTable-------------------\n");
@@ -169,7 +169,7 @@ async function setupPrerequisites(config) {
         }
     }
 
-    if (RuntimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE === true) {
+    if (runtimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE === true) {
         if (await bigqueryUtil.tableExists(config.projectId, config.accessControl.datasetId, "datasetPermissions") === false) {
             const userPermissionsSchema = [{
                 "name": "uuid",
@@ -272,7 +272,7 @@ async function processConfig(config) {
 
                 const currentExpiryTime = _viewMetadata.expirationTime;
 
-                if (RuntimeConfiguration.VERBOSE_MODE) {
+                if (runtimeConfiguration.VERBOSE_MODE) {
                     console.log(`expirationTime for view '${view.name}' is ${currentExpiryTime}`);
                 }
 
@@ -284,7 +284,7 @@ async function processConfig(config) {
                     await bigqueryUtil.setTableMetadata(ds, view.name, _viewMetadata);
                 }
                 else {
-                    if (RuntimeConfiguration.VERBOSE_MODE) {
+                    if (runtimeConfiguration.VERBOSE_MODE) {
                         console.log(`expirationTime for view '${view.name}' is in-sync`);
                     }
                 }
@@ -398,7 +398,7 @@ async function processAccessPermissions(config) {
             await bigqueryUtil.setDatasetMetadata(ds.name, metadata);
             const updatedMetadata = await bigqueryUtil.getDatasetMetadata(ds.name);
 
-            if (RuntimeConfiguration.VERBOSE_MODE) {
+            if (runtimeConfiguration.VERBOSE_MODE) {
                 console.log("Changes applied: " + JSON.stringify(updatedMetadata, null, 2));
             }
         }
@@ -442,7 +442,7 @@ async function removeStaleObjects(config) {
                 }
             }
         }
-        else if (dsMetadata.labels && dsMetadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] === config.name) {
+        else if (dsMetadata.labels && dsMetadata.labels[runtimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] === config.name) {
             console.log(`Dataset is managed: '${ds.id}'`);
 
             // If within a dataset, check it's authorized views and remove invalid objects?
@@ -467,13 +467,13 @@ async function removeStaleObjects(config) {
                 }
             }
         }
-        else if (RuntimeConfiguration.VERBOSE_MODE) {
+        else if (runtimeConfiguration.VERBOSE_MODE) {
             console.log(`Dataset is non-managed: '${ds.id}'`);
         }
 
         const [tables] = await ds.getTables();
         for (const table of tables) {
-            if (table.metadata.labels && table.metadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] === config.name) {
+            if (table.metadata.labels && table.metadata.labels[runtimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] === config.name) {
                 console.log(`View is managed: '${table.id}'`);
                 const isConfigured = await configUtil.configurationContainsView(config, ds.id, table.id);
 
@@ -489,7 +489,7 @@ async function removeStaleObjects(config) {
             else {
                 hasNonManagedTables = true;
 
-                if (RuntimeConfiguration.VERBOSE_MODE) {
+                if (runtimeConfiguration.VERBOSE_MODE) {
                     console.log(`Dataset '${ds.id}' contains non-managed table '${table.id}'`);
                 }
             }
@@ -505,7 +505,7 @@ async function removeStaleObjects(config) {
             await bigqueryUtil.setDatasetMetadata(ds.id, dsMetadata);
         }
         else {
-            if (RuntimeConfiguration.VERBOSE_MODE) {
+            if (runtimeConfiguration.VERBOSE_MODE) {
                 console.log(`Dataset '${ds.id}' will not be affected`);
             }
         }
@@ -522,7 +522,7 @@ async function refreshDatasetPermissionTable(config) {
     const date = new Date();
     for (const ds of datasets) {
         const dsMetadata = await bigqueryUtil.getDatasetMetadata(ds.id);
-        if (dsMetadata.labels && dsMetadata.labels[RuntimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] === config.name) {
+        if (dsMetadata.labels && dsMetadata.labels[runtimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] === config.name) {
             if (dsMetadata.access && dsMetadata.access.length > 0) {
                 dsMetadata.access.forEach((a) => {
                     const keys = Object.keys(a);
