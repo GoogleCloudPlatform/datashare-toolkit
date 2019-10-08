@@ -20,6 +20,7 @@ const commonUtil = require("./commonUtil")
 const configUtil = require("./configUtil")
 const bigqueryUtil = require("./bigqueryUtil")
 const endOfLine = require('os').EOL;
+const underscore = require("underscore")
 
 /**
  * @param  {} config
@@ -198,7 +199,7 @@ async function generateLocalEntitySubquery(config, view, viewDatasetId, availabl
             }) || [];
 
             let allLabels = viewAccessControlLabels.concat(dataset.accessControlLabels);
-            let uniqueLabels = allLabels.unique();
+            let uniqueLabels = underscore.uniq(allLabels);
             console.log(`uniqueLabels: ${uniqueLabels}`);
 
             if (uniqueLabels.length === 0) {

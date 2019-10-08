@@ -19,22 +19,6 @@
 const util = require('util');
 
 /**
- * Compares all objects and types and returns unique objects only.
- */
-/* eslint-disable no-extend-native */
-Array.prototype.unique = function () {
-    let a = this.concat();
-    for (let i = 0; i < a.length; ++i) {
-        for (let j = i + 1; j < a.length; ++j) {
-            if (a[i] === a[j])
-                a.splice(j--, 1);
-        }
-    }
-
-    return a;
-};
-
-/**
  * @param  {} obj
  */
 function printDebugInfo(obj) {
