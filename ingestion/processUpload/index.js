@@ -18,16 +18,12 @@
 
 const { BigQuery } = require('@google-cloud/bigquery');
 const { Storage } = require('@google-cloud/storage');
-const path = require('path');
-// TODO(b/139874392): Add StackDriver logging for ingestion and entitlement events
 const bigqueryClient = new BigQuery();
 const storageClient = new Storage();
-let datasetId;
 const schemaFileName = "schema.json";
 const transformFileName = "transform.sql";
 const defaultLocation = 'US';
 const defaultTransformQuery = "*";
-const util = require('util');
 const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
 const stagingTableExpiryDays = 2;
 const processPrefix = "bqds";
@@ -113,7 +109,7 @@ async function transform(config) {
     const batchId = generateBatchId(config);
     const transformQuery = await fromStorage(config.bucket,
         `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
-    const dataset = await bigqueryClient.dataset(config.dataset);
+    const dataset = bigqueryClient.dataset(config.dataset);
     const exists = tableExists(config.dataset, config.destinationTable);
     if (!exists) {
         console.log(`creating table ${config.destinationTable} with ${config.metadata.fields}`);
@@ -134,7 +130,7 @@ async function transform(config) {
  * @param  {} tableName
  */
 async function deleteTable(dataset, tableName) {
-    const ds = await bigqueryClient.dataset(dataset);
+    const ds = bigqueryClient.dataset(dataset);
     console.log('Deleting temp table ' + tableName);
     const toDelete = ds.table(tableName);
     const response = await toDelete.delete();
