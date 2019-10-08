@@ -62,7 +62,7 @@ async function generateSql(config, viewDatasetId, view) {
  */
 async function generateSqlWithoutPublicAccess(config, viewDatasetId, view) {
     const availableColumns = await bigqueryUtil.tableColumns(view.source.datasetId, view.source.tableId);
-    let sql = await generateSelectStatement(config, view, true, availableColumns);
+    let sql = await generateSelectStatement(config, view, true);
     let whereClause = await generateWhereClause(config, view, viewDatasetId, availableColumns);
     if (whereClause) {
         sql += `\n${whereClause}`;
@@ -74,58 +74,31 @@ async function generateSqlWithoutPublicAccess(config, viewDatasetId, view) {
  * @param  {} config
  * @param  {} view
  * @param  {} includeFrom
- * @param  {} availableColumns
  */
-async function generateSelectStatement(config, view, includeFrom, availableColumns) {
+async function generateSelectStatement(config, view, includeFrom) {
     let source = view.source;
     const visibleColumns = source.visibleColumns;
     const hiddenColumns = source.hiddenColumns;
 
-    // TODO: The config validation will ensure all columns exist. This can be removed.
-    let vColumns = [];
-    if (visibleColumns) {
-        visibleColumns.forEach((col) => {
-            const found = availableColumns.find((c) => {
-                return col.toLowerCase() === c.toLowerCase();
-            });
-            if (found !== undefined) {
-                vColumns.push(col);
-            }
-        });
-    }
-
-    // TODO: The config validation will ensure all columns exist. This can be removed.
-    let hColumns = [];
-    if (hiddenColumns) {
-        hiddenColumns.forEach((col) => {
-            const found = availableColumns.find((c) => {
-                return col.toLowerCase() === c.toLowerCase();
-            });
-            if (found !== undefined) {
-                hColumns.push(col);
-            }
-        });
-    }
-
     let sql = "";
-    if (vColumns.length > 0) {
+    if (visibleColumns && visibleColumns.length > 0) {
         // Column selects
         sql += "select\n";
         let i;
-        for (i = 0; i < vColumns.length; i++) {
+        for (i = 0; i < visibleColumns.length; i++) {
             if (i !== 0) {
                 // Not the last item in the collection
                 sql += ",\n";
             }
-            sql += `\t${vColumns[i]}`;
+            sql += `\t${visibleColumns[i]}`;
         }
     }
-    else if (hColumns.length > 0) {
+    else if (hiddenColumns && hiddenColumns.length > 0) {
         sql += "select *";
 
-        if (hColumns.length > 0) {
+        if (hiddenColumns.length > 0) {
             sql += " except (";
-            sql += hColumns.join(", ");
+            sql += hiddenColumns.join(", ");
             sql += ")";
         }
     }
@@ -304,7 +277,7 @@ async function generateSqlWithPublicAccess(config, viewDatasetId, view) {
 
     let sql = "with filteredSourceData as (\n";
     const availableColumns = await bigqueryUtil.tableColumns(source.datasetId, source.tableId);
-    let selectSql = await generateSelectStatement(config, view, true, availableColumns);
+    let selectSql = await generateSelectStatement(config, view, true);
     sql += await prependLines(selectSql, "\t", 1);
 
     let whereClause = await generateWhereClause(config, view, viewDatasetId, availableColumns);
