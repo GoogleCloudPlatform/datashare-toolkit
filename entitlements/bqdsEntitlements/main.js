@@ -18,8 +18,9 @@
 
 'use strict';
 
-var RuntimeConfiguration = require("./runtimeConfiguration");
-const entitlementManager = require("./entitlementManager")
+const runtimeConfiguration = require("./runtimeConfiguration");
+const entitlementManager = require("./entitlementManager");
+
 const args = require('minimist')(process.argv.slice(2), {
     alias: {
         c: 'configurationFilePath',
@@ -29,24 +30,24 @@ const args = require('minimist')(process.argv.slice(2), {
 });
 
 if (args["version"]) {
-    console.log(RuntimeConfiguration.PRODUCT_VERSION);
+    console.log(runtimeConfiguration.PRODUCT_VERSION);
     process.exit(0);
 }
 
 if (args["verbose"]) {
     console.log("Command line args");
     console.log(args);
-    RuntimeConfiguration.VERBOSE_MODE = true;
+    runtimeConfiguration.VERBOSE_MODE = true;
     console.log("--verbose is enabled");
 }
 
 if (args["dry-run"]) {
-    RuntimeConfiguration.DRY_RUN = true;
+    runtimeConfiguration.DRY_RUN = true;
     console.log("--dry-run is enabled");
 }
 
 if (args["prerequisiteSetup"]) {
-    RuntimeConfiguration.PREREQUISITE_SETUP_ONLY = true;
+    runtimeConfiguration.PREREQUISITE_SETUP_ONLY = true;
     console.log("--prerequisiteSetup is enabled");
 }
 

@@ -16,10 +16,9 @@
 
 'use strict';
 
-const commonUtil = require("./commonUtil")
-const configUtil = require("./configUtil")
-const bigqueryUtil = require("./bigqueryUtil")
+const configUtil = require("./configUtil");
 const endOfLine = require('os').EOL;
+const underscore = require("underscore");
 
 /**
  * @param  {} config
@@ -61,9 +60,8 @@ async function generateSql(config, viewDatasetId, view) {
  * @param  {} view
  */
 async function generateSqlWithoutPublicAccess(config, viewDatasetId, view) {
-    const availableColumns = await bigqueryUtil.tableColumns(view.source.datasetId, view.source.tableId);
-    let sql = await generateSelectStatement(config, view, true, availableColumns);
-    let whereClause = await generateWhereClause(config, view, viewDatasetId, availableColumns);
+    let sql = await generateSelectStatement(config, view, true);
+    let whereClause = await generateWhereClause(config, view, viewDatasetId);
     if (whereClause) {
         sql += `\n${whereClause}`;
     }
@@ -74,58 +72,31 @@ async function generateSqlWithoutPublicAccess(config, viewDatasetId, view) {
  * @param  {} config
  * @param  {} view
  * @param  {} includeFrom
- * @param  {} availableColumns
  */
-async function generateSelectStatement(config, view, includeFrom, availableColumns) {
+async function generateSelectStatement(config, view, includeFrom) {
     let source = view.source;
     const visibleColumns = source.visibleColumns;
     const hiddenColumns = source.hiddenColumns;
 
-    // TODO: The config validation will ensure all columns exist. This can be removed.
-    let vColumns = [];
-    if (visibleColumns) {
-        visibleColumns.forEach((col) => {
-            const found = availableColumns.find((c) => {
-                return col.toLowerCase() === c.toLowerCase();
-            });
-            if (found !== undefined) {
-                vColumns.push(col)
-            }
-        });
-    }
-
-    // TODO: The config validation will ensure all columns exist. This can be removed.
-    let hColumns = [];
-    if (hiddenColumns) {
-        hiddenColumns.forEach((col) => {
-            const found = availableColumns.find((c) => {
-                return col.toLowerCase() === c.toLowerCase();
-            });
-            if (found !== undefined) {
-                hColumns.push(col)
-            }
-        });
-    }
-
     let sql = "";
-    if (vColumns.length > 0) {
+    if (visibleColumns && visibleColumns.length > 0) {
         // Column selects
         sql += "select\n";
         let i;
-        for (i = 0; i < vColumns.length; i++) {
+        for (i = 0; i < visibleColumns.length; i++) {
             if (i !== 0) {
                 // Not the last item in the collection
                 sql += ",\n";
             }
-            sql += `\t${vColumns[i]}`;
+            sql += `\t${visibleColumns[i]}`;
         }
     }
-    else if (hColumns.length > 0) {
+    else if (hiddenColumns && hiddenColumns.length > 0) {
         sql += "select *";
 
-        if (hColumns.length > 0) {
-            sql += " except ("
-            sql += hColumns.join(", ")
+        if (hiddenColumns.length > 0) {
+            sql += " except (";
+            sql += hiddenColumns.join(", ");
             sql += ")";
         }
     }
@@ -145,8 +116,9 @@ async function generateSelectStatement(config, view, includeFrom, availableColum
 /**
  * @param  {} config
  * @param  {} view
+ * @param  {} viewDatasetId
  */
-async function generateDatasetEntitySubquery(config, view, viewDatasetId, availableColumns) {
+async function generateDatasetEntitySubquery(config, view, viewDatasetId) {
     let source = view.source;
     const accessControlEnabled = source.accessControl.enabled || false;
     const accessControlDatasetEnabled = source.accessControl.datasetEnabled || false;
@@ -179,71 +151,61 @@ async function generateDatasetEntitySubquery(config, view, viewDatasetId, availa
  * @param  {} config
  * @param  {} view
  * @param  {} viewDatasetId
- * @param  {} availableColumns
  */
-async function generateLocalEntitySubquery(config, view, viewDatasetId, availableColumns) {
+async function generateLocalEntitySubquery(config, view, viewDatasetId) {
     let source = view.source;
     const accessControlEnabled = source.accessControl.enabled || false;
     const accessControlLabelColumn = source.accessControl.labelColumn;
     const accessControlLabelColumnDelimiter = source.accessControlLabelColumnDelimiter;
 
     if (accessControlEnabled === true && accessControlLabelColumn) {
-        const found = availableColumns.find((c) => {
-            return accessControlLabelColumn.toLowerCase() === c.toLowerCase();
-        });
-        if (found !== undefined) {
-            let viewAccessControlLabels = source.accessControl.labels || [];
-            let dataset = config.datasets.find((d) => {
-                return d.name.toLowerCase() === viewDatasetId.toLowerCase();
-            }) || [];
+        let viewAccessControlLabels = source.accessControl.labels || [];
+        let dataset = config.datasets.find((d) => {
+            return d.name.toLowerCase() === viewDatasetId.toLowerCase();
+        }) || [];
 
-            let allLabels = viewAccessControlLabels.concat(dataset.accessControlLabels);
-            let uniqueLabels = allLabels.unique();
-            console.log(`uniqueLabels: ${uniqueLabels}`);
+        let allLabels = viewAccessControlLabels.concat(dataset.accessControlLabels);
+        let uniqueLabels = underscore.uniq(allLabels);
+        console.log(`uniqueLabels: ${uniqueLabels}`);
 
-            if (uniqueLabels.length === 0) {
-                throw new Error("No accessControlLabels were supplied");
-            }
+        if (uniqueLabels.length === 0) {
+            throw new Error("No accessControlLabels were supplied");
+        }
 
-            let sql = "";
+        let sql = "";
 
-            let useExistsClause = accessControlLabelColumnDelimiter && accessControlLabelColumnDelimiter.length > 0;
-            if (useExistsClause === true) {
-                sql += "exists (\n";
-                let select = `select 1 from unnest(split(s.${accessControlLabelColumn}, "${accessControlLabelColumnDelimiter}")) as flattenedLabel\n`;
-                select += "where upper(flattenedLabel) in (";
-                sql += await prependLines(select, "\t", 1);
-            }
-            else {
-                sql += `upper(s.${accessControlLabelColumn}) in (`;
-            }
-
-            let first = true;
-            uniqueLabels.forEach((label) => {
-                if (!label) {
-                    return
-                }
-                if (first === true) {
-                    first = false;
-                }
-                else {
-                    sql += ",";
-                }
-                sql += `'${label.toUpperCase()}'`;
-            });
-
-            sql += ")";
-            if (useExistsClause === true) {
-                sql += "\n";
-                sql += ")";
-            }
-
-            return sql;
+        let useExistsClause = accessControlLabelColumnDelimiter && accessControlLabelColumnDelimiter.length > 0;
+        if (useExistsClause === true) {
+            sql += "exists (\n";
+            let select = `select 1 from unnest(split(s.${accessControlLabelColumn}, "${accessControlLabelColumnDelimiter}")) as flattenedLabel\n`;
+            select += "where upper(flattenedLabel) in (";
+            sql += await prependLines(select, "\t", 1);
         }
         else {
-            // Throw an error
-            console.log("Unable to apply entity label entitlements because column doesn't exist");
+            sql += `upper(s.${accessControlLabelColumn}) in (`;
         }
+
+        let first = true;
+        uniqueLabels.forEach((label) => {
+            if (!label) {
+                return;
+            }
+            if (first === true) {
+                first = false;
+            }
+            else {
+                sql += ",";
+            }
+            sql += `'${label.toUpperCase()}'`;
+        });
+
+        sql += ")";
+        if (useExistsClause === true) {
+            sql += "\n";
+            sql += ")";
+        }
+
+        return sql;
     }
     return null;
 }
@@ -272,9 +234,7 @@ async function prependLines(inputText, prepend, occurences) {
     }
 
     let output = "";
-    let count = 0;
     rl.on('line', (line) => {
-        count++;
         if (line.length > 0) {
             output += `${prependText}${line}${endOfLine}`;
         }
@@ -302,12 +262,11 @@ async function prependLines(inputText, prepend, occurences) {
 async function generateSqlWithPublicAccess(config, viewDatasetId, view) {
     let source = view.source;
 
-    let sql = "with filteredSourceData as (\n"
-    const availableColumns = await bigqueryUtil.tableColumns(source.datasetId, source.tableId);
-    let selectSql = await generateSelectStatement(config, view, true, availableColumns);
+    let sql = "with filteredSourceData as (\n";
+    let selectSql = await generateSelectStatement(config, view, true);
     sql += await prependLines(selectSql, "\t", 1);
 
-    let whereClause = await generateWhereClause(config, view, viewDatasetId, availableColumns);
+    let whereClause = await generateWhereClause(config, view, viewDatasetId);
     if (whereClause) {
         sql += `\n${await prependLines(whereClause, "\t", 1)}`;
     }
@@ -317,7 +276,7 @@ async function generateSqlWithPublicAccess(config, viewDatasetId, view) {
 
     sql += ",\nrecordCount as (\n";
     sql += "\tselect count(*) as count from filteredSourceData";
-    sql += "\n),"
+    sql += "\n),";
     sql += "\npublicData as (\n";
 
     let publicSql = selectSql;
@@ -330,7 +289,7 @@ async function generateSqlWithPublicAccess(config, viewDatasetId, view) {
     sql += await prependLines(publicSql, "\t", 1);
     sql += "\n)";
 
-    sql += "\nselect * from filteredSourceData"
+    sql += "\nselect * from filteredSourceData";
 
     sql += "\nunion all\n";
     sql += "select * from publicData\nwhere (select sum(count) from recordCount) = 0";
@@ -342,9 +301,8 @@ async function generateSqlWithPublicAccess(config, viewDatasetId, view) {
  * @param  {} config
  * @param  {} view
  * @param  {} viewDatasetId
- * @param  {} availableColumns
  */
-async function generateWhereClause(config, view, viewDatasetId, availableColumns) {
+async function generateWhereClause(config, view, viewDatasetId) {
     let source = view.source;
     let sql = "";
     let whereAdded = false;
@@ -358,14 +316,14 @@ async function generateWhereClause(config, view, viewDatasetId, availableColumns
     const accessControlDatasetEnabled = (source.accessControl && source.accessControl.datasetEnabled) || false;
     if (accessControlEnabled === true && accessControlDatasetEnabled === true) {
         console.log("Using dataset entitlements");
-        let entityFilter = await generateDatasetEntitySubquery(config, view, viewDatasetId, availableColumns);
+        let entityFilter = await generateDatasetEntitySubquery(config, view, viewDatasetId);
         if (entityFilter) {
             sql += (whereAdded ? " and " : "where ") + entityFilter;
         }
     }
     else if (accessControlEnabled === true && accessControlDatasetEnabled === false) {
         console.log("Using local entitlements");
-        let entityFilter = await generateLocalEntitySubquery(config, view, viewDatasetId, availableColumns);
+        let entityFilter = await generateLocalEntitySubquery(config, view, viewDatasetId);
         if (entityFilter) {
             sql += (whereAdded ? " and " : "where ") + entityFilter;
         }
@@ -385,4 +343,4 @@ function prepareCustomSql(config, view) {
 
 module.exports = {
     generateSql
-}
+};

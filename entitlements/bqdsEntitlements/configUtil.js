@@ -60,10 +60,10 @@ function configurationContainsDataset(config, datasetId) {
 async function configurationContainsView(config, datasetId, viewId) {
     for (const view of config.views) {
         const dsFound = view.datasetNames.find((d) => {
-            return d.toLowerCase() === datasetId.toLowerCase()
+            return d.toLowerCase() === datasetId.toLowerCase();
         });
         if (dsFound !== undefined) {
-            return view.name.toLowerCase() === viewId.toLowerCase()
+            return view.name.toLowerCase() === viewId.toLowerCase();
         }
     }
     return false;
@@ -194,4 +194,4 @@ module.exports = {
     performTextVariableReplacements,
     concatentateAccessItems,
     accessItemsEqual
-}
+};
