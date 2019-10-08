@@ -16,7 +16,6 @@
 
 'use strict';
 
-const commonUtil = require("./commonUtil");
 const configUtil = require("./configUtil");
 const bigqueryUtil = require("./bigqueryUtil");
 const endOfLine = require('os').EOL;
