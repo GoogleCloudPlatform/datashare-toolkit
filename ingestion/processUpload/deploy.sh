@@ -15,7 +15,7 @@
 # limitations under the License.
 
 if [ "$#" -ne 1 ]; then
-  echo "Usage: $0 <REGION>" >&2
+  echo "Usage: $0 <BUCKET_NAME>" >&2
   exit 1
 fi
 
