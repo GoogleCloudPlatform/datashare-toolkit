@@ -17,7 +17,6 @@
 'use strict';
 
 const configUtil = require("./configUtil");
-const bigqueryUtil = require("./bigqueryUtil");
 const endOfLine = require('os').EOL;
 const underscore = require("underscore");
 
@@ -235,9 +234,7 @@ async function prependLines(inputText, prepend, occurences) {
     }
 
     let output = "";
-    let count = 0;
     rl.on('line', (line) => {
-        count++;
         if (line.length > 0) {
             output += `${prependText}${line}${endOfLine}`;
         }

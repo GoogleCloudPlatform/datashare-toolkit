@@ -16,7 +16,7 @@
 
 'use strict';
 
-class runtimeConfiguration {
+class RuntimeConfiguration {
     constructor() {
         this.verboseMode = false;
         this.labelValidation = true;
@@ -70,4 +70,4 @@ class runtimeConfiguration {
     }
 }
 
-module.exports = new runtimeConfiguration();
+module.exports = new RuntimeConfiguration();
