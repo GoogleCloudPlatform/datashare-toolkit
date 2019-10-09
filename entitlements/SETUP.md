@@ -30,7 +30,7 @@ entitlement-engine -c config.json
 git clone ssh://<account>@source.developers.google.com:2022/p/<project>/r/bqds
 
 # Change to the newly cloned bqds entitlements directory
-cd bqds
+cd bqds/entitlements/bin
 
 # Execute run.sh
 sh run.sh /path_to_your/service_account.json ./examples/config.json

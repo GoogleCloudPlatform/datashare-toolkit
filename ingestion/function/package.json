@@ -10,7 +10,7 @@
     },
     "scripts": {
         "start": "functions-framework --target=processEvent",
-        "deploy": "gcloud functions deploy processUpload --region=us-east1 --memory=256MB --source=. --runtime=nodejs8 --entry-point=processEvent --timeout=540s",
+        "deploy": "../bin/deploy.sh",
         "lint": "eslint ."
     },
     "devDependencies": {

@@ -41,7 +41,7 @@ After cloning the repository, this command will attach the Cloud Function to a s
 bucket of your choosing:
 
 ```
-cd bq-datashare-toolkit/ingestion/processUpload
+cd bq-datashare-toolkit/ingestion/function
 npm run deploy -- --trigger-bucket=gs://<mybucket>
 ```
 At this point, any files uploaded to that bucket will trigger the

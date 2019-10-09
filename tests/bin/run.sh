@@ -40,7 +40,7 @@ UPLOAD=${TESTDIR}/data/last_sale.csv
 BUCKET=gs://${RANDO}
 SCHEMA=${TESTDIR}/config/last_sale.schema.json
 TRANSFORM=${TESTDIR}/config/last_sale.transform.sql
-FUNCTION_DIR=${BASEDIR}/ingestion/processUpload
+FUNCTION_DIR=${BASEDIR}/ingestion/function
 QUERY="SELECT COUNT(*) AS count FROM ${DATASET}.${TABLE}"
 
 echo "### BQDS integration test starting at $(date) ###" 
