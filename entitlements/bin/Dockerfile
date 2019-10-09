@@ -2,7 +2,7 @@ FROM node:latest
 
 WORKDIR /app
 
-ADD ./bqdsEntitlements /app
+ADD ../bqdsEntitlements /app
 
 RUN npm install -g
 
