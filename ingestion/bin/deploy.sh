@@ -94,6 +94,6 @@ then
     exit 4
 else
     echo "Function region: ${FUNCTION_REGION}"
-    # gcloud functions deploy processUpload --region=${FUNCTION_REGION} --memory=256MB --source=. --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}"
+    gcloud functions deploy processUpload --region=${FUNCTION_REGION} --memory=256MB --source=../function --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}"
     exit 0
 fi

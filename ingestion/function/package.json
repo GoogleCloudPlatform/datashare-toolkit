@@ -10,7 +10,7 @@
     },
     "scripts": {
         "start": "functions-framework --target=processEvent",
-        "deploy": "./deploy.sh",
+        "deploy": "../bin/deploy.sh",
         "lint": "eslint ."
     },
     "devDependencies": {
