@@ -47,7 +47,7 @@ Entitlements are configured out-of-band, but ultimately reference tables created
 
 ## Ingestion and transformation
 
-The [processUpload](ingestion/processUpload/README.md) page has details on ```BQDS```'s embedded ingestion and transformation features.
+The [processUpload](ingestion/function/README.md) page has details on ```BQDS```'s embedded ingestion and transformation features.
 
 ## Entitlements and view management
 The [entitlementEngine](entitlements/README.md) sections go into more detail on using ```BQDS```'s  entitlement capabilities.
