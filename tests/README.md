@@ -1,4 +1,4 @@
-[Back to BQDS](../../README.md)
+[Back to BQDS](../README.md)
 
 # ```bin/run.sh```: Execute a hermetic iteration of the BQDS end-to-end scenario 
 
