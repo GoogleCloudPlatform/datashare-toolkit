@@ -48,7 +48,7 @@ then
 fi
 
 BUCKET_REGION=`gsutil ls -L -b ${BUCKET_NAME} | grep "Location constraint:" | awk 'END {print tolower($3)}'`
-if [ $? -eq 0 ]
+if [ $? -ne 0 ]
 then
     echo "Failed to find bucket location"
     exit 2
@@ -59,7 +59,7 @@ echo "Bucket region: ${BUCKET_REGION}"
 
 # https://cloud.google.com/functions/docs/locations
 AVAILABLE_FUNCTION_REGIONS=`gcloud functions regions list | xargs basename | grep -v NAME`
-if [ $? -eq 0 ]
+if [ $? -ne 0 ]
 then
     echo "Unable to get available functions region list"
     exit 3
@@ -69,7 +69,6 @@ FUNCTION_REGION=""
 for i in $AVAILABLE_FUNCTION_REGIONS
 do
     if [ "$i" == "${BUCKET_REGION}" ] ; then
-        # echo "Found $i"
         FUNCTION_REGION=${i}
         break
     fi
