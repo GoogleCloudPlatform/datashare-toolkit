@@ -29,6 +29,7 @@ echo "CONFIG_FILE_PATH=${CONFIG_FILE_PATH}"
 echo "CREDENTIAL_FILE_NAME=${CREDENTIAL_FILE_NAME}"
 echo "CONFIG_FILE_NAME=${CONFIG_FILE_NAME}"
 
+cd "$(dirname "$0")"
 pushd ../ > /dev/null
 docker build -t entitlement-engine:v1 -f ./bin/Dockerfile .
 popd > /dev/null
