@@ -29,8 +29,9 @@ echo "CONFIG_FILE_PATH=${CONFIG_FILE_PATH}"
 echo "CREDENTIAL_FILE_NAME=${CREDENTIAL_FILE_NAME}"
 echo "CONFIG_FILE_NAME=${CONFIG_FILE_NAME}"
 
-# --no-cache
-docker build -t entitlement-engine:v1 .
+pushd ../ > /dev/null
+docker build -t entitlement-engine:v1 -f ./bin/Dockerfile .
+popd > /dev/null
 
 IMAGE_CONFIG_FILE_PATH="/app/configuration/${CONFIG_FILE_NAME}"
 echo "\nTo update using the mounted configuration file: '${CONFIG_FILE_PATH}', run the following command:\n\n\tentitlement-engine -c '${IMAGE_CONFIG_FILE_PATH}'\n\n"
