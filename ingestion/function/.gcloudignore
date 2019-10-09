@@ -16,6 +16,6 @@
 node_modules
 
 .DS_Store
-.png
-.md
+*.png
+*.md
 .eslintrc.json
