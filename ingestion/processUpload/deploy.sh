@@ -48,12 +48,22 @@ then
 fi
 
 BUCKET_REGION=`gsutil ls -L -b ${BUCKET_NAME} | grep "Location constraint:" | awk 'END {print tolower($3)}'`
+if [ $? -eq 0 ]
+then
+    echo "Failed to find bucket location"
+    exit 2
+fi
 
 echo "Bucket name: ${BUCKET_NAME}"
 echo "Bucket region: ${BUCKET_REGION}"
 
 # https://cloud.google.com/functions/docs/locations
 AVAILABLE_FUNCTION_REGIONS=`gcloud functions regions list | xargs basename | grep -v NAME`
+if [ $? -eq 0 ]
+then
+    echo "Unable to get available functions region list"
+    exit 3
+fi
 
 FUNCTION_REGION=""
 for i in $AVAILABLE_FUNCTION_REGIONS
@@ -82,7 +92,7 @@ fi
 if [ -z "$FUNCTION_REGION" ]
 then
     echo "Function region could not be determined, exiting."
-    exit 2
+    exit 4
 else
     echo "Function region: ${FUNCTION_REGION}"
     # gcloud functions deploy processUpload --region=${FUNCTION_REGION} --memory=256MB --source=. --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}"
