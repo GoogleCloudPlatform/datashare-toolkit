@@ -41,16 +41,22 @@ then
     exit 1
 fi
 
+if [[ $BUCKET_NAME != gs://* ]] ;
+then
+    BUCKET_NAME="gs://${BUCKET_NAME}"
+    echo "Updated --trigger-bucket to '${BUCKET_NAME}'"
+fi
+
 BUCKET_REGION=`gsutil ls -L -b ${BUCKET_NAME} | grep "Location constraint:" | awk 'END {print tolower($3)}'`
 
 echo "Bucket name: ${BUCKET_NAME}"
 echo "Bucket region: ${BUCKET_REGION}"
 
-FUNCTION_REGION=""
 # https://cloud.google.com/functions/docs/locations
-declare -a functionRegions=("us-central1" "us-east1" "us-east4" "europe-west1" "europe-west2" "asia-east2" "asia-northeast1")
+AVAILABLE_FUNCTION_REGIONS=`gcloud functions regions list | xargs basename | grep -v NAME`
 
-for i in "${functionRegions[@]}"
+FUNCTION_REGION=""
+for i in $AVAILABLE_FUNCTION_REGIONS
 do
     if [ "$i" == "${BUCKET_REGION}" ] ; then
         # echo "Found $i"
@@ -79,6 +85,6 @@ then
     exit 2
 else
     echo "Function region: ${FUNCTION_REGION}"
-    gcloud functions deploy processUpload --region=${FUNCTION_REGION} --memory=256MB --source=. --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}"
+    # gcloud functions deploy processUpload --region=${FUNCTION_REGION} --memory=256MB --source=. --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}"
     exit 0
 fi
