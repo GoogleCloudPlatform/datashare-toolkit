@@ -24,8 +24,8 @@
 
 if [ "$(basename `pwd`)" != "bin" ]
 then
-	  echo "Please execute the test script from $PROJECT_HOME/tests/bin"
-	  exit 1
+	echo "Please execute the test script from $PROJECT_HOME/tests/bin"
+	exit 1
 fi	
 
 BASEDIR=../..
