@@ -63,7 +63,13 @@ gsutil cp ${TRANSFORM} ${BUCKET}/bqds/${TABLE}.transform.sql
 
 echo "Deploying cloud function" 
 cd ${FUNCTION_DIR}
-npm run deploy -- --trigger-bucket=${BUCKET} 
+DEPLOY_OUT=$(npm run deploy -- --trigger-bucket=${BUCKET}) 
+
+FUNCTION_NAME_REGEXP="name.*functions[\/]([a-zA-Z\d-]+)"
+[[ $DEPLOY_OUT =~ $FUNCTION_NAME_REGEXP ]]
+FUNCTION_NAME="${BASH_REMATCH[1]}"
+
+echo "${DEPLOY_OUT}"
 
 if [ $? -ne 0 ]
 then
@@ -137,9 +143,9 @@ echo "Validation complete"
 
 ##### Tear-down steps 
 
-echo "Removing cloud function $(basename ${FUNCTION_DIR})" 
+echo "Removing cloud function $FUNCTION_NAME" 
 cd ${FUNCTION_DIR}
-gcloud functions delete $(basename ${FUNCTION_DIR}) --quiet
+gcloud functions delete $FUNCTION_NAME --quiet
 
 if [ $? -ne 0 ]
 then
