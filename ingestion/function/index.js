@@ -144,7 +144,7 @@ async function deleteTable(dataset, tableName) {
 async function stageFile(config) {
     console.log(`using config ` + JSON.stringify(config));
     const dataset = bigqueryClient.dataset(config.dataset);
-    const today = new Date();
+    let today = new Date();
     today.setDate(today.getDate() + stagingTableExpiryDays);
     const expiryTime = today.getTime();
     console.log(`setting expirationTime for staging table to ${expiryTime}`);
