@@ -52,6 +52,8 @@ The [processUpload](ingestion/function/README.md) page has details on ```BQDS```
 ## Entitlements and view management
 The [entitlementEngine](entitlements/README.md) sections go into more detail on using ```BQDS```'s  entitlement capabilities.
 
+[![Run on Google Cloud](https://storage.googleapis.com/cloudrun/button.svg)](https://deploy.cloud.run?dir=entitlements%2Fbin)
+
 ## Disclaimers
 
 This is not an officially supported Google product.
