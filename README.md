@@ -52,6 +52,9 @@ The [processUpload](ingestion/function/README.md) page has details on ```BQDS```
 ## Entitlements and view management
 The [entitlementEngine](entitlements/README.md) sections go into more detail on using ```BQDS```'s  entitlement capabilities.
 
+<!--
+https://github.com/GoogleCloudPlatform/cloud-run-button#add-the-cloud-run-button-to-your-repos-readme
+-->
 [![Run on Google Cloud](https://storage.googleapis.com/cloudrun/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/GoogleCloudPlatform/bq-datashare-toolkit.git&dir=entitlements%2Fbin)
 
 ## Disclaimers
