@@ -1,10 +1,14 @@
 [Back to BQDS](../../README.md)
 
-# ```processUpload```: ingestion Cloud Function for batch data uploads
+# Ingestion Cloud Function for batch data uploads
 
 ## Synopsis
 
-A ```BQDS``` ingestion workflow iteration begins when a supported file type (```csv```,
+`BQDS`'s entry point is through a Cloud Function that is listening for
+events within a host storage bucket. This function can be deployed to
+a bucket of your choice using the deployment script it `ingestion/bin`
+
+An ingestion begins when a supported file type (```csv```,
 ```csv.gz```, ```txt```, ```avro``` or ```json```)  is discovered by ```processUpload``` through Google Cloud Functions'
 [bucket trigger mechanism](https://cloud.google.com/functions/docs/calling/storage). When ```processUpload``` is invoked, it looks
 in the same bucket (within the ```bqds``` subdirectory) for
@@ -12,8 +16,7 @@ schema and transform configurations corresponding to the name of the
 uploaded file. It then executes a series of  BigQuery actions to transform and load the data into the
 specified destination BigQuery dataset and table for that file.
 
-A summary of the logic within the ```processUpload``` Cloud Function
-is:
+A summary of the logic within the function is:
 
 0. If the file is not a known configuration file under `gs://<bucket-name>/bqds`, and
    is of a recognized file type -
