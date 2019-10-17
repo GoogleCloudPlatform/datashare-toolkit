@@ -41,7 +41,7 @@ then
     exit 1
 fi
 
-if [[ $BUCKET_NAME != gs://* ]] ;
+if [[ $BUCKET_NAME != gs://* ]]
 then
     BUCKET_NAME="gs://${BUCKET_NAME}"
     echo "Updated --trigger-bucket to '${BUCKET_NAME}'"
