@@ -6,7 +6,7 @@
 
 `BQDS`'s entry point is through a Cloud Function that is listening for
 events within a host storage bucket. This function can be deployed to
-a bucket of your choice using the deployment script it `ingestion/bin`
+a bucket of your choice using the deployment script in `ingestion/bin`
 
 An ingestion begins when a supported file type (```csv```,
 ```csv.gz```, ```txt```, ```avro``` or ```json```)  is discovered by ```processUpload``` through Google Cloud Functions'
