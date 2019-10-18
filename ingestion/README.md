@@ -257,62 +257,6 @@ might require more transformations. If your source data is clean and
 wholly interpretable by BigQuery using a specific schema, there might
 be less necessity to transform the data.
 
-
-## Configuring ingestion
-
-Two configuration files are used to instrument the ingestion of data files, both of which
-are optional.
-
-- ```*.schema.json```
-
-```<table_name>.schema.json``` files are placed in the ```bqds```
-subdirectory of the storage bucket, one each per destination
-table. The file specifies the delimiter to be used on the source data,
-as well as the column names and types for the inbound file, which
-inherits the same format as BigQuery's schema definitions. By default,
-the records in each individual file will be appended to the
-destination table (if that table already exists - the table will be
-created if it does not). If you prefer to
-have existing table data cleared out for each data load (for example, when you
-have tables that represent a complete set of the relevant data and it
-needs to be replaced wholesale each time), add a `"truncate": "true"`
-property to the JSON configuration:
-
-```
-{
-    "metadata": {
-        "fieldDelimiter": "|",
-            "fields": [
-                {"name": "ts_ms", "type": "integer"},
-                {"name": "object", "type": "string"},
-                {"name": "weight", "type": "float"},
-                {"name": "unit_of_measurement", "type": "string"}
-            ]
-        },
-        "truncate": "true"
-}
-```
-
-- ```*.transform.sql```
-
-```<table_name>.transform.sql``` specifies the future state of the
-data from the perspective of a SQL query off a table with the schema
-specified in ```schema.json``` (or auto-detected). This forms the basis of the query
-that will be executed off the temporary table holding the contents of
-the uploaded file. The results of that query will be appended to
-the specified destination table.
-
-If this file is omitted, the ingestor will default to ```*```, meaning no
-transformation will be performed — the file will be loaded as provided in the source.
-
-## Object naming conventions
-
-Files uploaded to your Cloud Storage bucket should be named according
-to their destination table,
-i.e. ```<dataset>.<table>.<anything-else>.<csv|csv.gz|gz|txt|avro|json>```.
-
-Any datasets or tables that do not exist will be created.
-
 ### Batch identification
 
 When the source data file is transformed into the destination table
