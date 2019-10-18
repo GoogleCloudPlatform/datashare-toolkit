@@ -59,7 +59,7 @@ echo "Bucket region: ${BUCKET_REGION}"
 
 # https://cloud.google.com/functions/docs/locations
 AVAILABLE_FUNCTION_REGIONS=`gcloud functions regions list | xargs basename -a | grep -v NAME`
-if [ $? -ne 0 ] || [ -z $AVAILABLE_FUNCTION_REGIONS ]
+if [ $? -ne 0 ] || [ -z "$AVAILABLE_FUNCTION_REGIONS" ]
 then
     echo "Unable to get available functions region list"
     exit 3
