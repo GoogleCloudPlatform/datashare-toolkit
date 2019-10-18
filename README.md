@@ -47,10 +47,10 @@ The function is triggered off mutations to a specified Cloud Storage Bucket.
 
 ## Ingestion and transformation
 
-The [ingestion](ingestion/README.md) page has details on ```BQDS```'s embedded ingestion and transformation features.
+The [ingestion](ingestion/README.md) page has details on `BQDS`'s embedded ingestion and transformation features.
 
 ## Entitlements and view management
-The [entitlementEngine](entitlements/README.md) sections go into more detail on using ```BQDS```'s  entitlement capabilities.
+The [entitlementEngine](entitlements/README.md) sections go into more detail on using `BQDS`'s  entitlement capabilities.
 
 ## Examples
 The [examples](examples) directory has several configurations highlighting various `BQDS` usage models.
@@ -59,7 +59,7 @@ The [examples](examples) directory has several configurations highlighting vario
 
 This is not an officially supported Google product.
 
-BQDS is under active development. Interfaces and functionality may change at any time.
+`BQDS` is under active development. Interfaces and functionality may change at any time.
 
 ## License
 
