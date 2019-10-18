@@ -48,7 +48,7 @@ then
 fi
 
 BUCKET_REGION=`gsutil ls -L -b ${BUCKET_NAME} | grep "Location constraint:" | awk 'END {print tolower($3)}'`
-if [ $? -ne 0 ] || [ -z $BUCKET_REGION ]
+if [ $? -ne 0 ] || [ -z "$BUCKET_REGION" ]
 then
     echo "Failed to find bucket location"
     exit 2
