@@ -54,13 +54,20 @@ then
     exit 3
 fi
 
-if [ "$(gcloud services list | grep "cloudfunctions.googleapis.com" -c)" -eq 0 ]; then
+ENABLED_SERVICE_LIST=`gcloud services list`
+if [ $? -ne 0 ]
+then
+    echo "Failed to get active services list"
+    exit 4
+fi
+
+if [[ "$ENABLED_SERVICE_LIST" != *"cloudfunctions.googleapis.com"* ]]; then
     echo "Enabling cloudfunctions.googleapis.com api"
     gcloud services enable cloudfunctions.googleapis.com
     if [ $? -ne 0 ]
     then
         echo "Failed to enable cloudfunctions.googleapis.com api"
-        exit 4
+        exit 5
     fi
 else
     echo "cloudfunctions.googleapis.com api is enabled"
@@ -74,7 +81,7 @@ AVAILABLE_FUNCTION_REGIONS=`gcloud functions regions list | xargs basename -a | 
 if [ $? -ne 0 ] || [ -z "$AVAILABLE_FUNCTION_REGIONS" ]
 then
     echo "Unable to get available functions region list"
-    exit 5
+    exit 6
 fi
 
 FUNCTION_REGION=""
@@ -103,7 +110,7 @@ fi
 if [ -z "$FUNCTION_REGION" ]
 then
     echo "Function region could not be determined, exiting."
-    exit 6
+    exit 7
 else
     echo "Function region: ${FUNCTION_REGION}"
     gcloud functions deploy processUpload --region=${FUNCTION_REGION} --memory=256MB --source=../function --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}"
