@@ -7,7 +7,9 @@ The ```BigQuery Datashare Toolkit (BQDS)``` is a solution for data publishers to
 
 While ```BQDS``` is used for data management and entitlement, it does *not* manage any commercial aspects of delivery. Hence, it is assumed that publishers already have licensing arrangements and that consumers have furnished you the GCP account ID's corresponding to their entitled users. These are required for the creation of the authorized views within BigQuery.
 
-```BQDS``` is open-source. Some supporting infrastructure, such as [storage buckets](https://cloud.google.com/storage/), serverless functions, and BigQuery datasets, must be maintained within GCP  by publishers in order to use BQDS. As a consumer, when your GCP account is added to the publisher entitlements, you can view published data as if it were your own, ready to integrate into your analytics workflow, machine learning model, or runtime application. Publishers are responsible for managing the limited BQDS support infrastructure for their datasets. While consumers are billed for BigQuery compute and networking, Publishers incur costs only on the storage of their data in BigQuery and Cloud Storage.
+```BQDS``` is open-source. Some supporting infrastructure, such as [storage buckets](https://cloud.google.com/storage/), serverless functions, and BigQuery datasets, must be maintained within GCP by publishers in order to use BQDS. As a consumer, when your GCP account is added to the publisher entitlements, you can view published data as if it were your own, ready to integrate into your analytics workflow, machine learning model, or runtime application. Publishers are responsible for managing the limited BQDS support infrastructure for their datasets. While consumers are billed for BigQuery compute and networking, Publishers incur costs only on the storage of their data in BigQuery and Cloud Storage.
+
+For publisher projects that do not have the Cloud Functions API enabled at the time of running [deploy.sh](ingestion/bin/deploy.sh), the API will be enabled on the project's behalf.
 
 ## Principles
 
