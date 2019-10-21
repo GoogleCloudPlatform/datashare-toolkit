@@ -38,7 +38,7 @@ done
 if [ -z "$BUCKET_NAME" ]
 then
     echo "--trigger-bucket must be supplied"
-    exit 1
+    exit 2
 fi
 
 if [[ $BUCKET_NAME != gs://* ]]
@@ -51,7 +51,19 @@ BUCKET_REGION=`gsutil ls -L -b ${BUCKET_NAME} | grep "Location constraint:" | aw
 if [ $? -ne 0 ] || [ -z "$BUCKET_REGION" ]
 then
     echo "Failed to find bucket location"
-    exit 2
+    exit 3
+fi
+
+if [ "$(gcloud services list | grep "cloudfunctions.googleapis.com" -c)" -eq 0 ]; then
+    echo "Enabling cloudfunctions.googleapis.com api"
+    gcloud services enable cloudfunctions.googleapis.com
+    if [ $? -ne 0 ]
+    then
+        echo "Failed to enable cloudfunctions.googleapis.com api"
+        exit 4
+    fi
+else
+    echo "cloudfunctions.googleapis.com api is enabled"
 fi
 
 echo "Bucket name: ${BUCKET_NAME}"
@@ -62,7 +74,7 @@ AVAILABLE_FUNCTION_REGIONS=`gcloud functions regions list | xargs basename -a | 
 if [ $? -ne 0 ] || [ -z "$AVAILABLE_FUNCTION_REGIONS" ]
 then
     echo "Unable to get available functions region list"
-    exit 3
+    exit 5
 fi
 
 FUNCTION_REGION=""
@@ -91,7 +103,7 @@ fi
 if [ -z "$FUNCTION_REGION" ]
 then
     echo "Function region could not be determined, exiting."
-    exit 4
+    exit 6
 else
     echo "Function region: ${FUNCTION_REGION}"
     gcloud functions deploy processUpload --region=${FUNCTION_REGION} --memory=256MB --source=../function --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}"
