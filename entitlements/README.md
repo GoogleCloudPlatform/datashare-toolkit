@@ -1,4 +1,4 @@
-[Back to BQDS](../README.md)
+[Back to BQDS](..)
 
 # Entitlement engine
 The entitlement toolkit contains an engine to synthesize views and data entitlements. This allows publishers to develop access control policies enforcing that only entitled GCP users have access to the licensed subset of their data. Publishers configure entitlements within a JSON or YAML configuration file, and specify the user principal ID's (of GCP accounts) to be granted access to specific BigQuery authorized views residing in a parallel dataset.
@@ -173,7 +173,7 @@ Lastly, you will need to populate the ```groups``` and ```groupEntitlements``` t
 
 ## Example configurations
 
-A configuration can be created in either JSON or YAML format. You can find examples in the Git repository within the [examples](../examples/mlb/config) folder. For further information see the [MLB example documention](../examples/mlb/README.md)
+A configuration can be created in either JSON or YAML format. You can find examples in the Git repository within the [examples](../examples/mlb/config) folder. For further information see the [MLB example documention](../examples/mlb)
 
 - [JSON simple example](../examples/mlb/config/entitlements/simple.json)
 - [YAML simple example](../examples/mlb/config/entitlements/simple.yaml)
