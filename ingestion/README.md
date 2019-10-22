@@ -1,4 +1,4 @@
-[Back to BQDS](/)
+[Back to BQDS](../..)
 
 # Ingestion Cloud Function for batch data uploads
 
