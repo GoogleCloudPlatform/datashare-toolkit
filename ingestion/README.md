@@ -283,9 +283,9 @@ The ```processUpload``` function must be run under a service account with read p
 ## Deployment
 
 To deploy the ingestion function run this command from the
-```function``` directory:
+```ingestion/bin``` directory:
 
-```npm run deploy -- --trigger-bucket=gs://example-bucket```
+```./deploy --trigger-bucket=gs://example-bucket```
 
 ## Debugging
 
