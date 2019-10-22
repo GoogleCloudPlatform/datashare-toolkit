@@ -1,4 +1,4 @@
-[Back to BQDS](../../)
+[Back to BQDS](../../README.md)
 
 # Example scenario using Major League Baseball game logs
 
