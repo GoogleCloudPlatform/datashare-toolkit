@@ -45,14 +45,14 @@ Ingestion is performed by a [Google Cloud Function](https://cloud.google.com/fun
 
 The function is triggered off mutations to a specified Cloud Storage Bucket.
 
-[Entitlements](entitlements/README.md) are configured in a separate workflow, but generally reference tables created during the ingestion stage. Entitlements must be regenerated each time access control lists or authorized views change.
+[Entitlements](entitlements) are configured in a separate workflow, but generally reference tables created during the ingestion stage. Entitlements must be regenerated each time access control lists or authorized views change.
 
 ## Ingestion and transformation
 
-The [ingestion](ingestion/README.md) page has details on `BQDS`'s embedded ingestion and transformation features.
+The [ingestion](ingestion) page has details on `BQDS`'s embedded ingestion and transformation features.
 
 ## Entitlements and view management
-The [entitlementEngine](entitlements/README.md) sections go into more detail on using `BQDS`'s  entitlement capabilities.
+The [entitlementEngine](entitlements) sections go into more detail on using `BQDS`'s  entitlement capabilities.
 
 ## Examples
 The [examples](examples) directory has several configurations highlighting various `BQDS` usage models.
