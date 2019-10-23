@@ -28,6 +28,8 @@ then
 	exit 1
 fi
 
+alias shasum="sha1sum"
+
 BASEDIR=../..
 TESTDIR=${BASEDIR}/tests
 DATADIR=${TESTDIR}/data
