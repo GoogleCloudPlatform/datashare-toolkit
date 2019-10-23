@@ -28,8 +28,6 @@ then
 	exit 1
 fi	
 
-ln -s /usr/bin/sha1sum /usr/bin/shasum
-
 BASEDIR=../..
 TESTDIR=${BASEDIR}/tests
 DATADIR=${TESTDIR}/data
