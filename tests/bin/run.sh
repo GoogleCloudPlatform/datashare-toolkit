@@ -20,19 +20,26 @@
 # Script will use current project but will create all other
 # necessary objects from the source repository. Will require 
 # administrator privileges for Cloud Functions, Cloud Storage
-# and BigWuery
+# and BigQuery
 
 if [ "$(basename `pwd`)" != "bin" ]
 then
 	echo "Please execute the test script from $PROJECT_HOME/tests/bin"
 	exit 1
-fi	
+fi
+
+SHASUMEXE="sha1sum"
+UNAME=`uname`
+if [ "$UNAME" == "darwin" ]
+then
+    SHASUMEXE="shasum"
+fi
 
 BASEDIR=../..
 TESTDIR=${BASEDIR}/tests
 DATADIR=${TESTDIR}/data
 LOG=${TESTDIR}/logs/bqds-test.log
-RANDO="$(cat /dev/urandom | head | shasum  | awk '{print $1}')"
+RANDO="$(cat /dev/urandom | head | ${SHASUMEXE} | awk '{print $1}')"
 PROJECT=$(gcloud config get-value project)
 DATASET=testbqds
 TABLE=last_sale
@@ -63,6 +70,7 @@ gsutil cp ${TRANSFORM} ${BUCKET}/bqds/${TABLE}.transform.sql
 
 echo "Deploying cloud function" 
 cd ${FUNCTION_DIR}
+npm install
 DEPLOY_OUT=$(npm run deploy -- --trigger-bucket=${BUCKET}) 
 
 FUNCTION_NAME_REGEXP="name.*functions[\/]([a-zA-Z\d-]+)"
@@ -170,5 +178,5 @@ then
 fi
 
 echo "### BQDS integration test ended at $(date) ###" 
-            
+
 exit 0

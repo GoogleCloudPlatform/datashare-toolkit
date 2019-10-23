@@ -1,7 +1,9 @@
 {
     "name": "processUpload",
     "version": "0.0.1",
+    "description": "BQDS processUpload ingestion function",
     "license": "Apache-2.0",
+    "repository": {},
     "dependencies": {
         "@google-cloud/bigquery": "^3.0.0",
         "@google-cloud/functions-framework": "^1.1.1",
