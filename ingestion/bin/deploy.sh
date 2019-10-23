@@ -85,7 +85,7 @@ then
 fi
 
 FUNCTION_REGION=""
-for i in $(basename -- $AVAILABLE_FUNCTION_REGIONS | grep -v NAME)
+for i in $(basename -- "$AVAILABLE_FUNCTION_REGIONS" | grep -v NAME)
 do
     if [ "$i" == "${BUCKET_REGION}" ] ; then
         FUNCTION_REGION=${i}
