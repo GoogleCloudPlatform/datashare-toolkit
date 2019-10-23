@@ -26,9 +26,7 @@ if [ "$(basename `pwd`)" != "bin" ]
 then
 	echo "Please execute the test script from $PROJECT_HOME/tests/bin"
 	exit 1
-fi	
-
-alias shasum='sha1sum'
+fi
 
 BASEDIR=../..
 TESTDIR=${BASEDIR}/tests

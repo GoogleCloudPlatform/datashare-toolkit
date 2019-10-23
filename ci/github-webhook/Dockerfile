@@ -35,5 +35,7 @@ ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
 COPY --from=builder /go/src/github.com/knative/docs/helloworld-shell/invoke /invoke
 COPY script.sh .
 
+RUN alias shasum='sha1sum'
+
 # Run the web service on container startup.
 CMD ["/invoke"]
