@@ -28,11 +28,18 @@ then
 	exit 1
 fi
 
+SHASUMEXE="sha1sum"
+UNAME=`uname`
+if [ "$UNAME" == "darwin" ]
+then
+    SHASUMEXE="shasum"
+fi
+
 BASEDIR=../..
 TESTDIR=${BASEDIR}/tests
 DATADIR=${TESTDIR}/data
 LOG=${TESTDIR}/logs/bqds-test.log
-RANDO="$(cat /dev/urandom | head | shasum | awk '{print $1}')"
+RANDO="$(cat /dev/urandom | head | ${SHASUMEXE} | awk '{print $1}')"
 PROJECT=$(gcloud config get-value project)
 DATASET=testbqds
 TABLE=last_sale
