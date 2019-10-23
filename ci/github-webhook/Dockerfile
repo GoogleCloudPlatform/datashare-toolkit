@@ -13,4 +13,5 @@ RUN mkdir -p /usr/local/gcloud \
 # Adding the package path to local
 ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
 
+RUN echo 'alias shasum="sha1sum"' >> ~/.profile
 RUN echo 'alias shasum="sha1sum"' >> ~/.bashrc
