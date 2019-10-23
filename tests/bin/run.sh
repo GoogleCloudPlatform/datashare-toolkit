@@ -32,7 +32,6 @@ BASEDIR=../..
 TESTDIR=${BASEDIR}/tests
 DATADIR=${TESTDIR}/data
 LOG=${TESTDIR}/logs/bqds-test.log
-
 RANDO="$(cat /dev/urandom | head | shasum | awk '{print $1}')"
 PROJECT=$(gcloud config get-value project)
 DATASET=testbqds
