@@ -3,11 +3,13 @@
 
 _This is not an officially supported Google product._
 
-The ```BigQuery Datashare Toolkit (BQDS)``` is a solution for data publishers to ingest and entitle GCP-native datasets in [BigQuery](https://cloud.google.com/bigquery/). Your data licensees can be freed from the toil of transferring, normalizing, and loading their datasets into GCP from source data files. Publishers upload data to a storage bucket and allocate  permissioned datasets virtually — using BigQuery [authorized views](https://cloud.google.com/bigquery/docs/authorized-views). This results in less friction and toil for both publishers and consumers and can be viewed as a parallel distribution channel specific to data customers running infrastructure on GCP.
+The ```BigQuery Datashare Toolkit (BQDS)``` is a solution for data publishers to easily manage datasets residing within [BigQuery](https://cloud.google.com/bigquery/). The toolkit includes functionality to ingest and entitle data, relieving consumers from much of the toil involved in onboarding datasets from a variety of providers. Publishers upload data files to a storage bucket and allocate permissioned datasets using BigQuery [authorized views](https://cloud.google.com/bigquery/docs/authorized-views). This results in less friction for both publishers and consumers.
 
-While ```BQDS``` is used for data management and entitlement, it does *not* manage any commercial aspects of delivery. Hence, it is assumed that publishers already have licensing arrangements and that your customers have furnished you the GCP account ID's corresponding to their entitled principals. These are required for the creation of the authorized views within BigQuery.
+While ```BQDS``` is used for data management and entitlement, it does *not* manage any commercial aspects of delivery. Hence, it is assumed that publishers already have licensing arrangements and that consumers have furnished you the GCP account ID's corresponding to their entitled users. These are required for the creation of the authorized views within BigQuery.
 
-```BQDS``` is open-source. Some supporting infrastructure, such as [storage buckets](https://cloud.google.com/storage/), serverless functions, and BigQuery datasets, must be maintained within GCP  by publishers in order to use BQDS. As a consumer, when your GCP account is added to the publisher entitlements, you can view published data as if it were your own, ready to integrate into your analytics workflow, machine learning model, or runtime application. Publishers are responsible for managing the limited BQDS support infrastructure for their datasets. While consumers are billed for BigQuery compute and networking, Publishers incur costs only on the storage of their data in BigQuery and Cloud Storage.
+```BQDS``` is open-source. Some supporting infrastructure, such as [storage buckets](https://cloud.google.com/storage/), serverless functions, and BigQuery datasets, must be maintained within GCP by publishers in order to use BQDS. As a consumer, when your GCP account is added to the publisher entitlements, you can view published data as if it were your own, ready to integrate into your analytics workflow, machine learning model, or runtime application. Publishers are responsible for managing the limited BQDS support infrastructure for their datasets. While consumers are billed for BigQuery compute and networking, Publishers incur costs only on the storage of their data in BigQuery and Cloud Storage.
+
+For publisher projects that do not have the Cloud Functions API enabled at the time of running [deploy.sh](ingestion/bin/deploy.sh), the API will be enabled on the project's behalf.
 
 ## Principles
 
@@ -43,14 +45,17 @@ Ingestion is performed by a [Google Cloud Function](https://cloud.google.com/fun
 
 The function is triggered off mutations to a specified Cloud Storage Bucket.
 
-Entitlements are configured out-of-band, but ultimately reference tables created during the ingestion stage. Entitlements must be regenerated each time access control lists change.
+[Entitlements](entitlements) are configured in a separate workflow, but generally reference tables created during the ingestion stage. Entitlements must be regenerated each time access control lists or authorized views change.
 
 ## Ingestion and transformation
 
-The [processUpload](ingestion/function/README.md) page has details on ```BQDS```'s embedded ingestion and transformation features.
+The [ingestion](ingestion) page has details on `BQDS`'s embedded ingestion and transformation features.
 
 ## Entitlements and view management
-The [entitlementEngine](entitlements/README.md) sections go into more detail on using ```BQDS```'s  entitlement capabilities.
+The [entitlementEngine](entitlements) sections go into more detail on using `BQDS`'s  entitlement capabilities.
+
+## Examples
+The [examples](examples) directory has several configurations highlighting various `BQDS` usage models.
 
 <!--
 https://github.com/GoogleCloudPlatform/cloud-run-button#add-the-cloud-run-button-to-your-repos-readme
@@ -61,7 +66,7 @@ https://github.com/GoogleCloudPlatform/cloud-run-button#add-the-cloud-run-button
 
 This is not an officially supported Google product.
 
-BQDS is under active development. Interfaces and functionality may change at any time.
+`BQDS` is under active development. Interfaces and functionality may change at any time.
 
 ## License
 

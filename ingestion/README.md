@@ -1,33 +1,37 @@
 [Back to BQDS](../../README.md)
 
-# ```processUpload```: ingestion Cloud Function for batch data uploads
+# Ingestion Cloud Function for batch data uploads
 
 ## Synopsis
 
-A ```BQDS``` ingestion workflow iteration begins when a supported file type (```csv```,
-```csv.gz```, ```txt```, ```avro``` or ```json```)  is discovered by ```processUpload``` through Google Cloud Functions'
-[bucket trigger mechanism](https://cloud.google.com/functions/docs/calling/storage). When ```processUpload``` is invoked, it looks
-in the same bucket (within the ```bqds``` subdirectory) for
-schema and transform configurations corresponding to the name of the
+`BQDS`'s entry point is through a Cloud Function that is listening for
+finalize events in a Cloud Storage bucket. This function can be deployed to
+a bucket of your choice using the deployment script in [bin/deploy.sh](bin/deploy.sh).
+
+An ingestion begins when a supported file type (```csv```,
+```csv.gz```, ```txt```, ```avro``` or ```json```)  is discovered by
+the function through Google Cloud Functions'
+[bucket trigger mechanism](https://cloud.google.com/functions/docs/calling/storage). When
+the function is invoked, it looks in the same bucket (within the ```bqds``` subdirectory) for
+[schema and transform](../examples/mlb/config/ingestion) configurations corresponding to the name of the
 uploaded file. It then executes a series of  BigQuery actions to transform and load the data into the
 specified destination BigQuery dataset and table for that file.
 
-A summary of the logic within the ```processUpload``` Cloud Function
-is:
+A summary of the logic within the function is:
 
-0. If the file is not a known configuration file under `gs://<bucket-name>/bqds`, and
-   is of a recognized file type -
+0. If the file extension is of a recognized file type -
 1. Extract the dataset and table names from the bucket's inbound file
-   name, determined by the first two tokens delimited by `.` in the
-   file name, e.g. `mydataset.mytable.upload.1.csv`
+   name, determined by the first two tokens of the file name delimited by `.` , e.g. `mydataset.mytable.upload.1.csv`
 2. Determine whether the dataset exists and, if not, create it
-3. Look for `<mytable>.schema.json` to get the delimiter, field
+3. Look for `<mytable>.schema.json` under the bucket's `/bqds`
+   subdirectory to get the delimiter, field
    definitions, and write disposition for the upload. If it these do not exist, instruct the BigQuery job to
-   auto-detect the schema and delimiter.
+   auto-detect the schema and delimiter, and apply `WRITE_APPEND` as the
+   write disposition
 4. Execute a BigQuery job to load the file's contents into a temporary table
 6. Execute SQL that uses the `SELECT` clause specified
-   in`<mytable>.transform.sql` (or the null transform`*`), saving the
-   results (creating or appending, depending on the write disposition employed) into the specified destination table
+   in`<mytable>.transform.sql` (or the null transform`*`), and save the
+   results (creating or appending, depending on the write disposition chosen) into the specified destination table
 7. Delete the temporary table after a successful transformation
    stage (temporary tables otherwise expire in 2 days).
    
@@ -41,34 +45,13 @@ After cloning the repository, this command will attach the Cloud Function to a s
 bucket of your choosing:
 
 ```
-cd bq-datashare-toolkit/ingestion/function
-npm run deploy -- --trigger-bucket=gs://<mybucket>
+cd bq-datashare-toolkit/ingestion/bin
+./deploy.sh --trigger-bucket=gs://<mybucket>
 ```
 At this point, any files uploaded to that bucket will trigger the
 Cloud Function, but only files of a recognized type will be
 processed. Unrecognized files, and any files placed in the bucket's `bqds`
 subdirectory, will be ignored.
-
-## Processing
-
-The ingestion process begins when a file has been uploaded to the
-source storage bucket. The configured Cloud
-Function trigger will be invoked with a pointer to the file.
-
-Source data files are named according to their destination dataset and
-table. `BQDS` checks these at runtime to create the requisite datasets
-and tables within BigQuery. 
-
-The Cloud Function will parse the name of the inbound file and look
-for applicable schema configurations and transformation SQL for the
-specified destination table.
-
-### GCS bucket
-
-The Cloud Storage bucket you will use to stage data is specified as an option to the `processUpload`
-function's deploy command. This bucket must be created in advance of
-installing the Cloud Function. There are several options pertaining to
-buckets, such as class of storage and region(s) in which to store the 
 
 ## Specifications for uploaded files
 
@@ -83,7 +66,7 @@ your storage bucket (```gs://example-bucket/```) are named:
 - ```DS.EXAMPLE.csv``` (if uncompressed).
 - ```DS.EXAMPLE.csv.gz``` (if compressed).
 
-The Cloud Function will time out after *540*x
+The Cloud Function will time out after *540*
 seconds of execution. Depending on the size of your files, it
 may not be possible to completely ingest very large files completely before this
 timeout threshold is crossed. If you encounter this condition,
@@ -103,7 +86,7 @@ The first stage uses a file named according to the convention
 file specifies the field definitions corresponding to the file
 being uploaded, as well as the
 [write disposition](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/WriteDisposition)
-will use in ingesting the file.
+to be used in ingesting the file.
 
 If the target BigQuery dataset (as inferred from the file name) does not exist, it will be created.
 
@@ -112,11 +95,10 @@ transformed file contents. Subsequent updates to the same target will
 append its rows if the table is found, unless you have specified
 `truncate: true` in your `schema.json`.
 
-Create the ```EXAMPLE.schema.json``` and  ```EXAMPLE.transform.sql```
-files. If you omit the ```EXAMPLE.transform.sql``` file,
-```processUpload``` willl default to ```*```, which signifies *no*
-transformation from the originally specified schema. The
-```EXAMPLE.schema.json``` file can also be omitted, in which case BigQuery
+If there is no ```EXAMPLE.transform.sql``` file,
+the function willl default to ```*```, which signifies *no*
+transformation from the originally specified schema. If the 
+```EXAMPLE.schema.json``` file is omitted, BigQuery
 will attempt to autodetect the schema from the file contents.
 
 The content within ```EXAMPLE.schema.json``` is a JSON object representation. The
@@ -138,6 +120,9 @@ used to delimit columns in each row of the CSV file. An example
     }
 }
 ```
+
+For a `WRITE_APPEND` disposition, simply omit `truncate: "true"` from
+the configuration.
 
 A file using this schema, and being uploaded into dataset `DS` and
 table `EXAMPLE` data in ```DS.EXAMPLE.20201102.csv``` might resemble:
@@ -272,62 +257,6 @@ might require more transformations. If your source data is clean and
 wholly interpretable by BigQuery using a specific schema, there might
 be less necessity to transform the data.
 
-
-## Configuring ingestion
-
-Two configuration files are used to instrument the ingestion of data files, both of which
-are optional.
-
-- ```*.schema.json```
-
-```<table_name>.schema.json``` files are placed in the ```bqds```
-subdirectory of the storage bucket, one each per destination
-table. The file specifies the delimiter to be used on the source data,
-as well as the column names and types for the inbound file, which
-inherits the same format as BigQuery's schema definitions. By default,
-the records in each individual file will be appended to the
-destination table (if that table already exists - the table will be
-created if it does not). If you prefer to
-have existing table data cleared out for each data load (for example, when you
-have tables that represent a complete set of the relevant data and it
-needs to be replaced wholesale each time), add a `"truncate": "true"`
-property to the JSON configuration:
-
-```
-{
-    "metadata": {
-        "fieldDelimiter": "|",
-            "fields": [
-                {"name": "ts_ms", "type": "integer"},
-                {"name": "object", "type": "string"},
-                {"name": "weight", "type": "float"},
-                {"name": "unit_of_measurement", "type": "string"}
-            ]
-        },
-        "truncate": "true"
-}
-```
-
-- ```*.transform.sql```
-
-```<table_name>.transform.sql``` specifies the future state of the
-data from the perspective of a SQL query off a table with the schema
-specified in ```schema.json``` (or auto-detected). This forms the basis of the query
-that will be executed off the temporary table holding the contents of
-the uploaded file. The results of that query will be appended to
-the specified destination table.
-
-If this file is omitted, the ingestor will default to ```*```, meaning no
-transformation will be performed — the file will be loaded as provided in the source.
-
-## Object naming conventions
-
-Files uploaded to your Cloud Storage bucket should be named according
-to their destination table,
-i.e. ```<dataset>.<table>.<anything-else>.<csv|csv.gz|gz|txt|avro|json>```.
-
-Any datasets or tables that do not exist will be created.
-
 ### Batch identification
 
 When the source data file is transformed into the destination table
@@ -354,9 +283,9 @@ The ```processUpload``` function must be run under a service account with read p
 ## Deployment
 
 To deploy the ingestion function run this command from the
-```function``` directory:
+```ingestion/bin``` directory:
 
-```npm run deploy -- --trigger-bucket=gs://example-bucket```
+```./deploy --trigger-bucket=gs://example-bucket```
 
 ## Debugging
 
