@@ -28,10 +28,6 @@ then
 	exit 1
 fi
 
-# Move to configuration file
-# gcloud auth login "165255570699@cloudbuild.gserviceaccount.com" --no-launch-browser
-gcloud config set account "165255570699@cloudbuild.gserviceaccount.com"
-
 SHASUMEXE="sha1sum"
 UNAME=`uname`
 if [ "$UNAME" == "darwin" ]
