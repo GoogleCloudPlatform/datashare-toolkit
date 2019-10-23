@@ -54,8 +54,7 @@ echo "### BQDS integration test starting at $(date) ###"
 PROJECT="bqds-${RANDO:0:25}"
 
 echo "Creating project ${PROJECT}" 
-gcloud projects create "${PROJECT}" --folder=396521612403
-gcloud services enable cloudresourcemanager.googleapis.com
+gcloud projects create "${PROJECT}" --folder=396521612403 --quiet
 
 ACCOUNT=$(gcloud alpha billing accounts list | head -2 | tail -1  | awk '{print $1}')
 
@@ -64,6 +63,8 @@ gcloud alpha billing projects link "${PROJECT}" --billing-account=${ACCOUNT}
 
 echo "Setting project to ${PROJECT}" 
 gcloud config set project "${PROJECT}"
+
+gcloud services enable cloudresourcemanager.googleapis.com
 
 SERVICE_ACCOUNT="165255570699@cloudbuild.gserviceaccount.com"
 gcloud projects add-iam-policy-binding "${PROJECT}" --member='serviceAccount:${SERVICE_ACCOUNT}' --role='roles/bigquery.admin'
