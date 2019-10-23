@@ -62,7 +62,7 @@ gcloud config set project "bqds-ci"
 # gcloud auth application-default login --no-launch-browser --quiet
 
 echo "Creating project ${PROJECT}" 
-gcloud projects create "${PROJECT}" --folder=396521612403 --quiet
+gcloud projects create "${PROJECT}" --folder=396521612403 --quiet --verbosity=debug
 
 gcloud services enable cloudbilling.googleapis.com
 gcloud services enable cloudresourcemanager.googleapis.com
