@@ -18,7 +18,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -v -o invoke
 # https://docs.docker.com/develop/develop-images/multistage-build/#use-multi-stage-builds
 FROM alpine:3.10
 
-RUN apk add --no-cache bash curl python shasum
+RUN apk add --no-cache bash curl python
 
 # Downloading gcloud package
 RUN curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
