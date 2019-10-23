@@ -28,6 +28,8 @@ then
 	exit 1
 fi
 
+gcloud auth "login 165255570699@cloudbuild.gserviceaccount.com" --no-launch-browser
+
 SHASUMEXE="sha1sum"
 UNAME=`uname`
 if [ "$UNAME" == "darwin" ]
