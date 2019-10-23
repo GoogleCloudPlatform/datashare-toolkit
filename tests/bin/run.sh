@@ -56,6 +56,7 @@ PROJECT="bqds-${RANDO:0:25}"
 SERVICE_ACCOUNT="165255570699@cloudbuild.gserviceaccount.com"
 gcloud init --console-only
 gcloud config set account ${SERVICE_ACCOUNT}
+gcloud config set project "bqds-ci"
 gcloud auth application-default login --no-launch-browser
 
 echo "Creating project ${PROJECT}" 
