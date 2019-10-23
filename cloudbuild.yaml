@@ -1,0 +1,5 @@
+steps:
+- name: 'gcr.io/bqds-ci/github-webhook'
+  args: ['cd', 'tests/bin']
+- name: 'gcr.io/bqds-ci/github-webhook'
+  args: ['./run.sh']
