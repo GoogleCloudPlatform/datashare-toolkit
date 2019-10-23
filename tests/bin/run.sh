@@ -64,6 +64,11 @@ gcloud alpha billing projects link "${PROJECT}" --billing-account=${ACCOUNT}
 echo "Setting project to ${PROJECT}" 
 gcloud config set project "${PROJECT}"
 
+SERVICE_ACCOUNT="165255570699@cloudbuild.gserviceaccount.com"
+gcloud projects add-iam-policy-binding "${PROJECT}" --member='serviceAccount:${SERVICE_ACCOUNT}' --role='roles/bigquery.admin'
+gcloud projects add-iam-policy-binding "${PROJECT}" --member='serviceAccount:${SERVICE_ACCOUNT}' --role='roles/storage.admin'
+gcloud projects add-iam-policy-binding "${PROJECT}" --member='serviceAccount:${SERVICE_ACCOUNT}' --role='roles/cloudfunctions.developer'
+
 echo "Enabling cloud functions API"
 gcloud services enable cloudfunctions.googleapis.com
 
