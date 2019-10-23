@@ -14,7 +14,4 @@ RUN mkdir -p /usr/local/gcloud \
 # Adding the package path to local
 ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
 
-RUN npm i json -g
-
-# RUN mkdir -p /builder/home \
-#   && echo 'alias shasum="sha1sum"' >> /builder/home/.bashrc
+RUN npm i json shasum -g
