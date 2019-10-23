@@ -178,5 +178,5 @@ then
 fi
 
 echo "### BQDS integration test ended at $(date) ###" 
-            
+
 exit 0
