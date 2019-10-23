@@ -46,9 +46,12 @@ QUERY="SELECT COUNT(*) AS count FROM ${DATASET}.${TABLE}"
 echo "### BQDS integration test starting at $(date) ###" 
 PROJECT="bqds-${RANDO:0:25}"
 
+echo "Creating project ${PROJECT}" 
 gcloud projects create "${PROJECT}" --folder=396521612403
+
 ACCOUNT=$(gcloud alpha billing accounts list | head -2 | tail -1  | awk '{print $1}')
 
+echo "Set billing account to ${ACCOUNT}" 
 gcloud alpha billing projects link "${PROJECT}" --billing-account=${ACCOUNT}
 
 echo "Setting project to ${PROJECT}" 
@@ -98,7 +101,7 @@ sleep 60
 
 ##### Validation steps are here
 
-echo "Checking dataset" 
+echo "Checking dataset (bq --project_id=${PROJECT} ls ${DATASET})"
 bq --project_id=${PROJECT} ls ${DATASET} 
 
 if [ $? -ne 0 ]
