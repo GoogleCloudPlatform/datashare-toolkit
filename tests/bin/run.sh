@@ -103,7 +103,7 @@ bq ls ${DATASET}
 if [ $? -ne 0 ]
 then
     echo "!!!!!!!!!!!!!!!!!!!!!"
-	  echo "ERROR: dataset ${DATASET} was not created!"
+	echo "ERROR: dataset ${DATASET} was not created!"
     echo "!!!!!!!!!!!!!!!!!!!!!"
     exit 1
 fi
@@ -113,7 +113,7 @@ RECORD_COUNT=`echo "$(wc -l ${UPLOAD} | awk '{print $1}') - 1"| bc`
 if [ $? -ne 0 ]
 then
     echo "!!!!!!!!!!!!!!!!!!!!!"
-	  echo "ERROR: COULDN'T GET UPLOADED FILE COUNT!"
+	echo "ERROR: COULDN'T GET UPLOADED FILE COUNT!"
     echo "!!!!!!!!!!!!!!!!!!!!!"
     exit 1   
 fi
@@ -123,7 +123,7 @@ BQ_COUNT=$(echo "${QUERY}" | bq query --format=json --quiet --headless --use_leg
 if [ $? -ne 0 ]
 then
     echo "!!!!!!!!!!!!!!!!!!!!!"
-	  echo "ERROR: QUERY BQ FAILED!"
+	echo "ERROR: QUERY BQ FAILED!"
     echo "!!!!!!!!!!!!!!!!!!!!!"
     exit 1   
 fi
