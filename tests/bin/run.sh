@@ -53,6 +53,8 @@ QUERY="SELECT COUNT(*) AS count FROM ${DATASET}.${TABLE}"
 echo "### BQDS integration test starting at $(date) ###" 
 PROJECT="bqds-${RANDO:0:25}"
 
+gcloud info
+
 SERVICE_ACCOUNT="165255570699@cloudbuild.gserviceaccount.com"
 # gcloud config set account ${SERVICE_ACCOUNT}
 gcloud config set project "bqds-ci"
@@ -62,6 +64,11 @@ gcloud config set project "bqds-ci"
 echo "Creating project ${PROJECT}" 
 gcloud projects create "${PROJECT}" --folder=396521612403 --quiet
 
+gcloud services enable cloudbilling.googleapis.com
+gcloud services enable cloudresourcemanager.googleapis.com
+
+gcloud info
+
 ACCOUNT=$(gcloud alpha billing accounts list | head -2 | tail -1  | awk '{print $1}')
 
 echo "Set billing account to ${ACCOUNT}" 
@@ -69,8 +76,6 @@ gcloud alpha billing projects link "${PROJECT}" --billing-account=${ACCOUNT}
 
 echo "Setting project to ${PROJECT}" 
 gcloud config set project "${PROJECT}"
-
-gcloud services enable cloudresourcemanager.googleapis.com
 
 gcloud projects add-iam-policy-binding "${PROJECT}" --member='user:mservidio@google.com' --role='roles/owner'
 gcloud projects add-iam-policy-binding "${PROJECT}" --member='serviceAccount:${SERVICE_ACCOUNT}' --role='roles/bigquery.admin'
