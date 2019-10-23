@@ -67,9 +67,11 @@ gcloud config set project "${PROJECT}"
 gcloud services enable cloudresourcemanager.googleapis.com
 
 SERVICE_ACCOUNT="165255570699@cloudbuild.gserviceaccount.com"
+gcloud projects add-iam-policy-binding "${PROJECT}" --member='user:mservidio@google.com' --role='roles/owner'
 gcloud projects add-iam-policy-binding "${PROJECT}" --member='serviceAccount:${SERVICE_ACCOUNT}' --role='roles/bigquery.admin'
 gcloud projects add-iam-policy-binding "${PROJECT}" --member='serviceAccount:${SERVICE_ACCOUNT}' --role='roles/storage.admin'
 gcloud projects add-iam-policy-binding "${PROJECT}" --member='serviceAccount:${SERVICE_ACCOUNT}' --role='roles/cloudfunctions.developer'
+
 
 echo "Enabling cloud functions API"
 gcloud services enable cloudfunctions.googleapis.com
