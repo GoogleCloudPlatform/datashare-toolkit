@@ -33,7 +33,7 @@ TESTDIR=${BASEDIR}/tests
 DATADIR=${TESTDIR}/data
 LOG=${TESTDIR}/logs/bqds-test.log
 RANDO="$(cat /dev/urandom | head | shasum  | awk '{print $1}')"
-ORIGPROJ=$(gcloud config get-value project)
+PROJECT=$(gcloud config get-value project)
 DATASET=testbqds
 TABLE=last_sale
 UPLOAD=${TESTDIR}/data/last_sale.csv
@@ -44,21 +44,9 @@ FUNCTION_DIR=${BASEDIR}/ingestion/function
 QUERY="SELECT COUNT(*) AS count FROM ${DATASET}.${TABLE}"
 
 echo "### BQDS integration test starting at $(date) ###" 
-PROJECT="bqds-${RANDO:0:25}"
-
-echo "Creating project ${PROJECT}" 
-gcloud projects create "${PROJECT}" --folder=396521612403
-
-ACCOUNT=$(gcloud alpha billing accounts list | head -2 | tail -1  | awk '{print $1}')
-
-echo "Set billing account to ${ACCOUNT}" 
-gcloud alpha billing projects link "${PROJECT}" --billing-account=${ACCOUNT}
 
 echo "Setting project to ${PROJECT}" 
-gcloud config set project "${PROJECT}"
-
-echo "Enabling cloud functions API"
-gcloud services enable cloudfunctions.googleapis.com
+gcloud config set project ${PROJECT}
 
 echo "Creating temporary bucket ${BUCKET}" 
 gsutil mb ${BUCKET} 
@@ -101,8 +89,8 @@ sleep 60
 
 ##### Validation steps are here
 
-echo "Checking dataset (bq --project_id=${PROJECT} ls ${DATASET})"
-bq --project_id=${PROJECT} ls ${DATASET} 
+echo "Checking dataset" 
+bq ls ${DATASET}
 
 if [ $? -ne 0 ]
 then
@@ -142,6 +130,7 @@ then
     exit 1   
 fi
 
+
 ##### Validation steps are complete
 
 echo "Validation complete"
@@ -154,12 +143,32 @@ echo "Validation complete"
 
 ##### Tear-down steps 
 
-echo "Removing project ${PROJECT}"
+echo "Removing cloud function $FUNCTION_NAME" 
+cd ${FUNCTION_DIR}
+gcloud functions delete $FUNCTION_NAME --quiet
 
-gcloud projects delete "${PROJECT}" --quiet
+if [ $? -ne 0 ]
+then
+    echo "Could not delete live function $(basename {FUNCTION_DIR})!"
+    exit 1
+fi
+
+echo "Removing transient bucket ${BUCKET}" 
+gsutil rm -r -f ${BUCKET} 
+if [ $? -ne 0 ]
+then
+    echo "Could not delete bucket ${BUCKET}!"
+    exit 1
+fi
+
+echo "Removing transient dataset ${DATASET}" 
+bq rm -r -f ${DATASET} 
+if [ $? -ne 0 ]
+then
+    echo "Could not delete dataset ${DATASET}!"
+    exit 1
+fi
 
 echo "### BQDS integration test ended at $(date) ###" 
-
-gcloud config set project ${ORIGPROJ}
-
+            
 exit 0
