@@ -28,10 +28,6 @@ then
 	exit 1
 fi
 
-echo "Setting alias"
-alias shasum="sha1sum"
-echo "alias set"
-
 BASEDIR=../..
 TESTDIR=${BASEDIR}/tests
 DATADIR=${TESTDIR}/data
