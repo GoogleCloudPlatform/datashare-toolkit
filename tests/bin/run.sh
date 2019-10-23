@@ -54,10 +54,10 @@ echo "### BQDS integration test starting at $(date) ###"
 PROJECT="bqds-${RANDO:0:25}"
 
 SERVICE_ACCOUNT="165255570699@cloudbuild.gserviceaccount.com"
-gcloud config set account ${SERVICE_ACCOUNT}
+# gcloud config set account ${SERVICE_ACCOUNT}
 gcloud config set project "bqds-ci"
-gcloud init --console-only
-gcloud auth application-default login --no-launch-browser --quiet
+# gcloud init --console-only
+# gcloud auth application-default login --no-launch-browser --quiet
 
 echo "Creating project ${PROJECT}" 
 gcloud projects create "${PROJECT}" --folder=396521612403 --quiet
