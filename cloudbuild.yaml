@@ -1,4 +1,6 @@
 steps:
 - name: 'gcr.io/bqds-ci/github-webhook'
+  args: ['ln', '-s', '/usr/bin/sha1sum', '/usr/bin/shasum']
+- name: 'gcr.io/bqds-ci/github-webhook'
   dir: 'tests/bin'
   args: ['bash', './run.sh']
