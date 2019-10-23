@@ -63,6 +63,9 @@ echo "Copying schema and transform files to ${BUCKET}"
 gsutil cp ${SCHEMA} ${BUCKET}/bqds/${TABLE}.schema.json 
 gsutil cp ${TRANSFORM} ${BUCKET}/bqds/${TABLE}.transform.sql 
 
+echo "Performing npm install"
+npm install
+
 echo "Deploying cloud function" 
 cd ${FUNCTION_DIR}
 DEPLOY_OUT=$(npm run deploy -- --trigger-bucket=${BUCKET}) 
