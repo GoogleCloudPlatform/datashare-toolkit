@@ -1,6 +1,6 @@
 FROM alpine:3.10
 
-RUN apk add --no-cache bash curl python nodejs nodejs-npm json
+RUN apk add --no-cache bash curl python nodejs nodejs-npm
 
 # Downloading gcloud package
 RUN curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
