@@ -56,18 +56,13 @@ PROJECT="bqds-${RANDO:0:25}"
 gcloud info
 
 SERVICE_ACCOUNT="165255570699@cloudbuild.gserviceaccount.com"
-# gcloud config set account ${SERVICE_ACCOUNT}
 gcloud config set project "bqds-ci"
-# gcloud init --console-only
-# gcloud auth application-default login --no-launch-browser --quiet
 
 echo "Creating project ${PROJECT}" 
 gcloud projects create "${PROJECT}" --folder=396521612403 --quiet --verbosity=debug
 
 gcloud services enable cloudbilling.googleapis.com
 gcloud services enable cloudresourcemanager.googleapis.com
-
-gcloud info
 
 ACCOUNT=$(gcloud alpha billing accounts list | head -2 | tail -1  | awk '{print $1}')
 
