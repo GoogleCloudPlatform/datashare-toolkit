@@ -1,6 +1,6 @@
 FROM alpine:3.10
 
-RUN apk add --no-cache bash curl python nodejs nodejs-npm
+RUN apk add --no-cache bash curl python nodejs nodejs-npm json
 
 # Downloading gcloud package
 RUN curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
@@ -12,6 +12,8 @@ RUN mkdir -p /usr/local/gcloud \
 
 # Adding the package path to local
 ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
+
+RUN npm i json
 
 # RUN mkdir -p /builder/home \
 #   && echo 'alias shasum="sha1sum"' >> /builder/home/.bashrc
