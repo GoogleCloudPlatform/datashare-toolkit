@@ -28,6 +28,7 @@ then
 	exit 1
 fi
 
+
 BASEDIR=../..
 TESTDIR=${BASEDIR}/tests
 DATADIR=${TESTDIR}/data
