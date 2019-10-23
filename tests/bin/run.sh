@@ -32,6 +32,8 @@ BASEDIR=../..
 TESTDIR=${BASEDIR}/tests
 DATADIR=${TESTDIR}/data
 LOG=${TESTDIR}/logs/bqds-test.log
+
+# This should be shasum, but having trouble with creating an alias through the cloudbuild.yaml
 RANDO="$(cat /dev/urandom | head | sha1sum | awk '{print $1}')"
 PROJECT=$(gcloud config get-value project)
 DATASET=testbqds

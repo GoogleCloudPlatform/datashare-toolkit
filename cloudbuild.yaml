@@ -1,4 +1,4 @@
 steps:
 - name: 'gcr.io/bqds-ci/integration-test'
   dir: 'tests/bin'
-  args: ['bash', '-c', 'alias shasum="sha1sum" && ./run.sh']
+  args: ['bash', '-c', './run.sh']
