@@ -1,3 +1,4 @@
+# gcloud builds submit --tag gcr.io/bqds-ci/integration-test
 FROM alpine:3.10
 
 RUN apk add --no-cache bash curl python nodejs nodejs-npm
