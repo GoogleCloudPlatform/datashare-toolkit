@@ -55,6 +55,7 @@ PROJECT="bqds-${RANDO:0:25}"
 
 echo "Creating project ${PROJECT}" 
 gcloud projects create "${PROJECT}" --folder=396521612403
+gcloud services enable cloudresourcemanager.googleapis.com
 
 ACCOUNT=$(gcloud alpha billing accounts list | head -2 | tail -1  | awk '{print $1}')
 
