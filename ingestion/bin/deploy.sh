@@ -13,106 +13,138 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Handle an error in the script
+#
+PROGNAME=$(basename $0)
 
-if [ "$#" -ne 1 ]; then
-  echo "Usage: $0 <BUCKET_NAME>" >&2
+abort()
+{
+  echo >&2 '
+  ***************
+  *** ABORTED ***
+  ***************
+  '
+  echo "An error occurred. Exiting..." >&2
+  echo "${PROGNAME}: ${1:-"Unknown Error"}" 1>&2
   exit 1
-fi
+}
 
-BUCKET_NAME=""
+main() {
+  if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <BUCKET_NAME>" >&2
+    exit 1
+  fi
 
-for i in "$@"
-do
-case $i in
-    -t=*|--trigger-bucket=*)
-    BUCKET_NAME="${i#*=}"
-    shift # past argument=value
-    ;;
-    *)
-        # unknown option
-        echo "Unknown option ${i}"
-    ;;
-esac
-done
+  BUCKET_NAME=""
 
-if [ -z "$BUCKET_NAME" ]
-then
-    echo "--trigger-bucket must be supplied"
-    exit 2
-fi
+  for i in "$@"
+  do
+  case $i in
+      -t=*|--trigger-bucket=*)
+      BUCKET_NAME="${i#*=}"
+      shift # past argument=value
+      ;;
+      *)
+	  # unknown option
+	  echo "Unknown option ${i}"
+      ;;
+  esac
+  done
 
-if [[ $BUCKET_NAME != gs://* ]]
-then
-    BUCKET_NAME="gs://${BUCKET_NAME}"
-    echo "Updated --trigger-bucket to '${BUCKET_NAME}'"
-fi
+  if [ -z "$BUCKET_NAME" ]
+  then
+      echo "--trigger-bucket must be supplied"
+      exit 2
+  fi
 
-BUCKET_REGION=`gsutil ls -L -b ${BUCKET_NAME} | grep "Location constraint:" | awk 'END {print tolower($3)}'`
-if [ $? -ne 0 ] || [ -z "$BUCKET_REGION" ]
-then
-    echo "Failed to find bucket location"
-    exit 3
-fi
+  if [[ $BUCKET_NAME != gs://* ]]
+  then
+      BUCKET_NAME="gs://${BUCKET_NAME}"
+      echo "Updated --trigger-bucket to '${BUCKET_NAME}'"
+  fi
 
-ENABLED_SERVICE_LIST=`gcloud services list`
-if [ $? -ne 0 ]
-then
-    echo "Failed to get active services list"
-    exit 4
-fi
+  BUCKET_REGION=`gsutil ls -L -b ${BUCKET_NAME} | grep "Location constraint:" | awk 'END {print tolower($3)}'`
+  if [ $? -ne 0 ] || [ -z "$BUCKET_REGION" ]
+  then
+      echo "Failed to find bucket location"
+      exit 3
+  fi
 
-if [[ "$ENABLED_SERVICE_LIST" != *"cloudfunctions.googleapis.com"* ]]; then
-    echo "Enabling cloudfunctions.googleapis.com api"
-    gcloud services enable cloudfunctions.googleapis.com
-    if [ $? -ne 0 ]
-    then
-        echo "Failed to enable cloudfunctions.googleapis.com api"
-        exit 5
-    fi
-else
-    echo "cloudfunctions.googleapis.com api is enabled"
-fi
+  ENABLED_SERVICE_LIST=$(gcloud services list --enabled | grep -v NAME | sort | cut -d " " -f1)
+  if [ $? -ne 0 ]
+  then
+      echo "Failed to get active services list"
+      exit 4
+  fi
 
-echo "Bucket name: ${BUCKET_NAME}"
-echo "Bucket region: ${BUCKET_REGION}"
+  #Following API's should be enabled if not already, only one for now maybe more in future
+  APIS="cloudfunctions"
+  declare -a REQ_APIS=(${APIS})
+  for api in "${REQ_APIS[@]}"
+  do
+      API_EXISTS=$(echo ${ENABLED_SERVICE_LIST} | grep ${api}.googleapis.com | wc -l)
+      if [ ${API_EXISTS} -eq 0 ]
+      then
+	echo "*** Enabling ${api} API"
+	gcloud services enable "${api}.googleapis.com"
+	if [ $? -ne 0 ]
+	then
+	  echo "Failed to enable ${api}.googleapis.com api"
+	  exit 5
+	fi
+      else
+	echo "${api}.googleapis.com api is enabled"
+      fi
+  done
 
-# https://cloud.google.com/functions/docs/locations
-AVAILABLE_FUNCTION_REGIONS=`gcloud functions regions list | xargs basename -a | grep -v NAME`
-if [ $? -ne 0 ] || [ -z "$AVAILABLE_FUNCTION_REGIONS" ]
-then
-    echo "Unable to get available functions region list"
-    exit 6
-fi
+  echo "Bucket name: ${BUCKET_NAME}"
+  echo "Bucket region: ${BUCKET_REGION}"
 
-FUNCTION_REGION=""
-for i in $AVAILABLE_FUNCTION_REGIONS
-do
-    if [ "$i" == "${BUCKET_REGION}" ] ; then
-        FUNCTION_REGION=${i}
-        break
-    fi
-done
+  # https://cloud.google.com/functions/docs/locations
+  AVAILABLE_FUNCTION_REGIONS=`gcloud functions regions list | xargs basename -a | grep -v NAME`
+  if [ $? -ne 0 ] || [ -z "$AVAILABLE_FUNCTION_REGIONS" ]
+  then
+      echo "Unable to get available functions region list"
+      exit 6
+  fi
 
-if [ -z "$FUNCTION_REGION" ]
-then
-    MAIN_REGION=`echo ${BUCKET_REGION} | awk -F"-" '{print $1}'`
-    echo "Main region: ${MAIN_REGION}"
+  FUNCTION_REGION=""
+  for i in $AVAILABLE_FUNCTION_REGIONS
+  do
+      if [ "$i" == "${BUCKET_REGION}" ] ; then
+	  FUNCTION_REGION=${i}
+	  break
+      fi
+  done
 
-    # https://cloud.google.com/storage/docs/locations
-    case ${MAIN_REGION} in
-        "northamerica"|"us"|"southamerica"|"australia"|"nam4") FUNCTION_REGION="us-central1";;
-        "europe"|"eu"|"eur4") FUNCTION_REGION="europe-west1";;
-        "asia") FUNCTION_REGION="asia-east2";;
-        *) FUNCTION_REGION="us-central1";;
-    esac    
-fi
+  if [ -z "$FUNCTION_REGION" ]
+  then
+      MAIN_REGION=`echo ${BUCKET_REGION} | awk -F"-" '{print $1}'`
+      echo "Main region: ${MAIN_REGION}"
 
-if [ -z "$FUNCTION_REGION" ]
-then
-    echo "Function region could not be determined, exiting."
-    exit 7
-else
-    echo "Function region: ${FUNCTION_REGION}"
-    gcloud functions deploy processUpload --region=${FUNCTION_REGION} --memory=256MB --source=../function --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}"
-    exit 0
-fi
+      # https://cloud.google.com/storage/docs/locations
+      case ${MAIN_REGION} in
+	  "northamerica"|"us"|"southamerica"|"australia"|"nam4") FUNCTION_REGION="us-central1";;
+	  "europe"|"eu"|"eur4") FUNCTION_REGION="europe-west1";;
+	  "asia") FUNCTION_REGION="asia-east2";;
+	  *) FUNCTION_REGION="us-central1";;
+      esac    
+  fi
+
+  if [ -z "$FUNCTION_REGION" ]
+  then
+      echo "Function region could not be determined, exiting."
+      exit 7
+  else
+      echo "Function region: ${FUNCTION_REGION}"
+      gcloud functions deploy processUpload --region=${FUNCTION_REGION} --memory=256MB --source=../function --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}"
+      exit 0
+  fi
+}
+
+set -e
+trap 'abort' 0
+SECONDS=0
+main
+trap : 0
