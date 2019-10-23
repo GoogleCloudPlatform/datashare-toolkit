@@ -1,4 +1,4 @@
 steps:
 - name: 'gcr.io/bqds-ci/github-webhook'
   dir: 'tests/bin'
-  args: ['./run.sh']
+  args: ['bash', './run.sh']
