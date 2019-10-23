@@ -20,7 +20,7 @@
 # Script will use current project but will create all other
 # necessary objects from the source repository. Will require 
 # administrator privileges for Cloud Functions, Cloud Storage
-# and BigWuery
+# and BigQuery
 
 if [ "$(basename `pwd`)" != "bin" ]
 then
