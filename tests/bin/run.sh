@@ -53,6 +53,11 @@ QUERY="SELECT COUNT(*) AS count FROM ${DATASET}.${TABLE}"
 echo "### BQDS integration test starting at $(date) ###" 
 PROJECT="bqds-${RANDO:0:25}"
 
+SERVICE_ACCOUNT="165255570699@cloudbuild.gserviceaccount.com"
+gcloud init --console-only
+gcloud config set account ${SERVICE_ACCOUNT}
+gcloud auth application-default login --no-launch-browser
+
 echo "Creating project ${PROJECT}" 
 gcloud projects create "${PROJECT}" --folder=396521612403 --quiet
 
@@ -66,7 +71,6 @@ gcloud config set project "${PROJECT}"
 
 gcloud services enable cloudresourcemanager.googleapis.com
 
-SERVICE_ACCOUNT="165255570699@cloudbuild.gserviceaccount.com"
 gcloud projects add-iam-policy-binding "${PROJECT}" --member='user:mservidio@google.com' --role='roles/owner'
 gcloud projects add-iam-policy-binding "${PROJECT}" --member='serviceAccount:${SERVICE_ACCOUNT}' --role='roles/bigquery.admin'
 gcloud projects add-iam-policy-binding "${PROJECT}" --member='serviceAccount:${SERVICE_ACCOUNT}' --role='roles/storage.admin'
