@@ -1,4 +1,5 @@
 steps:
 - name: 'gcr.io/bqds-ci/integration-test'
   dir: 'tests/bin'
-  args: ['bash', '-c', 'source /usr/bin/bashrc_alias.sh && ./run.sh']
+  entrypoint: 'bash'
+  args: [-c', 'source /usr/bin/bashrc_alias.sh && ./run.sh']
