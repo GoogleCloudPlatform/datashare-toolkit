@@ -67,7 +67,6 @@ echo "Deploying cloud function"
 cd ${FUNCTION_DIR}
 npm install
 DEPLOY_OUT=$(npm run deploy -- --trigger-bucket=${BUCKET}) 
-echo "Deploy complete"
 
 FUNCTION_NAME_REGEXP="name.*functions[\/]([a-zA-Z\d-]+)"
 [[ $DEPLOY_OUT =~ $FUNCTION_NAME_REGEXP ]]
