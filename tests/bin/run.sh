@@ -187,6 +187,8 @@ send_notification() {
         if [ ! -z ${REV} ]; then
             GIT_INFO=$(git show ${REV})
             AUTHOR=$(echo "${GIT_INFO}" | sed '2!d')
+        else
+            AUTHOR="Author: Unknown"
         fi
 
         # https://developers.google.com/hangouts/chat/reference/message-formats/basic
