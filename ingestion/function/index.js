@@ -115,7 +115,6 @@ async function transform(config) {
         console.log(`creating table ${config.destinationTable} with ${config.metadata.fields}`);
         await dataset.createTable(config.destinationTable, { schema: config.metadata.fields });
     }
-    const table = dataset.table(config.destinationTable);
     const transform = `SELECT ${transformQuery}, '${batchId}' AS ${processPrefix}_batch_id FROM \`${config.dataset}.${config.stagingTable}\``;
     console.log(`executing transform query: ${transform}`);
     const job = await runTransform(config, transform);
