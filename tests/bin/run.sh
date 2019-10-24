@@ -176,7 +176,7 @@ send_notification() {
     echo "Exit code is ${EXIT_CODE}"
     STATUS="succeeded"
     if [ $? -ne 0 ]; then
-        STATUS="FAILED"
+        STATUS="*FAILED*"
     fi
 
     gsutil cp gs://bqds-ci-config/integration-tests.config . || true
@@ -188,7 +188,7 @@ send_notification() {
         curl adf -X "POST" "${HANGOUTS_CHAT_WEBHOOK_URL}" \
             -H 'Content-Type: application/json; charset=utf-8' \
             -d $'{
-  "text": "Integration tests '"${STATUS}"'.\nCloud Build URL: '"${CLOUD_BUILD_STATUS_URL}"'\nBranch: '"${BRANCH}"'\nRevision: '"${REV}"'"
+  "text": "Integration tests '"${STATUS}"'.\nCloud Build Status: <'"${CLOUD_BUILD_STATUS_URL}"'|'"${BUILD}"'>\nBranch: '"${BRANCH}"'\nRevision: '"${REV}"'"
 }'
     fi
 }
