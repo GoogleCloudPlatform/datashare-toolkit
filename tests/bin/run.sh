@@ -22,6 +22,9 @@
 # administrator privileges for Cloud Functions, Cloud Storage
 # and BigQuery
 
+set -e
+trap send_notification EXIT
+
 main() {
     if [ "$(basename $(pwd))" != "bin" ]; then
         echo "Please execute the test script from $PROJECT_HOME/tests/bin"
@@ -172,15 +175,22 @@ main() {
 }
 
 send_notification() {
+    STATUS="succeeded"
+    if [ $? -ne 0 ]; then
+        STATUS="FAILED"
+    fi
+
     gsutil cp gs://bqds-ci-config/integration-tests.config . || true
     if [ ! -z "./integration-tests.config" ] && [ ! -z "$BRANCH" ] && [ ! -z "$REV" ]; then
         source ./integration-tests.config
         rm ./integration-tests.config
+        # echo ${CLOUD_BUILD_STATUS_URL}
+
         # https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
-        curl -X "POST" "${HANGOUTS_CHAT_WEBHOOK_URL}" \
+        curl adf -X "POST" "${HANGOUTS_CHAT_WEBHOOK_URL}" \
             -H 'Content-Type: application/json; charset=utf-8' \
             -d $'{
-  "text": "Integration tests succeeded for branch: '"${BRANCH}"' with revision: '"${REV}"'"
+  "text": "Integration tests '"${STATUS}"'. [build: '"${BUILD}"', branch: '"${BRANCH}"', revision: '"${REV}"']"
 }'
     fi
 }
