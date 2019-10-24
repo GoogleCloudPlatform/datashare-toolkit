@@ -42,10 +42,11 @@ main() {
     LOG=${TESTDIR}/logs/bqds-test.log
     RANDO="$(cat /dev/urandom | head | ${SHASUMEXE} | awk '{print $1}')"
     PROJECT=$(gcloud config get-value project)
-    DATASET=testbqds
+    DATASET="test_${RANDO}"
     TABLE=last_sale
     UPLOAD=${TESTDIR}/data/last_sale.csv
     BUCKET=gs://${RANDO}
+    export FUNCTION_NAME="test-${RANDO}"
     SCHEMA=${TESTDIR}/config/last_sale.schema.json
     TRANSFORM=${TESTDIR}/config/last_sale.transform.sql
     FUNCTION_DIR=${BASEDIR}/ingestion/function
@@ -59,6 +60,9 @@ main() {
     echo "Creating temporary bucket ${BUCKET}"
     gsutil mb ${BUCKET}
 
+    echo "Creating temporary dataset ${DATASET}"
+    bq mk ${DATASET}
+
     if [ $? -ne 0 ]; then
         echo "Could not create ${BUCKET}"
         exit 1
@@ -68,16 +72,10 @@ main() {
     gsutil cp ${SCHEMA} ${BUCKET}/bqds/${TABLE}.schema.json
     gsutil cp ${TRANSFORM} ${BUCKET}/bqds/${TABLE}.transform.sql
 
-    echo "Deploying cloud function"
+    echo "Deploying cloud function: ${FUNCTION_NAME}"
     cd ${FUNCTION_DIR}
     npm install
-    DEPLOY_OUT=$(npm run deploy -- --trigger-bucket=${BUCKET})
-
-    FUNCTION_NAME_REGEXP="name.*functions[\/]([a-zA-Z\d-]+)"
-    [[ $DEPLOY_OUT =~ $FUNCTION_NAME_REGEXP ]]
-    FUNCTION_NAME="${BASH_REMATCH[1]}"
-
-    echo "${DEPLOY_OUT}"
+    npm run deploy -- --trigger-bucket="${BUCKET}"
 
     if [ $? -ne 0 ]; then
         echo "Could not deploy cloud function to ${BUCKET}"
@@ -169,6 +167,7 @@ main() {
     fi
 
     echo "### BQDS integration test ended at $(date) ###"
+
     exit 0
 }
 
