@@ -187,7 +187,7 @@ send_notification() {
         # https://developers.google.com/hangouts/chat/reference/message-formats/basic
         # https://developers.google.com/hangouts/chat/reference/message-formats/cards
         # https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
-        curl adf -X "POST" "${HANGOUTS_CHAT_WEBHOOK_URL}" \
+        curl -X "POST" "${HANGOUTS_CHAT_WEBHOOK_URL}" \
             -H 'Content-Type: application/json; charset=utf-8' \
             -d $'{
   "text": "Integration tests '"${STATUS}"'\nCloud Build Status: <'"${CLOUD_BUILD_STATUS_URL}"'|'"${BUILD}"'>\nBranch: '"${BRANCH}"'\nRevision: '"${REV}"'"
