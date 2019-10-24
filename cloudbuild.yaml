@@ -1,5 +1,10 @@
 steps:
 - name: 'gcr.io/bqds-ci/integration-test'
+  env:
+  - 'BUILD=$BUILD_ID'
+  - 'PROJECT=$PROJECT_ID'
+  - 'REV=$REVISION_ID'
+  - 'BRANCH=$BRANCH_NAME'
   dir: 'tests/bin'
   entrypoint: 'bash'
   args: ['./run.sh']
