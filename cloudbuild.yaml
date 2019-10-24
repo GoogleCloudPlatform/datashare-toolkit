@@ -1,4 +1,6 @@
 steps:
+- name: gcr.io/cloud-builders/git
+  args: ['show', '269fc500ca72aead71957ab68769da72902d4a5c']
 - name: 'gcr.io/bqds-ci/integration-test'
   env:
   - 'BUILD=$BUILD_ID'
