@@ -169,7 +169,6 @@ main() {
     fi
 
     echo "### BQDS integration test ended at $(date) ###"
-    send_notification
     exit 0
 }
 
