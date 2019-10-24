@@ -59,11 +59,14 @@ function configurationContainsDataset(config, datasetId) {
  */
 async function configurationContainsView(config, datasetId, viewId) {
     for (const view of config.views) {
+        if (view.name.toLowerCase() !== viewId.toLowerCase()) {
+            continue;
+        }
         const dsFound = view.datasetNames.find((d) => {
             return d.toLowerCase() === datasetId.toLowerCase();
         });
         if (dsFound !== undefined) {
-            return view.name.toLowerCase() === viewId.toLowerCase();
+            return true;
         }
     }
     return false;
