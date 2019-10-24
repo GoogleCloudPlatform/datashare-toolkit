@@ -185,6 +185,7 @@ send_notification() {
         rm ./integration-tests.config
 
         REVISION_URL="https://github.com/GoogleCloudPlatform/bq-datashare-toolkit/commit/${REV}"
+        BRANCH_URL="https://github.com/GoogleCloudPlatform/bq-datashare-toolkit/tree/${BRANCH}"
 
         # https://developers.google.com/hangouts/chat/reference/message-formats/basic
         # https://developers.google.com/hangouts/chat/reference/message-formats/cards
@@ -192,7 +193,7 @@ send_notification() {
         curl -X "POST" "${HANGOUTS_CHAT_WEBHOOK_URL}" \
             -H 'Content-Type: application/json; charset=utf-8' \
             -d $'{
-  "text": "Integration tests '"${STATUS}"'\nCloud Build Status: <'"${CLOUD_BUILD_STATUS_URL}"'|'"${BUILD}"'>\nBranch: '"${BRANCH}"'\nRevision: <'"${REVISION_URL}"'|'"${REV}"'>"
+  "text": "Integration tests '"${STATUS}"'\nCloud Build Status: <'"${CLOUD_BUILD_STATUS_URL}"'|'"${BUILD}"'>\nBranch: <'"${BRANCH_URL}"'|'"${BRANCH}"'>\nRevision: <'"${REVISION_URL}"'|'"${REV}"'>"
 }'
     fi
 }
