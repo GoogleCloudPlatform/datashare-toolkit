@@ -184,6 +184,8 @@ send_notification() {
         source ./integration-tests.config
         rm ./integration-tests.config
 
+        # https://developers.google.com/hangouts/chat/reference/message-formats/basic
+        # https://developers.google.com/hangouts/chat/reference/message-formats/cards
         # https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
         curl adf -X "POST" "${HANGOUTS_CHAT_WEBHOOK_URL}" \
             -H 'Content-Type: application/json; charset=utf-8' \
