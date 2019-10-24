@@ -167,6 +167,7 @@ fi
 
 echo "### BQDS integration test ended at $(date) ###"
 
+# TODO: Move to Cloud Storage config bucket
 # https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
 curl -X "POST" "https://chat.googleapis.com/v1/spaces/AAAAYBeAAvg/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=WE6xlY4rKwmkTyyHmVwOL_CBTlf2wcWyOx8Cd6Ou-UM%3D" \
     -H 'Content-Type: application/json; charset=utf-8' \
