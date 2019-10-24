@@ -167,7 +167,7 @@ fi
 
 echo "### BQDS integration test ended at $(date) ###"
 
-gsutil cp gs://bqds-ci-config/c . || true
+gsutil cp gs://bqds-ci-config/integration-tests.config . || true
 if test -f "./integration-tests.config"; then
     source ./integration-tests.config
     # https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
