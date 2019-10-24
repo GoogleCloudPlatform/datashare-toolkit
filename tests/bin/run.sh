@@ -28,7 +28,7 @@ if [ "$(basename $(pwd))" != "bin" ]; then
 fi
 
 SHASUMEXE="sha1sum"
-UNAME=$(uname)
+UNAME=$(uname | awk '{print tolower($0)}')
 if [ "$UNAME" == "darwin" ]; then
     SHASUMEXE="shasum"
 fi
