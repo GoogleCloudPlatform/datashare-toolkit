@@ -183,13 +183,12 @@ send_notification() {
     if [ ! -z "./integration-tests.config" ] && [ ! -z "$BRANCH" ] && [ ! -z "$REV" ]; then
         source ./integration-tests.config
         rm ./integration-tests.config
-        # echo ${CLOUD_BUILD_STATUS_URL}
 
         # https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
         curl adf -X "POST" "${HANGOUTS_CHAT_WEBHOOK_URL}" \
             -H 'Content-Type: application/json; charset=utf-8' \
             -d $'{
-  "text": "Integration tests '"${STATUS}"'. [build: '"${BUILD}"', branch: '"${BRANCH}"', revision: '"${REV}"']"
+  "text": "Integration tests '"${STATUS}"'. [url: '"${HANGOUTS_CHAT_WEBHOOK_URL}"', branch: '"${BRANCH}"', revision: '"${REV}"']"
 }'
     fi
 }
