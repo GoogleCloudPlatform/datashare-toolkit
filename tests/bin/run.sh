@@ -22,7 +22,6 @@
 # administrator privileges for Cloud Functions, Cloud Storage
 # and BigQuery
 
-set -e
 trap send_notification EXIT
 
 main() {
