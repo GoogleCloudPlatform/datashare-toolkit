@@ -174,7 +174,7 @@ main() {
 send_notification() {
     EXIT_CODE=$?
     echo "Exit code is ${EXIT_CODE}"
-    STATUS="succeeded"
+    STATUS="*succeeded*"
     if [ $? -ne 0 ]; then
         STATUS="*FAILED*"
     fi
@@ -190,7 +190,7 @@ send_notification() {
         curl adf -X "POST" "${HANGOUTS_CHAT_WEBHOOK_URL}" \
             -H 'Content-Type: application/json; charset=utf-8' \
             -d $'{
-  "text": "Integration tests '"${STATUS}"'.\nCloud Build Status: <'"${CLOUD_BUILD_STATUS_URL}"'|'"${BUILD}"'>\nBranch: '"${BRANCH}"'\nRevision: '"${REV}"'"
+  "text": "Integration tests '"${STATUS}"'\nCloud Build Status: <'"${CLOUD_BUILD_STATUS_URL}"'|'"${BUILD}"'>\nBranch: '"${BRANCH}"'\nRevision: '"${REV}"'"
 }'
     fi
 }
