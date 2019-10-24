@@ -145,10 +145,10 @@ main() {
 
     echo "Removing cloud function $FUNCTION_NAME"
     cd ${FUNCTION_DIR}
-    gcloud functions delete $FUNCTION_NAME --quiet
+    gcloud functions delete ${FUNCTION_NAME} --quiet
 
     if [ $? -ne 0 ]; then
-        echo "Could not delete live function $(basename {FUNCTION_DIR})!"
+        echo "Could not delete live function $(basename ${FUNCTION_DIR})!"
         exit 1
     fi
 
@@ -172,7 +172,8 @@ main() {
 }
 
 send_notification() {
-    echo "Exit code is $?"
+    EXIT_CODE=$?
+    echo "Exit code is ${EXIT_CODE}"
     STATUS="succeeded"
     if [ $? -ne 0 ]; then
         STATUS="FAILED"
