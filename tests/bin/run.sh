@@ -184,13 +184,18 @@ send_notification() {
         source ./integration-tests.config
         rm ./integration-tests.config
 
+        if [ ! -z ${REV} ]; then
+            GIT_INFO=$(git show ${REV})
+            AUTHOR=$(echo "${GIT_INFO}" | sed '2!d')
+        fi
+
         # https://developers.google.com/hangouts/chat/reference/message-formats/basic
         # https://developers.google.com/hangouts/chat/reference/message-formats/cards
         # https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
         curl -X "POST" "${HANGOUTS_CHAT_WEBHOOK_URL}" \
             -H 'Content-Type: application/json; charset=utf-8' \
             -d $'{
-  "text": "Integration tests '"${STATUS}"'\nCloud Build Status: <'"${CLOUD_BUILD_STATUS_URL}"'|'"${BUILD}"'>\nBranch: '"${BRANCH}"'\nRevision: '"${REV}"'"
+  "text": "Integration tests '"${STATUS}"'\n'"${AUTHOR}"'\nCloud Build Status: <'"${CLOUD_BUILD_STATUS_URL}"'|'"${BUILD}"'>\nBranch: '"${BRANCH}"'\nRevision: '"${REV}"'"
 }'
     fi
 }
