@@ -188,7 +188,7 @@ send_notification() {
         curl adf -X "POST" "${HANGOUTS_CHAT_WEBHOOK_URL}" \
             -H 'Content-Type: application/json; charset=utf-8' \
             -d $'{
-  "text": "Integration tests '"${STATUS}"'. [url: '"${CLOUD_BUILD_STATUS_URL}"', branch: '"${BRANCH}"', revision: '"${REV}"']"
+  "text": "Integration tests '"${STATUS}"'.\nCloud Build URL: '"${CLOUD_BUILD_STATUS_URL}"'\nBranch: '"${BRANCH}"'\nRevision: '"${REV}"'"
 }'
     fi
 }
