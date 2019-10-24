@@ -173,6 +173,7 @@ main() {
 }
 
 send_notification() {
+    echo "Exit code is $?"
     STATUS="succeeded"
     if [ $? -ne 0 ]; then
         STATUS="FAILED"
