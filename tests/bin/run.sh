@@ -174,9 +174,9 @@ main() {
 send_notification() {
     EXIT_CODE=$?
     echo "Exit code is ${EXIT_CODE}"
-    STATUS="succeeded"
+    STATUS="*succeeded*"
     if [ $? -ne 0 ]; then
-        STATUS="FAILED"
+        STATUS="*FAILED*"
     fi
 
     gsutil cp gs://bqds-ci-config/integration-tests.config . || true
@@ -184,11 +184,13 @@ send_notification() {
         source ./integration-tests.config
         rm ./integration-tests.config
 
+        # https://developers.google.com/hangouts/chat/reference/message-formats/basic
+        # https://developers.google.com/hangouts/chat/reference/message-formats/cards
         # https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
         curl adf -X "POST" "${HANGOUTS_CHAT_WEBHOOK_URL}" \
             -H 'Content-Type: application/json; charset=utf-8' \
             -d $'{
-  "text": "Integration tests '"${STATUS}"'. [url: '"${CLOUD_BUILD_STATUS_URL}"', branch: '"${BRANCH}"', revision: '"${REV}"']"
+  "text": "Integration tests '"${STATUS}"'\nCloud Build Status: <'"${CLOUD_BUILD_STATUS_URL}"'|'"${BUILD}"'>\nBranch: '"${BRANCH}"'\nRevision: '"${REV}"'"
 }'
     fi
 }
