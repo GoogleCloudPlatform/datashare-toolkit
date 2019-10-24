@@ -175,6 +175,7 @@ send_notification() {
     gsutil cp gs://bqds-ci-config/integration-tests.config . || true
     if [ ! -z "./integration-tests.config" ] && [ ! -z "$BRANCH" ] && [ ! -z "$REV" ]; then
         source ./integration-tests.config
+        rm ./integration-tests.config
         # https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
         curl -X "POST" "${HANGOUTS_CHAT_WEBHOOK_URL}" \
             -H 'Content-Type: application/json; charset=utf-8' \
