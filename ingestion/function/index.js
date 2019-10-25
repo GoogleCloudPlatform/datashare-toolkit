@@ -44,9 +44,14 @@ exports.processEvent = async (event, context) => {
         } else {
             console.log(`found dataset ${config.dataset}`);
         }
-        await stageFile(config);
-        await transform(config);
-        await deleteTable(config.dataset, config.stagingTable);
+        try {
+            await stageFile(config);
+            await transform(config);
+            await deleteTable(config.dataset, config.stagingTable);
+        } catch (exception) {
+            console.error(`Exception processing ${event.name}: ` + JSON.stringify(exception));
+            return;
+        }
     } else {
         console.log("ignoring file " + event.name + ", exiting");
     }
@@ -159,11 +164,24 @@ async function stageFile(config) {
     const table = dataset.table(config.stagingTable);
     console.log(`created table ${config.stagingTable}`);
     console.log(`executing load for ${config.sourceFile} with ` + JSON.stringify(config.metadata));
-    const [job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile),
-        config.metadata || { autodetect: true });
 
-    console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
-    return;
+    try {
+        let [job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile), config.metadata || { autodetect: true });
+        console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
+        return;
+    } catch (ex) {
+        console.error(JSON.stringify(ex));
+        const errors = ex.errors;
+        if (errors && errors.length > 0) {
+            console.error(`Errors encountered loading ${config.sourceFile} to ${config.stagingTable}`);
+            for (let i = 0; i < errors.length; i++) {
+                console.error('ERROR ' + (i + 1) + ": " + JSON.stringify(errors[i].message));
+            }
+        } else {
+            console.error("Exception thrown, but no error array was given: " + JSON.stringify(ex));
+        }
+        throw (ex);
+    }
 }
 
 /**
