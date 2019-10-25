@@ -159,11 +159,26 @@ async function stageFile(config) {
     const table = dataset.table(config.stagingTable);
     console.log(`created table ${config.stagingTable}`);
     console.log(`executing load for ${config.sourceFile} with ` + JSON.stringify(config.metadata));
-    const [job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile),
-        config.metadata || { autodetect: true });
 
-    console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
-    return;
+    let job = undefined;
+    try {
+	[job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile),
+		config.metadata || { autodetect: true });
+	console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
+	return;
+    } catch (ex) {
+	console.error(JSON.stringify(ex));
+	const errors = ex.errors;
+	if (errors && errors.length > 0) {
+	    console.error(`Errors encountered loading ${config.sourceFile} to ${config.stagingTable}`);
+	    for (let i = 0; i < errors.length; i++) {
+		console.error('ERROR ' + (i + 1) + ": " + JSON.stringify(errors[i].message));
+		if (i === errors.length - 1) {
+		    return;
+		}
+	    }
+	}
+    }
 }
 
 /**
