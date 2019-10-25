@@ -44,9 +44,14 @@ exports.processEvent = async (event, context) => {
         } else {
             console.log(`found dataset ${config.dataset}`);
         }
-        await stageFile(config);
-        await transform(config);
-        await deleteTable(config.dataset, config.stagingTable);
+        try {
+            await stageFile(config);
+            await transform(config);
+            await deleteTable(config.dataset, config.stagingTable);
+        } catch (exception) {       
+            console.error(`Exception processing ${event.name}: ` + JSON.stringify(exception));
+            return;
+        }
     } else {
         console.log("ignoring file " + event.name + ", exiting");
     }
@@ -173,6 +178,7 @@ async function stageFile(config) {
             for (let i = 0; i < errors.length; i++) {
                 console.error('ERROR ' + (i + 1) + ": " + JSON.stringify(errors[i].message));
                 if (i === errors.length - 1) {
+                    throw (ex);
                     return;
                 }
             }
