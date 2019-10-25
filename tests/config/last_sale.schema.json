@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "fieldDelimiter": ",",
+        "fields": [
+            {"type":"INT64","name":"timestamp","mode":"REQUIRED"},
+            {"type":"STRING","name":"symbol","mode":"REQUIRED"},
+            {"type":"FLOAT","name":"price","mode":"REQUIRED"},
+            {"type":"INTEGER","name":"size","mode":"NULLABLE"}
+        ]
+    },
+    "truncate": "true"
+}

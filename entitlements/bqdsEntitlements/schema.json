@@ -1,0 +1,350 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "id": "/BQDSConfiguration",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "type": "string"
+    },
+    "projectId": {
+      "type": "string"
+    },
+    "accessControl": {
+      "$ref": "#/definitions/configAccessControl"
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/group"
+      },
+      "uniqueItems": true
+    },
+    "datasets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/dataset"
+      },
+      "uniqueItems": true
+    },
+    "views": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/view"
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "name",
+    "projectId",
+    "datasets",
+    "views"
+  ],
+  "definitions": {
+    "dataset": {
+      "id": "/dataset",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "accessControlLabels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "groupNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "access": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/access"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "access": {
+      "id": "/access",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "userByEmail": {
+          "type": "string",
+          "format": "email"
+        },
+        "groupByEmail": {
+          "type": "string",
+          "format": "email"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "specialGroup": {
+          "type": "string"
+        },
+        "iamMember": {
+          "type": "string"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "userByEmail"
+          ]
+        },
+        {
+          "required": [
+            "groupByEmail"
+          ]
+        },
+        {
+          "required": [
+            "domain"
+          ]
+        },
+        {
+          "required": [
+            "specialGroup"
+          ]
+        },
+        {
+          "required": [
+            "iamMember"
+          ]
+        }
+      ]
+    },
+    "group": {
+      "id": "/group",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "access": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/access"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "name",
+        "access"
+      ]
+    },
+    "view": {
+      "id": "/view",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "datasetNames": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "uniqueItems": true
+        },
+        "source": {
+          "$ref": "#/definitions/source"
+        },
+        "custom": {
+          "$ref": "#/definitions/custom"
+        },
+        "expiration": {
+          "$ref": "#/definitions/expiration"
+        }
+      },
+      "required": [
+        "name",
+        "datasetNames"
+      ]
+    },
+    "expiration": {
+      "id": "/expiration",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "delete": {
+          "type": "boolean"
+        },
+        "time": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "time"
+      ]
+    },
+    "publicAccess": {
+      "id": "/publicAccess",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "queryFilter": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "enabled",
+        "queryFilter"
+      ]
+    },
+    "source": {
+      "id": "/source",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "datasetId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "tableId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "visibleColumns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "uniqueItems": true
+        },
+        "hiddenColumns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "uniqueItems": true
+        },
+        "queryFilter": {
+          "type": "string"
+        },
+        "publicAccess": {
+          "$ref": "#/definitions/publicAccess"
+        },
+        "accessControl": {
+          "$ref": "#/definitions/sourceAccessControl"
+        }
+      },
+      "required": [
+        "datasetId",
+        "tableId"
+      ]
+    },
+    "sourceAccessControl": {
+      "id": "/sourceAccessControl",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "datasetEnabled": {
+          "type": "boolean"
+        },
+        "labelColumn": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "labelColumnDelimiter": {
+          "type": "string"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "labelColumn"
+      ]
+    },
+    "custom": {
+      "id": "/custom",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "authorizeFromDatasetIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "configAccessControl": {
+      "id": "/configAccessControl",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "datasetId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "viewId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      },
+      "required": [
+        "datasetId",
+        "viewId"
+      ]
+    }
+  }
+}
