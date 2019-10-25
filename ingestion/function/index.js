@@ -162,8 +162,7 @@ async function stageFile(config) {
 
     let job = undefined;
     try {
-        [job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile),
-                config.metadata || { autodetect: true });
+        [job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile),config.metadata || { autodetect: true });
         console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
         return;
     } catch (ex) {
