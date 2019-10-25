@@ -179,7 +179,6 @@ async function stageFile(config) {
                 console.error('ERROR ' + (i + 1) + ": " + JSON.stringify(errors[i].message));
                 if (i === errors.length - 1) {
                     throw (ex);
-                    return;
                 }
             }
         }
