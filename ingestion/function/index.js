@@ -48,7 +48,7 @@ exports.processEvent = async (event, context) => {
             await stageFile(config);
             await transform(config);
             await deleteTable(config.dataset, config.stagingTable);
-        } catch (exception) {       
+        } catch (exception) {
             console.error(`Exception processing ${event.name}: ` + JSON.stringify(exception));
             return;
         }
@@ -165,7 +165,7 @@ async function stageFile(config) {
     console.log(`created table ${config.stagingTable}`);
     console.log(`executing load for ${config.sourceFile} with ` + JSON.stringify(config.metadata));
 
-    try { 
+    try {
         let [job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile), config.metadata || { autodetect: true });
         console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
         return;
@@ -176,11 +176,11 @@ async function stageFile(config) {
             console.error(`Errors encountered loading ${config.sourceFile} to ${config.stagingTable}`);
             for (let i = 0; i < errors.length; i++) {
                 console.error('ERROR ' + (i + 1) + ": " + JSON.stringify(errors[i].message));
-	    }
+            }
         } else {
-	    console.error("Exception thrown, but no error array was given: " + JSON.stringify(ex));
-	}
-	throw(ex);
+            console.error("Exception thrown, but no error array was given: " + JSON.stringify(ex));
+        }
+        throw (ex);
     }
 }
 
