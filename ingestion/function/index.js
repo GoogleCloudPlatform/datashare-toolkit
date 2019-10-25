@@ -165,9 +165,8 @@ async function stageFile(config) {
     console.log(`created table ${config.stagingTable}`);
     console.log(`executing load for ${config.sourceFile} with ` + JSON.stringify(config.metadata));
 
-    let job = undefined;
-    try {
-        [job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile), config.metadata || { autodetect: true });
+    try { 
+        let [job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile), config.metadata || { autodetect: true });
         console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
         return;
     } catch (ex) {
@@ -177,11 +176,11 @@ async function stageFile(config) {
             console.error(`Errors encountered loading ${config.sourceFile} to ${config.stagingTable}`);
             for (let i = 0; i < errors.length; i++) {
                 console.error('ERROR ' + (i + 1) + ": " + JSON.stringify(errors[i].message));
-                if (i === errors.length - 1) {
-                    throw (ex);
-                }
-            }
-        }
+	    }
+        } else {
+	    console.error("Exception thrown, but no error array was given: " + JSON.stringify(ex));
+	}
+	throw(ex);
     }
 }
 
