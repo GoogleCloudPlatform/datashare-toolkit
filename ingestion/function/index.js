@@ -162,13 +162,13 @@ async function stageFile(config) {
 
     let job = undefined;
     try {
-	[job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile),
-		config.metadata || { autodetect: true });
-	console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
-	return;
+        [job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile),
+                config.metadata || { autodetect: true });
+        console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
+        return;
     } catch (ex) {
-	console.error(JSON.stringify(ex));
-	const errors = ex.errors;
+        console.error(JSON.stringify(ex));
+        const errors = ex.errors;
         if (errors && errors.length > 0) {
             console.error(`Errors encountered loading ${config.sourceFile} to ${config.stagingTable}`);
             for (let i = 0; i < errors.length; i++) {
