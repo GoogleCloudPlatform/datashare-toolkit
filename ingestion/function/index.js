@@ -170,16 +170,8 @@ async function stageFile(config) {
         console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
         return;
     } catch (ex) {
-        console.error(JSON.stringify(ex));
-        const errors = ex.errors;
-        if (errors && errors.length > 0) {
-            console.error(`Errors encountered loading ${config.sourceFile} to ${config.stagingTable}`);
-            for (let i = 0; i < errors.length; i++) {
-                console.error('ERROR ' + (i + 1) + ": " + JSON.stringify(errors[i].message));
-            }
-        } else {
-            console.error("Exception thrown, but no error array was given: " + JSON.stringify(ex));
-        }
+        console.error(`Errors encountered loading ${config.sourceFile} to ${config.stagingTable}`);
+	logException(ex);
         throw (ex);
     }
 }
@@ -259,7 +251,24 @@ async function runTransform(config, query) {
         }
     };
     console.log("BigQuery options: " + JSON.stringify(options));
-    return await bigqueryClient.createQueryJob(options);
+    try {
+	return await bigqueryClient.createQueryJob(options);
+    } catch (exception) {
+	console.error("Exception encountered running transform: " + JSON.stringify(exception));
+	logException(exception);
+	throw(exception);
+    }
+}
+
+function logException(exception) {
+    const errors = exception.errors;
+    if (errors && errors.length > 0) {
+        for (let i = 0; i < errors.length; i++) {
+            console.error('ERROR ' + (i + 1) + ": " + JSON.stringify(errors[i].message));
+        }
+    } else {
+        console.error("Exception thrown, but no error array was given: " + JSON.stringify(exception));
+    }
 }
 
 /**
