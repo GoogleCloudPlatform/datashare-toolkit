@@ -171,7 +171,7 @@ async function stageFile(config) {
         return;
     } catch (ex) {
         console.error(`Errors encountered loading ${config.sourceFile} to ${config.stagingTable}`);
-	logException(ex);
+        logException(ex);
         throw (ex);
     }
 }
@@ -252,11 +252,11 @@ async function runTransform(config, query) {
     };
     console.log("BigQuery options: " + JSON.stringify(options));
     try {
-	return await bigqueryClient.createQueryJob(options);
+        return await bigqueryClient.createQueryJob(options);
     } catch (exception) {
-	console.error("Exception encountered running transform: " + JSON.stringify(exception));
-	logException(exception);
-	throw(exception);
+        console.error("Exception encountered running transform: " + JSON.stringify(exception));
+        logException(exception);
+        throw(exception);
     }
 }
 
