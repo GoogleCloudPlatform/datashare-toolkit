@@ -6,8 +6,7 @@
             {"type":"STRING","name":"symbol","mode":"REQUIRED"},
             {"type":"FLOAT","name":"price","mode":"REQUIRED"},
             {"type":"INTEGER","name":"size","mode":"NULLABLE"}
-        ],
-        "skipLeadingRows": 2
+        ]
     },
     "truncate": "true"
 }
