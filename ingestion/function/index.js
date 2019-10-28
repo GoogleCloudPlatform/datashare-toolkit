@@ -284,14 +284,23 @@ async function getMetadata(bucket, schemaFileName) {
     } else {
         const config = JSON.parse(schemaConfig);
         const meta = config.metadata;
-        meta.sourceFormat = 'CSV'; // This doesn't seem to matter?
+
+        if (!meta.sourceFormat) {
+            meta.sourceFormat = 'CSV';
+        }
 
         if (!meta.skipLeadingRows) {
             meta.skipLeadingRows = 1;
         }
 
-        meta.maxBadRecords = 0;
-        meta.location = defaultLocation;
+        if (!meta.maxBadRecords) {
+            meta.maxBadRecords = 0;
+        }
+
+        if (!meta.location) {
+            meta.location = defaultLocation;
+        }
+
         console.log("using metadata: " + JSON.stringify(meta));
         return meta;
     }
