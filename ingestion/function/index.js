@@ -286,10 +286,7 @@ async function getMetadata(bucket, schemaFileName) {
         const meta = config.metadata;
         meta.sourceFormat = 'CSV'; // This doesn't seem to matter?
 
-        if (config.skipLeadingRows) {
-            meta.skipLeadingRows = config.skipLeadingRows;
-        }
-        else {
+        if (!meta.skipLeadingRows) {
             meta.skipLeadingRows = 1;
         }
 
