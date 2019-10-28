@@ -241,7 +241,7 @@ async function runTransform(config, query) {
             tableId: config.destinationTable
         },
         createDisposition: "CREATE_IF_NEEDED",
-        writeDisposition: (config.metadata && config.metadata.truncate)
+        writeDisposition: (config.truncate)
             ? "WRITE_TRUNCATE"
             : "WRITE_APPEND",
         query: query,
@@ -284,7 +284,6 @@ async function getMetadata(bucket, schemaFileName) {
     } else {
         const config = JSON.parse(schemaConfig);
         const meta = config.metadata;
-        meta.truncate = config.truncate;
         meta.sourceFormat = 'CSV'; // This doesn't seem to matter?
 
         if (config.skipLeadingRows) {
