@@ -175,7 +175,7 @@ send_notification() {
     EXIT_CODE=$?
     echo "Exit code is ${EXIT_CODE}"
     STATUS="*succeeded*"
-    if [ $? -ne 0 ]; then
+    if [ "${EXIT_CODE}" -ne "0" ]; then
         STATUS="*FAILED*"
     fi
 
