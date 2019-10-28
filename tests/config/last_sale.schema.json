@@ -8,6 +8,5 @@
             {"type":"INTEGER","name":"size","mode":"NULLABLE"}
         ]
     },
-    "truncate": "true",
-    "skipLeadingRows" : 2
+    "truncate": "true"
 }
