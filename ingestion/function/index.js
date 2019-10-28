@@ -256,7 +256,7 @@ async function runTransform(config, query) {
     } catch (exception) {
         console.error("Exception encountered running transform: " + JSON.stringify(exception));
         logException(exception);
-        throw(exception);
+        throw (exception);
     }
 }
 
@@ -286,7 +286,14 @@ async function getMetadata(bucket, schemaFileName) {
         const meta = config.metadata;
         meta.truncate = config.truncate;
         meta.sourceFormat = 'CSV'; // This doesn't seem to matter?
-        meta.skipLeadingRows = 1;
+
+        if (config.skipLeadingRows) {
+            meta.skipLeadingRows = skipLeadingRows;
+        }
+        else {
+            meta.skipLeadingRows = 1;
+        }
+
         meta.maxBadRecords = 0;
         meta.location = defaultLocation;
         console.log("using metadata: " + JSON.stringify(meta));
