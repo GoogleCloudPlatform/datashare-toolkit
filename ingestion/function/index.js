@@ -241,7 +241,7 @@ async function runTransform(config, query) {
             tableId: config.destinationTable
         },
         createDisposition: "CREATE_IF_NEEDED",
-        writeDisposition: (config.metadata && config.metadata.truncate)
+        writeDisposition: (config.truncate)
             ? "WRITE_TRUNCATE"
             : "WRITE_APPEND",
         query: query,
@@ -256,7 +256,7 @@ async function runTransform(config, query) {
     } catch (exception) {
         console.error("Exception encountered running transform: " + JSON.stringify(exception));
         logException(exception);
-        throw(exception);
+        throw (exception);
     }
 }
 
@@ -282,13 +282,24 @@ async function getMetadata(bucket, schemaFileName) {
         console.log("No metadata found");
         return undefined;
     } else {
-        const config = JSON.parse(schemaConfig);
-        const meta = config.metadata;
-        meta.truncate = config.truncate;
-        meta.sourceFormat = 'CSV'; // This doesn't seem to matter?
-        meta.skipLeadingRows = 1;
-        meta.maxBadRecords = 0;
-        meta.location = defaultLocation;
+        const meta = JSON.parse(schemaConfig).metadata;
+
+        if (!meta.sourceFormat) {
+            meta.sourceFormat = 'CSV';
+        }
+
+        if (!meta.skipLeadingRows) {
+            meta.skipLeadingRows = 1;
+        }
+
+        if (!meta.maxBadRecords) {
+            meta.maxBadRecords = 0;
+        }
+
+        if (!meta.location) {
+            meta.location = defaultLocation;
+        }
+
         console.log("using metadata: " + JSON.stringify(meta));
         return meta;
     }
