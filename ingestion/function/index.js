@@ -282,8 +282,7 @@ async function getMetadata(bucket, schemaFileName) {
         console.log("No metadata found");
         return undefined;
     } else {
-        const config = JSON.parse(schemaConfig);
-        const meta = config.metadata;
+        const meta = JSON.parse(schemaConfig).metadata;
 
         if (!meta.sourceFormat) {
             meta.sourceFormat = 'CSV';
