@@ -3,7 +3,26 @@
 # Example scenario using Major League Baseball game logs
 
 ## Overview
-For this BQDS example, we configure and load Major League Basseball [1871-2018 Game Logs](https://www.retrosheet.org/gamelogs/gl1871_2018.zip) which were downloaded from [Retrosheet](https://www.retrosheet.org/gamelogs/index.html).
+For this BQDS example, we configure and load Major League Baseball [1871-2018 Game Logs](https://www.retrosheet.org/gamelogs/gl1871_2018.zip) which were downloaded from [Retrosheet](https://www.retrosheet.org/gamelogs/index.html).
+
+## Quick start
+```
+export BUCKET=$(head -1 /dev/random | md5)
+gsutil mb gs://${BUCKET}
+cd bq-datashare-toolkit/ingestion/bin
+./deploy.sh --trigger-bucket=gs://${BUCKET}
+cd ../../examples/mlb/config/ingestion
+gsutil cp game_logs.schema.json gs://${BUCKET}/bqds/
+gsutil cp game_logs.transform.sql gs://${BUCKET}/bqds/
+cd ../../data
+gsutil cp mlb.game_logs.csv.gz gs://${BUCKET}
+sleep 60 # wait for ingestion
+echo "SELECT COUNT(*) AS entry_count FROM mlb.game_logs" | bq --quiet --format=json --headless query
+# [{"entry_count":"171907"}]
+gsutil rm -r -f gs://${BUCKET}
+
+```
+At the end of the above sequence of commands, you should see a total `entry_count` of 11
 
 ## Ingestion
 - [Teams](./data/mlb.teams.txt) - Raw data for ballparks available at [Retrosheet](https://www.retrosheet.org/TeamIDs.htm).
