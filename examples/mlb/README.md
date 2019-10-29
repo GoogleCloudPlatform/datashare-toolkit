@@ -10,7 +10,7 @@ For this BQDS example, we configure and load Major League Baseball [1871-2018 Ga
 This sequence of commands will create a new bucket, deploy the ingestion function attaching to the new bucket, then deploy the configuration and data files for the game logs example. It displays the number of records that were ingested, then deletes the bucket.
 
 ```
-export BUCKET=$(head -1 /dev/random | md5)
+BUCKET=$(head -1 /dev/random | md5)
 gsutil mb gs://${BUCKET}
 cd bq-datashare-toolkit/ingestion/function
 npm run deploy -- --trigger-bucket=gs://${BUCKET}
