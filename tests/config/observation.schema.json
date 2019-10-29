@@ -1,7 +1,7 @@
 {
     "truncate": "true",
     "metadata": {
-	"fieldDelimeter": ",",
+	"fieldDelimiter": ",",
 	"fields": [
 	    {
 		"type": "STRING",
