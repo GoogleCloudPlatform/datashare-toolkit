@@ -1,16 +1,40 @@
 {
-    "truncate": "false",
-    "metadata": {
-	"fieldDelimiter": ",",
-	"fields": [
-	    {"name": "station", "type": "string"},
-	    {"name": "date", "type": "string"},
-	    {"name": "element", "type": "string"},
-	    {"name": "value", "type": "integer"},
-	    {"name": "measurement_flag", "type": "string"},
-	    {"name": "quality_flag", "type": "string"},
-	    {"name": "source_flag", "type": "string"},
-	    {"name": "time", "type": "string"}
-	]
-    }
+	"truncate": "false",
+	"metadata": {
+		"fieldDelimiter": ",",
+		"fields": [
+			{
+				"name": "station",
+				"type": "string"
+			},
+			{
+				"name": "date",
+				"type": "string"
+			},
+			{
+				"name": "element",
+				"type": "string"
+			},
+			{
+				"name": "value",
+				"type": "integer"
+			},
+			{
+				"name": "measurement_flag",
+				"type": "string"
+			},
+			{
+				"name": "quality_flag",
+				"type": "string"
+			},
+			{
+				"name": "source_flag",
+				"type": "string"
+			},
+			{
+				"name": "time",
+				"type": "string"
+			}
+		]
+	}
 }
