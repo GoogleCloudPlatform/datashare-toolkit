@@ -43,12 +43,12 @@ main() {
     RANDO="$(cat /dev/urandom | head | ${SHASUMEXE} | awk '{print $1}')"
     PROJECT=$(gcloud config get-value project)
     DATASET="test_${RANDO}"
-    TABLE=last_sale
-    UPLOAD=${TESTDIR}/data/last_sale.csv
+    TABLE=observation
+    UPLOAD=${TESTDIR}/data/weather.observation.csv
     BUCKET=gs://${RANDO}
     export FUNCTION_NAME="test-${RANDO}"
-    SCHEMA=${TESTDIR}/config/last_sale.schema.json
-    TRANSFORM=${TESTDIR}/config/last_sale.transform.sql
+    SCHEMA=${TESTDIR}/config/observation.schema.json
+    TRANSFORM=${TESTDIR}/config/observation.transform.sql
     FUNCTION_DIR=${BASEDIR}/ingestion/function
     QUERY="SELECT COUNT(*) AS count FROM ${DATASET}.${TABLE}"
 
