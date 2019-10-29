@@ -32,7 +32,7 @@ gsutil rm -r -f gs://${BUCKET}
 The output from these commands would resemble:
 
 ```
-host:Code thisuser$ export BUCKET=$(head -1 /dev/random | md5)
+host:Code thisuser$ BUCKET=$(head -1 /dev/random | md5)
 host:Code thisuser$ gsutil mb gs://${BUCKET}
 Creating gs://713573366abd762a58fce9752b55b610/...
 host:Code thisuser$ cd bq-datashare-toolkit/ingestion/bin
