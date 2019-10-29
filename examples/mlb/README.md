@@ -6,11 +6,14 @@
 For this BQDS example, we configure and load Major League Baseball [1871-2018 Game Logs](https://www.retrosheet.org/gamelogs/gl1871_2018.zip) which were downloaded from [Retrosheet](https://www.retrosheet.org/gamelogs/index.html).
 
 ## Quick start
+
+This sequence of commands will create a new bucket, deploy the ingestion function attaching to the new bucket, then deploy the configuration and data files for the game logs example. It displays the number of records that were ingested, then deletes the bucket.
+
 ```
 export BUCKET=$(head -1 /dev/random | md5)
 gsutil mb gs://${BUCKET}
-cd bq-datashare-toolkit/ingestion/bin
-./deploy.sh --trigger-bucket=gs://${BUCKET}
+cd bq-datashare-toolkit/ingestion/function
+npm run deploy -- --trigger-bucket=gs://${BUCKET}
 cd ../../examples/mlb/config/ingestion
 gsutil cp game_logs.schema.json gs://${BUCKET}/bqds/
 gsutil cp game_logs.transform.sql gs://${BUCKET}/bqds/
@@ -19,11 +22,72 @@ gsutil cp mlb.game_logs.csv.gz gs://${BUCKET}
 sleep 60 # wait for ingestion
 echo "SELECT COUNT(*) AS entry_count FROM mlb.game_logs" | bq --quiet --format=json --headless query
 
-# ^^^ [{"entry_count":"171907"}]
+# [{"entry_count":"171907"}]
 
 # clean up bucket
 gsutil rm -r -f gs://${BUCKET}
 
+```
+
+The output from these commands would resemble:
+
+```
+host:Code thisuser$ export BUCKET=$(head -1 /dev/random | md5)
+host:Code thisuser$ gsutil mb gs://${BUCKET}
+Creating gs://713573366abd762a58fce9752b55b610/...
+host:Code thisuser$ cd bq-datashare-toolkit/ingestion/bin
+host:bin thisuser$ ./deploy.sh --trigger-bucket=gs://${BUCKET}
+cloudfunctions.googleapis.com api is enabled
+Bucket name: gs://713573366abd762a58fce9752b55b610
+Bucket region: us
+Main region: us
+Function region: us-central1
+Deploying function (may take a while - up to 2 minutes)...done.                       
+availableMemoryMb: 256
+entryPoint: processEvent
+eventTrigger:
+  eventType: google.storage.object.finalize
+  failurePolicy: {}
+  resource: projects/_/buckets/713573366abd762a58fce9752b55b610
+  service: storage.googleapis.com
+labels:
+  deployment-tool: cli-gcloud
+name: projects/thisuser-cloud-sandbox/locations/us-central1/functions/processUpload
+runtime: nodejs8
+serviceAccountEmail: thisuser-cloud-sandbox@appspot.gserviceaccount.com
+sourceUploadUrl: https://storage.googleapis.com/gcf-upload-us-central1-081d71f7-3b71-4e31-bbb2-8668bf287101/bbcb0441-0571-4dbc-920a-5772b9c34e85.zip?GoogleAccessId=service-283242825526@gcf-admin-robot.iam.gserviceaccount.com&Expires=1572371537&Signature=dZLp9YyRa2y40pTFuz0%2BEgWR0oUKAC9CYFzFy2rfwyKpobnyo17RivMnXgkFhyw4izwHTdUy%2FSfg4jYXIjM6kt6GCGX%2FuTz2F4Mp0sNifUEZ5WueNGsVdHQ%2BWDuKAkiUd%2FrHfAxNWm3UrU%2BuR0MSZg2%2Baaz9hh5AzFEAGu9ixhm4rc3G5LNDp4kud8QCVz57Dtl5F7ZZSX3RRzVCPAkP7Fq7%2BYZLLsENDrEz4%2B04FDLiuPXddvkU9XpLZAahWlWKZL8T4Y6wJPhKuQHqY8RLR9jU1Vfkbp93%2BcMXcOPtue6eXOmVVKVhRYalXsoLUMTu2qutKgVkbTN8MBczKT9K2g%3D%3D
+status: ACTIVE
+timeout: 540s
+updateTime: '2019-10-29T17:22:49Z'
+versionId: '21'
+host:bin thisuser$ cd ../../examples/mlb/config/ingestion
+host:ingestion thisuser$ gsutil cp game_logs.schema.json gs://${BUCKET}/bqds/
+Copying file://game_logs.schema.json [Content-Type=application/json]...
+/ [1 files][ 21.4 KiB/ 21.4 KiB]                                                
+Operation completed over 1 objects/21.4 KiB.                                     
+host:ingestion thisuser$ gsutil cp game_logs.transform.sql gs://${BUCKET}/bqds/
+Copying file://game_logs.transform.sql [Content-Type=application/x-sql]...
+/ [1 files][  158.0 B/  158.0 B]                                                
+Operation completed over 1 objects/158.0 B.                                      
+host:ingestion thisuser$ cd ../../data
+host:data thisuser$ gsutil cp mlb.game_logs.csv.gz gs://${BUCKET}
+Copying file://mlb.game_logs.csv.gz [Content-Type=text/csv]...
+\ [1 files][ 19.5 MiB/ 19.5 MiB]   25.1 MiB/s                                   
+Operation completed over 1 objects/19.5 MiB.                                     
+host:data thisuser$ sleep 60 # wait for ingestion
+host:data thisuser$ echo "SELECT COUNT(*) AS entry_count FROM mlb.game_logs" | bq --quiet --format=json --headless query
+[{"entry_count":"171907""}]
+host:data thisuser$ 
+host:data thisuser$ # ^^^ [{"entry_count":"171907"}]
+host:data thisuser$ 
+host:data thisuser$ # clean up bucket
+host:data thisuser$ gsutil rm -r -f gs://${BUCKET}
+Removing gs://713573366abd762a58fce9752b55b610/mlb.game_logs.csv.gz#1572369785409249...
+Removing gs://713573366abd762a58fce9752b55b610/bqds/game_logs.schema.json#1572369771326950...
+Removing gs://713573366abd762a58fce9752b55b610/bqds/game_logs.transform.sql#1572369772972359...
+/ [3 objects]                                                                   
+Operation completed over 3 objects.                                              
+Removing gs://713573366abd762a58fce9752b55b610/...
 ```
 
 ## Ingestion
@@ -49,16 +113,16 @@ gsutil rm -r -f gs://${BUCKET}
 
 ## Entitlements
 - Simple Example - [JSON](./config/entitlements/simple.json) | [YAML](./config/entitlements/simple.yaml)
-    - In the Simple example, there are two audiences - New York Fans, and Chicago Fans. We create two datasets to manage separate permissions for each - ny_fans and chicago_fans. We create two views, both have accessControl enabled, and are filtering rows by the team column label. For the `ny_game_logs` view we also configured `publicAccess` which allows a user with view access but no row-level access to view rows where the game_numer is 1 - limited to 20 results.
+    - In the simple example, there are two audiences - New York fans, and Chicago fans. We create two datasets to manage separate permissions for each - ny_fans and chicago_fans. We create two views, both have `accessControl` enabled, and are filtering rows by the team column label. For the `ny_game_logs` view we also configured `publicAccess` which allows a user with view access but no row-level access to view rows where the game_number is 1 - limited to 20 results.
 - Complex Example - [JSON](./config/entitlements.complex.json) | [YAML](./config/entitlements/complex.yaml)
-    - For the complex example, we configured custom queries for each of three configured views. Additionally, we added the `authorizeFromDatasetIds` property within `custom` to ensure that the `mlb` dataset is authorized for access by these newly created views.
+    - For the complex example, custom queries are configured for each of the three configured views. Additionally, the `authorizeFromDatasetIds` property  was added within `custom` to ensure that the `mlb` dataset is authorized for access by these newly created views.
 
 ## Directories
 The following directories are included in the example:
-- [config](./config) - Contains ingestion configuration files and entitlement-engine configuration files.
+- [config](./config) 
     - [ingestion](./config/ingestion) - Contains the ingestion configuration files.
-    - [entitlements](./config/entitlements) - Contains the entitlement-engine configuration files.
-- [data](./data) - Contains raw data and license used for the example.
+    - [entitlements](./config/entitlements) - Contains the entitlement engine configuration files.
+- [data](./data) - Contains a raw, compressed data archive and license file used for the example.
 
 ## License
 The license for [Retrosheet](https://www.retrosheet.org) data is available [here](https://www.retrosheet.org/notice.txt), or can be found locally in this repository [here](./data/RETROSHEET_LICENSE.txt).
