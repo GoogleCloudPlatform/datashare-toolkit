@@ -18,11 +18,13 @@ cd ../../data
 gsutil cp mlb.game_logs.csv.gz gs://${BUCKET}
 sleep 60 # wait for ingestion
 echo "SELECT COUNT(*) AS entry_count FROM mlb.game_logs" | bq --quiet --format=json --headless query
-# [{"entry_count":"171907"}]
+
+# ^^^ [{"entry_count":"171907"}]
+
+# clean up bucket
 gsutil rm -r -f gs://${BUCKET}
 
 ```
-At the end of the above sequence of commands, you should see a total `entry_count` of 11
 
 ## Ingestion
 - [Teams](./data/mlb.teams.txt) - Raw data for ballparks available at [Retrosheet](https://www.retrosheet.org/TeamIDs.htm).
@@ -53,7 +55,7 @@ At the end of the above sequence of commands, you should see a total `entry_coun
 
 ## Directories
 The following directories are included in the example:
-- [config](./config) - Contains injestion configuration files and entitlement-engine configuration files.
+- [config](./config) - Contains ingestion configuration files and entitlement-engine configuration files.
     - [ingestion](./config/ingestion) - Contains the ingestion configuration files.
     - [entitlements](./config/entitlements) - Contains the entitlement-engine configuration files.
 - [data](./data) - Contains raw data and license used for the example.
