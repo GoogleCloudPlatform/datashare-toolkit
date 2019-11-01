@@ -128,7 +128,9 @@ async function transform(config) {
         `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
     const dataset = bigqueryClient.dataset(config.dataset);
     const exists = await tableExists(config.dataset, config.destinationTable);
+    let createTable = false;
     if (!exists && config.destination.fields && config.destination.fields.length > 0) {
+        createTable = true;
         let fields = config.destination.fields;
         fields.push({ "type": "STRING", "name": batchIdColumnName, "mode": "REQUIRED" });
         console.log(`creating table ${config.destinationTable} with ${JSON.stringify(fields)}`);
@@ -141,7 +143,7 @@ async function transform(config) {
     }
     const transform = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.dataset}.${config.stagingTable}\``;
     console.log(`executing transform query: ${transform}`);
-    const job = await runTransform(config, transform);
+    const job = await runTransform(config, transform, createTable);
     console.log(`${job[0].metadata.id} ${job[0].metadata.statistics.query.statementType} ${job[0].metadata.configuration.jobType} ${job[0].metadata.status.state}`);
     console.log("processing done");
     return;
@@ -252,9 +254,9 @@ async function createDataset(datasetId) {
  * @param  {} config
  * @param  {} query
  */
-async function runTransform(config, query) {
+async function runTransform(config, query, createTable) {
     console.log("configuration for runTransform: " + JSON.stringify(config));
-    const options = {
+    let options = {
         location: defaultLocation,
         destinationTable: {
             projectId: process.env.GCP_PROJECT,
@@ -268,6 +270,13 @@ async function runTransform(config, query) {
         query: query,
         jobPrefix: `${processPrefix}_`
     };
+
+    if (createTable) {
+        options.timePartitioning = {
+            type: 'DAY'
+        };
+    }
+
     console.log("BigQuery options: " + JSON.stringify(options));
     try {
         return await bigqueryClient.createQueryJob(options);
