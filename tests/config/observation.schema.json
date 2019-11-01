@@ -5,17 +5,20 @@
 			{
 				"type": "TIMESTAMP",
 				"name": "timestamp",
-				"mode": "REQUIRED"
+				"mode": "REQUIRED",
+				"description": "The timestamp"
 			},
 			{
 				"type": "GEOGRAPHY",
 				"name": "coordinates",
-				"mode": "REQUIRED"
+				"mode": "REQUIRED",
+				"description": "The coordinates"
 			},
 			{
 				"type": "FLOAT",
 				"name": "mean_temperature",
-				"mode": "REQUIRED"
+				"mode": "REQUIRED",
+				"description": "The mean temperature"
 			}
 		]
 	},
