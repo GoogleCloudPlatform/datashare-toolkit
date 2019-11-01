@@ -13,7 +13,7 @@
 				"mode": "REQUIRED"
 			},
 			{
-				"type": "NUMBER",
+				"type": "FLOAT",
 				"name": "mean_temperature",
 				"mode": "REQUIRED"
 			}
