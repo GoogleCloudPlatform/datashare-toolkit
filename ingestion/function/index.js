@@ -261,7 +261,7 @@ async function runTransform(config, query, table) {
     console.log("configuration for runTransform: " + JSON.stringify(config));
     const options = {
         location: defaultLocation,
-        destination: table,
+        destinationTable: table,
         createDisposition: "CREATE_IF_NEEDED",
         writeDisposition: (config.truncate)
             ? "WRITE_TRUNCATE"
