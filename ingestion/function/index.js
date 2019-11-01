@@ -261,7 +261,7 @@ async function runTransform(config, query) {
             datasetId: config.dataset,
             tableId: config.destinationTable
         },
-        createDisposition: "CREATE_IF_NEEDED",
+        createDisposition: "CREATE_NEVER",
         writeDisposition: (config.truncate)
             ? "WRITE_TRUNCATE"
             : "WRITE_APPEND",
