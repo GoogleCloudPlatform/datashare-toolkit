@@ -116,13 +116,9 @@ async function transform(config) {
         `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
     const dataset = bigqueryClient.dataset(config.dataset);
     const exists = await tableExists(config.dataset, config.destinationTable);
-    console.log(`Checking if table exists: ${config.destinationTable}`);
     if (!exists) {
         console.log(`creating table ${config.destinationTable} with ${config.destination.fields}`);
         await dataset.createTable(config.destinationTable, { schema: config.destination.fields });
-    }
-    else {
-        console.log(`Table ${config.destinationTable} already exists`);
     }
     const transform = `SELECT ${transformQuery}, '${batchId}' AS ${processPrefix}_batch_id FROM \`${config.dataset}.${config.stagingTable}\``;
     console.log(`executing transform query: ${transform}`);
