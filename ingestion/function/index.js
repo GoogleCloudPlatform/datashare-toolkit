@@ -128,7 +128,7 @@ async function transform(config) {
     const dataset = bigqueryClient.dataset(config.dataset);
     const exists = await tableExists(config.dataset, config.destinationTable);
     if (!exists) {
-        console.log(`creating table ${config.destinationTable} with ${config.destination.fields}`);
+        console.log(`creating table ${config.destinationTable} with ${JSON.stringify(config.destination.fields)}`);
         await dataset.createTable(config.destinationTable, {
             schema: config.destination.fields,
             timePartitioning: {
