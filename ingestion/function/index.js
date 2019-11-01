@@ -63,16 +63,17 @@ exports.processEvent = async (event, context) => {
  * @param  {} context
  */
 async function getConfiguration(event, context) {
-    const schemaConfig = await fromStorage(event.bucket, `${processPrefix}/${config.destinationTable}.${schemaFileName}`);
-    const json = JSON.parse(schemaConfig);
-
     const config = {};
     const dest = getDestination(event.name).split('.');
 
-    config.truncate = json.truncate;
-    config.destination = json.destination;
     config.dataset = dest[0];
     config.destinationTable = dest[1];
+    
+    const schemaConfig = await fromStorage(event.bucket, `${processPrefix}/${config.destinationTable}.${schemaFileName}`);
+    const json = JSON.parse(schemaConfig);
+
+    config.truncate = json.truncate;
+    config.destination = json.destination;
     config.metadata = await getMetadata(json);
     config.stagingTable = `TMP_${config.destinationTable}_${context.eventId}`;
     config.sourceFile = event.name;
