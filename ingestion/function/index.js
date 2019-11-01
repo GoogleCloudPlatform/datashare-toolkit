@@ -128,7 +128,7 @@ async function transform(config) {
     const dataset = bigqueryClient.dataset(config.dataset);
     const exists = await tableExists(config.dataset, config.destinationTable);
     if (!exists) {
-        let fields = destination.fields;
+        let fields = config.destination.fields;
         fields.push({ "type": "STRING", "name": "bqds_batch_id", "mode": "REQUIRED" });
         console.log(`creating table ${config.destinationTable} with ${JSON.stringify(fields)}`);
         await dataset.createTable(config.destinationTable, {
