@@ -1,5 +1,5 @@
 {
-	"truncate": "false",
+	"truncate": "true",
 	"destination": {
 		"fields": [
 			{
