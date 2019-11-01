@@ -14,7 +14,7 @@
 			},
 			{
 				"type": "FLOAT",
-				"name": "mean_temperature",
+				"name": "MEAN_TEMPERATURE",
 				"mode": "REQUIRED"
 			}
 		]

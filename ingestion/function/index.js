@@ -49,7 +49,7 @@ exports.processEvent = async (event, context) => {
             await transform(config);
             await deleteTable(config.dataset, config.stagingTable);
         } catch (exception) {
-            console.error(`Exception processing ${event.name}: ${exception} ` + JSON.stringify(exception));
+            console.error(`Exception processing ${event.name}: ${getExceptionString(exception)}`);
             return;
         }
     } else {
@@ -129,7 +129,12 @@ async function transform(config) {
     const exists = await tableExists(config.dataset, config.destinationTable);
     if (!exists) {
         console.log(`creating table ${config.destinationTable} with ${config.destination.fields}`);
-        await dataset.createTable(config.destinationTable, { schema: config.destination.fields });
+        await dataset.createTable(config.destinationTable, {
+            schema: config.destination.fields,
+            timePartitioning: {
+                type: 'DAY'
+            }
+        });
     }
     const transform = `SELECT ${transformQuery}, '${batchId}' AS ${processPrefix}_batch_id FROM \`${config.dataset}.${config.stagingTable}\``;
     console.log(`executing transform query: ${transform}`);
@@ -200,7 +205,7 @@ async function fromStorage(bucket, file) {
         console.log(`found gs://${bucket}/${file}: ${content}`);
         return content;
     } catch (error) {
-        console.info(`file ${file} not found in bucket ${bucket}`);
+        console.info(`File ${file} not found in bucket ${bucket}: ${getExceptionString(error)}`);
         return undefined;
     }
 }
@@ -253,21 +258,17 @@ async function runTransform(config, query) {
             datasetId: config.dataset,
             tableId: config.destinationTable
         },
-        createDisposition: "CREATE_IF_NEEDED",
         writeDisposition: (config.truncate)
             ? "WRITE_TRUNCATE"
             : "WRITE_APPEND",
         query: query,
-        jobPrefix: `${processPrefix}_`,
-        timePartitioning: {
-            type: 'DAY'
-        }
+        jobPrefix: `${processPrefix}_`
     };
     console.log("BigQuery options: " + JSON.stringify(options));
     try {
         return await bigqueryClient.createQueryJob(options);
     } catch (exception) {
-        console.error(`Exception encountered running transform: ${exception}`);
+        console.error(`Exception encountered running transform: ${getExceptionString(exception)}`);
         logException(exception);
         throw (exception);
     }
@@ -280,7 +281,7 @@ function logException(exception) {
             console.error('ERROR ' + (i + 1) + ": " + JSON.stringify(errors[i].message));
         }
     } else {
-        console.error("Exception thrown, but no error array was given: " + JSON.stringify(exception));
+        console.error(`Exception thrown, but no error array was given: ${getExceptionString(exception)}`);
     }
 }
 
@@ -332,6 +333,18 @@ function getDestination(fileName) {
         return `${parts[0]}.${parts[1]}`;
     }
     return name;
+}
+
+/**
+ * @param  {} exception
+ * Returns exception message in string format. Attempts to stringify JSON, if that's undefined, returns the exception as a string.
+ */
+function getExceptionString(exception) {
+    let str = JSON.stringify(exception);
+    if (!str) {
+        str = exception;
+    }
+    return str;
 }
 
 /**
