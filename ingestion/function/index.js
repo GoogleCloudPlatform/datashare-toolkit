@@ -204,7 +204,7 @@ async function tableExists(datasetId, tableName) {
     const table = dataset.table(tableName);
     const response = await table.exists();
     const exists = response[0];
-    console.log(`${tableName}: ${exists}`);
+    console.log(`Check if table exists: ${tableName}: ${exists}`);
     return exists;
 }
 
