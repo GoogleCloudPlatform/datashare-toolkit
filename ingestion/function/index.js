@@ -27,6 +27,7 @@ const defaultTransformQuery = "*";
 const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
 const stagingTableExpiryDays = 2;
 const processPrefix = "bqds";
+const batchIdColumnName = `${processPrefix}_batch_id`;
 
 /**
  * @param  {} event
@@ -129,7 +130,7 @@ async function transform(config) {
     const exists = await tableExists(config.dataset, config.destinationTable);
     if (!exists) {
         let fields = config.destination.fields;
-        fields.push({ "type": "STRING", "name": "bqds_batch_id", "mode": "REQUIRED" });
+        fields.push({ "type": "STRING", "name": batchIdColumnName, "mode": "REQUIRED" });
         console.log(`creating table ${config.destinationTable} with ${JSON.stringify(fields)}`);
         await dataset.createTable(config.destinationTable, {
             schema: fields,
@@ -138,7 +139,7 @@ async function transform(config) {
             }
         });
     }
-    const transform = `SELECT ${transformQuery}, '${batchId}' AS ${processPrefix}_batch_id FROM \`${config.dataset}.${config.stagingTable}\``;
+    const transform = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.dataset}.${config.stagingTable}\``;
     console.log(`executing transform query: ${transform}`);
     const job = await runTransform(config, transform);
     console.log(`${job[0].metadata.id} ${job[0].metadata.statistics.query.statementType} ${job[0].metadata.configuration.jobType} ${job[0].metadata.status.state}`);
