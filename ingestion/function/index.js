@@ -49,7 +49,7 @@ exports.processEvent = async (event, context) => {
             await transform(config);
             await deleteTable(config.dataset, config.stagingTable);
         } catch (exception) {
-            console.error(`Exception processing ${event.name}: ` + JSON.stringify(exception));
+            console.error(`Exception processing ${event.name}: ${exception} ` + JSON.stringify(exception));
             return;
         }
     } else {
