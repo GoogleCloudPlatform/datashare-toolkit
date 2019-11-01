@@ -143,28 +143,28 @@ main() {
 
     ##### Tear-down steps
 
-    # echo "Removing cloud function $FUNCTION_NAME"
-    # cd ${FUNCTION_DIR}
-    # gcloud functions delete "$FUNCTION_NAME" --quiet
+    echo "Removing cloud function $FUNCTION_NAME"
+    cd ${FUNCTION_DIR}
+    gcloud functions delete "$FUNCTION_NAME" --quiet
 
-    # if [ $? -ne 0 ]; then
-    #     echo "Could not delete live function $FUNCTION_NAME!"
-    #     exit 1
-    # fi
+    if [ $? -ne 0 ]; then
+        echo "Could not delete live function $FUNCTION_NAME!"
+        exit 1
+    fi
 
-    # echo "Removing transient bucket ${BUCKET}"
-    # gsutil rm -r -f ${BUCKET}
-    # if [ $? -ne 0 ]; then
-    #     echo "Could not delete bucket ${BUCKET}!"
-    #     exit 1
-    # fi
+    echo "Removing transient bucket ${BUCKET}"
+    gsutil rm -r -f ${BUCKET}
+    if [ $? -ne 0 ]; then
+        echo "Could not delete bucket ${BUCKET}!"
+        exit 1
+    fi
 
-    # echo "Removing transient dataset ${DATASET}"
-    # bq rm -r -f ${DATASET}
-    # if [ $? -ne 0 ]; then
-    #     echo "Could not delete dataset ${DATASET}!"
-    #     exit 1
-    # fi
+    echo "Removing transient dataset ${DATASET}"
+    bq rm -r -f ${DATASET}
+    if [ $? -ne 0 ]; then
+        echo "Could not delete dataset ${DATASET}!"
+        exit 1
+    fi
 
     echo "### BQDS integration test ended at $(date) ###"
 
