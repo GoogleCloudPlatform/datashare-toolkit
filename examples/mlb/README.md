@@ -3,7 +3,7 @@
 # Example scenario using Major League Baseball game logs
 
 ## Overview
-For this BQDS example, we configure and load Major League Baseball [1871-2018 Game Logs](https://www.retrosheet.org/gamelogs/gl1871_2018.zip) which were downloaded from [Retrosheet](https://www.retrosheet.org/gamelogs/index.html).
+For this BQDS example, we configure and load Major League Baseball [1871-2018 Game Logs](https://www.retrosheet.org/gamelogs/gl1871_2018.zip) which were sourced from [Retrosheet](https://www.retrosheet.org/gamelogs/index.html).
 
 ## Quick start
 

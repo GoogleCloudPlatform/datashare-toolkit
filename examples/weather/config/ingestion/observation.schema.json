@@ -1,0 +1,298 @@
+{
+	"truncate": "true",
+	"metadata": {
+		"fieldDelimiter": ",",
+		"fields": [
+			{
+				"type": "STRING",
+				"name": "STATION",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "NAME",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "LATITUDE",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "LONGITUDE",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "ELEVATION",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "TIMESTAMP",
+				"name": "DATE",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_CLDH_NORMAL",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_CLDH_NORMAL_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "INTEGER",
+				"name": "HLY_CLOD_PCTBKN",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_CLOD_PCTBKN_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "INTEGER",
+				"name": "HLY_CLOD_PCTCLR",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_CLOD_PCTCLR_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "INTEGER",
+				"name": "HLY_CLOD_PCTFEW",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_CLOD_PCTFEW_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "INTEGER",
+				"name": "HLY_CLOD_PCTOVC",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_CLOD_PCTOVC_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "INTEGER",
+				"name": "HLY_CLOD_PCTSCT",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_CLOD_PCTSCT_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_DEWP_10PCTL",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_DEWP_10PCTL_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_DEWP_90PCTL",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_DEWP_90PCTL_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_DEWP_NORMAL",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_DEWP_NORMAL_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_HIDX_NORMAL",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_HIDX_NORMAL_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_HTDH_NORMAL",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_HTDH_NORMAL_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_PRES_10PCTL",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_PRES_10PCTL_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_PRES_90PCTL",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_PRES_90PCTL_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_PRES_NORMAL",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_PRES_NORMAL_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_TEMP_10PCTL",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_TEMP_10PCTL_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_TEMP_90PCTL",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_TEMP_90PCTL_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_TEMP_NORMAL",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_TEMP_NORMAL_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_WCHL_NORMAL",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_WCHL_NORMAL_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "INTEGER",
+				"name": "HLY_WIND_1STDIR",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_WIND_1STDIR_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "INTEGER",
+				"name": "HLY_WIND_1STPCT",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_WIND_1STPCT_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "INTEGER",
+				"name": "HLY_WIND_2NDDIR",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_WIND_2NDDIR_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "INTEGER",
+				"name": "HLY_WIND_2NDPCT",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_WIND_2NDPCT_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_WIND_AVGSPD",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_WIND_AVGSPD_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "INTEGER",
+				"name": "HLY_WIND_PCTCLM",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_WIND_PCTCLM_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "INTEGER",
+				"name": "HLY_WIND_VCTDIR",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_WIND_VCTDIR_ATTRIBUTES",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "FLOAT",
+				"name": "HLY_WIND_VCTSPD",
+				"mode": "NULLABLE"
+			},
+			{
+				"type": "STRING",
+				"name": "HLY_WIND_VCTSPD_ATTRIBUTES",
+				"mode": "NULLABLE"
+			}
+		]
+	}
+}
