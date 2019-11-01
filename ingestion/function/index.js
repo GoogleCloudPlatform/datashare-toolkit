@@ -254,13 +254,16 @@ async function createDataset(datasetId) {
  */
 async function runTransform(config, query) {
     console.log("configuration for runTransform: " + JSON.stringify(config));
+    const [table] = await bigqueryClient
+        .dataset(config.dataset)
+        .table(config.destinationTable)
+        .get();
+    const destinationTableRef = table.metadata.tableReference;
+    console.log(`Desintation table ref: ${getExceptionString(destinationTableRef)}`);
+
     const options = {
         location: defaultLocation,
-        destinationTable: {
-            projectId: process.env.GCP_PROJECT,
-            datasetId: config.dataset,
-            tableId: config.destinationTable
-        },
+        destinationTable: destinationTableRef,
         writeDisposition: (config.truncate)
             ? "WRITE_TRUNCATE"
             : "WRITE_APPEND",
