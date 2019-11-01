@@ -29,6 +29,8 @@ const stagingTableExpiryDays = 2;
 const processPrefix = "bqds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
 
+const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
+
 /**
  * @param  {} event
  * @param  {} context
@@ -141,6 +143,7 @@ async function transform(config) {
     }
     const transform = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.dataset}.${config.stagingTable}\``;
     console.log(`executing transform query: ${transform}`);
+    await sleep(20000);
     const job = await runTransform(config, transform);
     console.log(`${job[0].metadata.id} ${job[0].metadata.statistics.query.statementType} ${job[0].metadata.configuration.jobType} ${job[0].metadata.status.state}`);
     console.log("processing done");
