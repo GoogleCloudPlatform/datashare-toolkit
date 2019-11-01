@@ -138,6 +138,7 @@ async function transform(config) {
             }
         });
     }
+    process.exit(0);
     const transform = `SELECT ${transformQuery}, '${batchId}' AS ${processPrefix}_batch_id FROM \`${config.dataset}.${config.stagingTable}\``;
     console.log(`executing transform query: ${transform}`);
     const job = await runTransform(config, transform);
