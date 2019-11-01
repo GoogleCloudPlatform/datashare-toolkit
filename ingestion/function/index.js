@@ -133,13 +133,12 @@ async function transform(config) {
         let fields = config.destination.fields;
         fields.push({ "type": "STRING", "name": batchIdColumnName, "mode": "REQUIRED" });
         console.log(`creating table ${config.destinationTable} with ${JSON.stringify(fields)}`);
-        const [tb] = await dataset.createTable(config.destinationTable, {
+        table = await dataset.createTable(config.destinationTable, {
             schema: fields,
             timePartitioning: {
                 type: 'DAY'
             }
         });
-        table = tb;
     }
     else {
         table = dataset.table(config.destinationTable);
