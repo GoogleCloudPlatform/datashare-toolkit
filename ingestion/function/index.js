@@ -128,7 +128,7 @@ async function transform(config) {
         `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
     const dataset = bigqueryClient.dataset(config.dataset);
     const exists = await tableExists(config.dataset, config.destinationTable);
-    if (!exists) {
+    if (!exists && config.destination.fields && config.destination.fields.length > 0) {
         let fields = config.destination.fields;
         fields.push({ "type": "STRING", "name": batchIdColumnName, "mode": "REQUIRED" });
         console.log(`creating table ${config.destinationTable} with ${JSON.stringify(fields)}`);
@@ -261,6 +261,7 @@ async function runTransform(config, query) {
             datasetId: config.dataset,
             tableId: config.destinationTable
         },
+        createDisposition: "CREATE_IF_NEEDED",
         writeDisposition: (config.truncate)
             ? "WRITE_TRUNCATE"
             : "WRITE_APPEND",
