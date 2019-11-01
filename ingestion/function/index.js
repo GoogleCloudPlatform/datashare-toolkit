@@ -235,7 +235,7 @@ async function runTransform(config, query) {
     console.log("configuration for runTransform: " + JSON.stringify(config));
     const options = {
         location: defaultLocation,
-        destination: {
+        destinationTable: {
             projectId: process.env.GCP_PROJECT,
             datasetId: config.dataset,
             tableId: config.destinationTable
