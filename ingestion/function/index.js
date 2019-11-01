@@ -203,7 +203,7 @@ async function tableExists(datasetId, tableName) {
     const dataset = bigqueryClient.dataset(datasetId);
     const table = dataset.table(tableName);
     console.log(`${tableName}: ${table.exists}`);
-    return await table.exists();
+    return await table.exists()[0];
 }
 
 /**
