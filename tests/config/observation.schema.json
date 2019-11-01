@@ -4,19 +4,19 @@
 		"fields": [
 			{
 				"type": "TIMESTAMP",
-				"name": "TIMESTAMP",
+				"name": "timestamp",
 				"mode": "REQUIRED",
 				"description": "The timestamp"
 			},
 			{
 				"type": "GEOGRAPHY",
-				"name": "COORDINATES",
+				"name": "coordinates",
 				"mode": "REQUIRED",
 				"description": "The coordinates"
 			},
 			{
 				"type": "FLOAT",
-				"name": "MEAN_TEMPERATURE",
+				"name": "mean_temperature",
 				"mode": "REQUIRED",
 				"description": "The mean temperature"
 			}
