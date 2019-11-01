@@ -117,8 +117,8 @@ async function transform(config) {
     const dataset = bigqueryClient.dataset(config.dataset);
     const exists = tableExists(config.dataset, config.destinationTable);
     if (!exists) {
-        console.log(`creating table ${config.destinationTable} with ${config.metadata.fields}`);
-        await dataset.createTable(config.destinationTable, { schema: config.metadata.fields });
+        console.log(`creating table ${config.destinationTable} with ${config.destination.fields}`);
+        await dataset.createTable(config.destinationTable, { schema: config.destination.fields });
     }
     const transform = `SELECT ${transformQuery}, '${batchId}' AS ${processPrefix}_batch_id FROM \`${config.dataset}.${config.stagingTable}\``;
     console.log(`executing transform query: ${transform}`);
@@ -235,7 +235,7 @@ async function runTransform(config, query) {
     console.log("configuration for runTransform: " + JSON.stringify(config));
     const options = {
         location: defaultLocation,
-        destinationTable: {
+        destination: {
             projectId: process.env.GCP_PROJECT,
             datasetId: config.dataset,
             tableId: config.destinationTable

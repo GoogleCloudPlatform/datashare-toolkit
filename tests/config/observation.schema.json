@@ -1,5 +1,24 @@
 {
 	"truncate": "true",
+	"destination": {
+		"fields": [
+			{
+				"type": "TIMESTAMP",
+				"name": "DATE",
+				"mode": "REQUIRED"
+			},
+			{
+				"type": "GEOGRAPHY",
+				"name": "COORDINATES",
+				"mode": "REQUIRED"
+			},
+			{
+				"type": "NUMBER",
+				"name": "mean_temperature",
+				"mode": "REQUIRED"
+			}
+		]
+	},
 	"metadata": {
 		"fieldDelimiter": ",",
 		"fields": [
