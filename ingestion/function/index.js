@@ -63,11 +63,17 @@ exports.processEvent = async (event, context) => {
  * @param  {} context
  */
 async function getConfiguration(event, context) {
+    const schemaConfig = await fromStorage(event.bucket, `${processPrefix}/${config.destinationTable}.${schemaFileName}`);
+    const json = JSON.parse(schemaConfig);
+
     const config = {};
     const dest = getDestination(event.name).split('.');
+
+    config.truncate = json.truncate;
+    config.destination = json.destination;
     config.dataset = dest[0];
     config.destinationTable = dest[1];
-    config.metadata = await getMetadata(event.bucket, `${processPrefix}/${config.destinationTable}.${schemaFileName}`);
+    config.metadata = await getMetadata(json);
     config.stagingTable = `TMP_${config.destinationTable}_${context.eventId}`;
     config.sourceFile = event.name;
     config.bucket = event.bucket;
@@ -277,14 +283,12 @@ function logException(exception) {
  * @param  {} bucket
  * @param  {} schemaFileName
  */
-async function getMetadata(bucket, schemaFileName) {
-    const schemaConfig = await fromStorage(bucket, schemaFileName);
-    console.log("schema.json: " + schemaConfig);
-    if (!schemaConfig) {
+async function getMetadata(dict) {
+    if (!dict.metadata) {
         console.log("No metadata found");
         return undefined;
     } else {
-        const meta = JSON.parse(schemaConfig).metadata;
+        const meta = dict.metadata;
 
         if (!meta.sourceFormat) {
             meta.sourceFormat = 'CSV';
