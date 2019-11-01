@@ -1,5 +1,5 @@
 {
-	"truncate": "true",
+	"truncate": true,
 	"metadata": {
 		"fieldDelimiter": ",",
 		"fields": [

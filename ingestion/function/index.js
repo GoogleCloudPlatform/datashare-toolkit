@@ -63,15 +63,26 @@ exports.processEvent = async (event, context) => {
  * @param  {} context
  */
 async function getConfiguration(event, context) {
-    const config = {};
     const dest = getDestination(event.name).split('.');
-    config.dataset = dest[0];
-    config.destinationTable = dest[1];
-    config.metadata = await getMetadata(event.bucket, `${processPrefix}/${config.destinationTable}.${schemaFileName}`);
+    const dataset = dest[0];
+    const destinationTable = dest[1];
+
+    const schemaConfig = await fromStorage(event.bucket, `${processPrefix}/${destinationTable}.${schemaFileName}`);
+
+    // This will pull in the dictionary from the configuration file. IE: includes destination, metadata, truncate, etc.
+    const config = JSON.parse(schemaConfig);
+
+    // Updates the configured metadata to create necessary default values.
+    config.metadata = setMetadataDefaults(config);
+
+    // Runtime created properties
+    config.dataset = dataset;
+    config.destinationTable = destinationTable;
     config.stagingTable = `TMP_${config.destinationTable}_${context.eventId}`;
     config.sourceFile = event.name;
     config.bucket = event.bucket;
     config.eventId = context.eventId;
+
     console.log("configuration: " + JSON.stringify(config));
     return config;
 }
@@ -275,14 +286,12 @@ function logException(exception) {
  * @param  {} bucket
  * @param  {} schemaFileName
  */
-async function getMetadata(bucket, schemaFileName) {
-    const schemaConfig = await fromStorage(bucket, schemaFileName);
-    console.log("schema.json: " + schemaConfig);
-    if (!schemaConfig) {
+function setMetadataDefaults(dict) {
+    if (!dict.metadata) {
         console.log("No metadata found");
-        return undefined;
+        return dict;
     } else {
-        const meta = JSON.parse(schemaConfig).metadata;
+        const meta = dict.metadata;
 
         if (!meta.sourceFormat) {
             meta.sourceFormat = 'CSV';
