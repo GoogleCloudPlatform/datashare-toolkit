@@ -116,7 +116,7 @@ async function transform(config) {
         `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
     const dataset = bigqueryClient.dataset(config.dataset);
     const exists = await tableExists(config.dataset, config.destinationTable);
-    if (!exists) {
+    if (!exists[0]) {
         console.log(`creating table ${config.destinationTable} with ${config.destination.fields}`);
         await dataset.createTable(config.destinationTable, { schema: config.destination.fields });
     }
@@ -203,7 +203,7 @@ async function tableExists(datasetId, tableName) {
     const dataset = bigqueryClient.dataset(datasetId);
     const table = dataset.table(tableName);
     console.log(`${tableName}: ${table.exists}`);
-    return await table.exists()[0];
+    return await table.exists();
 }
 
 /**
