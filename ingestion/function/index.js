@@ -254,7 +254,7 @@ async function runTransform(config, query) {
     try {
         return await bigqueryClient.createQueryJob(options);
     } catch (exception) {
-        console.error("Exception encountered running transform: " + JSON.stringify(exception));
+        console.error(`Exception encountered running transform: ${exception}`);
         logException(exception);
         throw (exception);
     }
