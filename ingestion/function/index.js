@@ -67,7 +67,7 @@ async function getConfiguration(event, context) {
     const dataset = dest[0];
     const destinationTable = dest[1];
 
-    const schemaConfig = await fromStorage(event.bucket, `${processPrefix}/${config.destinationTable}.${schemaFileName}`);
+    const schemaConfig = await fromStorage(event.bucket, `${processPrefix}/${destinationTable}.${schemaFileName}`);
 
     // This will pull in the dictionary from the configuration file. IE: includes destination, metadata, truncate, etc.
     const config = JSON.parse(schemaConfig);
