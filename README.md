@@ -11,6 +11,21 @@ While ```BQDS``` is used for data management and entitlement, it does *not* mana
 
 For publisher projects that do not have the Cloud Functions API enabled at the time of running [deploy.sh](ingestion/bin/deploy.sh), the API will be enabled on the project's behalf.
 
+## Requirements
+
+### Publishers
+
+- A GCP account with billing enabled
+- A Google Cloud Storage bucket to store staged data
+- Several BigQuery datasets to store entitled data and authorized views
+- A Cloud Function to ingest the inbound data
+- Ability to run command-line applications (like Cloud Shell) for entitlements
+
+### Consumers
+
+- A GCP account with billing enabled
+
+
 ## Principles
 
 ```BQDS``` aims to embody certain key principles. Among these are:
