@@ -24,6 +24,7 @@ For publisher projects that do not have the Cloud Functions API enabled at the t
 ### Consumers
 
 - A GCP account with billing enabled
+- Entitlements granted to the specific datasets to which you are licensed
 
 
 ## Principles
