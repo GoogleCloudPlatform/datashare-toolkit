@@ -132,7 +132,7 @@ async function transform(config) {
     if (!exists && config.destination.fields && config.destination.fields.length > 0) {
         createTable = true;
         let fields = config.destination.fields;
-        fields.push({ "type": "STRING", "name": batchIdColumnName, "mode": "REQUIRED" });
+        fields.push({ "type": "STRING", "name": batchIdColumnName, "mode": "REQUIRED", "description": "The BQDS unique file batch identifier" });
         console.log(`creating table ${config.destinationTable} with ${JSON.stringify(fields)}`);
         await dataset.createTable(config.destinationTable, {
             schema: fields,
