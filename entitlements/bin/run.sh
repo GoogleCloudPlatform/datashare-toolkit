@@ -42,4 +42,4 @@ docker run -it \
     -v "${CREDENTIAL_FILE_PATH}":"/app/credentials/${CREDENTIAL_FILE_NAME}" \
     -e GOOGLE_APPLICATION_CREDENTIALS="/app/credentials/${CREDENTIAL_FILE_NAME}" \
     -e CONFIG_FILE_PATH="${IMAGE_CONFIG_FILE_PATH}" \
-    entitlement-engine:v1 bash
+    entitlement-engine:v1 ash
