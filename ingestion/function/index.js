@@ -127,13 +127,14 @@ async function transform(config) {
     const transformQuery = await fromStorage(config.bucket,
         `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
     const dataset = bigqueryClient.dataset(config.dataset);
+  
     const exists = await tableExists(config.dataset, config.destinationTable);
     let createTable = false;
     if (!exists && config.destination.fields && config.destination.fields.length > 0) {
         createTable = true;
         let fields = config.destination.fields;
         fields.push({ "type": "STRING", "name": batchIdColumnName, "mode": "REQUIRED", "description": "The BQDS unique file batch identifier" });
-        console.log(`creating table ${config.destinationTable} with ${JSON.stringify(fields)}`);
+        console.log(`Creating table ${config.destinationTable} with ${JSON.stringify(fields)}`);
         await dataset.createTable(config.destinationTable, {
             schema: fields,
             timePartitioning: {
@@ -141,6 +142,7 @@ async function transform(config) {
             }
         });
     }
+  
     const transform = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.dataset}.${config.stagingTable}\``;
     console.log(`executing transform query: ${transform}`);
     const job = await runTransform(config, transform, createTable);
@@ -207,7 +209,7 @@ async function fromStorage(bucket, file) {
             .bucket(bucket)
             .file(file)
             .download();
-        console.log(`found gs://${bucket}/${file}: ${content}`);
+        console.log(`Found gs://${bucket}/${file}: ${content}`);
         return content;
     } catch (error) {
         console.info(`File ${file} not found in bucket ${bucket}: ${getExceptionString(error)}`);
