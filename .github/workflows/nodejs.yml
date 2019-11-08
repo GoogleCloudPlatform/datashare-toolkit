@@ -14,7 +14,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm install, and lint for entitlements and processUpload
+    - name: npm install, lint, and test for entitlements
       run: |
         cd entitlements/bqdsEntitlements
         npm install --loglevel verbose
@@ -33,7 +33,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm install, and lint for entitlements and processUpload
+    - name: npm install and lint for processUpload
       run: |
         cd ingestion/function
         cd ../../ingestion/function
