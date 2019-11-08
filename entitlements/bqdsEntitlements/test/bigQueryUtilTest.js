@@ -17,7 +17,7 @@
 /* eslint-disable promise/always-return */
 /* eslint-disable promise/catch-or-return */
 
-var argv = require('minimist')(process.argv.slice(2));
+const argv = require('minimist')(process.argv.slice(2));
 if (argv.runCloudTests) {
     process.env.UNIT_TESTS = true;
 }
