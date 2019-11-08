@@ -17,14 +17,14 @@
 /* eslint-disable promise/always-return */
 /* eslint-disable promise/catch-or-return */
 
-var assert = require('assert');
-var chai = require('chai'), expect = chai.expect, should = chai.should();
-var chaiAsPromised = require('chai-as-promised');
+const assert = require('assert');
+const chai = require('chai'), expect = chai.expect, should = chai.should();
+const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 const runCloudTests = false;
 
 const bigqueryUtil = require("../bigqueryUtil");
-var configValidator = require('../configValidator');
+const configValidator = require('../configValidator');
 
 bigqueryUtil.init('bqds-ci');
 
