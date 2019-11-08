@@ -22,7 +22,7 @@ jobs:
         npm test
       env:
         CI: true
-  injestion:
+  ingestion:
     runs-on: ubuntu-latest
     strategy:
       matrix:
