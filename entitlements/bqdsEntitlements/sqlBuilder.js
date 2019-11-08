@@ -32,7 +32,7 @@ async function generateSql(config, viewDatasetId, view) {
         sql = prepareCustomSql(config, view);
     }
     else {
-        if (await configUtil.isPublicAccessEnabled(view) === true) {
+        if (configUtil.isPublicAccessEnabled(view) === true) {
             console.log(`Generating query with public access for view '${view.name}'`);
             sql = await generateSqlWithPublicAccess(config, viewDatasetId, view);
         }
