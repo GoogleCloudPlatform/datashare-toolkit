@@ -22,6 +22,7 @@ jobs:
         cd entitlements/bqdsEntitlements
         npm install --loglevel verbose
         npm run lint
+        npm test
         cd ../../ingestion/function
         npm install --loglevel verbose
         npm run lint
