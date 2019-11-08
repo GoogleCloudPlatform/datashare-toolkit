@@ -161,20 +161,6 @@ async function datasetExists(datasetId, datasets) {
 }
 
 /**
- * @param  {} metadata
- * @param  {} role
- */
-async function findUsersInRole(metadata, accessType, role) {
-    let users = [];
-    metadata.access.forEach((a) => {
-        if (a[accessType] && a.role && a.role.toLowerCase() === role.toLowerCase()) {
-            users.push(a[accessType]);
-        }
-    });
-    return users;
-}
-
-/**
  * @param  {} datasetId
  */
 async function getDatasetMetadata(datasetId) {
@@ -547,7 +533,6 @@ module.exports = {
     getDatasetMetadata,
     getTableMetadata,
     getDatasets,
-    findUsersInRole,
     datasetExists,
     createDataset,
     deleteDataset,
