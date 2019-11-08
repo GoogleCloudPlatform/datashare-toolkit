@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node main.js",
     "lint": "eslint .",
-    "test": "mocha --timeout 60000 --projectId='sferrazza-cloud-sandbox' --runCloudTests"
+    "test": "mocha --timeout 60000 --projectId='sferrazza-cloud-sandbox' --runCloudTestsX"
   },
   "bin": {
     "entitlement-engine": "main.js"
