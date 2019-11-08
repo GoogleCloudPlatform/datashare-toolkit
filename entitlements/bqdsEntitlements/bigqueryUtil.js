@@ -29,7 +29,7 @@ let bigqueryClient;
 /**
  * @param {} projectId
  */
-async function init(projectId) {
+function init(projectId) {
     if (bigqueryClient === undefined) {
         bigqueryClient = new BigQuery({
             projectId: projectId

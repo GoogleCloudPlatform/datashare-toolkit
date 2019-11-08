@@ -18,9 +18,15 @@
 /* eslint-disable promise/catch-or-return */
 
 var assert = require('assert');
-var chai = require('chai');
-var expect = chai.expect;
+var chai = require('chai'), expect = chai.expect, should = chai.should();
+var chaiAsPromised = require('chai-as-promised');
+chai.use(chaiAsPromised);
+const runCloudTests = false;
+
+const bigqueryUtil = require("../bigqueryUtil");
 var configValidator = require('../configValidator');
+
+bigqueryUtil.init('bqds-ci');
 
 it("should return true for valid json string", () => {
     expect(configValidator.isJsonString('{ "isValid": true }')).is.true;
@@ -29,3 +35,10 @@ it("should return true for valid json string", () => {
 it("should return false for invalid json string", () => {
     expect(configValidator.isJsonString('"isValid": true')).is.false;
 });
+
+if (runCloudTests) {
+    it("config should validate", async () => {
+        const simpleConfig = require('../../../examples/mlb/config/entitlements/simple.json');
+        return expect(configValidator.validate(simpleConfig)).to.eventually.be.true;
+    });
+}

@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node main.js",
     "lint": "eslint .",
-    "test": "mocha"
+    "test": "mocha --timeout 60000"
   },
   "bin": {
     "entitlement-engine": "main.js"
@@ -26,6 +26,7 @@
     "eslint": "^5.12.0",
     "eslint-plugin-promise": "^4.2.1",
     "mocha": "^6.2.2",
-    "chai": "^4.2.0"
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1"
   }
 }
