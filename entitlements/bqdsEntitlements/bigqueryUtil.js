@@ -561,3 +561,7 @@ module.exports = {
     setTableMetadata,
     insertRows
 };
+
+if (process.env.UNIT_TESTS) {
+    module.exports.executeQuery = executeQuery;
+}

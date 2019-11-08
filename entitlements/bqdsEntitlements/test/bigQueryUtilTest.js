@@ -35,21 +35,33 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const bigqueryUtil = require("../bigqueryUtil");
-const configValidator = require('../configValidator');
-
-it("should return true for valid json string", () => {
-    expect(configValidator.isJsonString('{ "isValid": true }')).is.true;
-});
-
-it("should return false for invalid json string", () => {
-    expect(configValidator.isJsonString('"isValid": true')).is.false;
-});
 
 if (argv.runCloudTests) {
     bigqueryUtil.init(argv.projectId);
 
-    it("config should validate", async () => {
-        const simpleConfig = require('../../../examples/mlb/config/entitlements/simple.json');
-        return expect(configValidator.validate(simpleConfig)).to.eventually.be.true;
+    it("execute query", async () => {
+        const options = { query: "select 1 union all select 2" };
+        const [rows] = await bigqueryUtil.executeQuery(options);
+        expect(rows.length).is.equal(2);
+    });
+
+    it("query should be valid", async () => {
+        const query = "select 1 union all select 2";
+        return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.true;
+    });
+
+    it("query should be invalid", async () => {
+        const query = "Xselect 1";
+        return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.false;
+    });
+
+    it("query should be valid with limit", async () => {
+        const query = "select 1 union all select 2 limit 10";
+        return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.true;
+    });
+
+    it("query should be invalid with limit", async () => {
+        const query = "Xselect 1 limit 10";
+        return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.false;
     });
 }
