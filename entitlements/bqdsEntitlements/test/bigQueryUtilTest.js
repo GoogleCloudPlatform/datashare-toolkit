@@ -17,12 +17,8 @@
 /* eslint-disable promise/always-return */
 /* eslint-disable promise/catch-or-return */
 
+process.env.UNIT_TESTS = true;
 const argv = require('minimist')(process.argv.slice(2));
-if (argv.runCloudTests) {
-    process.env.UNIT_TESTS = true;
-}
-
-console.log(`Command arguments: ${JSON.stringify(argv)}`);
 
 if (argv.runCloudTests && !argv.projectId) {
     console.log("projectId must be provided when runCloudTests is enabled");

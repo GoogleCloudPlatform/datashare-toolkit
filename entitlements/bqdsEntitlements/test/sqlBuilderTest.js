@@ -17,6 +17,8 @@
 /* eslint-disable promise/always-return */
 /* eslint-disable promise/catch-or-return */
 
+process.env.UNIT_TESTS = true;
+
 const chai = require('chai'), expect = chai.expect, should = chai.should();
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);

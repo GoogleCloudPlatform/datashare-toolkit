@@ -342,6 +342,9 @@ function prepareCustomSql(config, view) {
 }
 
 module.exports = {
-    generateSql,
-    prependLines
+    generateSql
 };
+
+if (process.env.UNIT_TESTS) {
+    module.exports.prependLines = prependLines;
+}

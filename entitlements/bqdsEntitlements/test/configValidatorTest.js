@@ -18,9 +18,7 @@
 /* eslint-disable promise/catch-or-return */
 
 var argv = require('minimist')(process.argv.slice(2));
-if (argv.runCloudTests) {
-    process.env.UNIT_TESTS = true;
-}
+process.env.UNIT_TESTS = true;
 
 console.log(`Command arguments: ${JSON.stringify(argv)}`);
 
