@@ -342,5 +342,6 @@ function prepareCustomSql(config, view) {
 }
 
 module.exports = {
-    generateSql
+    generateSql,
+    prependLines
 };
