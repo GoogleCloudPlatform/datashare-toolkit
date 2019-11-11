@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node main.js",
     "lint": "eslint .",
-    "test": "nyc mocha --timeout 60000 --projectId='bqds-ci'"
+    "test": "nyc mocha --timeout 60000 --projectId='${PROJECT:-bqds-ci}'"
   },
   "bin": {
     "entitlement-engine": "main.js"

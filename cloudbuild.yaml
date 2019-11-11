@@ -1,5 +1,7 @@
 steps:
 - name: 'gcr.io/cloud-builders/npm'
+  env:
+  - 'PROJECT=$PROJECT_ID'
   dir: 'entitlements/bqdsEntitlements'
   entrypoint: 'npm'
   args: ['install']
