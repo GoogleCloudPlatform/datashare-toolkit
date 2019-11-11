@@ -30,6 +30,11 @@ it("should be prepended with 1 tab per line", async () => {
     return expect(sqlBuilder.prependLines(testStr, "\t", 1)).to.eventually.equal("\ttest1\n\ttest2\n\ttest3");
 });
 
+it("should be prepended with 3 spaces per line", async () => {
+    const testStr = "test1\ntest2\ntest3";
+    return expect(sqlBuilder.prependLines(testStr, " ", 3)).to.eventually.equal("   test1\n   test2\n   test3");
+});
+
 it("should be prepended with nothing", async () => {
     const testStr = "test1\ntest2\ntest3";
     return expect(sqlBuilder.prependLines(testStr, "", 1)).to.eventually.equal(testStr);
