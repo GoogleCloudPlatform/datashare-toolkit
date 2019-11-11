@@ -58,7 +58,7 @@ if (argv.runCloudTests) {
     const uuid = uuidv4().replace(/-/g, "_");
     const viewName = `v_${uuid}`;
 
-    it("create dataset, table, check for existence, and delete", async () => {
+    it("create dataset, table, view, check for existence, and delete", async () => {
         bigqueryUtil.createDataset(uuid).then((result => {
             expect(result, "created dataset").is.true;
         })).then(() => {
