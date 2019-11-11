@@ -20,7 +20,7 @@
  * Returns bool indicating if public access is enabled for the source.
  * @param  {} view
  */
-async function isPublicAccessEnabled(view) {
+function isPublicAccessEnabled(view) {
     let source = view.source;
     if (source.hasOwnProperty('publicAccess')) {
         let publicAccess = source.publicAccess;

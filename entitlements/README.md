@@ -191,3 +191,18 @@ The following replacement tokens may be used:
 - ${projectId}
 - ${accessControl.datasetId}
 - ${accessControl.viewId}
+
+## Unit Tests
+To run unit tests for the entitlement-engine, switch to the bqdsEntitlements directory and run the tests:
+
+```
+cd entitlements/bqdsEntitlements
+
+# Including GCP dependent tests
+npm run test -- --runCloudTests
+
+# Excluding GCP dependent tests
+npm run test
+```
+
+The tests will run in the project specified in the projectId specified in the test script in package.json. If you include the --runCloudTests the tests with a dependency on GCP will execute, if you exclude it tests with a GCP dependency will be skipped.

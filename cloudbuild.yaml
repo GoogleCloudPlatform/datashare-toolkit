@@ -1,4 +1,12 @@
 steps:
+- name: 'gcr.io/cloud-builders/npm'
+  dir: 'entitlements/bqdsEntitlements'
+  entrypoint: 'npm'
+  args: ['install']
+- name: 'gcr.io/cloud-builders/npm'
+  dir: 'entitlements/bqdsEntitlements'
+  entrypoint: 'npm'
+  args: ['run', 'test', '--', '--runCloudTests']
 - name: 'gcr.io/bqds-ci/integration-test'
   env:
   - 'BUILD=$BUILD_ID'

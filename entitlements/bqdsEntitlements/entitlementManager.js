@@ -62,7 +62,7 @@ async function processConfiguration(filePath) {
  * This should be be a JSON object.
  */
 async function processEntitlementConfig(config) {
-    await bigqueryUtil.init(config.projectId);
+    bigqueryUtil.init(config.projectId);
 
     let prerequisiteComplete = false;
     if (runtimeConfiguration.DRY_RUN === false) {

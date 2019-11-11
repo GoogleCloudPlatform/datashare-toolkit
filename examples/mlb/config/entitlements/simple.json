@@ -1,6 +1,6 @@
 {
   "name": "mlb_simple",
-  "projectId": "sferrazza-cloud-sandbox",
+  "projectId": "bqds-ci",
   "accessControl": {
     "datasetId": "access_control",
     "viewId": "groupEntities"

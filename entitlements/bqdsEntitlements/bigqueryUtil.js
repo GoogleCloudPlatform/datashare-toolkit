@@ -29,7 +29,7 @@ let bigqueryClient;
 /**
  * @param {} projectId
  */
-async function init(projectId) {
+function init(projectId) {
     if (bigqueryClient === undefined) {
         bigqueryClient = new BigQuery({
             projectId: projectId
@@ -73,7 +73,9 @@ async function validateQuery(sql, limit) {
         const [rows] = await executeQuery(options);
         return true;
     } catch (error) {
-        console.log("ERROR: %s - Query: '%s' is invalid", error, _sql);
+        if (runtimeConfiguration.VERBOSE_MODE) {
+            console.log("ERROR: %s - Query: '%s' is invalid", error, _sql);
+        }
         return false;
     }
 }
@@ -158,20 +160,6 @@ async function datasetExists(datasetId, datasets) {
         return dataset.id.toLowerCase() === datasetId.toLowerCase();
     });
     return found !== undefined;
-}
-
-/**
- * @param  {} metadata
- * @param  {} role
- */
-async function findUsersInRole(metadata, accessType, role) {
-    let users = [];
-    metadata.access.forEach((a) => {
-        if (a[accessType] && a.role && a.role.toLowerCase() === role.toLowerCase()) {
-            users.push(a[accessType]);
-        }
-    });
-    return users;
 }
 
 /**
@@ -282,7 +270,10 @@ async function createView(projectId, datasetId, tableId, query, deleteIfExists, 
             .dataset(datasetId)
             .createTable(tableId, options);
 
-        console.log(`View '${table.id}' created.`);
+        if (runtimeConfiguration.VERBOSE_MODE) {
+            console.log(`View '${table.id}' created.`);
+        }
+
         return { success: true, metadata: table.metadata };
     } catch (error) {
         console.log(`Failed to create view '${tableId}' with error: ${error}`);
@@ -307,7 +298,10 @@ async function createTable(datasetId, tableId, schema) {
         .dataset(datasetId)
         .createTable(tableId, options);
 
-    console.log(`Table ${table.id} created.`);
+    if (runtimeConfiguration.VERBOSE_MODE) {
+        console.log(`Table ${table.id} created.`);
+    }
+    return true;
 }
 
 /**
@@ -321,7 +315,9 @@ async function deleteTable(datasetId, tableId) {
             .table(tableId)
             .delete();
 
-        console.log(`Table ${tableId} deleted`);
+        if (runtimeConfiguration.VERBOSE_MODE) {
+            console.log(`Table ${tableId} deleted`);
+        }
         return true;
     } catch (error) {
         console.log("Failed to delete table '%s', error: %s", tableId, error);
@@ -451,7 +447,10 @@ async function createDataset(datasetName, configurationName) {
             };
         }
         const [dataset] = await bigqueryClient.createDataset(datasetName, options);
-        console.log(`Dataset ${dataset.id} created.`);
+
+        if (runtimeConfiguration.VERBOSE_MODE) {
+            console.log(`Dataset ${dataset.id} created.`);
+        }
         return true;
     } catch (error) {
         console.log("Error creating Dataset '%s'", datasetName);
@@ -468,7 +467,9 @@ async function deleteDataset(datasetId) {
             .dataset(datasetId)
             .delete({ force: true });
 
-        console.log(`Dataset ${datasetId} deleted`);
+        if (runtimeConfiguration.VERBOSE_MODE) {
+            console.log(`Dataset ${datasetId} deleted`);
+        }
         return true;
     } catch (error) {
         console.log("Failed to delete dataset '%s', error: %s", datasetId, error);
@@ -547,7 +548,6 @@ module.exports = {
     getDatasetMetadata,
     getTableMetadata,
     getDatasets,
-    findUsersInRole,
     datasetExists,
     createDataset,
     deleteDataset,
@@ -561,3 +561,7 @@ module.exports = {
     setTableMetadata,
     insertRows
 };
+
+if (process.env.UNIT_TESTS) {
+    module.exports.executeQuery = executeQuery;
+}
