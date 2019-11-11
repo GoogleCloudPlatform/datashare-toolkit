@@ -123,7 +123,7 @@ async function processEntitlementConfig(config) {
  * @param  {} config
  */
 async function setupPrerequisites(config) {
-    if (configUtil.isAccessControlDatasetUsed(config) === true) {
+    if (configUtil.isAccessControlDatasetUsed(config) === true || runtimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE === true) {
         if (await bigqueryUtil.datasetExists(config.accessControl.datasetId) === false) {
             console.log("Creating provisioning dataset");
             await bigqueryUtil.createDataset(config.accessControl.datasetId);
@@ -131,7 +131,9 @@ async function setupPrerequisites(config) {
         else {
             console.log("Provisoning dataset already exists");
         }
+    }
 
+    if (configUtil.isAccessControlDatasetUsed(config) === true) {
         if (await bigqueryUtil.tableExists(config.projectId, config.accessControl.datasetId, "groupEntitlements") === false) {
             const groupEntitlementSchema = [{
                 "name": "groupName",
