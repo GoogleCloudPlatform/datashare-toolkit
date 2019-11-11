@@ -270,7 +270,10 @@ async function createView(projectId, datasetId, tableId, query, deleteIfExists, 
             .dataset(datasetId)
             .createTable(tableId, options);
 
-        console.log(`View '${table.id}' created.`);
+        if (runtimeConfiguration.VERBOSE_MODE) {
+            console.log(`View '${table.id}' created.`);
+        }
+
         return { success: true, metadata: table.metadata };
     } catch (error) {
         console.log(`Failed to create view '${tableId}' with error: ${error}`);
@@ -295,7 +298,9 @@ async function createTable(datasetId, tableId, schema) {
         .dataset(datasetId)
         .createTable(tableId, options);
 
-    console.log(`Table ${table.id} created.`);
+    if (runtimeConfiguration.VERBOSE_MODE) {
+        console.log(`Table ${table.id} created.`);
+    }
     return true;
 }
 
@@ -310,7 +315,9 @@ async function deleteTable(datasetId, tableId) {
             .table(tableId)
             .delete();
 
-        console.log(`Table ${tableId} deleted`);
+        if (runtimeConfiguration.VERBOSE_MODE) {
+            console.log(`Table ${tableId} deleted`);
+        }
         return true;
     } catch (error) {
         console.log("Failed to delete table '%s', error: %s", tableId, error);
@@ -440,7 +447,10 @@ async function createDataset(datasetName, configurationName) {
             };
         }
         const [dataset] = await bigqueryClient.createDataset(datasetName, options);
-        console.log(`Dataset ${dataset.id} created.`);
+
+        if (runtimeConfiguration.VERBOSE_MODE) {
+            console.log(`Dataset ${dataset.id} created.`);
+        }
         return true;
     } catch (error) {
         console.log("Error creating Dataset '%s'", datasetName);
@@ -457,7 +467,9 @@ async function deleteDataset(datasetId) {
             .dataset(datasetId)
             .delete({ force: true });
 
-        console.log(`Dataset ${datasetId} deleted`);
+        if (runtimeConfiguration.VERBOSE_MODE) {
+            console.log(`Dataset ${datasetId} deleted`);
+        }
         return true;
     } catch (error) {
         console.log("Failed to delete dataset '%s', error: %s", datasetId, error);
