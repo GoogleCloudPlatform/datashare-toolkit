@@ -23,6 +23,7 @@ const bqManager = require('./bigqueryManager');
 const storageManager = require('./storageManager');
 const pubsubManager = require('./pubSubManager');
 const validateManager = require('./validateManager');
+const fulfillmentMessageSchema = require('./validateManager').fulfillmentMessageSchema;
 
 /**
  * @param  {} name
@@ -110,7 +111,7 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
 async function pullFulfillmentSubscriptionRequest(options) {
     var message;
 
-    // References an existing subscription
+    // Check if subscription exists
     const pubsubTopicName = options.config.pubsubTopicName;
     const subscriptionName = options.config.pubsubSubscriptionName;
     const exists = await pubsubManager.checkIfSubscriptionExists(pubsubTopicName, subscriptionName).catch(err => {
@@ -120,18 +121,38 @@ async function pullFulfillmentSubscriptionRequest(options) {
     if (exists !== true) {
         return { ...exists };
     }
-    const subscription = pubsubManager.getSubscription(subscriptionName);
-    var messageData;
-    let pubsubMessage = {};
-    // async
-    subscription.on('message', pubsubMessage => {
-        console.log(pubsubMessage.attributes);
-        //messageData = pubsubMessage.data;
-        pubsubMessage.ack();
-        return { data: pubsubMessage.attributes };
-    })
-    var message = `Fulfillment messages doe not exist`;
-    return { success: false, code:400, errors: [message] };
+
+    // Process one message after ack
+    const pubsubMessage = await pubsubManager.getMessage(subscriptionName).catch(err => {
+        console.warn(err);
+        return { success: false, errors: [err.message] };
+    });
+    if (pubsubMessage.success === false) {
+        return { ...pubsubMessage };
+    }
+
+    // validate pubsub message data against fulfillment message schema
+    let result = fulfillmentMessageSchema.validate(pubsubMessage.data);
+    if (result.error) {
+        message = `Incorrect Spot fulfillment message schema`;
+        console.warn(message);
+        return { success: false, code: 400, errors: [message] };
+    }
+    //const messageId = pubsubMessage.message.messageId;
+    const requestId = pubsubMessage.message.attributes.requestId;
+    const jsonString = Buffer.from(pubsubMessage.message.data).toString('utf8');
+    options = {...options, ...JSON.parse(jsonString)};
+
+    const query = querystring.encode({
+        bucketName: options.destination.bucketName,
+        fileName: options.destination.fileName
+    });
+
+    const data = await createFulfillment(requestId, options).catch(err => {
+        console.warn(err);
+        return { requestId: requestId, success: false, errors: [err.message] };
+    });
+    return { requestId: requestId, query: query, ...data }
 }
 
 /**
@@ -183,7 +204,7 @@ async function createFulfillment(requestId, options) {
     if (fileCreate.success === false) {
         return fileCreate;
     }
-    return { signedUrl: fileCreate.url };
+    return { requestId: requestId, signedUrl: fileCreate.url };
 }
 
 module.exports = {

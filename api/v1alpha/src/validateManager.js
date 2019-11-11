@@ -49,6 +49,25 @@ const fulfillmentParameterSchema = Joi.object({
 });
 
 /************************************************************
+  fulfillmentMessageSchema defines the GCP Pubsub publisher
+  and subscriber payload schema.
+  'requestId' must be included as a custom attribute in the
+  pubsub message.
+  More details here: https://cloud.google.com/pubsub/docs/push
+ ************************************************************/
+const fulfillmentMessageSchema = Joi.object({
+    message: Joi.object().required()
+        .keys({
+            attributes: Joi.object().required()
+                .keys({
+                    requestId: Joi.string().required()
+                }),
+            data: Joi.string().base64({ urlSafe: true }).required(),
+            messageId: Joi.string().required(),
+        })
+});
+
+/************************************************************
   fulfillmentWebhookSchema defines the GCP Pubsub subscriber
   webhook payload schema. 'requestId' must be included as a
   custom attribute in the pubsub message.
@@ -411,3 +430,4 @@ module.exports = {
     getDynamicQueryOptions
 };
 module.exports.FULFILLMENT_CONFIG = FULFILLMENT_CONFIG;
+module.exports.fulfillmentMessageSchema = fulfillmentMessageSchema;

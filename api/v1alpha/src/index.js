@@ -577,6 +577,7 @@ router.post('/fulfillmentWorker', async(req, res) => {
     console.log(`Options: ${JSON.stringify(options)}`);
     const data = await dataManager.pullFulfillmentSubscriptionRequest(options);
     //const data = await dataManager.createFulfillment(options);
+    //console.log(data);
     if (data && data.success === false) {
         var code = (data.code === undefined ) ? 500 : data.code;
         res.status(code).json({

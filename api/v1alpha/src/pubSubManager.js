@@ -18,6 +18,8 @@
 
 const { PubSub } = require('@google-cloud/pubsub');
 const pubsub = new PubSub();
+const pubsubClient = require('@google-cloud/pubsub');
+const client = new pubsubClient.v1.SubscriberClient();
 
 /**
  * @param  {} topicName
@@ -32,7 +34,7 @@ async function checkIfSubscriptionExists(topicName, subscriptionName) {
         throw err;
     });
     if (exists[0] === false) {
-        return { success: false, code: 400, errors: ['Subscription [' + subscriptionName + '] does not exist'] };
+        return { success: false, code: 404, errors: ['Pubsub subscription [' + subscriptionName + '] not found'] };
     }
     return true;
 }
@@ -43,6 +45,41 @@ async function checkIfSubscriptionExists(topicName, subscriptionName) {
  */
 function getSubscription(subscriptionName) {
     return pubsub.subscription(subscriptionName);
+}
+
+/**
+ * @param  {} subscriptionName
+ * get a message syncronously
+ */
+async function getMessage(subscriptionName) {
+    // The maximum number of messages returned for this request.
+    const maxMessages = 1;
+    const request = {
+        subscription: subscriptionName,
+        maxMessages: maxMessages,
+        returnImmediately: true
+    };
+
+    // The subscriber pulls a specified number of messages.
+    const [response] = await client.pull(request).catch(err => {
+        console.warn(err.message);
+        throw err;
+    });
+    if (response.receivedMessages.length === 0) {
+        return { success: false, code: 404, errors: ['Pubsub messages not found'] };
+    }
+    // Obtain the first message.
+    const message = response.receivedMessages[0];
+
+    const ackRequest = {
+        subscription: subscriptionName,
+        ackIds: [message.ackId],
+    };
+    //..acknowledges the message.
+    const ack = await client.acknowledge(ackRequest);
+    console.log(`Message ${message.message.messageId} acknowledged via ack ${ack}`);
+    // Return the message contents.
+    return message;
 }
 
 /**
@@ -57,7 +94,7 @@ async function publishMessage(topicName, message, customAttributes) {
         throw err;
     });
     if (messageId[0] === false) {
-        return { success: false, errors: ['Publish PubSub message to [' + topic + '] failed'] };
+        return { success: false, errors: ['Publish PubSub message to [' + topicName + '] failed'] };
     }
     console.log(`Message ${messageId} published.`);
     return messageId;
@@ -66,5 +103,6 @@ async function publishMessage(topicName, message, customAttributes) {
 module.exports = {
     checkIfSubscriptionExists,
     getSubscription,
+    getMessage,
     publishMessage
 };
