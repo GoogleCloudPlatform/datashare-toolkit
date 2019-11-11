@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bqds-spot-fulfillment-api
+  labels:
+    app: bqds-spot-fulfillment-api
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5555
+      name: http
+  selector:
+    app: bqds-spot-fulfillment-api
+    version: v1

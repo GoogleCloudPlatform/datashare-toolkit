@@ -1,0 +1,29 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: bqds-spot-fulfillment-api
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bqds-spot-fulfillment-api
+        version: v1
+    spec:
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: bqds-spot-fulfillment-api-creds
+      containers:
+        - name: bqds-spot-fulfillment-api
+          image: gcr.io/chrispage-dev/bqds-spot-fulfillment-api
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5555
+          volumeMounts:
+          - name: google-cloud-key
+            mountPath: /var/secrets/google
+          env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /var/secrets/google/key.json

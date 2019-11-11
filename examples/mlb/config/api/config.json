@@ -1,0 +1,61 @@
+{
+    "entities": [
+        {
+            "projectId": "chrispage-dev",
+            "datasetId": "mlb",
+            "tableId": "game_logs",
+            "parameters": [
+                {
+                    "name": "visitorTeamName",
+                    "column": "v_name",
+                    "description": "Visitor team name"
+                },
+                {
+                    "name": "homeTeamName",
+                    "column": "h_name",
+                    "description": "Home team name"
+                },
+                {
+                    "name": "teamName",
+                    "custom": "select distinct v_name as value from `${projectId}.${datasetId}.${tableId}` union all select distinct h_name from `${projectId}.${datasetId}.${tableId}`",
+                    "description": "Team name"
+                },
+                {
+                    "name": "gameDate",
+                    "column": "game_date",
+                    "description": "Date of game"
+                }
+            ],
+            "availableRequests": [
+                {
+                    "name": "Query by home team name",
+                    "dataId": "query-by-home-team",
+                    "query": "select * from `${projectId}.${datasetId}.${tableId}` where h_name = @homeTeamName",
+                    "includeAllColumns": true
+                },
+                {
+                    "name": "Query by visitor team name",
+                    "dataId": "query-by-visitor-team",
+                    "query": "select * from `${projectId}.${datasetId}.${tableId}` where v_name = @visitorTeamName",
+                    "includeAllColumns": true
+                },
+                {
+                    "name": "Query by home or visitor team name",
+                    "dataId": "query-by-home-or-visitor-team",
+                    "query": "select * from `${projectId}.${datasetId}.${tableId}` where h_name = @teamName or v_name = @teamName",
+                    "availableColumns": [
+                        "h_name",
+                        "v_name",
+                        "game_date"
+                    ]
+                },
+                {
+                    "name": "Query by game date",
+                    "dataId": "query-by-game-date",
+                    "filter": "game_date = @gameDate",
+                    "includeAllColumns": true
+                }
+            ]
+        }
+    ]
+}

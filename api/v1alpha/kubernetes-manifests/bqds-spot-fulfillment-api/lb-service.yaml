@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bqds-spot-fulfillment-api-lb
+  labels:
+    app: bqds-spot-fulfillment-api
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 5555
+      name: http
+      targetPort: 5555
+  selector:
+    app: bqds-spot-fulfillment-api
+    version: v1
