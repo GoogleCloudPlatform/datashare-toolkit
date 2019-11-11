@@ -135,7 +135,6 @@ async function objectExists(projectId, datasetId, tableId, tableType) {
         if (runtimeConfiguration.VERBOSE_MODE) {
             console.log(`objectExists threw an error: ${error}`);
         }
-        console.log(`objectExists threw an error: ${error}`);
     }
     return false;
 }
