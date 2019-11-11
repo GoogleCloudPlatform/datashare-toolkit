@@ -2,7 +2,7 @@ steps:
 - name: 'gcr.io/cloud-builders/npm'
   dir: 'entitlements/bqdsEntitlements'
   entrypoint: 'npm'
-  args: ['run', 'install']
+  args: ['install']
 - name: 'gcr.io/cloud-builders/npm'
   dir: 'entitlements/bqdsEntitlements'
   entrypoint: 'npm'
