@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-/* eslint-disable promise/always-return */
-/* eslint-disable promise/catch-or-return */
+var argv = require('minimist')(process.argv.slice(2));
+process.env.UNIT_TESTS = true;
 
-const { argv } = require('./testSetup');
+console.log(`Command arguments: ${JSON.stringify(argv)}`);
 
-const chai = require('chai'), expect = chai.expect, should = chai.should();
-const chaiAsPromised = require('chai-as-promised');
-chai.use(chaiAsPromised);
+if (argv.runCloudTests && !argv.projectId) {
+    console.log("projectId must be provided when runCloudTests is enabled");
+    process.exit(1);
+}
 
-const sqlBuilder = require('../sqlBuilder');
+const uuidv4 = require('uuid/v4');
 
-it("should be prepended with 1 tab per line", async () => {
-    const testStr = "test1\ntest2\ntest3";
-    return expect(sqlBuilder.prependLines(testStr, "\t", 1)).to.eventually.equal("\ttest1\n\ttest2\n\ttest3");
-});
+module.exports = {
+    argv,
+    uuidv4
+};

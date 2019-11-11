@@ -73,7 +73,9 @@ async function validateQuery(sql, limit) {
         const [rows] = await executeQuery(options);
         return true;
     } catch (error) {
-        console.log("ERROR: %s - Query: '%s' is invalid", error, _sql);
+        if (runtimeConfiguration.VERBOSE_MODE) {
+            console.log("ERROR: %s - Query: '%s' is invalid", error, _sql);
+        }
         return false;
     }
 }
@@ -294,6 +296,7 @@ async function createTable(datasetId, tableId, schema) {
         .createTable(tableId, options);
 
     console.log(`Table ${table.id} created.`);
+    return true;
 }
 
 /**

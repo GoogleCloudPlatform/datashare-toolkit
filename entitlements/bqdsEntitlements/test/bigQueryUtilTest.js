@@ -17,13 +17,7 @@
 /* eslint-disable promise/always-return */
 /* eslint-disable promise/catch-or-return */
 
-process.env.UNIT_TESTS = true;
-const argv = require('minimist')(process.argv.slice(2));
-
-if (argv.runCloudTests && !argv.projectId) {
-    console.log("projectId must be provided when runCloudTests is enabled");
-    process.exit(1);
-}
+const { argv, uuidv4 } = require('./testSetup');
 
 const assert = require('assert');
 const chai = require('chai'), expect = chai.expect, should = chai.should();
@@ -59,5 +53,59 @@ if (argv.runCloudTests) {
     it("query should be invalid with limit", async () => {
         const query = "Xselect 1 limit 10";
         return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.false;
+    });
+
+    const uuid = uuidv4().replace(/-/g, "_");
+    const viewName = `v_${uuid}`;
+
+    it("create dataset, table, check for existence, and delete", async () => {
+        bigqueryUtil.createDataset(uuid).then((result => {
+            expect(result, "created dataset").is.true;
+        })).then(() => {
+            return bigqueryUtil.datasetExists(uuid);
+        }).then((result) => {
+            expect(result).is.true;
+        }).then(() => {
+            const schema = [{
+                "name": "column1",
+                "type": "STRING",
+                "mode": "REQUIRED"
+            },
+            {
+                "name": "column2",
+                "type": "STRING",
+                "mode": "REQUIRED"
+            }];
+            return bigqueryUtil.createTable(uuid, uuid, schema);
+        }).then((result) => {
+            expect(result).is.true;
+        }).then(() => {
+            return bigqueryUtil.tableColumns(uuid, uuid);
+        }).then((columns) => {
+            expect(columns).length.is(2);
+            expect(columns[0]).is.equal("column1");
+            expect(columns[1]).is.equal("column2");
+        }).then(() => {
+            const query = `select * from \`${argv.projectId}.${uuid}.${uuid}\``;
+            return bigqueryUtil.createView(argv.projectId, uuid, viewName, query);
+        }).then((result) => {
+            return bigqueryUtil.viewExists(argv.projectId, uuid, viewName);
+        }).then((result) => {
+            expect(result).is.true;
+        }).then(() => {
+            return bigqueryUtil.deleteTable(uuid, viewName);
+        }).then((result) => {
+            expect(result).is.true;
+        }).then(() => {
+            return bigqueryUtil.deleteTable(uuid, uuid);
+        }).then((result) => {
+            expect(result).is.true;
+        }).then(() => {
+            return bigqueryUtil.deleteDataset(uuid);
+        }).then((result) => {
+            expect(result).is.true;
+        }).catch((reason) => {
+            expect.fail(`Failed: ${reason}`);
+        });
     });
 }

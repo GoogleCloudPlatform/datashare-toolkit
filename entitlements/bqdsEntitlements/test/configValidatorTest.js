@@ -17,15 +17,7 @@
 /* eslint-disable promise/always-return */
 /* eslint-disable promise/catch-or-return */
 
-var argv = require('minimist')(process.argv.slice(2));
-process.env.UNIT_TESTS = true;
-
-console.log(`Command arguments: ${JSON.stringify(argv)}`);
-
-if (argv.runCloudTests && !argv.projectId) {
-    console.log("projectId must be provided when runCloudTests is enabled");
-    process.exit(1);
-}
+const { argv } = require('./testSetup');
 
 const assert = require('assert');
 const chai = require('chai'), expect = chai.expect, should = chai.should();
