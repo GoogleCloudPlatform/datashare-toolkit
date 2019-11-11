@@ -35,6 +35,38 @@ it("should return false for invalid json string", () => {
     expect(configValidator.isJsonString('"isValid": true')).is.false;
 });
 
+it("should return true for valid yaml string", () => {
+    expect(configValidator.isYamlString(`---
+    name: mlb_simple
+    projectId: sferrazza-cloud-sandbox
+    accessControl:
+      datasetId: access_control
+      viewId: groupEntities
+    groups:
+    - name: newyork_users
+      access:
+      - userByEmail: benjentargaryen.327201@gmail.com
+    - name: chicago_users
+      access:
+      - userByEmail: melisandresnow.388027@gmail.com`)).is.true;
+});
+
+it("should return false for invalid yaml string", () => {
+    expect(configValidator.isYamlString(`---
+    name mlb_simple
+    projectId: sferrazza-cloud-sandbox
+    accessControl:
+      datasetId: access_control
+      viewId: groupEntities
+    groups:
+    - name: newyork_users
+      access:
+      - userByEmail: benjentargaryen.327201@gmail.com
+    - name: chicago_users
+      access:
+      - userByEmail: melisandresnow.388027@gmail.com`)).is.false;
+});
+
 if (argv.runCloudTests) {
     bigqueryUtil.init(argv.projectId);
 
