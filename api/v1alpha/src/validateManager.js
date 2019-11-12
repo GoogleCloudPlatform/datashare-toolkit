@@ -353,6 +353,17 @@ function fulfillmentWebhookParams(req, res, next) {
 
 /**
  * @param  {} options
+ * Parses base64 payload from GCP Pubsub message
+ */
+function fulfillmentWebhookPayload(options) {
+    const requestId = options.message.attributes.requestId;
+    const jsonString = Buffer.from(options.message.data, 'base64').toString('utf8');
+    options = {...options, ...JSON.parse(jsonString)};
+    return { requestId: requestId, options: options }
+}
+
+/**
+ * @param  {} options
  * Returns a list of available requests and the corresponding parameters.
  * TODO: Refactor.
  */
@@ -428,6 +439,7 @@ module.exports = {
     urlPathParams,
     fulfillmentParams,
     fulfillmentWebhookParams,
+    fulfillmentWebhookPayload,
     fulfillmentConfig,
     getAvailableRequests,
     getDynamicQueryOptions

@@ -147,41 +147,44 @@ app.use('/' + apiVersion, router);
  *
  *   SpotFulfillmentRequestDestination:
  *     type: object
+ *     description: Spot fulfillment request destination
  *     properties:
- *       projectId:
+ *       bucketName:
+ *         type: string
+ *         required: true
+ *         description: Spot fulfillment destination storage bucket name
+ *       fileName:
  *         type: string
  *         required: false
- *         description: Spot fulfillment destination Project Id
- *       datasetId:
- *         type: string
- *         required: false
- *         description: Spot fulfillment destination Dataset Id
+ *         description: Spot fulfillment destination storage file name
  *
  *   SpotFulfillmentRequestSchema:
  *     type: object
+ *     description: Spot fulfillment request schema
  *     properties:
  *       dataId:
  *         type: string
  *         required: true
  *       parameters:
- *         $ref: '#/definitions/SpotFulfillmentQueryParameter'
+ *         type: object
+ *         required: false
  *       destination:
  *         $ref: '#/definitions/SpotFulfillmentRequestDestination'
  *
  *   SpotFulfillmentRequestResponseSchema:
  *     type: object
+ *     description: Spot fulfillment request response
  *     properties:
  *       requestId:
  *         type: string
  *         required: true
- *       queryId:
+ *       query:
  *         type: string
  *         required: true
- *       signedUrl:
- *         type: string
  *
  *   SpotFulfillmentRequestStatusResponseSchema:
  *     type: string
+ *     description: Spot fulfillment request status response
  *     properties:
  *       requestId:
  *         type: string
@@ -190,9 +193,9 @@ app.use('/' + apiVersion, router);
  *         type: string
  *         required: true
  *
- *   SpotFulfillmentWebhookRequestSchema:
+ *   SpotFulfillmentSubscriberRequestSchema:
  *     type: object
- *     description: Note that the message.data field is base64-encoded.
+ *     description: Spot fulfillment subscriber webhook request schema (Note that the message.data field is base64-encoded.)
  *     properties:
  *       message:
  *         type: object
@@ -215,17 +218,19 @@ app.use('/' + apiVersion, router);
  *         type: string
  *         required: true
  *
- *   SpotFulfillmentWebhoookResponseSchema:
+ *   SpotFulfillmentWorkerResponseSchema:
  *     type: object
+ *     description: Spot fulfillment worker response schema
  *     properties:
  *       requestId:
  *         type: string
  *         required: true
- *       queryId:
+ *       query:
  *         type: string
  *         required: true
  *       signedUrl:
  *         type: string
+ *         required: true
  *
  */
 
@@ -384,10 +389,7 @@ router.get('/fulfillmentOptions', validateManager.fulfillmentConfig, async(req, 
  *                   type: integer
  *                   description: HTTP status code
  *                 data:
- *                   type: array
- *                   description: list of Spot fulfillment query parameters
- *                   items:
- *                     $ref: '#/definitions/SpotFulfillmentRequestResponseSchema'
+ *                   $ref: '#/definitions/SpotFulfillmentRequestResponseSchema'
  */
 router.post('/fulfillmentRequests', validateManager.fulfillmentParams, async(req, res) => {
     const options = {
@@ -406,7 +408,7 @@ router.post('/fulfillmentRequests', validateManager.fulfillmentParams, async(req
         res.status(201).json({
             success: true,
             code: 201,
-            data: data
+            ... data
         });
     }
 });
@@ -439,7 +441,7 @@ router.post('/fulfillmentRequests', validateManager.fulfillmentParams, async(req
  *       description: File Name from the Spot Fulfillment Request Id
  *     responses:
  *       200:
- *         description: Spot fulfillment Request Status Response
+ *         description: Spot fulfillment Request Status 200 Response
  *         content:
  *           application/json:
  *             schema:
@@ -450,12 +452,33 @@ router.post('/fulfillmentRequests', validateManager.fulfillmentParams, async(req
  *                   description: Success of the request
  *                 code:
  *                   type: integer
+ *                   default: 200
  *                   description: HTTP status code
  *                 data:
  *                   type: object
- *                   description: Spot fulfillment Request Status Response
+ *       400:
+ *         description: Spot fulfillment Request Status 400 Response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   default: false
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   default: 400
+ *                   description: HTTP status code
+ *                 data:
  *                   items:
- *                     $ref: '#/definitions/SpotFulfillmentResponseStatusResponseSchema'
+ *                     $ref: '#/definitions/SpotFulfillmentRequestResponseSchema'
+ *                 errors:
+ *                   type: array
+ *                   description: list of Spot fulfillment errors
+ *                   items:
+ *                     type: string
  */
 router.get('/fulfillmentRequests/:requestId', async(req, res) => {
     const requestId = req.params.requestId;
@@ -481,7 +504,7 @@ router.get('/fulfillmentRequests/:requestId', async(req, res) => {
         res.status(200).json({
             success: true,
             code: 200,
-            data: data
+            ... data
         });
     }
 });
@@ -491,17 +514,17 @@ router.get('/fulfillmentRequests/:requestId', async(req, res) => {
  *
  * /fulfillmentSubscriber:
  *   post:
- *     summary: Spot fulfillment webhook request endpoint
- *     description: Spot fulfillment webhook request endpoint receives Spot fulfillment request message from GCP PubSub, acknowledges that request, and completes the appropriate execution tasks from the fulfillment request.
+ *     summary: Spot fulfillment subscriber webhook request endpoint
+ *     description: Spot fulfillment subscriber webhook request endpoint receives Spot fulfillment request message from GCP PubSub, acknowledges that request, and completes the appropriate execution tasks asynchronously for the fulfillment request.
  *     requestBody:
- *       description: Request parameters for Spot Fulfillment Webhook
+ *       description: Request parameters for Spot Fulfillment subscriber webhook
  *       content:
  *        application/json:
  *          schema:
- *            $ref: '#/definitions/SpotFulfillmentWebhookRequestSchema'
+ *            $ref: '#/definitions/SpotFulfillmentSubscriberRequestSchema'
  *     responses:
  *       202:
- *         description: Spot fulfillment Webhook response
+ *         description: Spot fulfillment subscriber webhook 202 response
  *         content:
  *           application/json:
  *             schema:
@@ -514,10 +537,31 @@ router.get('/fulfillmentRequests/:requestId', async(req, res) => {
  *                   type: integer
  *                   description: HTTP status code
  *                 data:
+ *                   type: object
+ *                   properties:
+ *                     requestId:
+ *                       type: string
+ *                       required: true
+ *       400:
+ *         description: Spot fulfillment subscriber webhook 400 response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   default: false
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   default: 400
+ *                   description: HTTP status code
+ *                 errors:
  *                   type: array
- *                   description: list of Spot fulfillment query parameters
+ *                   description: list of Spot fulfillment errors
  *                   items:
- *                     $ref: '#/definitions/SpotFulfillmentWebhookResponseSchema'
+ *                     type: string
  */
 router.post('/fulfillmentSubscriber', validateManager.fulfillmentWebhookParams, async(req, res) => {
     const options = {
@@ -525,19 +569,23 @@ router.post('/fulfillmentSubscriber', validateManager.fulfillmentWebhookParams, 
         ... req.body
     };
     console.log(`Options: ${JSON.stringify(options)}`);
-    const data = await dataManager.processFulfillmentSubscriptionRequest(options);
-    if (data && data.success === false) {
-        var code = (data.code === undefined ) ? 500 : data.code;
-        res.status(code).json({
-            code: code,
-            ... data
+    try {
+        const data = validateManager.fulfillmentWebhookPayload(options)
+        dataManager.processFulfillmentSubscriptionRequest(data.options).catch (err => {
+            console.warn(`processFulfillmentSubscriptionRequest error: ${err.message}`);
         });
-    } else {
-        res.status(201).json({
+        res.status(202).json({
             success: true,
-            code: 201,
-            data: data
+            code: 202,
+            data: { requestId: data.requestId }
         });
+    } catch (err) {
+        console.warn(`fulfillmentSubscriber error: ${err.message}`);
+        res.status(500).json({
+            success: true,
+            code: 500,
+            errors: [err.message]
+        })
     }
 });
 
@@ -550,7 +598,7 @@ router.post('/fulfillmentSubscriber', validateManager.fulfillmentWebhookParams, 
  *     description: Spot fulfillment worker request endpoint pulls a fulfillment request message from GCP PubSub, acknowledges that request, and completes the execution tasks from the fulfillment request.
  *     responses:
  *       201:
- *         description: Spot fulfillment worker response
+ *         description: Spot fulfillment worker 201 response
  *         content:
  *           application/json:
  *             schema:
@@ -563,10 +611,33 @@ router.post('/fulfillmentSubscriber', validateManager.fulfillmentWebhookParams, 
  *                   type: integer
  *                   description: HTTP status code
  *                 data:
- *                   type: array
+ *                   type: object
  *                   description: list of Spot fulfillment query parameters
  *                   items:
  *                     $ref: '#/definitions/SpotFulfillmentRequestResponseSchema'
+ *       400:
+ *         description: Spot fulfillment worker 400 response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   default: false
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   default: 400
+ *                   description: HTTP status code
+ *                 data:
+ *                   items:
+ *                     $ref: '#/definitions/SpotFulfillmentRequestResponseSchema'
+ *                 errors:
+ *                   type: array
+ *                   description: list of Spot fulfillment errors
+ *                   items:
+ *                     type: string
  */
 router.post('/fulfillmentWorker', async(req, res) => {
     const options = {
@@ -586,7 +657,7 @@ router.post('/fulfillmentWorker', async(req, res) => {
         res.status(201).json({
             success: true,
             code: 201,
-            data: data
+            ... data
         });
     }
 });
@@ -703,6 +774,7 @@ router.get(routes, function(req, res) {
  *               properties:
  *                 success:
  *                   type: boolean
+ *                   default: true
  *                   description: Success of the request
  *                 code:
  *                   type: integer

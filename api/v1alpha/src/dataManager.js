@@ -53,9 +53,9 @@ async function createFulfillmentRequest(options) {
     if (options.wait === true) {
         const data = await createFulfillment(requestId, options).catch(err => {
             console.warn(err);
-            return { requestId: requestId, success: false, errors: [err.message] };
+            return { data: { requestId: requestId }, success: false, errors: [err.message] };
         });
-        return { requestId: requestId, query: query, ...data }
+        return { data: { requestId: requestId, query: query, ...data } }
     }
 
     // create the fulfillment pubsub message
@@ -65,10 +65,10 @@ async function createFulfillmentRequest(options) {
     const pubsubTopicName = options.config.pubsubTopicName;
     await pubsubManager.publishMessage(pubsubTopicName, options, customAttributes).catch(err => {
         console.warn(err);
-        return { requestId: requestId, success: false, errors: [err.message] };
+        return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
     //console.log(pubsubMessage);
-    return { requestId: requestId, query: query };
+    return { data: { requestId: requestId, query: query } };
 }
 
 /**
@@ -81,27 +81,27 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
 
     const exists = await storageManager.checkIfFileExists(bucketName, fileName).catch(err => {
         console.warn(err);
-        return { requestId: requestId, success: false, errors: [err.message] };
+        return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
     if (exists !== true) {
-        return { requestId: requestId, ...exists };
+        return { data: { requestId: requestId }, ...exists };
     }
 
     const metadata = await storageManager.getFileMetadata(bucketName, fileName).catch(err => {
         console.warn(err);
-        return { requestId: requestId, success: false, errors: [err.message] };
+        return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
     if (metadata.metadata.requestId === undefined || metadata.metadata.requestId !== requestId) {
         console.log(metadata.metadata);
         message = `fileName: '${fileName}' does not have the signature for requestId: '${requestId}'`;
-        return { requestId: requestId, success: false, errors: [message] };
+        return { data: { requestId: requestId }, success: false, errors: [message] };
     }
 
     const signedUrl = await storageManager.getUrl(bucketName, fileName, true).catch(err => {
         console.warn(err);
-        return { requestId: requestId, success: false, errors: [err.message] };
+        return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
-    return { requestId: requestId, signedUrl: signedUrl[0] };
+    return { data: { requestId: requestId }, signedUrl: signedUrl[0] };
 }
 
 /**
@@ -112,19 +112,15 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
  */
 async function processFulfillmentSubscriptionRequest(options) {
     const requestId = options.message.attributes.requestId;
-    const jsonString = Buffer.from(options.message.data, 'base64').toString('utf8');
-    options = {...options, ...JSON.parse(jsonString)};
-
     const query = querystring.encode({
         bucketName: options.destination.bucketName,
         fileName: options.destination.fileName
     });
-
     const data = await createFulfillment(requestId, options).catch(err => {
         console.warn(err);
-        return { requestId: requestId, success: false, errors: [err.message] };
+        return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
-    return { requestId: requestId, query: query, ...data }
+    return { data: { requestId: requestId, query: query, ...data } }
 }
 
 /**
@@ -156,7 +152,7 @@ async function pullFulfillmentSubscriptionRequest(options) {
     }
 
     // validate pubsub message data against fulfillment message schema
-    let result = fulfillmentMessageSchema.validate(pubsubMessage.data);
+    const result = fulfillmentMessageSchema.validate(pubsubMessage.data);
     if (result.error) {
         message = `Incorrect Spot fulfillment message schema`;
         console.warn(message);
@@ -174,9 +170,9 @@ async function pullFulfillmentSubscriptionRequest(options) {
 
     const data = await createFulfillment(requestId, options).catch(err => {
         console.warn(err);
-        return { requestId: requestId, success: false, errors: [err.message] };
+        return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
-    return { requestId: requestId, query: query, ...data }
+    return { data: { requestId: requestId, query: query, ...data } }
 }
 
 /**
@@ -223,12 +219,12 @@ async function createFulfillment(requestId, options) {
     }
     const fileCreate = await storageManager.createFile(bucketName, fileName, buf, fileOptions).catch(err => {
         console.warn(err);
-        return { success: false, errors: [err.message] };
+        return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
     if (fileCreate.success === false) {
         return fileCreate;
     }
-    return { requestId: requestId, signedUrl: fileCreate.url };
+    return { data: { requestId: requestId, signedUrl: fileCreate.url } };
 }
 
 module.exports = {
