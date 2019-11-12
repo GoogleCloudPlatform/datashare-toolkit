@@ -55,7 +55,7 @@ async function createFulfillmentRequest(options) {
             console.warn(err);
             return { data: { requestId: requestId }, success: false, errors: [err.message] };
         });
-        return { data: { requestId: requestId, query: query, ...data } }
+        return { requestId: requestId, query: query, ...data }
     }
 
     // create the fulfillment pubsub message
@@ -68,7 +68,7 @@ async function createFulfillmentRequest(options) {
         return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
     //console.log(pubsubMessage);
-    return { data: { requestId: requestId, query: query } };
+    return { requestId: requestId, query: query };
 }
 
 /**
@@ -101,7 +101,7 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
         console.warn(err);
         return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
-    return { data: { requestId: requestId , signedUrl: signedUrl[0] } };
+    return { requestId: requestId , signedUrl: signedUrl[0] };
 }
 
 /**
@@ -120,7 +120,7 @@ async function processFulfillmentSubscriptionRequest(options) {
         console.warn(err);
         return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
-    return { data: { requestId: requestId, query: query, ...data } }
+    return { requestId: requestId, query: query, ...data }
 }
 
 /**
@@ -172,7 +172,7 @@ async function pullFulfillmentSubscriptionRequest(options) {
         console.warn(err);
         return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
-    return { data: { requestId: requestId, query: query, ...data } }
+    return { requestId: requestId, query: query, ...data }
 }
 
 /**
@@ -224,7 +224,7 @@ async function createFulfillment(requestId, options) {
     if (fileCreate.success === false) {
         return fileCreate;
     }
-    return { data: { requestId: requestId, signedUrl: fileCreate.url } };
+    return { requestId: requestId, signedUrl: fileCreate.url };
 }
 
 module.exports = {

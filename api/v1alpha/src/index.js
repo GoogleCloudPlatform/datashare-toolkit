@@ -345,19 +345,27 @@ router.get('/fulfillmentOptions', validateManager.fulfillmentConfig, async(req, 
         includeAvailableValues: req.query.includeAvailableValues ? req.query.includeAvailableValues === "true" : false,
         config: FULFILLMENT_CONFIG
     };
-    const data = await validateManager.getAvailableRequests(options);
-    if (data && data.success === false) {
-        var code = (data.code === undefined ) ? 500 : data.code;
-        res.status(code).json({
-            code: code,
-            ... data
-        });
-    } else {
-        res.status(200).json({
-            success: true,
-            code: 200,
-            data: data
-        });
+    try {
+        const data = await validateManager.getAvailableRequests(options)
+        if (data && data.success === false) {
+            var code = (data.code === undefined ) ? 500 : data.code;
+            res.status(code).json({
+                code: code,
+                ... data
+            });
+        } else {
+            res.status(200).json({
+                success: true,
+                code: 200,
+                data: data
+            });
+        };
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            code: 500,
+            errors: [err.message]
+        })
     }
 });
 
@@ -408,7 +416,7 @@ router.post('/fulfillmentRequests', validateManager.fulfillmentParams, async(req
         res.status(201).json({
             success: true,
             code: 201,
-            ... data
+            data: data
         });
     }
 });
@@ -504,7 +512,7 @@ router.get('/fulfillmentRequests/:requestId', async(req, res) => {
         res.status(200).json({
             success: true,
             code: 200,
-            ... data
+            data: data
         });
     }
 });
@@ -580,9 +588,8 @@ router.post('/fulfillmentSubscriber', validateManager.fulfillmentWebhookParams, 
             data: { requestId: data.requestId }
         });
     } catch (err) {
-        console.warn(`fulfillmentSubscriber error: ${err.message}`);
         res.status(500).json({
-            success: true,
+            success: false,
             code: 500,
             errors: [err.message]
         })
@@ -657,7 +664,7 @@ router.post('/fulfillmentWorker', async(req, res) => {
         res.status(201).json({
             success: true,
             code: 201,
-            ... data
+            data: data
         });
     }
 });

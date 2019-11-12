@@ -110,6 +110,9 @@ async function getAvailableRequests(options, includeQuery) {
     }
     json = JSON.parse(stripJsonComments(file.content));
 
+    if (json.entities === undefined) {
+        return { success: false, errors: ['File [' + configFileName + '] schema is not correct'] };
+    }
     let requests = [];
     for (const e of json.entities) {
         let fqTable = `${e.projectId}.${e.datasetId}.${e.tableId}`;

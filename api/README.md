@@ -123,7 +123,7 @@ These are the GCP project APIs that require the BQDS Spot fulfillment API access
 ```
 bigquery-json.googleapis.com
 iam.googleapis.com
-cloudtasks.googleapis.com
+pubsub.googleapis.com
 ```
 
 ### Service Account
@@ -266,6 +266,13 @@ Set your **PULL\_SUBSCRIPTION\_NAME** if you have not already:
 Create the Subscription:
 
     gcloud beta pubsub subscriptions create ${PULL_SUBSCRIPTION_NAME} --topic ${TOPIC_ID}
+
+    gcloud beta pubsub subscriptions add-iam-policy-binding ${PULL_SUBSCRIPTION_NAME} --member=serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --role='roles/pubsub.subscriber'
+
+List the subscriptions for the topic:
+
+    gcloud beta pubsub topics list-subscriptions ${TOPIC_ID}
+
 
 ### Examples
 
