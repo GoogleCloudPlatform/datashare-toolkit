@@ -82,6 +82,9 @@ const fulfillmentWebhookSchema = Joi.object({
                 }),
             data: Joi.string().base64({ urlSafe: true }).required(),
             messageId: Joi.string().required(),
+            message_id: Joi.string(),
+            publishTime: Joi.string().required(),
+            publish_time: Joi.string(),
         }),
     subscription: Joi.string().required()
 });
@@ -307,7 +310,7 @@ function fulfillmentParams(req, res, next) {
         console.warn(message);
         errors.push(result.error.details);
     }
-    if (errors.lengh > 0 ){
+    if (errors.length > 0 ){
         return res.status(400).json({
             success: false,
             errors: errors,
@@ -338,7 +341,7 @@ function fulfillmentWebhookParams(req, res, next) {
         console.warn(message);
         errors.push(result.error.details);
     }
-    if (errors.lengh > 0 ){
+    if (errors.length > 0 ){
         return res.status(400).json({
             success: false,
             errors: errors,

@@ -105,8 +105,32 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
 }
 
 /**
+ * @param  {} options
+ * Receives message payload from GCP Pubsub subscription and processes
+ * fulfillment request. logic assumes that message payload schema has
+ * already been validated.
+ */
+async function processFulfillmentSubscriptionRequest(options) {
+    const requestId = options.message.attributes.requestId;
+    const jsonString = Buffer.from(options.message.data, 'base64').toString('utf8');
+    options = {...options, ...JSON.parse(jsonString)};
+
+    const query = querystring.encode({
+        bucketName: options.destination.bucketName,
+        fileName: options.destination.fileName
+    });
+
+    const data = await createFulfillment(requestId, options).catch(err => {
+        console.warn(err);
+        return { requestId: requestId, success: false, errors: [err.message] };
+    });
+    return { requestId: requestId, query: query, ...data }
+}
+
+/**
  * @param  {}
- * Pulls message from GCP Pubsub subscription and processes fulfillment request
+ * Pulls message from GCP Pubsub subscription and processes
+ * fulfillment request.
  */
 async function pullFulfillmentSubscriptionRequest(options) {
     var message;
@@ -210,6 +234,7 @@ async function createFulfillment(requestId, options) {
 module.exports = {
     createFulfillmentRequest,
     getFulfillmentRequest,
+    processFulfillmentSubscriptionRequest,
     pullFulfillmentSubscriptionRequest,
     createFulfillment
 };

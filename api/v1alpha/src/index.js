@@ -525,9 +525,7 @@ router.post('/fulfillmentSubscriber', validateManager.fulfillmentWebhookParams, 
         ... req.body
     };
     console.log(`Options: ${JSON.stringify(options)}`);
-    //const data = await dataManager.processFulfillmentSubscription(options);
-    //const data = await dataManager.createFulfillment(options);
-    var data = {}
+    const data = await dataManager.processFulfillmentSubscriptionRequest(options);
     if (data && data.success === false) {
         var code = (data.code === undefined ) ? 500 : data.code;
         res.status(code).json({
