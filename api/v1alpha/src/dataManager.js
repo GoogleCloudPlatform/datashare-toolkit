@@ -94,14 +94,14 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
     if (metadata.metadata.requestId === undefined || metadata.metadata.requestId !== requestId) {
         console.log(metadata.metadata);
         message = `fileName: '${fileName}' does not have the signature for requestId: '${requestId}'`;
-        return { data: { requestId: requestId }, success: false, errors: [message] };
+        return { data: { requestId: requestId }, code: 400, success: false, errors: [message] };
     }
 
     const signedUrl = await storageManager.getUrl(bucketName, fileName, true).catch(err => {
         console.warn(err);
         return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
-    return { data: { requestId: requestId }, signedUrl: signedUrl[0] };
+    return { data: { requestId: requestId , signedUrl: signedUrl[0] } };
 }
 
 /**

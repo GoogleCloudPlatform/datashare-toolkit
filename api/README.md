@@ -1,7 +1,6 @@
 # BQDS Spot Fulfillment - API Service
 
 * [Overview](#overview)
-  * [Use Case](#use-case)
   * [Architecture](#architecture)
   * [Configuration](#configuration)
   * [Documentation (OpenAPI Spec)](#documentation)
@@ -27,15 +26,11 @@
 
 # Overview
 
-This documentation provides the details for the BQDS Spot Fulfillment API Service. The Spot fulfillment API provides data producers the ability to expose a limited subset of their datasets in a programatically. Data producers can configure explicit query parameters for data consumers to discover and query against a larger dataset.
-
-
-## Use Case
-TODO
+This documentation provides the details for the BQDS Spot Fulfillment API Service. The Spot fulfillment API provides data producers the ability to expose a limited subset of their datasets programatically. Data producers can configure explicit query parameters for data consumers to discover and execute queries against larger consumer datasets. The sub-datasets are extracted for short-term storage in buckets with signed urls for distribution to the data consumers.
 
 
 ## Architecture
-TODO
+![alt text](files/images/bqds-fulfillment-architecture.png)
 
 
 ## Configuration
@@ -94,11 +89,11 @@ You can also access an instance of Swagger UI to render the OAS docs:
 
 ## Getting Started
 
-These instructions will setup an instance of the BQDS API Serivce
+These instructions will setup an instance of the BQDS API Serivce in your GCP project.
 
 ### Create Storage Bucket
 
-Create a storage bucket to persist the API Configuration. This does not have to be the same storage bucket that was created in
+Create a storage bucket to persist the API Configuration. This does not have to be the same storage bucket for the initial dataset injestion.
 
 Set your **BUCKET_ID** environment variable:
 
@@ -138,19 +133,18 @@ BQDS API services is a trusted application that makes authorized API calls to yo
 _Note_ This is a working list that will be utilzed for a custom BQDS API role - **WIP**
 
 ```
+bigquery.tables.create
+bigquery.tables.delete
+bigquery.tables.export
+bigquery.tables.get
+bigquery.tables.getData
+bigquery.tables.update
+bigquery.tables.updateData
+iam.serviceAccounts.signBlob
+pubsub.subscriptions.consume
 storage.buckets.list
-
 storage.objects.get
 storage.objects.list
-
-bigquery.tables.create
-bigquery.tables.export
-bigquery.tables.getData
-bigquery.tables.updateData
-
-bigquery.jobs.create
-
-iam.serviceAccounts.signBlob
 ```
 
 For now, you can proceed to the next step and utilzed the predefined IAM roles below.
@@ -163,44 +157,43 @@ Set your **PROJECT\_ID** if you have not already:
 
 Set the **SERVICE\_ACCOUNT\_NAME** environment variable(s):
 
-    export SERVICE_ACCOUNT_NAME=bqds-fulfillments-mgr;
+    export SERVICE_ACCOUNT_NAME=bqds-spot-fulfillments-mgr;
 
 Set the **SERVICE\_ACCOUNT\_DESC** environment variable(s):
 
-    export SERVICE_ACCOUNT_DESC="BQDS Fulfillments Manager";
+    export SERVICE_ACCOUNT_DESC="BQDS Spot Fulfillments Manager";
 
 Create the custom BQDS API service-account:
 
     gcloud iam service-accounts create ${SERVICE_ACCOUNT_NAME} --display-name "${SERVICE_ACCOUNT_DESC}";
 
-Grant GCP service roles to service account:\
-_Note_ - You cannot specify multiple roles in the gcloud command
+Set the **CUSTOM\_ROLE\_NAME** environment variable(s):
+
+    export CUSTOM_ROLE_NAME=custom.bqds.spot.fulfillments.mgr;
+
+*Note* We could use the the following roles, but it's better to follow the principle of least privilege. \
+_The roles are defined in [config/bqds-fulfillments-mgr-role-definition.yaml](config/bqds-fulfillments-mgr-role-definition.yaml)_
+```
+--role="roles/viewer"
+--role="roles/bigquery.dataEditor"
+--role="roles/bigquery.jobUser"
+--role="roles/pubsub.subscriber"
+# This role is only required if deploying the API service to GCP Cloud Run
+--role="roles/serverless.serviceAgent";
+```
+Create custom BQDS API role:
+
+    gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/bqds-fulfillments-mgr-role-definition.yaml
+
+*Note* If the custom role already exists, just update the stage:
+
+    gcloud iam roles update ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --stage BETA
+
+Grant the new GCP service role to service account:
 
     gcloud projects add-iam-policy-binding ${PROJECT_ID} \
       --member serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
-      --role="roles/viewer";
-
-    gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-      --member serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
-      --role="roles/bigquery.dataEditor";
-
-    gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-      --member serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
-      --role="roles/bigquery.jobUser";
-
-  ~~ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-      --member serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
-      --role="roles/storage.objectViewer"; ~~
-
-^^ Not required since _roles/serverless.serviceAgent_ supersedes _roles/storage.objectViewer_
-
-    gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-      --member serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
-      --role="roles/serverless.serviceAgent";
-
-    gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-      --member serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
-      --role="roles/pubsub.subscriber";
+      --role="projects/${PROJECT_ID}/roles/${CUSTOM_ROLE_NAME}"
 
 #### Setup Bucket ACLs:
 
@@ -250,19 +243,29 @@ Create the Topic:
 
 Set the permissions for the service account:
 
-    gcloud beta pubsub topics add-iam-policy-binding ${TOPIC_ID} --member=serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --role='roles/editor
+    gcloud beta pubsub topics add-iam-policy-binding ${TOPIC_ID} --member=serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --role='roles/editor'
 
 ### Create Pub/Sub Subscription:
 
-A Pub/Sub Subscription is utilzed for the Worker and Subscriber to process fulfillment messages from BQDS API Service.
+A Pub/Sub Subscription is utilzed for the Subscriber (push) and Worker (pull) to process fulfillment messages from BQDS API Service.
+_Note_ The Worker subscription is only for debuging purposes, so is not required.
+
+Set your **PUSH\_SUBSCRIPTION\_NAME** if you have not already:
+
+    export PUSH_SUBSCRIPTION_NAME=bqds-spot-fulfillments-subscriber;
+
+Create the Subscription:
+_Note_ The **--push-endpoint** will be based off your BQDS service Cloud run or GKE DNS name:
+
+    gcloud beta pubsub subscriptions create ${PULL_SUBSCRIPTION_NAME} --topic ${TOPIC_ID} --push-endpoint=https://bqds-spot-fulfillment-api-6t26dsokuq-uc.a.run.app/v1alpha/fulfillmentSubscriber
 
 Set your **PULL\_SUBSCRIPTION\_NAME** if you have not already:
 
-    export PULL_SUBSCRIPTION_NAME=bqds-spot-fulfillments;
+    export PULL_SUBSCRIPTION_NAME=bqds-spot-fulfillments-worker;
 
 Create the Subscription:
 
-    gcloud pubsub topics create ${TOPIC_ID}
+    gcloud beta pubsub subscriptions create ${PULL_SUBSCRIPTION_NAME} --topic ${TOPIC_ID}
 
 ### Examples
 
