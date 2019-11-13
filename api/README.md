@@ -59,9 +59,9 @@ These instructions will setup an instance of the BQDS API Serivce in your GCP pr
 
 Create a storage bucket to persist the API Configuration. This does not have to be the same storage bucket for the initial dataset injestion.
 
-Set your **BUCKET_ID** environment variable:
+Set your **BUCKET_NAME** environment variable:
 
-    export BUCKET_ID=chrispage-dev-bqds-test
+    export BUCKET_NAME=chrispage-dev-bqds-test
 
 Set your **BUCKET_REGION** environment variable:
 
@@ -69,7 +69,7 @@ Set your **BUCKET_REGION** environment variable:
 
 Create the new storage bucket:
 
-    gsutil mb -l ${BUCKET_REGION} gs://${BUCKET_ID}/
+    gsutil mb -l ${BUCKET_REGION} gs://${BUCKET_NAME}/
 
 ### Create Configuration
 
@@ -77,7 +77,7 @@ The BQDS Spot fulfillment API configuration definitions are defined [above](#con
 
 Copy configuration to the storage bucket:
 
-    gsutil cp config.json gs://${BUCKET_ID}/bqds/api/config.json
+    gsutil cp config.json gs://${BUCKET_NAME}/bqds/api/config.json
 
 
 ### Enable APIs
@@ -161,23 +161,23 @@ Grant the new GCP service role to service account:
 
 #### Setup Bucket ACLs:
 
-Set the **BUCKET_ID** environment variable(s):\
+Set the **BUCKET_NAME** environment variable(s):\
 _Note_ **objectCreator** is required for the destination GCS Bucket for authorization to persist the spot fulfillment data. You will need to run these commands for both the source and destination GCS Bucket if they are different.
 
-    export BUCKET_ID=chrispage-dev-bqds-test
+    export BUCKET_NAME=chrispage-dev-bqds-test
 
 Set the Bucket ACL for the service account:
 
     gsutil iam ch serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com:objectViewer \
-      gs://${BUCKET_ID};
+      gs://${BUCKET_NAME};
     gsutil iam ch serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com:objectCreator \
-      gs://${BUCKET_ID};
+      gs://${BUCKET_NAME};
     gsutil iam ch serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com:legacyBucketReader \
-      gs://${BUCKET_ID};
+      gs://${BUCKET_NAME};
 
 View the Bucket IAM permissions:
 
-    gsutil iam get gs://${BUCKET_ID}
+    gsutil iam get gs://${BUCKET_NAME}
 
 ![alt text](files/images/bqds-fulfillment-mgr-gcs-bucket-permissions.png)
 
@@ -197,17 +197,17 @@ Set the **GOOGLE_APPLICATION_CREDENTIALS** environment variable(s):
 A Pub/Sub Topic with the appropriate service account permissions is required for the BQDS API Service.
 
 
-Set your **TOPIC\_ID** if you have not already:
+Set your **TOPIC\_NAME** if you have not already:
 
-    export TOPIC_ID=bqds-spot-fulfillments;
+    export TOPIC_NAME=bqds-spot-fulfillments;
 
 Create the Topic:
 
-    gcloud pubsub topics create ${TOPIC_ID}
+    gcloud pubsub topics create ${TOPIC_NAME}
 
 Set the permissions for the service account:
 
-    gcloud beta pubsub topics add-iam-policy-binding ${TOPIC_ID} --member=serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --role='roles/editor'
+    gcloud beta pubsub topics add-iam-policy-binding ${TOPIC_NAME} --member=serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --role='roles/editor'
 
 ### Create Pub/Sub Subscription:
 
@@ -221,7 +221,7 @@ Set your **PUSH\_SUBSCRIPTION\_NAME** if you have not already:
 Create the Subscription:
 _Note_ The **--push-endpoint** will be based off your BQDS service Cloud run or GKE DNS name:
 
-    gcloud beta pubsub subscriptions create ${PULL_SUBSCRIPTION_NAME} --topic ${TOPIC_ID} --push-endpoint=https://bqds-spot-fulfillment-api-6t26dsokuq-uc.a.run.app/v1alpha/fulfillmentSubscriber
+    gcloud beta pubsub subscriptions create ${PUSH_SUBSCRIPTION_NAME} --topic ${TOPIC_NAME} --push-endpoint=https://bqds-spot-fulfillment-api-6t26dsokuq-uc.a.run.app/v1alpha/fulfillmentSubscriber
 
 Set your **PULL\_SUBSCRIPTION\_NAME** if you have not already:
 
@@ -229,13 +229,15 @@ Set your **PULL\_SUBSCRIPTION\_NAME** if you have not already:
 
 Create the Subscription:
 
-    gcloud beta pubsub subscriptions create ${PULL_SUBSCRIPTION_NAME} --topic ${TOPIC_ID}
+    gcloud beta pubsub subscriptions create ${PULL_SUBSCRIPTION_NAME} --topic ${TOPIC_NAME}
+
+Set the IAM policy for the Subscription:
 
     gcloud beta pubsub subscriptions add-iam-policy-binding ${PULL_SUBSCRIPTION_NAME} --member=serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --role='roles/pubsub.subscriber'
 
 List the subscriptions for the topic:
 
-    gcloud beta pubsub topics list-subscriptions ${TOPIC_ID}
+    gcloud beta pubsub topics list-subscriptions ${TOPIC_NAME}
 
 
 ### Examples
@@ -257,9 +259,14 @@ Install the Node modules
     npm install
 
 Start the service.\
-_Note_ - [Nodemon](https://nodemon.io/) is leveraged to read file changes and reload automatically
+_Note_ - There are a few environment variables that need to be set before the application starts (see below). [Nodemon](https://nodemon.io/) is leveraged to read file changes and reload automatically.
 
-    FULFILLMENT_BUCKET_NAME=<your-bucket-name> npm run dev
+    export GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS};
+    export FULFILLMENT_CONFIG_BUCKET_NAME=${BUCKET_NAME};
+    export FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME=${TOPIC_NAME};
+    export FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME="projects/${PROJECT_ID}/subscriptions/${PULL_SUBSCRIPTION_NAME}";
+
+    npm run dev
 
 
 ## Testing
@@ -304,13 +311,16 @@ Build with Cloud Build and TAG:
     gcloud builds submit --tag gcr.io/${PROJECT_ID}/bqds-spot-fulfillment-api:${TAG}
 
 Deploy with Cloud Run Beta:
+_Note_ - There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/beta/run/deploy#--set-env-vars) provides details for how they are set.
 
     gcloud beta run deploy bqds-spot-fulfillment-api \
       --image gcr.io/${PROJECT_ID}/bqds-spot-fulfillment-api:${TAG} \
       --region=us-central1 \
       --allow-unauthenticated \
       --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
-      --set-env-vars=FULFILLMENT_BUCKET_NAME=${FULFILLMENT_BUCKET_NAME}
+      --set-env-vars=FULFILLMENT_CONFIG_BUCKET_NAME=${BUCKET_NAME} \
+      --set-env-vars=FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME=${TOPIC_NAME} \
+      --set-env-vars=FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME="projects/${PROJECT_ID}/subscriptions/${PULL_SUBSCRIPTION_NAME}"
 
 Open the app URL in your browser. You can return the FQDN via:
 

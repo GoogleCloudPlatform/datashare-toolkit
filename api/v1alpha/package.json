@@ -19,7 +19,7 @@
         "uuid": "^3.3.3"
     },
     "scripts": {
-        "dev": "cd src && nodemon index.js",
+        "dev": "nodemon src/index.js",
         "start": "functions-framework --target=processEvent",
         "deploy": "gcloud functions deploy bqds --memory=2GB --timeout=120s --runtime nodejs8 --trigger-http --entry-point app",
         "lint": "eslint src",
