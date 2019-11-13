@@ -92,26 +92,7 @@ pubsub.googleapis.com
 
 ### Service Account
 
-BQDS API services is a trusted application that makes authorized API calls to your GCP project service(s). The application requires a GCP service account with the appropriate permissions enabled.
-
-_Note_ This is a working list that will be utilzed for a custom BQDS API role - **WIP**
-
-```
-bigquery.tables.create
-bigquery.tables.delete
-bigquery.tables.export
-bigquery.tables.get
-bigquery.tables.getData
-bigquery.tables.update
-bigquery.tables.updateData
-iam.serviceAccounts.signBlob
-pubsub.subscriptions.consume
-storage.buckets.list
-storage.objects.get
-storage.objects.list
-```
-
-For now, you can proceed to the next step and utilzed the predefined IAM roles below.
+BQDS Spot Fulfillment API service is a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](config/bqds-fulfillments-mgr-role-definition.yaml)
 
 #### Setup Service Account
 
@@ -136,7 +117,7 @@ Set the **CUSTOM\_ROLE\_NAME** environment variable(s):
     export CUSTOM_ROLE_NAME=custom.bqds.spot.fulfillments.mgr;
 
 *Note* We could use the the following roles, but it's better to follow the principle of least privilege. \
-_The roles are defined in [config/bqds-fulfillments-mgr-role-definition.yaml](config/bqds-fulfillments-mgr-role-definition.yaml)_
+_The permissions for the custom role are defined in [config/bqds-fulfillments-mgr-role-definition.yaml](config/bqds-fulfillments-mgr-role-definition.yaml)_
 ```
 --role="roles/viewer"
 --role="roles/bigquery.dataEditor"
