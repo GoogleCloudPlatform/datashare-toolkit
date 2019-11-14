@@ -25,6 +25,7 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const bigqueryUtil = require("../bigqueryUtil");
+const runtimeConfiguration = require("../runtimeConfiguration");
 
 if (argv.runCloudTests) {
     bigqueryUtil.init(argv.projectId);
@@ -57,14 +58,19 @@ if (argv.runCloudTests) {
 
     const uuid = uuidv4().replace(/-/g, "_");
     const viewName = `v_${uuid}`;
+    const label = "unit_tests";
 
     it("create dataset, table, view, check for existence, and delete", async () => {
-        await bigqueryUtil.createDataset(uuid).then((result => {
+        await bigqueryUtil.createDataset(uuid, label).then((result => {
             expect(result, "created dataset").is.true;
         })).then(() => {
             return bigqueryUtil.datasetExists(uuid);
         }).then((result) => {
             expect(result).is.true;
+        }).then(() => {
+            return bigqueryUtil.getDatasetLabelValue(uuid, runtimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY);
+        }).then((result) => {
+            expect(result).is.equal(label);
         }).then(() => {
             const schema = [{
                 "name": "column1",
@@ -91,11 +97,15 @@ if (argv.runCloudTests) {
             expect(columns[1]).is.equal("column2");
         }).then(() => {
             const query = `select * from \`${argv.projectId}.${uuid}.${uuid}\``;
-            return bigqueryUtil.createView(argv.projectId, uuid, viewName, query);
+            return bigqueryUtil.createView(argv.projectId, uuid, viewName, query, false, label);
         }).then((result) => {
             return bigqueryUtil.viewExists(argv.projectId, uuid, viewName);
         }).then((result) => {
             expect(result).is.true;
+        }).then(() => {
+            return bigqueryUtil.getTableLabelValue(uuid, viewName, runtimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY);
+        }).then((result) => {
+            expect(result).is.equal(label);
         }).then(() => {
             const rows = [{ column1: "value 1", column2: "value 2" }, { column1: "value 3", column2: "value 4" }];
             return bigqueryUtil.insertRows(uuid, uuid, rows);
