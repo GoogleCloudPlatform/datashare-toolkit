@@ -317,11 +317,19 @@ These instructions are to build and deploy in a k8s environment via Skaffold.
 Create a kubernetes secret with the appropriate service account key file from above:\
 _Note_ Change the file path to the appropriate destination. Secrets management for multiple k8s clusters is outside the scope of this example.
 
-    kubectl create secret generic bqds-spot-fulfillment-api-creds --from-file=key.json=../../temp/bqds-fulfillments-mgr.json
+    kubectl create secret generic bqds-spot-fulfillment-api-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
+
+Modify the ConfigMap with the appropriate Spot Fulfillment environment variables:
+
+    vi kubernetes-manifests/bqds-spot-fulfillment-api/configmaps.yaml
 
 Set the default GCR project repository:
 
     skaffold config set default-repo gcr.io/${PROJECT_ID}
+
+Run `skaffold` with the dev parameter to deploy locally:
+
+    skaffold dev
 
 Build the image with the `skaffold run -t <TAG>` command:
 
