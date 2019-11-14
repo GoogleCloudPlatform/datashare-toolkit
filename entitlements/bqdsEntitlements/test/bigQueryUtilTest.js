@@ -80,6 +80,10 @@ if (argv.runCloudTests) {
         }).then((result) => {
             expect(result).is.true;
         }).then(() => {
+            return bigqueryUtil.tableExists(argv.projectId, uuid, uuid);
+        }).then((result) => {
+            expect(result).is.true;
+        }).then(() => {
             return bigqueryUtil.tableColumns(uuid, uuid);
         }).then((columns) => {
             expect(columns).length.is(2);
@@ -92,6 +96,15 @@ if (argv.runCloudTests) {
             return bigqueryUtil.viewExists(argv.projectId, uuid, viewName);
         }).then((result) => {
             expect(result).is.true;
+        }).then(() => {
+            const rows = [{ column1: "value 1", column2: "value 2" }, { column1: "value 3", column2: "value 4" }];
+            return bigqueryUtil.insertRows(uuid, uuid, rows);
+        }).then(() => {
+            const options = { query: `select * from \`${argv.projectId}.${uuid}.${uuid}\`` };
+            return bigqueryUtil.executeQuery(options);
+        }).then((result) => {
+            const [rows] = result;
+            expect(rows.length).is.equal(2);
         }).then(() => {
             return bigqueryUtil.deleteTable(uuid, viewName);
         }).then((result) => {
