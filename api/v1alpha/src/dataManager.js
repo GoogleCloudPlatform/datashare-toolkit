@@ -41,12 +41,14 @@ function createFileName(name) {
  */
 async function createFulfillmentRequest(options) {
     const requestId = uuidv4();
-    options['destination']['fileName'] = createFileName(requestId);
+    const bucketName = options.destination.bucketName;
+    const fileName = createFileName(requestId);
+    options['destination']['fileName'] = fileName;
     console.log(`RequestId: ${requestId}, options: ${JSON.stringify(options)}`);
 
     const query = querystring.encode({
-        bucketName: options.destination.bucketName,
-        fileName: options.destination.fileName
+        bucketName: bucketName,
+        fileName: fileName
     });
 
     // create the fulfillment request now
@@ -55,7 +57,13 @@ async function createFulfillmentRequest(options) {
             console.warn(err);
             return { data: { requestId: requestId }, success: false, errors: [err.message] };
         });
-        return { requestId: requestId, query: query, ...data }
+        return {
+            requestId: requestId,
+            query: query,
+            bucketName: bucketName,
+            fileName: fileName,
+            ...data
+        };
     }
 
     // create the fulfillment pubsub message
@@ -68,7 +76,12 @@ async function createFulfillmentRequest(options) {
         return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
     //console.log(pubsubMessage);
-    return { requestId: requestId, query: query };
+    return {
+        requestId: requestId,
+        query: query,
+        bucketName: bucketName,
+        fileName: fileName
+    };
 }
 
 /**
@@ -77,6 +90,10 @@ async function createFulfillmentRequest(options) {
  */
 async function getFulfillmentRequest(requestId, bucketName, fileName) {
     var message;
+    const query = querystring.encode({
+        bucketName: bucketName,
+        fileName: fileName
+    });
     console.log(`RequestId: ${requestId}, bucketName: ${bucketName}, fileName: ${fileName}`);
 
     const exists = await storageManager.checkIfFileExists(bucketName, fileName).catch(err => {
@@ -101,7 +118,13 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
         console.warn(err);
         return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
-    return { requestId: requestId , signedUrl: signedUrl[0] };
+    return {
+        requestId: requestId,
+        query: query,
+        bucketName: bucketName,
+        fileName: fileName,
+        signedUrl: signedUrl[0]
+    };
 }
 
 /**
@@ -112,15 +135,23 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
  */
 async function processFulfillmentSubscriptionRequest(options) {
     const requestId = options.message.attributes.requestId;
+    const bucketName = options.destination.bucketName;
+    const fileName = options.destination.fileName;
     const query = querystring.encode({
-        bucketName: options.destination.bucketName,
-        fileName: options.destination.fileName
+        bucketName: bucketName,
+        fileName: fileName
     });
     const data = await createFulfillment(requestId, options).catch(err => {
         console.warn(err);
         return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
-    return { requestId: requestId, query: query, ...data }
+    return {
+        requestId: requestId,
+        query: query,
+        bucketName: bucketName,
+        fileName: fileName,
+        ...data
+    };
 }
 
 /**
@@ -163,16 +194,24 @@ async function pullFulfillmentSubscriptionRequest(options) {
     const jsonString = Buffer.from(pubsubMessage.message.data).toString('utf8');
     options = {...options, ...JSON.parse(jsonString)};
 
+    const bucketName = options.destination.bucketName;
+    const fileName = options.destination.fileName;
     const query = querystring.encode({
-        bucketName: options.destination.bucketName,
-        fileName: options.destination.fileName
+        bucketName: bucketName,
+        fileName: fileName
     });
 
     const data = await createFulfillment(requestId, options).catch(err => {
         console.warn(err);
         return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
-    return { requestId: requestId, query: query, ...data }
+    return {
+        requestId: requestId,
+        query: query,
+        bucketName: bucketName,
+        fileName: fileName,
+        ...data
+    };
 }
 
 /**
