@@ -1,7 +1,7 @@
 {
-  "name": "bqds-entitlement-engine",
-  "version": "1.0.2",
-  "description": "BQDS entitlement-engine",
+  "name": "bqds-shared",
+  "version": "1.0.0",
+  "description": "BQDS shared library",
   "license": "Apache-2.0",
   "repository": {},
   "main": "main.js",
@@ -20,8 +20,7 @@
     "uuid": "^3.3.3",
     "minimist": "^1.2.0",
     "lint": "^0.7.0",
-    "underscore": "^1.9.1",
-    "bqds-shared": "file:../../shared"
+    "underscore": "^1.9.1"
   },
   "devDependencies": {
     "eslint": "^5.12.0",
@@ -29,6 +28,7 @@
     "mocha": "^6.2.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "uuid": "^3.3.2",
     "nyc": "^14.1.1"
   }
 }
