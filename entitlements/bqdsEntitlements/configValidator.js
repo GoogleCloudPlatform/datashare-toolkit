@@ -16,8 +16,8 @@
 
 'use strict';
 
+const { bigqueryUtil } = require('bqds-shared');
 const configUtil = require("./configUtil");
-const bigqueryUtil = require("./bigqueryUtil");
 const sqlBuilder = require("./sqlBuilder");
 const runtimeConfiguration = require("./runtimeConfiguration");
 const YAML = require('yaml');

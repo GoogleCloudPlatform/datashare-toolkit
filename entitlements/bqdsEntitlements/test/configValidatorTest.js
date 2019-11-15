@@ -24,7 +24,7 @@ const chai = require('chai'), expect = chai.expect, should = chai.should();
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
-const bigqueryUtil = require("../bigqueryUtil");
+const { bigqueryUtil } = require('bqds-shared');
 const configValidator = require('../configValidator');
 
 it("should return true for valid json string", () => {

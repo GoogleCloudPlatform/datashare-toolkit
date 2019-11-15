@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const bigqueryUtil = require("../bigqueryUtil");
+const bigqueryUtil = require("./bigqueryUtil");
 
 module.exports = {
     bigqueryUtil: bigqueryUtil
