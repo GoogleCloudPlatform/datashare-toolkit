@@ -6,12 +6,8 @@
   "repository": {},
   "main": "main.js",
   "scripts": {
-    "start": "node main.js",
     "lint": "eslint .",
     "test": "nyc mocha --timeout 60000 --projectId='bqds-ci'"
-  },
-  "bin": {
-    "entitlement-engine": "main.js"
   },
   "dependencies": {
     "@google-cloud/bigquery": "^4.1.3",
