@@ -38,6 +38,7 @@ if (args["verbose"]) {
     console.log("Command line args");
     console.log(args);
     runtimeConfiguration.VERBOSE_MODE = true;
+    process.env.VERBOSE_MODE = true;
     console.log("--verbose is enabled");
 }
 
