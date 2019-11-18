@@ -5,10 +5,12 @@ steps:
   args: ['install']
 - name: 'gcr.io/cloud-builders/npm'
   dir: 'shared'
-  args: ['npm', 'run', 'test', '--', '--runCloudTests']
+  entrypoint: 'npm'
+  args: ['run', 'test', '--', '--runCloudTests']
 - name: 'gcr.io/cloud-builders/npm'
   dir: 'entitlements/bqdsEntitlements'
-  args: ['npm', 'run', 'test', '--', '--runCloudTests']
+  entrypoint: 'npm'
+  args: ['run', 'test', '--', '--runCloudTests']
 - name: 'gcr.io/bqds-ci/integration-test'
   env:
   - 'BUILD=$BUILD_ID'
