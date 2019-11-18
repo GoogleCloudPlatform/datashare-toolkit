@@ -30,15 +30,15 @@ const bigqueryUtil = new BigQueryUtil(argv.projectId);
 const configValidator = require('../configValidator');
 
 it("should return true for valid json string", () => {
-  expect(configValidator.isJsonString('{ "isValid": true }')).is.true;
+    expect(configValidator.isJsonString('{ "isValid": true }')).is.true;
 });
 
 it("should return false for invalid json string", () => {
-  expect(configValidator.isJsonString('"isValid": true')).is.false;
+    expect(configValidator.isJsonString('"isValid": true')).is.false;
 });
 
 it("should return true for valid yaml string", () => {
-  expect(configValidator.isYamlString(`---
+    expect(configValidator.isYamlString(`---
     name: mlb_simple
     projectId: sferrazza-cloud-sandbox
     accessControl:
@@ -54,7 +54,7 @@ it("should return true for valid yaml string", () => {
 });
 
 it("should return false for invalid yaml string", () => {
-  expect(configValidator.isYamlString(`---
+    expect(configValidator.isYamlString(`---
     name mlb_simple
     projectId: sferrazza-cloud-sandbox
     accessControl:
@@ -70,10 +70,10 @@ it("should return false for invalid yaml string", () => {
 });
 
 if (argv.runCloudTests) {
-  bigqueryUtil.init(argv.projectId);
+    bigqueryUtil.init(argv.projectId);
 
-  it("config should validate", async () => {
-    const simpleConfig = require('../../../examples/mlb/config/entitlements/simple.json');
-    return expect(configValidator.validate(simpleConfig)).to.eventually.be.true;
-  });
+    it("config should validate", async () => {
+        const simpleConfig = require('../../../examples/mlb/config/entitlements/simple.json');
+        return expect(configValidator.validate(simpleConfig)).to.eventually.be.true;
+    });
 }
