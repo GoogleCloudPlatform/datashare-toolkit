@@ -4,6 +4,10 @@ steps:
   entrypoint: 'npm'
   args: ['install']
 - name: 'gcr.io/cloud-builders/npm'
+  dir: 'shared'
+  entrypoint: 'npm'
+  args: ['run', 'test', '--', '--runCloudTests']
+- name: 'gcr.io/cloud-builders/npm'
   dir: 'entitlements/bqdsEntitlements'
   entrypoint: 'npm'
   args: ['run', 'test', '--', '--runCloudTests']

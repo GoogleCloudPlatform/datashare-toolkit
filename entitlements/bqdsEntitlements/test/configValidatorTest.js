@@ -70,8 +70,6 @@ it("should return false for invalid yaml string", () => {
 });
 
 if (argv.runCloudTests) {
-    bigqueryUtil.init(argv.projectId);
-
     it("config should validate", async () => {
         const simpleConfig = require('../../../examples/mlb/config/entitlements/simple.json');
         return expect(configValidator.validate(simpleConfig)).to.eventually.be.true;
