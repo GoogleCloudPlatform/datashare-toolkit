@@ -57,21 +57,15 @@ async function createFulfillmentRequest(options) {
             console.warn(err);
             return { data: { requestId: requestId }, success: false, errors: [err.message] };
         });
-        return {
-            requestId: requestId,
-            query: query,
-            bucketName: bucketName,
-            fileName: fileName,
-            ...data
-        };
+        return data;
     }
 
     // create the fulfillment pubsub message
     const customAttributes = {
         requestId: requestId
     }
-    const pubsubTopicName = options.config.pubsubTopicName;
-    await pubsubManager.publishMessage(pubsubTopicName, options, customAttributes).catch(err => {
+    const topicName = options.config.pubsub.topicName;
+    await pubsubManager.publishMessage(topicName, options, customAttributes).catch(err => {
         console.warn(err);
         return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
@@ -145,13 +139,7 @@ async function processFulfillmentSubscriptionRequest(options) {
         console.warn(err);
         return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
-    return {
-        requestId: requestId,
-        query: query,
-        bucketName: bucketName,
-        fileName: fileName,
-        ...data
-    };
+    return data;
 }
 
 /**
@@ -163,9 +151,9 @@ async function pullFulfillmentSubscriptionRequest(options) {
     var message;
 
     // Check if subscription exists
-    const pubsubTopicName = options.config.pubsubTopicName;
-    const subscriptionName = options.config.pubsubSubscriptionName;
-    const exists = await pubsubManager.checkIfSubscriptionExists(pubsubTopicName, subscriptionName).catch(err => {
+    const topicName = options.config.pubsub.topicName;
+    const subscriptionName = options.config.pubsub.subscriptionName;
+    const exists = await pubsubManager.checkIfSubscriptionExists(topicName, subscriptionName).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -205,13 +193,7 @@ async function pullFulfillmentSubscriptionRequest(options) {
         console.warn(err);
         return { data: { requestId: requestId }, success: false, errors: [err.message] };
     });
-    return {
-        requestId: requestId,
-        query: query,
-        bucketName: bucketName,
-        fileName: fileName,
-        ...data
-    };
+    return data;
 }
 
 /**
@@ -230,22 +212,31 @@ async function createFulfillment(requestId, options) {
     const queryOptions = await validateManager.getDynamicQueryOptions(options);
     const bucketName = options.destination.bucketName;
     const fileName = options.destination.fileName;
+    const projectName = options.config.destination.projectName;
+    const datasetId = options.config.destination.datasetName;
+    // Dynamically create unique tableIds for the extractToBucket method
+    const tableId = requestId.replace(/-/g, "_");
+
     console.log(`Will execute query with options: ${JSON.stringify(queryOptions)}`);
     // Check if fileName exists
-    const exists = await storageManager.checkIfFileExists(bucketName, fileName).catch(err => {
+    var exists = await storageManager.checkIfFileExists(bucketName, fileName).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
     if (exists === true) {
         return { success: false, code:409, errors: ['Storage file [' + fileName + '] already exists'] };
     }
-    // Execute Query to buffer
-    const data = await bqManager.executeQuery(queryOptions).catch(err => {
-        console.warn(err);
-        return { success: false, errors: [err.message] };
-    });
-    const jsonString = JSON.stringify(data);
-    const buf = Buffer.from(jsonString);
+    // Set query options to execute BQ job and extract to table
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    const expiryTime = today.getTime();
+
+    queryOptions.destinationTable = {
+        projectId: projectName,
+        datasetId: datasetId,
+        tableId: tableId
+    };
+
     // create file and sign
     const fileOptions = {
         gzip: true,
@@ -256,14 +247,56 @@ async function createFulfillment(requestId, options) {
             }
         }
     }
-    const fileCreate = await storageManager.createFile(bucketName, fileName, buf, fileOptions).catch(err => {
+    queryOptions.createDisposition = "CREATE_IF_NEEDED";
+    queryOptions.writeDisposition = "WRITE_EMPTY";
+
+    // To ensure executeQuery does not retrieve any records in the result set, set to zero
+    queryOptions.maxResults = 0;
+
+    console.log(queryOptions);
+
+    var exists = await bqManager.checkIfDatasetExists(projectName, datasetId).catch(err => {
         console.warn(err);
-        return { data: { requestId: requestId }, success: false, errors: [err.message] };
+        return { success: false, errors: [err.message] };
     });
-    if (fileCreate.success === false) {
-        return fileCreate;
+    console.log(exists);
+    if (exists.success === false) {
+        console.log(`Creating new dataset ${datasetId} in project ${projectName}`);
+        exists = await bqManager.createDataset(projectName, datasetId).catch(err => {
+            console.warn(err);
+            return { success: false, errors: [err.message] };
+        });
     }
-    return { requestId: requestId, signedUrl: fileCreate.url };
+    if (exists.success === false) {
+        message = `Destination dataset ${datasetId} in project ${projectName} does not exist or failed creating`;
+        console.warn(message);
+        return { success: false, errors: [message] };
+    }
+
+    //var results = await bqManager.createDatasetIfDoesNotExist(projectName, datasetId).then(() => {
+        //console.log(`bqManager.createDatasetIfDoesNotExist: ${projectName} ${datasetId}`);
+    var results = await bqManager.executeQuery(queryOptions).then(() => {
+        console.log(`bqManager.extractTableToGCS: ${datasetId} ${tableId} ${bucketName} ${fileName}`);
+        return bqManager.extractTableToGCS(datasetId, tableId, bucketName, fileName);
+    }).then(() => {
+        console.log(`storageManager.getUrl: ${bucketName} ${fileName}`);
+        return storageManager.getUrl(bucketName, fileName, true);
+    }).then((signedUrl) => {
+        console.log(`bqManager.updateTableExpiration: ${datasetId} ${tableId} ${expiryTime}`);
+        bqManager.updateTableExpiration(datasetId, tableId, expiryTime);
+        return signedUrl;
+    }).catch(error => {
+        message = `BigQuery query failed: ${error}. Cleaning up`;
+        console.warn(message);
+        console.log(`Finally bqManager.updateTableExpiration: ${datasetId} ${tableId} ${expiryTime}`);
+        bqManager.updateTableExpiration(datasetId, tableId, expiryTime);
+        return { requestId: requestId, success: false, errors: [message] };
+    });
+    console.log(results);
+    if (results.success === false) {
+        return results;
+    };
+    return { requestId: requestId, signedUrl: results[0] };
 }
 
 module.exports = {

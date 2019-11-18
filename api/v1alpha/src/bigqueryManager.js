@@ -37,9 +37,9 @@ function dynamicClient(projectName) {
  * Check if a Dataset exists and return true if exists.
  */
 async function checkIfDatasetExists(projectName, datasetName) {
-    let bigqueryClient = dynamicClient(projectName);
-    let dataset = bigqueryClient.dataset(datasetName);
-    let exists = await dataset.exists().catch(err => {
+    const bigqueryClient = dynamicClient(projectName);
+    const dataset = bigqueryClient.dataset(datasetName);
+    const exists = await dataset.exists().catch(err => {
         console.warn(err.message);
         throw err;
     });
@@ -50,15 +50,34 @@ async function checkIfDatasetExists(projectName, datasetName) {
 }
 
 /**
+ * @param  {} projectName
+ * @param  {} datasetName
+ * Create a Dataset and return true
+ */
+async function createDataset(projectName, datasetName) {
+    const bigqueryClient = dynamicClient(projectName);
+    const dataset = bigqueryClient.dataset(datasetName);
+    const created = await dataset.create().catch(err => {
+        console.warn(err.message);
+        throw err;
+    });
+    if (!created[0]) {
+        // The dataset was created successfully.
+        return { success: false, code: 400, errors: ['BigQuery dataset [' + datasetName + '] created failed'] };
+    }
+    return true;
+}
+
+/**
 * @param  {} projectName
 * @param  {} datasetName
 * Check if a Dataset exists and return true if exists.
 */
 async function checkIfDatasetTableExists(projectName, datasetName, tableName) {
-    let bigqueryClient = dynamicClient(projectName);
-    let dataset = bigqueryClient.dataset(datasetName);
-    let table = dataset.table(tableName);
-    let exists = await table.exists().catch(err => {
+    const bigqueryClient = dynamicClient(projectName);
+    const dataset = bigqueryClient.dataset(datasetName);
+    const table = dataset.table(tableName);
+    const exists = await table.exists().catch(err => {
         console.warn(err.message);
         throw err;
     });
@@ -78,7 +97,7 @@ async function executeQuery(options) {
         throw err;
     });
     console.log(`Job '${job.id}' started for query: ${JSON.stringify(options)}`);
-    let results = await job.getQueryResults().catch(err => {
+    const results = await job.getQueryResults().catch(err => {
         console.warn(err.message);
         throw err;
     });
@@ -106,8 +125,8 @@ async function createQueryJob(options) {
  * Checks if the query job exists and returns the job
  */
 async function getQueryJob(jobId) {
-    let job = bigqueryClient.job(jobId);
-    let results = await job.exists().catch(err => {
+    const job = bigqueryClient.job(jobId);
+    const results = await job.exists().catch(err => {
         console.warn(err.message);
         throw err;
     });
@@ -135,9 +154,9 @@ async function updateTableExpiration(datasetId, tableId, expirationTime) {
         console.warn(err.message);
         throw err;
     });
-
     const newExpirationTime = apiResponse.expirationTime;
     console.log(`${tableId} expiration: ${newExpirationTime}`);
+    return true;
 }
 
 /**
@@ -172,6 +191,7 @@ async function extractTableToGCS(datasetId, tableId, bucketName, filename) {
 
 module.exports = {
     checkIfDatasetExists,
+    createDataset,
     checkIfDatasetTableExists,
     executeQuery,
     createQueryJob,

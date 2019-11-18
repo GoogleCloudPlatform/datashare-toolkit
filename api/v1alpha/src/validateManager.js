@@ -29,8 +29,14 @@ const URL_PATH_PARAMS = ["bucketName", "projectId", "datasetId", "tableId"];
 const FULFILLMENT_CONFIG = {
     bucketName: process.env.FULFILLMENT_CONFIG_BUCKET_NAME || "change-me",
     fileName: process.env.FULFILLMENT_CONFIG_FILE_NAME || "bqds/api/config.json",
-    pubsubTopicName: process.env.FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME || "bqds-spot-fulfillment",
-    pubsubSubscriptionName: process.env.FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME || "projects/chrispage-dev/subscriptions/bqds-spot-fulfilllment-consumer"
+    destination: {
+        projectName: process.env.FULFILLMENT_CONFIG_DESTINATION_PROJECT_NAME || "change-me",
+        datasetName: process.env.FULFILLMENT_CONFIG_DESTINATION_DATASET_NAME || "bqds_spot_fulfillment",
+    },
+    pubsub: {
+        topicName: process.env.FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME || "bqds-spot-fulfillment",
+        sbscriptionName: process.env.FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME || "projects/change-me/subscriptions/bqds-spot-fulfilllment-consumer"
+    }
 }
 
 /************************************************************
