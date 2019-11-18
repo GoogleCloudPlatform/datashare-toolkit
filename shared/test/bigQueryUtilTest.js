@@ -24,11 +24,10 @@ const chai = require('chai'), expect = chai.expect, should = chai.should();
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
-const bigqueryUtil = require("../bigqueryUtil");
+const BigQueryUtil = require("../bigqueryUtil");
+const bigqueryUtil = new BigQueryUtil(argv.projectId);
 
 if (argv.runCloudTests) {
-    bigqueryUtil.init(argv.projectId);
-
     it("execute query", async () => {
         const options = { query: "select 1 union all select 2" };
         const [rows] = await bigqueryUtil.executeQuery(options);
@@ -60,7 +59,7 @@ if (argv.runCloudTests) {
 
     const labelName = "bqds_configuration_name";
     const labelValue = "unit_tests";
-    let labels = { };
+    let labels = {};
     labels[labelName] = labelValue;
 
     it("create dataset, table, view, check for existence, and delete", async () => {

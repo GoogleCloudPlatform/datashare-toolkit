@@ -52,7 +52,7 @@ if (args["prerequisiteSetup"]) {
     console.log("--prerequisiteSetup is enabled");
 }
 
-if (args["configurationFilePath"]) {
+if (args["configurationFilePath"] && args["configurationFilePath"].length > 0) {
     var configFilePath = args.c.trim();
     entitlementManager.processConfiguration(configFilePath);
 }

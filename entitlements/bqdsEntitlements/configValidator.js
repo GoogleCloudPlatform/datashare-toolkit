@@ -16,7 +16,9 @@
 
 'use strict';
 
-const { bigqueryUtil } = require('bqds-shared');
+const { BigQueryUtil } = require('bqds-shared');
+let bigqueryUtil;
+
 const configUtil = require("./configUtil");
 const sqlBuilder = require("./sqlBuilder");
 const runtimeConfiguration = require("./runtimeConfiguration");
@@ -41,6 +43,7 @@ var [datasets] = [];
  * @param  {} config
  */
 async function validate(config) {
+    bigqueryUtil = new BigQueryUtil(config.projectId);
     [datasets] = await bigqueryUtil.getDatasets();
 
     console.log("-------------------START - validateSchema-------------------");
@@ -398,8 +401,10 @@ async function validateViews(config) {
                         logIssue(IssueType.ERROR, `'accessControl.labelColumn' must be provided for view '${v.name}'`);
                     }
 
-                    // Check for the existance of labelColumn
-                    await areAllColumnsAvailable([accessControl.labelColumn], source.datasetId, source.tableId, `View '${v.name}' has a 'labelColumn' defined that is not available in source table '${source.datasetId}.${source.tableId}'`);
+                    if (_tableExists === true) {
+                        // Check for the existance of labelColumn
+                        await areAllColumnsAvailable([accessControl.labelColumn], source.datasetId, source.tableId, `View '${v.name}' has a 'labelColumn' defined that is not available in source table '${source.datasetId}.${source.tableId}'`);
+                    }
 
                     if (accessControl.datasetEnabled && accessControl.datasetEnabled === true) {
                         // If accessControl.datasetEnabled is true, than config.accessControl.datasetId and config.accessControl.viewId must be provided.

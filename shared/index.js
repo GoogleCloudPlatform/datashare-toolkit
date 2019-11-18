@@ -17,5 +17,5 @@
 const bigqueryUtil = require("./bigqueryUtil");
 
 module.exports = {
-    bigqueryUtil: bigqueryUtil
+    BigQueryUtil: bigqueryUtil
 };

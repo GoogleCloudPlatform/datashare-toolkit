@@ -17,7 +17,10 @@
 'use strict';
 
 const fs = require('fs');
-const { bigqueryUtil } = require('bqds-shared');
+
+const { BigQueryUtil } = require('bqds-shared');
+let bigqueryUtil;
+
 const configUtil = require("./configUtil");
 const sqlBuilder = require("./sqlBuilder");
 const configValidator = require("./configValidator");
@@ -62,7 +65,7 @@ async function processConfiguration(filePath) {
  * This should be be a JSON object.
  */
 async function processEntitlementConfig(config) {
-    bigqueryUtil.init(config.projectId);
+    bigqueryUtil = new BigQueryUtil(config.projectId);
 
     let prerequisiteComplete = false;
     if (runtimeConfiguration.DRY_RUN === false) {
