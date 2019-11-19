@@ -170,9 +170,8 @@ class BigQueryUtil {
 
         // https://cloud.google.com/nodejs/docs/reference/bigquery/3.0.x/Dataset#getMetadata
         await dataset.getMetadata().then((data) => {
-            const metadata = data[0];
+            _metadata = data[0];
             const apiResponse = data[1];
-            _metadata = metadata;
             return;
         });
 
@@ -202,9 +201,8 @@ class BigQueryUtil {
         try {
             // https://cloud.google.com/nodejs/docs/reference/bigquery/1.3.x/Table#getMetadata
             await table.getMetadata().then((data) => {
-                const _metadata = data[0];
+                metadata = data[0];
                 const apiResponse = data[1];
-                metadata = _metadata;
                 return;
             });
         } catch (err) {
@@ -495,9 +493,8 @@ class BigQueryUtil {
 
         // https://cloud.google.com/nodejs/docs/reference/bigquery/1.3.x/Table#setMetadata
         await table.setMetadata(metadata).then((data) => {
-            const metadataResponse = data[0];
+            _metadata = data[0];
             const apiResponse = data[1];
-            _metadata = metadataResponse;
             return;
         });
 
