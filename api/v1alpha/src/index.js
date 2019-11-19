@@ -197,6 +197,9 @@ app.use('/' + apiVersion, router);
  *       fileName:
  *         type: string
  *         required: true
+ *       signedUrl:
+ *         type: string
+ *         required: false
  *
  *   SpotFulfillmentRequestsStatusResponseSchema:
  *     type: object
@@ -377,19 +380,16 @@ router.get('/fulfillmentOptions', validateManager.fulfillmentConfig, async(req, 
     };
     try {
         const data = await validateManager.getAvailableRequests(options)
+        var code;
         if (data && data.success === false) {
-            var code = (data.code === undefined ) ? 500 : data.code;
-            res.status(code).json({
-                code: code,
-                ... data
-            });
+            code = (data.code === undefined ) ? 500 : data.code;
         } else {
-            res.status(200).json({
-                success: true,
-                code: 200,
-                data: data
-            });
+            code = (data.code === undefined ) ? 200 : data.code;
         }
+        res.status(code).json({
+            code: code,
+            ... data
+        });
     } catch (err) {
         res.status(500).json({
             success: false,
@@ -437,19 +437,16 @@ router.post('/fulfillmentRequests', validateManager.fulfillmentParams, async(req
     };
     console.log(`Options: ${JSON.stringify(options)}`);
     const data = await dataManager.createFulfillmentRequest(options);
+    var code;
     if (data && data.success === false) {
-        var code = (data.code === undefined ) ? 500 : data.code;
-        res.status(code).json({
-            code: code,
-            ... data
-        });
+        code = (data.code === undefined ) ? 500 : data.code;
     } else {
-        res.status(201).json({
-            success: true,
-            code: 201,
-            data: data
-        });
+        code = (data.code === undefined ) ? 201 : data.code;
     }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
 });
 
 /**
@@ -510,9 +507,6 @@ router.post('/fulfillmentRequests', validateManager.fulfillmentParams, async(req
  *                   type: integer
  *                   default: 400
  *                   description: HTTP status code
- *                 data:
- *                   items:
- *                     $ref: '#/definitions/SpotFulfillmentRequestsResponseSchema'
  *                 errors:
  *                   type: array
  *                   description: list of Spot Fulfillment errors
@@ -533,19 +527,16 @@ router.get('/fulfillmentRequests/:requestId', async(req, res) => {
     }
 
     const data = await dataManager.getFulfillmentRequest(requestId, bucketName, fileName);
+    var code;
     if (data && data.success === false) {
-        var code = (data.code === undefined ) ? 500 : data.code;
-        res.status(code).json({
-            code: code,
-            ... data
-        });
+        code = (data.code === undefined ) ? 500 : data.code;
     } else {
-        res.status(200).json({
-            success: true,
-            code: 200,
-            data: data
-        });
+        code = (data.code === undefined ) ? 200 : data.code;
     }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
 });
 
 /**
@@ -667,9 +658,6 @@ router.post('/fulfillmentSubscriber', validateManager.fulfillmentWebhookParams, 
  *                   type: integer
  *                   default: 400
  *                   description: HTTP status code
- *                 data:
- *                   items:
- *                     $ref: '#/definitions/SpotFulfillmentRequestsResponseSchema'
  *                 errors:
  *                   type: array
  *                   description: list of Spot Fulfillment errors
@@ -683,19 +671,16 @@ router.post('/fulfillmentWorker', async(req, res) => {
     console.log(`Options: ${JSON.stringify(options)}`);
     const data = await dataManager.pullFulfillmentSubscriptionRequest(options);
     //console.log(data);
+    var code;
     if (data && data.success === false) {
-        var code = (data.code === undefined ) ? 500 : data.code;
-        res.status(code).json({
-            code: code,
-            ... data
-        });
+        code = (data.code === undefined ) ? 500 : data.code;
     } else {
-        res.status(201).json({
-            success: true,
-            code: 201,
-            data: data
-        });
+        code = (data.code === undefined ) ? 201 : data.code;
     }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
 });
 
 /**

@@ -26,16 +26,16 @@ const validateManager = require('./validateManager');
 const fulfillmentMessageSchema = require('./validateManager').fulfillmentMessageSchema;
 
 /**
- * @param  {} name
+ * @param  {string} name
  * Creates a file name string based off name parameter.
  */
 function createFileName(name) {
     const directoryName = 'fulfillments';
-    return `${directoryName}/${name}.jsonl`;
+    return `${directoryName}/${name}.jsonl.gz`;
 }
 
 /**
- * @param  {} options
+ * @param  {Object} options
  * Creates a message to execute a job/query based on the request and parameters.
  * Returns the request Id and query string for bucket object
  */
@@ -50,14 +50,22 @@ async function createFulfillmentRequest(options) {
         bucketName: bucketName,
         fileName: fileName
     });
-
+    const responseData = {
+        requestId: requestId,
+        query: query,
+        bucketName: bucketName,
+        fileName: fileName
+    }
     // create the fulfillment request now
     if (options.wait === true) {
         const data = await createFulfillment(requestId, options).catch(err => {
             console.warn(err);
-            return { data: { requestId: requestId }, success: false, errors: [err.message] };
+            return { success: false, errors: [err.message] };
         });
-        return data;
+        if (data.success === false ) {
+            return { ...data };
+        }
+        return { data: { ...responseData, ...data }, success: true };
     }
 
     // create the fulfillment pubsub message
@@ -67,62 +75,59 @@ async function createFulfillmentRequest(options) {
     const topicName = options.config.pubsub.topicName;
     await pubsubManager.publishMessage(topicName, options, customAttributes).catch(err => {
         console.warn(err);
-        return { data: { requestId: requestId }, success: false, errors: [err.message] };
+        return { success: false, errors: [err.message] };
     });
-    //console.log(pubsubMessage);
-    return {
-        requestId: requestId,
-        query: query,
-        bucketName: bucketName,
-        fileName: fileName
-    };
+    return { data: { ...responseData }, success: true };
 }
 
 /**
- * @param  {} options
+ * @param  {string} requestId
+ * @param  {string} bucketName
+ * @param  {string} fileName
  * Checks if the file exists and metadata matches the requestId
  */
 async function getFulfillmentRequest(requestId, bucketName, fileName) {
     var message;
+    console.log(`RequestId: ${requestId}, bucketName: ${bucketName}, fileName: ${fileName}`);
+
     const query = querystring.encode({
         bucketName: bucketName,
         fileName: fileName
     });
-    console.log(`RequestId: ${requestId}, bucketName: ${bucketName}, fileName: ${fileName}`);
+    const responseData = {
+        requestId: requestId,
+        query: query,
+        bucketName: bucketName,
+        fileName: fileName
+    }
 
     const exists = await storageManager.checkIfFileExists(bucketName, fileName).catch(err => {
         console.warn(err);
-        return { data: { requestId: requestId }, success: false, errors: [err.message] };
+        return { success: false, errors: [err.message] };
     });
-    if (exists !== true) {
-        return { data: { requestId: requestId }, ...exists };
+    if (exists.success === false) {
+        return { ...exists };
     }
 
     const metadata = await storageManager.getFileMetadata(bucketName, fileName).catch(err => {
         console.warn(err);
-        return { data: { requestId: requestId }, success: false, errors: [err.message] };
+        return { success: false, errors: [err.message] };
     });
     if (metadata.metadata.requestId === undefined || metadata.metadata.requestId !== requestId) {
         console.log(metadata.metadata);
         message = `fileName: '${fileName}' does not have the signature for requestId: '${requestId}'`;
-        return { data: { requestId: requestId }, code: 400, success: false, errors: [message] };
+        return { success: false, code: 400, errors: [message] };
     }
 
     const signedUrl = await storageManager.getUrl(bucketName, fileName, true).catch(err => {
         console.warn(err);
-        return { data: { requestId: requestId }, success: false, errors: [err.message] };
+        return { success: false, errors: [err.message] };
     });
-    return {
-        requestId: requestId,
-        query: query,
-        bucketName: bucketName,
-        fileName: fileName,
-        signedUrl: signedUrl[0]
-    };
+    return { data: { ...responseData, signedUrl: signedUrl[0] }, success: true };
 }
 
 /**
- * @param  {} options
+ * @param  {Object} options
  * Receives message payload from GCP Pubsub subscription and processes
  * fulfillment request. logic assumes that message payload schema has
  * already been validated.
@@ -135,15 +140,25 @@ async function processFulfillmentSubscriptionRequest(options) {
         bucketName: bucketName,
         fileName: fileName
     });
+    const responseData = {
+        requestId: requestId,
+        query: query,
+        bucketName: bucketName,
+        fileName: fileName
+    }
+
     const data = await createFulfillment(requestId, options).catch(err => {
         console.warn(err);
-        return { data: { requestId: requestId }, success: false, errors: [err.message] };
+        return { success: false, errors: [err.message] };
     });
-    return data;
+    if (data.success === false ) {
+        return { ...data };
+    }
+    return { data: { ...responseData, ...data }, success: true };
 }
 
 /**
- * @param  {}
+ * @param  {Object} options
  * Pulls message from GCP Pubsub subscription and processes
  * fulfillment request.
  */
@@ -157,7 +172,7 @@ async function pullFulfillmentSubscriptionRequest(options) {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
-    if (exists !== true) {
+    if (exists.success === false) {
         return { ...exists };
     }
 
@@ -188,16 +203,26 @@ async function pullFulfillmentSubscriptionRequest(options) {
         bucketName: bucketName,
         fileName: fileName
     });
+    const responseData = {
+        requestId: requestId,
+        query: query,
+        bucketName: bucketName,
+        fileName: fileName
+    }
 
     const data = await createFulfillment(requestId, options).catch(err => {
         console.warn(err);
-        return { data: { requestId: requestId }, success: false, errors: [err.message] };
+        return { success: false, errors: [err.message] };
     });
-    return data;
+    if (data.success === false ) {
+        return { ...data };
+    }
+    return { data: { ...responseData, ...data }, success: true };
 }
 
 /**
- * @param  {} options
+ * @param  {string} requiredId
+ * @param  {Object} options
  * Executes BigQuery job, extracts contents, creates file, and signs it.
  * This is a long running operation that should be run in the background.
  */
@@ -206,10 +231,16 @@ async function createFulfillment(requestId, options) {
     if (!options.destination.bucketName || !options.destination.fileName) {
         message = 'No Bucket Name or File Name is supplied.';
         console.warn(message);
-        return { success: false, code:400, errors: [message] };
+        return { success: false, code: 400, errors: [message] };
     }
     // Build up query based off of user request options
-    const queryOptions = await validateManager.getDynamicQueryOptions(options);
+    const queryOptions = await validateManager.getDynamicQueryOptions(options).catch(err => {
+        console.warn(err);
+        return { success: false, errors: [err.message] };
+    });
+    if (queryOptions.success === false) {
+        return { ...queryOptions };
+    }
     const bucketName = options.destination.bucketName;
     const fileName = options.destination.fileName;
     const projectName = options.config.destination.projectName;
@@ -224,42 +255,28 @@ async function createFulfillment(requestId, options) {
         return { success: false, errors: [err.message] };
     });
     if (exists === true) {
-        return { success: false, code:409, errors: ['Storage file [' + fileName + '] already exists'] };
+        return { success: false, code: 409, errors: ['Storage file [' + fileName + '] already exists'] };
     }
     // Set query options to execute BQ job and extract to table
     const today = new Date();
     today.setDate(today.getDate() + 1);
     const expiryTime = today.getTime();
 
+    // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
     queryOptions.destinationTable = {
         projectId: projectName,
         datasetId: datasetId,
         tableId: tableId
     };
-
-    // create file and sign
-    const fileOptions = {
-        gzip: true,
-        private: true,
-        metadata: {
-            metadata: {
-                requestId: requestId
-            }
-        }
-    }
     queryOptions.createDisposition = "CREATE_IF_NEEDED";
     queryOptions.writeDisposition = "WRITE_EMPTY";
-
     // To ensure executeQuery does not retrieve any records in the result set, set to zero
     queryOptions.maxResults = 0;
 
-    console.log(queryOptions);
-
-    var exists = await bqManager.checkIfDatasetExists(projectName, datasetId).catch(err => {
+    exists = await bqManager.checkIfDatasetExists(projectName, datasetId).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
-    console.log(exists);
     if (exists.success === false) {
         console.log(`Creating new dataset ${datasetId} in project ${projectName}`);
         exists = await bqManager.createDataset(projectName, datasetId).catch(err => {
@@ -268,16 +285,22 @@ async function createFulfillment(requestId, options) {
         });
     }
     if (exists.success === false) {
-        message = `Destination dataset ${datasetId} in project ${projectName} does not exist or failed creating`;
-        console.warn(message);
-        return { success: false, errors: [message] };
+        return exists;
     }
 
-    //var results = await bqManager.createDatasetIfDoesNotExist(projectName, datasetId).then(() => {
-        //console.log(`bqManager.createDatasetIfDoesNotExist: ${projectName} ${datasetId}`);
     var results = await bqManager.executeQuery(queryOptions).then(() => {
         console.log(`bqManager.extractTableToGCS: ${datasetId} ${tableId} ${bucketName} ${fileName}`);
         return bqManager.extractTableToGCS(datasetId, tableId, bucketName, fileName);
+    }).then(() => {
+        // update with requestId
+        const fileMetadata = {
+            private: true,
+            metadata: {
+                requestId: requestId
+            }
+        }
+        console.log(`storageManager.updateMetadata: ${bucketName} ${fileName}`);
+        return storageManager.updateMetadata(bucketName, fileName, fileMetadata);
     }).then(() => {
         console.log(`storageManager.getUrl: ${bucketName} ${fileName}`);
         return storageManager.getUrl(bucketName, fileName, true);
@@ -286,17 +309,17 @@ async function createFulfillment(requestId, options) {
         bqManager.updateTableExpiration(datasetId, tableId, expiryTime);
         return signedUrl;
     }).catch(error => {
-        message = `BigQuery query failed: ${error}. Cleaning up`;
+        message = `Create Fulfillment failed: ${error}`;
         console.warn(message);
         console.log(`Finally bqManager.updateTableExpiration: ${datasetId} ${tableId} ${expiryTime}`);
         bqManager.updateTableExpiration(datasetId, tableId, expiryTime);
-        return { requestId: requestId, success: false, errors: [message] };
+        return { success: false, errors: [message] };
     });
-    console.log(results);
+
     if (results.success === false) {
         return results;
-    };
-    return { requestId: requestId, signedUrl: results[0] };
+    }
+    return { signedUrl: results[0] };
 }
 
 module.exports = {

@@ -35,7 +35,7 @@ const FULFILLMENT_CONFIG = {
     },
     pubsub: {
         topicName: process.env.FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME || "bqds-spot-fulfillment",
-        sbscriptionName: process.env.FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME || "projects/change-me/subscriptions/bqds-spot-fulfilllment-consumer"
+        subscriptionName: process.env.FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME || "projects/change-me/subscriptions/bqds-spot-fulfilllment-consumer"
     }
 }
 
@@ -111,8 +111,7 @@ async function getAvailableRequests(options, includeQuery) {
         return { success: false, errors: [err.message]};
     });
     if (file.success === false) {
-        // propogate errors
-        return { success: false, data: file };
+        return { ...file };
     }
     json = JSON.parse(stripJsonComments(file.content));
 
@@ -183,7 +182,7 @@ async function getAvailableRequests(options, includeQuery) {
             requests.push(request);
         }
     }
-    return requests;
+    return { data: requests, success: true };
 }
 
 /************************************************************
@@ -379,16 +378,16 @@ function fulfillmentWebhookPayload(options) {
 async function getDynamicQueryOptions(options) {
     let definitions = await getAvailableRequests(options, true).catch(err => {
         console.warn(err.message);
-        throw err;
+        return { success: false, code: 400, errors: [err.message] };
     });
 
     var message;
-    if (!definitions) {
+    if (definitions.success === false) {
         message = `Missing query definitions: ${JSON.stringify(missingParams)}`;
         console.warn(message);
         return { success: false, code: 400, errors: [message] };
     }
-    let requestDefinition = underscore.findWhere(definitions, { dataId: options.dataId });
+    let requestDefinition = underscore.findWhere(definitions.data, { dataId: options.dataId });
     if (!requestDefinition) {
         message = `No valid query parameters: ${JSON.stringify(options)}`;
         console.warn(message);
