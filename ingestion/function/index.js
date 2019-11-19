@@ -16,6 +16,9 @@
 
 'use strict';
 
+const { BigQueryUtil } = require('bqds-shared');
+const bigqueryUtil = BigQueryUtil();
+
 const { BigQuery } = require('@google-cloud/bigquery');
 const { Storage } = require('@google-cloud/storage');
 const bigqueryClient = new BigQuery();
@@ -37,7 +40,7 @@ exports.processEvent = async (event, context) => {
     console.log(`Object notification arrived for gs://${event.bucket}/${event.name}`);
     if (canProcess(event.name)) {
         const config = await getConfiguration(event, context);
-        const haveDataset = await datasetExists(config.dataset);
+        const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
         if (!haveDataset) {
             console.log(`Dataset ${config.dataset} not found, creating...`);
             await createDataset(config.dataset);
@@ -127,7 +130,7 @@ async function transform(config) {
     const transformQuery = await fromStorage(config.bucket,
         `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
     const dataset = bigqueryClient.dataset(config.dataset);
-    // const exists = await tableExists(config.dataset, config.destinationTable);
+    // const exists = await bigqueryUtil.tableExists(config.dataset, config.destinationTable);
     // if (!exists) {
     //     console.log(`creating table ${config.destinationTable} with ${config.metadata.fields}`);
     //     await dataset.createTable(config.destinationTable, { schema: config.metadata.fields });
@@ -204,31 +207,6 @@ async function fromStorage(bucket, file) {
         console.info(`File ${file} not found in bucket ${bucket}: ${getExceptionString(error)}`);
         return undefined;
     }
-}
-
-/**
- * Returns value indicating if a BQ table exists.
- * @param  {} datasetId
- * @param  {} tableName
- */
-async function tableExists(datasetId, tableName) {
-    const dataset = bigqueryClient.dataset(datasetId);
-    const table = dataset.table(tableName);
-    const response = await table.exists();
-    const exists = response[0];
-    console.log(`Check if table exists: ${tableName}: ${exists}`);
-    return exists;
-}
-
-/**
- * Returns value indicating if a BQ dataset exists.
- * @param  {} datasetId
- */
-async function datasetExists(datasetId) {
-    const dataset = bigqueryClient.dataset(datasetId);
-    const results = await dataset.exists();
-    console.log('dataset exists?: ' + JSON.stringify(results));
-    return results.length > 0 ? results[0] : false;
 }
 
 /**

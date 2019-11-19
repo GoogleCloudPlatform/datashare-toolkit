@@ -140,7 +140,7 @@ async function setupPrerequisites(config) {
     }
 
     if (configUtil.isAccessControlDatasetUsed(config) === true) {
-        if (await bigqueryUtil.tableExists(config.projectId, config.accessControl.datasetId, "groupEntitlements") === false) {
+        if (await bigqueryUtil.tableExists(config.accessControl.datasetId, "groupEntitlements") === false) {
             const groupEntitlementSchema = [{
                 "name": "groupName",
                 "type": "STRING",
@@ -153,7 +153,7 @@ async function setupPrerequisites(config) {
             }];
             await bigqueryUtil.createTable(config.accessControl.datasetId, "groupEntitlements", groupEntitlementSchema, tableDescription);
         }
-        if (await bigqueryUtil.tableExists(config.projectId, config.accessControl.datasetId, "groups") === false) {
+        if (await bigqueryUtil.tableExists(config.accessControl.datasetId, "groups") === false) {
             const groupsSchema = [{
                 "name": "groupName",
                 "type": "STRING",
@@ -171,14 +171,14 @@ async function setupPrerequisites(config) {
             }];
             await bigqueryUtil.createTable(config.accessControl.datasetId, "groups", groupsSchema, tableDescription);
         }
-        if (await bigqueryUtil.viewExists(config.projectId, config.accessControl.datasetId, config.accessControl.viewId) === false) {
+        if (await bigqueryUtil.viewExists(config.accessControl.datasetId, config.accessControl.viewId) === false) {
             const viewSql = `select lower(g.viewName) as viewName, e.accessControlLabel\nfrom \`${config.projectId}.${config.accessControl.datasetId}.groups\` g\njoin \`${config.projectId}.${config.accessControl.datasetId}.groupEntitlements\` e on lower(g.groupName) = lower(e.groupName)\nwhere lower(g.user) = lower(session_user())`;
-            await bigqueryUtil.createView(config.projectId, config.accessControl.datasetId, config.accessControl.viewId, viewSql);
+            await bigqueryUtil.createView(config.accessControl.datasetId, config.accessControl.viewId, viewSql);
         }
     }
 
     if (runtimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE === true) {
-        if (await bigqueryUtil.tableExists(config.projectId, config.accessControl.datasetId, "datasetPermissions") === false) {
+        if (await bigqueryUtil.tableExists(config.accessControl.datasetId, "datasetPermissions") === false) {
             const userPermissionsSchema = [{
                 "name": "uuid",
                 "type": "STRING",
@@ -215,7 +215,7 @@ async function setupPrerequisites(config) {
             }];
             await bigqueryUtil.createTable(config.accessControl.datasetId, "datasetPermissions", userPermissionsSchema, tableDescription);
         }
-        if (await bigqueryUtil.viewExists(config.projectId, config.accessControl.datasetId, "latestDatasetPermissions") === false) {
+        if (await bigqueryUtil.viewExists(config.accessControl.datasetId, "latestDatasetPermissions") === false) {
             const viewSql = `WITH RANKED AS (\n  select\n    configurationName,\n    uuid,\n    DENSE_RANK() OVER (PARTITION BY configurationName ORDER BY lastUpdated) as rank\n  from \`${config.projectId}.${config.accessControl.datasetId}.datasetPermissions\`\n),\nROWIDENTIFIERS AS (\n  SELECT r.uuid\n  from RANKED r\n  where r.rank = (select max(r2.rank) from RANKED r2 where r2.configurationName = r.configurationName)\n)\nSELECT\n * EXCEPT(uuid)\nFROM \`${config.projectId}.${config.accessControl.datasetId}.datasetPermissions\` t\nWHERE EXISTS (SELECT 1 from ROWIDENTIFIERS r WHERE t.uuid = r.uuid)`;
             await bigqueryUtil.createView(config.projectId, config.accessControl.datasetId, "latestDatasetPermissions", viewSql);
         }
@@ -345,7 +345,6 @@ async function processConfig(config) {
  * @param  {} config
  */
 async function processAccessPermissions(config) {
-    const [datasets] = await bigqueryUtil.getDatasets();
     const _role = "READER";
 
     for (const ds of config.datasets) {
@@ -353,7 +352,7 @@ async function processAccessPermissions(config) {
             console.log("Dataset name is missing, continuing");
             continue;
         }
-        if (!bigqueryUtil.datasetExists(ds.name, datasets)) {
+        if (!bigqueryUtil.datasetExists(ds.name)) {
             console.log(`Dataset '${ds.name}' does not exist in BQ, skipping this dataset`);
             continue;
         }
@@ -451,7 +450,7 @@ async function removeStaleObjects(config) {
             while (i--) {
                 let a = dsMetadata.access[i];
                 if (a.view && a.view.projectId && a.view.datasetId && a.view.tableId) {
-                    const _viewExists = await bigqueryUtil.viewExists(a.view.projectId, a.view.datasetId, a.view.tableId);
+                    const _viewExists = await bigqueryUtil.viewExists(a.view.datasetId, a.view.tableId);
                     if (_viewExists === false) {
                         isDatasetMetadataUpdateRequired = true;
                         dsMetadata.access.splice(i, 1);
@@ -476,7 +475,7 @@ async function removeStaleObjects(config) {
             while (i--) {
                 let a = dsMetadata.access[i];
                 if (a.view && a.view.projectId && a.view.datasetId && a.view.tableId) {
-                    const _viewExists = await bigqueryUtil.viewExists(a.view.projectId, a.view.datasetId, a.view.tableId);
+                    const _viewExists = await bigqueryUtil.viewExists(a.view.datasetId, a.view.tableId);
                     if (_viewExists === false) {
                         isDatasetMetadataUpdateRequired = true;
                         dsMetadata.access.splice(i, 1);

@@ -88,7 +88,7 @@ if (argv.runCloudTests) {
         }).then((result) => {
             expect(result).is.true;
         }).then(() => {
-            return bigqueryUtil.tableExists(argv.projectId, uuid, uuid);
+            return bigqueryUtil.tableExists(uuid, uuid);
         }).then((result) => {
             expect(result).is.true;
         }).then(() => {
@@ -101,7 +101,7 @@ if (argv.runCloudTests) {
             const query = `select * from \`${argv.projectId}.${uuid}.${uuid}\``;
             return bigqueryUtil.createView(argv.projectId, uuid, viewName, query, false, "description", labels);
         }).then((result) => {
-            return bigqueryUtil.viewExists(argv.projectId, uuid, viewName);
+            return bigqueryUtil.viewExists(uuid, viewName);
         }).then((result) => {
             expect(result).is.true;
         }).then(() => {

@@ -17,11 +17,6 @@
 'use strict';
 const { BigQuery } = require('@google-cloud/bigquery');
 
-const TableType = {
-    BASE_TABLE: 'BASE TABLE',
-    VIEW: 'VIEW'
-};
-
 class BigQueryUtil {
     constructor(projectId) {
         this.projectId = projectId;
@@ -94,71 +89,69 @@ class BigQueryUtil {
         rows.forEach(row => columns.push(row.column_name));
         return columns;
     }
-
     /**
      * @param  {} datasetId
      * @param  {} tableId
+     * Checks for the existence of a table or view.
      */
-    async tableExists(projectId, datasetId, tableId) {
-        return this.objectExists(projectId, datasetId, tableId, TableType.BASE_TABLE);
-    }
+    async tableExists(datasetId, tableId) {
+        const dataset = this.bigqueryClient.dataset(datasetId);
+        const table = dataset.table(tableId);
+        const response = await table.exists();
+        const exists = response[0];
 
-    /**
-     * @param  {} datasetId
-     * @param  {} tableId
-     */
-    async viewExists(projectId, datasetId, viewId) {
-        return this.objectExists(projectId, datasetId, viewId, TableType.VIEW);
-    }
-
-    /**
-     * @param  {} datasetId
-     * @param  {} tableId
-     * @param  {} tableType
-     * See https://cloud.google.com/bigquery/docs/information-schema-intro for more information on using information_schema tables
-     * See https://cloud.google.com/bigquery/docs/views for more information on views.
-     * TODO: This should have more integrity than a try/catch. Other exceptions may be raised outside of a non-existant project or dataset which will cause a false return to be mis-leading.
-     * Instead of using the information_schema tables, we can switch to using datasets and tables instead.
-      */
-    async objectExists(projectId, datasetId, tableId, tableType) {
-        try {
-            const options = {
-                query: "select count(*) as count from `" + projectId + "." + datasetId + ".INFORMATION_SCHEMA.TABLES` where table_type = @_tableType and table_name = @_tableName",
-                params: { _tableType: tableType, _tableName: tableId },
-            };
-            const [rows] = await this.executeQuery(options);
-            if (rows.length === 1 && rows[0].count === 1) {
-                return true;
-            }
-        } catch (error) {
-            if (this.VERBOSE_MODE) {
-                console.log(`objectExists threw an error: ${error}`);
+        if (exists === true) {
+            const meta = await table.getMetadata();
+            const type = meta[0].type;
+            if (type !== "TABLE") {
+                throw new Error(`Object is of type ${type}, expected 'TABLE'`);
             }
         }
-        return false;
+
+        if (this.VERBOSE_MODE) {
+            console.log(`Checking if table exists: '${tableId}': ${exists}`);
+        }
+        return exists;
+    }
+
+    async viewExists(datasetId, tableId) {
+        const dataset = this.bigqueryClient.dataset(datasetId);
+        const table = dataset.table(tableId);
+        const response = await table.exists();
+        const exists = response[0];
+
+        if (exists === true) {
+            const meta = await table.getMetadata();
+            const type = meta[0].type;
+            if (type !== "VIEW") {
+                throw new Error(`Object is of type ${type}, expected 'VIEW'`);
+            }
+        }
+
+        if (this.VERBOSE_MODE) {
+            console.log(`Checking if table exists: '${tableId}': ${exists}`);
+        }
+        return exists;
+    }
+
+    /**
+     * Returns value indicating if a BQ dataset exists.
+     * @param  {} datasetId
+     */
+    async datasetExists(datasetId) {
+        const dataset = this.bigqueryClient.dataset(datasetId);
+        const response = await dataset.exists();
+        const exists = response[0];
+        if (this.VERBOSE_MODE) {
+            console.log(`Checking if dataset exists: '${tableId}': ${exists}`);
+        }
+        return exists;
     }
 
     /**
      */
     async getDatasets() {
         return this.bigqueryClient.getDatasets();
-    }
-
-    /**
-     * @param  {} datasetId
-     */
-    async datasetExists(datasetId, datasets) {
-        let [datasetList] = [];
-        if (datasets) {
-            datasetList = datasets;
-        }
-        if (!datasetList) {
-            [datasetList] = await this.bigqueryClient.getDatasets();
-        }
-        let found = datasetList.find((dataset) => {
-            return dataset.id.toLowerCase() === datasetId.toLowerCase();
-        });
-        return found !== undefined;
     }
 
     /**
@@ -237,7 +230,7 @@ class BigQueryUtil {
      */
     async createView(projectId, datasetId, tableId, query, deleteIfExists, description, labels, expirationTime) {
         if (deleteIfExists && deleteIfExists === true) {
-            const exists = await this.viewExists(projectId, datasetId, tableId);
+            const exists = await this.viewExists(datasetId, tableId);
             if (exists === true) {
                 console.log("View '%s' already exists, deleting it", tableId);
                 await deleteTable(datasetId, tableId);
@@ -372,7 +365,7 @@ class BigQueryUtil {
                     }
                     else {
                         // Remove authorized views for which are no longer valid, otherwise there will be an error saving
-                        const _viewExists = await this.viewExists(a.view.projectId, a.view.datasetId, a.view.tableId);
+                        const _viewExists = await this.viewExists(a.view.datasetId, a.view.tableId);
                         if (_viewExists === false) {
                             console.log(`View '${a.view.datasetId}.${a.view.tableId}' is no longer valid, will remove it from the authorized view list`);
                             updatedRequired = true;
