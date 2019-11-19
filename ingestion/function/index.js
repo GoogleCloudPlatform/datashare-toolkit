@@ -51,7 +51,7 @@ exports.processEvent = async (event, context) => {
         try {
             await stageFile(config);
             await transform(config);
-            await deleteTable(config.dataset, config.stagingTable);
+            await bigqueryUtil.deleteTable(config.dataset, config.stagingTable);
         } catch (exception) {
             console.error(`Exception processing ${event.name}: ${getExceptionString(exception)}`);
             return;
@@ -141,19 +141,6 @@ async function transform(config) {
     console.log(`${job[0].metadata.id} ${job[0].metadata.statistics.query.statementType} ${job[0].metadata.configuration.jobType} ${job[0].metadata.status.state}`);
     console.log("processing done");
     return;
-}
-
-/**
- * Deletes a BQ table.
- * @param  {} dataset
- * @param  {} tableName
- */
-async function deleteTable(dataset, tableName) {
-    const ds = bigqueryClient.dataset(dataset);
-    console.log('Deleting temp table ' + tableName);
-    const toDelete = ds.table(tableName);
-    const response = await toDelete.delete();
-    console.log("delete table: " + JSON.stringify(response));
 }
 
 /**
