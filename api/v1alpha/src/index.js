@@ -684,58 +684,6 @@ router.post('/fulfillmentWorker', async(req, res) => {
 });
 
 /**
- * @param  {} '/projects/:project/datasets/:dataset/tables/:table'
- * @param  {} async(req, res)
- * @param  {} res
- * Returns a status of each resource in the url path
- */
-routes = [
-    '/projects/:projectId',
-    '/projects/:projectId/datasets/:datasetId',
-    '/projects/:projectId/datasets/:datasetId/tables/:tableId'
-];
-
-router.get(routes, validateManager.urlPathParams, function(req, res) {
-    var message = [];
-    if (req.params.projectId) {
-        message.push(`Project ID [${req.params.projectId}] exists`);
-    }
-    if (req.params.datasetId) {
-        message.push(`Dataset [${req.params.datasetId}] exists`);
-    }
-    if (req.params.tableId) {
-        message.push(`Table [${req.params.tableId}] exists`);
-    }
-    if (message === []) {
-        message = 'Missing something';
-    }
-    res.status(200).json({
-        success: true,
-        code: 200,
-        message: message
-    });
-});
-
-/**
- * @param  {} '/projects/:project/datasets/:dataset/tables/:table/fulfillmentConfigs'
- * @param  {} async(request
- * @param  {} res
- * Returns fulfillment configurations for the table resource in the path
- */
-routes = [
-    '/projects/:projectId/datasets/:datasetId/tables/:tableId/fulfillmentConfigs'
-];
-
-router.get(routes, validateManager.urlPathParams, function(req, res) {
-    var message = 'TODO';
-    res.status(200).json({
-        success: true,
-        code: 200,
-        message: message
-    });
-});
-
-/**
  * @swagger
  *
  * /docs:

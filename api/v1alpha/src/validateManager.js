@@ -25,7 +25,6 @@ const Joi = require('@hapi/joi');
 /************************************************************
   immutable constant options
  ************************************************************/
-const URL_PATH_PARAMS = ["bucketName", "projectId", "datasetId", "tableId"];
 const FULFILLMENT_CONFIG = {
     bucketName: process.env.FULFILLMENT_CONFIG_BUCKET_NAME || "change-me",
     fileName: process.env.FULFILLMENT_CONFIG_FILE_NAME || "bqds/api/config.json",
@@ -183,86 +182,6 @@ async function getAvailableRequests(options, includeQuery) {
         }
     }
     return { data: requests, success: true };
-}
-
-/************************************************************
-  Validate the url path parameters based of url resource
-    Inputs:
-      - request, response, next
-    Returns:
-      - response or next
- ************************************************************/
-async function urlPathParams(req, res, next) {
-    var errors = []
-
-    // validParams validation
-    var validParams = URL_PATH_PARAMS;
-
-    var projectName = "";
-    var datasetName = "";
-    //
-    // lets iterate over the url path to validate the corresponding objects exist
-    // some object inheritance require parent objects, i.e. 'table' requires 'dataset'
-    // which requires 'project', etc.
-    // For now, we break if any of the corresponding items does not exist.
-    for (var i = 0; i < validParams.length; i++) {
-        if (validParams[i] == 'projectId') {
-            projectName = req.params[validParams[i]];
-        }
-        if (validParams[i] == 'dataset') {
-            datasetName = req.params[validParams[i]];
-        }
-        if (typeof req.params[validParams[i]] != 'undefined') {
-            // console.log(`Testing dynamic url path name:param [${validParams[i]}:${req.params[validParams[i]]}]`);
-            let paramValue = req.params[validParams[i]];
-            // Storage bucket validation
-            if (validParams[i] == 'bucketName') {
-                let result = await storageManager.checkIfBucketExists(paramValue).catch(err => {
-                    errors.push(err.message);
-                });
-                if (result && result.success === false) {
-                    errors.push(...result.errors);
-                }
-            }
-            // TODO Project validation
-            //
-            // Bigquery Dataset validation
-            if (validParams[i] == 'datasetId') {
-                if (!projectName) {
-                    errors.push(`Project ID does not exist`);
-                    break;
-                }
-                let result = await bigqueryManager.checkIfDatasetExists(projectName, paramValue).catch(err => {
-                    errors.push(err.message);
-                });
-                if (result && result.success === false) {
-                    errors.push(...result.errors);
-                }
-            }
-            // Bigquery Dataset Table validation
-            if (validParams[i] == 'tableId') {
-                if (!projectName) {
-                    errors.push(`Project ID does not exist`);
-                    break;
-                }
-                let result = await bigqueryManager.checkIfDatasetTableExists(projectName, datasetName, paramValue).catch(err => {
-                    errors.push(err.message);
-                });
-                if (result && result.success === false) {
-                   errors.push(...result.errors);
-                }
-            }
-            //break;
-        }
-    }
-    if (errors.length > 0) {
-        return res.status(400).json({
-            success: false,
-            errors: errors,
-            code: 400
-        });
-    }
-    return next();
 }
 
 /************************************************************
@@ -444,7 +363,6 @@ function performTextVariableReplacements(text, projectId, datasetId, tableId) {
   Module exports
  **************************************************************************/
 module.exports = {
-    urlPathParams,
     fulfillmentParams,
     fulfillmentWebhookParams,
     fulfillmentWebhookPayload,
