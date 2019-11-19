@@ -41,7 +41,8 @@ let batchId;
 exports.processEvent = async (event, context) => {
     batchId = cloudFunctionUtil.generateBatchId(event, context);
     console.log(`Object notification arrived for gs://${event.bucket}/${event.name}, batchId is ${batchId}`);
-    if (canProcess(event.name)) {
+
+    if (cloudFunctionUtil.isExtensionSupported(event.name, acceptable)) {
         const config = await getConfiguration(event, context);
         const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
         if (!haveDataset) {
@@ -92,23 +93,6 @@ async function getConfiguration(event, context) {
 
     console.log("configuration: " + JSON.stringify(config));
     return config;
-}
-
-/**
- * Determine whether a file suffix is recognized for ingestion.
- * @param  {} fileName
- */
-function canProcess(fileName) {
-    const parts = fileName.split('.');
-    if (parts[0] &&
-        (parts[0].startsWith(processPrefix)
-            || parts[0].startsWith(`/${processPrefix}`))) {
-        return false;
-    } else {
-        const ext = parts[parts.length - 1];
-        console.log(`file has extension ${ext}`);
-        return acceptable.includes(ext.toLowerCase());
-    }
 }
 
 /**

@@ -29,6 +29,23 @@ class CloudFunctionUtil {
             event.name
         ].join(':');
     }
+
+    /**
+     * Determine whether a file suffix is recognized for ingestion.
+     * @param  {} fileName
+     */
+    isExtensionSupported(fileName, acceptable) {
+        const parts = fileName.split('.');
+        if (parts[0] &&
+            (parts[0].startsWith(processPrefix)
+                || parts[0].startsWith(`/${processPrefix}`))) {
+            return false;
+        } else {
+            const ext = parts[parts.length - 1];
+            console.log(`file has extension ${ext}`);
+            return acceptable.includes(ext.toLowerCase());
+        }
+    }
 }
 
 module.exports = CloudFunctionUtil;
