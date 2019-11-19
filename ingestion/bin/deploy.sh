@@ -103,6 +103,7 @@ if [ -z "$FUNCTION_REGION" ]; then
     exit 7
 else
     echo "Function region: ${FUNCTION_REGION}"
+    # rm -R shared
     cp -R ../../shared shared/
     # ln -s ../../shared shared
     ls -la
