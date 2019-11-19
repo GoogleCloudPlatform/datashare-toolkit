@@ -32,12 +32,16 @@ class BigQueryUtil {
         this.bigqueryClient = new BigQuery(options);
     }
 
+    get VERBOSE_MODE() {
+        return process.env.VERBOSE_MODE;
+    }
+
     /**
      * @param  {} options
      */
     async executeQuery(options) {
         const [job] = await this.bigqueryClient.createQueryJob(options);
-        if (process.env.VERBOSE_MODE) {
+        if (this.VERBOSE_MODE) {
             console.log(`Job '${job.id}' started for query: ${JSON.stringify(options)}`);
         }
         return await job.getQueryResults();
@@ -68,7 +72,7 @@ class BigQueryUtil {
             const [rows] = await this.executeQuery(options);
             return true;
         } catch (error) {
-            if (process.env.VERBOSE_MODE) {
+            if (this.VERBOSE_MODE) {
                 console.log("ERROR: %s - Query: '%s' is invalid", error, _sql);
             }
             return false;
@@ -127,7 +131,7 @@ class BigQueryUtil {
                 return true;
             }
         } catch (error) {
-            if (process.env.VERBOSE_MODE) {
+            if (this.VERBOSE_MODE) {
                 console.log(`objectExists threw an error: ${error}`);
             }
         }
@@ -173,7 +177,7 @@ class BigQueryUtil {
         });
 
         // Should have boolean return, handling errors or throwing to caller
-        if (process.env.VERBOSE_MODE) {
+        if (this.VERBOSE_MODE) {
             console.log(`getDatasetMetadata result for datasetId: ${datasetId}:\n${JSON.stringify(_metadata, null, 2)}`);
         }
 
@@ -217,7 +221,7 @@ class BigQueryUtil {
             }
         }
 
-        if (process.env.VERBOSE_MODE) {
+        if (this.VERBOSE_MODE) {
             console.log(`getTableMetadata result for datasetId: '${datasetId}' and tableId: '${tableId}':\n${JSON.stringify(metadata, null, 2)}`);
         }
 
@@ -267,7 +271,7 @@ class BigQueryUtil {
                 .dataset(datasetId)
                 .createTable(tableId, options);
 
-            if (process.env.VERBOSE_MODE) {
+            if (this.VERBOSE_MODE) {
                 console.log(`View '${table.id}' created.`);
             }
 
@@ -298,7 +302,7 @@ class BigQueryUtil {
             .dataset(datasetId)
             .createTable(tableId, options);
 
-        if (process.env.VERBOSE_MODE) {
+        if (this.VERBOSE_MODE) {
             console.log(`Table ${table.id} created.`);
         }
         return true;
@@ -315,7 +319,7 @@ class BigQueryUtil {
                 .table(tableId)
                 .delete();
 
-            if (process.env.VERBOSE_MODE) {
+            if (this.VERBOSE_MODE) {
                 console.log(`Table ${tableId} deleted`);
             }
             return true;
@@ -356,14 +360,14 @@ class BigQueryUtil {
                             updatedRequired = true;
                             metadata.access.splice(i, 1);
 
-                            if (process.env.VERBOSE_MODE) {
+                            if (this.VERBOSE_MODE) {
                                 console.log(`Removing authorization in dataset '${sourceDatasetId}' granting object '${authorizeProject}.${authorizeDataset}.${authorizeView}' access`);
                             }
                         }
                         else {
                             isViewAlreadyAdded = true;
 
-                            if (process.env.VERBOSE_MODE) {
+                            if (this.VERBOSE_MODE) {
                                 console.log(`Authorization in dataset '${sourceDatasetId}' granting object '${authorizeProject}.${authorizeDataset}.${authorizeView}' access already exists`);
                             }
                         }
@@ -411,7 +415,7 @@ class BigQueryUtil {
         let success = false;
         const dataset = this.bigqueryClient.dataset(datasetId);
 
-        if (process.env.VERBOSE_MODE) {
+        if (this.VERBOSE_MODE) {
             console.log(`Setting metadata for dataset '${datasetId}': ${JSON.stringify(metadata, null, 2)}`);
         }
 
@@ -445,7 +449,7 @@ class BigQueryUtil {
 
             const [dataset] = await this.bigqueryClient.createDataset(datasetId, options);
 
-            if (process.env.VERBOSE_MODE) {
+            if (this.VERBOSE_MODE) {
                 console.log(`Dataset ${dataset.id} created.`);
             }
             return true;
@@ -464,7 +468,7 @@ class BigQueryUtil {
                 .dataset(datasetId)
                 .delete({ force: true });
 
-            if (process.env.VERBOSE_MODE) {
+            if (this.VERBOSE_MODE) {
                 console.log(`Dataset ${datasetId} deleted`);
             }
             return true;
@@ -485,7 +489,7 @@ class BigQueryUtil {
         const table = dataset.table(tableId);
         let _metadata;
 
-        if (process.env.VERBOSE_MODE) {
+        if (this.VERBOSE_MODE) {
             console.log(`Setting metadata for table '${datasetId}.${tableId}': ${JSON.stringify(metadata, null, 2)}`);
         }
 
