@@ -102,7 +102,7 @@ async function getConfiguration(event, context) {
 async function transform(config) {
     const transformQuery = await fromStorage(config.bucket,
         `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
-    const dataset = bigqueryClient.dataset(config.dataset);
+    // const dataset = bigqueryClient.dataset(config.dataset);
     // const exists = await bigqueryUtil.tableExists(config.dataset, config.destinationTable);
     // if (!exists) {
     //     console.log(`creating table ${config.destinationTable} with ${config.metadata.fields}`);
