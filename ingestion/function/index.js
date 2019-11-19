@@ -69,17 +69,19 @@ async function getConfiguration(event, context) {
     const destinationTable = dest[1];
 
     const schemaConfig = await fromStorage(event.bucket, `${processPrefix}/${destinationTable}.${schemaFileName}`);
+    let config = {};
+    if (schemaConfig) {
+        // This will pull in the dictionary from the configuration file. IE: includes destination, metadata, truncate, etc.
+        config = JSON.parse(schemaConfig);
 
-    // This will pull in the dictionary from the configuration file. IE: includes destination, metadata, truncate, etc.
-    const config = JSON.parse(schemaConfig);
-
-    // Updates the configured metadata to create necessary default values.
-    config.metadata = setMetadataDefaults(config);
+        // Updates the configured metadata to create necessary default values.
+        config.metadata = setMetadataDefaults(config);
+    }
 
     // Runtime created properties
     config.dataset = dataset;
     config.destinationTable = destinationTable;
-    config.stagingTable = `TMP_${config.destinationTable}_${context.eventId}`;
+    config.stagingTable = `TMP_${destinationTable}_${context.eventId}`;
     config.sourceFile = event.name;
     config.bucket = event.bucket;
     config.eventId = context.eventId;
