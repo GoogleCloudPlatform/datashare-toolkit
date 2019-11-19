@@ -16,8 +16,9 @@
 
 'use strict';
 
-const { BigQueryUtil } = require('bqds-shared');
+const { BigQueryUtil, CloudFunctionUtil } = require('bqds-shared');
 const bigqueryUtil = BigQueryUtil();
+const cloudFunctionUtil = CloudFunctionUtil();
 
 const { BigQuery } = require('@google-cloud/bigquery');
 const { Storage } = require('@google-cloud/storage');
@@ -31,13 +32,15 @@ const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
 const stagingTableExpiryDays = 2;
 const processPrefix = "bqds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
+let batchId;
 
 /**
  * @param  {} event
  * @param  {} context
  */
 exports.processEvent = async (event, context) => {
-    console.log(`Object notification arrived for gs://${event.bucket}/${event.name}`);
+    batchId = cloudFunctionUtil.generateBatchId(event, context);
+    console.log(`Object notification arrived for gs://${event.bucket}/${event.name}, batchId is ${batchId}`);
     if (canProcess(event.name)) {
         const config = await getConfiguration(event, context);
         const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
@@ -109,24 +112,10 @@ function canProcess(fileName) {
 }
 
 /**
- * Generates the batch Id.
- * @param  {} config
- */
-function generateBatchId(config) {
-    return [
-        new Date().getTime(),
-        config.eventId,
-        config.bucket,
-        config.sourceFile
-    ].join(':');
-}
-
-/**
  * Exceutes the sql transformation.
  * @param  {} config
  */
 async function transform(config) {
-    const batchId = generateBatchId(config);
     const transformQuery = await fromStorage(config.bucket,
         `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
     const dataset = bigqueryClient.dataset(config.dataset);
