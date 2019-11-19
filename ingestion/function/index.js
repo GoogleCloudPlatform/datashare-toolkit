@@ -43,7 +43,7 @@ exports.processEvent = async (event, context) => {
         const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
         if (!haveDataset) {
             console.log(`Dataset ${config.dataset} not found, creating...`);
-            await createDataset(config.dataset);
+            await bigqueryUtil.createDataset(config.dataset);
             console.log(`Created dataset ${config.dataset}`);
         } else {
             console.log(`found dataset ${config.dataset}`);
@@ -207,15 +207,6 @@ async function fromStorage(bucket, file) {
         console.info(`File ${file} not found in bucket ${bucket}: ${getExceptionString(error)}`);
         return undefined;
     }
-}
-
-/**
- * Creates a dataset.
- * @param  {} datasetId
- */
-async function createDataset(datasetId) {
-    const dataset = bigqueryClient.dataset(datasetId);
-    return await dataset.create();
 }
 
 /**
