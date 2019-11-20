@@ -27,7 +27,6 @@ const bigqueryClient = new BigQuery();
 const storageClient = new Storage();
 const schemaFileName = "schema.json";
 const transformFileName = "transform.sql";
-const defaultLocation = 'US';
 const defaultTransformQuery = "*";
 const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
 const stagingTableExpiryDays = 2;
@@ -161,8 +160,7 @@ async function stageFile(config) {
  */
 async function runTransform(config, query) {
     console.log("configuration for runTransform: " + JSON.stringify(config));
-    const options = {
-        location: defaultLocation,
+    let options = {
         destinationTable: {
             projectId: process.env.GCP_PROJECT,
             datasetId: config.dataset,
@@ -178,6 +176,11 @@ async function runTransform(config, query) {
             type: 'DAY'
         }
     };
+
+    if (config.metadata && config.metadata.location) {
+        options.location = config.metadata.location;
+    }
+
     console.log("BigQuery options: " + JSON.stringify(options));
     try {
         return await bigqueryClient.createQueryJob(options);
@@ -220,10 +223,6 @@ function setMetadataDefaults(dict) {
 
         if (!meta.maxBadRecords) {
             meta.maxBadRecords = 0;
-        }
-
-        if (!meta.location) {
-            meta.location = defaultLocation;
         }
 
         console.log("using metadata: " + JSON.stringify(meta));
