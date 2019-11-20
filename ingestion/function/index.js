@@ -42,7 +42,7 @@ exports.processEvent = async (event, context) => {
     batchId = cloudFunctionUtil.generateBatchId(event, context);
     console.log(`Object notification arrived for gs://${event.bucket}/${event.name}, batchId is ${batchId}`);
 
-    if (cloudFunctionUtil.isExtensionSupported(event.name, acceptable)) {
+    if (cloudFunctionUtil.isExtensionSupported(event.name, acceptable, processPrefix)) {
         const config = await getConfiguration(event, context);
         const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
         if (!haveDataset) {

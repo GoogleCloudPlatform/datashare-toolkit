@@ -17,6 +17,10 @@
 'use strict';
 
 class CloudFunctionUtil {
+    get VERBOSE_MODE() {
+        return process.env.VERBOSE_MODE;
+    }
+    
     /**
      * Generates the BQDS batch Id.
      * @param  {} config
@@ -34,15 +38,15 @@ class CloudFunctionUtil {
      * Determine whether a file suffix is recognized for ingestion.
      * @param  {} fileName
      */
-    isExtensionSupported(fileName, acceptable) {
+    isExtensionSupported(fileName, acceptable, ignoreStartsWith) {
         const parts = fileName.split('.');
         if (parts[0] &&
-            (parts[0].startsWith(processPrefix)
-                || parts[0].startsWith(`/${processPrefix}`))) {
+            (parts[0].startsWith(ignoreStartsWith)
+                || parts[0].startsWith(`/${ignoreStartsWith}`))) {
             return false;
         } else {
             const ext = parts[parts.length - 1];
-            console.log(`file has extension ${ext}`);
+            console.log(`File has extension ${ext}`);
             return acceptable.includes(ext.toLowerCase());
         }
     }
