@@ -20,10 +20,11 @@ class CloudFunctionUtil {
     get VERBOSE_MODE() {
         return process.env.VERBOSE_MODE;
     }
-    
+
     /**
+     * @param  {} event
+     * @param  {} context
      * Generates the BQDS batch Id.
-     * @param  {} config
      */
     generateBatchId(event, context) {
         return [
@@ -35,8 +36,10 @@ class CloudFunctionUtil {
     }
 
     /**
-     * Determine whether a file suffix is recognized for ingestion.
      * @param  {} fileName
+     * @param  {} acceptable
+     * @param  {} ignoreStartsWith
+     * Determine whether a file suffix is recognized for ingestion.
      */
     isExtensionSupported(fileName, acceptable, ignoreStartsWith) {
         const parts = fileName.split('.');
