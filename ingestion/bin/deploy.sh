@@ -123,6 +123,7 @@ else
         echo 'Running on macOS'
     else
         # linux
+        echo 'Running on linux, will perform replacement on bqds-shared package.json file path'
         sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../function/package.json
     fi
 
