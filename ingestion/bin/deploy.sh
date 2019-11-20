@@ -118,12 +118,13 @@ else
     UNAME=$(uname | awk '{print tolower($0)}')
     if [ "$UNAME" == "darwin" ]; then
         # macOS
-        # sed -i '' -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../function/package.json    
+        # sed -i '' -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../function/package.json
         # Do nothing as this is not the build server
     else
         # linux
-        sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../function/package.json    
+        sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../function/package.json
     fi
+
     gcloud functions deploy ${FUNCTION_NAME:-processUpload} --region=${FUNCTION_REGION} --memory=256MB --source=../function --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}" --quiet
     rm -R ../function/shared
     exit 0
