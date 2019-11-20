@@ -19,7 +19,7 @@ steps:
   dir: 'entitlements/bqdsEntitlements'
   entrypoint: 'npm'
   args: ['run', 'test', '--', '--runCloudTests']
-- name: 'gcr.io/cloud-builders/npm'
+- name: 'node:12.11.1'
   dir: 'ingestion/function'
   entrypoint: 'npm'
   args: ['run', 'test']
