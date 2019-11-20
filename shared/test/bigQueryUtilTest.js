@@ -30,7 +30,7 @@ const bigqueryUtil = new BigQueryUtil(argv.projectId);
 if (argv.runCloudTests) {
     it("execute query", async () => {
         const options = { query: "select 1 union all select 2" };
-        const [rows] = await bigqueryUtil.executeQuery(options);
+        const [rows] = await bigqueryUtil.executeQuerySync(options);
         expect(rows.length).is.equal(2);
     });
 
@@ -113,7 +113,7 @@ if (argv.runCloudTests) {
             return bigqueryUtil.insertRows(uuid, uuid, rows);
         }).then(() => {
             const options = { query: `select * from \`${argv.projectId}.${uuid}.${uuid}\`` };
-            return bigqueryUtil.executeQuery(options);
+            return bigqueryUtil.executeQuerySync(options);
         }).then((result) => {
             const [rows] = result;
             expect(rows.length).is.equal(2);

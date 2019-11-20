@@ -34,7 +34,7 @@ class BigQueryUtil {
     /**
      * @param  {} options
      */
-    async executeQuery(options) {
+    async executeQuerySync(options) {
         const [job] = await this.bigqueryClient.createQueryJob(options);
         if (this.VERBOSE_MODE) {
             console.log(`Job '${job.id}' started for query: ${JSON.stringify(options)}`);
@@ -64,7 +64,7 @@ class BigQueryUtil {
         };
 
         try {
-            const [rows] = await this.executeQuery(options);
+            const [rows] = await this.executeQuerySync(options);
             return true;
         } catch (error) {
             if (this.VERBOSE_MODE) {
@@ -84,11 +84,12 @@ class BigQueryUtil {
             query: "select column_name from `" + datasetId + ".INFORMATION_SCHEMA.COLUMNS` where table_name = @_tableName order by ordinal_position",
             params: { _tableName: tableId },
         };
-        const [rows] = await this.executeQuery(options);
+        const [rows] = await this.executeQuerySync(options);
         let columns = [];
         rows.forEach(row => columns.push(row.column_name));
         return columns;
     }
+
     /**
      * @param  {} datasetId
      * @param  {} tableId

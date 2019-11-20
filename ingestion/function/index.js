@@ -203,31 +203,30 @@ function logException(exception) {
 }
 
 /**
- * @param  {} bucket
- * @param  {} schemaFileName
+ * @param  {} dict
+ * Sets the default metadata values if meta is provided.
  */
 function setMetadataDefaults(dict) {
-    if (!dict.metadata) {
+    let meta = dict.metadata;
+    if (!meta) {
         console.log("No metadata found");
-        return dict;
-    } else {
-        const meta = dict.metadata;
-
-        if (!meta.sourceFormat) {
-            meta.sourceFormat = 'CSV';
-        }
-
-        if (!meta.skipLeadingRows) {
-            meta.skipLeadingRows = 1;
-        }
-
-        if (!meta.maxBadRecords) {
-            meta.maxBadRecords = 0;
-        }
-
-        console.log("using metadata: " + JSON.stringify(meta));
-        return meta;
+        meta = {};
     }
+
+    if (!meta.sourceFormat) {
+        meta.sourceFormat = 'CSV';
+    }
+
+    if (!meta.skipLeadingRows) {
+        meta.skipLeadingRows = 1;
+    }
+
+    if (!meta.maxBadRecords) {
+        meta.maxBadRecords = 0;
+    }
+
+    console.log("Using metadata: " + JSON.stringify(meta));
+    return meta;
 }
 
 /**
@@ -239,10 +238,6 @@ function getDestination(fileName) {
         fileName;
     const parts = name.split('.');
     if (parts && parts.length > 0) {
-        name = parts[1];
-        name.replace('.', '_');
-        name = name.replace('-', '_');
-        name = name.replace(' ', '_');
         return `${parts[0]}.${parts[1]}`;
     }
     return name;
@@ -265,4 +260,12 @@ function getExceptionString(exception) {
  */
 function log(message) {
     console.log(JSON.stringify(message, undefined, 1));
+}
+
+if (process.env.UNIT_TESTS) {
+    module.exports = {
+        getExceptionString,
+        getDestination,
+        setMetadataDefaults
+    };
 }

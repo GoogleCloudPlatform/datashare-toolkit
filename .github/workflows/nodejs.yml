@@ -57,5 +57,6 @@ jobs:
         cd ingestion/function
         npm install --loglevel verbose
         npm run lint
+        npm test
       env:
         CI: true
