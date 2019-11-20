@@ -217,7 +217,7 @@ async function setupPrerequisites(config) {
         }
         if (await bigqueryUtil.viewExists(config.accessControl.datasetId, "latestDatasetPermissions") === false) {
             const viewSql = `WITH RANKED AS (\n  select\n    configurationName,\n    uuid,\n    DENSE_RANK() OVER (PARTITION BY configurationName ORDER BY lastUpdated) as rank\n  from \`${config.projectId}.${config.accessControl.datasetId}.datasetPermissions\`\n),\nROWIDENTIFIERS AS (\n  SELECT r.uuid\n  from RANKED r\n  where r.rank = (select max(r2.rank) from RANKED r2 where r2.configurationName = r.configurationName)\n)\nSELECT\n * EXCEPT(uuid)\nFROM \`${config.projectId}.${config.accessControl.datasetId}.datasetPermissions\` t\nWHERE EXISTS (SELECT 1 from ROWIDENTIFIERS r WHERE t.uuid = r.uuid)`;
-            await bigqueryUtil.createView(config.projectId, config.accessControl.datasetId, "latestDatasetPermissions", viewSql);
+            await bigqueryUtil.createView(config.accessControl.datasetId, "latestDatasetPermissions", viewSql);
         }
     }
 }
@@ -276,7 +276,7 @@ async function processConfig(config) {
                     }
                     console.log(`SQL text is different, need to re-create view\nView Definition:\n${_viewDefinition}\n\nConfig SQL:\n${viewSql}`);
 
-                    createViewResult = await bigqueryUtil.createView(config.projectId, ds, view.name, viewSql, true, viewDescription, labels, configuredExpirationTime);
+                    createViewResult = await bigqueryUtil.createView(ds, view.name, viewSql, true, viewDescription, labels, configuredExpirationTime);
                     if (createViewResult.success === false) {
                         console.log("Failed to create view, skipping to next view");
                         continue;
@@ -313,7 +313,7 @@ async function processConfig(config) {
                     console.log("Query is invalid, skipping to next view");
                     continue;
                 }
-                createViewResult = await bigqueryUtil.createView(config.projectId, ds, view.name, viewSql, false, viewDescription, labels, configuredExpirationTime);
+                createViewResult = await bigqueryUtil.createView(ds, view.name, viewSql, false, viewDescription, labels, configuredExpirationTime);
             }
 
             let viewCreated = createViewResult && createViewResult.success;

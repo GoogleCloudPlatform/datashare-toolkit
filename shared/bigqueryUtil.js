@@ -219,17 +219,17 @@ class BigQueryUtil {
 
         return { metadata, exists, datasetExists, tableExists, error, errorMessage };
     }
-
+    
     /**
-     * @param  {} projectId
      * @param  {} datasetId
      * @param  {} tableId
      * @param  {} query
      * @param  {} deleteIfExists
-     * @param  {} configurationName
+     * @param  {} description
+     * @param  {} labels
      * @param  {} expirationTime
      */
-    async createView(projectId, datasetId, tableId, query, deleteIfExists, description, labels, expirationTime) {
+    async createView(datasetId, tableId, query, deleteIfExists, description, labels, expirationTime) {
         if (deleteIfExists && deleteIfExists === true) {
             const exists = await this.viewExists(datasetId, tableId);
             if (exists === true) {

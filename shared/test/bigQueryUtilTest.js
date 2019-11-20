@@ -99,7 +99,7 @@ if (argv.runCloudTests) {
             expect(columns[1]).is.equal("column2");
         }).then(() => {
             const query = `select * from \`${argv.projectId}.${uuid}.${uuid}\``;
-            return bigqueryUtil.createView(argv.projectId, uuid, viewName, query, false, "description", labels);
+            return bigqueryUtil.createView(uuid, viewName, query, false, "description", labels);
         }).then((result) => {
             return bigqueryUtil.viewExists(uuid, viewName);
         }).then((result) => {
