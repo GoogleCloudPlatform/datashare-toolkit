@@ -57,7 +57,7 @@ jobs:
         # cd shared
         # npm install
         # cd ..
-        cp -R ./shared ./ingestion/function/shared/
+        # cp -R ./shared ./ingestion/function/shared/
         cd ingestion/function
         npm install --loglevel verbose
         # npm i @typescript-eslint/eslint-plugin@latest --save-dev
