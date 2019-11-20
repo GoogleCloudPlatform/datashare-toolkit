@@ -120,6 +120,7 @@ else
         # macOS
         # sed -i '' -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../function/package.json
         # Do nothing as this is not the build server
+        echo 'Running on macOS'
     else
         # linux
         sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../function/package.json
