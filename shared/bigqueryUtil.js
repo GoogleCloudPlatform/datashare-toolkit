@@ -305,19 +305,13 @@ class BigQueryUtil {
      * @param  {} tableId
      */
     async deleteTable(datasetId, tableId) {
-        try {
-            await this.bigqueryClient
-                .dataset(datasetId)
-                .table(tableId)
-                .delete();
+        await this.bigqueryClient
+            .dataset(datasetId)
+            .table(tableId)
+            .delete();
 
-            if (this.VERBOSE_MODE) {
-                console.log(`Table ${tableId} deleted`);
-            }
-            return true;
-        } catch (error) {
-            console.log("Failed to delete table '%s', error: %s", tableId, error);
-            return false;
+        if (this.VERBOSE_MODE) {
+            console.log(`Table ${tableId} deleted`);
         }
     }
 

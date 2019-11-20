@@ -119,12 +119,8 @@ if (argv.runCloudTests) {
             expect(rows.length).is.equal(2);
         }).then(() => {
             return bigqueryUtil.deleteTable(uuid, viewName);
-        }).then((result) => {
-            expect(result).is.true;
         }).then(() => {
             return bigqueryUtil.deleteTable(uuid, uuid);
-        }).then((result) => {
-            expect(result).is.true;
         }).then(() => {
             return bigqueryUtil.deleteDataset(uuid);
         }).then((result) => {
