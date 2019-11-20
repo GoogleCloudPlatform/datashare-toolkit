@@ -108,7 +108,6 @@ if [ -z "$FUNCTION_REGION" ]; then
     exit 7
 else
     echo "Function region: ${FUNCTION_REGION}"
-    pwd
     FUNCTION_SHARED="../function/shared"
     if [ -d "${FUNCTION_SHARED}" ]; then
         rm -R "${FUNCTION_SHARED}"
