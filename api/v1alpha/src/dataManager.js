@@ -113,8 +113,8 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
-    if (metadata.metadata.requestId === undefined || metadata.metadata.requestId !== requestId) {
-        console.log(metadata.metadata);
+    if (metadata.metadata === undefined || metadata.metadata.requestId === undefined || metadata.metadata.requestId !== requestId) {
+        console.log(metadata);
         message = `fileName: '${fileName}' does not have the signature for requestId: '${requestId}'`;
         return { success: false, code: 400, errors: [message] };
     }
