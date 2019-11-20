@@ -20,11 +20,16 @@ if [ "$#" -ne 1 ]; then
 fi
 
 BUCKET_NAME=""
+CLOUD_BUILD=0
 
 for i in "$@"; do
     case $i in
     -t=* | --trigger-bucket=*)
         BUCKET_NAME="${i#*=}"
+        shift # past argument=value
+        ;;
+    --cloudbuild=*)
+        CLOUD_BUILD=1
         shift # past argument=value
         ;;
     *)
@@ -109,8 +114,16 @@ else
     fi
     # Symlinks do not work, have to physical copy the directory
     cp -R ../../shared ../function/shared/
-    # cat package.json | sed -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g'
-    sed -i '' -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../function/package.json    
+
+    UNAME=$(uname | awk '{print tolower($0)}')
+    if [ "$UNAME" == "darwin" ]; then
+        # macOS
+        # sed -i '' -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../function/package.json    
+        # Do nothing as this is not the build server
+    else
+        # linux
+        sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../function/package.json    
+    fi
     gcloud functions deploy ${FUNCTION_NAME:-processUpload} --region=${FUNCTION_REGION} --memory=256MB --source=../function --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}" --quiet
     rm -R ../function/shared
     exit 0
