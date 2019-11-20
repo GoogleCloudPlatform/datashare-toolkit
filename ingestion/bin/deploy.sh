@@ -109,11 +109,12 @@ if [ -z "$FUNCTION_REGION" ]; then
 else
     echo "Function region: ${FUNCTION_REGION}"
     pwd
-    if [ -d ../function/shared ]; then
-        rm -R ../function/shared
+    FUNCTION_SHARED="../function/shared"
+    if [ -d "${FUNCTION_SHARED}" ]; then
+        rm -R "${FUNCTION_SHARED}"
     fi
     # Symlinks do not work, have to physical copy the directory
-    cp -R ../../shared ../function/shared/
+    cp -R ../../shared "${FUNCTION_SHARED}/"
 
     UNAME=$(uname | awk '{print tolower($0)}')
     if [ "$UNAME" == "darwin" ]; then
@@ -128,6 +129,6 @@ else
     fi
 
     gcloud functions deploy ${FUNCTION_NAME:-processUpload} --region=${FUNCTION_REGION} --memory=256MB --source=../function --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}" --quiet
-    rm -R ../function/shared
+    rm -R "${FUNCTION_SHARED}"
     exit 0
 fi
