@@ -17,8 +17,8 @@
 'use strict';
 
 const { BigQueryUtil, CloudFunctionUtil } = require('bqds-shared');
-const bigqueryUtil = BigQueryUtil();
-const cloudFunctionUtil = CloudFunctionUtil();
+const bigqueryUtil = new BigQueryUtil();
+const cloudFunctionUtil = new CloudFunctionUtil();
 
 const { BigQuery } = require('@google-cloud/bigquery');
 const { Storage } = require('@google-cloud/storage');

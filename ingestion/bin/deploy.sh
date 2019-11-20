@@ -105,9 +105,13 @@ else
     echo "Function region: ${FUNCTION_REGION}"
     pwd
     if [ -d ../function/shared ]; then
-        rm ../function/shared
+        rm -R ../function/shared
     fi
-    ln -s ../../shared ../function/shared
+    # ln -s ../../shared ../function/shared
+    # Symlinks do not work, have to physical copy the directory
+    cp -R ../../shared ../function/shared/
+    ls -l ../function/shared
     gcloud functions deploy ${FUNCTION_NAME:-processUpload} --region=${FUNCTION_REGION} --memory=256MB --source=../function --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}" --quiet
+    rm -R ../function/shared
     exit 0
 fi
