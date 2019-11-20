@@ -104,10 +104,10 @@ if [ -z "$FUNCTION_REGION" ]; then
 else
     echo "Function region: ${FUNCTION_REGION}"
     pwd
-    # rm -R shared
-    # cp -R ../../shared ./shared/
-    #  ln -s ../../shared ../shared
-    ls -la ../../shared
+    if [ -d ../function/shared ]; then
+        rm ../function/shared
+    fi
+    ln -s ../../shared ../function/shared
     gcloud functions deploy ${FUNCTION_NAME:-processUpload} --region=${FUNCTION_REGION} --memory=256MB --source=../function --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}" --quiet
     exit 0
 fi
