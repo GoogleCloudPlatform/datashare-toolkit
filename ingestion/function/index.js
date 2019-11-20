@@ -16,9 +16,10 @@
 
 'use strict';
 
-const { BigQueryUtil, CloudFunctionUtil } = require('bqds-shared');
+const { BigQueryUtil, CloudFunctionUtil, StorageUtil } = require('bqds-shared');
 const bigqueryUtil = new BigQueryUtil();
 const cloudFunctionUtil = new CloudFunctionUtil();
+const storageUtil = new StorageUtil();
 
 const { BigQuery } = require('@google-cloud/bigquery');
 const { Storage } = require('@google-cloud/storage');
@@ -75,7 +76,7 @@ async function getConfiguration(event, context) {
     const dataset = dest[0];
     const destinationTable = dest[1];
 
-    const schemaConfig = await fromStorage(event.bucket, `${processPrefix}/${destinationTable}.${schemaFileName}`);
+    const schemaConfig = await storageUtil.fetchFileContent(event.bucket, `${processPrefix}/${destinationTable}.${schemaFileName}`);
     let config = {};
     if (schemaConfig) {
         // This will pull in the dictionary from the configuration file. IE: includes destination, metadata, truncate, etc.
@@ -102,7 +103,7 @@ async function getConfiguration(event, context) {
  * @param  {} config
  */
 async function transform(config) {
-    const transformQuery = await fromStorage(config.bucket,
+    const transformQuery = await storageUtil.fetchFileContent(config.bucket,
         `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
     // const dataset = bigqueryClient.dataset(config.dataset);
     // const exists = await bigqueryUtil.tableExists(config.dataset, config.destinationTable);
@@ -150,24 +151,6 @@ async function stageFile(config) {
         console.error(`Errors encountered loading ${config.sourceFile} to ${config.stagingTable}`);
         logException(ex);
         throw (ex);
-    }
-}
-
-/**
- * @param  {} bucket
- * @param  {} file
- */
-async function fromStorage(bucket, file) {
-    try {
-        let content = await storageClient
-            .bucket(bucket)
-            .file(file)
-            .download();
-        console.log(`Found gs://${bucket}/${file}: ${content}`);
-        return content;
-    } catch (error) {
-        console.info(`File ${file} not found in bucket ${bucket}: ${getExceptionString(error)}`);
-        return undefined;
     }
 }
 
