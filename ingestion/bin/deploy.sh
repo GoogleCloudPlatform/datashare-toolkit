@@ -109,6 +109,8 @@ else
     fi
     # Symlinks do not work, have to physical copy the directory
     cp -R ../../shared ../function/shared/
+    # cat package.json | sed -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g'
+    sed -i '' -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../function/package.json    
     gcloud functions deploy ${FUNCTION_NAME:-processUpload} --region=${FUNCTION_REGION} --memory=256MB --source=../function --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}" --quiet
     rm -R ../function/shared
     exit 0
