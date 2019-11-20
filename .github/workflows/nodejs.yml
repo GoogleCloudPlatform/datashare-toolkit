@@ -54,13 +54,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: npm install and lint for processUpload
       run: |
-        # cd shared
-        # npm install
-        # cd ..
-        # cp -R ./shared ./ingestion/function/shared/
         cd ingestion/function
         npm install --loglevel verbose
-        # npm i @typescript-eslint/eslint-plugin@latest --save-dev
         npm run lint
       env:
         CI: true
