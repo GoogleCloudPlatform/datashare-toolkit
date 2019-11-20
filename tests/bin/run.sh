@@ -181,7 +181,7 @@ send_notification() {
     CURRENT_PATH=$(pwd)
     echo "Copying integration-tests.config to ${CURRENT_PATH}"
     gsutil cp gs://bqds-ci-config/integration-tests.config . || true
-    if [ ! -z "./integration-tests.config" ] && [ ! -z "$BRANCH" ] && [ ! -z "$REV" ]; then
+    if [ ! -z "./integration-tests.config" ] && [ ! -z "${BRANCH:-}" ] && [ ! -z "${REV:-}" ]; then
         source ./integration-tests.config
         rm ./integration-tests.config
 
