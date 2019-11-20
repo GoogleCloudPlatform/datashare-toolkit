@@ -20,16 +20,11 @@ if [ "$#" -ne 1 ]; then
 fi
 
 BUCKET_NAME=""
-CLOUD_BUILD=0
 
 for i in "$@"; do
     case $i in
     -t=* | --trigger-bucket=*)
         BUCKET_NAME="${i#*=}"
-        shift # past argument=value
-        ;;
-    --cloudbuild=*)
-        CLOUD_BUILD=1
         shift # past argument=value
         ;;
     *)
