@@ -74,7 +74,6 @@ main() {
 
     echo "Deploying cloud function: ${FUNCTION_NAME}"
     cd ${FUNCTION_DIR}
-    # npm install
     npm run deploy -- --trigger-bucket="${BUCKET}"
 
     if [ $? -ne 0 ]; then
