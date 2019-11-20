@@ -123,8 +123,6 @@ if (argv.runCloudTests) {
             return bigqueryUtil.deleteTable(uuid, uuid);
         }).then(() => {
             return bigqueryUtil.deleteDataset(uuid);
-        }).then((result) => {
-            expect(result).is.true;
         }).catch((reason) => {
             expect.fail(`Failed: ${reason}`);
         });

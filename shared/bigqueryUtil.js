@@ -449,18 +449,12 @@ class BigQueryUtil {
      * @param  {} datasetId
      */
     async deleteDataset(datasetId) {
-        try {
-            await this.bigqueryClient
-                .dataset(datasetId)
-                .delete({ force: true });
+        await this.bigqueryClient
+            .dataset(datasetId)
+            .delete({ force: true });
 
-            if (this.VERBOSE_MODE) {
-                console.log(`Dataset ${datasetId} deleted`);
-            }
-            return true;
-        } catch (error) {
-            console.log("Failed to delete dataset '%s', error: %s", datasetId, error);
-            return false;
+        if (this.VERBOSE_MODE) {
+            console.log(`Dataset ${datasetId} deleted`);
         }
     }
 
