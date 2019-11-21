@@ -1,12 +1,28 @@
 steps:
-- name: 'gcr.io/cloud-builders/npm'
+- name: 'node:12.11.1'
+  dir: 'shared'
+  entrypoint: 'npm'
+  args: ['install']
+- name: 'node:12.11.1'
   dir: 'entitlements/bqdsEntitlements'
   entrypoint: 'npm'
   args: ['install']
-- name: 'gcr.io/cloud-builders/npm'
+- name: 'node:12.11.1'
+  dir: 'ingestion/function'
+  entrypoint: 'npm'
+  args: ['install']
+- name: 'node:12.11.1'
+  dir: 'shared'
+  entrypoint: 'npm'
+  args: ['run', 'test', '--', '--runCloudTests']
+- name: 'node:12.11.1'
   dir: 'entitlements/bqdsEntitlements'
   entrypoint: 'npm'
   args: ['run', 'test', '--', '--runCloudTests']
+- name: 'node:12.11.1'
+  dir: 'ingestion/function'
+  entrypoint: 'npm'
+  args: ['run', 'test']
 - name: 'gcr.io/bqds-ci/integration-test'
   env:
   - 'BUILD=$BUILD_ID'

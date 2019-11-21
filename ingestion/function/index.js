@@ -16,31 +16,38 @@
 
 'use strict';
 
+const { BigQueryUtil, CloudFunctionUtil, StorageUtil } = require('bqds-shared');
+const bigqueryUtil = new BigQueryUtil();
+const cloudFunctionUtil = new CloudFunctionUtil();
+const storageUtil = new StorageUtil();
+
 const { BigQuery } = require('@google-cloud/bigquery');
 const { Storage } = require('@google-cloud/storage');
 const bigqueryClient = new BigQuery();
 const storageClient = new Storage();
 const schemaFileName = "schema.json";
 const transformFileName = "transform.sql";
-const defaultLocation = 'US';
 const defaultTransformQuery = "*";
 const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
 const stagingTableExpiryDays = 2;
 const processPrefix = "bqds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
+let batchId;
 
 /**
  * @param  {} event
  * @param  {} context
  */
 exports.processEvent = async (event, context) => {
-    console.log(`Object notification arrived for gs://${event.bucket}/${event.name}`);
-    if (canProcess(event.name)) {
+    batchId = cloudFunctionUtil.generateBatchId(event, context);
+    console.log(`Object notification arrived for gs://${event.bucket}/${event.name}, batchId is ${batchId}`);
+
+    if (cloudFunctionUtil.isExtensionSupported(event.name, acceptable, processPrefix)) {
         const config = await getConfiguration(event, context);
-        const haveDataset = await datasetExists(config.dataset);
+        const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
         if (!haveDataset) {
             console.log(`Dataset ${config.dataset} not found, creating...`);
-            await createDataset(config.dataset);
+            await bigqueryUtil.createDataset(config.dataset);
             console.log(`Created dataset ${config.dataset}`);
         } else {
             console.log(`found dataset ${config.dataset}`);
@@ -48,7 +55,7 @@ exports.processEvent = async (event, context) => {
         try {
             await stageFile(config);
             await transform(config);
-            await deleteTable(config.dataset, config.stagingTable);
+            await bigqueryUtil.deleteTable(config.dataset, config.stagingTable);
         } catch (exception) {
             console.error(`Exception processing ${event.name}: ${getExceptionString(exception)}`);
             return;
@@ -68,7 +75,7 @@ async function getConfiguration(event, context) {
     const dataset = dest[0];
     const destinationTable = dest[1];
 
-    const schemaConfig = await fromStorage(event.bucket, `${processPrefix}/${destinationTable}.${schemaFileName}`);
+    const schemaConfig = await storageUtil.fetchFileContent(event.bucket, `${processPrefix}/${destinationTable}.${schemaFileName}`);
     let config = {};
     if (schemaConfig) {
         // This will pull in the dictionary from the configuration file. IE: includes destination, metadata, truncate, etc.
@@ -91,45 +98,14 @@ async function getConfiguration(event, context) {
 }
 
 /**
- * Determine whether a file suffix is recognized for ingestion.
- * @param  {} fileName
- */
-function canProcess(fileName) {
-    const parts = fileName.split('.');
-    if (parts[0] &&
-        (parts[0].startsWith(processPrefix)
-            || parts[0].startsWith(`/${processPrefix}`))) {
-        return false;
-    } else {
-        const ext = parts[parts.length - 1];
-        console.log(`file has extension ${ext}`);
-        return acceptable.includes(ext.toLowerCase());
-    }
-}
-
-/**
- * Generates the batch Id.
- * @param  {} config
- */
-function generateBatchId(config) {
-    return [
-        new Date().getTime(),
-        config.eventId,
-        config.bucket,
-        config.sourceFile
-    ].join(':');
-}
-
-/**
  * Exceutes the sql transformation.
  * @param  {} config
  */
 async function transform(config) {
-    const batchId = generateBatchId(config);
-    const transformQuery = await fromStorage(config.bucket,
+    const transformQuery = await storageUtil.fetchFileContent(config.bucket,
         `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
-    const dataset = bigqueryClient.dataset(config.dataset);
-    // const exists = await tableExists(config.dataset, config.destinationTable);
+    // const dataset = bigqueryClient.dataset(config.dataset);
+    // const exists = await bigqueryUtil.tableExists(config.dataset, config.destinationTable);
     // if (!exists) {
     //     console.log(`creating table ${config.destinationTable} with ${config.metadata.fields}`);
     //     await dataset.createTable(config.destinationTable, { schema: config.metadata.fields });
@@ -140,19 +116,6 @@ async function transform(config) {
     console.log(`${job[0].metadata.id} ${job[0].metadata.statistics.query.statementType} ${job[0].metadata.configuration.jobType} ${job[0].metadata.status.state}`);
     console.log("processing done");
     return;
-}
-
-/**
- * Deletes a BQ table.
- * @param  {} dataset
- * @param  {} tableName
- */
-async function deleteTable(dataset, tableName) {
-    const ds = bigqueryClient.dataset(dataset);
-    console.log('Deleting temp table ' + tableName);
-    const toDelete = ds.table(tableName);
-    const response = await toDelete.delete();
-    console.log("delete table: " + JSON.stringify(response));
 }
 
 /**
@@ -191,66 +154,13 @@ async function stageFile(config) {
 }
 
 /**
- * @param  {} bucket
- * @param  {} file
- */
-async function fromStorage(bucket, file) {
-    try {
-        let content = await storageClient
-            .bucket(bucket)
-            .file(file)
-            .download();
-        console.log(`Found gs://${bucket}/${file}: ${content}`);
-        return content;
-    } catch (error) {
-        console.info(`File ${file} not found in bucket ${bucket}: ${getExceptionString(error)}`);
-        return undefined;
-    }
-}
-
-/**
- * Returns value indicating if a BQ table exists.
- * @param  {} datasetId
- * @param  {} tableName
- */
-async function tableExists(datasetId, tableName) {
-    const dataset = bigqueryClient.dataset(datasetId);
-    const table = dataset.table(tableName);
-    const response = await table.exists();
-    const exists = response[0];
-    console.log(`Check if table exists: ${tableName}: ${exists}`);
-    return exists;
-}
-
-/**
- * Returns value indicating if a BQ dataset exists.
- * @param  {} datasetId
- */
-async function datasetExists(datasetId) {
-    const dataset = bigqueryClient.dataset(datasetId);
-    const results = await dataset.exists();
-    console.log('dataset exists?: ' + JSON.stringify(results));
-    return results.length > 0 ? results[0] : false;
-}
-
-/**
- * Creates a dataset.
- * @param  {} datasetId
- */
-async function createDataset(datasetId) {
-    const dataset = bigqueryClient.dataset(datasetId);
-    return await dataset.create();
-}
-
-/**
  * Creates query job for the transformation query.
  * @param  {} config
  * @param  {} query
  */
 async function runTransform(config, query) {
     console.log("configuration for runTransform: " + JSON.stringify(config));
-    const options = {
-        location: defaultLocation,
+    let options = {
         destinationTable: {
             projectId: process.env.GCP_PROJECT,
             datasetId: config.dataset,
@@ -266,6 +176,11 @@ async function runTransform(config, query) {
             type: 'DAY'
         }
     };
+
+    if (config.metadata && config.metadata.location) {
+        options.location = config.metadata.location;
+    }
+
     console.log("BigQuery options: " + JSON.stringify(options));
     try {
         return await bigqueryClient.createQueryJob(options);
@@ -288,35 +203,30 @@ function logException(exception) {
 }
 
 /**
- * @param  {} bucket
- * @param  {} schemaFileName
+ * @param  {} dict
+ * Sets the default metadata values if meta is provided.
  */
 function setMetadataDefaults(dict) {
-    if (!dict.metadata) {
+    let meta = dict.metadata;
+    if (!meta) {
         console.log("No metadata found");
-        return dict;
-    } else {
-        const meta = dict.metadata;
-
-        if (!meta.sourceFormat) {
-            meta.sourceFormat = 'CSV';
-        }
-
-        if (!meta.skipLeadingRows) {
-            meta.skipLeadingRows = 1;
-        }
-
-        if (!meta.maxBadRecords) {
-            meta.maxBadRecords = 0;
-        }
-
-        if (!meta.location) {
-            meta.location = defaultLocation;
-        }
-
-        console.log("using metadata: " + JSON.stringify(meta));
-        return meta;
+        meta = {};
     }
+
+    if (!meta.sourceFormat) {
+        meta.sourceFormat = 'CSV';
+    }
+
+    if (!meta.skipLeadingRows) {
+        meta.skipLeadingRows = 1;
+    }
+
+    if (!meta.maxBadRecords) {
+        meta.maxBadRecords = 0;
+    }
+
+    console.log("Using metadata: " + JSON.stringify(meta));
+    return meta;
 }
 
 /**
@@ -328,10 +238,6 @@ function getDestination(fileName) {
         fileName;
     const parts = name.split('.');
     if (parts && parts.length > 0) {
-        name = parts[1];
-        name.replace('.', '_');
-        name = name.replace('-', '_');
-        name = name.replace(' ', '_');
         return `${parts[0]}.${parts[1]}`;
     }
     return name;
@@ -354,4 +260,12 @@ function getExceptionString(exception) {
  */
 function log(message) {
     console.log(JSON.stringify(message, undefined, 1));
+}
+
+if (process.env.UNIT_TESTS) {
+    module.exports = {
+        getExceptionString,
+        getDestination,
+        setMetadataDefaults
+    };
 }

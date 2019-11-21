@@ -19,3 +19,5 @@ node_modules
 *.png
 *.md
 .eslintrc.json
+.nyc_output
+/shared/test

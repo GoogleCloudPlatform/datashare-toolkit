@@ -16,8 +16,10 @@
 
 'use strict';
 
+const { BigQueryUtil } = require('bqds-shared');
+let bigqueryUtil;
+
 const configUtil = require("./configUtil");
-const bigqueryUtil = require("./bigqueryUtil");
 const sqlBuilder = require("./sqlBuilder");
 const runtimeConfiguration = require("./runtimeConfiguration");
 const YAML = require('yaml');
@@ -41,6 +43,7 @@ var [datasets] = [];
  * @param  {} config
  */
 async function validate(config) {
+    bigqueryUtil = new BigQueryUtil(config.projectId);
     [datasets] = await bigqueryUtil.getDatasets();
 
     console.log("-------------------START - validateSchema-------------------");
@@ -356,7 +359,7 @@ async function validateViews(config) {
             let _tableExists = false;
             if (_validTableName === true) {
                 // Check if table exists
-                _tableExists = await bigqueryUtil.tableExists(config.projectId, source.datasetId, source.tableId);
+                _tableExists = await bigqueryUtil.tableExists(source.datasetId, source.tableId);
                 if (_tableExists === false) {
                     logIssue(IssueType.ERROR, `table '${source.datasetId}.${source.tableId}' referenced in view '${v.name}' does not exist in BigQuery project ${config.projectId}`);
                 }
@@ -398,8 +401,10 @@ async function validateViews(config) {
                         logIssue(IssueType.ERROR, `'accessControl.labelColumn' must be provided for view '${v.name}'`);
                     }
 
-                    // Check for the existance of labelColumn
-                    await areAllColumnsAvailable([accessControl.labelColumn], source.datasetId, source.tableId, `View '${v.name}' has a 'labelColumn' defined that is not available in source table '${source.datasetId}.${source.tableId}'`);
+                    if (_tableExists === true) {
+                        // Check for the existance of labelColumn
+                        await areAllColumnsAvailable([accessControl.labelColumn], source.datasetId, source.tableId, `View '${v.name}' has a 'labelColumn' defined that is not available in source table '${source.datasetId}.${source.tableId}'`);
+                    }
 
                     if (accessControl.datasetEnabled && accessControl.datasetEnabled === true) {
                         // If accessControl.datasetEnabled is true, than config.accessControl.datasetId and config.accessControl.viewId must be provided.
@@ -487,7 +492,7 @@ async function validateViews(config) {
             if (custom.authorizeFromDatasetIds && custom.authorizeFromDatasetIds.length > 0) {
                 for (const d of custom.authorizeFromDatasetIds) {
                     const ads = configUtil.performTextVariableReplacements(config, null, d);
-                    if (await bigqueryUtil.datasetExists(ads, datasets) === false) {
+                    if (await bigqueryUtil.datasetExists(ads) === false) {
                         logIssue(IssueType.ERROR, `authorizeViewFromDataset '${ads}' defined in view '${v.name}' does not exist`);
                     }
                 }
@@ -518,7 +523,7 @@ async function validateViews(config) {
 async function validateLabels(config) {
     if (config.hasOwnProperty('datasets')) {
         for (const d of config.datasets) {
-            if (await bigqueryUtil.datasetExists(d.name, datasets) === true) {
+            if (await bigqueryUtil.datasetExists(d.name) === true) {
                 let labelValue = await bigqueryUtil.getDatasetLabelValue(d.name, runtimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY);
                 if (labelValue !== config.name) {
                     logIssue(IssueType.ERROR, `An existing dataset exists for '${config.projectId}.${d.name}'. In order to modify this dataset, the label '${runtimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY}' must be defined on the dataset with current configuration value '${config.name}'. You may also resolve the issue by giving the dataset a unique name that does not currently exist in BigQuery.`);
@@ -534,7 +539,7 @@ async function validateLabels(config) {
         for (const v of config.views) {
             if (v.hasOwnProperty('datasetNames')) {
                 for (const d of v.datasetNames) {
-                    if (await bigqueryUtil.viewExists(config.projectId, d, v.name) === true) {
+                    if (await bigqueryUtil.viewExists(d, v.name) === true) {
                         let labelValue = await bigqueryUtil.getTableLabelValue(d, v.name, runtimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY);
                         if (labelValue !== config.name) {
                             logIssue(IssueType.ERROR, `An existing view exists for '${config.projectId}.${d}.${v.name}'. In order to modify this view, the label '${runtimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY}' must be defined on the view with current configuration value '${config.name}'. You may also resolve the issue by giving the view a unique name that does not currently exist in BigQuery.`);

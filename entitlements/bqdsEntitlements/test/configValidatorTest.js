@@ -24,7 +24,9 @@ const chai = require('chai'), expect = chai.expect, should = chai.should();
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
-const bigqueryUtil = require("../bigqueryUtil");
+const { BigQueryUtil } = require('bqds-shared');
+const bigqueryUtil = new BigQueryUtil(argv.projectId);
+
 const configValidator = require('../configValidator');
 
 it("should return true for valid json string", () => {
@@ -68,8 +70,6 @@ it("should return false for invalid yaml string", () => {
 });
 
 if (argv.runCloudTests) {
-    bigqueryUtil.init(argv.projectId);
-
     it("config should validate", async () => {
         const simpleConfig = require('../../../examples/mlb/config/entitlements/simple.json');
         return expect(configValidator.validate(simpleConfig)).to.eventually.be.true;

@@ -1,26 +1,25 @@
 {
-  "name": "bqds-entitlement-engine",
-  "version": "1.0.2",
-  "description": "BQDS entitlement-engine",
+  "name": "bqds-shared",
+  "version": "1.0.0",
+  "description": "BQDS shared library",
   "license": "Apache-2.0",
   "repository": {},
-  "main": "main.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node main.js",
     "lint": "eslint .",
     "test": "nyc mocha --timeout 60000 --projectId='bqds-ci'"
   },
-  "bin": {
-    "entitlement-engine": "main.js"
-  },
   "dependencies": {
+    "@google-cloud/bigquery": "^4.4.0",
+    "@google-cloud/functions-framework": "^1.3.2",
+    "@google-cloud/pubsub": "^1.1.5",
+    "@google-cloud/storage": "^4.1.3",
     "jsonschema": "^1.2.4",
     "yaml": "^1.6.0",
     "uuid": "^3.3.3",
     "minimist": "^1.2.0",
     "lint": "^0.7.0",
-    "underscore": "^1.9.1",
-    "bqds-shared": "file:../../shared"
+    "underscore": "^1.9.1"
   },
   "devDependencies": {
     "eslint": "^5.12.0",

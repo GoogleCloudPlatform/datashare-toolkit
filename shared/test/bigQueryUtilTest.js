@@ -24,15 +24,13 @@ const chai = require('chai'), expect = chai.expect, should = chai.should();
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
-const bigqueryUtil = require("../bigqueryUtil");
-const runtimeConfiguration = require("../runtimeConfiguration");
+const BigQueryUtil = require("../bigqueryUtil");
+const bigqueryUtil = new BigQueryUtil(argv.projectId);
 
 if (argv.runCloudTests) {
-    bigqueryUtil.init(argv.projectId);
-
     it("execute query", async () => {
         const options = { query: "select 1 union all select 2" };
-        const [rows] = await bigqueryUtil.executeQuery(options);
+        const [rows] = await bigqueryUtil.executeQuerySync(options);
         expect(rows.length).is.equal(2);
     });
 
@@ -58,35 +56,39 @@ if (argv.runCloudTests) {
 
     const uuid = uuidv4().replace(/-/g, "_");
     const viewName = `v_${uuid}`;
-    const label = "unit_tests";
+
+    const labelName = "bqds_configuration_name";
+    const labelValue = "unit_tests";
+    let labels = {};
+    labels[labelName] = labelValue;
 
     it("create dataset, table, view, check for existence, and delete", async () => {
-        await bigqueryUtil.createDataset(uuid, label).then((result => {
-            expect(result, "created dataset").is.true;
-        })).then(() => {
+        const options = { description: "description", labels: labels };
+        await bigqueryUtil.createDataset(uuid, options).then(() => {
             return bigqueryUtil.datasetExists(uuid);
         }).then((result) => {
             expect(result).is.true;
         }).then(() => {
-            return bigqueryUtil.getDatasetLabelValue(uuid, runtimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY);
+            return bigqueryUtil.getDatasetLabelValue(uuid, labelName);
         }).then((result) => {
-            expect(result).is.equal(label);
+            expect(result).is.equal(labelValue);
         }).then(() => {
-            const schema = [{
-                "name": "column1",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "column2",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            }];
-            return bigqueryUtil.createTable(uuid, uuid, schema);
-        }).then((result) => {
-            expect(result).is.true;
+            const options = {
+                description: "description",
+                schema: [{
+                    "name": "column1",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                },
+                {
+                    "name": "column2",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                }]
+            };
+            return bigqueryUtil.createTable(uuid, uuid, options);
         }).then(() => {
-            return bigqueryUtil.tableExists(argv.projectId, uuid, uuid);
+            return bigqueryUtil.tableExists(uuid, uuid);
         }).then((result) => {
             expect(result).is.true;
         }).then(() => {
@@ -97,36 +99,34 @@ if (argv.runCloudTests) {
             expect(columns[1]).is.equal("column2");
         }).then(() => {
             const query = `select * from \`${argv.projectId}.${uuid}.${uuid}\``;
-            return bigqueryUtil.createView(argv.projectId, uuid, viewName, query, false, label);
+            const options = {
+                description: "description",
+                labels: labels
+            };
+            return bigqueryUtil.createView(uuid, viewName, query, options);
         }).then((result) => {
-            return bigqueryUtil.viewExists(argv.projectId, uuid, viewName);
+            return bigqueryUtil.viewExists(uuid, viewName);
         }).then((result) => {
             expect(result).is.true;
         }).then(() => {
-            return bigqueryUtil.getTableLabelValue(uuid, viewName, runtimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY);
+            return bigqueryUtil.getTableLabelValue(uuid, viewName, labelName);
         }).then((result) => {
-            expect(result).is.equal(label);
+            expect(result).is.equal(labelValue);
         }).then(() => {
             const rows = [{ column1: "value 1", column2: "value 2" }, { column1: "value 3", column2: "value 4" }];
             return bigqueryUtil.insertRows(uuid, uuid, rows);
         }).then(() => {
             const options = { query: `select * from \`${argv.projectId}.${uuid}.${uuid}\`` };
-            return bigqueryUtil.executeQuery(options);
+            return bigqueryUtil.executeQuerySync(options);
         }).then((result) => {
             const [rows] = result;
             expect(rows.length).is.equal(2);
         }).then(() => {
             return bigqueryUtil.deleteTable(uuid, viewName);
-        }).then((result) => {
-            expect(result).is.true;
         }).then(() => {
             return bigqueryUtil.deleteTable(uuid, uuid);
-        }).then((result) => {
-            expect(result).is.true;
         }).then(() => {
             return bigqueryUtil.deleteDataset(uuid);
-        }).then((result) => {
-            expect(result).is.true;
         }).catch((reason) => {
             expect.fail(`Failed: ${reason}`);
         });

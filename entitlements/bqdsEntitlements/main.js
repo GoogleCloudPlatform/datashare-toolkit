@@ -38,6 +38,7 @@ if (args["verbose"]) {
     console.log("Command line args");
     console.log(args);
     runtimeConfiguration.VERBOSE_MODE = true;
+    process.env.VERBOSE_MODE = true;
     console.log("--verbose is enabled");
 }
 
@@ -51,7 +52,7 @@ if (args["prerequisiteSetup"]) {
     console.log("--prerequisiteSetup is enabled");
 }
 
-if (args["configurationFilePath"]) {
+if (args["configurationFilePath"] && args["configurationFilePath"].length > 0) {
     var configFilePath = args.c.trim();
     entitlementManager.processConfiguration(configFilePath);
 }
