@@ -364,7 +364,7 @@ class BigQueryUtil {
 
             if (updatedRequired === true) {
                 console.log(`Updating authorized view records in dataset '${sourceDatasetId}'`);
-                await setDatasetMetadata(sourceDatasetId, metadata);
+                await this.setDatasetMetadata(sourceDatasetId, metadata);
 
                 // We have to reload the metadata again before editing again.
                 metadata = await this.getDatasetMetadata(sourceDatasetId);
@@ -377,7 +377,7 @@ class BigQueryUtil {
 
         if (!isViewAlreadyAdded) {
             metadata.access.push({ "view": { "projectId": authorizeProject, "datasetId": authorizeDataset, "tableId": authorizeView } });
-            await setDatasetMetadata(sourceDatasetId, metadata);
+            await this.setDatasetMetadata(sourceDatasetId, metadata);
             console.log(`Changes applied to authorize view '${authorizeProject}.${authorizeDataset}.${authorizeView}' in dataset '${sourceDatasetId}'`);
         }
     }
