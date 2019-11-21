@@ -269,6 +269,12 @@ async function processConfig(config) {
             let labels = {};
             labels[runtimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] = config.name;
 
+            const viewOptions = {
+                description: viewDescription,
+                labels: labels,
+                expirationTime: configuredExpirationTime
+            };
+
             // Check if the view exists
             if (_viewExists === true) {
                 console.log("View '%s' already exists, checking if it's up to date", view.name);
@@ -285,7 +291,7 @@ async function processConfig(config) {
                     }
                     console.log(`SQL text is different, need to re-create view\nView Definition:\n${_viewDefinition}\n\nConfig SQL:\n${viewSql}`);
 
-                    createViewResult = await bigqueryUtil.createView(ds, view.name, viewSql, true, viewDescription, labels, configuredExpirationTime);
+                    createViewResult = await bigqueryUtil.createView(ds, view.name, viewSql, viewOptions, true);
                     if (createViewResult.success === false) {
                         console.log("Failed to create view, skipping to next view");
                         continue;
@@ -322,7 +328,7 @@ async function processConfig(config) {
                     console.log("Query is invalid, skipping to next view");
                     continue;
                 }
-                createViewResult = await bigqueryUtil.createView(ds, view.name, viewSql, false, viewDescription, labels, configuredExpirationTime);
+                createViewResult = await bigqueryUtil.createView(ds, view.name, viewSql, viewOptions, true);
             }
 
             let viewCreated = createViewResult && createViewResult.success;

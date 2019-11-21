@@ -224,12 +224,10 @@ class BigQueryUtil {
      * @param  {} datasetId
      * @param  {} tableId
      * @param  {} query
+     * @param  {} options For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
      * @param  {} deleteIfExists
-     * @param  {} description
-     * @param  {} labels
-     * @param  {} expirationTime
      */
-    async createView(datasetId, tableId, query, deleteIfExists, description, labels, expirationTime) {
+    async createView(datasetId, tableId, query, options, deleteIfExists) {
         if (deleteIfExists && deleteIfExists === true) {
             const exists = await this.viewExists(datasetId, tableId);
             if (exists === true) {
@@ -238,30 +236,16 @@ class BigQueryUtil {
             }
         }
 
-        // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
-        let options = {
-            view: {
-                query: query,
-                useLegacySql: false
-            }
+        let _options = options || {};
+        _options.view = {
+            query: query,
+            useLegacySql: false
         };
-
-        if (description) {
-            options.description = description;
-        }
-
-        if (labels) {
-            options.labels = labels;
-        }
-
-        if (expirationTime) {
-            options.expirationTime = expirationTime;
-        }
 
         try {
             const [table] = await this.bigqueryClient
                 .dataset(datasetId)
-                .createTable(tableId, options);
+                .createTable(tableId, _options);
 
             if (this.VERBOSE_MODE) {
                 console.log(`View '${table.id}' created.`);
