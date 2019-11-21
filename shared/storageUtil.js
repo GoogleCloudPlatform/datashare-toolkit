@@ -93,10 +93,13 @@ class StorageUtil {
         }
         return buckets;
     }
-
+    
     /**
      * @param  {} bucketName
-        return buckets;
+     * @param  {} options
+     */
+    async getBucket(bucketName, options) {
+        return storage.bucket(bucketName, options);
     }
     
     /**

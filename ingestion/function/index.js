@@ -22,9 +22,7 @@ const cloudFunctionUtil = new CloudFunctionUtil();
 const storageUtil = new StorageUtil();
 
 const { BigQuery } = require('@google-cloud/bigquery');
-const { Storage } = require('@google-cloud/storage');
 const bigqueryClient = new BigQuery();
-const storageClient = new Storage();
 const schemaFileName = "schema.json";
 const transformFileName = "transform.sql";
 const defaultTransformQuery = "*";
@@ -159,7 +157,7 @@ async function stageFile(config) {
     console.log(`executing load for ${config.sourceFile} with ` + JSON.stringify(config.metadata));
 
     try {
-        let [job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile), config.metadata || { autodetect: true });
+        let [job] = await table.load(storageUtil.getBucket(config.bucket).file(config.sourceFile), config.metadata || { autodetect: true });
         console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
         return;
     } catch (ex) {
