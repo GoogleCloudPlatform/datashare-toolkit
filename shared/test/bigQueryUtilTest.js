@@ -74,17 +74,20 @@ if (argv.runCloudTests) {
         }).then((result) => {
             expect(result).is.equal(labelValue);
         }).then(() => {
-            const schema = [{
-                "name": "column1",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "column2",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            }];
-            return bigqueryUtil.createTable(uuid, uuid, schema, "description");
+            const options = {
+                description: "description",
+                schema: [{
+                    "name": "column1",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                },
+                {
+                    "name": "column2",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                }]
+            };
+            return bigqueryUtil.createTable(uuid, uuid, options);
         }).then((result) => {
             expect(result).is.true;
         }).then(() => {

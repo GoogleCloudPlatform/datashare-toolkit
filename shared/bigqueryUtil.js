@@ -234,7 +234,7 @@ class BigQueryUtil {
             const exists = await this.viewExists(datasetId, tableId);
             if (exists === true) {
                 console.log("View '%s' already exists, deleting it", tableId);
-                await deleteTable(datasetId, tableId);
+                await this.deleteTable(datasetId, tableId);
             }
         }
 
