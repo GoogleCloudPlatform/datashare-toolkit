@@ -39,11 +39,23 @@ let batchId;
  * @param  {} context
  */
 exports.processEvent = async (event, context) => {
-    batchId = cloudFunctionUtil.generateBatchId(event, context);
-    console.log(`Object notification arrived for gs://${event.bucket}/${event.name}, batchId is ${batchId}`);
+    const options = {
+        eventId: context.eventId,
+        bucketName: event.bucket,
+        fileName: event.name
+    };
+    return processFile(options);
+};
 
-    if (cloudFunctionUtil.isExtensionSupported(event.name, acceptable, processPrefix)) {
-        const config = await getConfiguration(event, context);
+/**
+ * @param  {} options
+ */
+async function processFile(options) {
+    batchId = cloudFunctionUtil.generateBatchId(options.eventId, options.bucketName, options.fileName);
+    console.log(`Object notification arrived for ${getBucketName(options)}, batchId is ${batchId}`);
+
+    if (cloudFunctionUtil.isExtensionSupported(options.fileName, acceptable, processPrefix)) {
+        const config = await getConfiguration(options);
         const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
         if (!haveDataset) {
             console.log(`Dataset ${config.dataset} not found, creating...`);
@@ -57,25 +69,25 @@ exports.processEvent = async (event, context) => {
             await transform(config);
             await bigqueryUtil.deleteTable(config.dataset, config.stagingTable);
         } catch (exception) {
-            console.error(`Exception processing ${event.name}: ${getExceptionString(exception)}`);
+            console.error(`Exception processing ${options.fileName}: ${getExceptionString(exception)}`);
             return;
         }
-    } else {
-        console.log("ignoring file " + event.name + ", exiting");
+    }
+    else {
+        console.log(`Ignoring file ${options.fileName}, exiting`);
     }
     return;
-};
+}
 
 /**
- * @param  {} event
- * @param  {} context
+ * @param  {} options
  */
-async function getConfiguration(event, context) {
-    const dest = getDestination(event.name).split('.');
+async function getConfiguration(options) {
+    const dest = getDestination(options.fileName).split('.');
     const dataset = dest[0];
     const destinationTable = dest[1];
 
-    const schemaConfig = await storageUtil.fetchFileContent(event.bucket, `${processPrefix}/${destinationTable}.${schemaFileName}`);
+    const schemaConfig = await storageUtil.fetchFileContent(options.bucketName, `${processPrefix}/${destinationTable}.${schemaFileName}`);
     let config = {};
     if (schemaConfig) {
         // This will pull in the dictionary from the configuration file. IE: includes destination, metadata, truncate, etc.
@@ -88,18 +100,18 @@ async function getConfiguration(event, context) {
     // Runtime created properties
     config.dataset = dataset;
     config.destinationTable = destinationTable;
-    config.stagingTable = `TMP_${destinationTable}_${context.eventId}`;
-    config.sourceFile = event.name;
-    config.bucket = event.bucket;
-    config.eventId = context.eventId;
+    config.stagingTable = `TMP_${destinationTable}_${options.eventId}`;
+    config.sourceFile = options.fileName;
+    config.bucket = options.bucketName;
+    config.eventId = options.eventId;
 
-    console.log("configuration: " + JSON.stringify(config));
+    console.log(`Configuration: ${JSON.stringify(config)}`);
     return config;
 }
 
 /**
- * Exceutes the sql transformation.
  * @param  {} config
+ * Executes the SQL transformation.
  */
 async function transform(config) {
     const transformQuery = await storageUtil.fetchFileContent(config.bucket,
@@ -119,8 +131,8 @@ async function transform(config) {
 }
 
 /**
- * Loads data into BQ staging table.
  * @param  {} config
+ * Loads data into BQ staging table.
  */
 async function stageFile(config) {
     console.log(`using config ` + JSON.stringify(config));
@@ -154,9 +166,9 @@ async function stageFile(config) {
 }
 
 /**
- * Creates query job for the transformation query.
  * @param  {} config
  * @param  {} query
+ * Creates query job for the transformation query.
  */
 async function runTransform(config, query) {
     console.log("configuration for runTransform: " + JSON.stringify(config));
@@ -191,6 +203,9 @@ async function runTransform(config, query) {
     }
 }
 
+/**
+ * @param  {} exception
+ */
 function logException(exception) {
     const errors = exception.errors;
     if (errors && errors.length > 0) {
@@ -241,6 +256,13 @@ function getDestination(fileName) {
         return `${parts[0]}.${parts[1]}`;
     }
     return name;
+}
+
+/**
+ * @param  {} options
+ */
+function getBucketName(options) {
+    return `gs://${options.bucketName}/${options.fileName}`;
 }
 
 /**

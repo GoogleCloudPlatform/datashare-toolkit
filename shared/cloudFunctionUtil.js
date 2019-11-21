@@ -26,12 +26,12 @@ class CloudFunctionUtil {
      * @param  {} context
      * Generates the BQDS batch Id.
      */
-    generateBatchId(event, context) {
+    generateBatchId(eventId, bucketName, fileName) {
         return [
             new Date().getTime(),
-            context.eventId,
-            event.bucket,
-            event.name
+            eventId,
+            bucketName,
+            fileName
         ].join(':');
     }
 
