@@ -34,6 +34,13 @@ class BigQueryUtil {
     /**
      * @param  {} options
      */
+    async executeQuery(options) {
+        return this.bigqueryClient.createQueryJob(options);
+    }
+
+    /**
+     * @param  {} options
+     */
     async executeQuerySync(options) {
         const [job] = await this.bigqueryClient.createQueryJob(options);
         if (this.VERBOSE_MODE) {

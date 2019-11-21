@@ -197,9 +197,9 @@ async function runTransform(config, query) {
         options.location = config.metadata.location;
     }
 
-    console.log("BigQuery options: " + JSON.stringify(options));
+    console.log(`BigQuery options: ${JSON.stringify(options)}`);
     try {
-        return await bigqueryClient.createQueryJob(options);
+        return await bigqueryUtil.executeQuery(options);
     } catch (exception) {
         console.error(`Exception encountered running transform: ${getExceptionString(exception)}`);
         logException(exception);
