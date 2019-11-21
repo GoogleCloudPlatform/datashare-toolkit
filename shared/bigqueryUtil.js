@@ -63,6 +63,7 @@ class BigQueryUtil {
             query: _sql
         };
 
+        // Purposefully handle this error as needed to validate the query.
         try {
             const [rows] = await this.executeQuerySync(options);
             return true;
