@@ -62,12 +62,16 @@ async function processFile(options) {
             await bigqueryUtil.createDataset(config.dataset);
             console.log(`Created dataset ${config.dataset}`);
         } else {
-            console.log(`found dataset ${config.dataset}`);
+            console.log(`Found dataset ${config.dataset}`);
         }
         try {
-            await stageFile(config);
-            await transform(config);
-            await bigqueryUtil.deleteTable(config.dataset, config.stagingTable);
+            await stageFile(config).then(() => {
+                return transform(config);
+            }).then(() => {
+                return bigqueryUtil.deleteTable(config.dataset, config.stagingTable);
+            }).catch((reason) => {
+                console.error(`Exception processing ${options.fileName}: ${getExceptionString(reason)}`);
+            });
         } catch (exception) {
             console.error(`Exception processing ${options.fileName}: ${getExceptionString(exception)}`);
             return;
