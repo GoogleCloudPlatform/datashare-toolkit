@@ -34,3 +34,7 @@ it("extension is valid", () => {
 it("extension is invalid", () => {
     expect(cloudFunctionUtil.isExtensionSupported("test.txt", ["json", "csv"])).is.false;
 });
+
+it("batchId has 4 parts", () => {
+    expect(cloudFunctionUtil.generateBatchId("eventId", "bucketName", "fileName.csv").split(":").length).is.equal(4);
+});
