@@ -88,8 +88,6 @@ if (argv.runCloudTests) {
                 }]
             };
             return bigqueryUtil.createTable(uuid, uuid, options);
-        }).then((result) => {
-            expect(result).is.true;
         }).then(() => {
             return bigqueryUtil.tableExists(uuid, uuid);
         }).then((result) => {
