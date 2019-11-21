@@ -214,8 +214,9 @@ function logException(exception) {
         for (let i = 0; i < errors.length; i++) {
             console.error('ERROR ' + (i + 1) + ": " + JSON.stringify(errors[i].message));
         }
-    } else {
-        console.error(`Exception thrown, but no error array was given: ${getExceptionString(exception)}`);
+    }
+    else {
+        console.error(`Exception thrown, but no error array was given: ${exception}`);
     }
 }
 
@@ -270,9 +271,12 @@ function getBucketName(options) {
 /**
  * @param  {} exception
  * Returns exception message in string format. Attempts to stringify JSON, if that's undefined, returns the exception as a string.
+ * TODO: This isn't working as expected. When a string is passed, it's returning {}.
+ * IE: TypeError: storageUtil.getBucket(...).file is not a function
  */
 function getExceptionString(exception) {
     let str = JSON.stringify(exception);
+    // Try to parse to json using JSON.parse, and only if returns true, then return the json string, otherwise return object.
     if (!str) {
         str = exception;
     }
