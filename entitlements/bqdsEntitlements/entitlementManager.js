@@ -141,35 +141,41 @@ async function setupPrerequisites(config) {
 
     if (configUtil.isAccessControlDatasetUsed(config) === true) {
         if (await bigqueryUtil.tableExists(config.accessControl.datasetId, "groupEntitlements") === false) {
-            const groupEntitlementSchema = [{
-                "name": "groupName",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "accessControlLabel",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            }];
-            await bigqueryUtil.createTable(config.accessControl.datasetId, "groupEntitlements", groupEntitlementSchema, tableDescription);
+            const options = {
+                description: tableDescription,
+                schema: [{
+                    "name": "groupName",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                },
+                {
+                    "name": "accessControlLabel",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                }]
+            };
+            await bigqueryUtil.createTable(config.accessControl.datasetId, "groupEntitlements", options);
         }
         if (await bigqueryUtil.tableExists(config.accessControl.datasetId, "groups") === false) {
-            const groupsSchema = [{
-                "name": "groupName",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "viewName",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "user",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            }];
-            await bigqueryUtil.createTable(config.accessControl.datasetId, "groups", groupsSchema, tableDescription);
+            const options = {
+                description: tableDescription,
+                schema: [{
+                    "name": "groupName",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                },
+                {
+                    "name": "viewName",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                },
+                {
+                    "name": "user",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                }]
+            };
+            await bigqueryUtil.createTable(config.accessControl.datasetId, "groups", options);
         }
         if (await bigqueryUtil.viewExists(config.accessControl.datasetId, config.accessControl.viewId) === false) {
             const viewSql = `select lower(g.viewName) as viewName, e.accessControlLabel\nfrom \`${config.projectId}.${config.accessControl.datasetId}.groups\` g\njoin \`${config.projectId}.${config.accessControl.datasetId}.groupEntitlements\` e on lower(g.groupName) = lower(e.groupName)\nwhere lower(g.user) = lower(session_user())`;
@@ -179,41 +185,44 @@ async function setupPrerequisites(config) {
 
     if (runtimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE === true) {
         if (await bigqueryUtil.tableExists(config.accessControl.datasetId, "datasetPermissions") === false) {
-            const userPermissionsSchema = [{
-                "name": "uuid",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "configurationName",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            }, {
-                "name": "datasetId",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "accessType",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "accessId",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "role",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "lastUpdated",
-                "type": "TIMESTAMP",
-                "mode": "REQUIRED"
-            }];
-            await bigqueryUtil.createTable(config.accessControl.datasetId, "datasetPermissions", userPermissionsSchema, tableDescription);
+            const options = {
+                description: tableDescription,
+                schema: [{
+                    "name": "uuid",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                },
+                {
+                    "name": "configurationName",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                }, {
+                    "name": "datasetId",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                },
+                {
+                    "name": "accessType",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                },
+                {
+                    "name": "accessId",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                },
+                {
+                    "name": "role",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                },
+                {
+                    "name": "lastUpdated",
+                    "type": "TIMESTAMP",
+                    "mode": "REQUIRED"
+                }]
+            };
+            await bigqueryUtil.createTable(config.accessControl.datasetId, "datasetPermissions", options);
         }
         if (await bigqueryUtil.viewExists(config.accessControl.datasetId, "latestDatasetPermissions") === false) {
             const viewSql = `WITH RANKED AS (\n  select\n    configurationName,\n    uuid,\n    DENSE_RANK() OVER (PARTITION BY configurationName ORDER BY lastUpdated) as rank\n  from \`${config.projectId}.${config.accessControl.datasetId}.datasetPermissions\`\n),\nROWIDENTIFIERS AS (\n  SELECT r.uuid\n  from RANKED r\n  where r.rank = (select max(r2.rank) from RANKED r2 where r2.configurationName = r.configurationName)\n)\nSELECT\n * EXCEPT(uuid)\nFROM \`${config.projectId}.${config.accessControl.datasetId}.datasetPermissions\` t\nWHERE EXISTS (SELECT 1 from ROWIDENTIFIERS r WHERE t.uuid = r.uuid)`;

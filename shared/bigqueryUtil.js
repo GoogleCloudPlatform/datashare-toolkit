@@ -219,7 +219,7 @@ class BigQueryUtil {
 
         return { metadata, exists, datasetExists, tableExists, error, errorMessage };
     }
-    
+
     /**
      * @param  {} datasetId
      * @param  {} tableId
@@ -277,19 +277,9 @@ class BigQueryUtil {
     /**
      * @param  {} datasetId
      * @param  {} tableId
-     * @param  {} schema
+     * @param  {} options For available options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
      */
-    async createTable(datasetId, tableId, schema, description) {
-        // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
-        let options = {
-            schema: schema
-        };
-
-        if (description) {
-            options.description = description;
-        }
-
-        // Create a new table in the dataset
+    async createTable(datasetId, tableId, options) {
         const [table] = await this.bigqueryClient
             .dataset(datasetId)
             .createTable(tableId, options);
@@ -297,7 +287,6 @@ class BigQueryUtil {
         if (this.VERBOSE_MODE) {
             console.log(`Table ${table.id} created.`);
         }
-        return true;
     }
 
     /**
