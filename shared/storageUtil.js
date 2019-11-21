@@ -93,15 +93,15 @@ class StorageUtil {
         }
         return buckets;
     }
-    
+
     /**
      * @param  {} bucketName
      * @param  {} options
      */
-    async getBucket(bucketName, options) {
+    getBucket(bucketName, options) {
         return storage.bucket(bucketName, options);
     }
-    
+
     /**
      * @param  {} bucketName
      * Check if a bucket exists and return true if exists.
