@@ -392,29 +392,14 @@ class BigQueryUtil {
 
     /**
      * @param  {} datasetId
-     * @param  {} description
-     * @param  {} labels
+     * @param  {} options
      */
-    async createDataset(datasetId, description, labels) {
-        try {
-            let options = {};
+    async createDataset(datasetId, options) {
+        let _options = options || {};
+        const [dataset] = await this.bigqueryClient.createDataset(datasetId, _options);
 
-            if (description) {
-                options.description = description;
-            }
-            if (labels) {
-                options.labels = labels;
-            }
-
-            const [dataset] = await this.bigqueryClient.createDataset(datasetId, options);
-
-            if (this.VERBOSE_MODE) {
-                console.log(`Dataset ${dataset.id} created.`);
-            }
-            return true;
-        } catch (error) {
-            console.log(`Error creating Dataset '${datasetId}': ${error}`);
-            return false;
+        if (this.VERBOSE_MODE) {
+            console.log(`Dataset ${dataset.id} created.`);
         }
     }
 

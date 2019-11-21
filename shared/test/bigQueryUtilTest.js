@@ -63,9 +63,8 @@ if (argv.runCloudTests) {
     labels[labelName] = labelValue;
 
     it("create dataset, table, view, check for existence, and delete", async () => {
-        await bigqueryUtil.createDataset(uuid, "description", labels).then((result => {
-            expect(result, "created dataset").is.true;
-        })).then(() => {
+        const options = { description: "description", labels: labels };
+        await bigqueryUtil.createDataset(uuid, options).then(() => {
             return bigqueryUtil.datasetExists(uuid);
         }).then((result) => {
             expect(result).is.true;

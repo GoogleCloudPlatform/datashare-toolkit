@@ -132,7 +132,8 @@ async function setupPrerequisites(config) {
     if (configUtil.isAccessControlDatasetUsed(config) === true || runtimeConfiguration.REFRESH_DATASET_PERMISSION_TABLE === true) {
         if (await bigqueryUtil.datasetExists(config.accessControl.datasetId) === false) {
             console.log("Creating provisioning dataset");
-            await bigqueryUtil.createDataset(config.accessControl.datasetId, datasetDescription);
+            const options = { description: datasetDescription };
+            await bigqueryUtil.createDataset(config.accessControl.datasetId, options);
         }
         else {
             console.log("Provisoning dataset already exists");
@@ -249,11 +250,8 @@ async function processConfig(config) {
                 let labels = {};
                 labels[runtimeConfiguration.BQDS_CONFIGURATION_NAME_LABEL_KEY] = config.name;
 
-                const datasetCreated = await bigqueryUtil.createDataset(ds, description, labels);
-                if (datasetCreated === false) {
-                    console.log("Failed to create Dataset '%s', continuing to next view", ds);
-                    continue;
-                }
+                const options = { description: description, labels: labels };
+                await bigqueryUtil.createDataset(ds, options);
             }
 
             const viewSql = await sqlBuilder.generateSql(config, ds, view);
