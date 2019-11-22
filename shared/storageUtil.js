@@ -24,9 +24,10 @@ class StorageUtil {
      * @param  {} fileName
      * @param  {} contents
      * @param  {} options https://cloud.google.com/nodejs/docs/reference/storage/2.5.x/global.html#CreateWriteStreamOptions
+     * @param  {} createSignedUrl
      * Creates a file in Cloud Storage.
      */
-    async createFile(bucketName, fileName, contents, options) {
+    async createFile(bucketName, fileName, contents, options, createSignedUrl) {
         const bucket = storage.bucket(bucketName);
         const file = bucket.file(fileName);
         const fileSave = await file.save(contents, options).catch(err => {
@@ -36,12 +37,15 @@ class StorageUtil {
         if (fileSave[0] === false) {
             return { success: false, errors: ['Storage file [' + fileName + '] create failed'] };
         }
-        const url = await file.getSignedUrl({ action: 'read', expires: '03-01-2500' }).catch(err => {
-            console.warn(err.message);
-            throw err;
-        });
-        console.log(`Signed url is ${url}`);
-        return { url: url[0] };
+        if (createSignedUrl === true) {
+            const url = await file.getSignedUrl({ action: 'read', expires: '03-01-2500' }).catch(err => {
+                console.warn(err.message);
+                throw err;
+            });
+            console.log(`Signed url is ${url}`);
+            return { success: true, url: url[0] };
+        }
+        return { success: true };
     }
 
     /**

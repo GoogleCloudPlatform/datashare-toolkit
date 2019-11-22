@@ -114,7 +114,7 @@ if (argv.runCloudTests) {
         };
         let json = JSON.stringify(config);
         let buf = Buffer.from(json);
-        return storageUtil.createFile(bucketName, configFileName, buf);
+        return storageUtil.createFile(bucketName, configFileName, buf, null, false);
     });
 
     it("check generated configuration", async () => {
