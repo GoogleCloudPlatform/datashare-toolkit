@@ -37,11 +37,20 @@ let batchId;
 exports.processEvent = async (event, context) => {
     console.log(`Event type: ${context.eventType}`);
     const isHttpRequest = !context.eventType && context.eventType !== "google.storage.object.finalize";
-    const options = {
-        eventId: context.eventId,
-        bucketName: event.bucket,
-        fileName: event.name
-    };
+    let options;
+    if (isHttpRequest === false) {
+        // Cloud Storage finalize trigger
+        options = {
+            eventId: context.eventId,
+            bucketName: event.bucket,
+            fileName: event.name
+        };
+    }
+    else {
+        // Local http debugging
+        options = event.body || {};
+        console.log(`Provided options: ${JSON.stringify(options)}`);
+    }
     const result = validateOptions(options);
     if (!result.isValid) {
         if (isHttpRequest === true) {
