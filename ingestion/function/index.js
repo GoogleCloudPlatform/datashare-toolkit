@@ -51,13 +51,11 @@ exports.processEvent = async (event, context) => {
         }
         return;
     }
-
     const status = await processFile(options);
     if (isHttpRequest === true) {
         const statusCode = (status === true) ? 200 : 400;
         context.status(statusCode).send();
     }
-    return;
 };
 
 /**
