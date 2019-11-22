@@ -119,8 +119,8 @@ async function processFile(options) {
     }
     else {
         console.log(`Ignoring file ${options.fileName}, exiting`);
+        return false;
     }
-    return false;
 }
 
 /**
