@@ -37,13 +37,48 @@ let batchId;
  * @param  {} context
  */
 exports.processEvent = async (event, context) => {
+    console.log(`Event type: ${context.eventType}`);
+    const isHttpRequest = !context.eventType && context.eventType !== "google.storage.object.finalize";
     const options = {
         eventId: context.eventId,
         bucketName: event.bucket,
         fileName: event.name
     };
-    return processFile(options);
+    const result = validateOptions(options);
+    if (!result.isValid) {
+        if (isHttpRequest === true) {
+            context.status(400).send({ errors: result.errors });
+        }
+        return;
+    }
+
+    const status = await processFile(options);
+    if (isHttpRequest === true) {
+        const statusCode = (status === true) ? 200 : 400;
+        context.status(statusCode).send();
+    }
+    return;
 };
+
+function validateOptions(options) {
+    let errors = [];
+    if (!options.eventId) {
+        errors.push("options.eventId must be provided");
+    }
+    if (!options.bucketName) {
+        errors.push("options.bucketName must be provided");
+    }
+    if (!options.fileName) {
+        errors.push("options.fileName must be provided");
+    }
+    if (errors.length === 0) {
+        return { isValid: true };
+    }
+    else {
+        console.log(`Options validation failed: ${errors.join(", ")}`);
+        return { isValid: false, errors: errors };
+    }
+}
 
 /**
  * @param  {} options
@@ -70,15 +105,15 @@ async function processFile(options) {
             }).catch((reason) => {
                 console.error(`Exception processing ${options.fileName}: ${getExceptionString(reason)}`);
             });
+            return true;
         } catch (exception) {
             console.error(`Exception processing ${options.fileName}: ${getExceptionString(exception)}`);
-            return;
         }
     }
     else {
         console.log(`Ignoring file ${options.fileName}, exiting`);
     }
-    return;
+    return false;
 }
 
 /**
