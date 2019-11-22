@@ -152,7 +152,7 @@ class BigQueryUtil {
         const response = await dataset.exists();
         const exists = response[0];
         if (this.VERBOSE_MODE) {
-            console.log(`Checking if dataset exists: '${tableId}': ${exists}`);
+            console.log(`Checking if dataset exists: '${datasetId}': ${exists}`);
         }
         return exists;
     }
@@ -162,7 +162,7 @@ class BigQueryUtil {
     async getDatasets() {
         return this.bigqueryClient.getDatasets();
     }
-    
+
     /**
      * @param  {} datasetId
      * @param  {} options
@@ -293,15 +293,23 @@ class BigQueryUtil {
      * @param  {} datasetId
      * @param  {} tableId
      */
-    async deleteTable(datasetId, tableId) {
-        await this.bigqueryClient
+    async deleteTable(datasetId, tableId, ignoreError) {
+        return this.bigqueryClient
             .dataset(datasetId)
             .table(tableId)
-            .delete();
-
-        if (this.VERBOSE_MODE) {
-            console.log(`Table ${tableId} deleted`);
-        }
+            .delete()
+            .then((response) => {
+                if (this.VERBOSE_MODE) {
+                    console.log(`Table ${tableId} deleted: ${JSON.stringify(response)}`);
+                }
+                return true;
+            })
+            .catch((reason) => {
+                if (!ignoreError) {
+                    throw reason;
+                }
+                return false;
+            });
     }
 
     /**

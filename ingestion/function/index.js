@@ -96,18 +96,17 @@ async function processFile(options) {
         } else {
             console.log(`Found dataset ${config.dataset}`);
         }
-        try {
-            await stageFile(config).then(() => {
-                return transform(config);
-            }).then(() => {
-                return bigqueryUtil.deleteTable(config.dataset, config.stagingTable);
-            }).catch((reason) => {
-                console.error(`Exception processing ${options.fileName}: ${getExceptionString(reason)}`);
-            });
-            return true;
-        } catch (exception) {
-            console.error(`Exception processing ${options.fileName}: ${getExceptionString(exception)}`);
-        }
+
+        let success = true;
+        await stageFile(config).then(() => {
+            return transform(config);
+        }).catch((reason) => {
+            success = false;
+            console.error(`Exception processing ${options.fileName}: ${reason}`);
+        }).then(() => {
+            return bigqueryUtil.deleteTable(config.dataset, config.stagingTable, true);
+        });
+        return success;
     }
     else {
         console.log(`Ignoring file ${options.fileName}, exiting`);
@@ -180,11 +179,11 @@ async function stageFile(config) {
 
     const fields = (config.metadata && config.metadata.fields) || undefined;
 
-    const cfg = fields
+    const options = fields
         ? { schema: fields, expirationTime: expiryTime }
         : { autodetect: true, expirationTime: expiryTime };
 
-    await dataset.createTable(config.stagingTable, cfg);
+    await dataset.createTable(config.stagingTable, options);
 
     const table = dataset.table(config.stagingTable);
     console.log(`created table ${config.stagingTable}`);
