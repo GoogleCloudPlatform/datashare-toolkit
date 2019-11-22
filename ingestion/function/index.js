@@ -60,6 +60,9 @@ exports.processEvent = async (event, context) => {
     return;
 };
 
+/**
+ * @param  {} options
+ */
 function validateOptions(options) {
     let errors = [];
     if (!options.eventId) {
