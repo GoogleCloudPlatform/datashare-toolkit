@@ -54,6 +54,11 @@ if (argv.runCloudTests) {
         return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.false;
     });
 
+    it("query should be invalid with limit", async () => {
+        const query = "Xselect 1 limit 10";
+        return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.false;
+    });
+
     const uuid = uuidv4().replace(/-/g, "_");
     const viewName = `v_${uuid}`;
 
@@ -61,6 +66,151 @@ if (argv.runCloudTests) {
     const labelValue = "unit_tests";
     let labels = {};
     labels[labelName] = labelValue;
+
+    it("create and delete dataset", async () => {
+        const options = { description: "description", labels: labels };
+        await bigqueryUtil.createDataset(uuid, options).then(() => {
+            return bigqueryUtil.deleteDataset(uuid);
+        }).catch((reason) => {
+            expect.fail(`Failed: ${reason}`);
+        });
+    });
+
+    it("create dataset and getDatasets", async () => {
+        const options = { description: "description", labels: labels };
+        await bigqueryUtil.createDataset(uuid, options).then(() => {
+            return bigqueryUtil.getDatasets();
+        }).then((result) => {
+            expect(result).to.be.a('array');
+        }).then(() => {
+            return bigqueryUtil.deleteDataset(uuid);
+        }).catch((reason) => {
+            expect.fail(`Failed: ${reason}`);
+        });
+    });
+
+    it("create dataset and getDatasetMetadata", async () => {
+        const options = { description: "description", labels: labels };
+        await bigqueryUtil.createDataset(uuid, options).then(() => {
+            return bigqueryUtil.getDatasetMetadata(uuid);
+        }).then((result) => {
+            expect(result).to.be.an('object');
+            expect(result.datasetReference.datasetId).to.equal(uuid);
+        }).then(() => {
+            return bigqueryUtil.deleteDataset(uuid);
+        }).catch((reason) => {
+            expect.fail(`Failed: ${reason}`);
+        });
+    });
+
+    it("create dataset and setDatasetMetadata", async () => {
+        const options = { description: "description", labels: labels };
+        await bigqueryUtil.createDataset(uuid, options).then(() => {
+            const metadata = {
+                abc: "123"
+            };
+            return bigqueryUtil.setDatasetMetadata(uuid, metadata);
+        }).then((result) => {
+            expect(result).to.be.a('boolean');
+            expect(result).to.equal(true);
+        }).then(() => {
+            return bigqueryUtil.deleteDataset(uuid);
+        }).catch((reason) => {
+            expect.fail(`Failed: ${reason}`);
+        });
+    });
+
+    it("create dataset and getDatasetLabelValue", async () => {
+        const options = { description: "description", labels: labels };
+        await bigqueryUtil.createDataset(uuid, options).then(() => {
+            return bigqueryUtil.getDatasetLabelValue(uuid, labelName);
+        }).then((result) => {
+            expect(result).to.be.an('string');
+            expect(result).is.equal(labelValue);
+        }).then(() => {
+            return bigqueryUtil.deleteDataset(uuid);
+        }).catch((reason) => {
+            expect.fail(`Failed: ${reason}`);
+        });
+    });
+
+    it("create dataset, table, and getTableMetadata", async () => {
+        const options = { description: "description", labels: labels };
+        await bigqueryUtil.createDataset(uuid, options).then(() => {
+            const options = {
+                description: "description",
+                labels: labels,
+                schema: [{
+                    "name": "column1",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                }]
+            };
+            return bigqueryUtil.createTable(uuid, uuid, options);
+        }).then(() => {
+            return bigqueryUtil.getTableMetadata(uuid, uuid);
+        }).then((result) => {
+            expect(result).to.be.an('object');
+            expect(result.metadata.tableReference.tableId).to.equal(uuid);
+        }).then(() => {
+            return bigqueryUtil.deleteDataset(uuid);
+        }).catch((reason) => {
+            expect.fail(`Failed: ${reason}`);
+        });
+    });
+
+    it("create dataset, table, and setTableMetadata", async () => {
+        const options = { description: "description", labels: labels };
+        await bigqueryUtil.createDataset(uuid, options).then(() => {
+            const options = {
+                description: "description",
+                labels: labels,
+                schema: [{
+                    "name": "column1",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                }]
+            };
+            return bigqueryUtil.createTable(uuid, uuid, options);
+        }).then(() => {
+            const metadata = {
+                abc: "123"
+            };
+            return bigqueryUtil.setTableMetadata(uuid, uuid, metadata);
+        }).then((result) => {
+            expect(result).to.be.a('boolean');
+            expect(result).to.equal(true);
+        }).then(() => {
+            return bigqueryUtil.deleteDataset(uuid);
+        }).catch((reason) => {
+            expect.fail(`Failed: ${reason}`);
+        });
+    });
+
+    it("create dataset, table, and getTableLabelValue", async () => {
+        const options = { description: "description", labels: labels };
+        await bigqueryUtil.createDataset(uuid, options).then(() => {
+            const options = {
+                description: "description",
+                labels: labels,
+                schema: [{
+                    "name": "column1",
+                    "type": "STRING",
+                    "mode": "REQUIRED"
+                }]
+            };
+            return bigqueryUtil.createTable(uuid, uuid, options);
+        }).then((result) => {
+            return bigqueryUtil.getTableLabelValue(uuid, uuid, labelName);
+        }).then((result) => {
+            expect(result).to.be.an('string');
+            expect(result).is.equal(labelValue);
+        }).then(() => {
+            return bigqueryUtil.deleteDataset(uuid);
+        }).catch((reason) => {
+            expect.fail(`Failed: ${reason}`);
+        });
+    });
 
     it("create dataset, table, view, check for existence, and delete", async () => {
         const options = { description: "description", labels: labels };
