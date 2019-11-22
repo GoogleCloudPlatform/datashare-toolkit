@@ -160,6 +160,7 @@ async function getConfiguration(options) {
 async function transform(config) {
     const transformQuery = await storageUtil.fetchFileContent(config.bucket,
         `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
+    // Blocked by TODO(b/144032584): Destination tables not respecting nullable/required modes specified in schema.json.
     // const dataset = bigqueryClient.dataset(config.dataset);
     // const exists = await bigqueryUtil.tableExists(config.dataset, config.destinationTable);
     // if (!exists) {
