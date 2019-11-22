@@ -325,6 +325,9 @@ function log(message) {
 if (process.env.UNIT_TESTS) {
     module.exports = {
         getExceptionString,
-        setMetadataDefaults
+        setMetadataDefaults,
+        getBucketName,
+        validateOptions,
+        getConfiguration
     };
 }

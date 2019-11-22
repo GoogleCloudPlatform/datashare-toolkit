@@ -18,6 +18,8 @@
 /* eslint-disable promise/catch-or-return */
 
 const { argv, uuidv4 } = require('./testSetup');
+const { StorageUtil } = require('bqds-shared');
+const storageUtil = new StorageUtil();
 
 const assert = require('assert');
 const chai = require('chai'), expect = chai.expect, should = chai.should();
@@ -25,6 +27,8 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const ingestion = require("../index");
+const uuid = uuidv4();
+const bucketName = "bqds-unit-tests";
 
 it("getExceptionString empty dictionary", () => {
     const e = {};
@@ -60,4 +64,91 @@ it("checking metadata defaults with values provided", () => {
         maxBadRecords: 1
     };
     expect(ingestion.setMetadataDefaults(dict)).is.eql(expected);
+});
+
+it("get bucket uri", () => {
+    const options = {
+        eventId: 1,
+        bucketName: "myBucket",
+        fileName: "myFile.txt"
+    };
+    expect(ingestion.getBucketName(options)).is.equal("gs://myBucket/myFile.txt");
+});
+
+it("options are valid", () => {
+    const options = {
+        eventId: 1,
+        bucketName: "myBucket",
+        fileName: "myFile.txt"
+    };
+    expect(ingestion.validateOptions(options).isValid).is.true;
+});
+
+it("options are invalid", () => {
+    const options = {};
+    const result = ingestion.validateOptions(options);
+    expect(result.isValid).is.false;
+    expect(result.errors.length).is.equal(3);
+});
+
+it("check generated configuration", async () => {
+    let configFileName = `bqds/${uuid}.schema.json`;
+    const config = {
+        "truncate": true,
+        "metadata": {
+            "fieldDelimiter": ",",
+            "fields": [
+                {
+                    "type": "STRING",
+                    "name": "column1",
+                    "mode": "NULLABLE"
+                },
+                {
+                    "type": "STRING",
+                    "name": "column2",
+                    "mode": "NULLABLE"
+                }
+            ]
+        }
+    };
+    let json = JSON.stringify(config);
+    let buf = Buffer.from(json);
+    return storageUtil.createFile(bucketName, configFileName, buf);
+});
+
+it("check generated configuration", async () => {
+    const options = {
+        eventId: 1,
+        bucketName: bucketName,
+        fileName: `myFile.${uuid}.txt`
+    };
+    const config = await ingestion.getConfiguration(options);
+    const expected = {
+        bucket: bucketName,
+        dataset: "myFile",
+        destinationTable: uuid,
+        eventId: 1,
+        metadata: {
+            fieldDelimiter: ",",
+            fields: [
+                {
+                    mode: "NULLABLE",
+                    name: "column1",
+                    type: "STRING"
+                },
+                {
+                    mode: "NULLABLE",
+                    name: "column2",
+                    type: "STRING"
+                }
+            ],
+            maxBadRecords: 0,
+            skipLeadingRows: 1,
+            sourceFormat: "CSV"
+        },
+        sourceFile: `myFile.${uuid}.txt`,
+        stagingTable: `TMP_${uuid}_1`,
+        truncate: true
+    };
+    expect(config).is.eql(expected);
 });
