@@ -410,8 +410,9 @@ class BigQueryUtil {
             return;
         });
 
-        // Should have boolean return, handling errors or throwing to caller
-        console.log(`Metadata update is complete for dataset '${datasetId}'`);
+        if (this.VERBOSE_MODE) {
+            console.log(`Metadata update is complete for dataset '${datasetId}'`);
+        }
         return success;
     }
 
@@ -459,7 +460,6 @@ class BigQueryUtil {
         let success = false;
         const dataset = this.bigqueryClient.dataset(datasetId);
         const table = dataset.table(tableId);
-        let _metadata;
 
         if (this.VERBOSE_MODE) {
             console.log(`Setting metadata for table '${datasetId}.${tableId}': ${JSON.stringify(metadata, null, 2)}`);
@@ -467,13 +467,14 @@ class BigQueryUtil {
 
         // https://cloud.google.com/nodejs/docs/reference/bigquery/1.3.x/Table#setMetadata
         await table.setMetadata(metadata).then((data) => {
-            _metadata = data[0];
             const apiResponse = data[1];
+            success = true;
             return;
         });
 
-        // Should have boolean return, handling errors or throwing to caller
-        console.log(`Metadata update is complete for table '${datasetId}.${tableId}'`);
+        if (this.VERBOSE_MODE) {
+            console.log(`Metadata update is complete for table '${datasetId}.${tableId}'`);
+        };
         return success;
     }
 
