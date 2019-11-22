@@ -21,8 +21,6 @@ const bigqueryUtil = new BigQueryUtil();
 const cloudFunctionUtil = new CloudFunctionUtil();
 const storageUtil = new StorageUtil();
 
-const { BigQuery } = require('@google-cloud/bigquery');
-const bigqueryClient = new BigQuery();
 const schemaFileName = "schema.json";
 const transformFileName = "transform.sql";
 const defaultTransformQuery = "*";
@@ -174,7 +172,7 @@ async function transform(config) {
  */
 async function stageFile(config) {
     console.log(`using config ` + JSON.stringify(config));
-    const dataset = bigqueryClient.dataset(config.dataset);
+    const dataset = bigqueryUtil.getDataset(config.dataset);
     let today = new Date();
     today.setDate(today.getDate() + stagingTableExpiryDays);
     const expiryTime = today.getTime();

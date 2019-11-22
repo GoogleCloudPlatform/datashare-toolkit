@@ -162,6 +162,14 @@ class BigQueryUtil {
     async getDatasets() {
         return this.bigqueryClient.getDatasets();
     }
+    
+    /**
+     * @param  {} datasetId
+     * @param  {} options
+     */
+    getDataset(datasetId, options) {
+        return this.bigqueryClient.dataset(datasetId, options);
+    }
 
     /**
      * @param  {} datasetId
