@@ -36,11 +36,6 @@ it("getExceptionString empty string", () => {
     expect(ingestion.getExceptionString(e)).is.equal('""');
 });
 
-it("get filename from path", () => {
-    const file = "/path/my-test_file.txt";
-    expect(ingestion.getDestination(file)).is.equal("my-test_file.txt");
-});
-
 it("checking metadata defaults with no values provided", () => {
     const dict = { metadata: {} };
     const expected = {

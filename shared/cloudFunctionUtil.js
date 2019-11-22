@@ -49,7 +49,6 @@ class CloudFunctionUtil {
             return false;
         } else {
             const ext = parts[parts.length - 1];
-            console.log(`File has extension ${ext}`);
             return acceptable.includes(ext.toLowerCase());
         }
     }

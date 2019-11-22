@@ -20,6 +20,7 @@ const { BigQueryUtil, CloudFunctionUtil, StorageUtil } = require('bqds-shared');
 const bigqueryUtil = new BigQueryUtil();
 const cloudFunctionUtil = new CloudFunctionUtil();
 const storageUtil = new StorageUtil();
+const path = require("path");
 
 const schemaFileName = "schema.json";
 const transformFileName = "transform.sql";
@@ -127,7 +128,7 @@ async function processFile(options) {
  * @param  {} options
  */
 async function getConfiguration(options) {
-    const dest = getDestination(options.fileName).split('.');
+    const dest = path.basename(options.fileName).split('.');
     const dataset = dest[0];
     const destinationTable = dest[1];
 
@@ -286,22 +287,10 @@ function setMetadataDefaults(dict) {
         meta.maxBadRecords = 0;
     }
 
-    console.log("Using metadata: " + JSON.stringify(meta));
-    return meta;
-}
-
-/**
- * @param  {} fileName
- */
-function getDestination(fileName) {
-    let name = fileName.indexOf('/') >= 0 ?
-        fileName.substring(fileName.lastIndexOf('/') + 1) :
-        fileName;
-    const parts = name.split('.');
-    if (parts && parts.length > 0) {
-        return `${parts[0]}.${parts[1]}`;
+    if (process.env.VERBOSE_MODE) {
+        console.log("Using metadata: " + JSON.stringify(meta));
     }
-    return name;
+    return meta;
 }
 
 /**
@@ -336,7 +325,6 @@ function log(message) {
 if (process.env.UNIT_TESTS) {
     module.exports = {
         getExceptionString,
-        getDestination,
         setMetadataDefaults
     };
 }
