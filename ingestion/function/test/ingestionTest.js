@@ -91,64 +91,66 @@ it("options are invalid", () => {
     expect(result.errors.length).is.equal(3);
 });
 
-it("check generated configuration", async () => {
-    let configFileName = `bqds/${uuid}.schema.json`;
-    const config = {
-        "truncate": true,
-        "metadata": {
-            "fieldDelimiter": ",",
-            "fields": [
-                {
-                    "type": "STRING",
-                    "name": "column1",
-                    "mode": "NULLABLE"
-                },
-                {
-                    "type": "STRING",
-                    "name": "column2",
-                    "mode": "NULLABLE"
-                }
-            ]
-        }
-    };
-    let json = JSON.stringify(config);
-    let buf = Buffer.from(json);
-    return storageUtil.createFile(bucketName, configFileName, buf);
-});
+if (argv.runCloudTests) {
+    it("check generated configuration", async () => {
+        let configFileName = `bqds/${uuid}.schema.json`;
+        const config = {
+            "truncate": true,
+            "metadata": {
+                "fieldDelimiter": ",",
+                "fields": [
+                    {
+                        "type": "STRING",
+                        "name": "column1",
+                        "mode": "NULLABLE"
+                    },
+                    {
+                        "type": "STRING",
+                        "name": "column2",
+                        "mode": "NULLABLE"
+                    }
+                ]
+            }
+        };
+        let json = JSON.stringify(config);
+        let buf = Buffer.from(json);
+        return storageUtil.createFile(bucketName, configFileName, buf);
+    });
 
-it("check generated configuration", async () => {
-    const options = {
-        eventId: 1,
-        bucketName: bucketName,
-        fileName: `myFile.${uuid}.txt`
-    };
-    const config = await ingestion.getConfiguration(options);
-    const expected = {
-        bucket: bucketName,
-        dataset: "myFile",
-        destinationTable: uuid,
-        eventId: 1,
-        metadata: {
-            fieldDelimiter: ",",
-            fields: [
-                {
-                    mode: "NULLABLE",
-                    name: "column1",
-                    type: "STRING"
-                },
-                {
-                    mode: "NULLABLE",
-                    name: "column2",
-                    type: "STRING"
-                }
-            ],
-            maxBadRecords: 0,
-            skipLeadingRows: 1,
-            sourceFormat: "CSV"
-        },
-        sourceFile: `myFile.${uuid}.txt`,
-        stagingTable: `TMP_${uuid}_1`,
-        truncate: true
-    };
-    expect(config).is.eql(expected);
-});
+    it("check generated configuration", async () => {
+        const options = {
+            eventId: 1,
+            bucketName: bucketName,
+            fileName: `myFile.${uuid}.txt`
+        };
+        const config = await ingestion.getConfiguration(options);
+        const expected = {
+            bucket: bucketName,
+            dataset: "myFile",
+            destinationTable: uuid,
+            eventId: 1,
+            metadata: {
+                fieldDelimiter: ",",
+                fields: [
+                    {
+                        mode: "NULLABLE",
+                        name: "column1",
+                        type: "STRING"
+                    },
+                    {
+                        mode: "NULLABLE",
+                        name: "column2",
+                        type: "STRING"
+                    }
+                ],
+                maxBadRecords: 0,
+                skipLeadingRows: 1,
+                sourceFormat: "CSV"
+            },
+            sourceFile: `myFile.${uuid}.txt`,
+            stagingTable: `TMP_${uuid}_1`,
+            truncate: true
+        };
+        expect(config).is.eql(expected);
+    });
+}
