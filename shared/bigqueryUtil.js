@@ -498,7 +498,7 @@ class BigQueryUtil {
     async insertRows(datasetId, tableId, rows) {
         const dataset = this.bigqueryClient.dataset(datasetId);
         const table = dataset.table(tableId);
-        await table.insert(rows);
+        return table.insert(rows);
     }
 }
 
