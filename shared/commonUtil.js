@@ -15,6 +15,7 @@
  */
 
 'use strict';
+const YAML = require('yaml');
 
 /**
  * @param  {} str
