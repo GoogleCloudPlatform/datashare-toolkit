@@ -167,11 +167,11 @@ if (argv.runCloudTests) {
     });
 
     it("function integration test", async () => {
-        const datasetName = `it_${uuid}`;
+        const datasetName = `${uuid}_weather`;
 
-        let schemaBucketFile = `bqds/${uuid}/config/observation.schema.json`;
-        let sqlBucketFile = `bqds/${uuid}/config/observation.transform.sql`;
-        let dataBucketFile = `bqds/${uuid}/data/weather.observation.csv`;
+        let schemaBucketFile = `bqds/${uuid}/config/${uuid}_observation.schema.json`;
+        let sqlBucketFile = `bqds/${uuid}/config/${uuid}_observation.transform.sql`;
+        let dataBucketFile = `bqds/${uuid}/data/${uuid}_weather.observation.csv`;
 
         let schemaFileCreated = false;
         let sqlFileCreated = false;
@@ -212,14 +212,15 @@ if (argv.runCloudTests) {
             return true;
         }).then((result) => {
             // Run query to get records
-            const options = { query: `select * from \`${argv.projectId}.${uuid}.${uuid}\`` };
-            // return bigqueryUtil.executeQuerySync(options);
-            return [];
+            const options = { query: `select * from \`${argv.projectId}.${datasetName}.observation\`` };
+            console.log(`Executing query: ${JSON.stringify(options)}`);
+            return bigQueryUtil.executeQuerySync(options);
         }).then((result) => {
+            console.log("result of query");
             // Check count of records
             const [rows] = result;
-            // expect(rows.length).is.equal(2);
-            return true;
+            console.log(`count of rows is ${rows.length}`);
+            expect(rows.length).is.equal(100);
         }).then((result) => {
             return bigQueryUtil.deleteDataset(datasetName);
         }).then((result) => {
