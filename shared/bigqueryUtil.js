@@ -118,7 +118,7 @@ class BigQueryUtil {
         }
 
         if (this.VERBOSE_MODE) {
-            console.log(`Checking if table exists: '${tableId}': ${exists}`);
+            console.log(`Checking if table exists: '${datasetId}.${tableId}': ${exists}`);
         }
         return exists;
     }
@@ -300,7 +300,7 @@ class BigQueryUtil {
             .delete()
             .then((response) => {
                 if (this.VERBOSE_MODE) {
-                    console.log(`Table ${tableId} deleted: ${JSON.stringify(response)}`);
+                    console.log(`Table ${tableId} deleted`);
                 }
                 return true;
             })

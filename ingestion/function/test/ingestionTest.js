@@ -30,7 +30,7 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const ingestion = require("../index");
-const uuid = uuidv4().replace(/-/gi, '_');
+const uuid = uuidv4().replace(/-/gi, '');
 const bucketName = "bqds-unit-tests";
 
 it("getExceptionString empty dictionary", () => {
@@ -197,6 +197,7 @@ if (argv.runCloudTests) {
             dataFileCreated = true;
         }).catch((reason) => {
             console.log(`Error creating files: ${reason}`);
+            expect.fail("Failed to save files to cloud storage");
         }).then(() => {
             if (dataFileCreated === true) {
                 const options = {
@@ -208,8 +209,9 @@ if (argv.runCloudTests) {
             }
             return false;
         }).then((result) => {
-            // Check if table exists returning boolean.
-            return true;
+            expect(result).to.be.true;
+        }).then((result) => {
+            expect(bigQueryUtil.tableExists(datasetName, "observation")).to.eventually.true;
         }).then((result) => {
             // Run query to get records
             const options = { query: `select * from \`${argv.projectId}.${datasetName}.observation\`` };
