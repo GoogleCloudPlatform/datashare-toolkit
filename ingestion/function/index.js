@@ -114,8 +114,8 @@ async function processFile(options) {
             return bigqueryUtil.deleteTable(config.dataset, config.stagingTable, true);
         }).catch((reason) => {
             console.error(`Exception processing ${options.fileName}: ${reason}`);
-            return success;
         });
+        return success;
     }
     else {
         console.log(`Ignoring file ${options.fileName}, exiting`);
