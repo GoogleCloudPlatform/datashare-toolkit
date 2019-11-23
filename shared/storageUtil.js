@@ -58,6 +58,10 @@ class StorageUtil {
         return file.delete();
     }
 
+    async deleteFolder(bucketName, folderName) {
+        
+    }
+
     /**
      * @param  {} bucketName
      * @param  {} fileName

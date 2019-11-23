@@ -219,6 +219,8 @@ if (argv.runCloudTests) {
             console.log(`Error deleting file from storage '${dataBucketFile}' with reason: ${reason}`);
         });
 
+        // Delete the folder instead of individual files.
+        
         /*
         return bigqueryUtil.tableExists(uuid, uuid);
 
