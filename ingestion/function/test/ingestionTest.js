@@ -95,8 +95,9 @@ it("options are invalid", () => {
 });
 
 if (argv.runCloudTests) {
-    it("check generated configuration", async () => {
-        let configFileName = `bqds/${uuid}.schema.json`;
+    let configFileName = `bqds/${uuid}.schema.json`;
+
+    it("create schema.json configuration file", async () => {
         const config = {
             "truncate": true,
             "metadata": {
@@ -120,7 +121,7 @@ if (argv.runCloudTests) {
         return storageUtil.createFile(bucketName, configFileName, buf, null, false);
     });
 
-    it("check generated configuration", async () => {
+    it("check generated schema.json configuration", async () => {
         const options = {
             eventId: 1,
             bucketName: bucketName,
@@ -155,6 +156,10 @@ if (argv.runCloudTests) {
             truncate: true
         };
         expect(config).is.eql(expected);
+    });
+
+    it("delete schema.json configuration file from bucket", async () => {
+        storageUtil.deleteFile(bucketName, configFileName);
     });
 
     it("function integration test", async () => {
@@ -220,7 +225,7 @@ if (argv.runCloudTests) {
         });
 
         // Delete the folder instead of individual files.
-        
+
         /*
         return bigqueryUtil.tableExists(uuid, uuid);
 
