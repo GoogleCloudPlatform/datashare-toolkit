@@ -58,10 +58,6 @@ class StorageUtil {
         return file.delete();
     }
 
-    async deleteFolder(bucketName, folderName) {
-        
-    }
-
     /**
      * @param  {} bucketName
      * @param  {} fileName
@@ -148,10 +144,7 @@ class StorageUtil {
             console.warn(err.message);
             throw err;
         });
-        if (exists[0] === false) {
-            return { success: false, code: 400, errors: ['Storage file [' + fileName + '] does not exist'] };
-        }
-        return true;
+        return exists[0];
     }
 
     /**

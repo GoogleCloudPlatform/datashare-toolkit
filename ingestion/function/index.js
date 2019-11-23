@@ -21,9 +21,6 @@ const bigqueryUtil = new BigQueryUtil();
 const cloudFunctionUtil = new CloudFunctionUtil();
 const storageUtil = new StorageUtil();
 const path = require("path");
-
-const schemaFileName = "schema.json";
-const transformFileName = "transform.sql";
 const defaultTransformQuery = "*";
 const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
 const stagingTableExpiryDays = 2;
@@ -127,19 +124,36 @@ async function processFile(options) {
 /**
  * @param  {} options
  */
+function getBucketPaths(options) {
+    const dest = path.basename(options.fileName).split('.');
+    const destinationTable = dest[1];
+    const bucketPath = path.dirname(options.fileName);
+    const schemaFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.schema.json`);
+    const transformFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.transform.sql`);
+    return { schemaPath: schemaFileBucketPath, transformPath: transformFileBucketPath };
+}
+
+/**
+ * @param  {} options
+ */
 async function getConfiguration(options) {
     const dest = path.basename(options.fileName).split('.');
     const dataset = dest[0];
     const destinationTable = dest[1];
 
-    const schemaConfig = await storageUtil.fetchFileContent(options.bucketName, `${processPrefix}/${destinationTable}.${schemaFileName}`);
+    const bucketPaths = getBucketPaths(options);
     let config = {};
-    if (schemaConfig) {
-        // This will pull in the dictionary from the configuration file. IE: includes destination, metadata, truncate, etc.
-        config = JSON.parse(schemaConfig);
 
-        // Updates the configured metadata to create necessary default values.
-        config.metadata = setMetadataDefaults(config);
+    const schemaExists = await storageUtil.checkIfFileExists(options.bucketName, bucketPaths.schemaPath);
+    if (schemaExists === true) {
+        const schemaConfig = await storageUtil.fetchFileContent(options.bucketName, bucketPaths.schemaPath);
+        if (schemaConfig) {
+            // This will pull in the dictionary from the configuration file. IE: includes destination, metadata, truncate, etc.
+            config = JSON.parse(schemaConfig);
+
+            // Updates the configured metadata to create necessary default values.
+            config.metadata = setMetadataDefaults(config);
+        }
     }
 
     // Runtime created properties
@@ -149,6 +163,10 @@ async function getConfiguration(options) {
     config.sourceFile = options.fileName;
     config.bucket = options.bucketName;
     config.eventId = options.eventId;
+    config.bucketPath = {
+        schema: bucketPaths.schemaPath,
+        transform: bucketPaths.transformPath
+    };
 
     console.log(`Configuration: ${JSON.stringify(config)}`);
     return config;
@@ -159,8 +177,12 @@ async function getConfiguration(options) {
  * Executes the SQL transformation.
  */
 async function transform(config) {
-    const transformQuery = await storageUtil.fetchFileContent(config.bucket,
-        `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
+    const transformExists = await storageUtil.checkIfFileExists(config.bucket, config.bucketPath.transform);
+
+    let transformQuery = defaultTransformQuery;
+    if (transformExists === true) {
+        transformQuery = await storageUtil.fetchFileContent(config.bucket, config.bucketPath.transform);
+    }
     // Blocked by TODO(b/144032584): Destination tables not respecting nullable/required modes specified in schema.json.
     // const dataset = bigqueryClient.dataset(config.dataset);
     // const exists = await bigqueryUtil.tableExists(config.dataset, config.destinationTable);
@@ -186,7 +208,7 @@ async function stageFile(config) {
     let today = new Date();
     today.setDate(today.getDate() + stagingTableExpiryDays);
     const expiryTime = today.getTime();
-    console.log(`setting expirationTime for staging table to ${expiryTime}`);
+    console.log(`Setting expirationTime for staging table to ${expiryTime}`);
 
     const fields = (config.metadata && config.metadata.fields) || undefined;
 

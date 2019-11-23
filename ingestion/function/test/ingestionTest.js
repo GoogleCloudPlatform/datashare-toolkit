@@ -95,7 +95,7 @@ it("options are invalid", () => {
 });
 
 if (argv.runCloudTests) {
-    let configFileName = `bqds/${uuid}.schema.json`;
+    let configFileName = `bqds/${uuid}/config/${uuid}.schema.json`;
 
     it("create schema.json configuration file", async () => {
         const config = {
@@ -125,11 +125,15 @@ if (argv.runCloudTests) {
         const options = {
             eventId: 1,
             bucketName: bucketName,
-            fileName: `myFile.${uuid}.txt`
+            fileName: `bqds/${uuid}/data/myFile.${uuid}.txt`
         };
         const config = await ingestion.getConfiguration(options);
         const expected = {
             bucket: bucketName,
+            bucketPath: {
+                schema: `bqds/${uuid}/config/${uuid}.schema.json`,
+                transform: `bqds/${uuid}/config/${uuid}.transform.sql`
+            },
             dataset: "myFile",
             destinationTable: uuid,
             eventId: 1,
@@ -151,7 +155,7 @@ if (argv.runCloudTests) {
                 skipLeadingRows: 1,
                 sourceFormat: "CSV"
             },
-            sourceFile: `myFile.${uuid}.txt`,
+            sourceFile: `bqds/${uuid}/data/myFile.${uuid}.txt`,
             stagingTable: `TMP_${uuid}_1`,
             truncate: true
         };
