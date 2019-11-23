@@ -51,6 +51,16 @@ class StorageUtil {
     /**
      * @param  {} bucketName
      * @param  {} fileName
+     */
+    async deleteFile(bucketName, fileName) {
+        const bucket = storage.bucket(bucketName);
+        const file = bucket.file(fileName);
+        return file.delete();
+    }
+
+    /**
+     * @param  {} bucketName
+     * @param  {} fileName
      * @param  {} fileMetadata https://googleapis.dev/nodejs/storage/latest/File.html#setMetadata
      * Updates the file metadata in GCP storage
      */

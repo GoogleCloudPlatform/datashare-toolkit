@@ -159,30 +159,76 @@ if (argv.runCloudTests) {
 
     it("function integration test", async () => {
         const datasetName = `it_${uuid}`;
+
+        let schemaBucketFile = `bqds/${uuid}/integration/observation.schema.json`;
+        let sqlBucketFile = `bqds/${uuid}/integration/observation.transform.sql`;
+        let dataBucketFile = `bqds/${uuid}/integration/weather.observation.csv`;
+
+        let schemaFileCreated = false;
+        let sqlFileCreated = false;
+        let dataFileCreated = false;
+
         bigQueryUtil.createDataset(datasetName).then(() => {
             console.log(`Dataset ${datasetName} created`);
             const schemaFile = path.join("..", "..", "tests", "config", "observation.schema.json");
             const schemaContent = fs.readFileSync(schemaFile);
             let schemaBuf = Buffer.from(schemaContent);
-            return storageUtil.createFile(bucketName, `bqds/${uuid}/integration/observation.schema.json`, schemaBuf);
+            return storageUtil.createFile(bucketName, schemaBucketFile, schemaBuf);
         }).then(() => {
+            schemaFileCreated = true;
             const sqlFile = path.join("..", "..", "tests", "config", "observation.transform.sql");
             const sqlContent = fs.readFileSync(sqlFile);
             let sqlBuf = Buffer.from(sqlContent);
-            return storageUtil.createFile(bucketName, `bqds/${uuid}/integration/observation.transform.sql`, sqlBuf);
+            return storageUtil.createFile(bucketName, sqlBucketFile, sqlBuf);
         }).then(() => {
+            sqlFileCreated = true;
             const dataFile = path.join("..", "..", "tests", "data", "weather.observation.csv");
             const dataContent = fs.readFileSync(dataFile);
             let dataBuf = Buffer.from(dataContent);
-            return storageUtil.createFile(bucketName, `bqds/${uuid}/integration/weather.observation.csv`, dataBuf);
+            return storageUtil.createFile(bucketName, dataBucketFile, dataBuf);
+        }).then(() => {
+            dataFileCreated = true;
         }).catch((reason) => {
             console.log(`Error creating files: ${reason}`);
         }).then(() => {
-            bigQueryUtil.deleteDataset(datasetName);
+            return bigQueryUtil.deleteDataset(datasetName);
         }).then(() => {
             console.log(`Dataset ${datasetName} deleted`);
         }).catch((reason) => {
             console.log(`Error deleting dataset ${datasetName}: ${reason}`);
+        }).then(() => {
+            if (schemaFileCreated === true) {
+                return storageUtil.deleteFile(bucketName, schemaBucketFile);
+            }
+            return [];
+        }).catch((reason) => {
+            console.log(`Error deleting file from storage '${schemaBucketFile}' with reason: ${reason}`);
+        }).then(() => {
+            if (sqlFileCreated === true) {
+                return storageUtil.deleteFile(bucketName, sqlBucketFile);
+            }
+            return [];
+        }).catch((reason) => {
+            console.log(`Error deleting file from storage '${sqlBucketFile}' with reason: ${reason}`);
+        }).then(() => {
+            if (dataFileCreated === true) {
+                return storageUtil.deleteFile(bucketName, dataBucketFile);
+            }
+            return [];
+        }).catch((reason) => {
+            console.log(`Error deleting file from storage '${dataBucketFile}' with reason: ${reason}`);
         });
+
+        /*
+        return bigqueryUtil.tableExists(uuid, uuid);
+
+        }).then(() => {
+            const options = { query: `select * from \`${argv.projectId}.${uuid}.${uuid}\`` };
+            return bigqueryUtil.executeQuerySync(options);
+        }).then((result) => {
+            const [rows] = result;
+            expect(rows.length).is.equal(2);
+        })
+        */
     });
 }
