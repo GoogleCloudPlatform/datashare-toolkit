@@ -93,7 +93,7 @@ async function processFile(options) {
     batchId = cloudFunctionUtil.generateBatchId(options.eventId, options.bucketName, options.fileName);
     console.log(`Object notification arrived for ${getBucketName(options)}, batchId is ${batchId}`);
 
-    if (cloudFunctionUtil.isExtensionSupported(options.fileName, acceptable, processPrefix)) {
+    if (cloudFunctionUtil.isExtensionSupported(options.fileName, acceptable)) {
         const config = await getConfiguration(options);
         const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
         if (!haveDataset) {
@@ -112,8 +112,10 @@ async function processFile(options) {
             console.error(`Exception processing ${options.fileName}: ${reason}`);
         }).then(() => {
             return bigqueryUtil.deleteTable(config.dataset, config.stagingTable, true);
+        }).catch((reason) => {
+            console.error(`Exception processing ${options.fileName}: ${reason}`);
+            return success;
         });
-        return success;
     }
     else {
         console.log(`Ignoring file ${options.fileName}, exiting`);
@@ -190,9 +192,9 @@ async function transform(config) {
     //     console.log(`creating table ${config.destinationTable} with ${config.metadata.fields}`);
     //     await dataset.createTable(config.destinationTable, { schema: config.metadata.fields });
     // }
-    const transform = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.dataset}.${config.stagingTable}\``;
-    console.log(`executing transform query: ${transform}`);
-    const job = await runTransform(config, transform);
+    const query = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.dataset}.${config.stagingTable}\``;
+    console.log(`executing transform query: ${query}`);
+    const job = await runTransform(config, query);
     console.log(`${job[0].metadata.id} ${job[0].metadata.statistics.query.statementType} ${job[0].metadata.configuration.jobType} ${job[0].metadata.status.state}`);
     console.log("processing done");
     return;
@@ -239,7 +241,7 @@ async function stageFile(config) {
  * Creates query job for the transformation query.
  */
 async function runTransform(config, query) {
-    console.log("configuration for runTransform: " + JSON.stringify(config));
+    console.log("Configuration for runTransform: " + JSON.stringify(config));
     let options = {
         destinationTable: {
             projectId: process.env.GCP_PROJECT,
@@ -350,6 +352,7 @@ if (process.env.UNIT_TESTS) {
         setMetadataDefaults,
         getBucketName,
         validateOptions,
-        getConfiguration
+        getConfiguration,
+        processFile
     };
 }

@@ -24,6 +24,9 @@ if (argv.runCloudTests && !argv.projectId) {
     process.exit(1);
 }
 
+// Needs to be set to mimic environmental variable set by cloud function invocation and used within ingestion.
+process.env.GCP_PROJECT = argv.projectId;
+
 const uuidv4 = require('uuid/v4');
 
 module.exports = {

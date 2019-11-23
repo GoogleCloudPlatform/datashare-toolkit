@@ -13,7 +13,7 @@
     "start": "functions-framework --target=processEvent",
     "deploy": "../bin/deploy.sh",
     "lint": "eslint .",
-    "test": "nyc mocha"
+    "test": "nyc mocha --timeout 60000 --projectId='bqds-ci'"
   },
   "devDependencies": {
     "minimist": "^1.2.0",

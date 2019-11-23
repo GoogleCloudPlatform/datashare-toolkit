@@ -20,7 +20,7 @@
 const { argv, uuidv4 } = require('./testSetup');
 const { BigQueryUtil, StorageUtil } = require('bqds-shared');
 const storageUtil = new StorageUtil();
-const bigQueryUtil = new BigQueryUtil();
+const bigQueryUtil = new BigQueryUtil(argv.projectId);
 const fs = require('fs');
 const path = require('path');
 
@@ -177,13 +177,11 @@ if (argv.runCloudTests) {
         let sqlFileCreated = false;
         let dataFileCreated = false;
 
-        bigQueryUtil.createDataset(datasetName).then(() => {
-            console.log(`Dataset ${datasetName} created`);
-            const schemaFile = path.join("..", "..", "tests", "config", "observation.schema.json");
-            const schemaContent = fs.readFileSync(schemaFile);
-            let schemaBuf = Buffer.from(schemaContent);
-            return storageUtil.createFile(bucketName, schemaBucketFile, schemaBuf);
-        }).then(() => {
+        const schemaFile = path.join("..", "..", "tests", "config", "observation.schema.json");
+        const schemaContent = fs.readFileSync(schemaFile);
+        let schemaBuf = Buffer.from(schemaContent);
+
+        return storageUtil.createFile(bucketName, schemaBucketFile, schemaBuf).then(() => {
             schemaFileCreated = true;
             const sqlFile = path.join("..", "..", "tests", "config", "observation.transform.sql");
             const sqlContent = fs.readFileSync(sqlFile);
@@ -200,8 +198,31 @@ if (argv.runCloudTests) {
         }).catch((reason) => {
             console.log(`Error creating files: ${reason}`);
         }).then(() => {
+            if (dataFileCreated === true) {
+                const options = {
+                    eventId: uuid,
+                    bucketName: bucketName,
+                    fileName: dataBucketFile
+                };
+                return ingestion.processFile(options);
+            }
+            return false;
+        }).then((result) => {
+            // Check if table exists returning boolean.
+            return true;
+        }).then((result) => {
+            // Run query to get records
+            const options = { query: `select * from \`${argv.projectId}.${uuid}.${uuid}\`` };
+            // return bigqueryUtil.executeQuerySync(options);
+            return [];
+        }).then((result) => {
+            // Check count of records
+            const [rows] = result;
+            // expect(rows.length).is.equal(2);
+            return true;
+        }).then((result) => {
             return bigQueryUtil.deleteDataset(datasetName);
-        }).then(() => {
+        }).then((result) => {
             console.log(`Dataset ${datasetName} deleted`);
         }).catch((reason) => {
             console.log(`Error deleting dataset ${datasetName}: ${reason}`);
@@ -228,18 +249,6 @@ if (argv.runCloudTests) {
             console.log(`Error deleting file from storage '${dataBucketFile}' with reason: ${reason}`);
         });
 
-        // Delete the folder instead of individual files.
-
-        /*
-        return bigqueryUtil.tableExists(uuid, uuid);
-
-        }).then(() => {
-            const options = { query: `select * from \`${argv.projectId}.${uuid}.${uuid}\`` };
-            return bigqueryUtil.executeQuerySync(options);
-        }).then((result) => {
-            const [rows] = result;
-            expect(rows.length).is.equal(2);
-        })
-        */
+        // TODO: Delete the folder instead of individual files.
     });
 }

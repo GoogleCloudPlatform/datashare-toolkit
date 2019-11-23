@@ -41,16 +41,10 @@ class CloudFunctionUtil {
      * @param  {} ignoreStartsWith
      * Determine whether a file suffix is recognized for ingestion.
      */
-    isExtensionSupported(fileName, acceptable, ignoreStartsWith) {
+    isExtensionSupported(fileName, acceptable) {
         const parts = fileName.split('.');
-        if (parts[0] &&
-            (parts[0].startsWith(ignoreStartsWith)
-                || parts[0].startsWith(`/${ignoreStartsWith}`))) {
-            return false;
-        } else {
-            const ext = parts[parts.length - 1];
-            return acceptable.includes(ext.toLowerCase());
-        }
+        const ext = parts[parts.length - 1];
+        return acceptable.includes(ext.toLowerCase());
     }
 }
 
