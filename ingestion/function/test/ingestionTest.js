@@ -18,8 +18,11 @@
 /* eslint-disable promise/catch-or-return */
 
 const { argv, uuidv4 } = require('./testSetup');
-const { StorageUtil } = require('bqds-shared');
+const { BigQueryUtil, StorageUtil } = require('bqds-shared');
 const storageUtil = new StorageUtil();
+const bigQueryUtil = new BigQueryUtil();
+const fs = require('fs');
+const path = require('path');
 
 const assert = require('assert');
 const chai = require('chai'), expect = chai.expect, should = chai.should();
@@ -27,7 +30,7 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const ingestion = require("../index");
-const uuid = uuidv4();
+const uuid = uuidv4().replace(/-/gi, '_');
 const bucketName = "bqds-unit-tests";
 
 it("getExceptionString empty dictionary", () => {
@@ -152,5 +155,34 @@ if (argv.runCloudTests) {
             truncate: true
         };
         expect(config).is.eql(expected);
+    });
+
+    it("function integration test", async () => {
+        const datasetName = `it_${uuid}`;
+        bigQueryUtil.createDataset(datasetName).then(() => {
+            console.log(`Dataset ${datasetName} created`);
+            const schemaFile = path.join("..", "..", "tests", "config", "observation.schema.json");
+            const schemaContent = fs.readFileSync(schemaFile);
+            let schemaBuf = Buffer.from(schemaContent);
+            return storageUtil.createFile(bucketName, `bqds/${uuid}/integration/observation.schema.json`, schemaBuf);
+        }).then(() => {
+            const sqlFile = path.join("..", "..", "tests", "config", "observation.transform.sql");
+            const sqlContent = fs.readFileSync(sqlFile);
+            let sqlBuf = Buffer.from(sqlContent);
+            return storageUtil.createFile(bucketName, `bqds/${uuid}/integration/observation.transform.sql`, sqlBuf);
+        }).then(() => {
+            const dataFile = path.join("..", "..", "tests", "data", "weather.observation.csv");
+            const dataContent = fs.readFileSync(dataFile);
+            let dataBuf = Buffer.from(dataContent);
+            return storageUtil.createFile(bucketName, `bqds/${uuid}/integration/weather.observation.csv`, dataBuf);
+        }).catch((reason) => {
+            console.log(`Error creating files: ${reason}`);
+        }).then(() => {
+            bigQueryUtil.deleteDataset(datasetName);
+        }).then(() => {
+            console.log(`Dataset ${datasetName} deleted`);
+        }).catch((reason) => {
+            console.log(`Error deleting dataset ${datasetName}: ${reason}`);
+        });
     });
 }
