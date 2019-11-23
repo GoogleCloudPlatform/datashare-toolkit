@@ -169,9 +169,9 @@ if (argv.runCloudTests) {
     it("function integration test", async () => {
         const datasetName = `it_${uuid}`;
 
-        let schemaBucketFile = `bqds/${uuid}/integration/observation.schema.json`;
-        let sqlBucketFile = `bqds/${uuid}/integration/observation.transform.sql`;
-        let dataBucketFile = `bqds/${uuid}/integration/weather.observation.csv`;
+        let schemaBucketFile = `bqds/${uuid}/config/observation.schema.json`;
+        let sqlBucketFile = `bqds/${uuid}/config/observation.transform.sql`;
+        let dataBucketFile = `bqds/${uuid}/data/weather.observation.csv`;
 
         let schemaFileCreated = false;
         let sqlFileCreated = false;
