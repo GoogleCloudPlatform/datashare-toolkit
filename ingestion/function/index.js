@@ -37,7 +37,7 @@ let batchId;
  */
 exports.processEvent = async (event, context) => {
     console.log(`Event type: ${context.eventType}`);
-    const isHttpRequest = !context.eventType && context.eventType !== "google.storage.object.finalize";
+    const isHttpRequest = (!context.eventType && context.eventType !== "google.storage.object.finalize");
     let options;
     if (isHttpRequest === false) {
         // Cloud Storage finalize trigger
