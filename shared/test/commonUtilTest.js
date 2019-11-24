@@ -65,3 +65,11 @@ it("should return false for invalid yaml string", () => {
       access:
       - userByEmail: melisandresnow.388027@gmail.com`)).is.false;
 });
+
+it("extension is valid", () => {
+    expect(commonUtil.isExtensionSupported("test.json", ["json", "csv"])).is.true;
+});
+
+it("extension is invalid", () => {
+    expect(commonUtil.isExtensionSupported("test.txt", ["json", "csv"])).is.false;
+});

@@ -27,14 +27,6 @@ chai.use(chaiAsPromised);
 const CloudFunctionUtil = require("../cloudFunctionUtil");
 const cloudFunctionUtil = new CloudFunctionUtil();
 
-it("extension is valid", () => {
-    expect(cloudFunctionUtil.isExtensionSupported("test.json", ["json", "csv"])).is.true;
-});
-
-it("extension is invalid", () => {
-    expect(cloudFunctionUtil.isExtensionSupported("test.txt", ["json", "csv"])).is.false;
-});
-
 it("batchId has 4 parts", () => {
     expect(cloudFunctionUtil.generateBatchId("eventId", "bucketName", "fileName.csv").split(":").length).is.equal(4);
 });
