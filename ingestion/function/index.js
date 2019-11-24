@@ -29,7 +29,7 @@ const stagingTableExpiryDays = 2;
 const processPrefix = "bqds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
 let batchId;
-const pathValidationEnabled = process.env.PATH_VALIDATION_ENABLED || true;
+const pathValidationEnabled = (process.env.PATH_VALIDATION_ENABLED === "true");
 
 /**
  * @param  {} event
