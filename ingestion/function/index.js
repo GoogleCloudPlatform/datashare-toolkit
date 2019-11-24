@@ -22,6 +22,7 @@ const cloudFunctionUtil = new CloudFunctionUtil();
 const storageUtil = new StorageUtil();
 const commonUtil = CommonUtil;
 const path = require("path");
+const underscore = require("underscore");
 const defaultTransformQuery = "*";
 const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
 const stagingTableExpiryDays = 2;
@@ -83,7 +84,7 @@ async function processHttpEvent(request, response) {
 /**
  * @param  {} options
  */
-async function validateOptions(options) {
+async function validateOptions(options, validateStorage) {
     let errors = [];
     if (!options.eventId) {
         errors.push("options.eventId must be provided");
@@ -94,15 +95,37 @@ async function validateOptions(options) {
     if (!options.fileName) {
         errors.push("options.fileName must be provided");
     }
+    else {
+        const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
+        console.log(`Path parts: ${pathParts}`);
+        // Path parts: ,bqds,trades,data
+        if (pathParts.length < 3) {
+            errors.push(`Path must contain at least 3 parts for data files. Provided: '${pathParts}'. Path must start with 'bqds' and the data file must be in a directory named 'data'.`);
+        }
+        if (pathParts.length >= 3) {
+            const first = underscore.first(pathParts);
+            const last = underscore.last(pathParts);
+            if (first !== "bqds") {
+                errors.push(`First level directory must be named 'bqds', current is '${first}'`);
+            }
+            if (last !== "data") {
+                errors.push(`Last level directory must be named 'data', current is '${last}'`);
+            }
+        }
+    }
     if (options.fileName && !commonUtil.isExtensionSupported(options.fileName, acceptable)) {
         errors.push(`File extension '${path.extname(options.fileName)}' in fileName '${options.fileName}' is not supported`);
     }
-    if (options.bucketName && options.fileName) {
-        const exists = await storageUtil.checkIfFileExists(options.bucketName, options.fileName);
-        if (!exists) {
-            errors.push(`File '${options.fileName}' not found in bucket: ${options.bucketName}`);
+
+    if (validateStorage) {
+        if (options.bucketName && options.fileName) {
+            const exists = await storageUtil.checkIfFileExists(options.bucketName, options.fileName);
+            if (!exists) {
+                errors.push(`File '${options.fileName}' not found in bucket: ${options.bucketName}`);
+            }
         }
     }
+
     if (errors.length === 0) {
         return { isValid: true };
     }
@@ -148,13 +171,14 @@ async function processFile(options) {
  */
 function parseDerivedFileAttributes(options) {
     const dest = path.basename(options.fileName).split('.');
+    const dataset = dest[0];
     const destinationTable = dest[1];
     const bucketPath = path.dirname(options.fileName);
     const schemaFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.schema.json`);
     const transformFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.transform.sql`);
     return {
-        dataset: dest[0],
-        destinationTable: dest[1],
+        dataset: dataset,
+        destinationTable: destinationTable,
         schemaPath: schemaFileBucketPath,
         transformPath: transformFileBucketPath
     };
