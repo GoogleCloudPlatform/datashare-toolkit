@@ -131,28 +131,28 @@ async function validateOptions(options, validateStorage) {
             errors.push(`File extension '${path.extname(options.fileName)}' in fileName '${options.fileName}' is not supported`);
         }
 
-        if (options.bucketName && extensionSupported) {
-            // Check for existence of a schema.json transform.sql file. If they don't exist, return warnings
-            const schemaConfig = attributes.schemaPath;
-            const transformConfig = attributes.transformPath;
-            const schemaConfigExists = await storageUtil.checkIfFileExists(options.bucketName, attributes.schemaPath);
-            const transformConfigExists = await storageUtil.checkIfFileExists(options.bucketName, attributes.transformPath);
-
-            if (schemaConfigExists) {
-                info.push(`Schema configuration found at '${schemaConfig}' in bucket: ${options.bucketName}`);
-            }
-            else {
-                warn.push(`Schema configuration not found at '${schemaConfig}' in bucket: ${options.bucketName}`);
-            }
-            if (transformConfigExists) {
-                info.push(`Transform configuration found at '${transformConfig}' in bucket: ${options.bucketName}`);
-            }
-            else {
-                warn.push(`Transform configuration not found at '${transformConfig}' in bucket: ${options.bucketName}`);
-            }
-        }
-
         if (validateStorage) {
+            if (options.bucketName && extensionSupported) {
+                // Check for existence of a schema.json transform.sql file. If they don't exist, return warnings
+                const schemaConfig = attributes.schemaPath;
+                const transformConfig = attributes.transformPath;
+                const schemaConfigExists = await storageUtil.checkIfFileExists(options.bucketName, attributes.schemaPath);
+                const transformConfigExists = await storageUtil.checkIfFileExists(options.bucketName, attributes.transformPath);
+
+                if (schemaConfigExists) {
+                    info.push(`Schema configuration found at '${schemaConfig}' in bucket: ${options.bucketName}`);
+                }
+                else {
+                    warn.push(`Schema configuration not found at '${schemaConfig}' in bucket: ${options.bucketName}`);
+                }
+                if (transformConfigExists) {
+                    info.push(`Transform configuration found at '${transformConfig}' in bucket: ${options.bucketName}`);
+                }
+                else {
+                    warn.push(`Transform configuration not found at '${transformConfig}' in bucket: ${options.bucketName}`);
+                }
+            }
+
             if (options.bucketName) {
                 const exists = await storageUtil.checkIfFileExists(options.bucketName, options.fileName);
                 if (!exists) {
