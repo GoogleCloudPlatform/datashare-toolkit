@@ -232,7 +232,6 @@ function parseDerivedFileAttributes(options) {
     const schemaFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.schema.json`);
     const transformFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.transform.sql`);
     const archivePath = path.join(bucketPath, "archive", `${basename}`);
-    console.log(`Archive path: ${archivePath}`);
 
     const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
     const isArchived = (pathParts.pop().toLowerCase() === "archive" && pathParts.pop().toLowerCase() === "data");
