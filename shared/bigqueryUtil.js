@@ -34,7 +34,7 @@ class BigQueryUtil {
     /**
      * @param  {} options
      */
-    async executeQuery(options) {
+    async createQueryJob(options) {
         return this.bigqueryClient.createQueryJob(options);
     }
 
@@ -430,14 +430,22 @@ class BigQueryUtil {
     /**
      * @param  {} datasetId
      */
-    async deleteDataset(datasetId) {
-        await this.bigqueryClient
+    async deleteDataset(datasetId, ignoreError) {
+        return this.bigqueryClient
             .dataset(datasetId)
-            .delete({ force: true });
-
-        if (this.VERBOSE_MODE) {
-            console.log(`Dataset ${datasetId} deleted`);
-        }
+            .delete({ force: true })
+            .then((response) => {
+                if (this.VERBOSE_MODE) {
+                    console.log(`Dataset ${datasetId} deleted`);
+                }
+                return true;
+            })
+            .catch((reason) => {
+                if (!ignoreError) {
+                    throw reason;
+                }
+                return false;
+            });
     }
 
     /**

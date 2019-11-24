@@ -52,10 +52,22 @@ class StorageUtil {
      * @param  {} bucketName
      * @param  {} fileName
      */
-    async deleteFile(bucketName, fileName) {
+    async deleteFile(bucketName, fileName, ignoreError) {
         const bucket = storage.bucket(bucketName);
         const file = bucket.file(fileName);
-        return file.delete();
+        return file.delete()
+            .then((response) => {
+                if (this.VERBOSE_MODE) {
+                    console.log(`Filename ${fileName} deleted from bucket: ${bucketName}`);
+                }
+                return true;
+            })
+            .catch((reason) => {
+                if (!ignoreError) {
+                    throw reason;
+                }
+                return false;
+            });
     }
 
     /**

@@ -20,7 +20,7 @@
 const { argv, uuidv4 } = require('./testSetup');
 const { BigQueryUtil, StorageUtil } = require('bqds-shared');
 const storageUtil = new StorageUtil();
-const bigQueryUtil = new BigQueryUtil(argv.projectId);
+const bigqueryUtil = new BigQueryUtil(argv.projectId);
 const fs = require('fs');
 const path = require('path');
 
@@ -207,49 +207,38 @@ if (argv.runCloudTests) {
                 };
                 return ingestion.processFile(options);
             }
-            return false;
+            else {
+                return false;
+            }
         }).then((result) => {
+            console.log(`Process file is done: ${result}`);
             expect(result).to.be.true;
+        }).then(() => {
+            expect(bigqueryUtil.tableExists(datasetName, "observation")).is.eventually.true;
         }).then((result) => {
-            expect(bigQueryUtil.tableExists(datasetName, "observation")).to.eventually.true;
+            const options = { query: `select * from \`${datasetName}.observation\`` };
+            return bigqueryUtil.executeQuerySync(options);
         }).then((result) => {
-            // Run query to get records
-            const options = { query: `select * from \`${argv.projectId}.${datasetName}.observation\`` };
-            console.log(`Executing query: ${JSON.stringify(options)}`);
-            return bigQueryUtil.executeQuerySync(options);
-        }).then((result) => {
-            console.log("result of query");
-            // Check count of records
             const [rows] = result;
-            console.log(`count of rows is ${rows.length}`);
+            console.log(`Count of rows is ${rows.length}`);
             expect(rows.length).is.equal(100);
         }).then((result) => {
-            return bigQueryUtil.deleteDataset(datasetName);
-        }).then((result) => {
-            console.log(`Dataset ${datasetName} deleted`);
-        }).catch((reason) => {
-            console.log(`Error deleting dataset ${datasetName}: ${reason}`);
+            return bigqueryUtil.deleteDataset(datasetName, true);
         }).then(() => {
             if (schemaFileCreated === true) {
-                return storageUtil.deleteFile(bucketName, schemaBucketFile);
+                return storageUtil.deleteFile(bucketName, schemaBucketFile, true);
             }
             return [];
-        }).catch((reason) => {
-            console.log(`Error deleting file from storage '${schemaBucketFile}' with reason: ${reason}`);
         }).then(() => {
             if (sqlFileCreated === true) {
-                return storageUtil.deleteFile(bucketName, sqlBucketFile);
+                return storageUtil.deleteFile(bucketName, sqlBucketFile, true);
             }
             return [];
-        }).catch((reason) => {
-            console.log(`Error deleting file from storage '${sqlBucketFile}' with reason: ${reason}`);
         }).then(() => {
             if (dataFileCreated === true) {
-                return storageUtil.deleteFile(bucketName, dataBucketFile);
+                return storageUtil.deleteFile(bucketName, dataBucketFile, true);
             }
             return [];
-        }).catch((reason) => {
-            console.log(`Error deleting file from storage '${dataBucketFile}' with reason: ${reason}`);
         });
 
         // TODO: Delete the folder instead of individual files.

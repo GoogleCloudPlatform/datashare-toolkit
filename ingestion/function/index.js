@@ -194,9 +194,9 @@ async function transform(config) {
     // }
     const query = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.dataset}.${config.stagingTable}\``;
     console.log(`executing transform query: ${query}`);
-    const job = await runTransform(config, query);
-    console.log(`${job[0].metadata.id} ${job[0].metadata.statistics.query.statementType} ${job[0].metadata.configuration.jobType} ${job[0].metadata.status.state}`);
-    console.log("processing done");
+    const [job] = await createTransformJob(config, query);
+    await job.getQueryResults({ maxApiCalls: 1, maxResults: 0 });
+    console.log(`Transform job: ${job.metadata.id} ${job.metadata.statistics.query.statementType} ${job.metadata.configuration.jobType} ${job.metadata.status.state}`);
     return;
 }
 
@@ -205,7 +205,7 @@ async function transform(config) {
  * Loads data into BQ staging table.
  */
 async function stageFile(config) {
-    console.log(`using config ` + JSON.stringify(config));
+    console.log(`Using config ` + JSON.stringify(config));
     const dataset = bigqueryUtil.getDataset(config.dataset);
     let today = new Date();
     today.setDate(today.getDate() + stagingTableExpiryDays);
@@ -213,16 +213,18 @@ async function stageFile(config) {
     console.log(`Setting expirationTime for staging table to ${expiryTime}`);
 
     const fields = (config.metadata && config.metadata.fields) || undefined;
-
-    const options = fields
-        ? { schema: fields, expirationTime: expiryTime }
-        : { autodetect: true, expirationTime: expiryTime };
+    let options = { expirationTime: expiryTime };
+    if (fields) {
+        options.schema = fields;
+    }
+    else {
+        options.autodetect = true;
+    }
 
     await dataset.createTable(config.stagingTable, options);
-
     const table = dataset.table(config.stagingTable);
-    console.log(`created table ${config.stagingTable}`);
-    console.log(`executing load for ${config.sourceFile} with ` + JSON.stringify(config.metadata));
+    console.log(`Created table ${config.stagingTable}`);
+    console.log(`Executing load for ${config.sourceFile} with metadata: ${JSON.stringify(config.metadata)}`);
 
     try {
         let [job] = await table.load(storageUtil.getBucket(config.bucket).file(config.sourceFile), config.metadata || { autodetect: true });
@@ -240,7 +242,7 @@ async function stageFile(config) {
  * @param  {} query
  * Creates query job for the transformation query.
  */
-async function runTransform(config, query) {
+async function createTransformJob(config, query) {
     console.log("Configuration for runTransform: " + JSON.stringify(config));
     let options = {
         destinationTable: {
@@ -265,7 +267,7 @@ async function runTransform(config, query) {
 
     console.log(`BigQuery options: ${JSON.stringify(options)}`);
     try {
-        return await bigqueryUtil.executeQuery(options);
+        return bigqueryUtil.createQueryJob(options);
     } catch (exception) {
         console.error(`Exception encountered running transform: ${getExceptionString(exception)}`);
         logException(exception);
