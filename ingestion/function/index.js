@@ -29,6 +29,7 @@ const stagingTableExpiryDays = 2;
 const processPrefix = "bqds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
 let batchId;
+const pathValidationEnabled = false;
 
 /**
  * @param  {} event
@@ -98,18 +99,20 @@ async function validateOptions(options, validateStorage) {
     else {
         const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
         console.log(`Path parts: ${pathParts}`);
-        // Path parts: ,bqds,trades,data
-        if (pathParts.length < 3) {
-            errors.push(`Path must contain at least 3 parts for data files. Provided: '${pathParts}'. Path must start with 'bqds' and the data file must be in a directory named 'data'.`);
-        }
-        if (pathParts.length >= 3) {
-            const first = underscore.first(pathParts);
-            const last = underscore.last(pathParts);
-            if (first !== "bqds") {
-                errors.push(`First level directory must be named 'bqds', current is '${first}'`);
+
+        if (pathValidationEnabled) {
+            if (pathParts.length < 3) {
+                errors.push(`Path must contain at least 3 parts for data files. Provided: '${pathParts}'. Path must start with 'bqds' and the data file must be in a directory named 'data'.`);
             }
-            if (last !== "data") {
-                errors.push(`Last level directory must be named 'data', current is '${last}'`);
+            if (pathParts.length >= 3) {
+                const first = underscore.first(pathParts);
+                const last = underscore.last(pathParts);
+                if (first !== "bqds") {
+                    errors.push(`First level directory must be named 'bqds', current is '${first}'`);
+                }
+                if (last !== "data") {
+                    errors.push(`Last level directory must be named 'data', current is '${last}'`);
+                }
             }
         }
     }
