@@ -89,6 +89,17 @@ it("options are valid", async () => {
     expect(v.isValid).is.true;
 });
 
+it("options are valid with archived file", async () => {
+    const options = {
+        eventId: 1,
+        bucketName: bucketName,
+        fileName: "/bqds/trades/data/archive/myFile.txt"
+    };
+    const v = await ingestion.validateOptions(options, false);
+    console.log(JSON.stringify(v));
+    expect(v.isArchived).is.true;
+});
+
 it("options are invalid", async () => {
     const options = {};
     const result = await ingestion.validateOptions(options, false);

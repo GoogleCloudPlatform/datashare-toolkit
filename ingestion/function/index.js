@@ -30,6 +30,7 @@ const processPrefix = "bqds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
 let batchId;
 const pathValidationEnabled = process.env.PATH_VALIDATION_ENABLED ? (process.env.PATH_VALIDATION_ENABLED.toLowerCase() === "true") : true;
+const archiveEnabled = process.env.ARCHIVE_FILES ? (process.env.ARCHIVE_FILES.toLowerCase() === "true") : true;
 
 /**
  * @param  {} event
@@ -93,15 +94,18 @@ async function validateOptions(options, validateStorage) {
     if (!options.eventId) {
         errors.push("options.eventId must be provided");
     }
-    
+
     if (!options.bucketName) {
         errors.push("options.bucketName must be provided");
     }
 
+    let attributes;
     if (!options.fileName) {
         errors.push("options.fileName must be provided");
     }
     else {
+        attributes = parseDerivedFileAttributes(options);
+
         // options.fileName is defined
         const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
         console.log(`Path parts: ${pathParts}`);
@@ -128,9 +132,6 @@ async function validateOptions(options, validateStorage) {
         }
 
         if (options.bucketName && extensionSupported) {
-            // By checking if extension is supported we've ensured that the filename canbe parsed in parseDerivedFileAttributes
-            const attributes = parseDerivedFileAttributes(options);
-
             // Check for existence of a schema.json transform.sql file. If they don't exist, return warnings
             const schemaConfig = attributes.schemaPath;
             const transformConfig = attributes.transformPath;
@@ -161,7 +162,11 @@ async function validateOptions(options, validateStorage) {
         }
     }
 
-    if (errors.length === 0) {
+    if (attributes && attributes.isArchived === true) {
+        console.log(`Ignoring archived file: '${options.fileName} in bucket:: ${options.bucketName}'`);
+        return { isValid: false, isArchived: true };
+    }
+    else if (errors.length === 0) {
         console.log(`Options validation succeeded: ${info.join(", ")}`);
         return { isValid: true, info: info, warn: warn };
     }
@@ -207,16 +212,23 @@ async function processFile(options) {
  */
 function parseDerivedFileAttributes(options) {
     const dest = path.basename(options.fileName).split('.');
-    const dataset = dest[0];
-    const destinationTable = dest[1];
+    const dataset = dest.length > 0 ? dest[0] : null;
+    const destinationTable = dest.length > 1 ? dest[1] : null;
     const bucketPath = path.dirname(options.fileName);
     const schemaFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.schema.json`);
     const transformFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.transform.sql`);
+    const archivePath = path.join(bucketPath, "archive", `${batchId}-${options.fileName}`);
+
+    const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
+    const isArchived = (pathParts.pop().toLowerCase() === "archive" && pathParts.pop().toLowerCase() === "data");
+
     return {
         dataset: dataset,
         destinationTable: destinationTable,
         schemaPath: schemaFileBucketPath,
-        transformPath: transformFileBucketPath
+        transformPath: transformFileBucketPath,
+        archivePath: archivePath,
+        isArchived: isArchived
     };
 }
 
