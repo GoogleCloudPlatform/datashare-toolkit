@@ -196,8 +196,7 @@ if (argv.runCloudTests) {
         }).then(() => {
             dataFileCreated = true;
         }).catch((reason) => {
-            console.log(`Error creating files: ${reason}`);
-            expect.fail("Failed to save files to cloud storage");
+            expect.fail(`Failed to save files to Cloud Storage: ${reason}`);
         }).then(() => {
             if (dataFileCreated === true) {
                 const options = {
@@ -211,34 +210,31 @@ if (argv.runCloudTests) {
                 return false;
             }
         }).then((result) => {
-            console.log(`Process file is done: ${result}`);
             expect(result).to.be.true;
         }).then(() => {
-            expect(bigqueryUtil.tableExists(datasetName, "observation")).is.eventually.true;
+            return bigqueryUtil.tableExists(datasetName, "observation");
         }).then((result) => {
+            expect(result).to.be.true;
+        }).then(() => {
             const options = { query: `select * from \`${datasetName}.observation\`` };
             return bigqueryUtil.executeQuerySync(options);
         }).then((result) => {
             const [rows] = result;
-            console.log(`Count of rows is ${rows.length}`);
             expect(rows.length).is.equal(100);
-        }).then((result) => {
-            return bigqueryUtil.deleteDataset(datasetName, true);
+        }).then(() => {
+            expect(bigqueryUtil.deleteDataset(datasetName, true)).to.eventually.be.true;
         }).then(() => {
             if (schemaFileCreated === true) {
-                return storageUtil.deleteFile(bucketName, schemaBucketFile, true);
+                expect(storageUtil.deleteFile(bucketName, schemaBucketFile, true)).to.eventually.be.true;
             }
-            return [];
         }).then(() => {
             if (sqlFileCreated === true) {
-                return storageUtil.deleteFile(bucketName, sqlBucketFile, true);
+                expect(storageUtil.deleteFile(bucketName, sqlBucketFile, true)).to.eventually.be.true;
             }
-            return [];
         }).then(() => {
             if (dataFileCreated === true) {
-                return storageUtil.deleteFile(bucketName, dataBucketFile, true);
+                expect(storageUtil.deleteFile(bucketName, dataBucketFile, true)).to.eventually.be.true;
             }
-            return [];
         });
 
         // TODO: Delete the folder instead of individual files.
