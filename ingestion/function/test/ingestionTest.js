@@ -78,18 +78,20 @@ it("get bucket uri", () => {
     expect(ingestion.getBucketName(options)).is.equal("gs://myBucket/myFile.txt");
 });
 
-it("options are valid", () => {
+/*it("options are valid", async () => {
     const options = {
         eventId: 1,
-        bucketName: "myBucket",
+        bucketName: bucketName,
         fileName: "myFile.txt"
     };
-    expect(ingestion.validateOptions(options).isValid).is.true;
-});
+    const v = await ingestion.validateOptions(options);
+    console.log(JSON.stringify(v));
+    expect(v.isValid).is.true;
+});*/
 
-it("options are invalid", () => {
+it("options are invalid", async () => {
     const options = {};
-    const result = ingestion.validateOptions(options);
+    const result = await ingestion.validateOptions(options);
     expect(result.isValid).is.false;
     expect(result.errors.length).is.equal(3);
 });

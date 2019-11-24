@@ -16,7 +16,7 @@
 
 'use strict';
 
-const { BigQueryUtil, CloudFunctionUtil, StorageUtil, CommonUtil} = require('bqds-shared');
+const { BigQueryUtil, CloudFunctionUtil, StorageUtil, CommonUtil } = require('bqds-shared');
 const bigqueryUtil = new BigQueryUtil();
 const cloudFunctionUtil = new CloudFunctionUtil();
 const storageUtil = new StorageUtil();
@@ -54,7 +54,7 @@ async function processTriggerEvent(event, context) {
         bucketName: event.bucket,
         fileName: event.name
     };
-    const result = validateOptions(options);
+    const result = await validateOptions(options);
     if (!result.isValid) {
         return false;
     }
@@ -68,21 +68,22 @@ async function processTriggerEvent(event, context) {
  * For local debugging.
  */
 async function processHttpEvent(request, response) {
-    const options = event.body || {};
-    const result = validateOptions(options);
+    const options = request.body || {};
+    const result = await validateOptions(options);
     if (!result.isValid) {
-        context.status(400).send({ errors: result.errors });
+        response.status(400).send({ errors: result.errors });
         return;
     }
     const status = await processFile(options);
     const statusCode = (status === true) ? 200 : 400;
-    context.status(statusCode).send();
+    response.status(statusCode).send();
+    return;
 }
 
 /**
  * @param  {} options
  */
-function validateOptions(options) {
+async function validateOptions(options) {
     let errors = [];
     if (!options.eventId) {
         errors.push("options.eventId must be provided");
@@ -92,6 +93,15 @@ function validateOptions(options) {
     }
     if (!options.fileName) {
         errors.push("options.fileName must be provided");
+    }
+    if (options.fileName && !commonUtil.isExtensionSupported(options.fileName, acceptable)) {
+        errors.push(`File extension '${path.extname(options.fileName)}' in fileName '${options.fileName}' is not supported`);
+    }
+    if (options.bucketName && options.fileName) {
+        const exists = await storageUtil.checkIfFileExists(options.bucketName, options.fileName);
+        if (!exists) {
+            errors.push(`File '${options.fileName}' not found in bucket: ${options.bucketName}`);
+        }
     }
     if (errors.length === 0) {
         return { isValid: true };
@@ -109,34 +119,28 @@ async function processFile(options) {
     batchId = cloudFunctionUtil.generateBatchId(options.eventId, options.bucketName, options.fileName);
     console.log(`Object notification arrived for ${getBucketName(options)}, batchId is ${batchId}`);
 
-    if (commonUtil.isExtensionSupported(options.fileName, acceptable)) {
-        const config = await getConfiguration(options);
-        const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
-        if (!haveDataset) {
-            console.log(`Dataset ${config.dataset} not found, creating...`);
-            await bigqueryUtil.createDataset(config.dataset);
-            console.log(`Created dataset ${config.dataset}`);
-        } else {
-            console.log(`Found dataset ${config.dataset}`);
-        }
+    const config = await getConfiguration(options);
+    const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
+    if (!haveDataset) {
+        console.log(`Dataset ${config.dataset} not found, creating...`);
+        await bigqueryUtil.createDataset(config.dataset);
+        console.log(`Created dataset ${config.dataset}`);
+    } else {
+        console.log(`Found dataset ${config.dataset}`);
+    }
 
-        let success = true;
-        await stageFile(config).then(() => {
-            return transform(config);
-        }).catch((reason) => {
-            success = false;
-            console.error(`Exception processing ${options.fileName}: ${reason}`);
-        }).then(() => {
-            return bigqueryUtil.deleteTable(config.dataset, config.stagingTable, true);
-        }).catch((reason) => {
-            console.error(`Exception processing ${options.fileName}: ${reason}`);
-        });
-        return success;
-    }
-    else {
-        console.log(`Ignoring file ${options.fileName}, exiting`);
-        return false;
-    }
+    let success = true;
+    await stageFile(config).then(() => {
+        return transform(config);
+    }).catch((reason) => {
+        success = false;
+        console.error(`Exception processing ${options.fileName}: ${reason}`);
+    }).then(() => {
+        return bigqueryUtil.deleteTable(config.dataset, config.stagingTable, true);
+    }).catch((reason) => {
+        console.error(`Exception processing ${options.fileName}: ${reason}`);
+    });
+    return success;
 }
 
 /**
