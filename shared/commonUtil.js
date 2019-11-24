@@ -41,7 +41,21 @@ function isYamlString(str) {
     return true;
 }
 
+
+/**
+ * @param  {} fileName
+ * @param  {} acceptable
+ * @param  {} ignoreStartsWith
+ * Determine whether a file suffix is recognized for ingestion.
+ */
+function isExtensionSupported(fileName, acceptable) {
+    const parts = fileName.split('.');
+    const ext = parts[parts.length - 1];
+    return acceptable.includes(ext.toLowerCase());
+}
+
 module.exports = {
     isJsonString,
-    isYamlString
+    isYamlString,
+    isExtensionSupported
 };

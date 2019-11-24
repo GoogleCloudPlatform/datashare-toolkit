@@ -16,10 +16,11 @@
 
 'use strict';
 
-const { BigQueryUtil, CloudFunctionUtil, StorageUtil } = require('bqds-shared');
+const { BigQueryUtil, CloudFunctionUtil, StorageUtil, CommonUtil} = require('bqds-shared');
 const bigqueryUtil = new BigQueryUtil();
 const cloudFunctionUtil = new CloudFunctionUtil();
 const storageUtil = new StorageUtil();
+const commonUtil = CommonUtil;
 const path = require("path");
 const defaultTransformQuery = "*";
 const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
@@ -34,34 +35,49 @@ let batchId;
  */
 exports.processEvent = async (event, context) => {
     console.log(`Event type: ${context.eventType}`);
-    const isHttpRequest = (!context.eventType && context.eventType !== "google.storage.object.finalize");
-    let options;
-    if (isHttpRequest === false) {
-        // Cloud Storage finalize trigger
-        options = {
-            eventId: context.eventId,
-            bucketName: event.bucket,
-            fileName: event.name
-        };
+    if (context.eventType === "google.storage.object.finalize") {
+        await processTriggerEvent(event, context);
     }
     else {
-        // Local http debugging
-        options = event.body || {};
-        console.log(`Provided options: ${JSON.stringify(options)}`);
+        await processHttpEvent(event, context);
     }
+};
+
+/**
+ * @param  {} event
+ * @param  {} context
+ * For Cloud Storage finalize trigger.
+ */
+async function processTriggerEvent(event, context) {
+    const options = {
+        eventId: context.eventId,
+        bucketName: event.bucket,
+        fileName: event.name
+    };
     const result = validateOptions(options);
     if (!result.isValid) {
-        if (isHttpRequest === true) {
-            context.status(400).send({ errors: result.errors });
-        }
+        return false;
+    }
+    const status = await processFile(options);
+    return status;
+}
+
+/**
+ * @param  {} request
+ * @param  {} response
+ * For local debugging.
+ */
+async function processHttpEvent(request, response) {
+    const options = event.body || {};
+    const result = validateOptions(options);
+    if (!result.isValid) {
+        context.status(400).send({ errors: result.errors });
         return;
     }
     const status = await processFile(options);
-    if (isHttpRequest === true) {
-        const statusCode = (status === true) ? 200 : 400;
-        context.status(statusCode).send();
-    }
-};
+    const statusCode = (status === true) ? 200 : 400;
+    context.status(statusCode).send();
+}
 
 /**
  * @param  {} options
@@ -93,7 +109,7 @@ async function processFile(options) {
     batchId = cloudFunctionUtil.generateBatchId(options.eventId, options.bucketName, options.fileName);
     console.log(`Object notification arrived for ${getBucketName(options)}, batchId is ${batchId}`);
 
-    if (cloudFunctionUtil.isExtensionSupported(options.fileName, acceptable)) {
+    if (commonUtil.isExtensionSupported(options.fileName, acceptable)) {
         const config = await getConfiguration(options);
         const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
         if (!haveDataset) {
