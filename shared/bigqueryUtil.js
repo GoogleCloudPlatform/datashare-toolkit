@@ -305,6 +305,7 @@ class BigQueryUtil {
                 return true;
             })
             .catch((reason) => {
+                console.log(`Error deleting table ${tableId}: ${reason}`);
                 if (!ignoreError) {
                     throw reason;
                 }
@@ -441,6 +442,7 @@ class BigQueryUtil {
                 return true;
             })
             .catch((reason) => {
+                console.log(`Error deleting dataset ${datasetId}: ${reason}`);
                 if (!ignoreError) {
                     throw reason;
                 }

@@ -144,6 +144,7 @@ if (argv.runCloudTests) {
         const expected = {
             bucket: bucketName,
             bucketPath: {
+                archive: `bqds/${uuid}/data/archive/myFile.${uuid}.txt`,
                 schema: `bqds/${uuid}/config/${uuid}.schema.json`,
                 transform: `bqds/${uuid}/config/${uuid}.transform.sql`
             },
@@ -248,6 +249,8 @@ if (argv.runCloudTests) {
             if (dataFileCreated === true) {
                 expect(storageUtil.deleteFile(bucketName, dataBucketFile, true)).to.eventually.be.true;
             }
+        }).catch((reason) => {
+            console.log(`Exception: ${reason}`);
         });
 
         // TODO: Delete the folder instead of individual files.

@@ -30,7 +30,7 @@ const processPrefix = "bqds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
 let batchId;
 const pathValidationEnabled = process.env.PATH_VALIDATION_ENABLED ? (process.env.PATH_VALIDATION_ENABLED.toLowerCase() === "true") : true;
-const archiveEnabled = process.env.ARCHIVE_FILES ? (process.env.ARCHIVE_FILES.toLowerCase() === "true") : true;
+const archiveEnabled = process.env.ARCHIVE_FILES ? (process.env.ARCHIVE_FILES.toLowerCase() === "true") : false;
 
 /**
  * @param  {} event
@@ -196,13 +196,26 @@ async function processFile(options) {
     let success = true;
     await stageFile(config).then(() => {
         return transform(config);
+    }).then(() => {
+        if (archiveEnabled === true) {
+            return storageUtil.moveFile(options.bucketName, config.sourceFile, config.bucketPath.archive);
+        }
+        else {
+            return undefined;
+        }
+    }).then((result) => {
+        if (archiveEnabled === true) {
+            console.log(`File has been archived`);
+            return true;
+        }
+        else {
+            return undefined;
+        }
     }).catch((reason) => {
         success = false;
         console.error(`Exception processing ${options.fileName}: ${reason}`);
     }).then(() => {
         return bigqueryUtil.deleteTable(config.dataset, config.stagingTable, true);
-    }).catch((reason) => {
-        console.error(`Exception processing ${options.fileName}: ${reason}`);
     });
     return success;
 }
@@ -211,13 +224,15 @@ async function processFile(options) {
  * @param  {} options
  */
 function parseDerivedFileAttributes(options) {
-    const dest = path.basename(options.fileName).split('.');
+    const basename = path.basename(options.fileName);
+    const dest = basename.split('.');
     const dataset = dest.length > 0 ? dest[0] : null;
     const destinationTable = dest.length > 1 ? dest[1] : null;
     const bucketPath = path.dirname(options.fileName);
     const schemaFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.schema.json`);
     const transformFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.transform.sql`);
-    const archivePath = path.join(bucketPath, "archive", `${batchId}-${options.fileName}`);
+    const archivePath = path.join(bucketPath, "archive", `${basename}`);
+    console.log(`Archive path: ${archivePath}`);
 
     const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
     const isArchived = (pathParts.pop().toLowerCase() === "archive" && pathParts.pop().toLowerCase() === "data");
@@ -260,7 +275,8 @@ async function getConfiguration(options) {
     config.eventId = options.eventId;
     config.bucketPath = {
         schema: attributes.schemaPath,
-        transform: attributes.transformPath
+        transform: attributes.transformPath,
+        archive: attributes.archivePath
     };
 
     console.log(`Configuration: ${JSON.stringify(config)}`);

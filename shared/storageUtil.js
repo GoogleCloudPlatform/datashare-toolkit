@@ -63,6 +63,7 @@ class StorageUtil {
                 return true;
             })
             .catch((reason) => {
+                console.log(`Error deleting file ${fileName}: ${reason}`);
                 if (!ignoreError) {
                     throw reason;
                 }
@@ -157,6 +158,22 @@ class StorageUtil {
             throw err;
         });
         return exists[0];
+    }
+
+    /**
+     * @param  {} bucketName
+     * @param  {} sourceFile
+     * @param  {} destinationFile
+     */
+    async moveFile(bucketName, sourceFile, destinationFile) {
+        return storage
+            .bucket(bucketName)
+            .file(sourceFile)
+            .move(destinationFile)
+            .then((result) => {
+                console.log(`gs://${bucketName}/${sourceFile} moved to gs://${bucketName}/${destinationFile}.`);
+                return result;
+            });
     }
 
     /**
