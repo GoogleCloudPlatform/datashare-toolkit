@@ -29,7 +29,7 @@ const stagingTableExpiryDays = 2;
 const processPrefix = "bqds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
 let batchId;
-const pathValidationEnabled = false;
+const pathValidationEnabled = process.env.PATH_VALIDATION_ENABLED || true;
 
 /**
  * @param  {} event
@@ -128,6 +128,8 @@ async function validateOptions(options, validateStorage) {
             }
         }
     }
+
+    // Check for existence of a schema.json transform.sql file. If they don't exist, return warnings.
 
     if (errors.length === 0) {
         return { isValid: true };
