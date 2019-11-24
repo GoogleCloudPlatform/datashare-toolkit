@@ -86,17 +86,23 @@ async function processHttpEvent(request, response) {
  * @param  {} options
  */
 async function validateOptions(options, validateStorage) {
+    let info = [];
+    let warn = [];
     let errors = [];
+
     if (!options.eventId) {
         errors.push("options.eventId must be provided");
     }
+    
     if (!options.bucketName) {
         errors.push("options.bucketName must be provided");
     }
+
     if (!options.fileName) {
         errors.push("options.fileName must be provided");
     }
     else {
+        // options.fileName is defined
         const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
         console.log(`Path parts: ${pathParts}`);
 
@@ -115,28 +121,53 @@ async function validateOptions(options, validateStorage) {
                 }
             }
         }
-    }
-    if (options.fileName && !commonUtil.isExtensionSupported(options.fileName, acceptable)) {
-        errors.push(`File extension '${path.extname(options.fileName)}' in fileName '${options.fileName}' is not supported`);
-    }
 
-    if (validateStorage) {
-        if (options.bucketName && options.fileName) {
-            const exists = await storageUtil.checkIfFileExists(options.bucketName, options.fileName);
-            if (!exists) {
-                errors.push(`File '${options.fileName}' not found in bucket: ${options.bucketName}`);
+        const extensionSupported = commonUtil.isExtensionSupported(options.fileName, acceptable);
+        if (!extensionSupported) {
+            errors.push(`File extension '${path.extname(options.fileName)}' in fileName '${options.fileName}' is not supported`);
+        }
+
+        if (options.bucketName && extensionSupported) {
+            // By checking if extension is supported we've ensured that the filename canbe parsed in parseDerivedFileAttributes
+            const attributes = parseDerivedFileAttributes(options);
+
+            // Check for existence of a schema.json transform.sql file. If they don't exist, return warnings
+            const schemaConfig = attributes.schemaPath;
+            const transformConfig = attributes.transformPath;
+            const schemaConfigExists = await storageUtil.checkIfFileExists(options.bucketName, attributes.schemaPath);
+            const transformConfigExists = await storageUtil.checkIfFileExists(options.bucketName, attributes.transformPath);
+
+            if (schemaConfigExists) {
+                info.push(`Schema configuration found at '${schemaConfig}' in bucket: ${options.bucketName}`);
+            }
+            else {
+                warn.push(`Schema configuration not found at '${schemaConfig}' in bucket: ${options.bucketName}`);
+            }
+            if (transformConfigExists) {
+                info.push(`Transform configuration found at '${transformConfig}' in bucket: ${options.bucketName}`);
+            }
+            else {
+                warn.push(`Transform configuration not found at '${transformConfig}' in bucket: ${options.bucketName}`);
+            }
+        }
+
+        if (validateStorage) {
+            if (options.bucketName) {
+                const exists = await storageUtil.checkIfFileExists(options.bucketName, options.fileName);
+                if (!exists) {
+                    errors.push(`File '${options.fileName}' not found in bucket: ${options.bucketName}`);
+                }
             }
         }
     }
 
-    // Check for existence of a schema.json transform.sql file. If they don't exist, return warnings.
-
     if (errors.length === 0) {
-        return { isValid: true };
+        console.log(`Options validation succeeded: ${info.join(", ")}`);
+        return { isValid: true, info: info, warn: warn };
     }
     else {
         console.log(`Options validation failed: ${errors.join(", ")}`);
-        return { isValid: false, errors: errors };
+        return { isValid: false, errors: errors, info: info, warn: warn };
     }
 }
 
