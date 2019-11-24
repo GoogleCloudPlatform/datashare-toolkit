@@ -146,29 +146,30 @@ async function processFile(options) {
 /**
  * @param  {} options
  */
-function getBucketPaths(options) {
+function parseDerivedFileAttributes(options) {
     const dest = path.basename(options.fileName).split('.');
     const destinationTable = dest[1];
     const bucketPath = path.dirname(options.fileName);
     const schemaFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.schema.json`);
     const transformFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.transform.sql`);
-    return { schemaPath: schemaFileBucketPath, transformPath: transformFileBucketPath };
+    return {
+        dataset: dest[0],
+        destinationTable: dest[1],
+        schemaPath: schemaFileBucketPath,
+        transformPath: transformFileBucketPath
+    };
 }
 
 /**
  * @param  {} options
  */
 async function getConfiguration(options) {
-    const dest = path.basename(options.fileName).split('.');
-    const dataset = dest[0];
-    const destinationTable = dest[1];
-
-    const bucketPaths = getBucketPaths(options);
+    const attributes = parseDerivedFileAttributes(options);
     let config = {};
 
-    const schemaExists = await storageUtil.checkIfFileExists(options.bucketName, bucketPaths.schemaPath);
+    const schemaExists = await storageUtil.checkIfFileExists(options.bucketName, attributes.schemaPath);
     if (schemaExists === true) {
-        const schemaConfig = await storageUtil.fetchFileContent(options.bucketName, bucketPaths.schemaPath);
+        const schemaConfig = await storageUtil.fetchFileContent(options.bucketName, attributes.schemaPath);
         if (schemaConfig) {
             // This will pull in the dictionary from the configuration file. IE: includes destination, metadata, truncate, etc.
             config = JSON.parse(schemaConfig);
@@ -179,15 +180,15 @@ async function getConfiguration(options) {
     }
 
     // Runtime created properties
-    config.dataset = dataset;
-    config.destinationTable = destinationTable;
-    config.stagingTable = `TMP_${destinationTable}_${options.eventId}`;
+    config.dataset = attributes.dataset;
+    config.destinationTable = attributes.destinationTable;
+    config.stagingTable = `TMP_${attributes.destinationTable}_${options.eventId}`;
     config.sourceFile = options.fileName;
     config.bucket = options.bucketName;
     config.eventId = options.eventId;
     config.bucketPath = {
-        schema: bucketPaths.schemaPath,
-        transform: bucketPaths.transformPath
+        schema: attributes.schemaPath,
+        transform: attributes.transformPath
     };
 
     console.log(`Configuration: ${JSON.stringify(config)}`);
