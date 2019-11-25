@@ -27,113 +27,131 @@ chai.use(chaiAsPromised);
 const PubSubUtil = require("../pubSubUtil");
 const pubSubUtil = new PubSubUtil(argv.projectId);
 
-if (argv.runCloudTests) {
+describe('PubSubUtil', () => {
 
-    // PubSub resource names must start with a letter:  https://cloud.google.com/pubsub/docs/admin#resource_names for more information.
-    const uuid = 'a' + uuidv4();
-    const projectName = argv.projectId;
+    if (argv.runCloudTests) {
 
-    it("createTopic and deleteTopic", async () => {
-        await pubSubUtil.createTopic(uuid).then((result) => {
-            expect(result).to.be.a('boolean');
-            expect(result).to.equal(true);
-        }).then(() => {
-            return pubSubUtil.deleteTopic(uuid);
-        }).catch((reason) => {
-            expect.fail(`Failed: ${reason}`);
+        // PubSub resource names must start with a letter:  https://cloud.google.com/pubsub/docs/admin#resource_names for more information.
+        const uuid = 'a' + uuidv4();
+        const projectName = argv.projectId;
+
+        context('createTopic with arguments', () => {
+            it("should return true", async () => {
+                await pubSubUtil.createTopic(uuid).then((result) => {
+                    expect(result).to.be.a('boolean');
+                    expect(result).to.equal(true);
+                }).then(() => {
+                    return pubSubUtil.deleteTopic(uuid);
+                }).catch((reason) => {
+                    expect.fail(`Failed: ${reason}`);
+                });
+            });
         });
-    });
 
-    it("createTopic, createSubscription and deleteSubscription, deleteTopic", async () => {
-        await pubSubUtil.createTopic(uuid).then(() => {
-            return pubSubUtil.createSubscription(uuid, uuid);
-        }).then(() => {
-            return pubSubUtil.deleteSubscription(uuid, uuid);
-        }).then((result) => {
-            expect(result).to.be.a('boolean');
-            expect(result).to.equal(true);
-        }).then(() => {
-            return pubSubUtil.deleteTopic(uuid);
-        }).catch((reason) => {
-            expect.fail(`Failed: ${reason}`);
+        context('createSubscription with arguments', () => {
+            it("should return true", async () => {
+                await pubSubUtil.createTopic(uuid).then(() => {
+                    return pubSubUtil.createSubscription(uuid, uuid);
+                }).then(() => {
+                    return pubSubUtil.deleteSubscription(uuid, uuid);
+                }).then((result) => {
+                    expect(result).to.be.a('boolean');
+                    expect(result).to.equal(true);
+                }).then(() => {
+                    return pubSubUtil.deleteTopic(uuid);
+                }).catch((reason) => {
+                    expect.fail(`Failed: ${reason}`);
+                });
+            });
         });
-    });
 
-    it("createTopic, createSubscription, and checkIfSubscriptionExists", async () => {
-        await pubSubUtil.createTopic(uuid).then(() => {
-        }).then(() => {
-            return pubSubUtil.createSubscription(uuid, uuid);
-        }).then(() => {
-            return pubSubUtil.checkIfSubscriptionExists(uuid, uuid);
-        }).then((result) => {
-            expect(result).to.be.a('boolean');
-            expect(result).to.equal(true);
-        }).then(() => {
-            return pubSubUtil.deleteSubscription(uuid, uuid);
-        }).then(() => {
-            return pubSubUtil.deleteTopic(uuid);
-        }).catch((reason) => {
-            expect.fail(`Failed: ${reason}`);
+        context('checkIfSubscriptionExists with arguments', () => {
+            it("should return true", async () => {
+                await pubSubUtil.createTopic(uuid).then(() => {
+                }).then(() => {
+                    return pubSubUtil.createSubscription(uuid, uuid);
+                }).then(() => {
+                    return pubSubUtil.checkIfSubscriptionExists(uuid, uuid);
+                }).then((result) => {
+                    expect(result).to.be.a('boolean');
+                    expect(result).to.equal(true);
+                }).then(() => {
+                    return pubSubUtil.deleteSubscription(uuid, uuid);
+                }).then(() => {
+                    return pubSubUtil.deleteTopic(uuid);
+                }).catch((reason) => {
+                    expect.fail(`Failed: ${reason}`);
+                });
+            });
         });
-    });
 
-    const message = {
-        abc: '123'
-    };
-    const customAttr = {
-        foo: 'bar'
-    };
-    it("createTopic, createSubscription, and publishMessage", async () => {
-        await pubSubUtil.createTopic(uuid).then(() => {
-        }).then(() => {
-            return pubSubUtil.createSubscription(uuid, uuid);
-        }).then(() => {
-            return pubSubUtil.publishMessage(uuid, message, customAttr);
-        }).then((result) => {
-            expect(result).to.be.a('string');
-        }).then(() => {
-            return pubSubUtil.deleteSubscription(uuid, uuid);
-        }).then(() => {
-            return pubSubUtil.deleteTopic(uuid);
-        }).catch((reason) => {
-            expect.fail(`Failed: ${reason}`);
-        });
-    });
+        const message = {
+            abc: '123'
+        };
+        const customAttr = {
+            foo: 'bar'
+        };
 
-    it("createTopic, createSubscription, publishMessage, and getMessage", async () => {
-        await pubSubUtil.createTopic(uuid).then(() => {
-        }).then(() => {
-            return pubSubUtil.createSubscription(uuid, uuid);
-        }).then(() => {
-            return pubSubUtil.publishMessage(uuid, message, customAttr);
-        }).then(() => {
-            return pubSubUtil.getMessage(projectName, uuid);
-        }).then((result) => {
-            expect(result).to.be.an('Object');
-            const jsonString = Buffer.from(result.message.data).toString('utf8');
-            expect(JSON.parse(jsonString)).to.deep.equal(message);
-            expect(result.message.attributes).to.deep.equal(customAttr);
-        }).then(() => {
-            return pubSubUtil.deleteSubscription(uuid, uuid);
-        }).then(() => {
-            return pubSubUtil.deleteTopic(uuid);
-        }).catch((reason) => {
-            expect.fail(`Failed: ${reason}`);
+        context('publishMessage with arguments', () => {
+            it("should return a string", async () => {
+                await pubSubUtil.createTopic(uuid).then(() => {
+                }).then(() => {
+                    return pubSubUtil.createSubscription(uuid, uuid);
+                }).then(() => {
+                    return pubSubUtil.publishMessage(uuid, message, customAttr);
+                }).then((result) => {
+                    expect(result).to.be.a('string');
+                }).then(() => {
+                    return pubSubUtil.deleteSubscription(uuid, uuid);
+                }).then(() => {
+                    return pubSubUtil.deleteTopic(uuid);
+                }).catch((reason) => {
+                    expect.fail(`Failed: ${reason}`);
+                });
+            });
         });
-    });
 
-    it("createTopic, createSubscription, and getMessage error", async () => {
-        await pubSubUtil.createTopic(uuid).then(() => {
-        }).then(() => {
-            return pubSubUtil.createSubscription(uuid, uuid);
-        }).then(() => {
-            expect(pubSubUtil.getMessage(projectName, uuid)).to.be.rejectedWith(Error);
-        }).then(() => {
-            return pubSubUtil.deleteSubscription(uuid, uuid);
-        }).then(() => {
-            return pubSubUtil.deleteTopic(uuid);
-        }).catch((reason) => {
-            expect.fail(`Failed: ${reason}`);
+        context('getMessage with arguments', () => {
+            it("should return an object", async () => {
+                await pubSubUtil.createTopic(uuid).then(() => {
+                }).then(() => {
+                    return pubSubUtil.createSubscription(uuid, uuid);
+                }).then(() => {
+                    return pubSubUtil.publishMessage(uuid, message, customAttr);
+                }).then(() => {
+                    return pubSubUtil.getMessage(projectName, uuid);
+                }).then((result) => {
+                    expect(result).to.be.an('Object');
+                    const jsonString = Buffer.from(result.message.data).toString('utf8');
+                    expect(JSON.parse(jsonString)).to.deep.equal(message);
+                    expect(result.message.attributes).to.deep.equal(customAttr);
+                }).then(() => {
+                    return pubSubUtil.deleteSubscription(uuid, uuid);
+                }).then(() => {
+                    return pubSubUtil.deleteTopic(uuid);
+                }).catch((reason) => {
+                    expect.fail(`Failed: ${reason}`);
+                });
+            });
         });
-    });
-}
+
+        context('getMessage without subscription', () => {
+            it("should reject with error", async () => {
+                await pubSubUtil.createTopic(uuid).then(() => {
+                }).then(() => {
+                    return pubSubUtil.createSubscription(uuid, uuid);
+                }).then(() => {
+                    expect(pubSubUtil.getMessage(projectName, uuid)).to.be.rejectedWith(Error);
+                }).then(() => {
+                    return pubSubUtil.deleteSubscription(uuid, uuid);
+                }).then(() => {
+                    return pubSubUtil.deleteTopic(uuid);
+                }).catch((reason) => {
+                    expect.fail(`Failed: ${reason}`);
+                });
+            });
+        });
+
+    }
+
+});
