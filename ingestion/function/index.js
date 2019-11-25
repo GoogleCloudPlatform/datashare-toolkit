@@ -343,7 +343,7 @@ async function stageFile(config) {
  * Creates query job for the transformation query.
  */
 async function createTransformJob(config, query) {
-    console.log("Configuration for runTransform: " + JSON.stringify(config));
+    console.log(`Configuration for runTransform: ${JSON.stringify(config)}`);
     let options = {
         destinationTable: {
             projectId: process.env.GCP_PROJECT,
@@ -414,7 +414,7 @@ function setMetadataDefaults(dict) {
     }
 
     if (process.env.VERBOSE_MODE) {
-        console.log("Using metadata: " + JSON.stringify(meta));
+        console.log(`Using metadata: ${JSON.stringify(meta)}`);
     }
     return meta;
 }
