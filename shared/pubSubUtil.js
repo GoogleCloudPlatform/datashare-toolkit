@@ -127,7 +127,7 @@ class PubSubUtil {
             ackIds: [message.ackId],
         };
         //..acknowledges the message.
-        await this.client.acknowledge(ackRequest);
+        const ack = await this.client.acknowledge(ackRequest);
         if (this.VERBOSE_MODE) {
             console.log(`Message ${message.message.messageId} acknowledged.`);
         }
