@@ -98,10 +98,10 @@ describe('BigQueryUtil', () => {
 
             before(async () => {
                 await bigqueryUtil.createDataset(uuid, datasetOptions);
-            })
+            });
             after(async () => {
                 await bigqueryUtil.deleteDataset(uuid);
-            })
+            });
 
             context('getDatasets', () => {
                 it("should succeed", async () => {
@@ -170,11 +170,11 @@ describe('BigQueryUtil', () => {
             before(async () => {
                 await bigqueryUtil.createDataset(uuid, datasetOptions);
                 await bigqueryUtil.createTable(uuid, uuid, tableOptions);
-            })
+            });
             after(async () => {
                 await bigqueryUtil.deleteTable(uuid, uuid);
                 await bigqueryUtil.deleteDataset(uuid);
-            })
+            });
 
             context('getTableMetadata with arguments', () => {
                 it("should return object", async () => {

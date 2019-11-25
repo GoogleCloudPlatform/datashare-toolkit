@@ -60,10 +60,10 @@ describe('StorageUtil', () => {
 
             before(async () => {
                 await storageUtil.createBucket(uuid);
-            })
+            });
             after(async () => {
                 await storageUtil.deleteBucket(uuid);
-            })
+            });
 
             const jsonString = JSON.stringify({ foo: 'bar' });
             const buf = Buffer.from(jsonString);
@@ -103,11 +103,11 @@ describe('StorageUtil', () => {
             before(async () => {
                 await storageUtil.createBucket(uuid);
                 await storageUtil.createFile(uuid, uuid, buf, options);
-            })
+            });
             after(async () => {
                 await storageUtil.deleteFile(uuid, uuid);
                 await storageUtil.deleteBucket(uuid);
-            })
+            });
 
             const jsonString = JSON.stringify({ foo: 'bar' });
             const buf = Buffer.from(jsonString);
