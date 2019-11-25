@@ -30,6 +30,7 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const ingestion = require("../index");
+const configManager = require('../configurationManager');
 const uuid = uuidv4().replace(/-/gi, '');
 const bucketName = "bqds-unit-tests";
 
@@ -43,32 +44,6 @@ it("getExceptionString empty string", () => {
     expect(ingestion.getExceptionString(e)).is.equal('""');
 });
 
-it("checking metadata defaults with no values provided", () => {
-    const dict = { metadata: {} };
-    const expected = {
-        sourceFormat: "CSV",
-        skipLeadingRows: 1,
-        maxBadRecords: 0
-    };
-    expect(ingestion.setMetadataDefaults(dict)).is.eql(expected);
-});
-
-it("checking metadata defaults with values provided", () => {
-    const dict = {
-        metadata: {
-            sourceFormat: "JSON",
-            skipLeadingRows: 2,
-            maxBadRecords: 1
-        }
-    };
-    const expected = {
-        sourceFormat: "JSON",
-        skipLeadingRows: 2,
-        maxBadRecords: 1
-    };
-    expect(ingestion.setMetadataDefaults(dict)).is.eql(expected);
-});
-
 it("get bucket uri", () => {
     const options = {
         eventId: 1,
@@ -78,108 +53,7 @@ it("get bucket uri", () => {
     expect(ingestion.getBucketName(options)).is.equal("gs://myBucket/myFile.txt");
 });
 
-it("options are valid", async () => {
-    const options = {
-        eventId: 1,
-        bucketName: bucketName,
-        fileName: "/bqds/trades/data/myFile.txt"
-    };
-    const v = await ingestion.validateOptions(options, false);
-    console.log(JSON.stringify(v));
-    expect(v.isValid).is.true;
-});
-
-it("options are valid with archived file", async () => {
-    const options = {
-        eventId: 1,
-        bucketName: bucketName,
-        fileName: "/bqds/trades/data/archive/myFile.txt"
-    };
-    const v = await ingestion.validateOptions(options, false);
-    console.log(JSON.stringify(v));
-    expect(v.isArchived).is.true;
-});
-
-it("options are invalid", async () => {
-    const options = {};
-    const result = await ingestion.validateOptions(options, false);
-    expect(result.isValid).is.false;
-    expect(result.errors.length).is.equal(3);
-});
-
 if (argv.runCloudTests) {
-    let configFileName = `bqds/${uuid}/config/${uuid}.schema.json`;
-
-    it("create schema.json configuration file", async () => {
-        const config = {
-            "truncate": true,
-            "metadata": {
-                "fieldDelimiter": ",",
-                "fields": [
-                    {
-                        "type": "STRING",
-                        "name": "column1",
-                        "mode": "NULLABLE"
-                    },
-                    {
-                        "type": "STRING",
-                        "name": "column2",
-                        "mode": "NULLABLE"
-                    }
-                ]
-            }
-        };
-        let json = JSON.stringify(config);
-        let buf = Buffer.from(json);
-        return storageUtil.createFile(bucketName, configFileName, buf, null, false);
-    });
-
-    it("check generated schema.json configuration", async () => {
-        const options = {
-            eventId: 1,
-            bucketName: bucketName,
-            fileName: `bqds/${uuid}/data/myFile.${uuid}.txt`
-        };
-        const config = await ingestion.getConfiguration(options);
-        const expected = {
-            bucket: bucketName,
-            bucketPath: {
-                archive: `bqds/${uuid}/data/archive/myFile.${uuid}.txt`,
-                schema: `bqds/${uuid}/config/${uuid}.schema.json`,
-                transform: `bqds/${uuid}/config/${uuid}.transform.sql`
-            },
-            dataset: "myFile",
-            destinationTable: uuid,
-            eventId: 1,
-            metadata: {
-                fieldDelimiter: ",",
-                fields: [
-                    {
-                        mode: "NULLABLE",
-                        name: "column1",
-                        type: "STRING"
-                    },
-                    {
-                        mode: "NULLABLE",
-                        name: "column2",
-                        type: "STRING"
-                    }
-                ],
-                maxBadRecords: 0,
-                skipLeadingRows: 1,
-                sourceFormat: "CSV"
-            },
-            sourceFile: `bqds/${uuid}/data/myFile.${uuid}.txt`,
-            stagingTable: `TMP_${uuid}_1`,
-            truncate: true
-        };
-        expect(config).is.eql(expected);
-    });
-
-    it("delete schema.json configuration file from bucket", async () => {
-        storageUtil.deleteFile(bucketName, configFileName);
-    });
-
     it("function integration test", async () => {
         const datasetName = `${uuid}_weather`;
 
