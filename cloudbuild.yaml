@@ -14,15 +14,15 @@ steps:
 - name: 'node:12.11.1'
   dir: 'shared'
   entrypoint: 'npm'
-  args: ['run', 'test', '--', '--runCloudTests']
+  args: ['run', 'cloudtest']
 - name: 'node:12.11.1'
   dir: 'entitlements/bqdsEntitlements'
   entrypoint: 'npm'
-  args: ['run', 'test', '--', '--runCloudTests']
+  args: ['run', 'cloudtest']
 - name: 'node:8.16.2'
   dir: 'ingestion/function'
   entrypoint: 'npm'
-  args: ['run', 'test', '--', '--runCloudTests']
+  args: ['run', 'cloudtest']
 - name: 'gcr.io/bqds-ci/integration-test'
   env:
   - 'BUILD=$BUILD_ID'

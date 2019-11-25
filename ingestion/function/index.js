@@ -37,12 +37,15 @@ const archiveEnabled = process.env.ARCHIVE_FILES ? (process.env.ARCHIVE_FILES.to
  */
 exports.processEvent = async (event, context) => {
     console.log(`Event type: ${context.eventType}`);
-    if (context.eventType === "google.storage.object.finalize") {
-        await processTriggerEvent(event, context);
-    }
-    else {
-        await processHttpEvent(event, context);
-    }
+    await processTriggerEvent(event, context);
+};
+
+/**
+ * @param  {} request
+ * @param  {} response
+ */
+exports.processHttpEvent = async (request, response) => {
+    await processHttpEvent(request, response);
 };
 
 /**

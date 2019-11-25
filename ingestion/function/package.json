@@ -11,10 +11,11 @@
     "underscore": "^1.9.1"
   },
   "scripts": {
-    "start": "functions-framework --target=processEvent",
+    "start": "functions-framework --target=processHttpEvent",
     "deploy": "../bin/deploy.sh",
     "lint": "eslint .",
-    "test": "nyc mocha --timeout 60000 --projectId='bqds-ci'"
+    "test": "nyc mocha --timeout 60000",
+    "cloudtest": "nyc mocha --timeout 60000 --projectId='bqds-ci' --runCloudTests"
   },
   "devDependencies": {
     "minimist": "^1.2.0",
