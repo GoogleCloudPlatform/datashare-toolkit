@@ -226,7 +226,7 @@ function parseDerivedFileAttributes(options) {
     const archivePath = path.join(bucketPath, "archive", `${basename}`);
 
     const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
-    const isArchived = (pathParts.pop().toLowerCase() === "archive" && pathParts.pop().toLowerCase() === "data");
+    const isArchived = (underscore.first(pathParts).toLowerCase() === "bqds" && pathParts.pop().toLowerCase() === "archive" && pathParts.pop().toLowerCase() === "data");
 
     return {
         dataset: dataset,
@@ -305,7 +305,7 @@ async function transform(config) {
  * Loads data into BQ staging table.
  */
 async function stageFile(config) {
-    console.log(`Using config ` + JSON.stringify(config));
+    console.log(`Using config ${JSON.stringify(config)}`);
     const dataset = bigqueryUtil.getDataset(config.dataset);
     let today = new Date();
     today.setDate(today.getDate() + stagingTableExpiryDays);
