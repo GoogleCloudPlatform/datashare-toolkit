@@ -181,7 +181,7 @@ async function validateOptions(options, validateStorage) {
  */
 async function processFile(options) {
     batchId = cloudFunctionUtil.generateBatchId(options.eventId, options.bucketName, options.fileName);
-    console.log(`Object notification arrived for ${getBucketName(options)}, batchId is ${batchId}`);
+    console.log(`processFile called for ${getBucketName(options)}, batchId is ${batchId}`);
 
     const config = await getConfiguration(options);
     const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
@@ -193,30 +193,22 @@ async function processFile(options) {
         console.log(`Found dataset ${config.dataset}`);
     }
 
-    let success = true;
-    await stageFile(config).then(() => {
-        return transform(config);
-    }).then(() => {
+    let success = false;
+    try {
+        await stageFile(config);
+        await transform(config);
         if (archiveEnabled === true) {
-            return storageUtil.moveFile(options.bucketName, config.sourceFile, config.bucketPath.archive);
+            await storageUtil.moveFile(options.bucketName, config.sourceFile, config.bucketPath.archive);
+            console.log(`File '${config.sourceFile}' has been archived to: ${config.bucketPath.archive}`);
         }
-        else {
-            return undefined;
-        }
-    }).then((result) => {
-        if (archiveEnabled === true) {
-            console.log(`File has been archived`);
-            return true;
-        }
-        else {
-            return undefined;
-        }
-    }).catch((reason) => {
-        success = false;
+        success = true;
+    }
+    catch (reason) {
         console.error(`Exception processing ${options.fileName}: ${reason}`);
-    }).then(() => {
-        return bigqueryUtil.deleteTable(config.dataset, config.stagingTable, true);
-    });
+    }
+    finally {
+        await bigqueryUtil.deleteTable(config.dataset, config.stagingTable, true);
+    }
     return success;
 }
 
