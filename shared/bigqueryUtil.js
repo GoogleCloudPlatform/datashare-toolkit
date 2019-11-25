@@ -78,9 +78,7 @@ class BigQueryUtil {
             const [rows] = await this.executeQuerySync(options);
             return true;
         } catch (error) {
-            if (this.VERBOSE_MODE) {
-                console.log("ERROR: %s - Query: '%s' is invalid", error, _sql);
-            }
+            console.warn("ERROR: %s - Query: '%s' is invalid", error, _sql);
             return false;
         }
     }
@@ -157,12 +155,14 @@ class BigQueryUtil {
      */
     async datasetExists(datasetId) {
         const dataset = this.bigqueryClient.dataset(datasetId);
-        const response = await dataset.exists();
-        const exists = response[0];
+        const exists = await dataset.exists().catch((err) => {
+            console.warn(err.message);
+            throw err
+        });
         if (this.VERBOSE_MODE) {
-            console.log(`Checking if dataset exists: '${datasetId}': ${exists}`);
+            console.log(`Checking if dataset exists: '${datasetId}': ${exists[0]}`);
         }
-        return exists;
+        return exists[0];
     }
 
     /**
@@ -280,7 +280,7 @@ class BigQueryUtil {
 
             return { success: true, metadata: table.metadata };
         } catch (error) {
-            console.log(`Failed to create view '${tableId}' with error: ${error}`);
+            console.warn(`Failed to create view '${tableId}' with error: ${error}`);
             return { success: false };
         }
     }
@@ -317,8 +317,8 @@ class BigQueryUtil {
                 }
                 return true;
             })
-            .catch((reason) => {
-                console.log(`Error deleting table ${tableId}: ${reason}`);
+            .catch((err) => {
+                console.warn(err.message);
                 if (!ignoreError) {
                     throw reason;
                 }
@@ -458,8 +458,8 @@ class BigQueryUtil {
                 }
                 return true;
             })
-            .catch((reason) => {
-                console.log(`Error deleting dataset ${datasetId}: ${reason}`);
+            .catch((err) => {
+                console.warn(err.message);
                 if (!ignoreError) {
                     throw reason;
                 }

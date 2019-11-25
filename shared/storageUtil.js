@@ -16,41 +16,42 @@
 
 'use strict';
 const { Storage } = require('@google-cloud/storage');
-const storage = new Storage();
 
 class StorageUtil {
+    constructor(projectId) {
+        this.projectId = projectId;
+        const options = {};
+        if (projectId) {
+            options.projectId = projectId;
+        }
+        this.storage = new Storage(options);
+    }
+
+    get VERBOSE_MODE() {
+        return process.env.VERBOSE_MODE;
+    }
+
     /**
-     * @param  {} bucketName
-     * @param  {} fileName
-     * @param  {} contents
-     * @param  {} options https://cloud.google.com/nodejs/docs/reference/storage/2.5.x/global.html#CreateWriteStreamOptions
-     * @param  {} createSignedUrl
-     * Creates a file in Cloud Storage.
+     * @param  {string} bucketName
+     * @param  {string} fileName
+     * @param  {buffer} contents
+     * @param  {Object} options https://cloud.google.com/nodejs/docs/reference/storage/2.5.x/global.html#CreateWriteStreamOptions
+     * Creates a file in Cloud Storage and return true/false or signedUrl.
      */
-    async createFile(bucketName, fileName, contents, options, createSignedUrl) {
+    async createFile(bucketName, fileName, contents, options) {
         const bucket = storage.bucket(bucketName);
         const file = bucket.file(fileName);
-        const fileSave = await file.save(contents, options).catch(err => {
+        const fileSave = await file.save(contents, options).catch((err) => {
             console.warn(err.message);
             throw err;
         });
-        if (fileSave[0] === false) {
-            return { success: false, errors: ['Storage file [' + fileName + '] create failed'] };
-        }
-        if (createSignedUrl === true) {
-            const url = await file.getSignedUrl({ action: 'read', expires: '03-01-2500' }).catch(err => {
-                console.warn(err.message);
-                throw err;
-            });
-            console.log(`Signed url is ${url}`);
-            return { success: true, url: url[0] };
-        }
-        return { success: true };
+        return true;
     }
 
     /**
      * @param  {} bucketName
      * @param  {} fileName
+     * Delete a file in Cloud Storage and return true/false.
      */
     async deleteFile(bucketName, fileName, ignoreError) {
         const bucket = storage.bucket(bucketName);
@@ -62,108 +63,118 @@ class StorageUtil {
                 }
                 return true;
             })
-            .catch((reason) => {
-                console.log(`Error deleting file ${fileName}: ${reason}`);
+            .catch((err) => {
+                console.warn(err.message);
                 if (!ignoreError) {
-                    throw reason;
+                    throw err;
                 }
                 return false;
             });
-    }
+        }
 
-    /**
-     * @param  {} bucketName
-     * @param  {} fileName
-     * @param  {} fileMetadata https://googleapis.dev/nodejs/storage/latest/File.html#setMetadata
-     * Updates the file metadata in GCP storage
+    /*
+     * @param  {string} bucketName
+     * Creates a Cloud Storage bucket and returns true.
      */
-    async updateMetadata(bucketName, fileName, fileMetadata) {
-        const bucket = storage.bucket(bucketName);
-        const file = bucket.file(fileName);
-        const results = await file.setMetadata(fileMetadata).catch(err => {
-            console.warn(err.message);
-            throw err;
-        });
-        if (results[0] === false) {
-            return { success: false, errors: ['Storage file [' + fileName + '] metadata update failed'] };
+    async createBucket(bucketName) {
+        await this.storage.createBucket(bucketName);
+        if (this.VERBOSE_MODE) {
+            console.log(`Storage bucket '${bucketName}' created.`);
         }
         return true;
     }
 
     /**
-     * @param  {} bucketName
-     * Creates a Cloud Storage bucket.
+     * @param  {string} bucketName
+     * Delete a Cloud Storage bucket and return true.
      */
-    async createBucket(bucketName) {
-        const bucket = await storage.createBucket(bucketName).catch(err => {
-            console.warn(err.message);
-            throw err;
-        });
-        console.log(`Bucket ${bucketName} created.`);
-        if (bucket[0] === false) {
-            return { success: false, errors: ['Storage bucket [' + bucketName + '] create failed'] };
+    async deleteBucket(bucketName) {
+        await this.storage.bucket(bucketName).delete();
+        if (this.VERBOSE_MODE) {
+            console.log(`Storage bucket '${bucketName}' deleted.`);
         }
-        return bucket;
+        return true;
     }
 
     /**
-     * @param  {}
-     * List Cloud Storage bucket(s)
+     * @param  {string} bucketName
+     * Check if a bucket exists and return true/false.
      */
-    async getBuckets() {
-        const [buckets] = await storage.getBuckets().catch(err => {
+    async checkIfBucketExists(bucketName) {
+        const bucket = this.storage.bucket(bucketName);
+        const exists = await bucket.exists().catch((err) => {
             console.warn(err.message);
             throw err;
         });
-        if (buckets[0] === false) {
-            return { success: false, code: 400, errors: ['Storage bucket(s) do not exist'] };
+        if (this.VERBOSE_MODE) {
+            console.log(`Storage bucket '${bucketName}' exists: '${exists[0]}'.`);
         }
-        return buckets;
+        return exists[0];
     }
 
     /**
-     * @param  {} bucketName
-     * @param  {} options
+     * @param  {string} bucketName
+     * @param  {string} fileName
+     * @param  {buffer} contents
+     * @param  {Object} options https://cloud.google.com/nodejs/docs/reference/storage/2.5.x/global.html#CreateWriteStreamOptions
+     * Creates a file in Cloud Storage and return true.
+     */
+    async createFile(bucketName, fileName, contents, options) {
+        const bucket = this.storage.bucket(bucketName);
+        const file = bucket.file(fileName);
+        await file.save(contents, options);
+        if (this.VERBOSE_MODE) {
+            console.log(`Storage bucket file '${fileName}' created.`);
+        }
+        return true;
+    }
+
+    /**
+     * @param  {string} bucketName
+     * @param  {Object} options
      */
     getBucket(bucketName, options) {
         return storage.bucket(bucketName, options);
     }
 
     /**
-     * @param  {} bucketName
-     * Check if a bucket exists and return true if exists.
+     * @param  {string} bucketName
+     * @param  {string} fileName
+     * @param  {Object} fileMetadata https://googleapis.dev/nodejs/storage/latest/File.html#setMetadata
+     * Updates the file metadata in GCP storage and return true/false.
      */
-    async checkIfBucketExists(bucketName) {
-        const bucket = storage.bucket(bucketName);
-        var exists = await bucket.exists().catch(err => {
-            console.warn(err.message);
-            throw err;
-        });
-        if (exists[0] === false) {
-            return { success: false, code: 400, errors: ['Storage bucket [' + bucketName + '] does not exist'] };
+    async updateFileMetadata(bucketName, fileName, fileMetadata) {
+        const bucket = this.storage.bucket(bucketName);
+        const file = bucket.file(fileName);
+        const results = await file.setMetadata(fileMetadata);
+        if (this.VERBOSE_MODE) {
+            console.log(`Storage bucket file '${fileName}' metadata updated: '${results[0]}'.`);
         }
-        return true;
+        return results[0];
     }
 
     /**
-     * @param  {} bucketName
-     * @param  {} fileName
-     * Check if a file exists and return true if exists.
+     * @param  {string} bucketName
+     * @param  {string} fileName
+     * Check if a file exists and return true/false.
      */
     async checkIfFileExists(bucketName, fileName) {
-        const bucket = storage.bucket(bucketName);
+        const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
-        const exists = await file.exists().catch(err => {
+        const exists = await file.exists().catch((err) => {
             console.warn(err.message);
             throw err;
         });
+        if (this.VERBOSE_MODE) {
+            console.log(`Storage bucket file '${fileName}' exists: '${exists[0]}'.`);
+        }
         return exists[0];
     }
 
     /**
-     * @param  {} bucketName
-     * @param  {} sourceFile
-     * @param  {} destinationFile
+     * @param  {string} bucketName
+     * @param  {string} sourceFile
+     * @param  {string} destinationFile
      */
     async moveFile(bucketName, sourceFile, destinationFile) {
         return storage
@@ -171,56 +182,50 @@ class StorageUtil {
             .file(sourceFile)
             .move(destinationFile)
             .then((result) => {
-                console.log(`gs://${bucketName}/${sourceFile} moved to gs://${bucketName}/${destinationFile}.`);
+                if (this.VERBOSE_MODE) {
+                    console.log(`gs://${bucketName}/${sourceFile} moved to gs://${bucketName}/${destinationFile}.`);
+                }
                 return result;
             });
+        }
     }
 
     /**
-     * @param  {} bucketName
-     * @param  {} fileName
-     * Get the metadata of a file and return if exists.
+     * @param  {string} bucketName
+     * @param  {string} fileName
+     * Get the metadata of a file and return it.
      */
     async getFileMetadata(bucketName, fileName) {
-        const bucket = storage.bucket(bucketName);
+        const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
-        const metadata = await file.getMetadata().catch(err => {
-            console.warn(err.message);
-            throw err;
-        });
-        if (metadata[0] === false) {
-            return { success: false, code: 400, errors: ['Storage file [' + fileName + '] does not exist'] };
+        const results = await file.getMetadata();
+        const metadata = results[0];
+        if (this.VERBOSE_MODE) {
+            console.log(`Storage bucket file '${fileName}' metadata: '${metadata}'.`);
         }
-        return metadata[0];
+        return metadata;
     }
 
     /**
-     * @param  {} bucketName
-     * @param  {} fileName
+     * @param  {string} bucketName
+     * @param  {string} fileName
      * Check if a file exists and return the content if exists.
      */
     async fetchFileContent(bucketName, fileName) {
-        const bucket = storage.bucket(bucketName);
+        const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
-        const exists = await this.checkIfFileExists(bucketName, fileName).catch(err => {
-            console.warn(err.message);
-            throw err;
-        });
-        if (exists.success === false) {
-            // Propogate up errors
-            return exists;
-        }
-        const buf = await file.download().catch(err => {
-            console.warn(err.message);
-            throw err;
-        });
+        const exists = await this.checkIfFileExists(bucketName, fileName);
+        const buf = await file.download();
         const content = buf.toString('utf-8');
+        if (this.VERBOSE_MODE) {
+            console.log(`Fetching the file '${fileName}' content.`);
+        }
         return content;
     }
 
     /**
-     * @param  {} bucketName
-     * @param  {} fileName
+     * @param  {string} bucketName
+     * @param  {string} fileName
      * Returns a (optionally signed) URL for a given file name in Cloud Storage.
      */
     async getUrl(bucketName, fileName, signed) {
@@ -230,9 +235,9 @@ class StorageUtil {
         }
         else {
             console.log("Creating signed url");
-            const bucket = storage.bucket(bucketName);
+            const bucket = this.storage.bucket(bucketName);
             const file = bucket.file(fileName);
-            return await file.getSignedUrl({ action: 'read', expires: '03-01-2500' }).catch(err => {
+            return await file.getSignedUrl({ action: 'read', expires: '03-01-2500' }).catch((err) => {
                 console.warn(err.message);
                 throw err;
             });
