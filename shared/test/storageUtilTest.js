@@ -36,6 +36,7 @@ describe('StorageUtil', () => {
 
         context('createBucket with arguments', () => {
             it("should return true", async () => {
+                let uuid = uuidv4();
                 await storageUtil.createBucket(uuid).then((result) => {
                     expect(result).to.be.a('boolean');
                     expect(result).to.equal(true);
@@ -55,145 +56,125 @@ describe('StorageUtil', () => {
         //});
         */
 
-        context('checkIfBucketExists with arguments', () => {
-            it("should return true", async () => {
-                await storageUtil.createBucket(uuid).then(() => {
-                    return storageUtil.checkIfBucketExists(uuid);
-                }).then((result) => {
-                    expect(result).to.be.a('boolean');
-                    expect(result).to.equal(true);
-                }).then(() => {
-                    return storageUtil.deleteBucket(uuid);
-                }).catch((reason) => {
-                    expect.fail(`Failed: ${reason}`);
+        describe('Bucket created/deleted in pre/post setup', () => {
+
+            before(async () => {
+                await storageUtil.createBucket(uuid);
+            })
+            after(async () => {
+                await storageUtil.deleteBucket(uuid);
+            })
+
+            const jsonString = JSON.stringify({ foo: 'bar' });
+            const buf = Buffer.from(jsonString);
+            const options = { gzip: true, private: true };
+
+            context('checkIfBucketExists with arguments', () => {
+                it("should return true", async () => {
+                    await storageUtil.checkIfBucketExists(uuid).then((result) => {
+                        expect(result).to.be.a('boolean');
+                        expect(result).to.equal(true);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
                 });
             });
-        });
 
-        const jsonString = JSON.stringify({ foo: 'bar' });
-        const buf = Buffer.from(jsonString);
-        const options = { gzip: true, private: true };
-
-        context('createFile with arguments', () => {
-            it("should return true", async () => {
-                await storageUtil.createBucket(uuid).then(() => {
-                    return storageUtil.createFile(uuid, uuid, buf, options);
-                }).then((result) => {
-                    expect(result).to.be.a('boolean');
-                    expect(result).to.equal(true);
-                }).then(() => {
-                    return storageUtil.deleteFile(uuid, uuid);
-                }).then((result) => {
-                    expect(result).to.be.a('boolean');
-                    expect(result).to.equal(true);
-                }).then(() => {
-                    return storageUtil.deleteBucket(uuid);
-                }).catch((reason) => {
-                    expect.fail(`Failed: ${reason}`);
+            context('createFile with arguments', () => {
+                it("should return true", async () => {
+                    await storageUtil.createFile(uuid, uuid, buf, options).then((result) => {
+                        expect(result).to.be.a('boolean');
+                        expect(result).to.equal(true);
+                    }).then(() => {
+                        return storageUtil.deleteFile(uuid, uuid);
+                    }).then((result) => {
+                        expect(result).to.be.a('boolean');
+                        expect(result).to.equal(true);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
                 });
             });
+
         });
 
-        context('checkIfFileExists with arguments', () => {
-            it("should return true", async () => {
-                await storageUtil.createBucket(uuid).then(() => {
-                    return storageUtil.createFile(uuid, uuid, buf, options);
-                }).then(() => {
-                    return storageUtil.checkIfFileExists(uuid, uuid);
-                }).then((result) => {
-                    expect(result).to.be.a('boolean');
-                    expect(result).to.equal(true);
-                }).then(() => {
-                    return storageUtil.deleteFile(uuid, uuid);
-                }).then(() => {
-                    return storageUtil.deleteBucket(uuid);
-                }).catch((reason) => {
-                    expect.fail(`Failed: ${reason}`);
+        describe('Bucket and file created/delete in pre/post setup', () => {
+
+            before(async () => {
+                await storageUtil.createBucket(uuid);
+                await storageUtil.createFile(uuid, uuid, buf, options);
+            })
+            after(async () => {
+                await storageUtil.deleteFile(uuid, uuid);
+                await storageUtil.deleteBucket(uuid);
+            })
+
+            const jsonString = JSON.stringify({ foo: 'bar' });
+            const buf = Buffer.from(jsonString);
+            const options = { gzip: true, private: true };
+
+            context('checkIfFileExists with arguments', () => {
+                it("should return true", async () => {
+                    await storageUtil.checkIfFileExists(uuid, uuid).then((result) => {
+                        expect(result).to.be.a('boolean');
+                        expect(result).to.equal(true);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
                 });
             });
-        });
 
-        context('getFileMetadata with arguments', () => {
-            it("should return object", async () => {
-                await storageUtil.createBucket(uuid).then(() => {
-                    return storageUtil.createFile(uuid, uuid, buf, options);
-                }).then(() => {
-                    return storageUtil.getFileMetadata(uuid, uuid);
-                }).then((result) => {
-                    expect(result).to.be.an('object');
-                    expect(result.name).to.equal(uuid);
-                }).then(() => {
-                    return storageUtil.deleteFile(uuid, uuid);
-                }).then(() => {
-                    return storageUtil.deleteBucket(uuid);
-                }).catch((reason) => {
-                    expect.fail(`Failed: ${reason}`);
+            context('getFileMetadata with arguments', () => {
+                it("should return object", async () => {
+                    await storageUtil.getFileMetadata(uuid, uuid).then((result) => {
+                        expect(result).to.be.an('object');
+                        expect(result.name).to.equal(uuid);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
                 });
             });
-        });
 
-        context('setFileMetadata with arguments', () => {
-            it("should return true", async () => {
-                await storageUtil.createBucket(uuid).then(() => {
-                    return storageUtil.createFile(uuid, uuid, buf, options);
-                }).then(() => {
+            context('setFileMetadata with arguments', () => {
+                it("should return true", async () => {
                     const metadata = {
                         metadata: {
                             abc: "123"
                         }
                     };
-                    return storageUtil.setFileMetadata(uuid, uuid, metadata);
-                }).then((result) => {
-                    expect(result).to.be.a('boolean');
-                    expect(result).to.equal(true);
-                }).then(() => {
-                    return storageUtil.deleteFile(uuid, uuid);
-                }).then(() => {
-                    return storageUtil.deleteBucket(uuid);
-                }).catch((reason) => {
-                    expect.fail(`Failed: ${reason}`);
+                    await storageUtil.setFileMetadata(uuid, uuid, metadata).then((result) => {
+                        expect(result).to.be.a('boolean');
+                        expect(result).to.equal(true);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
                 });
             });
-        });
 
-        context('fetchFileContent with arguments', () => {
-            it("should return true", async () => {
-                await storageUtil.createBucket(uuid).then(() => {
-                    return storageUtil.createFile(uuid, uuid, buf, options);
-                }).then(() => {
-                    return storageUtil.fetchFileContent(uuid, uuid);
-                }).then((result) => {
-                    expect(result).to.be.a('string');
-                    expect(result).to.equal(jsonString);
-                }).then(() => {
-                    return storageUtil.deleteFile(uuid, uuid);
-                }).then(() => {
-                    return storageUtil.deleteBucket(uuid);
-                }).catch((reason) => {
-                    expect.fail(`Failed: ${reason}`);
+            context('fetchFileContent with arguments', () => {
+                it("should return true", async () => {
+                    await storageUtil.fetchFileContent(uuid, uuid).then((result) => {
+                        expect(result).to.be.a('string');
+                        expect(result).to.equal(jsonString);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
                 });
             });
-        });
 
-        context('getUrl with arguments', () => {
-            it("should return string", async () => {
-                await storageUtil.createBucket(uuid).then(() => {
-                    return storageUtil.createFile(uuid, uuid, buf, options);
-                }).then(() => {
-                    return storageUtil.getUrl(uuid, uuid, true);
-                }).then((result) => {
-                    expect(result).to.be.a('string');
-                    return storageUtil.getUrl(uuid, uuid, false);
-                }).then((result) => {
-                    expect(result).to.be.a('string');
-                }).then(() => {
-                    return storageUtil.deleteFile(uuid, uuid);
-                }).then(() => {
-                    return storageUtil.deleteBucket(uuid);
-                }).catch((reason) => {
-                    expect.fail(`Failed: ${reason}`);
+            context('getUrl with arguments', () => {
+                it("should return string", async () => {
+                    await storageUtil.getUrl(uuid, uuid, true).then((result) => {
+                        expect(result).to.be.a('string');
+                        return storageUtil.getUrl(uuid, uuid, false);
+                    }).then((result) => {
+                        expect(result).to.be.a('string');
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
                 });
             });
+
         });
 
     }
