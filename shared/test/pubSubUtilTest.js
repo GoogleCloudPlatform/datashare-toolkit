@@ -52,10 +52,10 @@ describe('PubSubUtil', () => {
 
             before(async () => {
                 await pubSubUtil.createTopic(uuid);
-            })
+            });
             after(async () => {
                 await pubSubUtil.deleteTopic(uuid);
-            })
+            });
 
             context('createSubscription with arguments', () => {
                 it("should return true", async () => {
@@ -77,11 +77,11 @@ describe('PubSubUtil', () => {
             before(async () => {
                 await pubSubUtil.createTopic(uuid);
                 await pubSubUtil.createSubscription(uuid, uuid);
-            })
+            });
             after(async () => {
                 await pubSubUtil.deleteSubscription(uuid, uuid);
                 await pubSubUtil.deleteTopic(uuid);
-            })
+            });
 
             context('checkIfSubscriptionExists with arguments', () => {
                 it("should return true", async () => {
