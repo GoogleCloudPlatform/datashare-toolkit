@@ -47,7 +47,9 @@ async function validateOptions(options, validateStorage) {
     }
     else {
         attributes = parseDerivedFileAttributes(options);
-        console.log(`Attributes: ${JSON.stringify(attributes)}`);
+        console.log(`File attributes: ${JSON.stringify(attributes)}`);
+        
+        // If file is archived, skip checks.
         if (attributes && !attributes.isArchived) {
             // options.fileName is defined
             const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
