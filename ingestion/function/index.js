@@ -441,13 +441,6 @@ function getExceptionString(exception) {
     return str;
 }
 
-/**
- * @param  {} message
- */
-function log(message) {
-    console.log(JSON.stringify(message, undefined, 1));
-}
-
 if (process.env.UNIT_TESTS) {
     module.exports = {
         getExceptionString,
