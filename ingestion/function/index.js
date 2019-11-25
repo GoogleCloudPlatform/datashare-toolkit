@@ -23,7 +23,6 @@ const storageUtil = new StorageUtil();
 const commonUtil = CommonUtil;
 const path = require("path");
 const underscore = require("underscore");
-const defaultTransformQuery = "*";
 const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
 const stagingTableExpiryDays = 2;
 const processPrefix = "bqds";
@@ -85,6 +84,7 @@ async function processHttpEvent(request, response) {
 
 /**
  * @param  {} options
+ * @param  {} validateStorage Indicates if existence checks should be performed against files in Cloud Storage.
  */
 async function validateOptions(options, validateStorage) {
     let info = [];
@@ -281,7 +281,7 @@ async function getConfiguration(options) {
 async function transform(config) {
     const transformExists = await storageUtil.checkIfFileExists(config.bucket, config.bucketPath.transform);
 
-    let transformQuery = defaultTransformQuery;
+    let transformQuery = "*";
     if (transformExists === true) {
         transformQuery = await storageUtil.fetchFileContent(config.bucket, config.bucketPath.transform);
     }
