@@ -1,6 +1,5 @@
 /**
- * Copyright 2019 Google LLC
- *
+ * Copyright 2019 Google LLC *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,11 +17,15 @@
 const { Storage } = require('@google-cloud/storage');
 
 class StorageUtil {
-    constructor(projectId) {
+    constructor(projectId, keyFilename) {
         this.projectId = projectId;
+        this.keyFilename = keyFilename;
         const options = {};
         if (projectId) {
             options.projectId = projectId;
+        }
+        if (keyFilename) {
+            options.keyFilename = keyFilename;
         }
         this.storage = new Storage(options);
     }
@@ -141,9 +144,9 @@ class StorageUtil {
      * @param  {string} bucketName
      * @param  {string} fileName
      * @param  {Object} fileMetadata https://googleapis.dev/nodejs/storage/latest/File.html#setMetadata
-     * Updates the file metadata in GCP storage and return true/false.
+     * Updates the file metadata in GCP storage and return true.
      */
-    async updateFileMetadata(bucketName, fileName, fileMetadata) {
+    async setFileMetadata(bucketName, fileName, fileMetadata) {
         const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
         const results = await file.setMetadata(fileMetadata);
@@ -226,21 +229,21 @@ class StorageUtil {
     /**
      * @param  {string} bucketName
      * @param  {string} fileName
+     * @param  {boolean} signed
      * Returns a (optionally signed) URL for a given file name in Cloud Storage.
      */
     async getUrl(bucketName, fileName, signed) {
         if (signed === false) {
-            console.log("Creating public url");
             return `https://storage.googleapis.com/${bucketName}/${fileName}`;
         }
         else {
-            console.log("Creating signed url");
             const bucket = this.storage.bucket(bucketName);
             const file = bucket.file(fileName);
-            return await file.getSignedUrl({ action: 'read', expires: '03-01-2500' }).catch((err) => {
-                console.warn(err.message);
-                throw err;
-            });
+            const url = await file.getSignedUrl({ action: 'read', expires: '03-01-2500' });
+            if (this.VERBOSE_MODE) {
+                console.log(`Signed url created.`);
+            }
+            return url[0];
         }
     }
 }
