@@ -70,15 +70,24 @@ describe('PubSubUtil', () => {
                 });
             });
 
+        });
+
+        describe('Topic and subscription created/deleted in pre/post setup', () => {
+
+            before(async () => {
+                await pubSubUtil.createTopic(uuid);
+                await pubSubUtil.createSubscription(uuid, uuid);
+            })
+            after(async () => {
+                await pubSubUtil.deleteSubscription(uuid, uuid);
+                await pubSubUtil.deleteTopic(uuid);
+            })
+
             context('checkIfSubscriptionExists with arguments', () => {
                 it("should return true", async () => {
-                    await pubSubUtil.createSubscription(uuid, uuid).then(() => {
-                        return pubSubUtil.checkIfSubscriptionExists(uuid, uuid);
-                    }).then((result) => {
+                    await pubSubUtil.checkIfSubscriptionExists(uuid, uuid).then((result) => {
                         expect(result).to.be.a('boolean');
                         expect(result).to.equal(true);
-                    }).then(() => {
-                        return pubSubUtil.deleteSubscription(uuid, uuid);
                     }).catch((reason) => {
                         expect.fail(`Failed: ${reason}`);
                     });
@@ -94,12 +103,10 @@ describe('PubSubUtil', () => {
 
             context('publishMessage with arguments', () => {
                 it("should return a string", async () => {
-                    await pubSubUtil.createSubscription(uuid, uuid).then(() => {
-                        return pubSubUtil.publishMessage(uuid, message, customAttr);
-                    }).then((result) => {
+                    await pubSubUtil.publishMessage(uuid, message, customAttr).then((result) => {
                         expect(result).to.be.a('string');
                     }).then(() => {
-                        return pubSubUtil.deleteSubscription(uuid, uuid);
+                        return pubSubUtil.getMessage(projectName, uuid);
                     }).catch((reason) => {
                         expect.fail(`Failed: ${reason}`);
                     });
@@ -108,17 +115,13 @@ describe('PubSubUtil', () => {
 
             context('getMessage with arguments', () => {
                 it("should return an object", async () => {
-                    await pubSubUtil.createSubscription(uuid, uuid).then(() => {
-                        return pubSubUtil.publishMessage(uuid, message, customAttr);
-                    }).then(() => {
+                    await pubSubUtil.publishMessage(uuid, message, customAttr).then(() => {
                         return pubSubUtil.getMessage(projectName, uuid);
                     }).then((result) => {
                         expect(result).to.be.an('Object');
                         const jsonString = Buffer.from(result.message.data).toString('utf8');
                         expect(JSON.parse(jsonString)).to.deep.equal(message);
                         expect(result.message.attributes).to.deep.equal(customAttr);
-                    }).then(() => {
-                        return pubSubUtil.deleteSubscription(uuid, uuid);
                     }).catch((reason) => {
                         expect.fail(`Failed: ${reason}`);
                     });
@@ -127,13 +130,7 @@ describe('PubSubUtil', () => {
 
             context('getMessage without subscription', () => {
                 it("should reject with error", async () => {
-                    await pubSubUtil.createSubscription(uuid, uuid).then(() => {
-                        expect(pubSubUtil.getMessage(projectName, uuid)).to.be.rejectedWith(Error);
-                    }).then(() => {
-                        return pubSubUtil.deleteSubscription(uuid, uuid);
-                    }).catch((reason) => {
-                        expect.fail(`Failed: ${reason}`);
-                    });
+                    await expect(pubSubUtil.getMessage(projectName, uuid)).to.be.rejectedWith(Error);
                 });
             });
 
