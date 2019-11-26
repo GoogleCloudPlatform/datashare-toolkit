@@ -74,7 +74,7 @@ it("options are valid with archived file", async () => {
     };
     const v = await configManager.validateOptions(options, false);
     console.log(JSON.stringify(v));
-    expect(v.isArchived).is.true;
+    expect(v.isDataFile).is.false;
 });
 
 it("options are invalid with bad path", async () => {

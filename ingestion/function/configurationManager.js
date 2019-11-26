@@ -49,7 +49,7 @@ async function validateOptions(options, validateStorage) {
         console.log(`File attributes: ${JSON.stringify(attributes)}`);
 
         // If file is archived, skip checks.
-        if (attributes && !attributes.isArchived) {
+        if (attributes && attributes.isDataFile) {
             // options.fileName is defined
             const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
             console.log(`Path parts: ${pathParts}`);
@@ -119,17 +119,17 @@ async function validateOptions(options, validateStorage) {
         }
     }
 
-    if (attributes && attributes.isArchived === true) {
+    if (attributes && attributes.isDataFile === false) {
         console.log(`Ignoring archived file: '${options.fileName} in bucket: ${options.bucketName}'`);
-        return { isValid: false, isArchived: true };
+        return { isValid: false, isDataFile: false };
     }
     else if (errors.length === 0) {
         console.log(`Options validation succeeded: ${info.join(", ")}`);
-        return { isValid: true, isArchived: false, info: info, warn: warn };
+        return { isValid: true, isDataFile: true, info: info, warn: warn };
     }
     else {
         console.log(`Options validation failed: ${errors.join(", ")}`);
-        return { isValid: false, isArchived: false, errors: errors, info: info, warn: warn };
+        return { isValid: false, isDataFile: true, errors: errors, info: info, warn: warn };
     }
 }
 
@@ -147,8 +147,7 @@ function parseDerivedFileAttributes(options) {
     const schemaFileBucketPath = path.join(bucketPath, "..", "config", `schema.json`);
     const transformFileBucketPath = path.join(bucketPath, "..", "config", `transform.sql`);
     const archivePath = path.join(bucketPath, "archive", `${basename}`);
-
-    const isArchived = (underscore.first(pathParts).toLowerCase() === "bqds" && pathParts.pop().toLowerCase() === "archive" && pathParts.pop().toLowerCase() === "data");
+    const isDataFile = (underscore.first(pathParts).toLowerCase() === "bqds" && pathParts.pop().toLowerCase() === "data");
 
     return {
         dataset: datasetId,
@@ -156,7 +155,7 @@ function parseDerivedFileAttributes(options) {
         schemaPath: schemaFileBucketPath,
         transformPath: transformFileBucketPath,
         archivePath: archivePath,
-        isArchived: isArchived
+        isDataFile: isDataFile
     };
 }
 
