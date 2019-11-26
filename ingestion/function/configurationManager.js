@@ -22,7 +22,6 @@ const commonUtil = CommonUtil;
 const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
 const path = require("path");
 const underscore = require("underscore");
-const pathValidationEnabled = process.env.PATH_VALIDATION_ENABLED ? (process.env.PATH_VALIDATION_ENABLED.toLowerCase() === "true") : true;
 
 /**
  * @param  {} options
@@ -55,34 +54,32 @@ async function validateOptions(options, validateStorage) {
             const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
             console.log(`Path parts: ${pathParts}`);
 
-            if (pathValidationEnabled) {
-                if (pathParts.length !== 4) {
-                    errors.push(`Path must contain at least 4 parts for data files. Provided: '${pathParts}'. Path must start with 'bqds' and the data file must be in a directory named 'data'.`);
+            if (pathParts.length !== 4) {
+                errors.push(`Path must contain at least 4 parts for data files. Provided: '${pathParts}'. Path must start with 'bqds' and the data file must be in a directory named 'data'.`);
+            }
+            else {
+                // Path parts should contain n. IE: /bqds/dataset/table/data, /bqds/dataset/table/config
+                const first = underscore.first(pathParts);
+                const last = underscore.last(pathParts);
+                if (first !== "bqds") {
+                    errors.push(`First level directory must be named 'bqds', current is '${first}'`);
                 }
-                else {
-                    // Path parts should contain n. IE: /bqds/dataset/table/data, /bqds/dataset/table/config
-                    const first = underscore.first(pathParts);
-                    const last = underscore.last(pathParts);
-                    if (first !== "bqds") {
-                        errors.push(`First level directory must be named 'bqds', current is '${first}'`);
-                    }
-                    if (last !== "data") {
-                        errors.push(`Last level directory must be named 'data', current is '${last}'`);
-                    }
+                if (last !== "data") {
+                    errors.push(`Last level directory must be named 'data', current is '${last}'`);
                 }
+            }
 
-                if (!pathCheck(pathParts, 0, "bqds")) {
-                    errors.push("The first path component must be 'bqds' only");
-                }
-                if (!pathCheck(pathParts, 3, "data")) {
-                    errors.push("The fourth path component must be 'data' only");
-                }
-                if (!pathCheck(pathParts, 3, "config", false)) {
-                    errors.push("The fourth path component must be 'config' only");
-                }
-                if (!pathCheck(pathParts, 4, "archive", false)) {
-                    errors.push("The fourth path component must be 'archive' only");
-                }
+            if (!pathCheck(pathParts, 0, "bqds")) {
+                errors.push("The first path component must be 'bqds' only");
+            }
+            if (!pathCheck(pathParts, 3, "data")) {
+                errors.push("The fourth path component must be 'data' only");
+            }
+            if (!pathCheck(pathParts, 3, "config", false)) {
+                errors.push("The fourth path component must be 'config' only");
+            }
+            if (!pathCheck(pathParts, 4, "archive", false)) {
+                errors.push("The fourth path component must be 'archive' only");
             }
 
             const extensionSupported = commonUtil.isExtensionSupported(options.fileName, acceptable);
