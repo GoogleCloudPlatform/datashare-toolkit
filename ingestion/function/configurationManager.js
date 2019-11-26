@@ -140,7 +140,7 @@ function parseDerivedFileAttributes(options) {
     const basename = path.basename(options.fileName);
     const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
     const datasetId = pathParts[1];
-    const destinationTable = pathParts[2];
+    const destinationTableId = pathParts[2];
     const bucketPath = path.dirname(options.fileName);
     const schemaFileBucketPath = path.join(bucketPath, "..", "config", `schema.json`);
     const transformFileBucketPath = path.join(bucketPath, "..", "config", `transform.sql`);
@@ -149,7 +149,7 @@ function parseDerivedFileAttributes(options) {
 
     return {
         dataset: datasetId,
-        destinationTable: destinationTable,
+        destinationTableId: destinationTableId,
         schemaPath: schemaFileBucketPath,
         transformPath: transformFileBucketPath,
         archivePath: archivePath,
@@ -178,8 +178,8 @@ async function getConfiguration(options) {
 
     // Runtime created properties
     config.dataset = attributes.dataset;
-    config.destinationTable = attributes.destinationTable;
-    config.stagingTable = `TMP_${attributes.destinationTable}_${options.eventId}`;
+    config.destinationTableId = attributes.destinationTableId;
+    config.stagingTable = `TMP_${attributes.destinationTableId}_${options.eventId}`;
     config.sourceFile = options.fileName;
     config.bucket = options.bucketName;
     config.eventId = options.eventId;

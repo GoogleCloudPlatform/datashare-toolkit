@@ -138,7 +138,7 @@ if (argv.runCloudTests) {
                 transform: `bqds/${uuid}/table/config/transform.sql`
             },
             dataset: uuid,
-            destinationTable: "table",
+            destinationTableId: "table",
             eventId: 1,
             metadata: {
                 fieldDelimiter: ",",
