@@ -170,7 +170,7 @@ if (argv.runCloudTests) {
                 schema: configFileName,
                 transform: `bqds/${uuid}/table/config/transform.sql`
             },
-            dataset: uuid,
+            datasetId: uuid,
             destinationTableId: "table",
             eventId: 1,
             metadata: {
