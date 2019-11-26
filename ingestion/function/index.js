@@ -130,10 +130,10 @@ async function transform(config) {
     }
     // Blocked by TODO(b/144032584): Destination tables not respecting nullable/required modes specified in schema.json.
     // const dataset = bigqueryClient.dataset(config.datasetId);
-    // const exists = await bigqueryUtil.tableExists(config.datasetId, config.destinationTable);
+    // const exists = await bigqueryUtil.tableExists(config.datasetId, config.destinationTableId);
     // if (!exists) {
-    //     console.log(`creating table ${config.destinationTable} with ${config.metadata.fields}`);
-    //     await dataset.createTable(config.destinationTable, { schema: config.metadata.fields });
+    //     console.log(`creating table ${config.destinationTableId} with ${config.metadata.fields}`);
+    //     await dataset.createTable(config.destinationTableId, { schema: config.metadata.fields });
     // }
     const query = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.datasetId}.${config.stagingTable}\``;
     console.log(`executing transform query: ${query}`);
@@ -191,7 +191,7 @@ async function createTransformJob(config, query) {
         destinationTable: {
             projectId: process.env.GCP_PROJECT,
             datasetId: config.datasetId,
-            tableId: config.destinationTable
+            tableId: config.destinationTableId
         },
         createDisposition: "CREATE_IF_NEEDED",
         writeDisposition: (config.truncate)
