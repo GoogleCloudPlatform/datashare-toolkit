@@ -129,13 +129,13 @@ async function transform(config) {
         transformQuery = await storageUtil.fetchFileContent(config.bucket, config.bucketPath.transform);
     }
     // Blocked by TODO(b/144032584): Destination tables not respecting nullable/required modes specified in schema.json.
-    // const dataset = bigqueryClient.dataset(config.dataset);
-    // const exists = await bigqueryUtil.tableExists(config.dataset, config.destinationTable);
+    // const dataset = bigqueryClient.dataset(config.datasetId);
+    // const exists = await bigqueryUtil.tableExists(config.datasetId, config.destinationTable);
     // if (!exists) {
     //     console.log(`creating table ${config.destinationTable} with ${config.metadata.fields}`);
     //     await dataset.createTable(config.destinationTable, { schema: config.metadata.fields });
     // }
-    const query = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.dataset}.${config.stagingTable}\``;
+    const query = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.datasetId}.${config.stagingTable}\``;
     console.log(`executing transform query: ${query}`);
     const [job] = await createTransformJob(config, query);
     await job.getQueryResults({ maxApiCalls: 1, maxResults: 0 });
@@ -149,7 +149,7 @@ async function transform(config) {
  */
 async function stageFile(config) {
     console.log(`Using config ${JSON.stringify(config)}`);
-    const dataset = bigqueryUtil.getDataset(config.dataset);
+    const dataset = bigqueryUtil.getDataset(config.datasetId);
     let today = new Date();
     today.setDate(today.getDate() + stagingTableExpiryDays);
     const expiryTime = today.getTime();
@@ -190,7 +190,7 @@ async function createTransformJob(config, query) {
     let options = {
         destinationTable: {
             projectId: process.env.GCP_PROJECT,
-            datasetId: config.dataset,
+            datasetId: config.datasetId,
             tableId: config.destinationTable
         },
         createDisposition: "CREATE_IF_NEEDED",
