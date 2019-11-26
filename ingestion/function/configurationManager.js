@@ -138,7 +138,6 @@ async function validateOptions(options, validateStorage) {
  */
 function parseDerivedFileAttributes(options) {
     const basename = path.basename(options.fileName);
-
     const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
     console.log(`Path parts: ${pathParts}`);
     const datasetId = pathParts[1];
@@ -147,7 +146,7 @@ function parseDerivedFileAttributes(options) {
     const schemaFileBucketPath = path.join(bucketPath, "..", "config", `schema.json`);
     const transformFileBucketPath = path.join(bucketPath, "..", "config", `transform.sql`);
     const archivePath = path.join(bucketPath, "archive", `${basename}`);
-    const isDataFile = (underscore.first(pathParts).toLowerCase() === "bqds" && pathParts.pop().toLowerCase() === "data");
+    const isDataFile = (pathParts.length === 4 && underscore.first(pathParts).toLowerCase() === "bqds" && pathParts.pop().toLowerCase() === "data");
 
     return {
         dataset: datasetId,
