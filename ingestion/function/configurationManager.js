@@ -139,7 +139,6 @@ async function validateOptions(options, validateStorage) {
 function parseDerivedFileAttributes(options) {
     const basename = path.basename(options.fileName);
     const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
-    console.log(`Path parts: ${pathParts}`);
     const datasetId = pathParts[1];
     const destinationTable = pathParts[2];
     const bucketPath = path.dirname(options.fileName);
