@@ -55,7 +55,7 @@ async function validateOptions(options, validateStorage) {
             console.log(`Path parts: ${pathParts}`);
 
             if (pathParts.length !== 4) {
-                errors.push(`Path must contain at least 4 parts for data files. Provided: '${pathParts}'. Path must start with 'bqds' and the data file must be in a directory named 'data'.`);
+                errors.push(`Path must contain 4 components for data files. Provided: '${pathParts}'. Path must start with 'bqds' and the data file must be in a directory named 'data'.`);
             }
             else {
                 // Path parts should contain n. IE: /bqds/dataset/table/data, /bqds/dataset/table/config
