@@ -77,6 +77,12 @@ async function validateOptions(options, validateStorage) {
                 if (!pathCheck(pathParts, 3, "data")) {
                     errors.push("The fourth path component must be 'data' only");
                 }
+                if (!pathCheck(pathParts, 3, "config", false)) {
+                    errors.push("The fourth path component must be 'config' only");
+                }
+                if (!pathCheck(pathParts, 4, "archive", false)) {
+                    errors.push("The fourth path component must be 'archive' only");
+                }
             }
 
             const extensionSupported = commonUtil.isExtensionSupported(options.fileName, acceptable);

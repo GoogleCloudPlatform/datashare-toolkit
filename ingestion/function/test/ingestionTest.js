@@ -55,11 +55,12 @@ it("get bucket uri", () => {
 
 if (argv.runCloudTests) {
     it("function integration test", async () => {
-        const datasetName = `${uuid}_weather`;
+        const datasetName = `${uuid}`;
+        const tableName = "observation";
 
-        let schemaBucketFile = `bqds/${uuid}/config/${uuid}_observation.schema.json`;
-        let sqlBucketFile = `bqds/${uuid}/config/${uuid}_observation.transform.sql`;
-        let dataBucketFile = `bqds/${uuid}/data/${uuid}_weather.observation.csv`;
+        let schemaBucketFile = `bqds/${datasetName}/${tableName}/config/${uuid}_observation.schema.json`;
+        let sqlBucketFile = `bqds/${datasetName}/${tableName}/config/${uuid}_observation.transform.sql`;
+        let dataBucketFile = `bqds/${datasetName}/${tableName}/data/${uuid}_weather.observation.csv`;
 
         let schemaFileCreated = false;
         let sqlFileCreated = false;
@@ -100,11 +101,11 @@ if (argv.runCloudTests) {
         }).then((result) => {
             expect(result).to.be.true;
         }).then(() => {
-            return bigqueryUtil.tableExists(datasetName, "observation");
+            return bigqueryUtil.tableExists(datasetName, tableName);
         }).then((result) => {
             expect(result).to.be.true;
         }).then(() => {
-            const options = { query: `select * from \`${datasetName}.observation\`` };
+            const options = { query: `select * from \`${datasetName}.${tableName}\`` };
             return bigqueryUtil.executeQuerySync(options);
         }).then((result) => {
             const [rows] = result;
@@ -125,6 +126,7 @@ if (argv.runCloudTests) {
             }
         }).catch((reason) => {
             console.log(`Exception: ${reason}`);
+            assert.fail(reason);
         });
 
         // TODO: Delete the folder instead of individual files.
