@@ -73,3 +73,11 @@ it("extension is valid", () => {
 it("extension is invalid", () => {
     expect(commonUtil.isExtensionSupported("test.txt", ["json", "csv"])).is.false;
 });
+
+it("extension doesn't exist", () => {
+    expect(commonUtil.isExtensionSupported("test", ["json", "csv"])).is.false;
+});
+
+it("extension (double) is valid", () => {
+    expect(commonUtil.isExtensionSupported("test.json.txt", ["json", "csv"])).is.false;
+});
