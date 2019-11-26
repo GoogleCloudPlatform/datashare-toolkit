@@ -37,7 +37,7 @@ it("should return false for invalid json string", () => {
 it("should return true for valid yaml string", () => {
     expect(commonUtil.isYamlString(`---
     name: mlb_simple
-    projectId: sferrazza-cloud-sandbox
+    projectId: bqds-ci
     accessControl:
       datasetId: access_control
       viewId: groupEntities
@@ -53,7 +53,7 @@ it("should return true for valid yaml string", () => {
 it("should return false for invalid yaml string", () => {
     expect(commonUtil.isYamlString(`---
     name mlb_simple
-    projectId: sferrazza-cloud-sandbox
+    projectId: bqds-ci
     accessControl:
       datasetId: access_control
       viewId: groupEntities
