@@ -89,13 +89,13 @@ async function processFile(options) {
     console.log(`processFile called for ${getBucketName(options)}, batchId is ${batchId}`);
 
     const config = await configManager.getConfiguration(options);
-    const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
+    const haveDataset = await bigqueryUtil.datasetExists(config.datasetId);
     if (!haveDataset) {
-        console.log(`Dataset ${config.dataset} not found, creating...`);
-        await bigqueryUtil.createDataset(config.dataset);
-        console.log(`Created dataset ${config.dataset}`);
+        console.log(`Dataset ${config.datasetId} not found, creating...`);
+        await bigqueryUtil.createDataset(config.datasetId);
+        console.log(`Created dataset ${config.datasetId}`);
     } else {
-        console.log(`Found dataset ${config.dataset}`);
+        console.log(`Found dataset ${config.datasetId}`);
     }
 
     let success = false;
@@ -112,7 +112,7 @@ async function processFile(options) {
         console.error(`Exception processing ${options.fileName}: ${reason}`);
     }
     finally {
-        await bigqueryUtil.deleteTable(config.dataset, config.stagingTable, true);
+        await bigqueryUtil.deleteTable(config.datasetId, config.stagingTable, true);
     }
     return success;
 }

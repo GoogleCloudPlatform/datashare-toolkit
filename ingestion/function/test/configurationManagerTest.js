@@ -66,6 +66,39 @@ it("options are valid", async () => {
     expect(v.isValid).is.true;
 });
 
+it("options are invalid, dataset name not valid", async () => {
+    const options = {
+        eventId: 1,
+        bucketName: bucketName,
+        fileName: "/bqds/data$set/table/data/myFile.txt"
+    };
+    const v = await configManager.validateOptions(options, false);
+    console.log(JSON.stringify(v));
+    expect(v.isValid).is.false;
+});
+
+it("options are invalid, dataset and table length too long", async () => {
+    const options = {
+        eventId: 1,
+        bucketName: bucketName,
+        fileName: "/bqds/abcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabas/abcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabas/data/myFile.txt"
+    };
+    const v = await configManager.validateOptions(options, false);
+    console.log(JSON.stringify(v));
+    expect(v.isValid).is.false;
+});
+
+it("options are invalid, table name not valid", async () => {
+    const options = {
+        eventId: 1,
+        bucketName: bucketName,
+        fileName: "/bqds/dataset/tab%le/data/myFile.txt"
+    };
+    const v = await configManager.validateOptions(options, false);
+    console.log(JSON.stringify(v));
+    expect(v.isValid).is.false;
+});
+
 it("options are valid with archived file", async () => {
     const options = {
         eventId: 1,

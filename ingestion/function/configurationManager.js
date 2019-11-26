@@ -116,6 +116,24 @@ async function validateOptions(options, validateStorage) {
                     }
                 }
             }
+            
+            if (attributes.datasetId) {
+                if (attributes.datasetId.length > 1024) {
+                    errors.push(`DatasetId '${attributes.datasetId}' exceeds maximum allowable length of 1024: ${attributes.datasetId.length}}`);
+                }
+                if (!attributes.datasetId.match(/^[A-Za-z0-9_]+$/g)) {
+                    errors.push(`DatasetId '${attributes.datasetId}' name is invalid. See https://cloud.google.com/bigquery/docs/datasets for further information.`);
+                }
+            }
+
+            if (attributes.destinationTableId) {
+                if (attributes.destinationTableId.length > 1024) {
+                    errors.push(`Destination tableId '${attributes.destinationTableId}' exceeds maximum allowable length of 1024: ${attributes.destinationTableId.length}}`);
+                }
+                if (!attributes.destinationTableId.match(/^[A-Za-z0-9_]+$/g)) {
+                    errors.push(`Destination tableId '${attributes.destinationTableId}' name is invalid. See https://cloud.google.com/bigquery/docs/tables for further information.`);
+                }
+            }
         }
     }
 
@@ -148,7 +166,7 @@ function parseDerivedFileAttributes(options) {
     const isDataFile = (pathParts.length === 4 && underscore.first(pathParts).toLowerCase() === "bqds" && pathParts.pop().toLowerCase() === "data");
 
     return {
-        dataset: datasetId,
+        datasetId: datasetId,
         destinationTableId: destinationTableId,
         schemaPath: schemaFileBucketPath,
         transformPath: transformFileBucketPath,
@@ -177,7 +195,7 @@ async function getConfiguration(options) {
     }
 
     // Runtime created properties
-    config.dataset = attributes.dataset;
+    config.datasetId = attributes.datasetId;
     config.destinationTableId = attributes.destinationTableId;
     config.stagingTable = `TMP_${attributes.destinationTableId}_${options.eventId}`;
     config.sourceFile = options.fileName;
