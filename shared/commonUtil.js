@@ -43,6 +43,13 @@ function isYamlString(str) {
 }
 
 /**
+ * @param  {} str
+ */
+function parseYaml(str) {
+    return YAML.parse(str);
+}
+
+/**
  * @param  {} fileName
  * @param  {} acceptable
  * Determine whether a file suffix is recognized for ingestion.
@@ -55,5 +62,6 @@ function isExtensionSupported(fileName, acceptable) {
 module.exports = {
     isJsonString,
     isYamlString,
+    parseYaml,
     isExtensionSupported
 };

@@ -59,7 +59,7 @@ it("options are valid", async () => {
     const options = {
         eventId: 1,
         bucketName: bucketName,
-        fileName: "/bqds/trades/data/myFile.txt"
+        fileName: "/bqds/dataset/table/data/myFile.txt"
     };
     const v = await configManager.validateOptions(options, false);
     console.log(JSON.stringify(v));
@@ -70,11 +70,23 @@ it("options are valid with archived file", async () => {
     const options = {
         eventId: 1,
         bucketName: bucketName,
-        fileName: "/bqds/trades/data/archive/myFile.txt"
+        fileName: "/bqds/dataset/table/data/archive/myFile.txt"
     };
     const v = await configManager.validateOptions(options, false);
     console.log(JSON.stringify(v));
     expect(v.isArchived).is.true;
+});
+
+it("options are invalid with bad path", async () => {
+    const options = {
+        eventId: 1,
+        bucketName: bucketName,
+        fileName: "/bqds/bqds/table/data/myFile.txt"
+    };
+    const result = await configManager.validateOptions(options, false);
+    console.log(`Test result ${JSON.stringify(result)}`);
+    expect(result.isValid).is.false;
+    expect(result.errors.length).is.equal(1);
 });
 
 it("options are invalid", async () => {
@@ -85,7 +97,7 @@ it("options are invalid", async () => {
 });
 
 if (argv.runCloudTests) {
-    let configFileName = `bqds/${uuid}/config/${uuid}.schema.json`;
+    let configFileName = `bqds/${uuid}/table/config/schema.json`;
 
     it("create schema.json configuration file", async () => {
         const config = {
@@ -115,18 +127,18 @@ if (argv.runCloudTests) {
         const options = {
             eventId: 1,
             bucketName: bucketName,
-            fileName: `bqds/${uuid}/data/myFile.${uuid}.txt`
+            fileName: `bqds/${uuid}/table/data/myFile.${uuid}.txt`
         };
         const config = await configManager.getConfiguration(options);
         const expected = {
             bucket: bucketName,
             bucketPath: {
-                archive: `bqds/${uuid}/data/archive/myFile.${uuid}.txt`,
-                schema: `bqds/${uuid}/config/${uuid}.schema.json`,
-                transform: `bqds/${uuid}/config/${uuid}.transform.sql`
+                archive: `bqds/${uuid}/table/data/archive/myFile.${uuid}.txt`,
+                schema: configFileName,
+                transform: `bqds/${uuid}/table/config/transform.sql`
             },
-            dataset: "myFile",
-            destinationTable: uuid,
+            dataset: uuid,
+            destinationTable: "table",
             eventId: 1,
             metadata: {
                 fieldDelimiter: ",",
@@ -146,8 +158,8 @@ if (argv.runCloudTests) {
                 skipLeadingRows: 1,
                 sourceFormat: "CSV"
             },
-            sourceFile: `bqds/${uuid}/data/myFile.${uuid}.txt`,
-            stagingTable: `TMP_${uuid}_1`,
+            sourceFile: `bqds/${uuid}/table/data/myFile.${uuid}.txt`,
+            stagingTable: `TMP_table_1`,
             truncate: true
         };
         expect(config).is.eql(expected);

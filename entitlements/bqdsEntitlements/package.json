@@ -20,8 +20,7 @@
     "minimist": "^1.2.0",
     "lint": "^0.7.0",
     "underscore": "^1.9.1",
-    "bqds-shared": "file:../../shared",
-    "yaml": "^1.7.2"
+    "bqds-shared": "file:../../shared"
   },
   "devDependencies": {
     "eslint": "^5.12.0",

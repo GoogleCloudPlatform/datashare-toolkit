@@ -48,7 +48,7 @@ async function validateOptions(options, validateStorage) {
     else {
         attributes = parseDerivedFileAttributes(options);
         console.log(`File attributes: ${JSON.stringify(attributes)}`);
-        
+
         // If file is archived, skip checks.
         if (attributes && !attributes.isArchived) {
             // options.fileName is defined
@@ -56,10 +56,11 @@ async function validateOptions(options, validateStorage) {
             console.log(`Path parts: ${pathParts}`);
 
             if (pathValidationEnabled) {
-                if (pathParts.length < 3) {
-                    errors.push(`Path must contain at least 3 parts for data files. Provided: '${pathParts}'. Path must start with 'bqds' and the data file must be in a directory named 'data'.`);
+                if (pathParts.length !== 4) {
+                    errors.push(`Path must contain at least 4 parts for data files. Provided: '${pathParts}'. Path must start with 'bqds' and the data file must be in a directory named 'data'.`);
                 }
-                if (pathParts.length >= 3) {
+                else {
+                    // Path parts should contain n. IE: /bqds/dataset/table/data, /bqds/dataset/table/config
                     const first = underscore.first(pathParts);
                     const last = underscore.last(pathParts);
                     if (first !== "bqds") {
@@ -68,6 +69,13 @@ async function validateOptions(options, validateStorage) {
                     if (last !== "data") {
                         errors.push(`Last level directory must be named 'data', current is '${last}'`);
                     }
+                }
+
+                if (!pathCheck(pathParts, 0, "bqds")) {
+                    errors.push("The first path component must be 'bqds' only");
+                }
+                if (!pathCheck(pathParts, 3, "data")) {
+                    errors.push("The fourth path component must be 'data' only");
                 }
             }
 
@@ -127,24 +135,20 @@ async function validateOptions(options, validateStorage) {
  */
 function parseDerivedFileAttributes(options) {
     const basename = path.basename(options.fileName);
-    const dest = basename.split('.');
-
-    // const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
-    // const tableId = pathParts.pop();
-    // const datasetId = pathParts.pop();
-
-    const dataset = dest.length > 0 ? dest[0] : null;
-    const destinationTable = dest.length > 1 ? dest[1] : null;
-    const bucketPath = path.dirname(options.fileName);
-    const schemaFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.schema.json`);
-    const transformFileBucketPath = path.join(bucketPath, "..", "config", `${destinationTable}.transform.sql`);
-    const archivePath = path.join(bucketPath, "archive", `${basename}`);
 
     const pathParts = path.dirname(options.fileName).split("/").filter(Boolean);
+    console.log(`Path parts: ${pathParts}`);
+    const datasetId = pathParts[1];
+    const destinationTable = pathParts[2];
+    const bucketPath = path.dirname(options.fileName);
+    const schemaFileBucketPath = path.join(bucketPath, "..", "config", `schema.json`);
+    const transformFileBucketPath = path.join(bucketPath, "..", "config", `transform.sql`);
+    const archivePath = path.join(bucketPath, "archive", `${basename}`);
+
     const isArchived = (underscore.first(pathParts).toLowerCase() === "bqds" && pathParts.pop().toLowerCase() === "archive" && pathParts.pop().toLowerCase() === "data");
 
     return {
-        dataset: dataset,
+        dataset: datasetId,
         destinationTable: destinationTable,
         schemaPath: schemaFileBucketPath,
         transformPath: transformFileBucketPath,
@@ -216,6 +220,30 @@ function setMetadataDefaults(dict) {
         console.log(`Using metadata: ${JSON.stringify(meta)}`);
     }
     return meta;
+}
+
+/**
+ * @param  {} pathParts
+ * @param  {} expectedIndex
+ * @param  {} component
+ */
+function pathCheck(pathParts, expectedIndex, component, isRequired) {
+    const lPathParts = pathParts.map(c => c.toLowerCase());
+    if (lPathParts.length > expectedIndex && lPathParts.includes(component)) {
+        if (lPathParts[expectedIndex] !== component) {
+            return false;
+        }
+        if (underscore.filter(lPathParts, (comp) => { return comp === component; }).length > 1) {
+            return false;
+        }
+        return true;
+    }
+    else if (isRequired) {
+        return false;
+    }
+    else {
+        return true;
+    }
 }
 
 module.exports = {

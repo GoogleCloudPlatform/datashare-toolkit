@@ -26,7 +26,6 @@ const configUtil = require("./configUtil");
 const sqlBuilder = require("./sqlBuilder");
 const configValidator = require("./configValidator");
 const runtimeConfiguration = require("./runtimeConfiguration");
-const YAML = require('yaml');
 const uuidv4 = require('uuid/v4');
 
 /**
@@ -55,7 +54,7 @@ async function processConfiguration(filePath) {
             console.log("Configuration is not valid YAML");
             return;
         }
-        config = YAML.parse(data);
+        config = commonUtil.parseYaml(data);
     }
     if (config) {
         await processEntitlementConfig(config);
