@@ -226,6 +226,7 @@ function setMetadataDefaults(dict) {
  * @param  {} pathParts
  * @param  {} expectedIndex
  * @param  {} component
+ * @param  {} isRequired
  */
 function pathCheck(pathParts, expectedIndex, component, isRequired) {
     const lPathParts = pathParts.map(c => c.toLowerCase());
