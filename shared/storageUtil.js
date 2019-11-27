@@ -42,12 +42,15 @@ class StorageUtil {
      * Creates a file in Cloud Storage and return true/false or signedUrl.
      */
     async createFile(bucketName, fileName, contents, options) {
-        const bucket = storage.bucket(bucketName);
+        const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
-        const fileSave = await file.save(contents, options).catch((err) => {
+        await file.save(contents, options).catch((err) => {
             console.warn(err.message);
             throw err;
         });
+        if (this.VERBOSE_MODE) {
+            console.log(`Storage bucket file '${fileName}' created.`);
+        }
         return true;
     }
 
@@ -57,7 +60,7 @@ class StorageUtil {
      * Delete a file in Cloud Storage and return true/false.
      */
     async deleteFile(bucketName, fileName, ignoreError) {
-        const bucket = storage.bucket(bucketName);
+        const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
         return file.delete()
             .then((response) => {
@@ -73,7 +76,7 @@ class StorageUtil {
                 }
                 return false;
             });
-        }
+    }
 
     /*
      * @param  {string} bucketName
@@ -117,27 +120,10 @@ class StorageUtil {
 
     /**
      * @param  {string} bucketName
-     * @param  {string} fileName
-     * @param  {buffer} contents
-     * @param  {Object} options https://cloud.google.com/nodejs/docs/reference/storage/2.5.x/global.html#CreateWriteStreamOptions
-     * Creates a file in Cloud Storage and return true.
-     */
-    async createFile(bucketName, fileName, contents, options) {
-        const bucket = this.storage.bucket(bucketName);
-        const file = bucket.file(fileName);
-        await file.save(contents, options);
-        if (this.VERBOSE_MODE) {
-            console.log(`Storage bucket file '${fileName}' created.`);
-        }
-        return true;
-    }
-
-    /**
-     * @param  {string} bucketName
      * @param  {Object} options
      */
     getBucket(bucketName, options) {
-        return storage.bucket(bucketName, options);
+        return this.storage.bucket(bucketName, options);
     }
 
     /**
@@ -149,11 +135,14 @@ class StorageUtil {
     async setFileMetadata(bucketName, fileName, fileMetadata) {
         const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
-        const results = await file.setMetadata(fileMetadata);
+        const results = await file.setMetadata(fileMetadata).catch((err) => {
+            console.warn(err.message);
+            throw err;
+        });
         if (this.VERBOSE_MODE) {
-            console.log(`Storage bucket file '${fileName}' metadata updated: '${results[0]}'.`);
+            console.log(`Storage bucket file '${fileName}' metadata updated.`);
         }
-        return results[0];
+        return true;
     }
 
     /**
@@ -180,7 +169,7 @@ class StorageUtil {
      * @param  {string} destinationFile
      */
     async moveFile(bucketName, sourceFile, destinationFile) {
-        return storage
+        return this.storage
             .bucket(bucketName)
             .file(sourceFile)
             .move(destinationFile)
@@ -190,7 +179,6 @@ class StorageUtil {
                 }
                 return result;
             });
-        }
     }
 
     /**

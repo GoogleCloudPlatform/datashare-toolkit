@@ -157,7 +157,7 @@ class BigQueryUtil {
         const dataset = this.bigqueryClient.dataset(datasetId);
         const exists = await dataset.exists().catch((err) => {
             console.warn(err.message);
-            throw err
+            throw err;
         });
         if (this.VERBOSE_MODE) {
             console.log(`Checking if dataset exists: '${datasetId}': ${exists[0]}`);
