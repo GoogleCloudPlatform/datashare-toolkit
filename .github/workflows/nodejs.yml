@@ -17,7 +17,7 @@ jobs:
     - name: npm install, lint, and test for shared
       run: |
         cd shared
-        npm install --loglevel verbose
+        npm install
         npm run lint
         npm test
       env:
@@ -36,7 +36,7 @@ jobs:
     - name: npm install, lint, and test for entitlements
       run: |
         cd entitlements/bqdsEntitlements
-        npm install --loglevel verbose
+        npm install
         npm run lint
         npm test
       env:
@@ -55,7 +55,7 @@ jobs:
     - name: npm install and lint for processUpload
       run: |
         cd ingestion/function
-        npm install --loglevel verbose
+        npm install
         npm run lint
         npm test
       env:

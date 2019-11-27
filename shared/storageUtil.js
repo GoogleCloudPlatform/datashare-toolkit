@@ -24,9 +24,10 @@ class StorageUtil {
      * @param  {} fileName
      * @param  {} contents
      * @param  {} options https://cloud.google.com/nodejs/docs/reference/storage/2.5.x/global.html#CreateWriteStreamOptions
+     * @param  {} createSignedUrl
      * Creates a file in Cloud Storage.
      */
-    async createFile(bucketName, fileName, contents, options) {
+    async createFile(bucketName, fileName, contents, options, createSignedUrl) {
         const bucket = storage.bucket(bucketName);
         const file = bucket.file(fileName);
         const fileSave = await file.save(contents, options).catch(err => {
@@ -36,12 +37,38 @@ class StorageUtil {
         if (fileSave[0] === false) {
             return { success: false, errors: ['Storage file [' + fileName + '] create failed'] };
         }
-        const url = await file.getSignedUrl({ action: 'read', expires: '03-01-2500' }).catch(err => {
-            console.warn(err.message);
-            throw err;
-        });
-        console.log(`Signed url is ${url}`);
-        return { url: url[0] };
+        if (createSignedUrl === true) {
+            const url = await file.getSignedUrl({ action: 'read', expires: '03-01-2500' }).catch(err => {
+                console.warn(err.message);
+                throw err;
+            });
+            console.log(`Signed url is ${url}`);
+            return { success: true, url: url[0] };
+        }
+        return { success: true };
+    }
+
+    /**
+     * @param  {} bucketName
+     * @param  {} fileName
+     */
+    async deleteFile(bucketName, fileName, ignoreError) {
+        const bucket = storage.bucket(bucketName);
+        const file = bucket.file(fileName);
+        return file.delete()
+            .then((response) => {
+                if (this.VERBOSE_MODE) {
+                    console.log(`Filename ${fileName} deleted from bucket: ${bucketName}`);
+                }
+                return true;
+            })
+            .catch((reason) => {
+                console.log(`Error deleting file ${fileName}: ${reason}`);
+                if (!ignoreError) {
+                    throw reason;
+                }
+                return false;
+            });
     }
 
     /**
@@ -96,9 +123,12 @@ class StorageUtil {
 
     /**
      * @param  {} bucketName
-        return buckets;
+     * @param  {} options
+     */
+    getBucket(bucketName, options) {
+        return storage.bucket(bucketName, options);
     }
-    
+
     /**
      * @param  {} bucketName
      * Check if a bucket exists and return true if exists.
@@ -127,10 +157,23 @@ class StorageUtil {
             console.warn(err.message);
             throw err;
         });
-        if (exists[0] === false) {
-            return { success: false, code: 400, errors: ['Storage file [' + fileName + '] does not exist'] };
-        }
-        return true;
+        return exists[0];
+    }
+
+    /**
+     * @param  {} bucketName
+     * @param  {} sourceFile
+     * @param  {} destinationFile
+     */
+    async moveFile(bucketName, sourceFile, destinationFile) {
+        return storage
+            .bucket(bucketName)
+            .file(sourceFile)
+            .move(destinationFile)
+            .then((result) => {
+                console.log(`gs://${bucketName}/${sourceFile} moved to gs://${bucketName}/${destinationFile}.`);
+                return result;
+            });
     }
 
     /**

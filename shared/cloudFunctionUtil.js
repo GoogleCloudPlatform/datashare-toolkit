@@ -26,32 +26,13 @@ class CloudFunctionUtil {
      * @param  {} context
      * Generates the BQDS batch Id.
      */
-    generateBatchId(event, context) {
+    generateBatchId(eventId, bucketName, fileName) {
         return [
             new Date().getTime(),
-            context.eventId,
-            event.bucket,
-            event.name
+            eventId,
+            bucketName,
+            fileName
         ].join(':');
-    }
-
-    /**
-     * @param  {} fileName
-     * @param  {} acceptable
-     * @param  {} ignoreStartsWith
-     * Determine whether a file suffix is recognized for ingestion.
-     */
-    isExtensionSupported(fileName, acceptable, ignoreStartsWith) {
-        const parts = fileName.split('.');
-        if (parts[0] &&
-            (parts[0].startsWith(ignoreStartsWith)
-                || parts[0].startsWith(`/${ignoreStartsWith}`))) {
-            return false;
-        } else {
-            const ext = parts[parts.length - 1];
-            console.log(`File has extension ${ext}`);
-            return acceptable.includes(ext.toLowerCase());
-        }
     }
 }
 

@@ -18,14 +18,14 @@
 
 const fs = require('fs');
 
-const { BigQueryUtil } = require('bqds-shared');
+const { BigQueryUtil, CommonUtil } = require('bqds-shared');
 let bigqueryUtil;
 
+const commonUtil = CommonUtil;
 const configUtil = require("./configUtil");
 const sqlBuilder = require("./sqlBuilder");
 const configValidator = require("./configValidator");
 const runtimeConfiguration = require("./runtimeConfiguration");
-const YAML = require('yaml');
 const uuidv4 = require('uuid/v4');
 
 /**
@@ -43,18 +43,18 @@ async function processConfiguration(filePath) {
 
     let config;
     if (extension === ".json") {
-        if (configValidator.isJsonString(data) === false) {
+        if (commonUtil.isJsonString(data) === false) {
             console.log("Configuration is not valid JSON");
             return;
         }
         config = JSON.parse(data);
     }
     else if (extension === ".yaml") {
-        if (configValidator.isYamlString(data) === false) {
+        if (commonUtil.isYamlString(data) === false) {
             console.log("Configuration is not valid YAML");
             return;
         }
-        config = YAML.parse(data);
+        config = commonUtil.parseYaml(data);
     }
     if (config) {
         await processEntitlementConfig(config);

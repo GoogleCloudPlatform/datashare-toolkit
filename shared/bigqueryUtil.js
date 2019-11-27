@@ -34,6 +34,13 @@ class BigQueryUtil {
     /**
      * @param  {} options
      */
+    async createQueryJob(options) {
+        return this.bigqueryClient.createQueryJob(options);
+    }
+
+    /**
+     * @param  {} options
+     */
     async executeQuerySync(options) {
         const [job] = await this.bigqueryClient.createQueryJob(options);
         if (this.VERBOSE_MODE) {
@@ -111,7 +118,7 @@ class BigQueryUtil {
         }
 
         if (this.VERBOSE_MODE) {
-            console.log(`Checking if table exists: '${tableId}': ${exists}`);
+            console.log(`Checking if table exists: '${datasetId}.${tableId}': ${exists}`);
         }
         return exists;
     }
@@ -145,7 +152,7 @@ class BigQueryUtil {
         const response = await dataset.exists();
         const exists = response[0];
         if (this.VERBOSE_MODE) {
-            console.log(`Checking if dataset exists: '${tableId}': ${exists}`);
+            console.log(`Checking if dataset exists: '${datasetId}': ${exists}`);
         }
         return exists;
     }
@@ -154,6 +161,14 @@ class BigQueryUtil {
      */
     async getDatasets() {
         return this.bigqueryClient.getDatasets();
+    }
+
+    /**
+     * @param  {} datasetId
+     * @param  {} options
+     */
+    getDataset(datasetId, options) {
+        return this.bigqueryClient.dataset(datasetId, options);
     }
 
     /**
@@ -278,15 +293,24 @@ class BigQueryUtil {
      * @param  {} datasetId
      * @param  {} tableId
      */
-    async deleteTable(datasetId, tableId) {
-        await this.bigqueryClient
+    async deleteTable(datasetId, tableId, ignoreError) {
+        return this.bigqueryClient
             .dataset(datasetId)
             .table(tableId)
-            .delete();
-
-        if (this.VERBOSE_MODE) {
-            console.log(`Table ${tableId} deleted`);
-        }
+            .delete()
+            .then((response) => {
+                if (this.VERBOSE_MODE) {
+                    console.log(`Table ${tableId} deleted`);
+                }
+                return true;
+            })
+            .catch((reason) => {
+                console.log(`Error deleting table ${tableId}: ${reason}`);
+                if (!ignoreError) {
+                    throw reason;
+                }
+                return false;
+            });
     }
 
     /**
@@ -407,14 +431,23 @@ class BigQueryUtil {
     /**
      * @param  {} datasetId
      */
-    async deleteDataset(datasetId) {
-        await this.bigqueryClient
+    async deleteDataset(datasetId, ignoreError) {
+        return this.bigqueryClient
             .dataset(datasetId)
-            .delete({ force: true });
-
-        if (this.VERBOSE_MODE) {
-            console.log(`Dataset ${datasetId} deleted`);
-        }
+            .delete({ force: true })
+            .then((response) => {
+                if (this.VERBOSE_MODE) {
+                    console.log(`Dataset ${datasetId} deleted`);
+                }
+                return true;
+            })
+            .catch((reason) => {
+                console.log(`Error deleting dataset ${datasetId}: ${reason}`);
+                if (!ignoreError) {
+                    throw reason;
+                }
+                return false;
+            });
     }
 
     /**
@@ -475,7 +508,7 @@ class BigQueryUtil {
     async insertRows(datasetId, tableId, rows) {
         const dataset = this.bigqueryClient.dataset(datasetId);
         const table = dataset.table(tableId);
-        await table.insert(rows);
+        return table.insert(rows);
     }
 }
 

@@ -22,7 +22,6 @@ let bigqueryUtil;
 const configUtil = require("./configUtil");
 const sqlBuilder = require("./sqlBuilder");
 const runtimeConfiguration = require("./runtimeConfiguration");
-const YAML = require('yaml');
 const Validator = require('jsonschema').Validator;
 
 const IssueType = {
@@ -646,32 +645,6 @@ async function areAllColumnsAvailable(columns, dataset, table, message) {
     return missingColumns;
 }
 
-/**
- * @param  {} str
- */
-function isJsonString(str) {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
-}
-
-/**
- * @param  {} str
- */
-function isYamlString(str) {
-    try {
-        YAML.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
-}
-
 module.exports = {
-    validate,
-    isJsonString,
-    isYamlString
+    validate
 };

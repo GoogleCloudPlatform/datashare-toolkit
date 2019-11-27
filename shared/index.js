@@ -18,10 +18,12 @@ const bigqueryUtil = require("./bigqueryUtil");
 const cloudFunctionUtil = require("./cloudFunctionUtil");
 const pubSubUtil = require("./pubSubUtil");
 const storageUtil = require("./storageUtil");
+const commonUtil = require("./commonUtil");
 
 module.exports = {
     BigQueryUtil: bigqueryUtil,
     CloudFunctionUtil: cloudFunctionUtil,
     PubSubUtil: pubSubUtil,
-    StorageUtil: storageUtil
+    StorageUtil: storageUtil,
+    CommonUtil: commonUtil
 };

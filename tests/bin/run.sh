@@ -69,8 +69,8 @@ main() {
     fi
 
     echo "Copying schema and transform files to ${BUCKET}"
-    gsutil cp ${SCHEMA} ${BUCKET}/bqds/${TABLE}.schema.json
-    gsutil cp ${TRANSFORM} ${BUCKET}/bqds/${TABLE}.transform.sql
+    gsutil cp ${SCHEMA} ${BUCKET}/bqds/${DATASET}/${TABLE}/config/schema.json
+    gsutil cp ${TRANSFORM} ${BUCKET}/bqds/${DATASET}/${TABLE}/config/transform.sql
 
     echo "Deploying cloud function: ${FUNCTION_NAME}"
     cd ${FUNCTION_DIR}
@@ -82,8 +82,8 @@ main() {
     fi
 
     cd ${DATADIR}
-    echo "Copying testing data ${UPLOAD} to ${BUCKET}/${DATASET}.${TABLE}.${RANDO}.$(basename ${UPLOAD})"
-    gsutil cp ${UPLOAD} ${BUCKET}/${DATASET}.${TABLE}.${RANDO}.$(basename ${UPLOAD})
+    echo "Copying testing data ${UPLOAD} to ${BUCKET}/bqds/${DATASET}/${TABLE}/data/${DATASET}.${TABLE}.${RANDO}.$(basename ${UPLOAD})"
+    gsutil cp ${UPLOAD} ${BUCKET}/bqds/${DATASET}/${TABLE}/data/${DATASET}.${TABLE}.${RANDO}.$(basename ${UPLOAD})
 
     # TODO: wait some time until upload is done?
     # TODO: tail StackDriver logs to check for progress?

@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-const argv = require('minimist')(process.argv.slice(2));
-process.env.UNIT_TESTS = true;
+/* eslint-disable promise/always-return */
+/* eslint-disable promise/catch-or-return */
 
-if (argv.verbose) {
-    process.env.VERBOSE_MODE = true;
-}
+const { argv, uuidv4 } = require('./testSetup');
 
-console.log(`Command arguments: ${JSON.stringify(argv)}`);
+const assert = require('assert');
+const chai = require('chai'), expect = chai.expect, should = chai.should();
+const chaiAsPromised = require('chai-as-promised');
+chai.use(chaiAsPromised);
 
-if (argv.runCloudTests && !argv.projectId) {
-    console.log("projectId must be provided when runCloudTests is enabled");
-    process.exit(1);
-}
+const CloudFunctionUtil = require("../cloudFunctionUtil");
+const cloudFunctionUtil = new CloudFunctionUtil();
 
-// Needs to be set to mimic environmental variable set by cloud function invocation and used within ingestion.
-process.env.GCP_PROJECT = argv.projectId;
-
-const uuidv4 = require('uuid/v4');
-
-module.exports = {
-    argv,
-    uuidv4
-};
+it("batchId has 4 parts", () => {
+    expect(cloudFunctionUtil.generateBatchId("eventId", "bucketName", "fileName.csv").split(":").length).is.equal(4);
+});

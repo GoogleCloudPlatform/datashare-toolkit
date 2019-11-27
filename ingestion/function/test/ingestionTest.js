@@ -18,6 +18,11 @@
 /* eslint-disable promise/catch-or-return */
 
 const { argv, uuidv4 } = require('./testSetup');
+const { BigQueryUtil, StorageUtil } = require('bqds-shared');
+const storageUtil = new StorageUtil();
+const bigqueryUtil = new BigQueryUtil(argv.projectId);
+const fs = require('fs');
+const path = require('path');
 
 const assert = require('assert');
 const chai = require('chai'), expect = chai.expect, should = chai.should();
@@ -25,6 +30,9 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const ingestion = require("../index");
+const configManager = require('../configurationManager');
+const uuid = uuidv4().replace(/-/gi, '');
+const bucketName = "bqds-unit-tests";
 
 it("getExceptionString empty dictionary", () => {
     const e = {};
@@ -36,33 +44,91 @@ it("getExceptionString empty string", () => {
     expect(ingestion.getExceptionString(e)).is.equal('""');
 });
 
-it("get filename from path", () => {
-    const file = "/path/my-test_file.txt";
-    expect(ingestion.getDestination(file)).is.equal("my-test_file.txt");
+it("get bucket uri", () => {
+    const options = {
+        eventId: 1,
+        bucketName: "myBucket",
+        fileName: "myFile.txt"
+    };
+    expect(ingestion.getBucketName(options)).is.equal("gs://myBucket/myFile.txt");
 });
 
-it("checking metadata defaults with no values provided", () => {
-    const dict = { metadata: {} };
-    const expected = {
-        sourceFormat: "CSV",
-        skipLeadingRows: 1,
-        maxBadRecords: 0
-    };
-    expect(ingestion.setMetadataDefaults(dict)).is.eql(expected);
-});
+if (argv.runCloudTests) {
+    it("function integration test", async () => {
+        const datasetName = `${uuid}`;
+        const tableName = "observation";
 
-it("checking metadata defaults with values provided", () => {
-    const dict = {
-        metadata: {
-            sourceFormat: "JSON",
-            skipLeadingRows: 2,
-            maxBadRecords: 1
-        }
-    };
-    const expected = {
-        sourceFormat: "JSON",
-        skipLeadingRows: 2,
-        maxBadRecords: 1
-    };
-    expect(ingestion.setMetadataDefaults(dict)).is.eql(expected);
-});
+        let schemaBucketFile = `bqds/${datasetName}/${tableName}/config/${uuid}_observation.schema.json`;
+        let sqlBucketFile = `bqds/${datasetName}/${tableName}/config/${uuid}_observation.transform.sql`;
+        let dataBucketFile = `bqds/${datasetName}/${tableName}/data/${uuid}_weather.observation.csv`;
+
+        let schemaFileCreated = false;
+        let sqlFileCreated = false;
+        let dataFileCreated = false;
+
+        const schemaFile = path.join("..", "..", "tests", "config", "observation.schema.json");
+        const schemaContent = fs.readFileSync(schemaFile);
+        let schemaBuf = Buffer.from(schemaContent);
+
+        return storageUtil.createFile(bucketName, schemaBucketFile, schemaBuf).then(() => {
+            schemaFileCreated = true;
+            const sqlFile = path.join("..", "..", "tests", "config", "observation.transform.sql");
+            const sqlContent = fs.readFileSync(sqlFile);
+            let sqlBuf = Buffer.from(sqlContent);
+            return storageUtil.createFile(bucketName, sqlBucketFile, sqlBuf);
+        }).then(() => {
+            sqlFileCreated = true;
+            const dataFile = path.join("..", "..", "tests", "data", "weather.observation.csv");
+            const dataContent = fs.readFileSync(dataFile);
+            let dataBuf = Buffer.from(dataContent);
+            return storageUtil.createFile(bucketName, dataBucketFile, dataBuf);
+        }).then(() => {
+            dataFileCreated = true;
+        }).catch((reason) => {
+            expect.fail(`Failed to save files to Cloud Storage: ${reason}`);
+        }).then(() => {
+            if (dataFileCreated === true) {
+                const options = {
+                    eventId: uuid,
+                    bucketName: bucketName,
+                    fileName: dataBucketFile
+                };
+                return ingestion.processFile(options);
+            }
+            else {
+                return false;
+            }
+        }).then((result) => {
+            expect(result).to.be.true;
+        }).then(() => {
+            return bigqueryUtil.tableExists(datasetName, tableName);
+        }).then((result) => {
+            expect(result).to.be.true;
+        }).then(() => {
+            const options = { query: `select * from \`${datasetName}.${tableName}\`` };
+            return bigqueryUtil.executeQuerySync(options);
+        }).then((result) => {
+            const [rows] = result;
+            expect(rows.length).is.equal(100);
+        }).then(() => {
+            expect(bigqueryUtil.deleteDataset(datasetName, true)).to.eventually.be.true;
+        }).then(() => {
+            if (schemaFileCreated === true) {
+                expect(storageUtil.deleteFile(bucketName, schemaBucketFile, true)).to.eventually.be.true;
+            }
+        }).then(() => {
+            if (sqlFileCreated === true) {
+                expect(storageUtil.deleteFile(bucketName, sqlBucketFile, true)).to.eventually.be.true;
+            }
+        }).then(() => {
+            if (dataFileCreated === true) {
+                expect(storageUtil.deleteFile(bucketName, dataBucketFile, true)).to.eventually.be.true;
+            }
+        }).catch((reason) => {
+            console.log(`Exception: ${reason}`);
+            assert.fail(reason);
+        });
+
+        // TODO: Delete the folder instead of individual files.
+    });
+}

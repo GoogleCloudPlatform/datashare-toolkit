@@ -17,133 +17,160 @@
 'use strict';
 
 const { BigQueryUtil, CloudFunctionUtil, StorageUtil } = require('bqds-shared');
+const configManager = require('./configurationManager');
 const bigqueryUtil = new BigQueryUtil();
 const cloudFunctionUtil = new CloudFunctionUtil();
 const storageUtil = new StorageUtil();
-
-const { BigQuery } = require('@google-cloud/bigquery');
-const { Storage } = require('@google-cloud/storage');
-const bigqueryClient = new BigQuery();
-const storageClient = new Storage();
-const schemaFileName = "schema.json";
-const transformFileName = "transform.sql";
-const defaultTransformQuery = "*";
-const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
 const stagingTableExpiryDays = 2;
 const processPrefix = "bqds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
 let batchId;
+const archiveEnabled = process.env.ARCHIVE_FILES ? (process.env.ARCHIVE_FILES.toLowerCase() === "true") : false;
 
 /**
  * @param  {} event
  * @param  {} context
  */
 exports.processEvent = async (event, context) => {
-    batchId = cloudFunctionUtil.generateBatchId(event, context);
-    console.log(`Object notification arrived for gs://${event.bucket}/${event.name}, batchId is ${batchId}`);
+    console.log(`Event type: ${context.eventType}`);
+    await processTriggerEvent(event, context);
+};
 
-    if (cloudFunctionUtil.isExtensionSupported(event.name, acceptable, processPrefix)) {
-        const config = await getConfiguration(event, context);
-        const haveDataset = await bigqueryUtil.datasetExists(config.dataset);
-        if (!haveDataset) {
-            console.log(`Dataset ${config.dataset} not found, creating...`);
-            await bigqueryUtil.createDataset(config.dataset);
-            console.log(`Created dataset ${config.dataset}`);
-        } else {
-            console.log(`found dataset ${config.dataset}`);
-        }
-        try {
-            await stageFile(config);
-            await transform(config);
-            await bigqueryUtil.deleteTable(config.dataset, config.stagingTable);
-        } catch (exception) {
-            console.error(`Exception processing ${event.name}: ${getExceptionString(exception)}`);
-            return;
-        }
-    } else {
-        console.log("ignoring file " + event.name + ", exiting");
-    }
-    return;
+/**
+ * @param  {} request
+ * @param  {} response
+ */
+exports.processHttpEvent = async (request, response) => {
+    await processHttpEvent(request, response);
 };
 
 /**
  * @param  {} event
  * @param  {} context
+ * For Cloud Storage finalize trigger.
  */
-async function getConfiguration(event, context) {
-    const dest = getDestination(event.name).split('.');
-    const dataset = dest[0];
-    const destinationTable = dest[1];
-
-    const schemaConfig = await storageUtil.fetchFileContent(event.bucket, `${processPrefix}/${destinationTable}.${schemaFileName}`);
-    let config = {};
-    if (schemaConfig) {
-        // This will pull in the dictionary from the configuration file. IE: includes destination, metadata, truncate, etc.
-        config = JSON.parse(schemaConfig);
-
-        // Updates the configured metadata to create necessary default values.
-        config.metadata = setMetadataDefaults(config);
+async function processTriggerEvent(event, context) {
+    const options = {
+        eventId: context.eventId,
+        bucketName: event.bucket,
+        fileName: event.name
+    };
+    const result = await configManager.validateOptions(options);
+    if (!result.isValid) {
+        return false;
     }
-
-    // Runtime created properties
-    config.dataset = dataset;
-    config.destinationTable = destinationTable;
-    config.stagingTable = `TMP_${destinationTable}_${context.eventId}`;
-    config.sourceFile = event.name;
-    config.bucket = event.bucket;
-    config.eventId = context.eventId;
-
-    console.log("configuration: " + JSON.stringify(config));
-    return config;
+    const status = await processFile(options);
+    return status;
 }
 
 /**
- * Exceutes the sql transformation.
- * @param  {} config
+ * @param  {} request
+ * @param  {} response
+ * For local debugging.
  */
-async function transform(config) {
-    const transformQuery = await storageUtil.fetchFileContent(config.bucket,
-        `${processPrefix}/${config.destinationTable}.${transformFileName}`) || defaultTransformQuery;
-    // const dataset = bigqueryClient.dataset(config.dataset);
-    // const exists = await bigqueryUtil.tableExists(config.dataset, config.destinationTable);
-    // if (!exists) {
-    //     console.log(`creating table ${config.destinationTable} with ${config.metadata.fields}`);
-    //     await dataset.createTable(config.destinationTable, { schema: config.metadata.fields });
-    // }
-    const transform = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.dataset}.${config.stagingTable}\``;
-    console.log(`executing transform query: ${transform}`);
-    const job = await runTransform(config, transform);
-    console.log(`${job[0].metadata.id} ${job[0].metadata.statistics.query.statementType} ${job[0].metadata.configuration.jobType} ${job[0].metadata.status.state}`);
-    console.log("processing done");
+async function processHttpEvent(request, response) {
+    const options = request.body || {};
+    const result = await configManager.validateOptions(options);
+    if (!result.isValid) {
+        response.status(400).send({ errors: result.errors });
+        return;
+    }
+    const status = await processFile(options);
+    const statusCode = (status === true) ? 200 : 400;
+    response.status(statusCode).send();
     return;
 }
 
 /**
- * Loads data into BQ staging table.
+ * @param  {} options
+ */
+async function processFile(options) {
+    batchId = cloudFunctionUtil.generateBatchId(options.eventId, options.bucketName, options.fileName);
+    console.log(`processFile called for ${getBucketName(options)}, batchId is ${batchId}`);
+
+    const config = await configManager.getConfiguration(options);
+    const haveDataset = await bigqueryUtil.datasetExists(config.datasetId);
+    if (!haveDataset) {
+        console.log(`Dataset ${config.datasetId} not found, creating...`);
+        await bigqueryUtil.createDataset(config.datasetId);
+        console.log(`Created dataset ${config.datasetId}`);
+    } else {
+        console.log(`Found dataset ${config.datasetId}`);
+    }
+
+    let success = false;
+    try {
+        await stageFile(config);
+        await transform(config);
+        if (archiveEnabled === true) {
+            await storageUtil.moveFile(options.bucketName, config.sourceFile, config.bucketPath.archive);
+            console.log(`File '${config.sourceFile}' has been archived to: ${config.bucketPath.archive}`);
+        }
+        success = true;
+    }
+    catch (reason) {
+        console.error(`Exception processing ${options.fileName}: ${reason}`);
+    }
+    finally {
+        await bigqueryUtil.deleteTable(config.datasetId, config.stagingTable, true);
+    }
+    return success;
+}
+
+/**
  * @param  {} config
+ * Executes the SQL transformation.
+ */
+async function transform(config) {
+    const transformExists = await storageUtil.checkIfFileExists(config.bucket, config.bucketPath.transform);
+
+    let transformQuery = "*";
+    if (transformExists === true) {
+        transformQuery = await storageUtil.fetchFileContent(config.bucket, config.bucketPath.transform);
+    }
+    // Blocked by TODO(b/144032584): Destination tables not respecting nullable/required modes specified in schema.json.
+    // const dataset = bigqueryClient.dataset(config.datasetId);
+    // const exists = await bigqueryUtil.tableExists(config.datasetId, config.destinationTableId);
+    // if (!exists) {
+    //     console.log(`creating table ${config.destinationTableId} with ${config.metadata.fields}`);
+    //     await dataset.createTable(config.destinationTableId, { schema: config.metadata.fields });
+    // }
+    const query = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.datasetId}.${config.stagingTable}\``;
+    console.log(`executing transform query: ${query}`);
+    const [job] = await createTransformJob(config, query);
+    await job.getQueryResults({ maxApiCalls: 1, maxResults: 0 });
+    console.log(`Transform job: ${job.metadata.id} ${job.metadata.statistics.query.statementType} ${job.metadata.configuration.jobType} ${job.metadata.status.state}`);
+    return;
+}
+
+/**
+ * @param  {} config
+ * Loads data into BQ staging table.
  */
 async function stageFile(config) {
-    console.log(`using config ` + JSON.stringify(config));
-    const dataset = bigqueryClient.dataset(config.dataset);
+    console.log(`Using config ${JSON.stringify(config)}`);
+    const dataset = bigqueryUtil.getDataset(config.datasetId);
     let today = new Date();
     today.setDate(today.getDate() + stagingTableExpiryDays);
     const expiryTime = today.getTime();
-    console.log(`setting expirationTime for staging table to ${expiryTime}`);
+    console.log(`Setting expirationTime for staging table to ${expiryTime}`);
 
     const fields = (config.metadata && config.metadata.fields) || undefined;
+    let options = { expirationTime: expiryTime };
+    if (fields) {
+        options.schema = fields;
+    }
+    else {
+        options.autodetect = true;
+    }
 
-    const cfg = fields
-        ? { schema: fields, expirationTime: expiryTime }
-        : { autodetect: true, expirationTime: expiryTime };
-
-    await dataset.createTable(config.stagingTable, cfg);
-
+    await dataset.createTable(config.stagingTable, options);
     const table = dataset.table(config.stagingTable);
-    console.log(`created table ${config.stagingTable}`);
-    console.log(`executing load for ${config.sourceFile} with ` + JSON.stringify(config.metadata));
+    console.log(`Created table ${config.stagingTable}`);
+    console.log(`Executing load for ${config.sourceFile} with metadata: ${JSON.stringify(config.metadata)}`);
 
     try {
-        let [job] = await table.load(storageClient.bucket(config.bucket).file(config.sourceFile), config.metadata || { autodetect: true });
+        let [job] = await table.load(storageUtil.getBucket(config.bucket).file(config.sourceFile), config.metadata || { autodetect: true });
         console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
         return;
     } catch (ex) {
@@ -154,17 +181,17 @@ async function stageFile(config) {
 }
 
 /**
- * Creates query job for the transformation query.
  * @param  {} config
  * @param  {} query
+ * Creates query job for the transformation query.
  */
-async function runTransform(config, query) {
-    console.log("configuration for runTransform: " + JSON.stringify(config));
+async function createTransformJob(config, query) {
+    console.log(`Configuration for runTransform: ${JSON.stringify(config)}`);
     let options = {
         destinationTable: {
             projectId: process.env.GCP_PROJECT,
-            datasetId: config.dataset,
-            tableId: config.destinationTable
+            datasetId: config.datasetId,
+            tableId: config.destinationTableId
         },
         createDisposition: "CREATE_IF_NEEDED",
         writeDisposition: (config.truncate)
@@ -181,9 +208,9 @@ async function runTransform(config, query) {
         options.location = config.metadata.location;
     }
 
-    console.log("BigQuery options: " + JSON.stringify(options));
+    console.log(`BigQuery options: ${JSON.stringify(options)}`);
     try {
-        return await bigqueryClient.createQueryJob(options);
+        return bigqueryUtil.createQueryJob(options);
     } catch (exception) {
         console.error(`Exception encountered running transform: ${getExceptionString(exception)}`);
         logException(exception);
@@ -191,81 +218,47 @@ async function runTransform(config, query) {
     }
 }
 
+/**
+ * @param  {} exception
+ */
 function logException(exception) {
     const errors = exception.errors;
     if (errors && errors.length > 0) {
         for (let i = 0; i < errors.length; i++) {
             console.error('ERROR ' + (i + 1) + ": " + JSON.stringify(errors[i].message));
         }
-    } else {
-        console.error(`Exception thrown, but no error array was given: ${getExceptionString(exception)}`);
+    }
+    else {
+        console.error(`Exception thrown, but no error array was given: ${exception}`);
     }
 }
 
 /**
- * @param  {} dict
- * Sets the default metadata values if meta is provided.
+ * @param  {} options
  */
-function setMetadataDefaults(dict) {
-    let meta = dict.metadata;
-    if (!meta) {
-        console.log("No metadata found");
-        meta = {};
-    }
-
-    if (!meta.sourceFormat) {
-        meta.sourceFormat = 'CSV';
-    }
-
-    if (!meta.skipLeadingRows) {
-        meta.skipLeadingRows = 1;
-    }
-
-    if (!meta.maxBadRecords) {
-        meta.maxBadRecords = 0;
-    }
-
-    console.log("Using metadata: " + JSON.stringify(meta));
-    return meta;
-}
-
-/**
- * @param  {} fileName
- */
-function getDestination(fileName) {
-    let name = fileName.indexOf('/') >= 0 ?
-        fileName.substring(fileName.lastIndexOf('/') + 1) :
-        fileName;
-    const parts = name.split('.');
-    if (parts && parts.length > 0) {
-        return `${parts[0]}.${parts[1]}`;
-    }
-    return name;
+function getBucketName(options) {
+    return `gs://${options.bucketName}/${options.fileName}`;
 }
 
 /**
  * @param  {} exception
  * Returns exception message in string format. Attempts to stringify JSON, if that's undefined, returns the exception as a string.
+ * TODO: This isn't working as expected. When a string is passed, it's returning {}.
+ * IE: TypeError: storageUtil.getBucket(...).file is not a function
  */
 function getExceptionString(exception) {
     let str = JSON.stringify(exception);
+    // Try to parse to json using JSON.parse, and only if returns true, then return the json string, otherwise return object.
     if (!str) {
         str = exception;
     }
     return str;
 }
 
-/**
- * @param  {} message
- */
-function log(message) {
-    console.log(JSON.stringify(message, undefined, 1));
-}
-
 if (process.env.UNIT_TESTS) {
     module.exports = {
         getExceptionString,
-        getDestination,
-        setMetadataDefaults
+        getBucketName,
+        processFile
     };
 }
