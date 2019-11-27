@@ -7,8 +7,8 @@ The dataset and table names were previously inferred from the name of the file p
 
 ## Synopsis
 
-`BQDS`'s entry point is through a Cloud Function that is listening for
-the [finalize event](https://cloud.google.com/functions/docs/calling/storage) in a Cloud Storage bucket. This function can be deployed to
+`BQDS`'s entry point is through a [Cloud Function](https://cloud.google.com/functions/) that is listening for
+the [finalize event](https://cloud.google.com/functions/docs/calling/storage) in a [Cloud Storage](https://cloud.google.com/storage/) bucket. This function can be deployed to
 a bucket of your choice using the deployment script in [bin/deploy.sh](bin/deploy.sh).
 
 An ingestion begins when a supported file type (```csv```, ```csv.gz```, ```txt```, ```avro``` or ```json```)  is discovered by the function through Google Cloud Functions'
