@@ -66,19 +66,19 @@ if (argv.runCloudTests) {
         let sqlFileCreated = false;
         let dataFileCreated = false;
 
-        const schemaFile = path.join("..", "..", "tests", "config", "observation.schema.json");
+        const schemaFile = path.join(__dirname, "config", "observation.schema.json");
         const schemaContent = fs.readFileSync(schemaFile);
         let schemaBuf = Buffer.from(schemaContent);
 
         return storageUtil.createFile(bucketName, schemaBucketFile, schemaBuf).then(() => {
             schemaFileCreated = true;
-            const sqlFile = path.join("..", "..", "tests", "config", "observation.transform.sql");
+            const sqlFile = path.join(__dirname, "config", "observation.transform.sql");
             const sqlContent = fs.readFileSync(sqlFile);
             let sqlBuf = Buffer.from(sqlContent);
             return storageUtil.createFile(bucketName, sqlBucketFile, sqlBuf);
         }).then(() => {
             sqlFileCreated = true;
-            const dataFile = path.join("..", "..", "tests", "data", "weather.observation.csv");
+            const dataFile = path.join(__dirname, "data", "weather.observation.csv");
             const dataContent = fs.readFileSync(dataFile);
             let dataBuf = Buffer.from(dataContent);
             return storageUtil.createFile(bucketName, dataBucketFile, dataBuf);
