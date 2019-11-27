@@ -163,7 +163,7 @@ contents of ```transform.sql``` and not explicitly as it is
 for the temporary table staging the CSV file.
 
 Configuration files are placed in the
-```/bqds/<datasource-name>/<table-name>/config/` subdirectory of the source
+```/bqds/\<datasource-name\>/\<table-name\>/config/` subdirectory of the source
 bucket. They are recognized by the Cloud Function as special, so it
 won't treat them as normal data files to process. They can be copied to the source bucket with this command:
 
@@ -180,7 +180,7 @@ format.
 If the schema is not available in advance, the
 data can be autodetected and, in the worst case scenario, be staged
 with all columns representing ```STRING```s. In this case, you can
-author a ```<table>..transform.sql``` with SQL-based transformations
+author a ```transform.sql``` with SQL-based transformations
 into the target state.
 
 Assume a file with the following format:
