@@ -84,7 +84,7 @@ transformation from the originally specified schema. If the
 
 The content within ```schema.json``` is a JSON object representation. The
 ```metadata``` property is identical in format to BigQuery's JSON-based
-[schema representation ](https://cloud.google.com/bigquery/docs/schemas). The ```delimiter``` property specifies the single character
+[JobConfigurationLoad](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad). The ```delimiter``` property specifies the single character
 used to delimit columns in each row of the CSV file. An example
 ```/bqds/DS/EXAMPLE/config/schema.json```  might resemble:
 
