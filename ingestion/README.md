@@ -20,7 +20,7 @@ A summary of the logic within the function is:
 2. Extract the dataset and table names from the bucket's inbound file
    `data` path, determined by the second and third path components of the file name e.g. `/bqds/mydataset/mytable/data/upload.1.csv`.
 3. Determine whether the dataset exists and, if not, create it.
-4. Look for `schema.json` under the bucket's `/bqds/mydataset/mytable/config/` directory to get the delimiter, field definitions, and write disposition for the upload. If these do not exist, instruct the BigQuery job to auto-detect the schema and delimiter, and apply `WRITE_APPEND` as the write disposition.
+4. Look for `schema.json` under the bucket's `/bqds/mydataset/mytable/config/` directory to get the delimiter, field definitions, and write disposition for the upload. If these do not exist, instruct the BigQuery job to [auto-detect](https://cloud.google.com/bigquery/docs/schema-detect) the schema and delimiter, and apply `WRITE_APPEND` as the write disposition.
 5. Execute a BigQuery job to load the file's contents into a temporary table
 6. Execute SQL that uses the `SELECT` clause specified
    in `/bqds/mydataset/mytable/config/transform.sql` (or the null transform `*`), and save the results (creating or appending, depending on the write disposition chosen) into the specified destination table.
