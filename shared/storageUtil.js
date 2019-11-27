@@ -39,7 +39,7 @@ class StorageUtil {
      * @param  {string} fileName
      * @param  {buffer} contents
      * @param  {Object} options https://cloud.google.com/nodejs/docs/reference/storage/2.5.x/global.html#CreateWriteStreamOptions
-     * Creates a file in Cloud Storage and return true/false or signedUrl.
+     * Creates a file in Cloud Storage and return true/false;
      */
     async createFile(bucketName, fileName, contents, options) {
         const bucket = this.storage.bucket(bucketName);
@@ -120,14 +120,6 @@ class StorageUtil {
 
     /**
      * @param  {string} bucketName
-     * @param  {Object} options
-     */
-    getBucket(bucketName, options) {
-        return this.storage.bucket(bucketName, options);
-    }
-
-    /**
-     * @param  {string} bucketName
      * @param  {string} fileName
      * @param  {Object} fileMetadata https://googleapis.dev/nodejs/storage/latest/File.html#setMetadata
      * Updates the file metadata in GCP storage and return true.
@@ -167,6 +159,7 @@ class StorageUtil {
      * @param  {string} bucketName
      * @param  {string} sourceFile
      * @param  {string} destinationFile
+     * move a file to a new name in the same bucket and return true/false.
      */
     async moveFile(bucketName, sourceFile, destinationFile) {
         return this.storage
@@ -177,7 +170,10 @@ class StorageUtil {
                 if (this.VERBOSE_MODE) {
                     console.log(`gs://${bucketName}/${sourceFile} moved to gs://${bucketName}/${destinationFile}.`);
                 }
-                return result;
+                return true;
+            }).catch((err) => {
+                console.warn(err.message);
+                throw err;
             });
     }
 

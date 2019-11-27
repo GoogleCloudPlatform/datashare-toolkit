@@ -124,6 +124,23 @@ describe('StorageUtil', () => {
                 });
             });
 
+            context('moveFile with arguments', () => {
+                it("should return true", async () => {
+                    const tempFileName = 'temp_file_name';
+                    await storageUtil.moveFile(uuid, uuid, tempFileName).then((result) => {
+                        expect(result).to.be.a('boolean');
+                        expect(result).to.equal(true);
+                    }).then(() => {
+                        return storageUtil.moveFile(uuid, tempFileName, uuid);
+                    }).then((result) => {
+                        expect(result).to.be.a('boolean');
+                        expect(result).to.equal(true);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
+                });
+            });
+
             context('getFileMetadata with arguments', () => {
                 it("should return object", async () => {
                     await storageUtil.getFileMetadata(uuid, uuid).then((result) => {
