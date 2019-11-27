@@ -2,38 +2,29 @@
 
 # Ingestion Cloud Function for batch data uploads
 
+## **Breaking Changes in v0.2.0.**
+The dataset and table names were previously inferred from the name of the file placed into the `/bqds` directory, IE: `mydataset.mytable.upload.1.csv`. This has been changed and the dataset and table names are now inferred from the file path. IE: `/bqds/mydataset/mytable/data/upload.1.csv`. The ingestion function will only process files from the path starting with `/bqds` where the subsequent two path components are dataset and table respectively, followed by `data`. Data files to be processed should always be delivered into the dataset and table names respective `data` directory.
+
 ## Synopsis
 
 `BQDS`'s entry point is through a Cloud Function that is listening for
-finalize events in a Cloud Storage bucket. This function can be deployed to
+the [finalize event](https://cloud.google.com/functions/docs/calling/storage) in a Cloud Storage bucket. This function can be deployed to
 a bucket of your choice using the deployment script in [bin/deploy.sh](bin/deploy.sh).
 
-An ingestion begins when a supported file type (```csv```,
-```csv.gz```, ```txt```, ```avro``` or ```json```)  is discovered by
-the function through Google Cloud Functions'
-[bucket trigger mechanism](https://cloud.google.com/functions/docs/calling/storage). When
-the function is invoked, it looks in the same bucket (within the ```bqds``` subdirectory) for
-[schema and transform](../examples/mlb/config/ingestion) configurations corresponding to the name of the
-uploaded file. It then executes a series of  BigQuery actions to transform and load the data into the
-specified destination BigQuery dataset and table for that file.
+An ingestion begins when a supported file type (```csv```, ```csv.gz```, ```txt```, ```avro``` or ```json```)  is discovered by the function through Google Cloud Functions'
+[bucket trigger mechanism](https://cloud.google.com/functions/docs/calling/storage). When the function is invoked, it looks in the same bucket (within the ```../config``` directory relative to the ```data``` directory) for [schema and transform](../examples/mlb/config/ingestion) configurations corresponding to the name of the uploaded file. It then executes a series of BigQuery actions to transform and load the data into the specified destination BigQuery dataset and table for that file.
 
 A summary of the logic within the function is:
 
-0. If the file extension is of a recognized file type -
-1. Extract the dataset and table names from the bucket's inbound file
-   name, determined by the first two tokens of the file name delimited by `.` , e.g. `mydataset.mytable.upload.1.csv`
-2. Determine whether the dataset exists and, if not, create it
-3. Look for `<mytable>.schema.json` under the bucket's `/bqds`
-   subdirectory to get the delimiter, field
-   definitions, and write disposition for the upload. If it these do not exist, instruct the BigQuery job to
-   auto-detect the schema and delimiter, and apply `WRITE_APPEND` as the
-   write disposition
-4. Execute a BigQuery job to load the file's contents into a temporary table
+1. If the file extension is of a recognized file type ->
+2. Extract the dataset and table names from the bucket's inbound file
+   `data` path, determined by the second and third path components of the file name e.g. `/bqds/mydataset/mytable/data/upload.1.csv`.
+3. Determine whether the dataset exists and, if not, create it.
+4. Look for `schema.json` under the bucket's `/bqds/mydataset/mytable/config/` directory to get the delimiter, field definitions, and write disposition for the upload. If these do not exist, instruct the BigQuery job to auto-detect the schema and delimiter, and apply `WRITE_APPEND` as the write disposition.
+5. Execute a BigQuery job to load the file's contents into a temporary table
 6. Execute SQL that uses the `SELECT` clause specified
-   in`<mytable>.transform.sql` (or the null transform`*`), and save the
-   results (creating or appending, depending on the write disposition chosen) into the specified destination table
-7. Delete the temporary table after a successful transformation
-   stage (temporary tables otherwise expire in 2 days).
+   in `/bqds/mydataset/mytable/config/transform.sql` (or the null transform `*`), and save the results (creating or appending, depending on the write disposition chosen) into the specified destination table.
+7. Delete the temporary table after a successful transformation stage (temporary tables otherwise expire in 2 days).
    
 ## Ingestion architecture
 
