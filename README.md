@@ -3,6 +3,9 @@
 
 _This is not an officially supported Google product._
 
+## Breaking Changes in v0.2.0.
+__There are breaking changes introduced in v0.2.0 related to the storage bucket directory structure used by the ingestion function. For further information see [ingestion](/ingestion/README.md).__
+
 The ```BigQuery Datashare Toolkit (BQDS)``` is a solution for data publishers to easily manage datasets residing within [BigQuery](https://cloud.google.com/bigquery/). The toolkit includes functionality to ingest and entitle data, relieving consumers from much of the toil involved in onboarding datasets from a variety of providers. Publishers upload data files to a storage bucket and allocate permissioned datasets using BigQuery [authorized views](https://cloud.google.com/bigquery/docs/authorized-views). This results in less friction for both publishers and consumers.
 
 While ```BQDS``` is used for data management and entitlement, it does *not* manage any commercial aspects of delivery. Hence, it is assumed that publishers already have licensing arrangements and that consumers have furnished you the GCP account ID's corresponding to their entitled users. These are required for the creation of the authorized views within BigQuery.
