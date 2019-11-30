@@ -48,11 +48,11 @@ all changes to the bucket, but will exit if the file extension is not
 supported or if validation fails. When it detects a supported file extension,
 it parses the file path to determine the destination BigQuery
 dataset and table in which to load the data. For example, if you wish
-to target dataset ```DS``` and table ```EXAMPLE```, files uploaded to
+to target dataset ```shareddataset``` and table ```EXAMPLE```, files uploaded to
 your storage bucket (```gs://example-bucket/```) are placed into the following paths:
 
-- ```gs://example-bucket/DS/EXAMPLE/data/data.csv``` (if uncompressed).
-- ```gs://example-bucket/DS/EXAMPLE/data/data.csv.gz``` (if compressed).
+- ```gs://example-bucket/bqds/shareddataset/EXAMPLE/data/data.csv``` (if uncompressed).
+- ```gs://example-bucket/bqds/shareddataset/EXAMPLE/data/data.csv.gz``` (if compressed).
 
 The Cloud Function will time out after *540* seconds of execution. Depending on the size of your files, it may not be possible to completely ingest very large files completely before this timeout threshold is crossed. If you encounter this condition, consider splitting up large files into smaller
 ones (each no larger than 1-1.5G) to upload and process individually.
@@ -86,7 +86,7 @@ The content within ```schema.json``` is a JSON object representation. The
 ```metadata``` property is identical in format to BigQuery's JSON-based
 [JobConfigurationLoad](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad). The ```fieldDelimiter``` property specifies the single character
 used to delimit columns in each row of the CSV file. An example
-```/bqds/DS/EXAMPLE/config/schema.json```  might resemble:
+```/bqds/shareddataset/EXAMPLE/config/schema.json```  might resemble:
 
 ```
 {
@@ -106,7 +106,7 @@ For a `WRITE_APPEND` disposition, simply omit `truncate: "true"` from
 the configuration.
 
 A file using this schema, and being uploaded into dataset `DS` and
-table `EXAMPLE` data in ```/bqds/DS/EXAMPLE/data/20201102.csv``` might resemble:
+table `EXAMPLE` data in ```/bqds/shareddataset/EXAMPLE/data/20201102.csv``` might resemble:
 
 
 |ts_ms|object|weight|unit_of_measurement|
@@ -123,10 +123,10 @@ integer. However, ```YYYYMMDD```, if defined as a DATE in BigQuery
 will fail to process, since BigQuery only interprets string DATEs in the format `YYYY-MM-DD`.
 
 Provided that you ultimately want the data represented as a DATE type,
-the source data destined for ```DS.EXAMPLE``` requires transformation from
+the source data destined for ```shareddataset.EXAMPLE``` requires transformation from
 the original data file schemas. These per-column transformations are
 specified in ```transform.sql``` (stored witin the source
-bucket's ```/bqds/DS/EXAMPLE/config/` subdirectory).
+bucket's ```/bqds/shareddataset/EXAMPLE/config/` subdirectory).
 
 The format of ```transform.sql``` is simply a SQL fragment
 that queries the original schema, either auto-detected or defined by
@@ -135,7 +135,7 @@ fragment is essentially the ```SELECT``` clause (including aggregate
 or synthetic columns) of a statement that queries the temporary table,
 but omitting the literal ```SELECT``` and everything following and inclusive of the ```WHERE``` clause of the query.
 
-For example, if we wanted ```DS.EXAMPLE``` to query the timestamp as a
+For example, if we wanted ```shareddataset.EXAMPLE``` to query the timestamp as a
 SQL ```TIMESTAMP``` instead of the ```INTEGER```  being
 auto-detected into the temporary tale, yet leave all other columns the same,
 the SQL statement would be:
@@ -158,16 +158,16 @@ weight,
 unit_of_measurement
 ```
 
-Hence, ```DS.EXAMPLE```'s  ultimate schema is inferred at runtime by the
+Hence, ```shareddataset.EXAMPLE```'s  ultimate schema is inferred at runtime by the
 contents of ```transform.sql``` and not explicitly as it is
 for the temporary table staging the CSV file.
 
 Configuration files are placed in the
-```/bqds/\<datasource-name\>/\<table-name\>/config/` subdirectory of the source
+```/bqds/\<dataset-name\>/\<table-name\>/config/` subdirectory of the source
 bucket. They are recognized by the Cloud Function as special, so it
 won't treat them as normal data files to process. They can be copied to the source bucket with this command:
 
-```gsutil cp schema.json transform.sql gs://bqds/<datasource-name>/<table-name>/config/```
+```gsutil cp schema.json transform.sql gs://${BUCKET}/bqds/<dataset-name>/<table-name>/config/```
 
 ## Transformation options
 
