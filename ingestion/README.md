@@ -2,38 +2,29 @@
 
 # Ingestion Cloud Function for batch data uploads
 
+## **Breaking Changes in v0.2.0.**
+The dataset and table names were previously inferred from the name of the file placed into the `/bqds` directory, IE: `mydataset.mytable.upload.1.csv`. This has been changed and the dataset and table names are now inferred from the file path. IE: `/bqds/mydataset/mytable/data/upload.1.csv`. The ingestion function will only process files from the path starting with `/bqds` where the subsequent two path components are dataset and table respectively, followed by `data`. Data files to be processed should always be delivered into the dataset and table names respective `data` directory.
+
 ## Synopsis
 
-`BQDS`'s entry point is through a Cloud Function that is listening for
-finalize events in a Cloud Storage bucket. This function can be deployed to
+`BQDS`'s entry point is through a [Cloud Function](https://cloud.google.com/functions/) that is listening for
+the [finalize event](https://cloud.google.com/functions/docs/calling/storage) in a [Cloud Storage](https://cloud.google.com/storage/) bucket. This function can be deployed to
 a bucket of your choice using the deployment script in [bin/deploy.sh](bin/deploy.sh).
 
-An ingestion begins when a supported file type (```csv```,
-```csv.gz```, ```txt```, ```avro``` or ```json```)  is discovered by
-the function through Google Cloud Functions'
-[bucket trigger mechanism](https://cloud.google.com/functions/docs/calling/storage). When
-the function is invoked, it looks in the same bucket (within the ```bqds``` subdirectory) for
-[schema and transform](../examples/mlb/config/ingestion) configurations corresponding to the name of the
-uploaded file. It then executes a series of  BigQuery actions to transform and load the data into the
-specified destination BigQuery dataset and table for that file.
+An ingestion begins when a supported file type (```csv```, ```csv.gz```, ```txt```, ```avro``` or ```json```)  is discovered by the function through Google Cloud Functions'
+[bucket trigger mechanism](https://cloud.google.com/functions/docs/calling/storage). When the function is invoked, it looks in the same bucket (within the ```../config``` directory relative to the ```data``` directory) for [schema and transform](../examples/mlb/config/ingestion) configurations corresponding to the name of the uploaded file. It then executes a series of BigQuery actions to transform and load the data into the specified destination BigQuery dataset and table for that file.
 
 A summary of the logic within the function is:
 
-0. If the file extension is of a recognized file type -
-1. Extract the dataset and table names from the bucket's inbound file
-   name, determined by the first two tokens of the file name delimited by `.` , e.g. `mydataset.mytable.upload.1.csv`
-2. Determine whether the dataset exists and, if not, create it
-3. Look for `<mytable>.schema.json` under the bucket's `/bqds`
-   subdirectory to get the delimiter, field
-   definitions, and write disposition for the upload. If it these do not exist, instruct the BigQuery job to
-   auto-detect the schema and delimiter, and apply `WRITE_APPEND` as the
-   write disposition
-4. Execute a BigQuery job to load the file's contents into a temporary table
+1. If the file extension is of a recognized file type ->
+2. Extract the dataset and table names from the bucket's inbound file
+   `data` path, determined by the second and third path components of the file name e.g. `/bqds/mydataset/mytable/data/upload.1.csv`.
+3. Determine whether the dataset exists and, if not, create it.
+4. Look for `schema.json` under the bucket's `/bqds/mydataset/mytable/config/` directory to get the delimiter, field definitions, and write disposition for the upload. If these do not exist, instruct the BigQuery job to [auto-detect](https://cloud.google.com/bigquery/docs/schema-detect) the schema and delimiter, and apply `WRITE_APPEND` as the write disposition.
+5. Execute a BigQuery job to load the file's contents into a temporary table
 6. Execute SQL that uses the `SELECT` clause specified
-   in`<mytable>.transform.sql` (or the null transform`*`), and save the
-   results (creating or appending, depending on the write disposition chosen) into the specified destination table
-7. Delete the temporary table after a successful transformation
-   stage (temporary tables otherwise expire in 2 days).
+   in `/bqds/mydataset/mytable/config/transform.sql` (or the null transform `*`), and save the results (creating or appending, depending on the write disposition chosen) into the specified destination table.
+7. Delete the temporary table after a successful transformation stage (temporary tables otherwise expire in 2 days).
    
 ## Ingestion architecture
 
@@ -41,36 +32,29 @@ A summary of the logic within the function is:
 
 ## Installation
 
-After cloning the repository, this command will attach the Cloud Function to a storage
-bucket of your choosing:
+After cloning the repository, this command will attach the Cloud Function to a storage bucket of your choosing:
 
 ```
 cd bq-datashare-toolkit/ingestion/bin
 ./deploy.sh --trigger-bucket=gs://<mybucket>
 ```
 At this point, any files uploaded to that bucket will trigger the
-Cloud Function, but only files of a recognized type will be
-processed. Unrecognized files, and any files placed in the bucket's `bqds`
-subdirectory, will be ignored.
+Cloud Function, but only files of a recognized type will be processed. Unrecognized files or any other directory at the root level of the bucket will be ignored.
 
 ## Specifications for uploaded files
 
 The ingestion Cloud Function ```processUpload``` will be triggered upon
 all changes to the bucket, but will exit if the file extension is not
-supported. When it detects a supported file extension,
-it parses the file name to determine the destination BigQuery
+supported or if validation fails. When it detects a supported file extension,
+it parses the file path to determine the destination BigQuery
 dataset and table in which to load the data. For example, if you wish
-to target dataset ```DS``` and table ```EXAMPLE```, files uploaded to
-your storage bucket (```gs://example-bucket/```) are named:
+to target dataset ```shareddataset``` and table ```EXAMPLE```, files uploaded to
+your storage bucket (```gs://example-bucket/```) are placed into the following paths:
 
-- ```DS.EXAMPLE.csv``` (if uncompressed).
-- ```DS.EXAMPLE.csv.gz``` (if compressed).
+- ```gs://example-bucket/bqds/shareddataset/EXAMPLE/data/data.csv``` (if uncompressed).
+- ```gs://example-bucket/bqds/shareddataset/EXAMPLE/data/data.csv.gz``` (if compressed).
 
-The Cloud Function will time out after *540*
-seconds of execution. Depending on the size of your files, it
-may not be possible to completely ingest very large files completely before this
-timeout threshold is crossed. If you encounter this condition,
-consider splitting up large files into smaller
+The Cloud Function will time out after *540* seconds of execution. Depending on the size of your files, it may not be possible to completely ingest very large files completely before this timeout threshold is crossed. If you encounter this condition, consider splitting up large files into smaller
 ones (each no larger than 1-1.5G) to upload and process individually.
 
 ## Configuration
@@ -82,30 +66,27 @@ files stored in the same Cloud Storage bucket as the data being
 uploaded.
 
 The first stage uses a file named according to the convention
-`gs://bucket/bqds/<table-name>.schema.json`. For `<table-name>`, this
-file specifies the field definitions corresponding to the file
-being uploaded, as well as the
-[write disposition](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/WriteDisposition)
+`gs://bucket/bqds/<dataset-name>/<table-name>/schema.json`. For `schema.json`, this file specifies the field definitions corresponding to the file
+being uploaded, as well as the [write disposition](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/WriteDisposition)
 to be used in ingesting the file.
 
-If the target BigQuery dataset (as inferred from the file name) does not exist, it will be created.
+If the target BigQuery dataset (as inferred from the file path) does not exist it will be created.
 
 Tables not found will also be created and seeded with the initial
 transformed file contents. Subsequent updates to the same target will
 append its rows if the table is found, unless you have specified
 `truncate: true` in your `schema.json`.
 
-If there is no ```EXAMPLE.transform.sql``` file,
+If there is no ```transform.sql``` file in the `/config` directory,
 the function willl default to ```*```, which signifies *no*
 transformation from the originally specified schema. If the 
-```EXAMPLE.schema.json``` file is omitted, BigQuery
-will attempt to autodetect the schema from the file contents.
+```schema.json``` file is omitted, BigQuery will attempt to autodetect the schema from the file contents.
 
-The content within ```EXAMPLE.schema.json``` is a JSON object representation. The
+The content within ```schema.json``` is a JSON object representation. The
 ```metadata``` property is identical in format to BigQuery's JSON-based
-[schema representation ](https://cloud.google.com/bigquery/docs/schemas). The ```delimiter``` property specifies the single character
+[JobConfigurationLoad](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad). The ```fieldDelimiter``` property specifies the single character
 used to delimit columns in each row of the CSV file. An example
-```.schema.json```  might resemble:
+```/bqds/shareddataset/EXAMPLE/config/schema.json```  might resemble:
 
 ```
 {
@@ -125,7 +106,7 @@ For a `WRITE_APPEND` disposition, simply omit `truncate: "true"` from
 the configuration.
 
 A file using this schema, and being uploaded into dataset `DS` and
-table `EXAMPLE` data in ```DS.EXAMPLE.20201102.csv``` might resemble:
+table `EXAMPLE` data in ```/bqds/shareddataset/EXAMPLE/data/20201102.csv``` might resemble:
 
 
 |ts_ms|object|weight|unit_of_measurement|
@@ -137,26 +118,24 @@ table `EXAMPLE` data in ```DS.EXAMPLE.20201102.csv``` might resemble:
 |1563543871232|liquid oxygen (1 gallon)|4.32|kg|
 
 
-You may find that you need a ```schema.json``` configuration if the autodetection
-by BigQuery does not yield expected results. For example, a column
-representing a date as ```YYYYMMDD``` is interpreted by BigQuery as an
+You may find that you need a ```schema.json``` configuration if the autodetection by BigQuery does not yield expected results. For example, a column representing a date as ```YYYYMMDD``` is interpreted by BigQuery as an
 integer. However, ```YYYYMMDD```, if defined as a DATE in BigQuery
 will fail to process, since BigQuery only interprets string DATEs in the format `YYYY-MM-DD`.
 
 Provided that you ultimately want the data represented as a DATE type,
-the source data destined for ```DS.EXAMPLE``` requires transformation from
+the source data destined for ```shareddataset.EXAMPLE``` requires transformation from
 the original data file schemas. These per-column transformations are
-specified in ```EXAMPLE.transform.sql``` (stored witin the source
-bucket's ```bqds``` subdirectory).
+specified in ```transform.sql``` (stored witin the source
+bucket's ```/bqds/shareddataset/EXAMPLE/config/` subdirectory).
 
-The format of ```EXAMPLE.transform.sql``` is simply a SQL fragment
+The format of ```transform.sql``` is simply a SQL fragment
 that queries the original schema, either auto-detected or defined by
-``` EXAMPLE.schema.json```. In ```EXAMPLE.transform.sql```, the SQL
+``` schema.json```. In ```transform.sql```, the SQL
 fragment is essentially the ```SELECT``` clause (including aggregate
 or synthetic columns) of a statement that queries the temporary table,
 but omitting the literal ```SELECT``` and everything following and inclusive of the ```WHERE``` clause of the query.
 
-For example, if we wanted ```DS.EXAMPLE``` to query the timestamp as a
+For example, if we wanted ```shareddataset.EXAMPLE``` to query the timestamp as a
 SQL ```TIMESTAMP``` instead of the ```INTEGER```  being
 auto-detected into the temporary tale, yet leave all other columns the same,
 the SQL statement would be:
@@ -170,7 +149,7 @@ SELECT
 FROM TMP_TABLE_76893023444
 ```
 
-The associated ```EXAMPLE.transform.sql``` would be:
+The associated ```transform.sql``` would be:
 
 ```
 TIMESTAMP_MILLIS(ts_ms) AS measurement_time,
@@ -179,29 +158,29 @@ weight,
 unit_of_measurement
 ```
 
-Hence, ```DS.EXAMPLE```'s  ultimate schema is inferred at runtime by the
-contents of ```EXAMPLE.transform.sql``` and not explicitly as it is
+Hence, ```shareddataset.EXAMPLE```'s  ultimate schema is inferred at runtime by the
+contents of ```transform.sql``` and not explicitly as it is
 for the temporary table staging the CSV file.
 
 Configuration files are placed in the
-```gs:.//example-bucket/bqds``` subdirectory of the source
+```/bqds/\<dataset-name\>/\<table-name\>/config/` subdirectory of the source
 bucket. They are recognized by the Cloud Function as special, so it
 won't treat them as normal data files to process. They can be copied to the source bucket with this command:
 
-```gsutil cp *.schema.json *.transform.sql gs://example-bucket/bqds/```
+```gsutil cp schema.json transform.sql gs://${BUCKET}/bqds/<dataset-name>/<table-name>/config/```
 
 ## Transformation options
 
 There are generally two ways of transforming data from the
 representation in your data file to the target representation that is
 available to consumers. If you know the schema in advance, you can author
-a ```<table>.schema.json``` file that embeds the schema in BigQuey
+a ```schema.json``` file that embeds the schema in BigQuey
 format.
 
 If the schema is not available in advance, the
 data can be autodetected and, in the worst case scenario, be staged
 with all columns representing ```STRING```s. In this case, you can
-author a ```<table>..transform.sql``` with SQL-based transformations
+author a ```transform.sql``` with SQL-based transformations
 into the target state.
 
 Assume a file with the following format:
@@ -212,7 +191,7 @@ Assume a file with the following format:
 |20211031|ZVZZT|4.19
 
 
-The ```fields``` array of ```closing_prices.schema.json``` for this might be:
+The ```fields``` array of ```schema.json``` for this might be:
 
 ```
 {"name": "date", "type": "string"},
@@ -233,7 +212,7 @@ type, but the integer representation requires a casting to
 ```STRING``` before running the ```SUBSTR``` function to further
 transform it into a
 ```DATE``` in the ultimate destination table's associated column. Two different
-```closing_prices.transform.sql``` configurations illustrate this:
+```transform.sql``` configurations illustrate this:
 
 ```
 -- as a STRING
