@@ -232,7 +232,7 @@ class StorageUtil {
     }
 
     getBucket(bucketName, options) {
-        return storage.bucket(bucketName, options);
+        return this.storage.bucket(bucketName, options);
     }
 }
 
