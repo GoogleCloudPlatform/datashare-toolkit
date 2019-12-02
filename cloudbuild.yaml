@@ -11,6 +11,9 @@ steps:
   dir: 'ingestion/function'
   entrypoint: 'npm'
   args: ['install']
+- name: 'ubuntu'
+  dir: 'shared'
+  args: ['ls', '-la', '/workspace', '/workspace/ciphertexts/client_secret.json.enc']
 - name: gcr.io/cloud-builders/gcloud
   dir: 'shared'
   args:
