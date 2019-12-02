@@ -230,6 +230,10 @@ class StorageUtil {
             return url[0];
         }
     }
+
+    getBucket(bucketName, options) {
+        return storage.bucket(bucketName, options);
+    }
 }
 
 module.exports = StorageUtil;
