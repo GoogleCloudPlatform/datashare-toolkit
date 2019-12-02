@@ -11,16 +11,13 @@ steps:
   dir: 'ingestion/function'
   entrypoint: 'npm'
   args: ['install']
-- name: 'ubuntu'
-  dir: 'shared'
-  args: ['ls', '-la', '/workspace', '/workspace/ciphertexts/client_secret.json.enc']
 - name: gcr.io/cloud-builders/gcloud
   dir: 'shared'
   args:
   - kms
   - decrypt
-  - --ciphertext-file=/workspace/ciphertexts/client_secret.json.enc
-  - --plaintext-file=/workspace/ciphertexts/client_secret.json
+  - --ciphertext-file=/workspace/shared/ciphertexts/client_secret.json.enc
+  - --plaintext-file=/workspace/shared/ciphertexts/client_secret.json
   - --location=global
   - --keyring=bqds-cloud-build-ring
   - --key=bqds-cloud-build
@@ -28,7 +25,7 @@ steps:
   dir: 'shared'
   entrypoint: 'npm'
   args: ['run', 'cloudtest']
-  env: ['GOOGLE_APPLICATION_CREDENTIALS=/workspace/ciphertexts/client_secret.json']
+  env: ['GOOGLE_APPLICATION_CREDENTIALS=/workspace/shared/ciphertexts/client_secret.json']
 - name: 'node:12.11.1'
   dir: 'entitlements/bqdsEntitlements'
   entrypoint: 'npm'
