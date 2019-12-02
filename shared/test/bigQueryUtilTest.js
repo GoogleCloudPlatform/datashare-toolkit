@@ -27,54 +27,134 @@ chai.use(chaiAsPromised);
 const BigQueryUtil = require("../bigqueryUtil");
 const bigqueryUtil = new BigQueryUtil(argv.projectId);
 
-if (argv.runCloudTests) {
-    it("execute query", async () => {
-        const options = { query: "select 1 union all select 2" };
-        const [rows] = await bigqueryUtil.executeQuerySync(options);
-        expect(rows.length).is.equal(2);
-    });
+describe('BigQueryUtil', () => {
 
-    it("query should be valid", async () => {
-        const query = "select 1 union all select 2";
-        return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.true;
-    });
+    if (argv.runCloudTests) {
 
-    it("query should be invalid", async () => {
-        const query = "Xselect 1";
-        return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.false;
-    });
+        context('executeQuerySync with arguments', () => {
+            it("execute query should return rows", async () => {
+                const options = { query: "select 1 union all select 2" };
+                const [rows] = await bigqueryUtil.executeQuerySync(options);
+                expect(rows.length).is.equal(2);
+            });
+        });
 
-    it("query should be valid with limit", async () => {
-        const query = "select 1 union all select 2 limit 10";
-        return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.true;
-    });
+        context('validateQuery with arguments', () => {
+            it("query should be valid", async () => {
+                const query = "select 1 union all select 2";
+                return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.true;
+            });
+        });
 
-    it("query should be invalid with limit", async () => {
-        const query = "Xselect 1 limit 10";
-        return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.false;
-    });
+        context('validateQuery with arguments', () => {
+            it("query should be invalid", async () => {
+                const query = "Xselect 1";
+                return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.false;
+            });
+        });
 
-    const uuid = uuidv4().replace(/-/g, "_");
-    const viewName = `v_${uuid}`;
+        context('validateQuery with arguments', () => {
+            it("query should be valid with limit", async () => {
+                const query = "select 1 union all select 2 limit 10";
+                return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.true;
+            });
+        });
 
-    const labelName = "bqds_configuration_name";
-    const labelValue = "unit_tests";
-    let labels = {};
-    labels[labelName] = labelValue;
+        context('validateQuery with arguments', () => {
+            it("query should be invalid with limit", async () => {
+                const query = "Xselect 1 limit 10";
+                return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.false;
+            });
+        });
 
-    it("create dataset, table, view, check for existence, and delete", async () => {
-        const options = { description: "description", labels: labels };
-        await bigqueryUtil.createDataset(uuid, options).then(() => {
-            return bigqueryUtil.datasetExists(uuid);
-        }).then((result) => {
-            expect(result).is.true;
-        }).then(() => {
-            return bigqueryUtil.getDatasetLabelValue(uuid, labelName);
-        }).then((result) => {
-            expect(result).is.equal(labelValue);
-        }).then(() => {
-            const options = {
+        context('validateQuery with arguments', () => {
+            it("query should be invalid with limit", async () => {
+                const query = "Xselect 1 limit 10";
+                return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.false;
+            });
+        });
+
+        const uuid = uuidv4().replace(/-/g, "_");
+        const viewName = `v_${uuid}`;
+
+        const labelName = "bqds_configuration_name";
+        const labelValue = "unit_tests";
+        let labels = {};
+        labels[labelName] = labelValue;
+
+        const datasetOptions = { description: "description", labels: labels };
+
+        context('createDataset with arguments', () => {
+            it("should succeed", async () => {
+                await bigqueryUtil.createDataset(uuid, datasetOptions).then(() => {
+                    return bigqueryUtil.deleteDataset(uuid);
+                }).catch((reason) => {
+                    expect.fail(`Failed: ${reason}`);
+                });
+            });
+        });
+
+        describe('Dataset created/deleted in pre/post setup', () => {
+
+            before(async () => {
+                await bigqueryUtil.createDataset(uuid, datasetOptions);
+            });
+            after(async () => {
+                await bigqueryUtil.deleteDataset(uuid);
+            });
+
+            context('getDatasets', () => {
+                it("should succeed", async () => {
+                    await bigqueryUtil.getDatasets().then((result) => {
+                        expect(result).to.be.a('array');
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
+                });
+            });
+
+            context('getDatasetMetadata with arguments', () => {
+                it("should return object", async () => {
+                    await bigqueryUtil.getDatasetMetadata(uuid).then((result) => {
+                        expect(result).to.be.an('object');
+                        expect(result.datasetReference.datasetId).to.equal(uuid);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
+                });
+            });
+
+            context('setDatasetMetadata with arguments', () => {
+                it("should return true", async () => {
+                    const metadata = {
+                        abc: "123"
+                    };
+                    await bigqueryUtil.setDatasetMetadata(uuid, metadata).then((result) => {
+                        expect(result).to.be.a('boolean');
+                        expect(result).to.equal(true);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
+                });
+            });
+
+            context('getDatasetLabelValue with arguments', () => {
+                it("should return labelValue", async () => {
+                    await bigqueryUtil.getDatasetLabelValue(uuid, labelName).then((result) => {
+                        expect(result).to.be.an('string');
+                        expect(result).is.equal(labelValue);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
+                });
+            });
+        });
+
+        describe('Dataset and table created/deleted in pre/post setup', () => {
+
+            const tableOptions = {
                 description: "description",
+                labels: labels,
                 schema: [{
                     "name": "column1",
                     "type": "STRING",
@@ -86,49 +166,103 @@ if (argv.runCloudTests) {
                     "mode": "REQUIRED"
                 }]
             };
-            return bigqueryUtil.createTable(uuid, uuid, options);
-        }).then(() => {
-            return bigqueryUtil.tableExists(uuid, uuid);
-        }).then((result) => {
-            expect(result).is.true;
-        }).then(() => {
-            return bigqueryUtil.tableColumns(uuid, uuid);
-        }).then((columns) => {
-            expect(columns).length.is(2);
-            expect(columns[0]).is.equal("column1");
-            expect(columns[1]).is.equal("column2");
-        }).then(() => {
-            const query = `select * from \`${argv.projectId}.${uuid}.${uuid}\``;
-            const options = {
-                description: "description",
-                labels: labels
-            };
-            return bigqueryUtil.createView(uuid, viewName, query, options);
-        }).then((result) => {
-            return bigqueryUtil.viewExists(uuid, viewName);
-        }).then((result) => {
-            expect(result).is.true;
-        }).then(() => {
-            return bigqueryUtil.getTableLabelValue(uuid, viewName, labelName);
-        }).then((result) => {
-            expect(result).is.equal(labelValue);
-        }).then(() => {
-            const rows = [{ column1: "value 1", column2: "value 2" }, { column1: "value 3", column2: "value 4" }];
-            return bigqueryUtil.insertRows(uuid, uuid, rows);
-        }).then(() => {
-            const options = { query: `select * from \`${argv.projectId}.${uuid}.${uuid}\`` };
-            return bigqueryUtil.executeQuerySync(options);
-        }).then((result) => {
-            const [rows] = result;
-            expect(rows.length).is.equal(2);
-        }).then(() => {
-            return bigqueryUtil.deleteTable(uuid, viewName);
-        }).then(() => {
-            return bigqueryUtil.deleteTable(uuid, uuid);
-        }).then(() => {
-            return bigqueryUtil.deleteDataset(uuid);
-        }).catch((reason) => {
-            expect.fail(`Failed: ${reason}`);
+
+            before(async () => {
+                await bigqueryUtil.createDataset(uuid, datasetOptions);
+                await bigqueryUtil.createTable(uuid, uuid, tableOptions);
+            });
+            after(async () => {
+                await bigqueryUtil.deleteTable(uuid, uuid);
+                await bigqueryUtil.deleteDataset(uuid);
+            });
+
+            context('getTableMetadata with arguments', () => {
+                it("should return object", async () => {
+                    await bigqueryUtil.getTableMetadata(uuid, uuid).then((result) => {
+                        expect(result).to.be.an('object');
+                        expect(result.metadata.tableReference.tableId).to.equal(uuid);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
+                });
+            });
+
+            context('setTableMetadata with arguments', () => {
+                it("should return true", async () => {
+                    const metadata = {
+                        abc: "123"
+                    };
+                    await bigqueryUtil.setTableMetadata(uuid, uuid, metadata).then((result) => {
+                        expect(result).to.be.a('boolean');
+                        expect(result).to.equal(true);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
+                });
+            });
+
+            context('getTableLabelValue with arguments', () => {
+                it("should return labelValue", async () => {
+                    await bigqueryUtil.getTableLabelValue(uuid, uuid, labelName).then((result) => {
+                        expect(result).to.be.an('string');
+                        expect(result).is.equal(labelValue);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
+                });
+            });
+
+            context('getDatasetLabelValue with arguments', () => {
+                it("should return labelValue", async () => {
+                    await bigqueryUtil.datasetExists(uuid).then((result) => {
+                        expect(result).is.true;
+                    }).then(() => {
+                        return bigqueryUtil.getDatasetLabelValue(uuid, labelName);
+                    }).then((result) => {
+                        expect(result).is.equal(labelValue);
+                    }).then(() => {
+                        return bigqueryUtil.tableExists(uuid, uuid);
+                    }).then((result) => {
+                        expect(result).is.true;
+                    }).then(() => {
+                        return bigqueryUtil.tableColumns(uuid, uuid);
+                    }).then((columns) => {
+                        expect(columns).length.is(2);
+                        expect(columns[0]).is.equal("column1");
+                        expect(columns[1]).is.equal("column2");
+                    }).then(() => {
+                        const query = `select * from \`${argv.projectId}.${uuid}.${uuid}\``;
+                        const options = {
+                            description: "description",
+                            labels: labels
+                        };
+                        return bigqueryUtil.createView(uuid, viewName, query, options);
+                    }).then((result) => {
+                        return bigqueryUtil.viewExists(uuid, viewName);
+                    }).then((result) => {
+                        expect(result).is.true;
+                    }).then(() => {
+                        return bigqueryUtil.getTableLabelValue(uuid, viewName, labelName);
+                    }).then((result) => {
+                        expect(result).is.equal(labelValue);
+                    }).then(() => {
+                        const rows = [{ column1: "value 1", column2: "value 2" }, { column1: "value 3", column2: "value 4" }];
+                        return bigqueryUtil.insertRows(uuid, uuid, rows);
+                    }).then(() => {
+                        const options = { query: `select * from \`${argv.projectId}.${uuid}.${uuid}\`` };
+                        return bigqueryUtil.executeQuerySync(options);
+                    }).then((result) => {
+                        const [rows] = result;
+                        expect(rows.length).is.equal(2);
+                    }).then(() => {
+                        return bigqueryUtil.deleteTable(uuid, viewName);
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
+                });
+            });
+
         });
-    });
-}
+    }
+
+});
