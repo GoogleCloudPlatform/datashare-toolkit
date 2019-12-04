@@ -55,7 +55,7 @@ async function processTriggerEvent(event, context) {
         bucketName: event.bucket,
         fileName: event.name
     };
-    const result = await configManager.validateOptions(options);
+    const result = await configManager.validateOptions(options, true);
     if (!result.isValid) {
         return false;
     }
@@ -70,7 +70,7 @@ async function processTriggerEvent(event, context) {
  */
 async function processHttpEvent(request, response) {
     const options = request.body || {};
-    const result = await configManager.validateOptions(options);
+    const result = await configManager.validateOptions(options, true);
     if (!result.isValid) {
         response.status(400).send({ errors: result.errors });
         return;
