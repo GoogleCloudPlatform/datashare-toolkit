@@ -199,7 +199,7 @@ To run unit tests for the entitlement-engine, switch to the bqdsEntitlements dir
 cd entitlements/bqdsEntitlements
 
 # Including GCP dependent tests
-npm run test -- --runCloudTests
+npm run cloudtest
 
 # Excluding GCP dependent tests
 npm run test
