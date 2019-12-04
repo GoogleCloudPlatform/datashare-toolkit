@@ -212,8 +212,8 @@ describe('BigQueryUtil', () => {
                 });
             });
 
-            context('getDatasetLabelValue with arguments', () => {
-                it("should return labelValue", async () => {
+            context('ingestion integration test', () => {
+                it("create dataset, table, and load data", async () => {
                     await bigqueryUtil.datasetExists(uuid).then((result) => {
                         expect(result).is.true;
                     }).then(() => {

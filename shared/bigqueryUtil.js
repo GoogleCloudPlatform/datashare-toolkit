@@ -191,7 +191,6 @@ class BigQueryUtil {
         // https://cloud.google.com/nodejs/docs/reference/bigquery/3.0.x/Dataset#getMetadata
         await dataset.getMetadata().then((data) => {
             _metadata = data[0];
-            const apiResponse = data[1];
             return;
         });
 
