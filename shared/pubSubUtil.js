@@ -94,7 +94,7 @@ class PubSubUtil {
         const response = await subscription.exists();
         const exists = response[0];
         if (this.VERBOSE_MODE) {
-            console.log(`Checking if subscription exists: '${ttopicName}': ${subscriptionName}`);
+            console.log(`Checking if subscription exists: '${topicName}': ${subscriptionName}`);
         }
         return exists;
     }
