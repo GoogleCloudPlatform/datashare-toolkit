@@ -29,8 +29,8 @@ const chai = require('chai'), expect = chai.expect, should = chai.should();
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
+process.env.ARCHIVE_FILES = "true";
 const ingestion = require("../index");
-const configManager = require('../configurationManager');
 const uuid = uuidv4().replace(/-/gi, '');
 const bucketName = "bqds-unit-tests";
 
@@ -58,9 +58,10 @@ if (argv.runCloudTests) {
         const datasetName = `${uuid}`;
         const tableName = "observation";
 
-        let schemaBucketFile = `bqds/${datasetName}/${tableName}/config/${uuid}_observation.schema.json`;
-        let sqlBucketFile = `bqds/${datasetName}/${tableName}/config/${uuid}_observation.transform.sql`;
-        let dataBucketFile = `bqds/${datasetName}/${tableName}/data/${uuid}_weather.observation.csv`;
+        let schemaBucketFile = `bqds/${datasetName}/${tableName}/config/observation.schema.json`;
+        let sqlBucketFile = `bqds/${datasetName}/${tableName}/config/observation.transform.sql`;
+        let dataBucketFile = `bqds/${datasetName}/${tableName}/data/weather.observation.csv`;
+        let dataArchiveBucketFile = `bqds/${datasetName}/${tableName}/data/archive/weather.observation.csv`;
 
         let schemaFileCreated = false;
         let sqlFileCreated = false;
@@ -122,13 +123,15 @@ if (argv.runCloudTests) {
             }
         }).then(() => {
             if (dataFileCreated === true) {
-                expect(storageUtil.deleteFile(bucketName, dataBucketFile, true)).to.eventually.be.true;
+                expect(storageUtil.deleteFile(bucketName, dataArchiveBucketFile, true)).to.eventually.be.true;
+            }
+        }).then(() => {
+            if (dataFileCreated === true) {
+                expect(storageUtil.deleteFile(bucketName, dataBucketFile, true)).to.eventually.be.false;
             }
         }).catch((reason) => {
             console.log(`Exception: ${reason}`);
             assert.fail(reason);
         });
-
-        // TODO: Delete the folder instead of individual files.
     });
 }

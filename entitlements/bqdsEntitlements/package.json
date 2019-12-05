@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "test": "nyc mocha --timeout 60000",
     "cloudtest": "nyc mocha --timeout 60000 --projectId='bqds-ci' --runCloudTests",
-    "coverage": "nyc report --reporter=html"
+    "coverage": "nyc report --reporter=html" 
   },
   "bin": {
     "entitlement-engine": "main.js"
