@@ -179,7 +179,8 @@ async function stageFile(config) {
         let [job] = await table.load(storageUtil.getBucket(config.bucket).file(config.sourceFile), config.metadata || { autodetect: true });
         console.log(`${job.id} ${job.configuration.jobType} ${job.status.state} ${job.statistics.load.outputRows} rows`);
         return;
-    } catch (ex) {
+    }
+    catch (ex) {
         console.error(`Errors encountered loading ${config.sourceFile} to ${config.stagingTable}`);
         logException(ex);
         throw (ex);
@@ -217,7 +218,8 @@ async function createTransformJob(config, query) {
     console.log(`BigQuery options: ${JSON.stringify(options)}`);
     try {
         return bigqueryUtil.createQueryJob(options);
-    } catch (exception) {
+    }
+    catch (exception) {
         console.error(`Exception encountered running transform: ${getExceptionString(exception)}`);
         logException(exception);
         throw (exception);
