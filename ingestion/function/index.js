@@ -57,10 +57,9 @@ async function processTriggerEvent(event, context) {
     };
     const result = await configManager.validateOptions(options, true);
     if (!result.isValid) {
-        return false;
+        throw new Error(`Validation error for fileName: ${options.fileName}: ${JSON.stringify(result)}`);
     }
-    const status = await processFile(options);
-    return status;
+    await processFile(options, true);
 }
 
 /**
@@ -75,7 +74,7 @@ async function processHttpEvent(request, response) {
         response.status(400).send({ errors: result.errors });
         return;
     }
-    const status = await processFile(options);
+    const status = await processFile(options, false);
     const statusCode = (status === true) ? 200 : 400;
     response.status(statusCode).send();
     return;
@@ -84,7 +83,7 @@ async function processHttpEvent(request, response) {
 /**
  * @param  {} options
  */
-async function processFile(options) {
+async function processFile(options, throws) {
     batchId = cloudFunctionUtil.generateBatchId(options.eventId, options.bucketName, options.fileName);
     console.log(`processFile called for ${getBucketName(options)}, batchId is ${batchId}`);
 
@@ -99,6 +98,7 @@ async function processFile(options) {
     }
 
     let success = false;
+    let ex;
     try {
         await stageFile(config);
         await transform(config);
@@ -109,11 +109,17 @@ async function processFile(options) {
         success = true;
     }
     catch (reason) {
-        console.error(`Exception processing ${options.fileName}: ${reason}`);
+        ex = `Exception processing ${options.fileName}: ${reason}`;
+        console.error(ex);
     }
     finally {
         await bigqueryUtil.deleteTable(config.datasetId, config.stagingTable, true);
     }
+
+    if (throws && !success) {
+        throw ex;
+    }
+
     return success;
 }
 
