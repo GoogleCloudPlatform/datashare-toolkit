@@ -28,7 +28,8 @@ var clientCmd = &cobra.Command{
 	Long: `The BQDS client service is a daemon that will listen to various POSIX server interfaces
 to stream messages to GCP. For example:
 
-UNIX Socket: '/tmp/echo.sock'
+Input (stdin/file): '{"a": 123}\n{"b": "xyz"}'
+Socket (unix/tcp): '/tmp/echo.sock'
 Websocket: 'wss://127.0.0.1:8000'
 Multicast: '224.0.1.0:264'
 `,

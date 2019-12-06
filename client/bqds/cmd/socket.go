@@ -21,8 +21,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var network string
-var address string
+var (
+	network string
+	address string
+)
 
 var (
 	networkDefault string = "unix"
@@ -33,21 +35,30 @@ var (
 var socketCmd = &cobra.Command{
 	Use:   "socket",
 	Short: "BQDS client socket service",
+	Long: `The BQDS client socket service will attach to a raw unix or tcp socket and iterate over
+stream data if new line. For example:
+
+  -n "unix"
+  -a "/tmp/echo.sock"
+`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("socket called")
 		network, _ := cmd.Flags().GetString("network")
 		if network != "" {
-			fmt.Println("Network:", network)
-
+			fmt.Println("network:", network)
 		}
+		address, _ := cmd.Flags().GetString("address")
+		if address != "" {
+			fmt.Println("address:", address)
+		}
+		fmt.Println("socket called. Add main logic here.")
 	},
 }
 
 func init() {
 	clientCmd.AddCommand(socketCmd)
 	//countCmd.Flags().Int("number", 10, "A help for number")
-	socketCmd.Flags().StringVar(&network, "network", networkDefault, "network interface name for socket connection")
-	socketCmd.Flags().StringVar(&address, "address", addressDefault, "network address name or ip for socket connection")
+	socketCmd.Flags().StringVarP(&network, "network", "n", networkDefault, "network interface name for socket connection")
+	socketCmd.Flags().StringVarP(&address, "address", "a", addressDefault, "network address name or ip for socket connection")
 
 	// Here you will define your flags and configuration settings.
 
