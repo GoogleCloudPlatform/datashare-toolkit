@@ -2,6 +2,11 @@
 #
 # Usage: daysOfMonth.sh 1 2019
 
+if [ -z ${2} ]; then
+    echo "Usage: ./daysOfMonth.sh <MONTH> <YEAR>"
+    exit 1
+fi
+
 if [ ${#1} == 1 ];
 then
   MONTH="0${1}";
