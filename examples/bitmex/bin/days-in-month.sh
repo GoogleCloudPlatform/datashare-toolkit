@@ -15,7 +15,7 @@
 # limitations under the License.
 
 if [ -z $(echo "${2}") ]; then
-    echo "Usage: ${0} MONTH> <YEAR>"
+    echo "Usage: ${0} <MONTH> <YEAR>"
     exit 1
 fi
 
