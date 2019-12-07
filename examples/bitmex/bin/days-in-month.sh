@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -e
 #
 # Copyright 2019 Google LLC
 #
@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [ -z ${2} ]; then
-    echo "Usage: ./daysOfMonth.sh <MONTH> <YEAR>"
+if [ -z $(echo "${2}") ]; then
+    echo "Usage: ${0} MONTH> <YEAR>"
     exit 1
 fi
 

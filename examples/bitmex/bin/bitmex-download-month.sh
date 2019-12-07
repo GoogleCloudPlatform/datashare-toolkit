@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -e
 #
 # Copyright 2019 Google LLC
 #
@@ -16,10 +16,10 @@
 
 MONTH=${1}
 YEAR=${2}
-BUCKET=$(echo ${3} | sed 's/gs:\/\///g')
+BUCKET=$(echo "${3}" | sed 's/gs:\/\///g')
 
 if [ -z ${BUCKET} ]; then
-    echo "Usage: ./bitmex-download-month.sh <MONTH> <YEAR> <BUCKET>"
+    echo "Usage: ${0} <MONTH> <YEAR> <BUCKET>"
     exit 1
 fi
 
