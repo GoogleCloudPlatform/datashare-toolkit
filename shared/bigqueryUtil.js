@@ -32,7 +32,8 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} options
+     * @param  {Object} options
+     * create a BigQuery job and return the job results
      */
     async createQueryJob(options) {
         return this.bigqueryClient.createQueryJob(options);
@@ -50,7 +51,9 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} sql
+     * @param  {string} sql
+     * @param  {integer} sql
+     * execute SQL query with a limit and returnn true/false
      */
     async validateQuery(sql, limit) {
         let _sql = sql.trim();
@@ -75,16 +78,14 @@ class BigQueryUtil {
             const [rows] = await this.executeQuerySync(options);
             return true;
         } catch (error) {
-            if (this.VERBOSE_MODE) {
-                console.log("ERROR: %s - Query: '%s' is invalid", error, _sql);
-            }
+            console.warn("ERROR: %s - Query: '%s' is invalid", error, _sql);
             return false;
         }
     }
 
     /**
-     * @param  {} datasetId
-     * @param  {} tableId
+     * @param  {string} datasetId
+     * @param  {string} tableId
      * Returns an array of column names in the table
      */
     async tableColumns(datasetId, tableId) {
@@ -99,9 +100,9 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} datasetId
-     * @param  {} tableId
-     * Checks for the existence of a table or view.
+     * @param  {string} datasetId
+     * @param  {string} tableId
+     * Checks for the existence of a table.
      */
     async tableExists(datasetId, tableId) {
         const dataset = this.bigqueryClient.dataset(datasetId);
@@ -123,6 +124,11 @@ class BigQueryUtil {
         return exists;
     }
 
+    /**
+     * @param  {string} datasetId
+     * @param  {string} tableId
+     * Checks for the existence of a view.
+     */
     async viewExists(datasetId, tableId) {
         const dataset = this.bigqueryClient.dataset(datasetId);
         const table = dataset.table(tableId);
@@ -144,20 +150,23 @@ class BigQueryUtil {
     }
 
     /**
+     * @param  {string} datasetId
      * Returns value indicating if a BQ dataset exists.
-     * @param  {} datasetId
      */
     async datasetExists(datasetId) {
         const dataset = this.bigqueryClient.dataset(datasetId);
-        const response = await dataset.exists();
-        const exists = response[0];
+        const exists = await dataset.exists().catch((err) => {
+            console.warn(err.message);
+            throw err;
+        });
         if (this.VERBOSE_MODE) {
-            console.log(`Checking if dataset exists: '${datasetId}': ${exists}`);
+            console.log(`Checking if dataset exists: '${datasetId}': ${exists[0]}`);
         }
-        return exists;
+        return exists[0];
     }
 
     /**
+     * Returns BigQuery client datasets.
      */
     async getDatasets() {
         return this.bigqueryClient.getDatasets();
@@ -172,7 +181,8 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} datasetId
+     * @param  {string} datasetId
+     * get and return the metadata from a dataset
      */
     async getDatasetMetadata(datasetId) {
         const dataset = this.bigqueryClient.dataset(datasetId);
@@ -181,7 +191,6 @@ class BigQueryUtil {
         // https://cloud.google.com/nodejs/docs/reference/bigquery/3.0.x/Dataset#getMetadata
         await dataset.getMetadata().then((data) => {
             _metadata = data[0];
-            const apiResponse = data[1];
             return;
         });
 
@@ -194,8 +203,9 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} datasetId
-     * @param  {} tableId
+     * @param  {string} datasetId
+     * @param  {string} tableId
+     * get and return the metadata from a dataset table
      */
     async getTableMetadata(datasetId, tableId) {
         const dataset = this.bigqueryClient.dataset(datasetId);
@@ -237,11 +247,11 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} datasetId
-     * @param  {} tableId
-     * @param  {} query
-     * @param  {} options For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
-     * @param  {} deleteIfExists
+     * @param  {string} datasetId
+     * @param  {string} tableId
+     * @param  {string} query
+     * @param  {Object} options For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
+     * @param  {string} deleteIfExists
      */
     async createView(datasetId, tableId, query, options, deleteIfExists) {
         if (deleteIfExists && deleteIfExists === true) {
@@ -269,15 +279,16 @@ class BigQueryUtil {
 
             return { success: true, metadata: table.metadata };
         } catch (error) {
-            console.log(`Failed to create view '${tableId}' with error: ${error}`);
+            console.warn(`Failed to create view '${tableId}' with error: ${error}`);
             return { success: false };
         }
     }
 
     /**
-     * @param  {} datasetId
-     * @param  {} tableId
-     * @param  {} options For available options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
+     * @param  {string} datasetId
+     * @param  {string} tableId
+     * @param  {Object} options For available options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
+     * create a dataset table by name with options
      */
     async createTable(datasetId, tableId, options) {
         const [table] = await this.bigqueryClient
@@ -290,8 +301,9 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} datasetId
-     * @param  {} tableId
+     * @param  {string} datasetId
+     * @param  {string} tableId
+     * delete a dataset table by name
      */
     async deleteTable(datasetId, tableId, ignoreError) {
         return this.bigqueryClient
@@ -304,8 +316,8 @@ class BigQueryUtil {
                 }
                 return true;
             })
-            .catch((reason) => {
-                console.log(`Error deleting table ${tableId}: ${reason}`);
+            .catch((err) => {
+                console.warn(err.message);
                 if (!ignoreError) {
                     throw reason;
                 }
@@ -314,10 +326,10 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} sourceDatasetId
-     * @param  {} authorizeProject
-     * @param  {} authorizeDataset
-     * @param  {} authorizeView
+     * @param  {string} sourceDatasetId
+     * @param  {string} authorizeProject
+     * @param  {string} authorizeDataset
+     * @param  {string} authorizeView
      * Apply permissions from source data to the authorized view
      * Grant source dataset access to the new authorized view
      * Note: If an authorized view was defined, and it's dependent object was deleted, the authorized view record still exists in the dataset.
@@ -392,8 +404,9 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} datasetId
-     * @param  {} metadata
+     * @param  {string} datasetId
+     * @param  {string} metadata
+     * set the metadata for a dataset
      */
     async setDatasetMetadata(datasetId, metadata) {
         let success = false;
@@ -410,14 +423,16 @@ class BigQueryUtil {
             return;
         });
 
-        // Should have boolean return, handling errors or throwing to caller
-        console.log(`Metadata update is complete for dataset '${datasetId}'`);
+        if (this.VERBOSE_MODE) {
+            console.log(`Metadata update is complete for dataset '${datasetId}'`);
+        }
         return success;
     }
 
     /**
-     * @param  {} datasetId
-     * @param  {} options
+     * @param  {string} datasetId
+     * @param  {Object} options
+     * create a dataset by name with options
      */
     async createDataset(datasetId, options) {
         let _options = options || {};
@@ -429,7 +444,8 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} datasetId
+     * @param  {string} datasetId
+     * delete a dataset by name
      */
     async deleteDataset(datasetId, ignoreError) {
         return this.bigqueryClient
@@ -441,8 +457,8 @@ class BigQueryUtil {
                 }
                 return true;
             })
-            .catch((reason) => {
-                console.log(`Error deleting dataset ${datasetId}: ${reason}`);
+            .catch((err) => {
+                console.warn(err.message);
                 if (!ignoreError) {
                     throw reason;
                 }
@@ -451,15 +467,15 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} datasetId
-     * @param  {} tableId
-     * @param  {} metadata
+     * @param  {string} datasetId
+     * @param  {string} tableId
+     * @param  {Object} metadata
+     * set the dataset by name with options
      */
     async setTableMetadata(datasetId, tableId, metadata) {
         let success = false;
         const dataset = this.bigqueryClient.dataset(datasetId);
         const table = dataset.table(tableId);
-        let _metadata;
 
         if (this.VERBOSE_MODE) {
             console.log(`Setting metadata for table '${datasetId}.${tableId}': ${JSON.stringify(metadata, null, 2)}`);
@@ -467,19 +483,21 @@ class BigQueryUtil {
 
         // https://cloud.google.com/nodejs/docs/reference/bigquery/1.3.x/Table#setMetadata
         await table.setMetadata(metadata).then((data) => {
-            _metadata = data[0];
             const apiResponse = data[1];
+            success = true;
             return;
         });
 
-        // Should have boolean return, handling errors or throwing to caller
-        console.log(`Metadata update is complete for table '${datasetId}.${tableId}'`);
+        if (this.VERBOSE_MODE) {
+            console.log(`Metadata update is complete for table '${datasetId}.${tableId}'`);
+        }
         return success;
     }
 
     /**
-     * @param  {} datasetId
-     * @param  {} labelKey
+     * @param  {string} datasetId
+     * @param  {string} labelKey
+     * get a dataset label value by key
      */
     async getDatasetLabelValue(datasetId, labelKey) {
         const metadata = await this.getDatasetMetadata(datasetId);
@@ -491,9 +509,10 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} datasetId
-     * @param  {} tableId
-     * @param  {} labelKey
+     * @param  {string} datasetId
+     * @param  {string} tableId
+     * @param  {string} labelKey
+     * get a dataset table label value by key
      */
     async getTableLabelValue(datasetId, tableId, labelKey) {
         const tableMeta = await this.getTableMetadata(datasetId, tableId);
@@ -505,6 +524,12 @@ class BigQueryUtil {
         return null;
     }
 
+    /**
+     * @param  {string} datasetId
+     * @param  {string} tableId
+     * @param  {string} rows
+     * inset rows into a dataset tabl
+     */
     async insertRows(datasetId, tableId, rows) {
         const dataset = this.bigqueryClient.dataset(datasetId);
         const table = dataset.table(tableId);

@@ -16,87 +16,138 @@
 
 'use strict';
 const { PubSub } = require('@google-cloud/pubsub');
-const pubsub = new PubSub();
-const pubsubClient = require('@google-cloud/pubsub');
-const client = new pubsubClient.v1.SubscriberClient();
+const pubsub = require('@google-cloud/pubsub');
 
 class PubSubUtil {
+    constructor(projectId) {
+        this.projectId = projectId;
+        const options = {};
+        if (projectId) {
+            options.projectId = projectId;
+        }
+        this.pubsub = new PubSub(options);
+        this.client = new pubsub.v1.SubscriberClient(options);
+    }
+
+    get VERBOSE_MODE() {
+        return process.env.VERBOSE_MODE;
+    }
+
     /**
-     * @param  {} topicName
-     * @param  {} subscriptionName
-     * check if the subscription exists by name
+     * @param  {string} topicName
+     * create topic by name and return true
      */
-    async checkIfSubscriptionExists(topicName, subscriptionName) {
-        const topic = pubsub.topic(topicName);
-        const subscription = topic.subscription(subscriptionName);
-        const exists = await subscription.exists().catch(err => {
-            console.warn(err.message);
-            throw err;
-        });
-        if (exists[0] === false) {
-            return { success: false, code: 404, errors: ['Pubsub subscription [' + subscriptionName + '] not found'] };
+    async createTopic(topicName) {
+        await this.pubsub.createTopic(topicName);
+        if (this.VERBOSE_MODE) {
+            console.log(`Topic '${topicName}' created.`);
         }
         return true;
     }
 
     /**
-     * @param  {} subscriptionName
-     * return a subscription object
+     * @param  {string} topicName
+     * delete topic by name and return true
      */
-    getSubscription(subscriptionName) {
-        return pubsub.subscription(subscriptionName);
+    async deleteTopic(topicName) {
+        await this.pubsub.topic(topicName).delete();
+        if (this.VERBOSE_MODE) {
+            console.log(`Topic '${topicName}' deleted.`);
+        }
+        return true;
     }
 
     /**
-     * @param  {} subscriptionName
-     * get a message syncronously
+     * @param  {string} topicName
+     * @param  {string} subscriptionName
+     * create subscription by name and return true
      */
-    async getMessage(subscriptionName) {
+    async createSubscription(topicName, subscriptionName) {
+        await this.pubsub.topic(topicName).createSubscription(subscriptionName);
+        if (this.VERBOSE_MODE) {
+            console.log(`Subscription '${subscriptionName}' created for '${topicName}'.`);
+        }
+        return true;
+    }
+
+    /**
+     * @param  {string} topicName
+     * @param  {string} subscriptionName
+     * delete subscription by name and return true
+     */
+    async deleteSubscription(topicName, subscriptionName) {
+        await this.pubsub.subscription(subscriptionName).delete();
+        if (this.VERBOSE_MODE) {
+            console.log(`Subscription '${subscriptionName}' deleted for '${topicName}'.`);
+        }
+        return true;
+    }
+
+    /**
+     * @param  {string} topicName
+     * @param  {string} subscriptionName
+     * check if the subscription exists by name and return true if exists
+     */
+    async checkIfSubscriptionExists(topicName, subscriptionName) {
+        const topic = this.pubsub.topic(topicName);
+        const subscription = topic.subscription(subscriptionName);
+        const response = await subscription.exists();
+        const exists = response[0];
+        if (this.VERBOSE_MODE) {
+            console.log(`Checking if subscription exists: '${topicName}': ${subscriptionName}`);
+        }
+        return exists;
+    }
+
+    /**
+     * @param  {string} projectName
+     * @param  {string} subscriptionName
+     * get a message syncronously and ack it. throw an error if no messages in the subscription
+     */
+    async getMessage(projectName, subscriptionName) {
         // The maximum number of messages returned for this request.
+        const formattedSubscription = this.client.subscriptionPath(projectName, subscriptionName);
         const maxMessages = 1;
         const request = {
-            subscription: subscriptionName,
+            subscription: formattedSubscription,
             maxMessages: maxMessages,
             returnImmediately: true
         };
 
         // The subscriber pulls a specified number of messages.
-        const [response] = await client.pull(request).catch(err => {
-            console.warn(err.message);
-            throw err;
-        });
+        const [response] = await this.client.pull(request);
         if (response.receivedMessages.length === 0) {
-            return { success: false, code: 404, errors: ['Pubsub messages not found'] };
+            throw new Error('Pubsub message(s) not found.');
         }
         // Obtain the first message.
         const message = response.receivedMessages[0];
 
         const ackRequest = {
-            subscription: subscriptionName,
+            subscription: formattedSubscription,
             ackIds: [message.ackId],
         };
         //..acknowledges the message.
-        const ack = await client.acknowledge(ackRequest);
-        console.log(`Message ${message.message.messageId} acknowledged via ack ${ack}`);
+        const ack = await this.client.acknowledge(ackRequest);
+        if (this.VERBOSE_MODE) {
+            console.log(`Message ${message.message.messageId} acknowledged.`);
+        }
         // Return the message contents.
         return message;
     }
 
     /**
-     * @param  {} topicName
-     * @param  {} message
+     * @param  {string} topicName
+     * @param  {Object} message
+     * @param  {Object} customAttributes
+     * publish a message to a topicName with custom attributes and return the message id
      */
     async publishMessage(topicName, message, customAttributes) {
         const jsonString = JSON.stringify(message);
         const dataBuffer = Buffer.from(jsonString);
-        const messageId = await pubsub.topic(topicName).publish(dataBuffer, customAttributes).catch(err => {
-            console.warn(err.message);
-            throw err;
-        });
-        if (messageId[0] === false) {
-            return { success: false, errors: ['Publish PubSub message to [' + topicName + '] failed'] };
+        const messageId = await this.pubsub.topic(topicName).publish(dataBuffer, customAttributes);
+        if (this.VERBOSE_MODE) {
+            console.log(`Message '${messageId}' published to '${topicName}'.`);
         }
-        console.log(`Message ${messageId} published.`);
         return messageId;
     }
 }

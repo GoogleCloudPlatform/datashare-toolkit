@@ -199,10 +199,10 @@ To run unit tests for the entitlement-engine, switch to the bqdsEntitlements dir
 cd entitlements/bqdsEntitlements
 
 # Including GCP dependent tests
-npm run test -- --runCloudTests
+npm run cloudtest
 
 # Excluding GCP dependent tests
 npm run test
 ```
 
-The tests will run in the project specified in the projectId specified in the test script in package.json. If you include the --runCloudTests the tests with a dependency on GCP will execute, if you exclude it tests with a GCP dependency will be skipped.
+If you run `cloudtest`, the tests will run in the projectId specified in the `cloudtest` script in package.json.
