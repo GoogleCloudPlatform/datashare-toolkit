@@ -101,12 +101,15 @@ class PubSubUtil {
 
     /**
      * @param  {string} projectName
-     * @param  {string} subscriptionName
      * get a message syncronously and ack it. throw an error if no messages in the subscription
      */
-    async getMessage(projectName, subscriptionName) {
+    async getMessage(subscriptionName) {
         // The maximum number of messages returned for this request.
-        const formattedSubscription = this.client.subscriptionPath(projectName, subscriptionName);
+
+        // TODO add the ability to create fully qualified subscripton name from
+        // project and name
+        //const formattedSubscription = this.client.subscriptionPath(projectName, subscriptionName);
+        const formattedSubscription = subscriptionName;
         const maxMessages = 1;
         const request = {
             subscription: formattedSubscription,

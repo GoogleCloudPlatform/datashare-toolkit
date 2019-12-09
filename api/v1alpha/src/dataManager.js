@@ -75,7 +75,7 @@ async function createFulfillmentRequest(options) {
         requestId: requestId
     }
     const topicName = options.config.pubsub.topicName;
-    await pubsubManager.publishMessage(topicName, options, customAttributes).catch(err => {
+    await pubsubUtil.publishMessage(topicName, options, customAttributes).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -125,7 +125,7 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
-    return { data: { ...responseData, signedUrl: signedUrl[0] }, success: true };
+    return { data: { ...responseData, signedUrl: signedUrl }, success: true };
 }
 
 /**
@@ -170,7 +170,7 @@ async function pullFulfillmentSubscriptionRequest(options) {
     // Check if subscription exists
     const topicName = options.config.pubsub.topicName;
     const subscriptionName = options.config.pubsub.subscriptionName;
-    const exists = await pubsubManager.checkIfSubscriptionExists(topicName, subscriptionName).catch(err => {
+    const exists = await pubsubUtil.checkIfSubscriptionExists(topicName, subscriptionName).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -179,7 +179,7 @@ async function pullFulfillmentSubscriptionRequest(options) {
     }
 
     // Process one message after ack
-    const pubsubMessage = await pubsubManager.getMessage(subscriptionName).catch(err => {
+    const pubsubMessage = await pubsubUtil.getMessage(subscriptionName).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -292,8 +292,12 @@ async function createFulfillment(requestId, options) {
     }
 
     var results = await bigqueryUtil.executeQuerySync(queryOptions).then(() => {
+        const options = {
+            format: 'json',
+            gzip: true
+        }
         console.log(`bigqueryUtil.extractTableToGCS: ${datasetId} ${tableId} ${bucketName} ${fileName}`);
-        return bigqueryUtil.extractTableToGCS(datasetId, tableId, bucketName, fileName);
+        return bigqueryUtil.extractTableToGCS(datasetId, tableId, bucketName, fileName, options);
     }).then(() => {
         // update with requestId
         const fileMetadata = {
@@ -302,27 +306,33 @@ async function createFulfillment(requestId, options) {
                 requestId: requestId
             }
         }
-        console.log(`storageUtil.updateMetadata: ${bucketName} ${fileName}`);
-        return storageUtil.updateMetadata(bucketName, fileName, fileMetadata);
+        console.log(`storageUtil.setFileMetadata: ${bucketName} ${fileName}`);
+        return storageUtil.setFileMetadata(bucketName, fileName, fileMetadata);
     }).then(() => {
         console.log(`storageUtil.getUrl: ${bucketName} ${fileName}`);
         return storageUtil.getUrl(bucketName, fileName, true);
     }).then((signedUrl) => {
-        console.log(`bigqueryUtil.updateTableExpiration: ${datasetId} ${tableId} ${expiryTime}`);
-        bigqueryUtil.updateTableExpiration(datasetId, tableId, expiryTime);
+        console.log(`bigqueryUtil.setTableMetadata: ${datasetId} ${tableId} ${expiryTime}`);
+        const metadata = {
+            expirationTime: expiryTime
+        }
+        bigqueryUtil.setTableMetadata(datasetId, tableId, metadata);
         return signedUrl;
     }).catch(error => {
         message = `Create Fulfillment failed: ${error}`;
         console.warn(message);
-        console.log(`Finally bigqueryUtil.updateTableExpiration: ${datasetId} ${tableId} ${expiryTime}`);
-        bigqueryUtil.updateTableExpiration(datasetId, tableId, expiryTime);
+        const metadata = {
+            expirationTime: expiryTime
+        }
+        console.log(`Finally bigqueryUtil.setTableMetadata: ${datasetId} ${tableId} ${expiryTime}`);
+        bigqueryUtil.setTableMetadata(datasetId, tableId, metadata);
         return { success: false, errors: [message] };
     });
 
     if (results.success === false) {
         return results;
     }
-    return { signedUrl: results[0] };
+    return { signedUrl: results };
 }
 
 module.exports = {

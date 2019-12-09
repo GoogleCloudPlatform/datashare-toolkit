@@ -106,7 +106,7 @@ describe('PubSubUtil', () => {
                     await pubSubUtil.publishMessage(uuid, message, customAttr).then((result) => {
                         expect(result).to.be.a('string');
                     }).then(() => {
-                        return pubSubUtil.getMessage(projectName, uuid);
+                        return pubSubUtil.getMessage(uuid);
                     }).catch((reason) => {
                         expect.fail(`Failed: ${reason}`);
                     });
@@ -116,7 +116,7 @@ describe('PubSubUtil', () => {
             context('getMessage with arguments', () => {
                 it("should return an object", async () => {
                     await pubSubUtil.publishMessage(uuid, message, customAttr).then(() => {
-                        return pubSubUtil.getMessage(projectName, uuid);
+                        return pubSubUtil.getMessage(uuid);
                     }).then((result) => {
                         expect(result).to.be.an('Object');
                         const jsonString = Buffer.from(result.message.data).toString('utf8');
@@ -130,7 +130,7 @@ describe('PubSubUtil', () => {
 
             context('getMessage without subscription', () => {
                 it("should reject with error", async () => {
-                    await expect(pubSubUtil.getMessage(projectName, uuid)).to.be.rejectedWith(Error);
+                    await expect(pubSubUtil.getMessage(uuid)).to.be.rejectedWith(Error);
                 });
             });
 
