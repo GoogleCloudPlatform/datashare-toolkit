@@ -244,9 +244,10 @@ _Note_ - There are a few environment variables that need to be set before the ap
 
     export GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS};
     export FULFILLMENT_CONFIG_BUCKET_NAME=${BUCKET_NAME};
-    export FULFILLMENT_CONFIG_DESTINATION_PROJECT_NAME=${PROJECT_ID};
+    export FULFILLMENT_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID};
     export FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME=${TOPIC_NAME};
-    export FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME="projects/${PROJECT_ID}/subscriptions/${PULL_SUBSCRIPTION_NAME}";
+    export FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_PROJECT_ID=${PROJECT_ID};
+    export FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME=${PULL_SUBSCRIPTION_NAME};
 
     npm run dev
 
@@ -301,9 +302,10 @@ _Note_ - There are a few environment variables that need to be set before the ap
       --allow-unauthenticated \
       --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
       --set-env-vars=FULFILLMENT_CONFIG_BUCKET_NAME=${BUCKET_NAME} \
-      --set-env-vars=FULFILLMENT_CONFIG_DESTINATION_PROJECT_NAME=${PROJECT_ID} \
+      --set-env-vars=FULFILLMENT_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID} \
       --set-env-vars=FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME=${TOPIC_NAME} \
-      --set-env-vars=FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME="projects/${PROJECT_ID}/subscriptions/${PULL_SUBSCRIPTION_NAME}"
+      --set-env-vars=FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_PROJECT_ID=${PROJECT_ID} \
+      --set-env-vars=FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME=${PULL_SUBSCRIPTION_NAME}
 
 Open the app URL in your browser. You can return the FQDN via:
 

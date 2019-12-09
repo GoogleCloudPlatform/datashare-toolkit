@@ -169,8 +169,9 @@ async function pullFulfillmentSubscriptionRequest(options) {
 
     // Check if subscription exists
     const topicName = options.config.pubsub.topicName;
-    const subscriptionName = options.config.pubsub.subscriptionName;
-    const exists = await pubsubUtil.checkIfSubscriptionExists(topicName, subscriptionName).catch(err => {
+    const subscriptionProjectId = options.config.pubsub.subscription.projectId;
+    const subscriptionName = options.config.pubsub.subscription.name;
+    const exists = await pubsubUtil.checkIfSubscriptionExists(topicName, subscriptionProjectId, subscriptionName).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -179,7 +180,7 @@ async function pullFulfillmentSubscriptionRequest(options) {
     }
 
     // Process one message after ack
-    const pubsubMessage = await pubsubUtil.getMessage(subscriptionName).catch(err => {
+    const pubsubMessage = await pubsubUtil.getMessage(subscriptionProjectId, subscriptionName).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -245,8 +246,8 @@ async function createFulfillment(requestId, options) {
     }
     const bucketName = options.destination.bucketName;
     const fileName = options.destination.fileName;
-    const projectName = options.config.destination.projectName;
-    const datasetId = options.config.destination.datasetName;
+    const projectId = options.config.destination.projectId;
+    const datasetId = options.config.destination.datasetId;
     // Dynamically create unique tableIds for the extractToBucket method
     const tableId = requestId.replace(/-/g, "_");
 
@@ -266,7 +267,7 @@ async function createFulfillment(requestId, options) {
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
     queryOptions.destinationTable = {
-        projectId: projectName,
+        projectId: projectId,
         datasetId: datasetId,
         tableId: tableId
     };
@@ -275,14 +276,14 @@ async function createFulfillment(requestId, options) {
     // To ensure executeQuery does not retrieve any records in the result set, set to zero
     queryOptions.maxResults = 0;
 
-    bigqueryUtil = new BigQueryUtil(projectName);
+    bigqueryUtil = new BigQueryUtil(projectId);
     exists = await bigqueryUtil.datasetExists(datasetId).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
     if (exists.success === false) {
-        console.log(`Creating new dataset ${datasetId} in project ${projectName}`);
-        exists = await bigqueryUtil.createDataset(projectName, datasetId).catch(err => {
+        console.log(`Creating new dataset ${datasetId} in project ${projectId}`);
+        exists = await bigqueryUtil.createDataset(projectId, datasetId).catch(err => {
             console.warn(err);
             return { success: false, errors: [err.message] };
         });

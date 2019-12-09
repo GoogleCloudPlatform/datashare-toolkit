@@ -33,7 +33,7 @@ describe('PubSubUtil', () => {
 
         // PubSub resource names must start with a letter:  https://cloud.google.com/pubsub/docs/admin#resource_names for more information.
         const uuid = 'a' + uuidv4();
-        const projectName = argv.projectId;
+        const projectId = argv.projectId;
 
         context('createTopic with arguments', () => {
             it("should return true", async () => {
@@ -85,7 +85,7 @@ describe('PubSubUtil', () => {
 
             context('checkIfSubscriptionExists with arguments', () => {
                 it("should return true", async () => {
-                    await pubSubUtil.checkIfSubscriptionExists(uuid, uuid).then((result) => {
+                    await pubSubUtil.checkIfSubscriptionExists(uuid, projectId, uuid).then((result) => {
                         expect(result).to.be.a('boolean');
                         expect(result).to.equal(true);
                     }).catch((reason) => {
@@ -106,7 +106,7 @@ describe('PubSubUtil', () => {
                     await pubSubUtil.publishMessage(uuid, message, customAttr).then((result) => {
                         expect(result).to.be.a('string');
                     }).then(() => {
-                        return pubSubUtil.getMessage(uuid);
+                        return pubSubUtil.getMessage(projectId, uuid);
                     }).catch((reason) => {
                         expect.fail(`Failed: ${reason}`);
                     });
@@ -116,7 +116,7 @@ describe('PubSubUtil', () => {
             context('getMessage with arguments', () => {
                 it("should return an object", async () => {
                     await pubSubUtil.publishMessage(uuid, message, customAttr).then(() => {
-                        return pubSubUtil.getMessage(uuid);
+                        return pubSubUtil.getMessage(projectId, uuid);
                     }).then((result) => {
                         expect(result).to.be.an('Object');
                         const jsonString = Buffer.from(result.message.data).toString('utf8');
@@ -130,7 +130,7 @@ describe('PubSubUtil', () => {
 
             context('getMessage without subscription', () => {
                 it("should reject with error", async () => {
-                    await expect(pubSubUtil.getMessage(uuid)).to.be.rejectedWith(Error);
+                    await expect(pubSubUtil.getMessage(projectId, uuid)).to.be.rejectedWith(Error);
                 });
             });
 

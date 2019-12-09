@@ -163,10 +163,10 @@ app.use('/' + apiVersion, router);
  *         type: string
  *         required: false
  *         description: Spot Fulfillment destination storage file name
- *       projectName:
+ *       projectId:
  *         type: string
  *         required: true
- *         description: Spot Fulfillment destination GCP project name
+ *         description: Spot Fulfillment destination GCP project ID
  *
  *   SpotFulfillmentRequestSchema:
  *     type: object

@@ -31,12 +31,15 @@ const FULFILLMENT_CONFIG = {
     bucketName: process.env.FULFILLMENT_CONFIG_BUCKET_NAME || "change-me",
     fileName: process.env.FULFILLMENT_CONFIG_FILE_NAME || "bqds/api/config.json",
     destination: {
-        projectName: process.env.FULFILLMENT_CONFIG_DESTINATION_PROJECT_NAME || "change-me",
-        datasetName: process.env.FULFILLMENT_CONFIG_DESTINATION_DATASET_NAME || "bqds_spot_fulfillment",
+        projectId: process.env.FULFILLMENT_CONFIG_DESTINATION_PROJECT_ID || "change-me",
+        datasetId: process.env.FULFILLMENT_CONFIG_DESTINATION_DATASET_ID || "bqds_spot_fulfillment",
     },
     pubsub: {
         topicName: process.env.FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME || "bqds-spot-fulfillment",
-        subscriptionName: process.env.FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME || "projects/change-me/subscriptions/bqds-spot-fulfilllment-consumer"
+        subscription: {
+            projectId: process.env.FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_PROJECT_ID || "change-me",
+            name: process.env.FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME || "bqds-spot-fulfilllment-consumer"
+        }
     }
 }
 
