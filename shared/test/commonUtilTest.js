@@ -66,6 +66,40 @@ it("should return false for invalid yaml string", () => {
       - userByEmail: melisandresnow.388027@gmail.com`)).is.false;
 });
 
+it("should parse yaml string", () => {
+    expect(commonUtil.parseYaml(`---
+  name: mlb_simple
+  projectId: bqds-ci
+  accessControl:
+    datasetId: access_control
+    viewId: groupEntities
+  groups:
+  - name: newyork_users
+    access:
+    - userByEmail: benjentargaryen.327201@gmail.com
+  - name: chicago_users
+    access:
+    - userByEmail: melisandresnow.388027@gmail.com`)).to.not.throw;
+});
+
+it("should fail to parse yaml string", () => {
+    expect(() => {
+        commonUtil.parseYaml(`---
+    name mlb_simple
+    projectId: bqds-ci
+    accessControl:
+      datasetId: access_control
+      viewId: groupEntities
+    groups:
+    - name: newyork_users
+      access:
+      - userByEmail: benjentargaryen.327201@gmail.com
+    - name: chicago_users
+      access:
+      - userByEmail: melisandresnow.388027@gmail.com`);
+    }).to.throw(/Implicit map keys need to be on a single line/);
+});
+
 it("extension is valid", () => {
     expect(commonUtil.isExtensionSupported("test.json", ["json", "csv"])).is.true;
 });
