@@ -19,9 +19,11 @@
 const querystring = require('querystring');
 const uuidv4 = require('uuid/v4');
 
-const bqManager = require('./bigqueryManager');
-const storageManager = require('./storageManager');
-const pubsubManager = require('./pubSubManager');
+const { BigQueryUtil, StorageUtil, PubSubUtil } = require('bqds-shared');
+let bigqueryUtil;
+const storageUtil = new StorageUtil();
+const pubsubUtil = new PubSubUtil();
+
 const validateManager = require('./validateManager');
 const fulfillmentMessageSchema = require('./validateManager').fulfillmentMessageSchema;
 
@@ -101,7 +103,7 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
         fileName: fileName
     }
 
-    const exists = await storageManager.checkIfFileExists(bucketName, fileName).catch(err => {
+    const exists = await storageUtil.checkIfFileExists(bucketName, fileName).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -109,7 +111,7 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
         return { ...exists };
     }
 
-    const metadata = await storageManager.getFileMetadata(bucketName, fileName).catch(err => {
+    const metadata = await storageUtil.getFileMetadata(bucketName, fileName).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -119,7 +121,7 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
         return { success: false, code: 400, errors: [message] };
     }
 
-    const signedUrl = await storageManager.getUrl(bucketName, fileName, true).catch(err => {
+    const signedUrl = await storageUtil.getUrl(bucketName, fileName, true).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -250,7 +252,7 @@ async function createFulfillment(requestId, options) {
 
     console.log(`Will execute query with options: ${JSON.stringify(queryOptions)}`);
     // Check if fileName exists
-    var exists = await storageManager.checkIfFileExists(bucketName, fileName).catch(err => {
+    var exists = await storageUtil.checkIfFileExists(bucketName, fileName).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -273,13 +275,14 @@ async function createFulfillment(requestId, options) {
     // To ensure executeQuery does not retrieve any records in the result set, set to zero
     queryOptions.maxResults = 0;
 
-    exists = await bqManager.checkIfDatasetExists(projectName, datasetId).catch(err => {
+    bigqueryUtil = new BigQueryUtil(projectName);
+    exists = await bigqueryUtil.datasetExists(datasetId).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
     if (exists.success === false) {
         console.log(`Creating new dataset ${datasetId} in project ${projectName}`);
-        exists = await bqManager.createDataset(projectName, datasetId).catch(err => {
+        exists = await bigqueryUtil.createDataset(projectName, datasetId).catch(err => {
             console.warn(err);
             return { success: false, errors: [err.message] };
         });
@@ -288,9 +291,9 @@ async function createFulfillment(requestId, options) {
         return exists;
     }
 
-    var results = await bqManager.executeQuery(queryOptions).then(() => {
-        console.log(`bqManager.extractTableToGCS: ${datasetId} ${tableId} ${bucketName} ${fileName}`);
-        return bqManager.extractTableToGCS(datasetId, tableId, bucketName, fileName);
+    var results = await bigqueryUtil.executeQuerySync(queryOptions).then(() => {
+        console.log(`bigqueryUtil.extractTableToGCS: ${datasetId} ${tableId} ${bucketName} ${fileName}`);
+        return bigqueryUtil.extractTableToGCS(datasetId, tableId, bucketName, fileName);
     }).then(() => {
         // update with requestId
         const fileMetadata = {
@@ -299,20 +302,20 @@ async function createFulfillment(requestId, options) {
                 requestId: requestId
             }
         }
-        console.log(`storageManager.updateMetadata: ${bucketName} ${fileName}`);
-        return storageManager.updateMetadata(bucketName, fileName, fileMetadata);
+        console.log(`storageUtil.updateMetadata: ${bucketName} ${fileName}`);
+        return storageUtil.updateMetadata(bucketName, fileName, fileMetadata);
     }).then(() => {
-        console.log(`storageManager.getUrl: ${bucketName} ${fileName}`);
-        return storageManager.getUrl(bucketName, fileName, true);
+        console.log(`storageUtil.getUrl: ${bucketName} ${fileName}`);
+        return storageUtil.getUrl(bucketName, fileName, true);
     }).then((signedUrl) => {
-        console.log(`bqManager.updateTableExpiration: ${datasetId} ${tableId} ${expiryTime}`);
-        bqManager.updateTableExpiration(datasetId, tableId, expiryTime);
+        console.log(`bigqueryUtil.updateTableExpiration: ${datasetId} ${tableId} ${expiryTime}`);
+        bigqueryUtil.updateTableExpiration(datasetId, tableId, expiryTime);
         return signedUrl;
     }).catch(error => {
         message = `Create Fulfillment failed: ${error}`;
         console.warn(message);
-        console.log(`Finally bqManager.updateTableExpiration: ${datasetId} ${tableId} ${expiryTime}`);
-        bqManager.updateTableExpiration(datasetId, tableId, expiryTime);
+        console.log(`Finally bigqueryUtil.updateTableExpiration: ${datasetId} ${tableId} ${expiryTime}`);
+        bigqueryUtil.updateTableExpiration(datasetId, tableId, expiryTime);
         return { success: false, errors: [message] };
     });
 

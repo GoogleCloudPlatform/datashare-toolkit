@@ -16,8 +16,10 @@
 
 'use strict';
 
-const storageManager = require('./storageManager');
-const bigqueryManager = require('./bigqueryManager');
+const { BigQueryUtil, StorageUtil } = require('bqds-shared');
+let bigqueryUtil;
+const storageUtil = new StorageUtil();
+
 const stripJsonComments = require('strip-json-comments');
 const underscore = require("underscore");
 const Joi = require('@hapi/joi');
@@ -105,20 +107,22 @@ async function getAvailableRequests(options, includeQuery) {
     let configFileName = FULFILLMENT_CONFIG.fileName;
 
     var json;
-    let file = await storageManager.fetchFileContent(configBucketName, configFileName).catch(err =>  {
+    let file = await storageUtil.fetchFileContent(configBucketName, configFileName).catch(err =>  {
         console.warn(err.message);
         return { success: false, errors: [err.message]};
     });
     if (file.success === false) {
         return { ...file };
     }
-    json = JSON.parse(stripJsonComments(file.content));
+    json = JSON.parse(stripJsonComments(file));
 
     if (json.entities === undefined) {
         return { success: false, errors: ['File [' + configFileName + '] schema is not correct'] };
     }
     let requests = [];
     for (const e of json.entities) {
+        // set bigqueryUtil based off projectId in entities for now
+        bigqueryUtil = new BigQueryUtil(e.projectId);
         let fqTable = `${e.projectId}.${e.datasetId}.${e.tableId}`;
         for (const r of e.availableRequests) {
             let request = { name: r.name, dataId: r.dataId };
@@ -166,7 +170,7 @@ async function getAvailableRequests(options, includeQuery) {
                             query: query
                         };
                         // eslint-disable-next-line no-await-in-loop
-                        availableValues = await bigqueryManager.executeQuery(queryOptions);
+                        availableValues = await bigqueryUtil.executeQuerySync(queryOptions);
                     }
                     // console.log(JSON.stringify(availableValues));
                     list = underscore.pluck(availableValues[0], 'value');
@@ -199,7 +203,7 @@ async function fulfillmentConfig(req, res, next) {
     var configFileName = (req.query.configFileName === undefined) ? FULFILLMENT_CONFIG.fileName : req.query.configFileName;
 
     // console.log(`Testing fulfillment config path gs://bucket/file [${bucketName}/${configFileName}]`);
-    let result = await storageManager.checkIfFileExists(bucketName, configFileName).catch(err => {
+    let result = await storageUtil.checkIfFileExists(bucketName, configFileName).catch(err => {
         errors.push(err.message);
     });
     if (result && result.success === false) {
@@ -268,7 +272,7 @@ function fulfillmentWebhookParams(req, res, next) {
         console.warn(message);
         errors.push(result.error.details);
     }
-    if (errors.length > 0 ){
+    if (errors.length > 0) {
         return res.status(400).json({
             success: false,
             errors: errors,
