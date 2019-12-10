@@ -37,16 +37,16 @@ if (process.argv.length < 4) {
 let topic = pubsub.topic(topicName);
 try {
     if (!topic) {
-	pubsub.createTopic(topicName, function(err) {
+        pubsub.createTopic(topicName, function(err) {
             if (err) {
-		console.error('Could not create topic: ' + JSON.stringify(err));
-		process.exit(1);
+                console.error('Could not create topic: ' + JSON.stringify(err));
+                process.exit(1);
             } else {
-		publishMessages();
-	    }
-	});   
+                publishMessages();
+            }
+        });   
     } else {
-	publishMessages();
+        publishMessages();
     }
 } catch(error) {
     console.error("Error: " + error);
@@ -59,19 +59,19 @@ function publishMessages() {
     const ws = new WebSocket(socketUrl);
 
     ws.on('open', function open() {
-	console.error('socket opened');
+        console.error('socket opened');
     });
     
     ws.on('message', function inbound(data) {
-	try {
-	    topic.publisher.publish(Buffer.from(data), function(err, messageId) {
-		if (err) {
-		    console.error(`could not publish message ${messageId}`);
-		}
-	    });
-	} catch(error) {
-	    console.error(`error publishing message: ${error}`);
-	}
+        try {
+            topic.publisher.publish(Buffer.from(data), function(err, messageId) {
+                if (err) {
+                    console.error(`could not publish message ${messageId}`);
+                }
+            });
+        } catch(error) {
+            console.error(`error publishing message: ${error}`);
+        }
     });
 
 }
