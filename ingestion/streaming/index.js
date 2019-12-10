@@ -16,15 +16,11 @@
  */
 
 'use strict';
-//const { PubSubUtil } = require('bqds-shared');
-//const readline = require('readline');
-//const {PubSub} = require('@google-cloud/pubsub');
 
-
-// Usage: ${0} <topic>
+// Usage: ${0} <ws url> <topic>
 //
-// take messages arriving via STDIN (JSONL-formatted) and
-// manufacture and publish messages to the specified topic
+// take messages arriving via WebSocket (JSONL-formatted) and
+// publish them individually to the specified topic
 
 const {PubSub} = require('@google-cloud/pubsub');
 const pubsub = new PubSub();
@@ -58,9 +54,10 @@ try {
 
 
 function publishMessages() {
+
     let topic = pubsub.topic(topicName);
     const ws = new WebSocket(socketUrl);
-    
+
     ws.on('open', function open() {
 	console.error('socket opened');
     });
@@ -73,7 +70,7 @@ function publishMessages() {
 		}
 	    });
 	} catch(error) {
-	    console.error("error publishing message: " + error);
+	    console.error(`error publishing message: ${error}`);
 	}
     });
 
