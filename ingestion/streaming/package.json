@@ -1,0 +1,11 @@
+{
+  "name": "ws2pubsub",
+  "version": "0.0.1",
+  "description": "BQDS WebSocket publisher",
+  "license": "Apache-2.0",
+  "repository": {},
+  "dependencies": {
+    "ws": "~2.3.1",
+    "@google-cloud/pubsub": "^0.28.1"
+  }
+}
