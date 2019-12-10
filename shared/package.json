@@ -8,7 +8,8 @@
   "scripts": {
     "lint": "eslint .",
     "test": "nyc mocha --timeout 60000",
-    "cloudtest": "nyc mocha --timeout 60000 --projectId='bqds-ci' --runCloudTests"
+    "cloudtest": "nyc mocha --timeout 60000 --projectId='bqds-ci' --runCloudTests",
+    "coverage": "nyc report --reporter=html"
   },
   "dependencies": {
     "@google-cloud/bigquery": "^4.4.0",

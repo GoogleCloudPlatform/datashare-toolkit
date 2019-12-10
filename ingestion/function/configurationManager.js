@@ -139,7 +139,7 @@ async function validateOptions(options, validateStorage) {
 
     if (attributes && attributes.isDataFile === false) {
         console.log(`Ignoring archived file: '${options.fileName} in bucket: ${options.bucketName}'`);
-        return { isValid: false, isDataFile: false };
+        return { isValid: true, isDataFile: false };
     }
     else if (errors.length === 0) {
         console.log(`Options validation succeeded: ${info.join(", ")}`);
