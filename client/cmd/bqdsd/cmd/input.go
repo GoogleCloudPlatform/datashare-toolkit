@@ -18,7 +18,7 @@ package cmd
 import (
 	log "github.com/sirupsen/logrus"
 
-	"github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/internal/validate"
+	"github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/internal/injestion"
 	"github.com/spf13/cobra"
 )
 
@@ -33,8 +33,7 @@ var inputCmd = &cobra.Command{
 	Short: "BQDS client input service",
 	Long: `The BQDS client input service will parse the raw data or a file and iterate over
 the data if new line. For example:
-
-  -d '{"a": 123}\n{"b": "xyz"}'
+-d '{"a": 123}\n{"b": "xyz"}'
   -f "$PWD/input/file.txt"
 `,
 	Args: func(cmd *cobra.Command, args []string) error {
@@ -51,14 +50,16 @@ the data if new line. For example:
 		rawData, _ := cmd.Flags().GetString("rawData")
 		if rawData != "" {
 			log.Debugln("rawData:", rawData)
-			data := validate.CheckInputData(rawData)
-			log.Debug(data)
+			err := injestion.Run(rawData)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 		fileName, _ := cmd.Flags().GetString("fileName")
 		if fileName != "" {
 			log.Debugln("FileName:", fileName)
+			log.Fatalf("Publishing messages from a fileName is still a WIP...")
 		}
-		log.Infoln("input called. Add main logic here.")
 	},
 }
 

@@ -1,0 +1,71 @@
+/*
+  pyright © 2019 Chris Page <chrispage@google.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+package pubsubutil
+
+import (
+	"cloud.google.com/go/pubsub"
+	"context"
+	"fmt"
+	log "github.com/sirupsen/logrus"
+)
+
+//var (
+//topic *pubsub.Topic
+//)
+
+func CreateClientTopic(projectID string, topicID string) (*pubsub.Topic, error) {
+
+	ctx := context.Background()
+	client, err := pubsub.NewClient(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	topic := client.Topic(topicID)
+
+	// check if topic exists before returning client
+	exists, err := topic.Exists(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, fmt.Errorf("Topic '%v' does not exist", topicID)
+	}
+	return topic, nil
+}
+
+// Publish a message to a specific topic and return the id and error
+func PublishMessage(topic *pubsub.Topic, input string) (string, error) {
+	ctx := context.Background()
+
+	msg := &pubsub.Message{
+		Data: []byte(input),
+		//Attributes: map[string]string{
+		//"origin":   "golang",
+		//"username": "gcp",
+		//},
+	}
+
+	// Block until the result is returned and a server-generated
+	// ID is returned for the published message.
+	var id string
+	if id, err := topic.Publish(ctx, msg).Get(ctx); err != nil {
+		return "", fmt.Errorf("Publish error on topic '%s'", topic)
+	} else {
+		log.Debugf("Published message. msg ID: %v\n", id)
+	}
+	return id, nil
+}

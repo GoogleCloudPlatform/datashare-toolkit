@@ -16,26 +16,27 @@ limitations under the License.
 package validate
 
 import (
-	log "github.com/sirupsen/logrus"
+	"fmt"
 	"strings"
 )
 
 const (
-	defaultSeparator = `n`
+	defaultSeparator = `\n`
 	defaultLength    = 4096
 	defaultMaxLines  = 2
 )
 
-/*
-	Check the input data for max length and total number of lines
-*/
-func CheckInputData(input string) []string {
+// Check the input data for max length and total number of lines.
+// It will return a list of strings to the caller.
+func CheckInputData(input string) ([]string, error) {
 	if len(input) > defaultLength {
-		log.Fatalf("Input data is over the max length. Given: [%d], Max: [%d]", len(input), defaultLength)
+		return nil, fmt.Errorf("Input data is over the max length. Given: [%d], Max: [%d]",
+			len(input), defaultLength)
 	}
-	temp := strings.Split(input, defaultSeparator)
-	if len(temp) > defaultMaxLines {
-		log.Fatalf("Input data is over the max number of lines. Given: [%d], Max: [%d]", len(temp), defaultMaxLines)
+	data := strings.Split(input, defaultSeparator)
+	if len(data) > defaultMaxLines {
+		return nil, fmt.Errorf("Input data is over the max lines. Given: [%d], Max: [%d]",
+			len(data), defaultMaxLines)
 	}
-	return temp
+	return data, nil
 }
