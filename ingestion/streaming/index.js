@@ -19,8 +19,13 @@
 
 // Usage: ${0} <ws url> <topic>
 //
-// take messages arriving via WebSocket (JSONL-formatted) and
+// Get messages arriving via WebSocket (JSONL-formatted) and
 // publish them individually to the specified topic
+
+if (process.argv.length < 4) {
+    console.error(`Usage: ${process.argv[0]} ${process.argv[1]} <WebSocket URL> <topic-mame>`);
+    process.exit(1);
+}
 
 const {PubSub} = require('@google-cloud/pubsub');
 const pubsub = new PubSub();
@@ -28,11 +33,8 @@ const pubsub = new PubSub();
 const socketUrl = process.argv[2];
 const topicName = process.argv[3];
 const WebSocket = require('ws');
+const ws = new WebSocket(socketUrl);
 
-if (process.argv.length < 4) {
-    console.error(`Usage: webSocketPublisher <WebSocket URL> <topic-mame>`);
-    process.exit(1);
-}
 
 let topic = pubsub.topic(topicName);
 try {
@@ -55,7 +57,6 @@ try {
 
 function publishMessages() {
     let topic = pubsub.topic(topicName);
-    const ws = new WebSocket(socketUrl);
 
     ws.on('open', function open() {
         console.error('Web socket connection opened');
@@ -75,9 +76,8 @@ function publishMessages() {
 
     ws.on('close', function close() {
         console.error("Web socket connection closed");
+	process.exit(1);
     });
 
-    ws.on('error', function error() {
-        
-    });
+    ws.on('error', function error() {  });
 }
