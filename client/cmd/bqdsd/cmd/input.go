@@ -48,9 +48,12 @@ the data if new line. For example:
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		rawData, _ := cmd.Flags().GetString("rawData")
+		// These PersistantFlags are required and validated in parent command
+		projectID, _ := cmd.Flags().GetString("projectID")
+		topicID, _ := cmd.Flags().GetString("topicID")
 		if rawData != "" {
 			log.Debugln("rawData:", rawData)
-			err := injestion.Run(rawData)
+			err := injestion.Run(projectID, topicID, rawData)
 			if err != nil {
 				log.Fatal(err)
 			}
