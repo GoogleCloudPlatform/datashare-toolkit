@@ -58,7 +58,7 @@ function publishMessages() {
     const ws = new WebSocket(socketUrl);
 
     ws.on('open', function open() {
-        console.error('socket opened');
+        console.error('Web socket connection opened');
     });
     
     ws.on('message', function inbound(data) {
@@ -71,5 +71,13 @@ function publishMessages() {
         } catch(error) {
             console.error(`error publishing message: ${error}`);
         }
+    });
+
+    ws.on('close', function close() {
+        console.error("Web socket connection closed");
+    });
+
+    ws.on('error', function error() {
+        
     });
 }
