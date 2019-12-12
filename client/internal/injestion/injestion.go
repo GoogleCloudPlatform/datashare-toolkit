@@ -33,16 +33,12 @@ func mustGetenv(k string) string {
 }
 
 // Stream the data to pubsub by validating and interating over the input
-func Run(raw string) error {
+func Run(projectID string, topicID string, raw string) error {
 	log.Debugf("Starting Injestion Run...")
 	data, err := validate.CheckInputData(raw)
 	if err != nil {
 		return fmt.Errorf("validate.CheckInputData: %s", err.Error())
 	}
-
-	// passing these as environment variables for testing
-	projectID := mustGetenv("GOOGLE_CLOUD_PROJECT")
-	topicID := mustGetenv("PUBSUB_TOPIC_NAME")
 
 	topic, err := pubsubutil.CreateClientTopic(projectID, topicID)
 	if err != nil {
