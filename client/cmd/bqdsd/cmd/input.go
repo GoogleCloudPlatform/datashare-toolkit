@@ -33,8 +33,9 @@ var inputCmd = &cobra.Command{
 	Short: "BQDS client input service",
 	Long: `The BQDS client input service will parse the raw data or a file and iterate over
 the data if new line. For example:
+k
 -d '{"a": 123}\n{"b": "xyz"}'
-  -f "$PWD/input/file.txt"
+-f "$PWD/input/file.txt"
 `,
 	Args: func(cmd *cobra.Command, args []string) error {
 		fileName, _ := cmd.Flags().GetString("fileName")

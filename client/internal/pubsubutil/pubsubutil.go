@@ -26,7 +26,9 @@ import (
 //topic *pubsub.Topic
 //)
 
-func CreateClientTopic(projectID string, topicID string) (*pubsub.Topic, error) {
+// Create a pubsub client and topic from GCP projectID and topicID. Return
+// the pubsub.Topic and/or error to the caller
+func CreateClientTopic(projectID, topicID string) (*pubsub.Topic, error) {
 
 	ctx := context.Background()
 	client, err := pubsub.NewClient(ctx, projectID)

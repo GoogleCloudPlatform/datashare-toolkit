@@ -16,10 +16,13 @@ limitations under the License.
 package injestion
 
 import (
+	"encoding/hex"
 	"fmt"
+	"github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/internal/multicast"
 	"github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/internal/pubsubutil"
 	"github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/internal/validate"
 	log "github.com/sirupsen/logrus"
+	"net"
 	"os"
 )
 
@@ -30,6 +33,23 @@ func mustGetenv(k string) string {
 		log.Fatalf("%s environment variable not set.", k)
 	}
 	return v
+}
+
+// temp multicast handler
+func msgHandler(src *net.UDPAddr, n int, b []byte) {
+	log.Println(n, "bytes read from", src)
+	log.Println(hex.Dump(b[:n]))
+}
+
+// Listen to Multicast and Stream the data to pubsub by validating and
+// interating over the input
+func MulticastListener(projectID, topicID, network, address string) error {
+	log.Debugf("Starting Multicast Injestion Run...")
+	err := multicast.Listen(network, address, msgHandler)
+	if err != nil {
+		return fmt.Errorf("multicast.Listen: %s", err.Error())
+	}
+	return nil
 }
 
 // Stream the data to pubsub by validating and interating over the input
