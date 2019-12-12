@@ -8,7 +8,7 @@ steps:
   entrypoint: 'npm'
   args: ['install']
 - name: 'node:8.16.2'
-  dir: 'ingestion/function'
+  dir: 'batch'
   entrypoint: 'npm'
   args: ['install']
 - name: gcr.io/cloud-builders/gcloud
@@ -31,6 +31,6 @@ steps:
   entrypoint: 'npm'
   args: ['run', 'cloudtest']
 - name: 'node:8.16.2'
-  dir: 'ingestion/function'
+  dir: 'batch'
   entrypoint: 'npm'
   args: ['run', 'cloudtest']
