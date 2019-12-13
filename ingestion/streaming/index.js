@@ -19,8 +19,13 @@
 
 // Usage: ${0} <ws url> <topic>
 //
-// take messages arriving via WebSocket (JSONL-formatted) and
+// Get messages arriving via WebSocket (JSONL-formatted) and
 // publish them individually to the specified topic
+
+if (process.argv.length < 4) {
+    console.error(`Usage: ${process.argv[0]} ${process.argv[1]} <WebSocket URL> <topic-mame>`);
+    process.exit(1);
+}
 
 const {PubSub} = require('@google-cloud/pubsub');
 const pubsub = new PubSub();
@@ -28,16 +33,40 @@ const pubsub = new PubSub();
 const socketUrl = process.argv[2];
 const topicName = process.argv[3];
 const WebSocket = require('ws');
+const ws = new WebSocket(socketUrl);
 
-if (process.argv.length < 4) {
-    console.error(`Usage: webSocketPublisher <WebSocket URL> <topic-mame>`);
+const publishMessages = function() {
+    let topic = pubsub.topic(topicName);
+
+    ws.on('open', function open() {
+        console.error('Web socket connection opened');
+    });
+    ws.on('message', inbound);
+    ws.on('close', close);
+
+}
+
+const inbound = function (data) {
+     try {
+         topic.publisher.publish(Buffer.from(data), function(err, messageId) {
+             if (err) {
+                 console.error(`could not publish message ${messageId}`);
+             }
+         });
+     } catch(error) {
+         console.error(`error publishing message: ${error}`);
+     }
+ }
+
+const close = function() {
+    console.error("Web socket connection closed");
     process.exit(1);
 }
 
 let topic = pubsub.topic(topicName);
 try {
     if (!topic) {
-        pubsub.createTopic(topicName, function(err) {
+        pubsub.createTopic(topicName, function (err) {
             if (err) {
                 console.error('Could not create topic: ' + JSON.stringify(err));
                 process.exit(1);
@@ -53,25 +82,3 @@ try {
 }
 
 
-function publishMessages() {
-
-    let topic = pubsub.topic(topicName);
-    const ws = new WebSocket(socketUrl);
-
-    ws.on('open', function open() {
-        console.error('socket opened');
-    });
-    
-    ws.on('message', function inbound(data) {
-        try {
-            topic.publisher.publish(Buffer.from(data), function(err, messageId) {
-                if (err) {
-                    console.error(`could not publish message ${messageId}`);
-                }
-            });
-        } catch(error) {
-            console.error(`error publishing message: ${error}`);
-        }
-    });
-
-}

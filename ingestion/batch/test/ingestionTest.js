@@ -106,6 +106,10 @@ if (argv.runCloudTests) {
         }).then((result) => {
             expect(result).to.be.true;
         }).then(() => {
+            return bigqueryUtil.getTableLabelValue(datasetName, tableName, ingestion.labelName);
+        }).then((label) => {
+            expect(label).equals("true");
+        }).then(() => {
             const options = { query: `select * from \`${datasetName}.${tableName}\`` };
             return bigqueryUtil.executeQuerySync(options);
         }).then((result) => {
