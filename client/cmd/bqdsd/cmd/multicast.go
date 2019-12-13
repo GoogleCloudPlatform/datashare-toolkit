@@ -25,6 +25,7 @@ import (
 var (
 	mltcstNetwork string
 	mltcstAddress string
+	mltcstIfName  string
 )
 
 // multicastCmd represents the multicast command
@@ -35,25 +36,29 @@ var multicastCmd = &cobra.Command{
 
 -n "udp_multicast_group_a"
 -a "239.0.0.0:9999"
+-i "en0"
 `,
 	Args: func(cmd *cobra.Command, args []string) error {
 		mltcstNetwork, _ := cmd.Flags().GetString("mltcstNetwork")
 		mltcstAddress, _ := cmd.Flags().GetString("mltcstAddress")
+		mltcstIfName, _ := cmd.Flags().GetString("mltcstIfName")
 		//fmt.Println(args)
-		if mltcstNetwork == "" || mltcstAddress == "" {
-			log.Fatalf("Input requires both the UDP mltcstNetwork name and mltcstAddress")
+		if mltcstNetwork == "" || mltcstAddress == "" || mltcstIfName == "" {
+			log.Fatalf("Input requires all the UDP: [mltcstNetwork, mltcstAddress, mltcstIfName]")
 		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		mltcstNetwork, _ := cmd.Flags().GetString("mltcstNetwork")
 		mltcstAddress, _ := cmd.Flags().GetString("mltcstAddress")
+		mltcstIfName, _ := cmd.Flags().GetString("mltcstIfName")
 		// These PersistantFlags are required and validated in parent command
 		projectID, _ := cmd.Flags().GetString("projectID")
 		topicID, _ := cmd.Flags().GetString("topicID")
 		log.Debugln("mltcstNetwork:", mltcstNetwork)
 		log.Debugln("mltcstAddress:", mltcstAddress)
-		err := injestion.MulticastListener(projectID, topicID, mltcstNetwork, mltcstAddress)
+		log.Debugln("mltcstIfName:", mltcstIfName)
+		err := injestion.MulticastListener(projectID, topicID, mltcstNetwork, mltcstAddress, mltcstIfName)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -62,8 +67,9 @@ var multicastCmd = &cobra.Command{
 
 func init() {
 	clientCmd.AddCommand(multicastCmd)
-	multicastCmd.Flags().StringVarP(&mltcstNetwork, "mltcstNetwork", "n", "", "UDP mltcstNetwork group name: e.g. 'udp_multicast_group_a'")
-	multicastCmd.Flags().StringVarP(&mltcstAddress, "mltcstAddress", "a", "", "UDP mltcstNetwork mltcstAddress in <HOST:PORT> format: e.g. '239.0.0.0:9999'")
+	multicastCmd.Flags().StringVarP(&mltcstNetwork, "mltcstNetwork", "n", "", "UDP multicast network group name: e.g. 'udp_multicast_group_a'")
+	multicastCmd.Flags().StringVarP(&mltcstAddress, "mltcstAddress", "a", "", "UDP multicast address in <HOST:PORT> format: e.g. '239.0.0.0:9999'")
+	multicastCmd.Flags().StringVarP(&mltcstIfName, "mltcstIfName", "i", "", "UDP multicast interface name: e.g. 'en0' or 'lo0'")
 
 	// Here you will define your flags and configuration settings.
 

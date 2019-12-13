@@ -26,6 +26,10 @@ import (
 	"os"
 )
 
+const (
+	maxDatagramSize = 4096
+)
+
 // force return of environment variables
 func mustGetenv(k string) string {
 	v := os.Getenv(k)
@@ -39,16 +43,33 @@ func mustGetenv(k string) string {
 func msgHandler(src *net.UDPAddr, n int, b []byte) {
 	log.Println(n, "bytes read from", src)
 	log.Println(hex.Dump(b[:n]))
+	//var rawData = hex.EncodeToString(b[:n]) // hex string
+	var rawData = string(b[:n])
+	log.Println(rawData)
 }
 
 // Listen to Multicast and Stream the data to pubsub by validating and
 // interating over the input
-func MulticastListener(projectID, topicID, network, address string) error {
+func MulticastListener(projectID, topicID, network, address, ifName string) error {
 	log.Debugf("Starting Multicast Injestion Run...")
-	err := multicast.Listen(network, address, msgHandler)
+
+	log.Debugf("Creating PubSub Topic Client.")
+	topic, err := pubsubutil.CreateTopicClient(projectID, topicID)
 	if err != nil {
-		return fmt.Errorf("multicast.Listen: %s", err.Error())
+		return fmt.Errorf("pubsubutil.CreateTopicClient: %s", err.Error())
 	}
+
+	conn, err := multicast.CreateConn(network, address, ifName)
+	if err != nil {
+		return fmt.Errorf("multicast.CreateConn: %s", err.Error())
+	}
+
+	log.Debugf("Listening and Publishing Messages...")
+	err = multicast.ListenAndPublish(conn, topic)
+	if err != nil {
+		return fmt.Errorf("pubsubutil.PublishMessage: %s", err.Error())
+	}
+	log.Debugf("Completed.")
 	return nil
 }
 
@@ -60,12 +81,15 @@ func Run(projectID string, topicID string, raw string) error {
 		return fmt.Errorf("validate.CheckInputData: %s", err.Error())
 	}
 
-	topic, err := pubsubutil.CreateClientTopic(projectID, topicID)
+	log.Debugf("Creating PubSub Client.")
+	topic, err := pubsubutil.CreateTopicClient(projectID, topicID)
 	if err != nil {
-		return fmt.Errorf("pubsubutil.CreateClientTopic: %s", err.Error())
+		return fmt.Errorf("pubsubutil.CreateTopicClient: %s", err.Error())
 	}
-	for index, line := range data {
-		log.Debugf("%d, %s", index, line)
+
+	log.Debugf("Publishing Messages...")
+	for idx, line := range data {
+		log.Debugf("idx: '%v', line: '%s'", idx, line)
 		_, err := pubsubutil.PublishMessage(topic, raw)
 		if err != nil {
 			return fmt.Errorf("pubsub.PublishMessage: %s", err.Error())

@@ -28,7 +28,7 @@ import (
 
 // Create a pubsub client and topic from GCP projectID and topicID. Return
 // the pubsub.Topic and/or error to the caller
-func CreateClientTopic(projectID, topicID string) (*pubsub.Topic, error) {
+func CreateTopicClient(projectID, topicID string) (*pubsub.Topic, error) {
 
 	ctx := context.Background()
 	client, err := pubsub.NewClient(ctx, projectID)
@@ -46,6 +46,7 @@ func CreateClientTopic(projectID, topicID string) (*pubsub.Topic, error) {
 	if !exists {
 		return nil, fmt.Errorf("Topic '%v' does not exist", topicID)
 	}
+	log.Debugf("PubSub Topic client created for projectID '%s', topicID '%s'", projectID, topicID)
 	return topic, nil
 }
 
