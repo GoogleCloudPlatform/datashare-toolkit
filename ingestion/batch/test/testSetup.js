@@ -16,6 +16,7 @@
 
 const argv = require('minimist')(process.argv.slice(2));
 process.env.UNIT_TESTS = true;
+process.env.VERBOSE_MODE = true;
 
 if (argv.verbose) {
     process.env.VERBOSE_MODE = true;
