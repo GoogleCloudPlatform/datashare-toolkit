@@ -16,6 +16,8 @@
 
 'use strict';
 const { BigQuery } = require('@google-cloud/bigquery');
+const { Storage } = require('@google-cloud/storage');
+const storage = new Storage();
 
 class BigQueryUtil {
     constructor(projectId) {
@@ -560,6 +562,33 @@ class BigQueryUtil {
         const dataset = this.bigqueryClient.dataset(datasetId);
         const table = dataset.table(tableId);
         return table.insert(rows);
+    }
+
+    /**
+     * @param  {string} datasetId
+     * @param  {string} tableId
+     * @param  {string} bucketName
+     * @param  {string} filename
+     * @param  {Object} extract options
+     * Extracts a BigQuery table to Cloud Storage with options and returns true
+     */
+    async extractTableToGCS(datasetId, tableId, bucketName, filename, options) {
+        // Export data from the table into a Google Cloud Storage file
+        const [job] = await this.bigqueryClient
+            .dataset(datasetId)
+            .table(tableId)
+            .extract(storage.bucket(bucketName).file(filename), options);
+
+        if (this.VERBOSE_MODE) {
+            console.log(`Extract job '${job.id}' is complete for table '${datasetId}.${tableId}'`);
+        }
+        // Check the job's status for errors
+        const err = job.status.errors;
+        if (err && err.length > 0) {
+            console.warn(err.message);
+            throw err;
+        }
+        return true;
     }
 }
 
