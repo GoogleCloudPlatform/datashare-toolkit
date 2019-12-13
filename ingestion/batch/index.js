@@ -24,6 +24,7 @@ const storageUtil = new StorageUtil();
 const stagingTableExpiryDays = 2;
 const processPrefix = "bqds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
+const labelName = "bqds_ingestion_managed";
 let batchId;
 const archiveEnabled = process.env.ARCHIVE_FILES ? (process.env.ARCHIVE_FILES.toLowerCase() === "true") : false;
 
@@ -145,6 +146,10 @@ async function transform(config) {
     console.log(`executing transform query: ${query}`);
     const [job] = await createTransformJob(config, query);
     await job.getQueryResults({ maxApiCalls: 1, maxResults: 0 });
+
+    // Label the table for managing and tracking
+    await bigqueryUtil.setTableLabel(config.datasetId, config.destinationTableId, labelName, "true");
+
     console.log(`Transform job: ${job.metadata.id} ${job.metadata.statistics.query.statementType} ${job.metadata.configuration.jobType} ${job.metadata.status.state}`);
     return;
 }
@@ -267,6 +272,7 @@ if (process.env.UNIT_TESTS) {
     module.exports = {
         getExceptionString,
         getBucketName,
-        processFile
+        processFile,
+        labelName
     };
 }

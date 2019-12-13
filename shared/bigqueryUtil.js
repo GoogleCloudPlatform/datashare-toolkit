@@ -222,7 +222,6 @@ class BigQueryUtil {
             // https://cloud.google.com/nodejs/docs/reference/bigquery/1.3.x/Table#getMetadata
             await table.getMetadata().then((data) => {
                 metadata = data[0];
-                const apiResponse = data[1];
                 return;
             });
         } catch (err) {
@@ -483,7 +482,6 @@ class BigQueryUtil {
 
         // https://cloud.google.com/nodejs/docs/reference/bigquery/1.3.x/Table#setMetadata
         await table.setMetadata(metadata).then((data) => {
-            const apiResponse = data[1];
             success = true;
             return;
         });
@@ -506,6 +504,34 @@ class BigQueryUtil {
             return labelValue;
         }
         return null;
+    }
+
+    /**
+     * @param  {} datasetId
+     * @param  {} tableId
+     * @param  {} key
+     * @param  {} value
+     * set table label
+     */
+    async setTableLabel(datasetId, tableId, key, value) {
+        const dataset = this.bigqueryClient.dataset(datasetId);
+        const [table] = await dataset.table(tableId).get();
+    
+        // Retrieve current table metadata
+        const [metadata] = await table.getMetadata();
+    
+        if (!metadata.labels) {
+            metadata.labels = { };
+        }
+
+        // Set label in table metadata
+        metadata.labels[key] = value;
+
+        const [apiResponse] = await table.setMetadata(metadata);    
+        if (this.VERBOSE_MODE) {
+            console.log(`${tableId} labels:`);
+            console.log(apiResponse.labels);
+        }
     }
 
     /**
