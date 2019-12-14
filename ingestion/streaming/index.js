@@ -21,18 +21,20 @@
 //
 // Get messages arriving via WebSocket (JSONL-formatted) and
 // publish them individually to the specified topic
+//
+// TODO: Set message attributes from data coming over via websockets
+//
+//
 
 if (process.argv.length < 4) {
     console.error(`Usage: ${process.argv[0]} ${process.argv[1]} <WebSocket URL> <topic-mame>`);
     process.exit(1);
 }
-
-const {PubSub} = require('@google-cloud/pubsub');
-const pubsub = new PubSub();
-
 const socketUrl = process.argv[2];
 const topicName = process.argv[3];
 const WebSocket = require('ws');
+const {PubSub} = require('@google-cloud/pubsub');
+const pubsub = new PubSub();
 const ws = new WebSocket(socketUrl);
 
 const publishMessages = function() {
@@ -47,14 +49,17 @@ const publishMessages = function() {
 }
 
 const inbound = function (data) {
-     try {
-         topic.publisher.publish(Buffer.from(data), function(err, messageId) {
+    try {
+	let payload = Buffer.from(data);
+        topic.publisher.publish(payload,
+				{ origin: socketUrl },
+				function(err, messageId) {
              if (err) {
-                 console.error(`could not publish message ${messageId}`);
+		 console.error(`error in publish callback: ${err}`);
              }
          });
      } catch(error) {
-         console.error(`error publishing message: ${error}`);
+         console.error(`caught error publishing message: ${error}`);
      }
  }
 
