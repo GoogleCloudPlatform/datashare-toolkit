@@ -32,7 +32,7 @@ describe('StorageUtil', () => {
     if (argv.runCloudTests) {
 
         const uuid = uuidv4();
-        const projectName = argv.projectId;
+        const projectId = argv.projectId;
 
         context('createBucket with arguments', () => {
             it("should return true", async () => {

@@ -85,28 +85,31 @@ class PubSubUtil {
 
     /**
      * @param  {string} topicName
+     * @param  {string} subscriptionProjectId
      * @param  {string} subscriptionName
      * check if the subscription exists by name and return true if exists
      */
-    async checkIfSubscriptionExists(topicName, subscriptionName) {
+    async checkIfSubscriptionExists(topicName, subscriptionProjectId, subscriptionName) {
         const topic = this.pubsub.topic(topicName);
-        const subscription = topic.subscription(subscriptionName);
+        const formattedSubscription = this.client.subscriptionPath(subscriptionProjectId, subscriptionName);
+        const subscription = topic.subscription(formattedSubscription);
         const response = await subscription.exists();
         const exists = response[0];
         if (this.VERBOSE_MODE) {
-            console.log(`Checking if subscription exists: '${topicName}': ${subscriptionName}`);
+            console.log(`Checking if subscription exists: '${topicName}': ${formattedSubscription}`);
         }
         return exists;
     }
 
     /**
-     * @param  {string} projectName
+     * @param  {string} subscriptionProjectId
      * @param  {string} subscriptionName
      * get a message syncronously and ack it. throw an error if no messages in the subscription
      */
-    async getMessage(projectName, subscriptionName) {
+    async getMessage(subscriptionProjectId, subscriptionName) {
         // The maximum number of messages returned for this request.
-        const formattedSubscription = this.client.subscriptionPath(projectName, subscriptionName);
+
+        const formattedSubscription = this.client.subscriptionPath(subscriptionProjectId, subscriptionName);
         const maxMessages = 1;
         const request = {
             subscription: formattedSubscription,
