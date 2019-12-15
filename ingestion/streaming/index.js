@@ -17,7 +17,7 @@
 
 'use strict';
 
-// Usage: ${0} <ws url> <topic>
+// Usage: pubsock <ws url> <topic>
 //
 // Get messages arriving via WebSocket (JSONL-formatted) and
 // publish them individually to the specified topic
@@ -27,7 +27,7 @@
 //
 
 if (process.argv.length < 4) {
-    console.error(`Usage: ${process.argv[0]} ${process.argv[1]} <WebSocket URL> <topic-mame>`);
+    console.error(`Usage: pubsock <WebSocket URL> <topic-mame>`);
     process.exit(1);
 }
 const socketUrl = process.argv[2];
@@ -36,6 +36,7 @@ const WebSocket = require('ws');
 const {PubSub} = require('@google-cloud/pubsub');
 const pubsub = new PubSub();
 const ws = new WebSocket(socketUrl);
+let topic = undefined;
 
 const publishMessages = function() {
     let topic = pubsub.topic(topicName);
@@ -50,12 +51,12 @@ const publishMessages = function() {
 
 const inbound = function (data) {
     try {
-	let payload = Buffer.from(data);
+        let payload = Buffer.from(data);
         topic.publisher.publish(payload,
-				{ origin: socketUrl },
-				function(err, messageId) {
+                                { origin: socketUrl },
+                                function(err, messageId) {
              if (err) {
-		 console.error(`error in publish callback: ${err}`);
+                 console.error(`error in publish callback: ${err}`);
              }
          });
      } catch(error) {
@@ -68,20 +69,29 @@ const close = function() {
     process.exit(1);
 }
 
-let topic = pubsub.topic(topicName);
 try {
-    if (!topic) {
-        pubsub.createTopic(topicName, function (err) {
-            if (err) {
-                console.error('Could not create topic: ' + JSON.stringify(err));
-                process.exit(1);
+    topic = pubsub.topic(topicName);
+    topic.exists(function(err, exists) {
+        if (err) {
+            console.error(`Error looking for specified topic ${topicName}: ${error}`);
+            process.exit(1);
+        } else {
+            if (!exists) {
+                console.error(`Topic ${topicName} not found, creating...`);
+                topic.create(function (err, topic, apiResponse) {
+                    if (err) {
+                        console.error(`Could not create non-existent topic ${topicName}: ${apiResponse} ${err}`);
+                        process.exit(1);
+                    } else {
+                        console.error(`Created topic ${topicName}`);
+                        publishMessages();
+                    }
+                }); 
             } else {
                 publishMessages();
             }
-        });   
-    } else {
-        publishMessages();
-    }
+        }
+    });
 } catch(error) {
     console.error("Error: " + error);
 }
