@@ -65,7 +65,7 @@ const inbound = function (data) {
  }
 
 const close = function() {
-    console.error("Web socket connection closed");
+    console.error('Web socket connection closed');
     process.exit(1);
 }
 
@@ -93,7 +93,8 @@ try {
         }
     });
 } catch(error) {
-    console.error("Error: " + error);
+    console.error(`Error: ${error}`);
+    process.exit(1);
 }
 
 
