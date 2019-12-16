@@ -41,16 +41,19 @@ let topic = undefined;
 const publishMessages = function() {
     let topic = pubsub.topic(topicName);
 
-    ws.on('open', function open() {
-        console.error('Web socket connection opened');
-    });
+    ws.on('open', open);
     ws.on('message', inbound);
     ws.on('close', close);
 
 }
 
+const open = function() {
+    console.error('Web socket connection opened');
+}
+
 const inbound = function (data) {
     try {
+//	console.error('.');
         let payload = Buffer.from(data);
         topic.publisher.publish(payload,
                                 { origin: socketUrl },
