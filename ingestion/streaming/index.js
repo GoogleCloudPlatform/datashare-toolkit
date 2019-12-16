@@ -40,11 +40,9 @@ let topic = undefined;
 
 const publishMessages = function() {
     let topic = pubsub.topic(topicName);
-
     ws.on('open', open);
     ws.on('message', inbound);
     ws.on('close', close);
-
 }
 
 const open = function() {
@@ -53,7 +51,6 @@ const open = function() {
 
 const inbound = function (data) {
     try {
-//	console.error('.');
         let payload = Buffer.from(data);
         topic.publisher.publish(payload,
                                 { origin: socketUrl },
