@@ -20,7 +20,7 @@ node_modules
 *.md
 *.bak
 .eslintrc.json
-.eslintignore.json
+.eslintignore
 .nyc_output
 /bin
 /test
