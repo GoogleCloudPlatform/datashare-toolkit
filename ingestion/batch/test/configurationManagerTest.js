@@ -106,7 +106,6 @@ it("options are valid with archived file", async () => {
         fileName: "/bqds/dataset/table/data/archive/myFile.csv"
     };
     const v = await configManager.validateOptions(options, false);
-    console.log(`options are valid with archived file: ${JSON.stringify(v)}`);
     expect(v.isArchiveFile).is.true;
 });
 
