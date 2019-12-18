@@ -168,7 +168,7 @@ function parseDerivedFileAttributes(options) {
     const transformFileBucketPath = path.join(bucketPath, "..", "config", `transform.sql`);
     const archivePath = path.join(bucketPath, "archive", `${basename}`);
     const isDataFile = (pathParts.length === 4 && pathParts[0].toLowerCase() === "bqds" && pathParts[3].toLowerCase() === "data");
-    const isArchiveFile = (pathParts.length === 5 && pathParts[0].toLowerCase() === "bqds" && pathParts[3].toLowerCase() === "data" && pathParts[4].toLowerCase() === "archive");
+    const isArchived = (pathParts.length === 5 && pathParts[0].toLowerCase() === "bqds" && pathParts[3].toLowerCase() === "data" && pathParts[4].toLowerCase() === "archive");
 
     let isDirectoryPath = false;
     if (options.fileName.endsWith("/")) {
@@ -182,7 +182,7 @@ function parseDerivedFileAttributes(options) {
         transformPath: transformFileBucketPath,
         archivePath: archivePath,
         isDataFile: isDataFile,
-        isArchiveFile, isArchiveFile,
+        isArchiveFile, isArchived,
         isDirectoryPath: isDirectoryPath
     };
 }
