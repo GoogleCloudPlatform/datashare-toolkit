@@ -17,68 +17,84 @@
 
 'use strict';
 
-// Usage: ${0} <ws url> <topic>
+// Usage: pubsock <ws url> <topic>
 //
 // Get messages arriving via WebSocket (JSONL-formatted) and
 // publish them individually to the specified topic
+//
+// TODO: Set message attributes from data coming over via websockets
+//
+//
 
 if (process.argv.length < 4) {
-    console.error(`Usage: ${process.argv[0]} ${process.argv[1]} <WebSocket URL> <topic-mame>`);
+    console.error(`Usage: pubsock <WebSocket URL> <topic-mame>`);
     process.exit(1);
 }
-
-const {PubSub} = require('@google-cloud/pubsub');
-const pubsub = new PubSub();
-
 const socketUrl = process.argv[2];
 const topicName = process.argv[3];
 const WebSocket = require('ws');
+const {PubSub} = require('@google-cloud/pubsub');
+const pubsub = new PubSub();
 const ws = new WebSocket(socketUrl);
+let topic = undefined;
 
 const publishMessages = function() {
     let topic = pubsub.topic(topicName);
-
-    ws.on('open', function open() {
-        console.error('Web socket connection opened');
-    });
+    ws.on('open', open);
     ws.on('message', inbound);
     ws.on('close', close);
+}
 
+const open = function() {
+    console.error('Web socket connection opened');
 }
 
 const inbound = function (data) {
-     try {
-         topic.publisher.publish(Buffer.from(data), function(err, messageId) {
+    try {
+        let payload = Buffer.from(data);
+        topic.publisher.publish(payload,
+                                { origin: socketUrl },
+                                function(err, messageId) {
              if (err) {
-                 console.error(`could not publish message ${messageId}`);
+                 console.error(`error in publish callback: ${err}`);
              }
          });
      } catch(error) {
-         console.error(`error publishing message: ${error}`);
+         console.error(`caught error publishing message: ${error}`);
      }
  }
 
 const close = function() {
-    console.error("Web socket connection closed");
+    console.error('Web socket connection closed');
     process.exit(1);
 }
 
-let topic = pubsub.topic(topicName);
 try {
-    if (!topic) {
-        pubsub.createTopic(topicName, function (err) {
-            if (err) {
-                console.error('Could not create topic: ' + JSON.stringify(err));
-                process.exit(1);
+    topic = pubsub.topic(topicName);
+    topic.exists(function(err, exists) {
+        if (err) {
+            console.error(`Error looking for specified topic ${topicName}: ${error}`);
+            process.exit(1);
+        } else {
+            if (!exists) {
+                console.error(`Topic ${topicName} not found, creating...`);
+                topic.create(function (err, topic, apiResponse) {
+                    if (err) {
+                        console.error(`Could not create non-existent topic ${topicName}: ${apiResponse} ${err}`);
+                        process.exit(1);
+                    } else {
+                        console.error(`Created topic ${topicName}`);
+                        publishMessages();
+                    }
+                }); 
             } else {
                 publishMessages();
             }
-        });   
-    } else {
-        publishMessages();
-    }
+        }
+    });
 } catch(error) {
-    console.error("Error: " + error);
+    console.error(`Error: ${error}`);
+    process.exit(1);
 }
 
 
