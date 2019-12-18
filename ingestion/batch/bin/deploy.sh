@@ -103,31 +103,31 @@ if [ -z "$FUNCTION_REGION" ]; then
     exit 7
 else
     echo "Function region: ${FUNCTION_REGION}"
-    FUNCTION_SHARED="../function/shared"
+    FUNCTION_SHARED="../../batch/shared"
     if [ -d "${FUNCTION_SHARED}" ]; then
         rm -R "${FUNCTION_SHARED}"
     fi
     # Symlinks do not work, have to physical copy the directory
     echo "Copying shared module into function directory"
-    cp -R ../../shared "${FUNCTION_SHARED}/"
+    cp -R ../../../shared "${FUNCTION_SHARED}/"
 
     echo "Creating backup of package.json"
-    cp ../function/package.json ../function/package.json.bak
+    cp ../../batch/package.json ../../batch/package.json.bak
     UNAME=$(uname | awk '{print tolower($0)}')
     if [ "$UNAME" == "darwin" ]; then
         # macOS
         echo 'Running on macOS, performing package.json replacement for bqds-shared module'
-        sed -i '' -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../function/package.json
+        sed -i '' -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../../batch/package.json
     else
         # linux
         echo 'Running on linux, performing package.json replacement for bqds-shared module'
-        sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../function/package.json
+        sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../../batch/package.json
     fi
 
-    gcloud functions deploy ${FUNCTION_NAME:-processUpload} --region=${FUNCTION_REGION} --memory=256MB --source=../function --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}" --quiet --set-env-vars=VERBOSE_MODE=true,ARCHIVE_FILES=false
+    gcloud functions deploy ${FUNCTION_NAME:-processUpload} --region=${FUNCTION_REGION} --memory=256MB --source=../../batch --runtime=nodejs8 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}" --quiet --set-env-vars=VERBOSE_MODE=true,ARCHIVE_FILES=false
 
     echo "Restoring original package.json"
-    mv -f ../function/package.json.bak ../function/package.json
+    mv -f ../../batch/package.json.bak ../../batch/package.json
 
     echo "Removing shared directory from function directory"
     rm -R "${FUNCTION_SHARED}"

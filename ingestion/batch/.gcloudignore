@@ -18,6 +18,12 @@ node_modules
 .DS_Store
 *.png
 *.md
+*.bak
 .eslintrc.json
+.eslintignore
 .nyc_output
+/bin
+/test
 /shared/test
+/shared/config
+/shared/ciphertexts

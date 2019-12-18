@@ -116,7 +116,7 @@ async function validateOptions(options, validateStorage) {
                     }
                 }
             }
-            
+
             if (attributes.datasetId) {
                 if (attributes.datasetId.length > 1024) {
                     errors.push(`DatasetId '${attributes.datasetId}' exceeds maximum allowable length of 1024: ${attributes.datasetId.length}}`);
@@ -137,17 +137,21 @@ async function validateOptions(options, validateStorage) {
         }
     }
 
-    if (attributes && attributes.isDataFile === false) {
+    if (attributes && attributes.isArchiveFile === true) {
         console.log(`Ignoring archived file: '${options.fileName} in bucket: ${options.bucketName}'`);
-        return { isValid: true, isDataFile: false };
+        return { isValid: false, hasException: false, isArchiveFile: true };
     }
-    else if (errors.length === 0) {
+    else if (attributes && attributes.isDirectoryPath === true) {
+        console.log(`Ignoring directory path: '${options.fileName} in bucket: ${options.bucketName}'`);
+        return { isValid: false, isDirectoryPath: true, hasException: false };
+    }
+    else if (attributes && attributes.isDataFile === true && errors.length === 0) {
         console.log(`Options validation succeeded: ${info.join(", ")}`);
-        return { isValid: true, isDataFile: true, info: info, warn: warn };
+        return { isValid: true, isDataFile: true, info: info, warn: warn, hasException: false };
     }
     else {
         console.log(`Options validation failed: ${errors.join(", ")}`);
-        return { isValid: false, isDataFile: true, errors: errors, info: info, warn: warn };
+        return { isValid: false, errors: errors, info: info, warn: warn, hasException: true };
     }
 }
 
@@ -163,7 +167,13 @@ function parseDerivedFileAttributes(options) {
     const schemaFileBucketPath = path.join(bucketPath, "..", "config", `schema.json`);
     const transformFileBucketPath = path.join(bucketPath, "..", "config", `transform.sql`);
     const archivePath = path.join(bucketPath, "archive", `${basename}`);
-    const isDataFile = (pathParts.length === 4 && underscore.first(pathParts).toLowerCase() === "bqds" && pathParts.pop().toLowerCase() === "data");
+    const isDataFile = (pathParts.length === 4 && pathParts[0].toLowerCase() === "bqds" && pathParts[3].toLowerCase() === "data");
+    const isArchived = (pathParts.length === 5 && pathParts[0].toLowerCase() === "bqds" && pathParts[3].toLowerCase() === "data" && pathParts[4].toLowerCase() === "archive");
+
+    let isDirectoryPath = false;
+    if (options.fileName.endsWith("/")) {
+        isDirectoryPath = true;
+    }
 
     return {
         datasetId: datasetId,
@@ -171,7 +181,9 @@ function parseDerivedFileAttributes(options) {
         schemaPath: schemaFileBucketPath,
         transformPath: transformFileBucketPath,
         archivePath: archivePath,
-        isDataFile: isDataFile
+        isDataFile: isDataFile,
+        isArchiveFile: isArchived,
+        isDirectoryPath: isDirectoryPath
     };
 }
 

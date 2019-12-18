@@ -103,11 +103,10 @@ it("options are valid with archived file", async () => {
     const options = {
         eventId: 1,
         bucketName: bucketName,
-        fileName: "/bqds/dataset/table/data/archive/myFile.txt"
+        fileName: "/bqds/dataset/table/data/archive/myFile.csv"
     };
     const v = await configManager.validateOptions(options, false);
-    console.log(JSON.stringify(v));
-    expect(v.isDataFile).is.false;
+    expect(v.isArchiveFile).is.true;
 });
 
 it("options are invalid with bad path", async () => {
@@ -127,6 +126,16 @@ it("options are invalid", async () => {
     const result = await configManager.validateOptions(options, false);
     expect(result.isValid).is.false;
     expect(result.errors.length).is.equal(3);
+});
+
+it("options file is a path directory", async () => {
+    const options = {
+        eventId: 1,
+        bucketName: bucketName,
+        fileName: "/bqds/bqds/table/data/"
+    };
+    const result = await configManager.validateOptions(options, false);
+    expect(result.isDirectoryPath).is.true;
 });
 
 if (argv.runCloudTests) {
