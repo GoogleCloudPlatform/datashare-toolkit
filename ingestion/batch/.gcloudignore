@@ -21,3 +21,5 @@ node_modules
 .eslintrc.json
 .nyc_output
 /shared/test
+/bin
+*.bak
