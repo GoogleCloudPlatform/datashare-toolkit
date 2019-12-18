@@ -182,7 +182,7 @@ function parseDerivedFileAttributes(options) {
         transformPath: transformFileBucketPath,
         archivePath: archivePath,
         isDataFile: isDataFile,
-        isArchiveFile, isArchived,
+        isArchiveFile: isArchived,
         isDirectoryPath: isDirectoryPath
     };
 }
