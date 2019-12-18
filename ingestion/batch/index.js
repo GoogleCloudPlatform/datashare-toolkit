@@ -57,7 +57,7 @@ async function processTriggerEvent(event, context) {
         fileName: event.name
     };
     const result = await configManager.validateOptions(options, true);
-    if (!result.isValid) {
+    if (!result.isValid && result.hasException) {
         throw new Error(`Validation error for fileName: ${options.fileName}: ${JSON.stringify(result)}`);
     }
     await processFile(options, true);
@@ -71,7 +71,7 @@ async function processTriggerEvent(event, context) {
 async function processHttpEvent(request, response) {
     const options = request.body || {};
     const result = await configManager.validateOptions(options, true);
-    if (!result.isValid) {
+    if (!result.isValid && result.hasException) {
         response.status(400).send({ errors: result.errors });
         return;
     }
