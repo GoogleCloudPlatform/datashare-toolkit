@@ -53,7 +53,7 @@ You can also access an instance of Swagger UI to render the OAS docs:
 
 ## Getting Started
 
-These instructions will setup an instance of the BQDS API Serivce in your GCP project.
+These instructions will setup an instance of the BQDS API Service in your GCP project.
 
 ### Create Storage Bucket
 
@@ -73,7 +73,7 @@ Create the new storage bucket:
 
 ### Create Configuration
 
-The BQDS Spot fulfillment API configuration definitions are defined [above](#configuration). You can view an example in the MLB examples config [here](../examples/mlb/config/api/config.json). Make the appopriate modifications and then copy to your storage bucket.
+The BQDS Spot fulfillment API configuration definitions are defined [above](#configuration). You can view an example in the MLB examples config [here](../examples/mlb/config/api/config.json). Make the appropriate modifications and then copy to your storage bucket.
 
 Copy configuration to the storage bucket:
 
@@ -223,8 +223,8 @@ List the subscriptions for the topic:
 
 ### Examples
 
-After you have completed the [Getting Started](#getting-started) prerequisites, you can now load the BQDS API eample configuration file. Navigate to the [examples](../examples) directory and modify the MLB api [config.json](../examples/mlb/config/api/config.json) accordingly. \
-_Note_ - Change the *projectId*, *datasetId*, and *tableId* to your GCP project and coresponding dataset
+After you have completed the [Getting Started](#getting-started) prerequisites, you can now load the BQDS API sample configuration file. Navigate to the [examples](../examples) directory and modify the MLB api [config.json](../examples/mlb/config/api/config.json) accordingly. \
+_Note_ - Change the *projectId*, *datasetId*, and *tableId* to your GCP project and corresponding dataset
 
 
 ## Development
