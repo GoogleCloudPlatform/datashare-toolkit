@@ -53,7 +53,7 @@ You can also access an instance of Swagger UI to render the OAS docs:
 
 ## Getting Started
 
-These instructions will setup an instance of the BQDS API Serivce in your GCP project.
+These instructions will setup an instance of the BQDS API Service in your GCP project.
 
 ### Create Storage Bucket
 
