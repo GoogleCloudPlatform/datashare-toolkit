@@ -48,9 +48,27 @@ func msgHandler(src *net.UDPAddr, n int, b []byte) {
 	log.Println(rawData)
 }
 
+// Listen to Multicast
+func MulticastListener(network, address, ifName string) error {
+	log.Debugf("Starting Multicast Injestion Run...")
+
+	conn, err := multicast.CreateConn(network, address, ifName)
+	if err != nil {
+		return fmt.Errorf("multicast.CreateConn: %s", err.Error())
+	}
+
+	log.Debugf("Listening Messages...")
+	err = multicast.Listen(conn, msgHandler)
+	if err != nil {
+		return fmt.Errorf("Listen: %s", err.Error())
+	}
+	log.Debugf("Completed.")
+	return nil
+}
+
 // Listen to Multicast and Stream the data to pubsub by validating and
 // interating over the input
-func MulticastListener(projectID, topicID, network, address, ifName string) error {
+func MulticastPublisher(projectID, topicID, network, address, ifName string) error {
 	log.Debugf("Starting Multicast Injestion Run...")
 
 	log.Debugf("Creating PubSub Topic Client.")

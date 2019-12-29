@@ -18,7 +18,6 @@ package cmd
 import (
 	log "github.com/sirupsen/logrus"
 
-	"github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/internal/injestion"
 	"github.com/spf13/cobra"
 )
 
@@ -32,42 +31,34 @@ var (
 var multicastCmd = &cobra.Command{
 	Use:   "multicast",
 	Short: "BQDS client multicast service",
-	Long: `The BQDS client multicast service will listen to a specific multicast network group and address. For example:
+	Long: `The BQDS client multicast service will listen, broadcast, or publish to a specific multicast network group and address. For example:
 
 -n "udp_multicast_group_a"
 -a "239.0.0.0:9999"
 -i "en0"
 `,
-	Args: func(cmd *cobra.Command, args []string) error {
-		mltcstNetwork, _ := cmd.Flags().GetString("mltcstNetwork")
-		mltcstAddress, _ := cmd.Flags().GetString("mltcstAddress")
-		mltcstIfName, _ := cmd.Flags().GetString("mltcstIfName")
-		//fmt.Println(args)
-		if mltcstNetwork == "" || mltcstAddress == "" || mltcstIfName == "" {
-			log.Fatalf("Input requires all the UDP: [mltcstNetwork, mltcstAddress, mltcstIfName]")
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		log.Debug("Running PersistentFlag validation")
+		requiredFlgs := [3]string{"mltcstNetwork", "mltcstAddress", "mltcstIfName"}
+		for _, flagName := range requiredFlgs {
+			flagValue, _ := cmd.Flags().GetString(flagName)
+			if flagValue == "" {
+				log.Fatalf("'%s' requires a valid value, not '%s'", flagName, flagValue)
+			}
 		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		mltcstNetwork, _ := cmd.Flags().GetString("mltcstNetwork")
-		mltcstAddress, _ := cmd.Flags().GetString("mltcstAddress")
-		mltcstIfName, _ := cmd.Flags().GetString("mltcstIfName")
-		// These PersistantFlags are required and validated in parent command
-		projectID, _ := cmd.Flags().GetString("projectID")
-		topicID, _ := cmd.Flags().GetString("topicID")
-		log.Debugln("mltcstNetwork:", mltcstNetwork)
-		log.Debugln("mltcstAddress:", mltcstAddress)
-		log.Debugln("mltcstIfName:", mltcstIfName)
-		err := injestion.MulticastListener(projectID, topicID, mltcstNetwork, mltcstAddress, mltcstIfName)
-		if err != nil {
-			log.Fatal(err)
-		}
+		log.Debugln("client multicast called. add main logic here")
 	},
 }
 
 func init() {
+	multicastCmd.PersistentFlags().StringVarP(&mltcstNetwork, "mltcstNetwork", "n", "", "UDP multicast network group name: e.g. 'udp_multicast_group_a'")
+	multicastCmd.PersistentFlags().StringVarP(&mltcstAddress, "mltcstAddress", "a", "", "UDP multicast address in <HOST:PORT> format: e.g. '239.0.0.0:9999'")
+	multicastCmd.PersistentFlags().StringVarP(&mltcstIfName, "mltcstIfName", "i", "", "UDP multicast interface name: e.g. 'en0' or 'lo0'")
+	multicastCmd.MarkPersistentFlagRequired("mltcstNetwork")
+	multicastCmd.MarkPersistentFlagRequired("mltcstAddress")
+	multicastCmd.MarkPersistentFlagRequired("mltcstIfName")
 	clientCmd.AddCommand(multicastCmd)
-	multicastCmd.Flags().StringVarP(&mltcstNetwork, "mltcstNetwork", "n", "", "UDP multicast network group name: e.g. 'udp_multicast_group_a'")
-	multicastCmd.Flags().StringVarP(&mltcstAddress, "mltcstAddress", "a", "", "UDP multicast address in <HOST:PORT> format: e.g. '239.0.0.0:9999'")
-	multicastCmd.Flags().StringVarP(&mltcstIfName, "mltcstIfName", "i", "", "UDP multicast interface name: e.g. 'en0' or 'lo0'")
 }
