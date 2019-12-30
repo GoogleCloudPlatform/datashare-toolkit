@@ -38,7 +38,6 @@ Websocket: 'wss://127.0.0.1:8000'
 Multicast: '224.0.1.0:264'
 `,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		log.Debug("Running PersistentFlag validation")
 		requiredFlgs := [2]string{"projectID", "topicID"}
 		for _, flagName := range requiredFlgs {
 			flagValue, _ := cmd.Flags().GetString(flagName)

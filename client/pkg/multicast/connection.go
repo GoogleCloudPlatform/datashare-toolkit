@@ -29,8 +29,8 @@ type Client struct {
 	Topic *pubsub.Topic
 }
 
-// Create Conn binds to the Client UDP network with address:port and returns Connection or error
-func (c *Client) CreateConn() error {
+// Create Listener Conn binds to the Client UDP network with address:port and returns Listener connection or error
+func (c *Client) CreateListenerConn() error {
 
 	addr, err := net.ResolveUDPAddr(c.Network, c.Address)
 	if err != nil {
@@ -47,7 +47,32 @@ func (c *Client) CreateConn() error {
 		return fmt.Errorf("net.ListenMulticastUDP: %s", err)
 	}
 
-	log.Debugf("Multicast Listener created: network '%s', address '%s', ifName '%s'",
+	log.Debugf("Multicast Listener connection created: network '%s', address '%s', ifName '%s'",
+		c.Network, c.Address, c.IfName)
+	c.Conn = conn
+	return nil
+}
+
+// Create Broadcaster Conn binds to the Client UDP network with address:port and returns Broadcaster connection or error
+func (c *Client) CreateBroadcasterConn() error {
+
+	addr, err := net.ResolveUDPAddr(c.Network, c.Address)
+	if err != nil {
+		return fmt.Errorf("net.ResolveUDPAddr: %s", err)
+	}
+
+	// TODO Add IfName option for broadcaster
+	//ifi, err := net.InterfaceByName(c.IfName)
+	//if err != nil {
+	//return fmt.Errorf("net.InterfaceByName: %s", err)
+	//}
+
+	conn, err := net.DialUDP(c.Network, nil, addr)
+	if err != nil {
+		return fmt.Errorf("net.DialUDP: %s", err)
+	}
+
+	log.Debugf("Multicast Broadcaster connection created: network '%s', address '%s', ifName '%s'",
 		c.Network, c.Address, c.IfName)
 	c.Conn = conn
 	return nil

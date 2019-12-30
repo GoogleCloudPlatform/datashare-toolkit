@@ -51,7 +51,30 @@ func CreateTopicClient(projectID, topicID string) (*pubsub.Topic, error) {
 }
 
 // Publish a message to a specific topic and return the id and error
-func PublishMessage(topic *pubsub.Topic, input string) (string, error) {
+func PublishMessage(topic *pubsub.Topic, input []byte) (string, error) {
+	ctx := context.Background()
+
+	msg := &pubsub.Message{
+		Data: input,
+		//Attributes: map[string]string{
+		//"origin":   "golang",
+		//"username": "gcp",
+		//},
+	}
+
+	// Block until the result is returned and a server-generated
+	// ID is returned for the published message.
+	var id string
+	if id, err := topic.Publish(ctx, msg).Get(ctx); err != nil {
+		return "", fmt.Errorf("Publish error on topic '%s'", topic)
+	} else {
+		log.Debugf("Published message. msg ID: %v\n", id)
+	}
+	return id, nil
+}
+
+// Publish a string message to a specific topic and return the id and error
+func PublishMessageS(topic *pubsub.Topic, input string) (string, error) {
 	ctx := context.Background()
 
 	msg := &pubsub.Message{

@@ -38,7 +38,6 @@ var multicastCmd = &cobra.Command{
 -i "en0"
 `,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		log.Debug("Running PersistentFlag validation")
 		requiredFlgs := [3]string{"mltcstNetwork", "mltcstAddress", "mltcstIfName"}
 		for _, flagName := range requiredFlgs {
 			flagValue, _ := cmd.Flags().GetString(flagName)
