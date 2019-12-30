@@ -21,12 +21,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	mltcstNetwork string
-	mltcstAddress string
-	mltcstIfName  string
-)
-
 // multicastCmd represents the multicast command
 var multicastCmd = &cobra.Command{
 	Use:   "multicast",
@@ -38,7 +32,7 @@ var multicastCmd = &cobra.Command{
 -i "en0"
 `,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		requiredFlgs := [3]string{"mltcstNetwork", "mltcstAddress", "mltcstIfName"}
+		requiredFlgs := [3]string{"network", "address", "ifName"}
 		for _, flagName := range requiredFlgs {
 			flagValue, _ := cmd.Flags().GetString(flagName)
 			if flagValue == "" {
@@ -53,11 +47,11 @@ var multicastCmd = &cobra.Command{
 }
 
 func init() {
-	multicastCmd.PersistentFlags().StringVarP(&mltcstNetwork, "mltcstNetwork", "n", "", "UDP multicast network group name: e.g. 'udp_multicast_group_a'")
-	multicastCmd.PersistentFlags().StringVarP(&mltcstAddress, "mltcstAddress", "a", "", "UDP multicast address in <HOST:PORT> format: e.g. '239.0.0.0:9999'")
-	multicastCmd.PersistentFlags().StringVarP(&mltcstIfName, "mltcstIfName", "i", "", "UDP multicast interface name: e.g. 'en0' or 'lo0'")
-	multicastCmd.MarkPersistentFlagRequired("mltcstNetwork")
-	multicastCmd.MarkPersistentFlagRequired("mltcstAddress")
-	multicastCmd.MarkPersistentFlagRequired("mltcstIfName")
+	multicastCmd.PersistentFlags().StringVarP(&network, "network", "n", "", "UDP multicast network group name: e.g. 'udp_multicast_group_a'")
+	multicastCmd.PersistentFlags().StringVarP(&address, "address", "a", "", "UDP multicast address in <HOST:PORT> format: e.g. '239.0.0.0:9999'")
+	multicastCmd.PersistentFlags().StringVarP(&ifName, "ifName", "i", "", "UDP multicast interface name: e.g. 'en0' or 'lo0'")
+	multicastCmd.MarkPersistentFlagRequired("network")
+	multicastCmd.MarkPersistentFlagRequired("address")
+	multicastCmd.MarkPersistentFlagRequired("ifName")
 	clientCmd.AddCommand(multicastCmd)
 }

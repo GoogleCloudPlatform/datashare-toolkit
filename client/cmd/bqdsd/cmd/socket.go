@@ -21,11 +21,6 @@ import (
 )
 
 var (
-	network string
-	address string
-)
-
-var (
 	networkDefault string = "unix"
 	addressDefault string = "/tmp/echo.sock"
 )

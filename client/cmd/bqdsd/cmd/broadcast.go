@@ -36,17 +36,17 @@ var mlcstBroadcastCmd = &cobra.Command{
 -m "I am a sample message"
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		mltcstNetwork, _ := cmd.Flags().GetString("mltcstNetwork")
-		mltcstAddress, _ := cmd.Flags().GetString("mltcstAddress")
-		mltcstIfName, _ := cmd.Flags().GetString("mltcstIfName")
+		network, _ := cmd.Flags().GetString("network")
+		address, _ := cmd.Flags().GetString("address")
+		ifName, _ := cmd.Flags().GetString("ifName")
 		message, _ := cmd.Flags().GetString("message")
 
 		log.Debugf("Starting Multicast Broadcast Run...")
 
 		mltcstClient := multicast.Client{
-			Network: mltcstNetwork,
-			Address: mltcstAddress,
-			IfName:  mltcstIfName,
+			Network: network,
+			Address: address,
+			IfName:  ifName,
 		}
 		err := mltcstClient.CreateBroadcasterConn()
 		if err != nil {

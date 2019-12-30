@@ -38,18 +38,17 @@ k
 -f "$PWD/input/file.txt"
 `,
 	Args: func(cmd *cobra.Command, args []string) error {
-		fileName, _ := cmd.Flags().GetString("fileName")
-		rawData, _ := cmd.Flags().GetString("rawData")
-		//fmt.Println(args)
-		//if len(args) < 1 && fileName == "" {
-		if rawData == "" && fileName == "" {
-			log.Fatalf("Input requires either rawData or fileName")
+		requiredFlgs := [4]string{"projectID", "topicID", "fileName", "rawData"}
+		for _, flagName := range requiredFlgs {
+			flagValue, _ := cmd.Flags().GetString(flagName)
+			if flagValue == "" {
+				log.Fatalf("'%s' requires a valid value, not '%s'", flagName, flagValue)
+			}
 		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		rawData, _ := cmd.Flags().GetString("rawData")
-		// These PersistantFlags are required and validated in parent command
 		projectID, _ := cmd.Flags().GetString("projectID")
 		topicID, _ := cmd.Flags().GetString("topicID")
 		if rawData != "" {

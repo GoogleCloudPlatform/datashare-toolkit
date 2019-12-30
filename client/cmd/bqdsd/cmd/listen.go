@@ -43,16 +43,16 @@ var mlcsListenCmd = &cobra.Command{
 -i "en0"
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		mltcstNetwork, _ := cmd.Flags().GetString("mltcstNetwork")
-		mltcstAddress, _ := cmd.Flags().GetString("mltcstAddress")
-		mltcstIfName, _ := cmd.Flags().GetString("mltcstIfName")
+		network, _ := cmd.Flags().GetString("network")
+		address, _ := cmd.Flags().GetString("address")
+		ifName, _ := cmd.Flags().GetString("ifName")
 
 		log.Debugf("Starting Multicast Listener Run...")
 
 		mltcstClient := multicast.Client{
-			Network: mltcstNetwork,
-			Address: mltcstAddress,
-			IfName:  mltcstIfName,
+			Network: network,
+			Address: address,
+			IfName:  ifName,
 		}
 		err := mltcstClient.CreateListenerConn()
 		if err != nil {

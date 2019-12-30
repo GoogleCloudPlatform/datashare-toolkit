@@ -32,19 +32,29 @@ var mlcstPublishCmd = &cobra.Command{
 -p "projectID"
 -t "topicID"
 `,
+	Args: func(cmd *cobra.Command, args []string) error {
+		requiredFlgs := [2]string{"projectID", "topicID"}
+		for _, flagName := range requiredFlgs {
+			flagValue, _ := cmd.Flags().GetString(flagName)
+			if flagValue == "" {
+				log.Fatalf("'%s' requires a valid value, not '%s'", flagName, flagValue)
+			}
+		}
+		return nil
+	},
 	Run: func(cmd *cobra.Command, args []string) {
-		mltcstNetwork, _ := cmd.Flags().GetString("mltcstNetwork")
-		mltcstAddress, _ := cmd.Flags().GetString("mltcstAddress")
-		mltcstIfName, _ := cmd.Flags().GetString("mltcstIfName")
+		network, _ := cmd.Flags().GetString("network")
+		address, _ := cmd.Flags().GetString("address")
+		ifName, _ := cmd.Flags().GetString("ifName")
 		projectID, _ := cmd.Flags().GetString("projectID")
 		topicID, _ := cmd.Flags().GetString("topicID")
 
 		log.Debugf("Starting Multicast Publish Run...")
 
 		mltcstClient := multicast.Client{
-			Network: mltcstNetwork,
-			Address: mltcstAddress,
-			IfName:  mltcstIfName,
+			Network: network,
+			Address: address,
+			IfName:  ifName,
 		}
 		err := mltcstClient.CreateListenerConn()
 		if err != nil {
@@ -68,5 +78,11 @@ var mlcstPublishCmd = &cobra.Command{
 }
 
 func init() {
+	mlcstPublishCmd.Flags().StringVarP(&projectID, "projectID", "p", "",
+		"GCP Project ID (name)")
+	mlcstPublishCmd.MarkFlagRequired("projectID")
+	mlcstPublishCmd.Flags().StringVarP(&topicID, "topicID", "t", "",
+		"GCP PubSub Topic ID (name)")
+	mlcstPublishCmd.MarkFlagRequired("topicID")
 	multicastCmd.AddCommand(mlcstPublishCmd)
 }
