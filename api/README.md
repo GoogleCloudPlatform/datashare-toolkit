@@ -290,16 +290,19 @@ Deploy with Cloud Run allows stateless HTTP containers on a fully managed enviro
 _Cloud Run and Cloud Build APIs will need to be enabled in your GCP project._
 
 Build with Cloud Build and TAG:
+_Cloud Build needs to run from parent directory for build context_
 
-    gcloud builds submit --tag gcr.io/${PROJECT_ID}/bqds-spot-fulfillment-api:${TAG}
+    cd ../../
+    gcloud builds submit --config api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 Deploy with Cloud Run Beta:
-_Note_ - There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/beta/run/deploy#--set-env-vars) provides details for how they are set.
+_Note_ - There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--set-env-vars) provides details for how they are set.
 
-    gcloud beta run deploy bqds-spot-fulfillment-api \
+    gcloud run deploy bqds-spot-fulfillment-api \
       --image gcr.io/${PROJECT_ID}/bqds-spot-fulfillment-api:${TAG} \
       --region=us-central1 \
       --allow-unauthenticated \
+      --platform managed \
       --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
       --set-env-vars=FULFILLMENT_CONFIG_BUCKET_NAME=${BUCKET_NAME} \
       --set-env-vars=FULFILLMENT_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID} \
@@ -309,7 +312,7 @@ _Note_ - There are a few environment variables that need to be set before the ap
 
 Open the app URL in your browser. You can return the FQDN via:
 
-    gcloud beta run services describe bqds-spot-fulfillment-api --format="value(status.domain)"
+    gcloud run services describe bqds-spot-fulfillment-api --platform managed --format="value(status.domain)"
 
 ### Deploy App Engine
 

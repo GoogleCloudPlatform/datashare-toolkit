@@ -25,11 +25,18 @@ MAINTAINER Chris Page <chrispage@google.com>
 RUN mkdir -p /app
 WORKDIR /app
 
+# Create the shared depdendency directory
+RUN mkdir -p /shared
+
 ## ---- Dependencies ----
 FROM base as dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
-COPY package*.json ./
+# install shared dependencies first
+COPY shared/package*.json /shared/
+RUN cd /shared && npm install && cd -
+
+COPY api/v1alpha/package*.json ./
 # install app dependencies including 'devDependencies'
 RUN npm install
 
@@ -37,14 +44,21 @@ RUN npm install
 FROM dependencies AS build
 WORKDIR /app
 
+# Bundle shared dep
+COPY shared/*.js /shared/
 # Bundle app source
-COPY src/*.js /app/
+COPY api/v1alpha/src/*.js /app/
 
 # --- Release with Alpine ----
 FROM node:12.6-alpine as release
 WORKDIR /app
-COPY --from=dependencies /app/package.json ./
+# Install the shared dependencies first
+COPY --from=dependencies /shared/package.json /shared/
+RUN cd /shared && npm install --only=production && cd -
+COPY --from=build /shared /shared
+
 # Install app dependencies
+COPY --from=dependencies /app/package.json ./
 RUN npm install --only=production
 COPY --from=build /app ./
 EXPOSE 5555

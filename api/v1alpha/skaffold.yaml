@@ -18,7 +18,9 @@ kind: Config
 build:
   artifacts:
   - image: bqds-spot-fulfillment-api
-    context: .
+    context: ../../.
+    docker:
+      dockerfile: api/v1alpha/Dockerfile
 deploy:
   kubectl:
     manifests:
