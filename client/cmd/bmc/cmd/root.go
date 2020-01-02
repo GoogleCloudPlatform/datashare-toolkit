@@ -64,6 +64,9 @@ func init() {
 	// Only log the warning severity or above.
 	log.SetLevel(log.DebugLevel)
 
+	// Set the timestamp in output
+	log.SetFormatter(&log.TextFormatter{TimestampFormat: "2020-01-02T21:34:34Z", FullTimestamp: true})
+
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
