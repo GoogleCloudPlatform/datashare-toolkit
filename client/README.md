@@ -1,4 +1,4 @@
-# BQDS Injestion - Multicast Client
+# BQDS - Multicast Client
 
 * [Overview](#overview)
   * [Architecture](#architecture)
@@ -19,7 +19,7 @@
 
 # Overview
 
-This documentation provides the details for the BQDS Injestion Multicast Client. The Mulicast Client provides data producers the ability to subscribe to a multicast broadcast group and publish those messages to a specific GCP PubSub Topic.
+This documentation provides the details for the BQDS Multicast Client (BMC). BMC provides data producers the ability to subscribe to a multicast broadcast group and publish those messages to a specific GCP PubSub Topic. Going the opposite direction (PubSub -> multicast group) is currently out of scope.
 
 
 ## Architecture
@@ -28,11 +28,11 @@ TBD
 
 ## Getting Started
 
-These instructions will setup an instance of the BQDS API Serivce in your GCP project.
+These instructions will setup an instance of the BMC service in your GCP project.
 
 ### Enable APIs
 
-These are the GCP project APIs that require the BQDS Spot fulfillment API access.
+These are the GCP project APIs that require the BMC service authorization.
 
 ```
 pubsub.googleapis.com
@@ -40,7 +40,7 @@ pubsub.googleapis.com
 
 ### Service Account
 
-BQDS Injestion Multicast Client service is a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account.
+The BMC service is a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account.
 
 #### Setup Service Account
 
@@ -50,11 +50,11 @@ Set your **PROJECT\_ID** if you have not already:
 
 Set the **SERVICE\_ACCOUNT\_NAME** environment variable(s):
 
-    export SERVICE_ACCOUNT_NAME=bqds-injestion-multicast-client;
+    export SERVICE_ACCOUNT_NAME=bqds-multicast-client;
 
 Set the **SERVICE\_ACCOUNT\_DESC** environment variable(s):
 
-    export SERVICE_ACCOUNT_DESC="BQDS Injestion Mulicast Client";
+    export SERVICE_ACCOUNT_DESC="BQDS Multicast Client";
 
 Create the custom BQDS API service-account:
 
@@ -79,7 +79,7 @@ Set the **GOOGLE_APPLICATION_CREDENTIALS** environment variable(s):
 
 ### Create Pub/Sub Topic
 
-A Pub/Sub Topic with the appropriate service account permissions is required for the BQDS Injestion Mulicast Service.
+A Pub/Sub Topic with the appropriate service account permissions is required for the BMC Service.
 
 
 Set your **TOPIC\_NAME** if you have not already:
@@ -95,8 +95,8 @@ Set the permissions for the service account:
     gcloud beta pubsub topics add-iam-policy-binding ${TOPIC_NAME} --member=serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --role='roles/editor'
 
 ### Create Pub/Sub Subscription:
+A Pub/Sub Subscription is utilzed for the Worker (pull) to process multicast messages from BMC Service. This use-case would be for exposing the PubSub topic to a specific customer or end-user. You can create a separate service account for consumption, but for this tutorial, we will use the same one created above.
 
-A Pub/Sub Subscription is utilzed for the Worker (pull) to process multicast messages from BQDS Injestion Multicast Service
 Set your **PULL\_SUBSCRIPTION\_NAME** if you have not already:
 
     export PULL_SUBSCRIPTION_NAME=bqds-multicast-demo-listener;
@@ -115,16 +115,24 @@ List the subscriptions for the topic:
 
 
 ### Examples
-#### Mulicast Client Service
-Open a terminal into the [cmd/bqdsd/](./cmd/bqdsd/) directory. Run the following command:
+Open a terminal into the [cmd/bmc/](./cmd/bmc/) directory and build the service executable:
 
     go get && go build
-    ./bqdsd client -p ${PROJECT_ID} -t ${TOPIC_NAME} multicast -a 239.0.0.0:9999 -n udp -i en0
 
-#### Mulicast Publisher
-Open another terminal and send some test messages:
+#### Multicast Client Service
+Run the following command:
+_Note_ For localhost, *lo0*, you would use the reserved 224.0.0.0 subnet
 
-    echo "this is a test message" | nc -w 1 -u 239.0.0.0 9999
+    ./bmc client multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -n udp -i en0
+
+#### Multicast Publisher
+Open another terminal and send some test messages. You can either use the *broadcast* command or *nc*
+
+    ./bmc client multicast broadcast -a 239.0.0.1:9999 -n udp -i lo0 -m "I'm a test message."
+
+or
+
+    echo "this is a test message" | nc -w 1 -u 239.0.0.1 9999
 
 #### Pubsub Subscriber
 Open another terminal and pull the messages from the PubSub subscription
