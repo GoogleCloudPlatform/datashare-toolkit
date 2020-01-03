@@ -65,7 +65,7 @@ func init() {
 	log.SetLevel(log.DebugLevel)
 
 	// Set the timestamp in output
-	log.SetFormatter(&log.TextFormatter{TimestampFormat: "2020-01-02T21:34:34Z", FullTimestamp: true})
+	log.SetFormatter(&log.TextFormatter{TimestampFormat: "2006-01-02T15:04:05.000000Z", FullTimestamp: true})
 
 	cobra.OnInitialize(initConfig)
 
