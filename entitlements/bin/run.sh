@@ -30,8 +30,8 @@ echo "CREDENTIAL_FILE_NAME=${CREDENTIAL_FILE_NAME}"
 echo "CONFIG_FILE_NAME=${CONFIG_FILE_NAME}"
 
 cd "$(dirname "$0")"
-pushd ../ >/dev/null
-docker build -t entitlement-engine:v1 -f ./bin/Dockerfile .
+pushd ../../ >/dev/null
+docker build -t entitlement-engine:v1 -f ./entitlements/bin/Dockerfile .
 popd >/dev/null
 
 IMAGE_CONFIG_FILE_PATH="/app/configuration/${CONFIG_FILE_NAME}"

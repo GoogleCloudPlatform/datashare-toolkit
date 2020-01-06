@@ -17,29 +17,48 @@
 ## ---- Base Node ----
 # Using official node runtime base apline image
 FROM node:12.6-alpine as base
+
+# Set the file maintainer (your name - the file's author)
+MAINTAINER Mark Servidio <mservidio@google.com>
+
 # Set the application directory
 RUN mkdir -p /app
 WORKDIR /app
+
+# Create the shared depdendency directory
+RUN mkdir -p /shared
 
 ## ---- Dependencies ----
 FROM base as dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
-COPY ./bqdsEntitlements/package*.json ./
+# install shared dependencies first
+COPY shared/package*.json /shared/
+RUN cd /shared && npm install && cd -
+
+COPY entitlements/bqdsEntitlements/package*.json ./
 # install app dependencies including 'devDependencies'
 RUN npm install
 
 ## ---- Copy Files/Build ----
 FROM dependencies AS build
 WORKDIR /app
+
+# Bundle shared dep
+COPY shared/*.js /shared/
 # Bundle app source
-COPY ./bqdsEntitlements/*.js /app/
-COPY ./bqdsEntitlements/schema.json /app/
+COPY entitlements/bqdsEntitlements/*.js /app/
+COPY entitlements/bqdsEntitlements/schema.json /app/
 
 # --- Release with Alpine ----
 FROM node:12.6-alpine as release
 WORKDIR /app
-COPY --from=dependencies /app/package.json ./
+# Install the shared dependencies first
+COPY --from=dependencies /shared/package.json /shared/
+RUN cd /shared && npm install --only=production && cd -
+COPY --from=build /shared /shared
+
 # Install app dependencies
+COPY --from=dependencies /app/package.json ./
 COPY --from=build /app ./
-RUN npm install --only=production -g
+RUN npm install -g --only=production
