@@ -21,8 +21,8 @@ import (
 )
 
 var (
-	networkDefault string = "unix"
-	addressDefault string = "/tmp/echo.sock"
+	socketNetworkTypeDefault string = "unix"
+	socketAddressDefault     string = "/tmp/echo.sock"
 )
 
 // socketCmd represents the socket command
@@ -36,9 +36,9 @@ stream data if new line. For example:
   -a "/tmp/echo.sock"
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		network, _ := cmd.Flags().GetString("network")
-		if network != "" {
-			log.Debugln("network:", network)
+		networkType, _ := cmd.Flags().GetString("networkType")
+		if networkType != "" {
+			log.Debugln("networkType:", networkType)
 		}
 		address, _ := cmd.Flags().GetString("address")
 		if address != "" {
@@ -49,7 +49,7 @@ stream data if new line. For example:
 }
 
 func init() {
+	//socketCmd.Flags().StringVarP(&networkType, "networkType", "n", "", "network type name for socket connection: e.g. 'unix', 'unixgram' or 'unixpacket'")
+	//socketCmd.Flags().StringVarP(&address, "address", "a", socketAddressDefault, "network address name or ip for socket connection")
 	clientCmd.AddCommand(socketCmd)
-	socketCmd.Flags().StringVarP(&network, "network", "n", networkDefault, "network interface name for socket connection")
-	socketCmd.Flags().StringVarP(&address, "address", "a", addressDefault, "network address name or ip for socket connection")
 }

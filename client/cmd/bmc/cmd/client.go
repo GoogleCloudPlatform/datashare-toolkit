@@ -22,11 +22,11 @@ import (
 
 // These are defined at the top-level command
 var (
-	projectID string
-	topicID   string
-	network   string
-	address   string
-	ifName    string
+	projectID   string
+	topicID     string
+	networkType string
+	address     string
+	ifName      string
 )
 
 // clientCmd represents the client command

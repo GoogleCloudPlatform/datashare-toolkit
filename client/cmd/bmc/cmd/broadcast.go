@@ -24,27 +24,22 @@ var (
 	message string
 )
 
-// mlcstBroadcastCmd represents the mlcstBroadcast command
-var mlcstBroadcastCmd = &cobra.Command{
+// multicastBroadcastCmd represents the mlcstBroadcast command
+var multicastBroadcastCmd = &cobra.Command{
 	Use:   "broadcast",
 	Short: "BQDS client multicast broadcaster service",
-	Long: `The BQDS client multicast broadcaster service will bind to a specific multicast network group, interface name, and address, then broadcast messages to the network interface. For example:
+	Long: `The BQDS client multicast broadcaster service will bind to a specific multicast network interface name and address, then broadcast messages to the network interface. For example:
 
--n "udp_mlcstBroadcast_group_a"
+-n "udp"
 -a "239.0.0.0:9999"
 -i "en0"
 -m "I am a sample message"
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		network, _ := cmd.Flags().GetString("network")
-		address, _ := cmd.Flags().GetString("address")
-		ifName, _ := cmd.Flags().GetString("ifName")
-		message, _ := cmd.Flags().GetString("message")
-
 		log.Debugf("Starting Multicast Broadcast Run...")
 
 		mltcstClient := multicast.Client{
-			Network: network,
+			Net:     networkType,
 			Address: address,
 			IfName:  ifName,
 		}
@@ -64,6 +59,6 @@ var mlcstBroadcastCmd = &cobra.Command{
 }
 
 func init() {
-	mlcstBroadcastCmd.Flags().StringVarP(&message, "message", "m", "", "Raw message to be broadcasted: e.g. 'I am a test message', '\x800\x123\x800'")
-	multicastCmd.AddCommand(mlcstBroadcastCmd)
+	multicastBroadcastCmd.Flags().StringVarP(&message, "message", "m", "", "Raw message to be broadcasted: e.g. 'I am a test message', '\x800\x123\x800'")
+	multicastCmd.AddCommand(multicastBroadcastCmd)
 }

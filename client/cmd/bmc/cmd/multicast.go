@@ -17,22 +17,25 @@ package cmd
 
 import (
 	log "github.com/sirupsen/logrus"
-
 	"github.com/spf13/cobra"
+)
+
+var (
+	multicastNetworkTypeDefault string = "udp"
 )
 
 // multicastCmd represents the multicast command
 var multicastCmd = &cobra.Command{
 	Use:   "multicast",
 	Short: "BQDS client multicast service",
-	Long: `The BQDS client multicast service will listen, broadcast, or publish to a specific multicast network group and address. For example:
+	Long: `The BQDS client multicast service will listen, broadcast, or publish to a specific multicast network interface and address. For example:
 
--n "udp_multicast_group_a"
+-n "udp"
 -a "239.0.0.0:9999"
 -i "en0"
 `,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		requiredFlgs := [3]string{"network", "address", "ifName"}
+		requiredFlgs := [2]string{"address", "ifName"}
 		for _, flagName := range requiredFlgs {
 			flagValue, _ := cmd.Flags().GetString(flagName)
 			if flagValue == "" {
@@ -47,10 +50,9 @@ var multicastCmd = &cobra.Command{
 }
 
 func init() {
-	multicastCmd.PersistentFlags().StringVarP(&network, "network", "n", "", "UDP multicast network group name: e.g. 'udp_multicast_group_a'")
+	multicastCmd.PersistentFlags().StringVarP(&networkType, "networkType", "n", multicastNetworkTypeDefault, "UDP multicast network type name: e.g. 'udp', 'udp4' (IPv4-only), 'udp6' (IPv6-only)")
 	multicastCmd.PersistentFlags().StringVarP(&address, "address", "a", "", "UDP multicast address in <HOST:PORT> format: e.g. '239.0.0.0:9999'")
 	multicastCmd.PersistentFlags().StringVarP(&ifName, "ifName", "i", "", "UDP multicast interface name: e.g. 'en0' or 'lo0'")
-	multicastCmd.MarkPersistentFlagRequired("network")
 	multicastCmd.MarkPersistentFlagRequired("address")
 	multicastCmd.MarkPersistentFlagRequired("ifName")
 	clientCmd.AddCommand(multicastCmd)

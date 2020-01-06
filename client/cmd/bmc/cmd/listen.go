@@ -32,25 +32,21 @@ func msgHandler(src *net.UDPAddr, n int, b []byte) {
 	log.Debugf("string: '%s'", rawData)
 }
 
-// mlcsListenCmd represents the mlcsListen command
-var mlcsListenCmd = &cobra.Command{
+// multicastListenCmd represents the mlcsListen command
+var multicastListenCmd = &cobra.Command{
 	Use:   "listen",
 	Short: "BQDS client multicast listener service",
-	Long: `The BQDS client multicast listener service will listen to a specific multicast network group, interface name, and address. For example:
+	Long: `The BQDS client multicast listener service will listen to a specific multicast network interface name and address. For example:
 
--n "udp_mlcsListen_group_a"
+-n "udp"
 -a "239.0.0.0:9999"
 -i "en0"
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		network, _ := cmd.Flags().GetString("network")
-		address, _ := cmd.Flags().GetString("address")
-		ifName, _ := cmd.Flags().GetString("ifName")
-
 		log.Debugf("Starting Multicast Listener Run...")
 
 		mltcstClient := multicast.Client{
-			Network: network,
+			Net:     networkType,
 			Address: address,
 			IfName:  ifName,
 		}
@@ -70,5 +66,5 @@ var mlcsListenCmd = &cobra.Command{
 }
 
 func init() {
-	multicastCmd.AddCommand(mlcsListenCmd)
+	multicastCmd.AddCommand(multicastListenCmd)
 }

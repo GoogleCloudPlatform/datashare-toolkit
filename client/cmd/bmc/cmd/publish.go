@@ -20,13 +20,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// mlcstPublishCmd represents the mlcstPublish command
-var mlcstPublishCmd = &cobra.Command{
+// multicastPublishCmd represents the mlcstPublish command
+var multicastPublishCmd = &cobra.Command{
 	Use:   "publish",
 	Short: "BQDS client multicast publisher service",
-	Long: `The BQDS client multicast publisher service will listen to a specific multicast network group and address, then publish those messages to the specified PubSub Topic. For example:
+	Long: `The BQDS client multicast publisher service will listen to a specific multicast interface and address, then publish those messages to the specified PubSub Topic. For example:
 
--n "udp_mlcstPublish_group_a"
+-n "udp"
 -a "239.0.0.0:9999"
 -i "en0"
 -p "projectID"
@@ -43,16 +43,10 @@ var mlcstPublishCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		network, _ := cmd.Flags().GetString("network")
-		address, _ := cmd.Flags().GetString("address")
-		ifName, _ := cmd.Flags().GetString("ifName")
-		projectID, _ := cmd.Flags().GetString("projectID")
-		topicID, _ := cmd.Flags().GetString("topicID")
-
 		log.Debugf("Starting Multicast Publish Run...")
 
 		mltcstClient := multicast.Client{
-			Network: network,
+			Net:     networkType,
 			Address: address,
 			IfName:  ifName,
 		}
@@ -78,11 +72,11 @@ var mlcstPublishCmd = &cobra.Command{
 }
 
 func init() {
-	mlcstPublishCmd.Flags().StringVarP(&projectID, "projectID", "p", "",
+	multicastPublishCmd.Flags().StringVarP(&projectID, "projectID", "p", "",
 		"GCP Project ID (name)")
-	mlcstPublishCmd.MarkFlagRequired("projectID")
-	mlcstPublishCmd.Flags().StringVarP(&topicID, "topicID", "t", "",
+	multicastPublishCmd.MarkFlagRequired("projectID")
+	multicastPublishCmd.Flags().StringVarP(&topicID, "topicID", "t", "",
 		"GCP PubSub Topic ID (name)")
-	mlcstPublishCmd.MarkFlagRequired("topicID")
-	multicastCmd.AddCommand(mlcstPublishCmd)
+	multicastPublishCmd.MarkFlagRequired("topicID")
+	multicastCmd.AddCommand(multicastPublishCmd)
 }

@@ -15,8 +15,8 @@ const (
 func (c *Client) Ping(b []byte) error {
 	for {
 		c.Conn.Write(b)
-		log.Debugf("Broadcasted: network '%s', address '%s', ifName '%s', raw '%s'",
-			c.Network, c.Address, c.IfName, b)
+		log.Debugf("Broadcasted: net '%s', address '%s', ifName '%s', raw '%s'",
+			c.Net, c.Address, c.IfName, b)
 		time.Sleep(secondsToSleep * time.Second)
 	}
 	return nil
@@ -25,7 +25,7 @@ func (c *Client) Ping(b []byte) error {
 // Broadcast writes to the client connetion interface and sleeps. Returns error
 func (c *Client) Broadcast(b []byte) error {
 	c.Conn.Write(b)
-	log.Debugf("Broadcasted: network '%s', address '%s', ifName '%s', raw '%s'",
-		c.Network, c.Address, c.IfName, b)
+	log.Debugf("Broadcasted: net '%s', address '%s', ifName '%s', raw '%s'",
+		c.Net, c.Address, c.IfName, b)
 	return nil
 }

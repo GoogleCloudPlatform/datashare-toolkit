@@ -20,8 +20,8 @@ type Client struct {
 	Address string
 	// UDP multicast interface name
 	IfName string
-	// UDP multicast network group name
-	Network string
+	// UDP multicast network type name: "udp", "udp4" (IPv4-only), "udp6" (IPv6-only)
+	Net string
 
 	// Connection instance
 	Conn *net.UDPConn
@@ -32,7 +32,7 @@ type Client struct {
 // Create Listener Conn binds to the Client UDP network with address:port and returns Listener connection or error
 func (c *Client) CreateListenerConn() error {
 
-	addr, err := net.ResolveUDPAddr(c.Network, c.Address)
+	addr, err := net.ResolveUDPAddr(c.Net, c.Address)
 	if err != nil {
 		return fmt.Errorf("net.ResolveUDPAddr: %s", err)
 	}
@@ -42,13 +42,13 @@ func (c *Client) CreateListenerConn() error {
 		return fmt.Errorf("net.InterfaceByName: %s", err)
 	}
 
-	conn, err := net.ListenMulticastUDP(c.Network, ifi, addr)
+	conn, err := net.ListenMulticastUDP(c.Net, ifi, addr)
 	if err != nil {
 		return fmt.Errorf("net.ListenMulticastUDP: %s", err)
 	}
 
-	log.Debugf("Multicast Listener connection created: network '%s', address '%s', ifName '%s'",
-		c.Network, c.Address, c.IfName)
+	log.Debugf("Multicast Listener connection created: net '%s', address '%s', ifName '%s'",
+		c.Net, c.Address, c.IfName)
 	c.Conn = conn
 	return nil
 }
@@ -56,7 +56,7 @@ func (c *Client) CreateListenerConn() error {
 // Create Broadcaster Conn binds to the Client UDP network with address:port and returns Broadcaster connection or error
 func (c *Client) CreateBroadcasterConn() error {
 
-	addr, err := net.ResolveUDPAddr(c.Network, c.Address)
+	addr, err := net.ResolveUDPAddr(c.Net, c.Address)
 	if err != nil {
 		return fmt.Errorf("net.ResolveUDPAddr: %s", err)
 	}
@@ -67,13 +67,13 @@ func (c *Client) CreateBroadcasterConn() error {
 	//return fmt.Errorf("net.InterfaceByName: %s", err)
 	//}
 
-	conn, err := net.DialUDP(c.Network, nil, addr)
+	conn, err := net.DialUDP(c.Net, nil, addr)
 	if err != nil {
 		return fmt.Errorf("net.DialUDP: %s", err)
 	}
 
-	log.Debugf("Multicast Broadcaster connection created: network '%s', address '%s', ifName '%s'",
-		c.Network, c.Address, c.IfName)
+	log.Debugf("Multicast Broadcaster connection created: net '%s', address '%s', ifName '%s'",
+		c.Net, c.Address, c.IfName)
 	c.Conn = conn
 	return nil
 }
