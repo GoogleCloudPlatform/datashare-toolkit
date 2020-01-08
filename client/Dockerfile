@@ -24,21 +24,21 @@ MAINTAINER Chris Page <chrispage@google.com>
 # Set the application directory
 WORKDIR /go/src/github.com/GoogleCloudPlatform/bq-datashare-toolkit/client
 
-COPY pkg                pkg
-COPY internal           internal
-COPY cmd                cmd
-
 # Install Git, Go dependencies, and build the app
 RUN apk --no-cache add git
 
 #RUN cd cmd/bmc && go get -d -v
 # Install outside build command for an additional image layer
-RUN go get -d -v \
+RUN go get -v \
   cloud.google.com/go/pubsub \
   github.com/sirupsen/logrus \
   github.com/spf13/cobra \
   github.com/spf13/viper \
   github.com/mitchellh/go-homedir
+
+COPY pkg                pkg
+COPY internal           internal
+COPY cmd                cmd
 
 # add user in this stage because it cannot be done in next stage which is built from scratch
 # in next stage we'll copy user and group information from this stage
