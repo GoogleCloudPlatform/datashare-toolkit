@@ -7,7 +7,9 @@
   * [Service Account](#service-account)
   * [Create Pub/Sub Topic](#create-pubsub-topic)
   * [Create Pub/Sub Subscription](#create-pubsub-subscription)
-  * [Examples](#examples)
+* [Examples](#examples)
+  * [Hello World](#hello-world)
+  * [Replay Messages](#replay-messages)
 * [Development](#development)
 * [Testing](#testing)
 * [Deployment](#deployment)
@@ -19,9 +21,9 @@
 
 # Overview
 
-This documentation provides the details for the BQDS Multicast Client (BMC). BMC provides data producers the ability to subscribe to a multicast broadcast group and publish those messages (unicast) to a specific GCP PubSub Topic.
+This documentation provides the details for the BQDS Multicast Client (BMC). The BMC service enables data providers (or data procuders) the abilitiy to subscribe to a multicast broadcast group and publish those messages (unicast) onto a Google Cloud Platform (GCP) Pub/Sub Topic securely. GCP Pub/Sub is a fully-managed real-time messaging service that allows you to send and receive messages between independent applications. The GCP IAM security controls enable data producers the ability to authorize specific consumers of the multicast Pub/Sub topic subscriptions.
 
-_Note_ Going the opposite direction (PubSub -> multicast group) is currently out of scope.
+_Note_ Translating Pub/Sub messages to multicast is currently out of scope.
 
 
 ## Architecture
@@ -97,7 +99,7 @@ Set the permissions for the service account:
     gcloud beta pubsub topics add-iam-policy-binding ${TOPIC_NAME} --member=serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --role='roles/editor'
 
 ### Create Pub/Sub Subscription:
-A Pub/Sub Subscription is utilzed for the Worker (pull) to process multicast messages from BMC Service. This use-case would be for exposing the PubSub topic to a specific customer or end-user. You can create a separate service account for consumption, but for this tutorial, we will use the same one created above.
+A Pub/Sub Subscription is utilzed for the Worker (pull) to process multicast messages from the BMC service's Pub/Sub topic. This use-case would be for exposing the multicast Pub/Sub topic to a specific customer or end-user. You can create a separate service account(s) for consumption, but for this tutorial, we will use the same one created above.
 
 Set your **PULL\_SUBSCRIPTION\_NAME** if you have not already:
 
@@ -116,34 +118,92 @@ List the subscriptions for the topic:
     gcloud beta pubsub topics list-subscriptions ${TOPIC_NAME}
 
 
-### Examples
-Open a terminal into the [cmd/bmc/](./cmd/bmc/) directory and build the service executable:
+## Examples
+The examples are currently executed in an isolated Docker environment. Verify Docker is running and server is > 19.03 version.
 
-    go get && go build
+    docker version
 
-#### Multicast Client Service
-Run the following command and specify the PROJECT_ID, TOPIC_NAME, multicast address and interface name:
+_Note_ GCP networking does not support multicast layer 2 today
+
+
+### Hello World
+The *Hello World* example will utilize the BMC service to simlulate (broadcast) a multicast message(s), receive (publish) the multicast message(s) to a Pub/Sub topic, and consume the message(s) via Pub/Sub subsription with *gcloud*. We will start two Docker containers; one for the multicast producer and one for the multicast publisher.
+
+#### Publisher
+Open a terminal and run the following command. Specify the GOOGLE_APPLICATION_CREDENTIALS, PROJECT_ID, TOPIC_NAME, multicast address and interface name. The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS json file created above. This is only for demo purposes.
 _Note_ For localhost, *lo0*, you would use the reserved 224.0.0/24 subnet block
 
-    ./bmc multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i en0 -v
+    docker run -it --rm -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json -v ${PWD}/${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/key.json gcr.io/chrispage-dev/bmc:dev multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i eth0 -v
 
-#### Multicast Publisher
-Open another terminal and send some test messages. You can either use the *broadcast* command or *nc*
+You should see `Listening and Publishing messages...`
 
-    ./bmc multicast broadcast -a 239.0.0.1:9999 -i lo0 -m "I'm a test message." -v
+#### Producer
+Open another terminal and run the following command(s). You can specify the message body with the *-m* flag. You need to keep the multicast group address the same as above.
 
-or
+    docker run -it --rm gcr.io/chrispage-dev/bmc:dev multicast broadcast -a 239.0.0.1:9999 -i eth0 -v -m "sample message"
 
-    echo "this is a test message" | nc -w 1 -u 239.0.0.1 9999
+You should see `Completed` in this terminal and the same message payload in the Publisher terminal above.
 
-#### Pubsub Subscriber
-Open another terminal and pull the messages from the PubSub subscription
+#### Subscriber
+Open another terminal and tun the following command(s) to pull the messages from the Pub/Sub subscription:
+
+    while ((1)); do gcloud alpha pubsub subscriptions pull ${PULL_SUBSCRIPTION_NAME} --auto-ack; done
+
+
+### Replay messages
+The *replay messages* example will utilize [tcpreplay](https://tcpreplay.appneta.com/) to replay an existing pcap file to simlulate (broadcast) a multicast message(s), receive (publish) the multicast message(s) to a Pub/Sub topic, and consume the message(s) via Pub/Sub subsription with *gcloud*. We will start two Docker containers; one for the multicast producer and one for the multicast publisher.
+
+#### Publisher
+Open a terminal and run the following command(s). First, we will initially try the `listen` subcommand before `publish` to verify the tcpreplay works. Specify a multicast address and *eth0* interface name
+
+    docker run -it --rm gcr.io/chrispage-dev/bmc:dev multicast listen -a 239.0.0.1:9999 -i eth0 -v
+
+You should see `Listening to messages...`
+
+#### Producer
+Open another terminal and run the following command(s). You can capture a multicast stream with [tcpdump](https://www.tcpdump.org/) or use a public data set. For this example, we will use the from (https://iextrading.com/trading/market-data/). Download one of the [Sample pcap](https://www.googleapis.com/download/storage/v1/b/iex/o/data%2Ffeeds%2F20180127%2F20180127_IEXTP1_DEEP1.0.pcap.gz?generation=1517101215560431&alt=media) files and unzip. You will need to change the *-D* option to replace the destination multicast group address, the *-r* to replace the port number, and the pcap file location, */temp/data_feeds_20180127_20180127_IEXTP1_DEEP1.0.pcap* if using a different pcap file.
+
+    docker run --cap-add NET_ADMIN --privileged -it --rm -v "${PWD}":"${PWD}" williamofockham/tcpreplay:4.3.0 tcpreplay-edit -i eth0 -D 233.215.21.4/32:239.0.0.1/32 -r 10378:9999 -C ${PWD}/temp/data_feeds_20180127_20180127_IEXTP1_DEEP1.0.pcap
+
+You will see messages running through the producer and publisher terminals.
+
+You can debug via tcpdump:
+
+    tcpdump -n -s0 -vv -X -e udp port 9999
+
+#### Publisher (con't)
+Now that you verified the above works, you can change the publisher command from `listen` to `publish` with appropriate parameters.\
+Open a terminal and run the following command. Specify the GOOGLE_APPLICATION_CREDENTIALS, PROJECT_ID, TOPIC_NAME, multicast address and interface name. The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS json file created above. This is only for demo purposes.
+_Note_ For localhost, *lo0*, you would use the reserved 224.0.0/24 subnet block
+
+    docker run -it --rm -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json -v ${PWD}/${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/key.json gcr.io/chrispage-dev/bmc:dev multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i eth0 -v
+
+You should see `Listening and Publishing messages...`
+
+#### Producer (con't)
+Re-run the same producer command above. You will see messages running through the producer and publisher terminals.
+
+#### Subscriber
+Open another terminal and tun the following command to pull the messages from the Pub/Sub subscription:
 
     while ((1)); do gcloud alpha pubsub subscriptions pull ${PULL_SUBSCRIPTION_NAME} --auto-ack; done
 
 
 ## Development
-TBD
+Verify you have [golang](https://golang.org/) >= 1.13 installed on your machine.
+
+Open a terminal into the [cmd/bmc/](./cmd/bmc/) directory and pull the dependencies:
+
+    go get -d -v
+
+Run the main.go command:
+
+    go run main.go -h
+
+If you want to purge the Pub/Sub subscription, run the following command:\
+_Note_ This is non-reversable!
+
+    gcloud pubsub subscriptions seek ${PULL_SUBSCRIPTION_NAME} --time=$(date +%Y-%m-%dT%H:%M:%S)
 
 
 ## Testing
@@ -151,7 +211,18 @@ TBD
 
 
 ## Deployment
-TBD
+Verify you have Docker running to build the image.\
+_Note_ GCP cloud build will be added in the future
+
+You can build the Docker image from the parent directory [client](./)
+
+    docker build .
+
+
+## ToDo
+* Add GCP cloud build for BMC service
+* Add k8s example
+* Add Pub/Sub to multicast feature
 
 
 ## Contributing
