@@ -79,8 +79,8 @@ func (c *Client) CreateBroadcasterConn() error {
 }
 
 // Create Topic creates a topic client to connect
-func (c *Client) CreateTopicClient(projectID, topicID string) error {
-	topic, err := pubsubutil.CreateTopicClient(projectID, topicID)
+func (c *Client) CreateTopicClient(projectID, topicName string) error {
+	topic, err := pubsubutil.CreateTopicClient(projectID, topicName)
 	if err != nil {
 		return fmt.Errorf("pubsubutil.CreateTopicClient: %s", err)
 	}

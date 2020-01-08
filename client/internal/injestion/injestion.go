@@ -23,7 +23,7 @@ import (
 )
 
 // Stream the data to pubsub by validating and interating over the input
-func Run(projectID string, topicID string, raw string) error {
+func Run(projectID string, topicName string, raw string) error {
 	log.Debugf("Starting Injestion Run...")
 	data, err := validate.CheckInputData(raw)
 	if err != nil {
@@ -31,7 +31,7 @@ func Run(projectID string, topicID string, raw string) error {
 	}
 
 	log.Debugf("Creating PubSub Client.")
-	topic, err := pubsubutil.CreateTopicClient(projectID, topicID)
+	topic, err := pubsubutil.CreateTopicClient(projectID, topicName)
 	if err != nil {
 		return fmt.Errorf("pubsubutil.CreateTopicClient: %s", err.Error())
 	}

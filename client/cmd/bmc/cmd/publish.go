@@ -30,10 +30,10 @@ var multicastPublishCmd = &cobra.Command{
 -a "239.0.0.0:9999"
 -i "en0"
 -p "projectID"
--t "topicID"
+-t "topicName"
 `,
 	Args: func(cmd *cobra.Command, args []string) error {
-		requiredFlgs := [2]string{"projectID", "topicID"}
+		requiredFlgs := [2]string{"projectID", "topicName"}
 		for _, flagName := range requiredFlgs {
 			flagValue, _ := cmd.Flags().GetString(flagName)
 			if flagValue == "" {
@@ -56,7 +56,7 @@ var multicastPublishCmd = &cobra.Command{
 		}
 
 		log.Infof("Creating PubSub Topic Client...")
-		err = mltcstClient.CreateTopicClient(projectID, topicID)
+		err = mltcstClient.CreateTopicClient(projectID, topicName)
 		if err != nil {
 			log.Fatalf("CreateTopicClient: %s", err.Error())
 		}
@@ -75,8 +75,8 @@ func init() {
 	multicastPublishCmd.Flags().StringVarP(&projectID, "projectID", "p", "",
 		"GCP Project ID (name)")
 	multicastPublishCmd.MarkFlagRequired("projectID")
-	multicastPublishCmd.Flags().StringVarP(&topicID, "topicID", "t", "",
+	multicastPublishCmd.Flags().StringVarP(&topicName, "topicName", "t", "",
 		"GCP PubSub Topic ID (name)")
-	multicastPublishCmd.MarkFlagRequired("topicID")
+	multicastPublishCmd.MarkFlagRequired("topicName")
 	multicastCmd.AddCommand(multicastPublishCmd)
 }

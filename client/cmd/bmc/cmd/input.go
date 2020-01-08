@@ -38,7 +38,7 @@ k
 -f "$PWD/input/file.txt"
 `,
 	Args: func(cmd *cobra.Command, args []string) error {
-		requiredFlgs := [4]string{"projectID", "topicID", "fileName", "rawData"}
+		requiredFlgs := [4]string{"projectID", "topicName", "fileName", "rawData"}
 		for _, flagName := range requiredFlgs {
 			flagValue, _ := cmd.Flags().GetString(flagName)
 			if flagValue == "" {
@@ -50,10 +50,10 @@ k
 	Run: func(cmd *cobra.Command, args []string) {
 		rawData, _ := cmd.Flags().GetString("rawData")
 		projectID, _ := cmd.Flags().GetString("projectID")
-		topicID, _ := cmd.Flags().GetString("topicID")
+		topicName, _ := cmd.Flags().GetString("topicName")
 		if rawData != "" {
 			log.Debugln("rawData:", rawData)
-			err := injestion.Run(projectID, topicID, rawData)
+			err := injestion.Run(projectID, topicName, rawData)
 			if err != nil {
 				log.Fatal(err)
 			}
