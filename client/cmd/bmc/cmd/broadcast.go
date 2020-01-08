@@ -36,7 +36,7 @@ var multicastBroadcastCmd = &cobra.Command{
 -m "I am a sample message"
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debugf("Starting Multicast Broadcast Run...")
+		log.Infof("Starting Multicast Broadcast Run...")
 
 		mltcstClient := multicast.Client{
 			Net:     networkType,
@@ -48,13 +48,13 @@ var multicastBroadcastCmd = &cobra.Command{
 			log.Fatalf("CreateBroadcasterConn: %s", err.Error())
 		}
 
-		log.Debugf("Broadcasting messages...")
+		log.Infof("Broadcasting messages...")
 		err = mltcstClient.Broadcast([]byte(message))
 		if err != nil {
 			log.Fatalf("Broadcast: %s", err.Error())
 		}
 
-		log.Debugf("Completed.")
+		log.Infof("Completed.")
 	},
 }
 

@@ -43,7 +43,7 @@ var multicastPublishCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debugf("Starting Multicast Publish Run...")
+		log.Infof("Starting Multicast Publish Run...")
 
 		mltcstClient := multicast.Client{
 			Net:     networkType,
@@ -55,19 +55,19 @@ var multicastPublishCmd = &cobra.Command{
 			log.Fatalf("CreateListenerConn: %s", err.Error())
 		}
 
-		log.Debugf("Creating PubSub Topic Client...")
+		log.Infof("Creating PubSub Topic Client...")
 		err = mltcstClient.CreateTopicClient(projectID, topicID)
 		if err != nil {
 			log.Fatalf("CreateTopicClient: %s", err.Error())
 		}
 
-		log.Debugf("Listening and Publishing messages...")
+		log.Infof("Listening and Publishing messages...")
 		err = mltcstClient.Publish()
 		if err != nil {
 			log.Fatalf("Publish: %s", err.Error())
 		}
 
-		log.Debugf("Completed.")
+		log.Infof("Completed.")
 	},
 }
 

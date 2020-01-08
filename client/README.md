@@ -125,12 +125,12 @@ Open a terminal into the [cmd/bmc/](./cmd/bmc/) directory and build the service 
 Run the following command and specify the PROJECT_ID, TOPIC_NAME, multicast address and interface name:
 _Note_ For localhost, *lo0*, you would use the reserved 224.0.0/24 subnet block
 
-    ./bmc client multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i en0
+    ./bmc multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i en0 -v
 
 #### Multicast Publisher
 Open another terminal and send some test messages. You can either use the *broadcast* command or *nc*
 
-    ./bmc client multicast broadcast -a 239.0.0.1:9999 -i lo0 -m "I'm a test message."
+    ./bmc multicast broadcast -a 239.0.0.1:9999 -i lo0 -m "I'm a test message." -v
 
 or
 

@@ -29,15 +29,41 @@ var (
 	// VERSION is set during build
 	VERSION string
 	cfgFile string
+	verbose bool
+)
+
+// These are defined at the top-level command
+var (
+	projectID   string
+	topicID     string
+	networkType string
+	address     string
+	ifName      string
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "bqds",
-	Short: "BQDS Toolkit for data providers",
-	Long: `The BigQuery Datashare (BQDS) Toolkit is a service that enables data providers
+	Use:   "client",
+	Short: "BQDS client service",
+	Long: `The BigQuery Datashare (BQDS) client service enables data providers
 (or data procuders) the abilitiy to publish their data onto Google Cloud
-Platform (GCP) securely.`,
+Platform (GCP) securely. The service can listen to various POSIX server interfaces
+to stream messages to GCP. For example:
+
+Input (stdin/file): '{"a": 123}\n{"b": "xyz"}'
+Socket (unix/tcp): '/tmp/echo.sock'
+Websocket: 'wss://127.0.0.1:8000'
+Multicast: '224.0.1.0:264'
+`,
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		// Only log the info severity or above based off verbose flag.
+		if verbose {
+			log.SetLevel(log.DebugLevel)
+		} else {
+			log.SetLevel(log.InfoLevel)
+		}
+		return nil
+	},
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
@@ -61,7 +87,7 @@ func init() {
 	// Can be any io.Writer, see below for File example
 	log.SetOutput(os.Stdout)
 
-	// Only log the warning severity or above.
+	// Log severity Debug by default. Will get changed based off verbose flag
 	log.SetLevel(log.DebugLevel)
 
 	// Set the timestamp in output
@@ -72,8 +98,10 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.client.yaml)")
+
+	// Verbose logging
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

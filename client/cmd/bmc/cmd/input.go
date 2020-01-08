@@ -67,7 +67,7 @@ k
 }
 
 func init() {
-	clientCmd.AddCommand(inputCmd)
+	rootCmd.AddCommand(inputCmd)
 	inputCmd.Flags().StringVarP(&rawData, "rawData", "d", "", "raw data to parse")
 	inputCmd.Flags().StringVarP(&fileName, "fileName", "f", "", "file name to read")
 }

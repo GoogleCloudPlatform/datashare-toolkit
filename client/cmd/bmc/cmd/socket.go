@@ -51,5 +51,5 @@ stream data if new line. For example:
 func init() {
 	//socketCmd.Flags().StringVarP(&networkType, "networkType", "n", "", "network type name for socket connection: e.g. 'unix', 'unixgram' or 'unixpacket'")
 	//socketCmd.Flags().StringVarP(&address, "address", "a", socketAddressDefault, "network address name or ip for socket connection")
-	clientCmd.AddCommand(socketCmd)
+	rootCmd.AddCommand(socketCmd)
 }

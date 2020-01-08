@@ -28,8 +28,8 @@ func msgHandler(src *net.UDPAddr, n int, b []byte) {
 	log.Debugf("'%d' bytes read from '%s'", n, src)
 	log.Debugln(hex.Dump(b[:n]))
 	//var rawData = hex.EncodeToString(b[:n]) // hex string
-	var rawData = string(b[:n])
-	log.Debugf("string: '%s'", rawData)
+	//var rawData = string(b[:n])
+	//log.Debugf("string: '%s'", rawData)
 }
 
 // multicastListenCmd represents the mlcsListen command
@@ -43,7 +43,7 @@ var multicastListenCmd = &cobra.Command{
 -i "en0"
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debugf("Starting Multicast Listener Run...")
+		log.Infof("Starting Multicast Listener Run...")
 
 		mltcstClient := multicast.Client{
 			Net:     networkType,
@@ -55,13 +55,13 @@ var multicastListenCmd = &cobra.Command{
 			log.Fatalf("CreateListenerConn: %s", err.Error())
 		}
 
-		log.Debugf("Listening to messages...")
+		log.Infof("Listening to messages...")
 		err = mltcstClient.Listen(msgHandler)
 		if err != nil {
 			log.Fatalf("Listen: %s", err.Error())
 		}
 
-		log.Debugf("Completed.")
+		log.Infof("Completed.")
 	},
 }
 

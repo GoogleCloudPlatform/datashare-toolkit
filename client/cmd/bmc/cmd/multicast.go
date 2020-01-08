@@ -42,6 +42,12 @@ var multicastCmd = &cobra.Command{
 				log.Fatalf("'%s' requires a valid value, not '%s'", flagName, flagValue)
 			}
 		}
+		// Only log the info severity or above based off verbose flag.
+		if verbose {
+			log.SetLevel(log.DebugLevel)
+		} else {
+			log.SetLevel(log.InfoLevel)
+		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -55,5 +61,5 @@ func init() {
 	multicastCmd.PersistentFlags().StringVarP(&ifName, "ifName", "i", "", "UDP multicast interface name: e.g. 'en0' or 'lo0'")
 	multicastCmd.MarkPersistentFlagRequired("address")
 	multicastCmd.MarkPersistentFlagRequired("ifName")
-	clientCmd.AddCommand(multicastCmd)
+	rootCmd.AddCommand(multicastCmd)
 }
