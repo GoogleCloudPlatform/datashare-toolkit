@@ -35,7 +35,7 @@ var (
 // These are defined at the top-level command
 var (
 	projectID   string
-	topicName     string
+	topicName   string
 	networkType string
 	address     string
 	ifName      string

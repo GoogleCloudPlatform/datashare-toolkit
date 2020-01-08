@@ -55,6 +55,7 @@ var multicastListenCmd = &cobra.Command{
 			log.Fatalf("CreateListenerConn: %s", err.Error())
 		}
 
+		mltcstClient.SetupCloseHandler()
 		log.Infof("Listening to messages...")
 		err = mltcstClient.Listen(msgHandler)
 		if err != nil {

@@ -29,6 +29,7 @@ func (c *Client) Publish() error {
 		if err != nil {
 			return fmt.Errorf("pubsubutil.PublishMessage: %s", err.Error())
 		}
+		c.Counter.totalPublishedMessages++
 	}
 	return nil
 }
@@ -54,6 +55,7 @@ func (c *Client) PublishS() error {
 		if err != nil {
 			return fmt.Errorf("pubsubutil.PublishMessage: %s", err.Error())
 		}
+		c.Counter.totalPublishedMessages++
 	}
 	return nil
 }

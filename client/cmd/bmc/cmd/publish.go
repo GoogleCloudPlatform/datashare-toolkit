@@ -61,6 +61,7 @@ var multicastPublishCmd = &cobra.Command{
 			log.Fatalf("CreateTopicClient: %s", err.Error())
 		}
 
+		mltcstClient.SetupCloseHandler()
 		log.Infof("Listening and Publishing messages...")
 		err = mltcstClient.Publish()
 		if err != nil {

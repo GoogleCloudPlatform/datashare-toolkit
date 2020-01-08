@@ -27,5 +27,6 @@ func (c *Client) Broadcast(b []byte) error {
 	c.Conn.Write(b)
 	log.Debugf("Broadcasted: net '%s', address '%s', ifName '%s', raw '%s'",
 		c.Net, c.Address, c.IfName, b)
+	c.Counter.totalBroadcastedMessages++
 	return nil
 }

@@ -19,6 +19,7 @@ func (c *Client) Listen(handler func(*net.UDPAddr, int, []byte)) error {
 		if err != nil {
 			return fmt.Errorf("c.Conn.ReadFromUDP: %s", err)
 		}
+		c.Counter.totalReceivedMessages++
 		handler(src, numBytes, buffer)
 	}
 	return nil

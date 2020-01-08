@@ -48,6 +48,7 @@ var multicastBroadcastCmd = &cobra.Command{
 			log.Fatalf("CreateBroadcasterConn: %s", err.Error())
 		}
 
+		mltcstClient.SetupCloseHandler()
 		log.Infof("Broadcasting messages...")
 		err = mltcstClient.Broadcast([]byte(message))
 		if err != nil {

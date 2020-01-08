@@ -8,11 +8,24 @@ import (
 	"github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/internal/pubsubutil"
 	log "github.com/sirupsen/logrus"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 const (
 	maxDatagramSize = 4096
 )
+
+// Message Counter
+type Counter struct {
+	// total number of broadcasted messages
+	totalBroadcastedMessages uint
+	// total number of received messages
+	totalReceivedMessages uint
+	// total number of published messages
+	totalPublishedMessages uint
+}
 
 // Client for Multicast
 type Client struct {
@@ -27,6 +40,9 @@ type Client struct {
 	Conn *net.UDPConn
 	// PubSub Topic instance
 	Topic *pubsub.Topic
+
+	// Message counter
+	Counter
 }
 
 // Create Listener Conn binds to the Client UDP network with address:port and returns Listener connection or error
@@ -49,6 +65,7 @@ func (c *Client) CreateListenerConn() error {
 
 	log.Debugf("Multicast Listener connection created: net '%s', address '%s', ifName '%s'",
 		c.Net, c.Address, c.IfName)
+
 	c.Conn = conn
 	return nil
 }
@@ -86,4 +103,23 @@ func (c *Client) CreateTopicClient(projectID, topicName string) error {
 	}
 	c.Topic = topic
 	return nil
+}
+
+// SetupCloseHandler creates a 'listener' on a new goroutine which will notify the
+// program if it receives an interrupt from the OS. We then handle this by calling
+// our clean up procedure and exiting the program.
+func (c *Client) SetupCloseHandler() {
+	channel := make(chan os.Signal, 2)
+	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-channel
+		log.Warnln("\r- Ctrl+C pressed in Terminal")
+		c.LogCounter()
+		os.Exit(0)
+	}()
+}
+
+// Return the Client Counter totals
+func (c *Client) LogCounter() {
+	log.Infof("%+v\n", c.Counter)
 }
