@@ -152,11 +152,12 @@ Open another terminal and tun the following command(s) to pull the messages from
 
 ### Replay messages
 The *replay messages* example will utilize [tcpreplay](https://tcpreplay.appneta.com/) to replay an existing pcap file to simlulate (broadcast) a multicast message(s), receive (publish) the multicast message(s) to a Pub/Sub topic, and consume the message(s) via Pub/Sub subsription with *gcloud*. We will start two Docker containers; one for the multicast producer and one for the multicast publisher.
+_Note_ This was tested on a 8CPU and 30GB mem virtual machine. Docker for Mac did not have enough resources.
 
 #### Publisher
-Open a terminal and run the following command(s). First, we will initially try the `listen` subcommand before `publish` to verify the tcpreplay works. Specify a multicast address and *eth0* interface name
+Open a terminal and run the following command(s). First, we will initially try the `listen` subcommand before `publish` to verify the tcpreplay works. Specify a multicast address, *eth0* interface name, and custom interface read buffer (1MB).
 
-    docker run -it --rm gcr.io/chrispage-dev/bmc:dev multicast listen -a 239.0.0.1:9999 -i eth0 -v
+    docker run -it --rm gcr.io/chrispage-dev/bmc:dev multicast listen -a 239.0.0.1:9999 -i eth0 -r 1048576
 
 You should see `Listening to messages...`
 
