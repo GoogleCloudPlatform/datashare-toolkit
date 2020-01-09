@@ -55,6 +55,18 @@ You can also access an instance of Swagger UI to render the OAS docs:
 
 These instructions will setup an instance of the BQDS API Service in your GCP project.
 
+### Setup GCloud
+* Install the [Google Cloud SDK](https://cloud.google.com/sdk/install) on your local machine.
+or
+* If you already have gcloud installed, then update it.  
+```
+gcloud components update
+```
+
+Set `gcloud` connect to your current project.
+
+    gcloud config set project YOUR_PROJECT_NAME
+
 ### Create Storage Bucket
 
 Create a storage bucket to persist the API Configuration. This does not have to be the same storage bucket for the initial dataset injestion.
@@ -77,7 +89,7 @@ The BQDS Spot fulfillment API configuration definitions are defined [above](#con
 
 Copy configuration to the storage bucket:
 
-    gsutil cp config.json gs://${BUCKET_NAME}/bqds/api/config.json
+    gsutil cp ../examples/mlb/config/api/config.json gs://${BUCKET_NAME}/bqds/api/config.json
 
 
 ### Enable APIs
@@ -85,9 +97,9 @@ Copy configuration to the storage bucket:
 These are the GCP project APIs that require the BQDS Spot fulfillment API access.
 
 ```
-bigquery-json.googleapis.com
-iam.googleapis.com
-pubsub.googleapis.com
+gcloud services enable bigquery-json.googleapis.com
+gcloud services enable iam.googleapis.com
+gcloud services enable pubsub.googleapis.com
 ```
 
 ### Service Account
@@ -221,46 +233,6 @@ List the subscriptions for the topic:
     gcloud beta pubsub topics list-subscriptions ${TOPIC_NAME}
 
 
-### Examples
-
-After you have completed the [Getting Started](#getting-started) prerequisites, you can now load the BQDS API sample configuration file. Navigate to the [examples](../examples) directory and modify the MLB api [config.json](../examples/mlb/config/api/config.json) accordingly. \
-_Note_ - Change the *projectId*, *datasetId*, and *tableId* to your GCP project and corresponding dataset
-
-
-## Development
-
-Navigate to the API version directory (*v1alpha*, *v1*, etc.).
-
-Install Node 12.6
-
-    nvm install 12.6
-
-Install the Node modules
-
-    npm install
-
-Start the service.\
-_Note_ - There are a few environment variables that need to be set before the application starts (see below). [Nodemon](https://nodemon.io/) is leveraged to read file changes and reload automatically.
-
-    export GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS};
-    export FULFILLMENT_CONFIG_BUCKET_NAME=${BUCKET_NAME};
-    export FULFILLMENT_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID};
-    export FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME=${TOPIC_NAME};
-    export FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_PROJECT_ID=${PROJECT_ID};
-    export FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME=${PULL_SUBSCRIPTION_NAME};
-
-    npm run dev
-
-
-## Testing
-
-The test frameworks include [Chai](https://www.chaijs.com/) and [Supertest](https://github.com/visionmedia/supertest)
-
-Execute the tests:
-
-    npm test
-
-
 ## Deployment
 You can deploy the API service via various methods below based off developer preference and/or environment. These are the options available:
 
@@ -314,6 +286,20 @@ Open the app URL in your browser. You can return the FQDN via:
 
     gcloud run services describe bqds-spot-fulfillment-api --platform managed --format="value(status.domain)"
 
+#### Confirm your API is running
+
+You can access the OAS directly from a browser by entering the following URI:
+
+```
+http://{HOSTNAME}/{API_VERSION}/docs/openapi_spec
+```
+
+You can also access an instance of Swagger UI to render the OAS docs:
+
+```
+http://{HOSTNAME}/{API_VERSION}/docs
+```
+
 ### Deploy App Engine
 
 TBD
@@ -341,6 +327,42 @@ Run `skaffold` with the dev parameter to deploy locally:
 Build the image with the `skaffold run -t <TAG>` command:
 
     skaffold run -t $TAG
+
+## Delete Deployment
+TODO - should we provide steps or a script to delete all the assets after they have been deployed? 
+
+## Development
+
+Navigate to the API version directory (*v1alpha*, *v1*, etc.).
+
+Install Node 12.6
+
+    nvm install 12.6
+
+Install the Node modules
+
+    npm install
+
+Start the service.\
+_Note_ - There are a few environment variables that need to be set before the application starts (see below). [Nodemon](https://nodemon.io/) is leveraged to read file changes and reload automatically.
+
+    export GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS};
+    export FULFILLMENT_CONFIG_BUCKET_NAME=${BUCKET_NAME};
+    export FULFILLMENT_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID};
+    export FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME=${TOPIC_NAME};
+    export FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_PROJECT_ID=${PROJECT_ID};
+    export FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME=${PULL_SUBSCRIPTION_NAME};
+
+    npm run dev
+
+
+## Testing
+
+The test frameworks include [Chai](https://www.chaijs.com/) and [Supertest](https://github.com/visionmedia/supertest)
+
+Execute the tests:
+
+    npm test
 
 
 ## Contributing
