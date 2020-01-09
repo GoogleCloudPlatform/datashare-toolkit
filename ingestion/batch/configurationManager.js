@@ -145,6 +145,10 @@ async function validateOptions(options, validateStorage) {
         console.log(`Ignoring directory path: '${options.fileName} in bucket: ${options.bucketName}'`);
         return { isValid: false, isDirectoryPath: true, hasException: false };
     }
+    else if (attributes && attributes.isConfigFile === true) {
+        console.log(`Ignoring config file: '${options.fileName} in bucket: ${options.bucketName}'`);
+        return { isValid: false, isConfigFile: true, hasException: false };
+    }
     else if (attributes && attributes.isDataFile === true && errors.length === 0) {
         console.log(`Options validation succeeded: ${info.join(", ")}`);
         return { isValid: true, isDataFile: true, info: info, warn: warn, hasException: false };
@@ -168,6 +172,7 @@ function parseDerivedFileAttributes(options) {
     const transformFileBucketPath = path.join(bucketPath, "..", "config", `transform.sql`);
     const archivePath = path.join(bucketPath, "archive", `${basename}`);
     const isDataFile = (pathParts.length === 4 && pathParts[0].toLowerCase() === "bqds" && pathParts[3].toLowerCase() === "data");
+    const isConfigFile = (pathParts.length === 4 && pathParts[0].toLowerCase() === "bqds" && pathParts[3].toLowerCase() === "config");
     const isArchived = (pathParts.length === 5 && pathParts[0].toLowerCase() === "bqds" && pathParts[3].toLowerCase() === "data" && pathParts[4].toLowerCase() === "archive");
 
     let isDirectoryPath = false;
@@ -183,7 +188,8 @@ function parseDerivedFileAttributes(options) {
         archivePath: archivePath,
         isDataFile: isDataFile,
         isArchiveFile: isArchived,
-        isDirectoryPath: isDirectoryPath
+        isDirectoryPath: isDirectoryPath,
+        isConfigFile: isConfigFile
     };
 }
 

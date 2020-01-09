@@ -64,6 +64,7 @@ it("options are valid", async () => {
     const v = await configManager.validateOptions(options, false);
     console.log(JSON.stringify(v));
     expect(v.isValid).is.true;
+    expect(v.hasException).is.false;
 });
 
 it("options are invalid, dataset name not valid", async () => {
@@ -71,6 +72,30 @@ it("options are invalid, dataset name not valid", async () => {
         eventId: 1,
         bucketName: bucketName,
         fileName: "/bqds/data$set/table/data/myFile.txt"
+    };
+    const v = await configManager.validateOptions(options, false);
+    console.log(JSON.stringify(v));
+    expect(v.isValid).is.false;
+    expect(v.hasException).is.true;
+});
+
+it("options are invalid, config file placed in config path", async () => {
+    const options = {
+        eventId: 1,
+        bucketName: bucketName,
+        fileName: "/bqds/dataset/table/config/schema.json"
+    };
+    const v = await configManager.validateOptions(options, false);
+    console.log(JSON.stringify(v));
+    expect(v.isValid).is.false;
+    expect(v.hasException).is.false;
+});
+
+it("options are invalid, config file placed in config path", async () => {
+    const options = {
+        eventId: 1,
+        bucketName: bucketName,
+        fileName: "/bqds/dataset/table/config/schema.json"
     };
     const v = await configManager.validateOptions(options, false);
     console.log(JSON.stringify(v));
@@ -86,6 +111,7 @@ it("options are invalid, dataset and table length too long", async () => {
     const v = await configManager.validateOptions(options, false);
     console.log(JSON.stringify(v));
     expect(v.isValid).is.false;
+    expect(v.hasException).is.true;
 });
 
 it("options are invalid, table name not valid", async () => {
@@ -97,6 +123,7 @@ it("options are invalid, table name not valid", async () => {
     const v = await configManager.validateOptions(options, false);
     console.log(JSON.stringify(v));
     expect(v.isValid).is.false;
+    expect(v.hasException).is.true;
 });
 
 it("options are valid with archived file", async () => {
@@ -107,6 +134,7 @@ it("options are valid with archived file", async () => {
     };
     const v = await configManager.validateOptions(options, false);
     expect(v.isArchiveFile).is.true;
+    expect(v.hasException).is.false;
 });
 
 it("options are invalid with bad path", async () => {
@@ -119,6 +147,7 @@ it("options are invalid with bad path", async () => {
     console.log(`Test result ${JSON.stringify(result)}`);
     expect(result.isValid).is.false;
     expect(result.errors.length).is.equal(1);
+    expect(result.hasException).is.true;
 });
 
 it("options are invalid", async () => {
@@ -126,6 +155,7 @@ it("options are invalid", async () => {
     const result = await configManager.validateOptions(options, false);
     expect(result.isValid).is.false;
     expect(result.errors.length).is.equal(3);
+    expect(result.hasException).is.true;
 });
 
 it("options file is a path directory", async () => {
@@ -136,6 +166,7 @@ it("options file is a path directory", async () => {
     };
     const result = await configManager.validateOptions(options, false);
     expect(result.isDirectoryPath).is.true;
+    expect(result.hasException).is.false;
 });
 
 if (argv.runCloudTests) {
