@@ -35,6 +35,8 @@ type Client struct {
 	IfName string
 	// UDP multicast network type name: "udp", "udp4" (IPv4-only), "udp6" (IPv6-only)
 	Net string
+	// Size of the operating system's receive buffer associated with the connection.
+	ReadBufferBytes int
 
 	// Connection instance
 	Conn *net.UDPConn

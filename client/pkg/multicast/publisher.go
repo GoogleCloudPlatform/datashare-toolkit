@@ -13,7 +13,9 @@ import (
 // to a PubSub Topic. Returns error
 func (c *Client) Publish() error {
 
-	c.Conn.SetReadBuffer(maxDatagramSize)
+	if err := c.Conn.SetReadBuffer(c.ReadBufferBytes); err != nil {
+		return fmt.Errorf("c.Conn.SetReadBuffer: %s", err)
+	}
 
 	for {
 		buffer := make([]byte, maxDatagramSize)
@@ -21,6 +23,7 @@ func (c *Client) Publish() error {
 		if err != nil {
 			return fmt.Errorf("c.Conn.ReadFromUDP: %s", err)
 		}
+		c.Counter.totalReceivedMessages++
 		log.Debugf("'%d' bytes read from '%s'", numBytes, src)
 		// publish the messages
 		raw := buffer[:numBytes]
@@ -38,7 +41,9 @@ func (c *Client) Publish() error {
 // as string to a PubSub Topic . Returns error
 func (c *Client) PublishS() error {
 
-	c.Conn.SetReadBuffer(maxDatagramSize)
+	if err := c.Conn.SetReadBuffer(c.ReadBufferBytes); err != nil {
+		return fmt.Errorf("c.Conn.SetReadBuffer: %s", err)
+	}
 
 	for {
 		buffer := make([]byte, maxDatagramSize)
@@ -46,6 +51,7 @@ func (c *Client) PublishS() error {
 		if err != nil {
 			return fmt.Errorf("c.Conn.ReadFromUDP: %s", err)
 		}
+		c.Counter.totalReceivedMessages++
 		log.Debugf("'%d' bytes read from '%s'", numBytes, src)
 		// publish the messages
 		raw := string(buffer[:numBytes])

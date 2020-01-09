@@ -39,9 +39,10 @@ var multicastBroadcastCmd = &cobra.Command{
 		log.Infof("Starting Multicast Broadcast Run...")
 
 		mltcstClient := multicast.Client{
-			Net:     networkType,
-			Address: address,
-			IfName:  ifName,
+			Net:             networkType,
+			Address:         address,
+			IfName:          ifName,
+			ReadBufferBytes: readBufferBytes,
 		}
 		err := mltcstClient.CreateBroadcasterConn()
 		if err != nil {

@@ -11,8 +11,9 @@ import (
 // to a buffer then generic hander. Returns error
 func (c *Client) Listen(handler func(*net.UDPAddr, int, []byte)) error {
 
-	c.Conn.SetReadBuffer(maxDatagramSize)
-
+	if err := c.Conn.SetReadBuffer(c.ReadBufferBytes); err != nil {
+		return fmt.Errorf("c.Conn.SetReadBuffer: %s", err)
+	}
 	for {
 		buffer := make([]byte, maxDatagramSize)
 		numBytes, src, err := c.Conn.ReadFromUDP(buffer)
@@ -20,7 +21,7 @@ func (c *Client) Listen(handler func(*net.UDPAddr, int, []byte)) error {
 			return fmt.Errorf("c.Conn.ReadFromUDP: %s", err)
 		}
 		c.Counter.totalReceivedMessages++
-		handler(src, numBytes, buffer)
+		go handler(src, numBytes, buffer)
 	}
 	return nil
 }

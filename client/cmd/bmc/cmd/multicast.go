@@ -22,6 +22,7 @@ import (
 
 var (
 	multicastNetworkTypeDefault string = "udp"
+	readBufferBytesDefault      int    = 212992 // SO_RCVBUF will depend on system resources
 )
 
 // multicastCmd represents the multicast command
@@ -59,6 +60,7 @@ func init() {
 	multicastCmd.PersistentFlags().StringVarP(&networkType, "networkType", "n", multicastNetworkTypeDefault, "UDP multicast network type name: e.g. 'udp', 'udp4' (IPv4-only), 'udp6' (IPv6-only)")
 	multicastCmd.PersistentFlags().StringVarP(&address, "address", "a", "", "UDP multicast address in <HOST:PORT> format: e.g. '239.0.0.0:9999'")
 	multicastCmd.PersistentFlags().StringVarP(&ifName, "ifName", "i", "", "UDP multicast interface name: e.g. 'en0' or 'lo0'")
+	multicastCmd.PersistentFlags().IntVarP(&readBufferBytes, "readBufferBytes", "r", readBufferBytesDefault, "Size of the operating system's receive buffer associated with the connection.")
 	multicastCmd.MarkPersistentFlagRequired("address")
 	multicastCmd.MarkPersistentFlagRequired("ifName")
 	rootCmd.AddCommand(multicastCmd)

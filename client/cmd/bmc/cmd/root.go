@@ -34,11 +34,12 @@ var (
 
 // These are defined at the top-level command
 var (
-	projectID   string
-	topicName   string
-	networkType string
-	address     string
-	ifName      string
+	projectID       string
+	topicName       string
+	networkType     string
+	address         string
+	ifName          string
+	readBufferBytes int
 )
 
 // rootCmd represents the base command when called without any subcommands
