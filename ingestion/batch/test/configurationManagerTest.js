@@ -91,6 +91,17 @@ it("options are invalid, config file placed in config path", async () => {
     expect(v.hasException).is.false;
 });
 
+it("options are invalid, config file placed in config path", async () => {
+    const options = {
+        eventId: 1,
+        bucketName: bucketName,
+        fileName: "/bqds/dataset/table/config/schema.json"
+    };
+    const v = await configManager.validateOptions(options, false);
+    console.log(JSON.stringify(v));
+    expect(v.isValid).is.false;
+});
+
 it("options are invalid, dataset and table length too long", async () => {
     const options = {
         eventId: 1,
