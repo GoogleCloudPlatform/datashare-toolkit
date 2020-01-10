@@ -3,6 +3,7 @@ description: "Custom BQDS Spot Fulfillment role for the API services to interfac
 stage: "BETA"
 includedPermissions:
 - bigquery.datasets.create
+- bigquery.datasets.get
 - bigquery.jobs.create
 - bigquery.tables.create
 - bigquery.tables.delete
