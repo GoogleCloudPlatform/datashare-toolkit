@@ -50,8 +50,25 @@ func CreateTopicClient(projectID, topicName string) (*pubsub.Topic, error) {
 	return topic, nil
 }
 
-// Publish a message to a specific topic and return the id and error
-func PublishMessage(topic *pubsub.Topic, input []byte) (string, error) {
+// Publish a message to a specific topic and return PublishResult (non-blocking)
+func PublishMessage(topic *pubsub.Topic, input []byte) *pubsub.PublishResult {
+	ctx := context.Background()
+
+	msg := &pubsub.Message{
+		Data: input,
+		//Attributes: map[string]string{
+		//"origin":   "golang",
+		//"username": "gcp",
+		//},
+	}
+
+	res := topic.Publish(ctx, msg)
+	log.Debugf("Message published to topic '%s'", topic)
+	return res
+}
+
+// Publish a message to a specific topic and return the id and error (blocking)
+func PublishMessageB(topic *pubsub.Topic, input []byte) (string, error) {
 	ctx := context.Background()
 
 	msg := &pubsub.Message{

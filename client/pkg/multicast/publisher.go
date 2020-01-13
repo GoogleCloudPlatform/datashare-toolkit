@@ -19,19 +19,18 @@ func (c *Client) Publish() error {
 
 	for {
 		buffer := make([]byte, maxDatagramSize)
-		numBytes, src, err := c.Conn.ReadFromUDP(buffer)
+		numBytes, _, err := c.Conn.ReadFromUDP(buffer)
 		if err != nil {
 			return fmt.Errorf("c.Conn.ReadFromUDP: %s", err)
 		}
 		c.Counter.totalReceivedMessages++
-		log.Debugf("'%d' bytes read from '%s'", numBytes, src)
-		// publish the messages
+		// publish the messages in routine
 		raw := buffer[:numBytes]
 		// TODO add source as custom metadata
-		_, err = pubsubutil.PublishMessage(c.Topic, raw)
-		if err != nil {
-			return fmt.Errorf("pubsubutil.PublishMessage: %s", err.Error())
+		if res := pubsubutil.PublishMessage(c.Topic, raw); res == nil {
+			return fmt.Errorf("pubsubutil.PublishMessage did not have a response")
 		}
+		// TODO add Ready state in routine to check message id success
 		c.Counter.totalPublishedMessages++
 	}
 	return nil

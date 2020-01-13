@@ -133,14 +133,14 @@ The *Hello World* example will utilize the BMC service to simlulate (broadcast) 
 Open a terminal and run the following command. Specify the GOOGLE_APPLICATION_CREDENTIALS, PROJECT_ID, TOPIC_NAME, multicast address and interface name. The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS json file created above. This is only for demo purposes.
 _Note_ For localhost, *lo0*, you would use the reserved 224.0.0/24 subnet block
 
-    docker run -it --rm -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json -v ${PWD}/${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/key.json gcr.io/chrispage-dev/bmc:dev multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i eth0 -v
+    docker run -it --rm --name publisher -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json -v ${PWD}/${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/key.json gcr.io/chrispage-dev/bmc:dev multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i eth0 -v
 
 You should see `Listening and Publishing messages...`
 
 #### Producer
 Open another terminal and run the following command(s). You can specify the message body with the *-m* flag. You need to keep the multicast group address the same as above.
 
-    docker run -it --rm gcr.io/chrispage-dev/bmc:dev multicast broadcast -a 239.0.0.1:9999 -i eth0 -v -m "sample message"
+    docker run -it --rm --name producer gcr.io/chrispage-dev/bmc:dev multicast broadcast -a 239.0.0.1:9999 -i eth0 -v -m "sample message"
 
 You should see `Completed` in this terminal and the same message payload in the Publisher terminal above.
 
@@ -157,14 +157,15 @@ _Note_ This was tested on a 8CPU and 30GB mem virtual machine. Docker for Mac di
 #### Publisher
 Open a terminal and run the following command(s). First, we will initially try the `listen` subcommand before `publish` to verify the tcpreplay works. Specify a multicast address, *eth0* interface name, and custom interface read buffer (1MB).
 
-    docker run -it --rm gcr.io/chrispage-dev/bmc:dev multicast listen -a 239.0.0.1:9999 -i eth0 -r 1048576
+    docker run -it --rm --name listener gcr.io/chrispage-dev/bmc:dev multicast listen -a 239.0.0.1:9999 -i eth0 -r 1048576
 
 You should see `Listening to messages...`
 
 #### Producer
-Open another terminal and run the following command(s). You can capture a multicast stream with [tcpdump](https://www.tcpdump.org/) or use a public data set. For this example, we will use the from (https://iextrading.com/trading/market-data/). Download one of the [Sample pcap](https://www.googleapis.com/download/storage/v1/b/iex/o/data%2Ffeeds%2F20180127%2F20180127_IEXTP1_DEEP1.0.pcap.gz?generation=1517101215560431&alt=media) files and unzip. You will need to change the *-D* option to replace the destination multicast group address, the *-r* to replace the port number, and the pcap file location, */temp/data_feeds_20180127_20180127_IEXTP1_DEEP1.0.pcap* if using a different pcap file.
+Open another terminal and run the following command(s). You can capture a multicast stream with [tcpdump](https://www.tcpdump.org/) or use a public data set. For this example, we will use the from (https://iextrading.com/trading/market-data/). Download one of the [Sample pcap](https://www.googleapis.com/download/storage/v1/b/iex/o/data%2Ffeeds%2F20180127%2F20180127_IEXTP1_DEEP1.0.pcap.gz?generation=1517101215560431&alt=media) files and unzip. You will need to change the *-D* option to replace the destination multicast group address, the *-r* to replace the port number, and the pcap file location, */temp/data_feeds_20180127_20180127_IEXTP1_DEEP1.0.pcap* if using a different pcap file. The *-t* option will send the feed as fast as possible.
+_Note_ You can loop `tcpreplay` with the *-l <# of loops>* option
 
-    docker run --cap-add NET_ADMIN --privileged -it --rm -v "${PWD}":"${PWD}" williamofockham/tcpreplay:4.3.0 tcpreplay-edit -i eth0 -D 233.215.21.4/32:239.0.0.1/32 -r 10378:9999 -C ${PWD}/temp/data_feeds_20180127_20180127_IEXTP1_DEEP1.0.pcap
+    docker run -it --rm --name producer -v "${PWD}":"${PWD}" williamofockham/tcpreplay:4.3.0 tcpreplay-edit -i eth0 -D 233.215.21.4/32:239.0.0.1/32 -r 10378:9999 -C -t ${PWD}/temp/data_feeds_20180127_20180127_IEXTP1_DEEP1.0.pcap
 
 You will see messages running through the producer and publisher terminals.
 
@@ -174,10 +175,10 @@ You can debug via tcpdump:
 
 #### Publisher (con't)
 Now that you verified the above works, you can change the publisher command from `listen` to `publish` with appropriate parameters.\
-Open a terminal and run the following command. Specify the GOOGLE_APPLICATION_CREDENTIALS, PROJECT_ID, TOPIC_NAME, multicast address and interface name. The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS json file created above. This is only for demo purposes.
+Open a terminal and run the following command. Specify the GOOGLE_APPLICATION_CREDENTIALS, PROJECT_ID, TOPIC_NAME, multicast address and interface name. The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS json file created above (This is only for demo purposes). Raise the buffer to 5MB.
 _Note_ For localhost, *lo0*, you would use the reserved 224.0.0/24 subnet block
 
-    docker run -it --rm -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json -v ${PWD}/${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/key.json gcr.io/chrispage-dev/bmc:dev multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i eth0 -v
+    docker run -it --rm --name publisher -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json -v ${PWD}/${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/key.json gcr.io/chrispage-dev/bmc:dev multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i eth0 -r 5242880
 
 You should see `Listening and Publishing messages...`
 
