@@ -30,8 +30,8 @@ var (
 // inputCmd represents the input command
 var inputCmd = &cobra.Command{
 	Use:   "input",
-	Short: "BQDS client input service",
-	Long: `The BQDS client input service will parse the raw data or a file and iterate over
+	Short: "CDS client input service",
+	Long: `The CDS client input service will parse the raw data or a file and iterate over
 the data if new line. For example:
 k
 -d '{"a": 123}\n{"b": "xyz"}'

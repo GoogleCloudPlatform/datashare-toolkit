@@ -6,6 +6,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
   https://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,28 +16,34 @@ limitations under the License.
 package cmd
 
 import (
+	"encoding/hex"
 	"github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/pkg/multicast"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"net"
 )
 
-var (
-	message string
-)
+// multicast message handler
+func msgHandler(src *net.UDPAddr, n int, b []byte) {
+	log.Debugf("'%d' bytes read from '%s'", n, src)
+	log.Debugln(hex.Dump(b[:n]))
+	//var rawData = hex.EncodeToString(b[:n]) // hex string
+	//var rawData = string(b[:n])
+	//log.Debugf("string: '%s'", rawData)
+}
 
-// multicastBroadcastCmd represents the mlcstBroadcast command
-var multicastBroadcastCmd = &cobra.Command{
-	Use:   "broadcast",
-	Short: "BQDS client multicast broadcaster service",
-	Long: `The BQDS client multicast broadcaster service will bind to a specific multicast network interface name and address, then broadcast messages to the network interface. For example:
+// multicastListenCmd represents the mlcsListen command
+var multicastListenCmd = &cobra.Command{
+	Use:   "listen",
+	Short: "CDS client multicast listener service",
+	Long: `The CDS client multicast listener service will listen to a specific multicast network interface name and address. For example:
 
 -n "udp"
 -a "239.0.0.0:9999"
 -i "en0"
--m "I am a sample message"
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Infof("Starting Multicast Broadcast Run...")
+		log.Infof("Starting Multicast Listener Run...")
 
 		mltcstClient := multicast.Client{
 			Net:             networkType,
@@ -44,16 +51,16 @@ var multicastBroadcastCmd = &cobra.Command{
 			IfName:          ifName,
 			ReadBufferBytes: readBufferBytes,
 		}
-		err := mltcstClient.CreateBroadcasterConn()
+		err := mltcstClient.CreateListenerConn()
 		if err != nil {
-			log.Fatalf("CreateBroadcasterConn: %s", err.Error())
+			log.Fatalf("CreateListenerConn: %s", err.Error())
 		}
 
 		mltcstClient.SetupCloseHandler()
-		log.Infof("Broadcasting messages...")
-		err = mltcstClient.Broadcast([]byte(message))
+		log.Infof("Listening to messages...")
+		err = mltcstClient.Listen(msgHandler)
 		if err != nil {
-			log.Fatalf("Broadcast: %s", err.Error())
+			log.Fatalf("Listen: %s", err.Error())
 		}
 
 		log.Infof("Completed.")
@@ -61,6 +68,5 @@ var multicastBroadcastCmd = &cobra.Command{
 }
 
 func init() {
-	multicastBroadcastCmd.Flags().StringVarP(&message, "message", "m", "", "Raw message to be broadcasted: e.g. 'I am a test message', '\x800\x123\x800'")
-	multicastCmd.AddCommand(multicastBroadcastCmd)
+	multicastCmd.AddCommand(multicastListenCmd)
 }

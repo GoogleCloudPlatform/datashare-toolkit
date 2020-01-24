@@ -13,15 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package main
+package cmd
 
-import "github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/cmd/bmc/cmd"
-
-var (
-	// VERSION is set during build
-	VERSION = "0.0.1"
+import (
+	"fmt"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	cmd.Execute(VERSION)
+// versionCmd represents the version command
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Show CDS client version",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println(rootCmd.Use + " " + VERSION)
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(versionCmd)
 }

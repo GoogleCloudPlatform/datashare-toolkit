@@ -28,8 +28,8 @@ var (
 // multicastCmd represents the multicast command
 var multicastCmd = &cobra.Command{
 	Use:   "multicast",
-	Short: "BQDS client multicast service",
-	Long: `The BQDS client multicast service will listen, broadcast, or publish to a specific multicast network interface and address. For example:
+	Short: "CDS client multicast service",
+	Long: `The CDS client multicast service will listen, broadcast, or publish to a specific multicast network interface and address. For example:
 
 -n "udp"
 -a "239.0.0.0:9999"

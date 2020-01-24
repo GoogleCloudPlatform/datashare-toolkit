@@ -27,7 +27,7 @@ WORKDIR /go/src/github.com/GoogleCloudPlatform/bq-datashare-toolkit/client
 # Install Git, Go dependencies, and build the app
 RUN apk --no-cache add git
 
-#RUN cd cmd/bmc && go get -d -v
+#RUN cd cmd/cdmc && go get -d -v
 # Install outside build command for an additional image layer
 RUN go get -v \
   cloud.google.com/go/pubsub \
@@ -42,7 +42,7 @@ COPY cmd                cmd
 
 # add user in this stage because it cannot be done in next stage which is built from scratch
 # in next stage we'll copy user and group information from this stage
-RUN cd cmd/bmc && CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /usr/bin/bmc \
+RUN cd cmd/cdmc && CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /usr/bin/cdmc \
     && addgroup -S app \
     && adduser -S -g app app
 
@@ -52,6 +52,6 @@ USER app
 
 COPY --from=base /etc/passwd /etc/group /etc/
 COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=base /usr/bin/bmc /usr/bin/
-ENTRYPOINT ["/usr/bin/bmc"]
+COPY --from=base /usr/bin/cdmc /usr/bin/
+ENTRYPOINT ["/usr/bin/cdmc"]
 CMD ["--help"]
