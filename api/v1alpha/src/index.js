@@ -32,8 +32,8 @@ const options = {
     definition: {
         openapi: '3.0.0', // Specification (optional, defaults to swagger: '2.0')
         info: {
-            description: 'This is the BQDS Spot Fulfillment API service that provides data producers the ability to expose subsets of their datasets programatically.',
-            title: 'BQDS Spot Fulfillment - API Service', // Title (required)
+            description: 'This is the CDS API service that provides data producers the ability to expose subsets of their datasets programatically.',
+            title: 'CDS API Service', // Title (required)
             version: '0.0.1', // Version (required)
             contact: {
                 email: 'no-reply@google.com'
@@ -57,12 +57,12 @@ const options = {
             }
         }],
         externalDocs: {
-            description: 'Find out more about BQ Datashare Toolkit',
+            description: 'Find out more about Cloud Datashare Toolkit',
             url: 'https://github.com/GoogleCloudPlatform/bq-datashare-toolkit'
         }
     },
     // Path to the API docs
-    apis: ['./index.js', './src/index.js'],
+    apis: ['./index.js', './src/index.js', './src/spots/index.js']
 };
 
 const openapiSpec = swaggerJSDoc(options);
@@ -79,6 +79,9 @@ const dataManager = require("./dataManager");
 const validateManager = require('./validateManager');
 const FULFILLMENT_CONFIG = require('./validateManager').FULFILLMENT_CONFIG;
 
+// Import the Spots API router
+const spots = require('./spots/index');
+
 /************************************************************
   API Endpoints
  ************************************************************/
@@ -90,8 +93,10 @@ var routes = [];
 // CORS will be controlled by the API GW layer
 router.all('*', cors());
 
-// All of the API routes will be prefixed with /api
+// All of the API routes will be prefixed with /apiVersion
 app.use('/' + apiVersion, router);
+// All of the API sub routes will be prefixed with /apiVersion
+app.use('/' + apiVersion, spots);
 
 /**
  * @swagger
@@ -107,103 +112,9 @@ app.use('/' + apiVersion, router);
  *         type: string
  *         description: Geographic location of the Bucket
  *
- *   SpotFulfillmentQueryParameter:
+ *   SpotRequestsStatusResponseSchema:
  *     type: object
- *     description: Spot Fulfillment Query Parameters Definition
- *     properties:
- *       name:
- *         type: string
- *         description: Spot Fulfillment query parameter name
- *       description:
- *         type: string
- *         description: Spot Fulfillment query parameter description
- *
- *   SpotFulfillmentApiServiceConfig:
- *     type: object
- *     description: Spot Fulfillment API service config
- *     properties:
- *       bucketName:
- *         type: string
- *         description: Spot Fulfillment API Service Bucket Name
- *       fileName:
- *         type: string
- *         description: Spot Fulfillment API Service Config File Name
- *       pubsubTopicName:
- *         type: string
- *         description: Spot Fulfillment API Service Pubsub Topic Name
- *       pubsubSubscriptionName:
- *         type: string
- *         description: Spot Fulfillment API Service Pubsub Pull Subscription Name
- *
- *   SpotFulfillmentEntitlementsQueryOptions:
- *     type: object
- *     description: Spot Fulfillment API entitlements query options
- *     properties:
- *       name:
- *         type: string
- *         description: Spot Fulfillment query set name
- *       dataId:
- *         type: string
- *         description: Unique Spot Fulfillment query set name
- *       params:
- *         type: array
- *         description: Available Spot Fulfillment parameters to query
- *         items:
- *           $ref: '#/definitions/SpotFulfillmentQueryParameter'
- *
- *   SpotFulfillmentRequestDestination:
- *     type: object
- *     description: Spot Fulfillment request destination
- *     properties:
- *       bucketName:
- *         type: string
- *         required: true
- *         description: Spot Fulfillment destination storage bucket name
- *       fileName:
- *         type: string
- *         required: false
- *         description: Spot Fulfillment destination storage file name
- *       projectId:
- *         type: string
- *         required: true
- *         description: Spot Fulfillment destination GCP project ID
- *
- *   SpotFulfillmentRequestSchema:
- *     type: object
- *     description: Spot Fulfillment request schema
- *     properties:
- *       dataId:
- *         type: string
- *         required: true
- *       parameters:
- *         type: object
- *         required: false
- *       destination:
- *         $ref: '#/definitions/SpotFulfillmentRequestDestination'
- *
- *   SpotFulfillmentRequestsResponseSchema:
- *     type: object
- *     description: Spot Fulfillment requests response
- *     properties:
- *       requestId:
- *         type: string
- *         required: true
- *       query:
- *         type: string
- *         required: true
- *       bucketName:
- *         type: string
- *         required: true
- *       fileName:
- *         type: string
- *         required: true
- *       signedUrl:
- *         type: string
- *         required: false
- *
- *   SpotFulfillmentRequestsStatusResponseSchema:
- *     type: object
- *     description: Spot Fulfillment requests status response
+ *     description: Spot requests status response
  *     properties:
  *       requestId:
  *         type: string
@@ -221,9 +132,9 @@ app.use('/' + apiVersion, router);
  *         type: string
  *         required: true
  *
- *   SpotFulfillmentSubscriberRequestSchema:
+ *   SpotSubscriberRequestSchema:
  *     type: object
- *     description: Spot Fulfillment subscriber webhook request schema (Note that the message.data field is base64-encoded.)
+ *     description: Spot subscriber webhook request schema (Note that the message.data field is base64-encoded.)
  *     properties:
  *       message:
  *         type: object
@@ -246,9 +157,9 @@ app.use('/' + apiVersion, router);
  *         type: string
  *         required: true
  *
- *   SpotFulfillmentWorkerResponseSchema:
+ *   SpotWorkerResponseSchema:
  *     type: object
- *     description: Spot Fulfillment worker response schema
+ *     description: Spot worker response schema
  *     properties:
  *       requestId:
  *         type: string
@@ -297,155 +208,7 @@ router.get('/', function(req, res) {
     res.status(200).json({
         success: true,
         code: 200,
-        message: 'Welcome to the BQDS API (' + apiVersion + ')!'
-    });
-});
-
-/**
- * @swagger
- *
- * /serviceConfig:
- *   get:
- *     summary: Spot Fulfillment API service environment configuration
- *     description: Returns the Spot Fulfillment API service configuration
- *     responses:
- *       200:
- *         description: Spot Fulfillment API service configuration
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   description: Spot Fulfillment API service config
- *                   properties:
- *                     $ref: '#/definitions/SpotFulfillmentApiServiceConfig'
- */
-router.get('/serviceConfig', async(req, res) => {
-    var data = {
-        config: FULFILLMENT_CONFIG
-    };
-    res.status(200).json({
-        success: true,
-        code: 200,
-        data: data
-    });
-});
-
-/**
- * @swagger
- *
- * /fulfillmentOptions:
- *   get:
- *     summary: Spot Fulfillment entitlement query options for the API service
- *     description: Returns the Spot Fulfillment entitlement query options for the API service
- *     parameters:
- *     - in: query
- *       name: includeAvailableValues
- *       schema:
- *          type: boolean
- *       required: false
- *       description: Include available values in options response
- *     responses:
- *       200:
- *         description: Spot Fulfillment entitlement query options 200 response
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: array
- *                   description: list of Spot Fulfillment API entitlements query options
- *                   items:
- *                     $ref: '#/definitions/SpotFulfillmentEntitlementsQueryOptions'
- */
-router.get('/fulfillmentOptions', validateManager.fulfillmentConfig, async(req, res) => {
-    const options = {
-        includeAvailableValues: req.query.includeAvailableValues ? req.query.includeAvailableValues === "true" : false,
-        config: FULFILLMENT_CONFIG
-    };
-    try {
-        const data = await validateManager.getAvailableRequests(options)
-        var code;
-        if (data && data.success === false) {
-            code = (data.code === undefined ) ? 500 : data.code;
-        } else {
-            code = (data.code === undefined ) ? 200 : data.code;
-        }
-        res.status(code).json({
-            code: code,
-            ... data
-        });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            code: 500,
-            errors: [err.message]
-        })
-    }
-});
-
-/**
- * @swagger
- *
- * /fulfillmentRequests:
- *   post:
- *     summary: Create Spot Fulfillment request based off request parameters
- *     description: Returns the Spot Fulfillment Request response
- *     requestBody:
- *       description: Request parameters for Spot Fulfillment
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/SpotFulfillmentRequestSchema'
- *     responses:
- *       201:
- *         description: Spot Fulfillment Configuration
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   items:
- *                     $ref: '#/definitions/SpotFulfillmentRequestsResponseSchema'
- */
-router.post('/fulfillmentRequests', validateManager.fulfillmentParams, async(req, res) => {
-    const options = {
-        config: FULFILLMENT_CONFIG,
-        ... req.body
-    };
-    console.log(`Options: ${JSON.stringify(options)}`);
-    const data = await dataManager.createFulfillmentRequest(options);
-    var code;
-    if (data && data.success === false) {
-        code = (data.code === undefined ) ? 500 : data.code;
-    } else {
-        code = (data.code === undefined ) ? 201 : data.code;
-    }
-    res.status(code).json({
-        code: code,
-        ... data
+        message: 'Welcome to the CDS API (' + apiVersion + ')!'
     });
 });
 
@@ -454,30 +217,30 @@ router.post('/fulfillmentRequests', validateManager.fulfillmentParams, async(req
  *
  * /fulfillmentRequests/{requestId}:
  *   get:
- *     summary: Check Spot Fulfillment request status based off Request ID
- *     description: Returns the Spot Fulfillment Request Status response
+ *     summary: Check Spot request status based off Request ID
+ *     description: Returns the Spot Request Status response
  *     parameters:
  *     - in: path
  *       name: requestId
  *       schema:
  *          type: string
  *       required: true
- *       description: Request Id of the Spot Fulfillment request
+ *       description: Request Id of the Spot request
  *     - in: query
  *       name: bucketName
  *       schema:
  *          type: string
  *       required: true
- *       description: Bucket Name from the Spot Fulfillment Request Id
+ *       description: Bucket Name from the Spot Request Id
  *     - in: query
  *       name: fileName
  *       schema:
  *          type: string
  *       required: true
- *       description: File Name from the Spot Fulfillment Request Id
+ *       description: File Name from the Spot Request Id
  *     responses:
  *       200:
- *         description: Spot Fulfillment Request Status 200 Response
+ *         description: Spot Request Status 200 Response
  *         content:
  *           application/json:
  *             schema:
@@ -491,9 +254,9 @@ router.post('/fulfillmentRequests', validateManager.fulfillmentParams, async(req
  *                   default: 200
  *                   description: HTTP status code
  *                 data:
- *                   $ref: '#/definitions/SpotFulfillmentRequestsStatusResponseSchema'
+ *                   $ref: '#/definitions/SpotRequestsStatusResponseSchema'
  *       400:
- *         description: Spot Fulfillment Request Status 400 Response
+ *         description: Spot Request Status 400 Response
  *         content:
  *           application/json:
  *             schema:
@@ -509,7 +272,7 @@ router.post('/fulfillmentRequests', validateManager.fulfillmentParams, async(req
  *                   description: HTTP status code
  *                 errors:
  *                   type: array
- *                   description: list of Spot Fulfillment errors
+ *                   description: list of Spot errors
  *                   items:
  *                     type: string
  */
@@ -544,17 +307,17 @@ router.get('/fulfillmentRequests/:requestId', async(req, res) => {
  *
  * /fulfillmentSubscriber:
  *   post:
- *     summary: Spot Fulfillment subscriber webhook request endpoint
- *     description: Spot Fulfillment subscriber webhook request endpoint receives Spot Fulfillment request message from GCP PubSub, acknowledges that request, and completes the appropriate execution tasks asynchronously for the fulfillment request.
+ *     summary: Spot subscriber webhook request endpoint
+ *     description: Spot subscriber webhook request endpoint receives Spot request message from GCP PubSub, acknowledges that request, and completes the appropriate execution tasks asynchronously for the fulfillment request.
  *     requestBody:
- *       description: Request parameters for Spot Fulfillment subscriber webhook
+ *       description: Request parameters for Spot subscriber webhook
  *       content:
  *        application/json:
  *          schema:
- *            $ref: '#/definitions/SpotFulfillmentSubscriberRequestSchema'
+ *            $ref: '#/definitions/SpotSubscriberRequestSchema'
  *     responses:
  *       202:
- *         description: Spot Fulfillment subscriber webhook 202 response
+ *         description: Spot subscriber webhook 202 response
  *         content:
  *           application/json:
  *             schema:
@@ -573,7 +336,7 @@ router.get('/fulfillmentRequests/:requestId', async(req, res) => {
  *                       type: string
  *                       required: true
  *       400:
- *         description: Spot Fulfillment subscriber webhook 400 response
+ *         description: Spot subscriber webhook 400 response
  *         content:
  *           application/json:
  *             schema:
@@ -589,7 +352,7 @@ router.get('/fulfillmentRequests/:requestId', async(req, res) => {
  *                   description: HTTP status code
  *                 errors:
  *                   type: array
- *                   description: list of Spot Fulfillment errors
+ *                   description: list of Spot errors
  *                   items:
  *                     type: string
  */
@@ -624,11 +387,11 @@ router.post('/fulfillmentSubscriber', validateManager.fulfillmentWebhookParams, 
  *
  * /fulfillmentWorker:
  *   post:
- *     summary: Spot Fulfillment worker request endpoint
- *     description: Spot Fulfillment worker request endpoint pulls a fulfillment request message from GCP PubSub, acknowledges that request, and completes the execution tasks from the fulfillment request.
+ *     summary: Spot worker request endpoint
+ *     description: Spot worker request endpoint pulls a fulfillment request message from GCP PubSub, acknowledges that request, and completes the execution tasks from the fulfillment request.
  *     responses:
  *       201:
- *         description: Spot Fulfillment worker 201 response
+ *         description: Spot worker 201 response
  *         content:
  *           application/json:
  *             schema:
@@ -642,9 +405,9 @@ router.post('/fulfillmentSubscriber', validateManager.fulfillmentWebhookParams, 
  *                   description: HTTP status code
  *                 data:
  *                   items:
- *                     $ref: '#/definitions/SpotFulfillmentWorkerResponseSchema'
+ *                     $ref: '#/definitions/SpotWorkerResponseSchema'
  *       400:
- *         description: Spot Fulfillment worker 400 response
+ *         description: Spot worker 400 response
  *         content:
  *           application/json:
  *             schema:
@@ -660,7 +423,7 @@ router.post('/fulfillmentSubscriber', validateManager.fulfillmentWebhookParams, 
  *                   description: HTTP status code
  *                 errors:
  *                   type: array
- *                   description: list of Spot Fulfillment errors
+ *                   description: list of Spot errors
  *                   items:
  *                     type: string
  */
@@ -726,6 +489,9 @@ router.get(routes, function(req, res) {
     res.send(openapiSpec);
 });
 
+// Import the other API routes before wildcard '*'
+router.use(spots);
+
 /**
  * @swagger
  *
@@ -764,7 +530,6 @@ router.get('*', function(req, res) {
 app.get('/', function(req, res) {
     res.redirect('/' + apiVersion);
 });
-
 
 /************************************************************
   Start server
