@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2019 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,29 +27,76 @@ const Joi = require('@hapi/joi');
 /************************************************************
   immutable constant options
  ************************************************************/
-const SPOT_SERVICE_CONFIG = {
-    bucketName: process.env.SPOT_SERVICE_CONFIG_BUCKET_NAME || "change-me",
-    fileName: process.env.SPOT_SERVICE_CONFIG_FILE_NAME || "cds/api/config.json",
+const FULFILLMENT_CONFIG = {
+    bucketName: process.env.FULFILLMENT_CONFIG_BUCKET_NAME || "change-me",
+    fileName: process.env.FULFILLMENT_CONFIG_FILE_NAME || "bqds/api/config.json",
     destination: {
-        projectId: process.env.SPOT_SERVICE_CONFIG_DESTINATION_PROJECT_ID || "change-me",
-        datasetId: process.env.SPOT_SERVICE_CONFIG_DESTINATION_DATASET_ID || "cds_spots",
+        projectId: process.env.FULFILLMENT_CONFIG_DESTINATION_PROJECT_ID || "change-me",
+        datasetId: process.env.FULFILLMENT_CONFIG_DESTINATION_DATASET_ID || "bqds_spot_fulfillment",
+    },
+    pubsub: {
+        topicName: process.env.FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME || "bqds-spot-fulfillment",
+        subscription: {
+            projectId: process.env.FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_PROJECT_ID || "change-me",
+            name: process.env.FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME || "bqds-spot-fulfilllment-consumer"
+        }
     }
 }
 
 /************************************************************
-  spotParameterSchema defines the parameters required
-  to submit a Spot request
+  fulfillmentParameterSchema defines the parameters required
+  to submit a Spot fulfillment request
  ************************************************************/
-const spotParameterSchema = Joi.object({
+const fulfillmentParameterSchema = Joi.object({
     dataId: Joi.string().required(),
     parameters: Joi.object().required(),
     wait: Joi.boolean(),
     destination: Joi.object().required()
         .keys({
             bucketName: Joi.string().required(),
-            fileName: Joi.string(),
-            projectId: Joi.string()
+            fileName: Joi.string()
         })
+});
+
+/************************************************************
+  fulfillmentMessageSchema defines the GCP Pubsub publisher
+  and subscriber payload schema.
+  'requestId' must be included as a custom attribute in the
+  pubsub message.
+  More details here: https://cloud.google.com/pubsub/docs/push
+ ************************************************************/
+const fulfillmentMessageSchema = Joi.object({
+    message: Joi.object().required()
+        .keys({
+            attributes: Joi.object().required()
+                .keys({
+                    requestId: Joi.string().required()
+                }),
+            data: Joi.string().base64({ urlSafe: true }).required(),
+            messageId: Joi.string().required(),
+        })
+});
+
+/************************************************************
+  fulfillmentWebhookSchema defines the GCP Pubsub subscriber
+  webhook payload schema. 'requestId' must be included as a
+  custom attribute in the pubsub message.
+  More details here: https://cloud.google.com/pubsub/docs/push
+ ************************************************************/
+const fulfillmentWebhookSchema = Joi.object({
+    message: Joi.object().required()
+        .keys({
+            attributes: Joi.object().required()
+                .keys({
+                    requestId: Joi.string().required()
+                }),
+            data: Joi.string().base64({ urlSafe: true }).required(),
+            messageId: Joi.string().required(),
+            message_id: Joi.string(),
+            publishTime: Joi.string().required(),
+            publish_time: Joi.string(),
+        }),
+    subscription: Joi.string().required()
 });
 
 /**
@@ -58,9 +105,9 @@ const spotParameterSchema = Joi.object({
  * Returns a list of available requests and the corresponding parameters.
  * TODO: Refactor.
  */
-async function getSpotOptions(options, includeQuery) {
-    let configBucketName = SPOT_SERVICE_CONFIG.bucketName;
-    let configFileName = SPOT_SERVICE_CONFIG.fileName;
+async function getAvailableRequests(options, includeQuery) {
+    let configBucketName = FULFILLMENT_CONFIG.bucketName;
+    let configFileName = FULFILLMENT_CONFIG.fileName;
 
     var json;
     let file = await storageUtil.fetchFileContent(configBucketName, configFileName).catch(err =>  {
@@ -68,7 +115,7 @@ async function getSpotOptions(options, includeQuery) {
         return { success: false, errors: [err.message]};
     });
     if (file.success === false) {
-        return { success: false, errors: [`fileName: '${configFileName}' or bucketName: '${configBucketName}' does not exist`] }
+        return { ...file };
     }
     json = JSON.parse(stripJsonComments(file));
 
@@ -145,19 +192,20 @@ async function getSpotOptions(options, includeQuery) {
 }
 
 /************************************************************
-  Validate the Spot query configFileName url query parameter
+  Validate the Fulfillment configFileName url query parameter
     Inputs:
       - request, response, next
     Returns:
       - response or next
  ************************************************************/
-async function spotConfig(req, res, next) {
+async function fulfillmentConfig(req, res, next) {
     var errors = []
 
     // validParams validation
-    var bucketName = (req.params.bucketName === undefined) ? SPOT_SERVICE_CONFIG.bucketName : req.params.bucketName;
-    var configFileName = (req.query.configFileName === undefined) ? SPOT_SERVICE_CONFIG.fileName : req.query.configFileName;
+    var bucketName = (req.params.bucketName === undefined) ? FULFILLMENT_CONFIG.bucketName : req.params.bucketName;
+    var configFileName = (req.query.configFileName === undefined) ? FULFILLMENT_CONFIG.fileName : req.query.configFileName;
 
+    // console.log(`Testing fulfillment config path gs://bucket/file [${bucketName}/${configFileName}]`);
     let result = await storageUtil.checkIfFileExists(bucketName, configFileName).catch(err => {
         errors.push(err.message);
     });
@@ -176,19 +224,23 @@ async function spotConfig(req, res, next) {
 }
 
 /************************************************************
-  Validate Spot data request parameters
+  Validate Fulfillment data request parameters
     Inputs:
       - request, response, next
     Returns:
       - response or next
  ************************************************************/
-function spotParams(req, res, next) {
+function fulfillmentParams(req, res, next) {
     var errors = [];
     var message;
 
-    let result = spotParameterSchema.validate(req.body);
+    if ('user-agent' in req.headers && req.headers['user-agent'] === 'Google-Cloud-Tasks') {
+        console.log('Google-Cloud-Tasks request');
+        //var jsonString = Buffer.from(req.body, 'base64').toString('utf8');
+    }
+    let result = fulfillmentParameterSchema.validate(req.body);
     if (result.error) {
-        message = `spotParameterSchema validation error: ${JSON.stringify(result.error.details)}`;
+        message = `fulfillmentParameterSchema validation error: ${JSON.stringify(result.error.details)}`;
         console.warn(message);
         errors.push(result.error.details);
     }
@@ -202,13 +254,55 @@ function spotParams(req, res, next) {
     return next();
 }
 
+/************************************************************
+  Validate Fulfillment webhook (subscription) request parameters
+    Inputs:
+      - request, response, next
+    Returns:
+      - response or next
+ ************************************************************/
+function fulfillmentWebhookParams(req, res, next) {
+    var errors = [];
+    var message;
+
+    if ('user-agent' in req.headers && req.headers['user-agent'] === 'Google-Cloud-Tasks') {
+        console.log('Google-Cloud-Tasks request');
+        //var jsonString = Buffer.from(req.body, 'base64').toString('utf8');
+    }
+    let result = fulfillmentWebhookSchema.validate(req.body);
+    if (result.error) {
+        message = `fulfillmentWebhookSchema validation error: ${JSON.stringify(result.error.details)}`;
+        console.warn(message);
+        errors.push(result.error.details);
+    }
+    if (errors.length > 0) {
+        return res.status(400).json({
+            success: false,
+            errors: errors,
+            code: 400
+        })
+    }
+    return next();
+}
+
+/**
+ * @param  {} options
+ * Parses base64 payload from GCP Pubsub message
+ */
+function fulfillmentWebhookPayload(options) {
+    const requestId = options.message.attributes.requestId;
+    const jsonString = Buffer.from(options.message.data, 'base64').toString('utf8');
+    options = {...options, ...JSON.parse(jsonString)};
+    return { requestId: requestId, options: options }
+}
+
 /**
  * @param  {} options
  * Returns a list of available requests and the corresponding parameters.
  * TODO: Refactor.
  */
-async function getDynamicSpotOptions(options) {
-    let definitions = await getSpotOptions(options, true).catch(err => {
+async function getDynamicQueryOptions(options) {
+    let definitions = await getAvailableRequests(options, true).catch(err => {
         console.warn(err.message);
         return { success: false, code: 400, errors: [err.message] };
     });
@@ -276,9 +370,12 @@ function performTextVariableReplacements(text, projectId, datasetId, tableId) {
   Module exports
  **************************************************************************/
 module.exports = {
-    spotParams,
-    spotConfig,
-    getSpotOptions,
-    getDynamicSpotOptions
+    fulfillmentParams,
+    fulfillmentWebhookParams,
+    fulfillmentWebhookPayload,
+    fulfillmentConfig,
+    getAvailableRequests,
+    getDynamicQueryOptions
 };
-module.exports.SPOT_SERVICE_CONFIG = SPOT_SERVICE_CONFIG;
+module.exports.FULFILLMENT_CONFIG = FULFILLMENT_CONFIG;
+module.exports.fulfillmentMessageSchema = fulfillmentMessageSchema;

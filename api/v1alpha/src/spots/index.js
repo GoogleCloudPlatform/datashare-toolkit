@@ -16,12 +16,17 @@
 
 'use strict';
 
+var compression = require('compression');
 const express = require('express');
+const bodyParser = require('body-parser');
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 const dataManager = require("./dataManager");
 
 // Import the validation functions for the API
 const validateManager = require('./validateManager');
+const FULFILLMENT_CONFIG = require('./validateManager').FULFILLMENT_CONFIG;
 
 /************************************************************
   API Endpoints
@@ -29,6 +34,7 @@ const validateManager = require('./validateManager');
 // Define the routes for the REST API
 var spots = express.Router();
 // methods that require multiple routes
+var routes = [];
 
 /**
  * @swagger
@@ -44,6 +50,12 @@ var spots = express.Router();
  *       fileName:
  *         type: string
  *         description: Spot API Service Config File Name
+ *       pubsubTopicName:
+ *         type: string
+ *         description: Spot API Service Pubsub Topic Name
+ *       pubsubSubscriptionName:
+ *         type: string
+ *         description: Spot API Service Pubsub Pull Subscription Name
  *
  *   SpotOptions:
  *     type: object
@@ -122,27 +134,8 @@ var spots = express.Router();
  *         type: string
  *         required: false
  *
- *   SpotStatusResponseSchema:
- *     type: object
- *     description: Spot request status response
- *     properties:
- *       requestId:
- *         type: string
- *         required: true
- *       query:
- *         type: string
- *         required: true
- *       bucketName:
- *         type: string
- *         required: true
- *       fileName:
- *         type: string
- *         required: true
- *       signedUrl:
- *         type: string
- *         required: true
- *
  */
+
 spots.get('/', function(req, res) {
     res.status(200).json({
         success: true,
@@ -158,15 +151,6 @@ spots.get('/', function(req, res) {
  *   get:
  *     summary: Spot API service environment configuration
  *     description: Returns the Spot API service configuration
- *     tags:
- *       - spots
- *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Spot request
  *     responses:
  *       200:
  *         description: Spot API service configuration
@@ -187,6 +171,17 @@ spots.get('/', function(req, res) {
  *                   properties:
  *                     $ref: '#/definitions/SpotApiServiceConfig'
  */
+spots.get('/projects/:projectId/spots:config', async(req, res) => {
+    var data = {
+        config: FULFILLMENT_CONFIG
+    };
+    res.status(200).json({
+        success: true,
+        code: 200,
+        data: data
+    });
+});
+
 /**
  * @swagger
  *
@@ -194,15 +189,7 @@ spots.get('/', function(req, res) {
  *   get:
  *     summary: Spot query options (entitlement) for the Spot API service
  *     description: Returns the Spot query options for the Spot API service
- *     tags:
- *       - spots
  *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Spot request
  *     - in: query
  *       name: includeAvailableValues
  *       schema:
@@ -229,34 +216,29 @@ spots.get('/', function(req, res) {
  *                   items:
  *                     $ref: '#/definitions/SpotOptions'
  */
-spots.get('/projects/:projectId/spots::custom', async(req, res) => {
-    var data;
+spots.get('/projects/:projectId/spots:options', validateManager.fulfillmentConfig, async(req, res) => {
     const options = {
         includeAvailableValues: req.query.includeAvailableValues ? req.query.includeAvailableValues === "true" : false,
-        config: dataManager.getSpotConfig()
+        config: FULFILLMENT_CONFIG
     };
-    switch (req.params.custom) {
-        case "options":
-            data = await validateManager.getSpotOptions(options)
-            var code;
-            if (data && data.success === false) {
-                code = (data.code === undefined ) ? 500 : data.code;
-            } else {
-                code = (data.code === undefined ) ? 200 : data.code;
-            }
-            return res.status(code).json({
-                code: code,
-                ... data
-            });
-        case "config":
-            data = {
-                config: dataManager.getSpotConfig()
-            };
-            return res.status(200).json({
-                success: true,
-                code: 200,
-                data: data
-            });
+    try {
+        const data = await validateManager.getAvailableRequests(options)
+        var code;
+        if (data && data.success === false) {
+            code = (data.code === undefined ) ? 500 : data.code;
+        } else {
+            code = (data.code === undefined ) ? 200 : data.code;
+        }
+        res.status(code).json({
+            code: code,
+            ... data
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            code: 500,
+            errors: [err.message]
+        })
     }
 });
 
@@ -267,15 +249,6 @@ spots.get('/projects/:projectId/spots::custom', async(req, res) => {
  *   post:
  *     summary: Create Spot based off request parameters
  *     description: Returns the Spot response
- *     tags:
- *       - spots
- *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Spot request
  *     requestBody:
  *       description: Request parameters for Spot
  *       content:
@@ -300,13 +273,13 @@ spots.get('/projects/:projectId/spots::custom', async(req, res) => {
  *                   items:
  *                     $ref: '#/definitions/SpotResponseSchema'
  */
-spots.post('/projects/:projectId/spots', validateManager.spotParams, async(req, res) => {
+spots.post('/projects/:projectId/spots', validateManager.fulfillmentParams, async(req, res) => {
     const options = {
-        config: dataManager.getSpotConfig(),
+        config: FULFILLMENT_CONFIG,
         ... req.body
     };
     console.log(`Options: ${JSON.stringify(options)}`);
-    const data = await dataManager.createSpot(options);
+    const data = await dataManager.createFulfillmentRequest(options);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -319,78 +292,6 @@ spots.post('/projects/:projectId/spots', validateManager.spotParams, async(req, 
     });
 });
 
-/**
- * @swagger
- *
- * /projects/{projectId}/spots/{requestId}:
- *   get:
- *     summary: Check Spot status based off Request ID
- *     description: Returns the Spot Status response
- *     tags:
- *       - spots
- *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Spot request
- *     - in: path
- *       name: requestId
- *       schema:
- *          type: string
- *       required: true
- *       description: Request Id of the Spot request
- *     - in: query
- *       name: bucketName
- *       schema:
- *          type: string
- *       required: true
- *       description: Bucket Name from the Spot Request Id
- *     - in: query
- *       name: fileName
- *       schema:
- *          type: string
- *       required: true
- *       description: File Name from the Spot Request Id
- *     responses:
- *       200:
- *         description: Spot Status 200 Response
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   $ref: '#/definitions/SpotStatusResponseSchema'
- *       400:
- *         description: Spot Status 400 Response
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   default: false
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 400
- *                   description: HTTP status code
- *                 errors:
- *                   type: array
- *                   description: list of Spot errors
- *                   items:
- *                     type: string
- */
 spots.get('/projects/:projectId/spots/:requestId', async(req, res) => {
     const requestId = req.params.requestId;
     const bucketName = req.query.bucketName;
@@ -404,7 +305,7 @@ spots.get('/projects/:projectId/spots/:requestId', async(req, res) => {
         });
     }
 
-    const data = await dataManager.getSpot(requestId, bucketName, fileName);
+    const data = await dataManager.getFulfillmentRequest(requestId, bucketName, fileName);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -416,5 +317,60 @@ spots.get('/projects/:projectId/spots/:requestId', async(req, res) => {
         ... data
     });
 });
+
+spots.post('/projects/:projectId/spots:subscriber', validateManager.fulfillmentWebhookParams, async(req, res) => {
+    const options = {
+        config: FULFILLMENT_CONFIG,
+        ... req.body
+    };
+    console.log(`Options: ${JSON.stringify(options)}`);
+    try {
+        const data = validateManager.fulfillmentWebhookPayload(options)
+        // Don't wait for the response
+        dataManager.processFulfillmentSubscriptionRequest(data.options).catch (err => {
+            console.warn(`processFulfillmentSubscriptionRequest error: ${err.message}`);
+        });
+        res.status(202).json({
+            success: true,
+            code: 202,
+            data: { requestId: data.requestId }
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            code: 500,
+            errors: [err.message]
+        })
+    }
+});
+
+spots.post('/projects/:projectId/spots:worker', async(req, res) => {
+    const options = {
+        config: FULFILLMENT_CONFIG
+    };
+    console.log(`Options: ${JSON.stringify(options)}`);
+    const data = await dataManager.pullFulfillmentSubscriptionRequest(options);
+    //console.log(data);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 201 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+spots.get('*', function(req, res) {
+    res.status(404).json({
+        success: true,
+        code: 404,
+        message: 'Not Found.'
+    });
+});
+
+
 
 module.exports = spots;
