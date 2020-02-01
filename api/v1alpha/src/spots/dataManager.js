@@ -22,7 +22,6 @@ const uuidv4 = require('uuid/v4');
 const { BigQueryUtil, StorageUtil, PubSubUtil } = require('bqds-shared');
 let bigqueryUtil;
 const storageUtil = new StorageUtil();
-const pubsubUtil = new PubSubUtil();
 
 const validateManager = require('./validateManager');
 const fulfillmentMessageSchema = require('./validateManager').fulfillmentMessageSchema;
@@ -68,18 +67,13 @@ async function createFulfillmentRequest(options) {
             return { ...data };
         }
         return { data: { ...responseData, ...data }, success: true };
+    } else {
+        // Don't wait for the response
+        createFulfillment(requestId, options).catch(err => {
+            console.warn(`createFulfillment error: ${err.message}`);
+        });
+        return { data: { ...responseData }, code: 202, success: true };
     }
-
-    // create the fulfillment pubsub message
-    const customAttributes = {
-        requestId: requestId
-    }
-    const topicName = options.config.pubsub.topicName;
-    await pubsubUtil.publishMessage(topicName, options, customAttributes).catch(err => {
-        console.warn(err);
-        return { success: false, errors: [err.message] };
-    });
-    return { data: { ...responseData }, success: true };
 }
 
 /**
@@ -126,101 +120,6 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
         return { success: false, errors: [err.message] };
     });
     return { data: { ...responseData, signedUrl: signedUrl }, success: true };
-}
-
-/**
- * @param  {Object} options
- * Receives message payload from GCP Pubsub subscription and processes
- * fulfillment request. logic assumes that message payload schema has
- * already been validated.
- */
-async function processFulfillmentSubscriptionRequest(options) {
-    const requestId = options.message.attributes.requestId;
-    const bucketName = options.destination.bucketName;
-    const fileName = options.destination.fileName;
-    const query = querystring.encode({
-        bucketName: bucketName,
-        fileName: fileName
-    });
-    const responseData = {
-        requestId: requestId,
-        query: query,
-        bucketName: bucketName,
-        fileName: fileName
-    }
-
-    const data = await createFulfillment(requestId, options).catch(err => {
-        console.warn(err);
-        return { success: false, errors: [err.message] };
-    });
-    if (data.success === false ) {
-        return { ...data };
-    }
-    return { data: { ...responseData, ...data }, success: true };
-}
-
-/**
- * @param  {Object} options
- * Pulls message from GCP Pubsub subscription and processes
- * fulfillment request.
- */
-async function pullFulfillmentSubscriptionRequest(options) {
-    var message;
-
-    // Check if subscription exists
-    const topicName = options.config.pubsub.topicName;
-    const subscriptionProjectId = options.config.pubsub.subscription.projectId;
-    const subscriptionName = options.config.pubsub.subscription.name;
-    const exists = await pubsubUtil.checkIfSubscriptionExists(topicName, subscriptionProjectId, subscriptionName).catch(err => {
-        console.warn(err);
-        return { success: false, errors: [err.message] };
-    });
-    if (exists.success === false) {
-        return { ...exists };
-    }
-
-    // Process one message after ack
-    const pubsubMessage = await pubsubUtil.getMessage(subscriptionProjectId, subscriptionName).catch(err => {
-        console.warn(err);
-        return { success: false, errors: [err.message] };
-    });
-    if (pubsubMessage.success === false) {
-        return { ...pubsubMessage };
-    }
-
-    // validate pubsub message data against fulfillment message schema
-    const result = fulfillmentMessageSchema.validate(pubsubMessage.data);
-    if (result.error) {
-        message = `Incorrect Spot fulfillment message schema`;
-        console.warn(message);
-        return { success: false, code: 400, errors: [message] };
-    }
-    //const messageId = pubsubMessage.message.messageId;
-    const requestId = pubsubMessage.message.attributes.requestId;
-    const jsonString = Buffer.from(pubsubMessage.message.data).toString('utf8');
-    options = {...options, ...JSON.parse(jsonString)};
-
-    const bucketName = options.destination.bucketName;
-    const fileName = options.destination.fileName;
-    const query = querystring.encode({
-        bucketName: bucketName,
-        fileName: fileName
-    });
-    const responseData = {
-        requestId: requestId,
-        query: query,
-        bucketName: bucketName,
-        fileName: fileName
-    }
-
-    const data = await createFulfillment(requestId, options).catch(err => {
-        console.warn(err);
-        return { success: false, errors: [err.message] };
-    });
-    if (data.success === false ) {
-        return { ...data };
-    }
-    return { data: { ...responseData, ...data }, success: true };
 }
 
 /**
@@ -339,7 +238,5 @@ async function createFulfillment(requestId, options) {
 module.exports = {
     createFulfillmentRequest,
     getFulfillmentRequest,
-    processFulfillmentSubscriptionRequest,
-    pullFulfillmentSubscriptionRequest,
     createFulfillment
 };
