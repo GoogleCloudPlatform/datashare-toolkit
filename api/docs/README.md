@@ -1,4 +1,4 @@
-# BQDS Spot Fulfillment - API Service Docs
+# CDS API - Spot Service Docs
 
   - [Configuration](CONFIGURATION.md)
 

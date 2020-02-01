@@ -1,5 +1,5 @@
 #
-# Copyright 2019 Google LLC
+# Copyright 2020 Google LLC
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ WORKDIR /app
 COPY shared/*.js /shared/
 # Bundle app source
 COPY api/v1alpha/src/*.js /app/
+COPY api/v1alpha/src/spots/*.js /app/spots/
 
 # --- Release with Alpine ----
 FROM node:12.6-alpine as release

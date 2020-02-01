@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: bqds-spot-fulfillment-api-lb
+  name: cds-api-spot-service-lb
   labels:
-    app: bqds-spot-fulfillment-api
+    app: cds-api-spot-service
 spec:
   type: LoadBalancer
   ports:
@@ -12,5 +12,5 @@ spec:
       name: http
       targetPort: 5555
   selector:
-    app: bqds-spot-fulfillment-api
+    app: cds-api-spot-service
     version: v1

@@ -33,13 +33,6 @@ const FULFILLMENT_CONFIG = {
     destination: {
         projectId: process.env.FULFILLMENT_CONFIG_DESTINATION_PROJECT_ID || "change-me",
         datasetId: process.env.FULFILLMENT_CONFIG_DESTINATION_DATASET_ID || "bqds_spot_fulfillment",
-    },
-    pubsub: {
-        topicName: process.env.FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME || "bqds-spot-fulfillment",
-        subscription: {
-            projectId: process.env.FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_PROJECT_ID || "change-me",
-            name: process.env.FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME || "bqds-spot-fulfilllment-consumer"
-        }
     }
 }
 
@@ -51,52 +44,12 @@ const fulfillmentParameterSchema = Joi.object({
     dataId: Joi.string().required(),
     parameters: Joi.object().required(),
     wait: Joi.boolean(),
-    destination: Joi.object().required()
+    destination: Joi.object()
         .keys({
             bucketName: Joi.string().required(),
-            fileName: Joi.string()
+            fileName: Joi.string(),
+            projectId: Joi.string()
         })
-});
-
-/************************************************************
-  fulfillmentMessageSchema defines the GCP Pubsub publisher
-  and subscriber payload schema.
-  'requestId' must be included as a custom attribute in the
-  pubsub message.
-  More details here: https://cloud.google.com/pubsub/docs/push
- ************************************************************/
-const fulfillmentMessageSchema = Joi.object({
-    message: Joi.object().required()
-        .keys({
-            attributes: Joi.object().required()
-                .keys({
-                    requestId: Joi.string().required()
-                }),
-            data: Joi.string().base64({ urlSafe: true }).required(),
-            messageId: Joi.string().required(),
-        })
-});
-
-/************************************************************
-  fulfillmentWebhookSchema defines the GCP Pubsub subscriber
-  webhook payload schema. 'requestId' must be included as a
-  custom attribute in the pubsub message.
-  More details here: https://cloud.google.com/pubsub/docs/push
- ************************************************************/
-const fulfillmentWebhookSchema = Joi.object({
-    message: Joi.object().required()
-        .keys({
-            attributes: Joi.object().required()
-                .keys({
-                    requestId: Joi.string().required()
-                }),
-            data: Joi.string().base64({ urlSafe: true }).required(),
-            messageId: Joi.string().required(),
-            message_id: Joi.string(),
-            publishTime: Joi.string().required(),
-            publish_time: Joi.string(),
-        }),
-    subscription: Joi.string().required()
 });
 
 /**
@@ -115,7 +68,7 @@ async function getAvailableRequests(options, includeQuery) {
         return { success: false, errors: [err.message]};
     });
     if (file.success === false) {
-        return { ...file };
+        return { success: false, errors: [`fileName: '${configFileName}' or bucketName: '${configBucketName}' does not exist`] }
     }
     json = JSON.parse(stripJsonComments(file));
 
@@ -378,4 +331,3 @@ module.exports = {
     getDynamicQueryOptions
 };
 module.exports.FULFILLMENT_CONFIG = FULFILLMENT_CONFIG;
-module.exports.fulfillmentMessageSchema = fulfillmentMessageSchema;
