@@ -26,7 +26,6 @@ const dataManager = require("./dataManager");
 
 // Import the validation functions for the API
 const validateManager = require('./validateManager');
-const FULFILLMENT_CONFIG = require('./validateManager').FULFILLMENT_CONFIG;
 
 /************************************************************
   API Endpoints
@@ -164,6 +163,8 @@ spots.get('/', function(req, res) {
  *   get:
  *     summary: Spot API service environment configuration
  *     description: Returns the Spot API service configuration
+ *     tags:
+ *       - spots
  *     parameters:
  *     - in: path
  *       name: projectId
@@ -198,6 +199,8 @@ spots.get('/', function(req, res) {
  *   get:
  *     summary: Spot query options (entitlement) for the Spot API service
  *     description: Returns the Spot query options for the Spot API service
+ *     tags:
+ *       - spots
  *     parameters:
  *     - in: path
  *       name: projectId
@@ -231,17 +234,15 @@ spots.get('/', function(req, res) {
  *                   items:
  *                     $ref: '#/definitions/SpotOptions'
  */
-
 spots.get('/projects/:projectId/spots::custom', async(req, res) => {
     var data;
     switch (req.params.custom) {
         case "options":
-            console.log("options");
             const options = {
                 includeAvailableValues: req.query.includeAvailableValues ? req.query.includeAvailableValues === "true" : false,
-                config: FULFILLMENT_CONFIG
+                config: dataManager.getSpotConfig()
             };
-            data = await validateManager.getAvailableRequests(options)
+            data = await validateManager.getSpotOptions(options)
             var code;
             if (data && data.success === false) {
                 code = (data.code === undefined ) ? 500 : data.code;
@@ -254,7 +255,7 @@ spots.get('/projects/:projectId/spots::custom', async(req, res) => {
             });
         case "config":
             data = {
-                config: FULFILLMENT_CONFIG
+                config: dataManager.getSpotConfig()
             };
             return res.status(200).json({
                 success: true,
@@ -271,6 +272,8 @@ spots.get('/projects/:projectId/spots::custom', async(req, res) => {
  *   post:
  *     summary: Create Spot based off request parameters
  *     description: Returns the Spot response
+ *     tags:
+ *       - spots
  *     parameters:
  *     - in: path
  *       name: projectId
@@ -302,13 +305,13 @@ spots.get('/projects/:projectId/spots::custom', async(req, res) => {
  *                   items:
  *                     $ref: '#/definitions/SpotResponseSchema'
  */
-spots.post('/projects/:projectId/spots', validateManager.fulfillmentParams, async(req, res) => {
+spots.post('/projects/:projectId/spots', validateManager.spotParams, async(req, res) => {
     const options = {
-        config: FULFILLMENT_CONFIG,
+        config: dataManager.getSpotConfig(),
         ... req.body
     };
     console.log(`Options: ${JSON.stringify(options)}`);
-    const data = await dataManager.createFulfillmentRequest(options);
+    const data = await dataManager.createSpot(options);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -328,6 +331,8 @@ spots.post('/projects/:projectId/spots', validateManager.fulfillmentParams, asyn
  *   get:
  *     summary: Check Spot status based off Request ID
  *     description: Returns the Spot Status response
+ *     tags:
+ *       - spots
  *     parameters:
  *     - in: path
  *       name: projectId
@@ -404,7 +409,7 @@ spots.get('/projects/:projectId/spots/:requestId', async(req, res) => {
         });
     }
 
-    const data = await dataManager.getFulfillmentRequest(requestId, bucketName, fileName);
+    const data = await dataManager.getSpot(requestId, bucketName, fileName);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -414,14 +419,6 @@ spots.get('/projects/:projectId/spots/:requestId', async(req, res) => {
     res.status(code).json({
         code: code,
         ... data
-    });
-});
-
-spots.get('*', function(req, res) {
-    res.status(404).json({
-        success: true,
-        code: 404,
-        message: 'Not Found.'
     });
 });
 

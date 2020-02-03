@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 Google LLC
+ * Copyright 2020 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,24 +27,24 @@ const Joi = require('@hapi/joi');
 /************************************************************
   immutable constant options
  ************************************************************/
-const FULFILLMENT_CONFIG = {
-    bucketName: process.env.FULFILLMENT_CONFIG_BUCKET_NAME || "change-me",
-    fileName: process.env.FULFILLMENT_CONFIG_FILE_NAME || "bqds/api/config.json",
+const SPOT_SERVICE_CONFIG = {
+    bucketName: process.env.SPOT_SERVICE_CONFIG_BUCKET_NAME || "change-me",
+    fileName: process.env.SPOT_SERVICE_CONFIG_FILE_NAME || "cds/api/config.json",
     destination: {
-        projectId: process.env.FULFILLMENT_CONFIG_DESTINATION_PROJECT_ID || "change-me",
-        datasetId: process.env.FULFILLMENT_CONFIG_DESTINATION_DATASET_ID || "bqds_spot_fulfillment",
+        projectId: process.env.SPOT_SERVICE_CONFIG_DESTINATION_PROJECT_ID || "change-me",
+        datasetId: process.env.SPOT_SERVICE_CONFIG_DESTINATION_DATASET_ID || "cds_spots",
     }
 }
 
 /************************************************************
-  fulfillmentParameterSchema defines the parameters required
-  to submit a Spot fulfillment request
+  spotParameterSchema defines the parameters required
+  to submit a Spot request
  ************************************************************/
-const fulfillmentParameterSchema = Joi.object({
+const spotParameterSchema = Joi.object({
     dataId: Joi.string().required(),
     parameters: Joi.object().required(),
     wait: Joi.boolean(),
-    destination: Joi.object()
+    destination: Joi.object().required()
         .keys({
             bucketName: Joi.string().required(),
             fileName: Joi.string(),
@@ -58,9 +58,9 @@ const fulfillmentParameterSchema = Joi.object({
  * Returns a list of available requests and the corresponding parameters.
  * TODO: Refactor.
  */
-async function getAvailableRequests(options, includeQuery) {
-    let configBucketName = FULFILLMENT_CONFIG.bucketName;
-    let configFileName = FULFILLMENT_CONFIG.fileName;
+async function getSpotOptions(options, includeQuery) {
+    let configBucketName = SPOT_SERVICE_CONFIG.bucketName;
+    let configFileName = SPOT_SERVICE_CONFIG.fileName;
 
     var json;
     let file = await storageUtil.fetchFileContent(configBucketName, configFileName).catch(err =>  {
@@ -145,20 +145,19 @@ async function getAvailableRequests(options, includeQuery) {
 }
 
 /************************************************************
-  Validate the Fulfillment configFileName url query parameter
+  Validate the Spot query configFileName url query parameter
     Inputs:
       - request, response, next
     Returns:
       - response or next
  ************************************************************/
-async function fulfillmentConfig(req, res, next) {
+async function spotConfig(req, res, next) {
     var errors = []
 
     // validParams validation
-    var bucketName = (req.params.bucketName === undefined) ? FULFILLMENT_CONFIG.bucketName : req.params.bucketName;
-    var configFileName = (req.query.configFileName === undefined) ? FULFILLMENT_CONFIG.fileName : req.query.configFileName;
+    var bucketName = (req.params.bucketName === undefined) ? SPOT_SERVICE_CONFIG.bucketName : req.params.bucketName;
+    var configFileName = (req.query.configFileName === undefined) ? SPOT_SERVICE_CONFIG.fileName : req.query.configFileName;
 
-    // console.log(`Testing fulfillment config path gs://bucket/file [${bucketName}/${configFileName}]`);
     let result = await storageUtil.checkIfFileExists(bucketName, configFileName).catch(err => {
         errors.push(err.message);
     });
@@ -177,23 +176,19 @@ async function fulfillmentConfig(req, res, next) {
 }
 
 /************************************************************
-  Validate Fulfillment data request parameters
+  Validate Spot data request parameters
     Inputs:
       - request, response, next
     Returns:
       - response or next
  ************************************************************/
-function fulfillmentParams(req, res, next) {
+function spotParams(req, res, next) {
     var errors = [];
     var message;
 
-    if ('user-agent' in req.headers && req.headers['user-agent'] === 'Google-Cloud-Tasks') {
-        console.log('Google-Cloud-Tasks request');
-        //var jsonString = Buffer.from(req.body, 'base64').toString('utf8');
-    }
-    let result = fulfillmentParameterSchema.validate(req.body);
+    let result = spotParameterSchema.validate(req.body);
     if (result.error) {
-        message = `fulfillmentParameterSchema validation error: ${JSON.stringify(result.error.details)}`;
+        message = `spotParameterSchema validation error: ${JSON.stringify(result.error.details)}`;
         console.warn(message);
         errors.push(result.error.details);
     }
@@ -207,55 +202,13 @@ function fulfillmentParams(req, res, next) {
     return next();
 }
 
-/************************************************************
-  Validate Fulfillment webhook (subscription) request parameters
-    Inputs:
-      - request, response, next
-    Returns:
-      - response or next
- ************************************************************/
-function fulfillmentWebhookParams(req, res, next) {
-    var errors = [];
-    var message;
-
-    if ('user-agent' in req.headers && req.headers['user-agent'] === 'Google-Cloud-Tasks') {
-        console.log('Google-Cloud-Tasks request');
-        //var jsonString = Buffer.from(req.body, 'base64').toString('utf8');
-    }
-    let result = fulfillmentWebhookSchema.validate(req.body);
-    if (result.error) {
-        message = `fulfillmentWebhookSchema validation error: ${JSON.stringify(result.error.details)}`;
-        console.warn(message);
-        errors.push(result.error.details);
-    }
-    if (errors.length > 0) {
-        return res.status(400).json({
-            success: false,
-            errors: errors,
-            code: 400
-        })
-    }
-    return next();
-}
-
-/**
- * @param  {} options
- * Parses base64 payload from GCP Pubsub message
- */
-function fulfillmentWebhookPayload(options) {
-    const requestId = options.message.attributes.requestId;
-    const jsonString = Buffer.from(options.message.data, 'base64').toString('utf8');
-    options = {...options, ...JSON.parse(jsonString)};
-    return { requestId: requestId, options: options }
-}
-
 /**
  * @param  {} options
  * Returns a list of available requests and the corresponding parameters.
  * TODO: Refactor.
  */
-async function getDynamicQueryOptions(options) {
-    let definitions = await getAvailableRequests(options, true).catch(err => {
+async function getDynamicSpotOptions(options) {
+    let definitions = await getSpotOptions(options, true).catch(err => {
         console.warn(err.message);
         return { success: false, code: 400, errors: [err.message] };
     });
@@ -323,11 +276,9 @@ function performTextVariableReplacements(text, projectId, datasetId, tableId) {
   Module exports
  **************************************************************************/
 module.exports = {
-    fulfillmentParams,
-    fulfillmentWebhookParams,
-    fulfillmentWebhookPayload,
-    fulfillmentConfig,
-    getAvailableRequests,
-    getDynamicQueryOptions
+    spotParams,
+    spotConfig,
+    getSpotOptions,
+    getDynamicSpotOptions
 };
-module.exports.FULFILLMENT_CONFIG = FULFILLMENT_CONFIG;
+module.exports.SPOT_SERVICE_CONFIG = SPOT_SERVICE_CONFIG;

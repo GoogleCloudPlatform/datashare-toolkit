@@ -83,7 +83,7 @@ Create the new storage bucket:
 
 ### Create Configuration
 
-The CDS API Spot Service configuration definitions are defined [above](#configuration). You can view an example in the MLB examples config [here](../examples/mlb/config/api/config.json). Make the appropriate modifications and then copy to your storage bucket.
+The CDS API Spot Service configuration definitions are defined [above](#configuration). You can view an example in the MLB examples config [here](../../examples/mlb/config/api/config.json). Make the appropriate modifications and then copy to your storage bucket.
 
 Copy configuration to the storage bucket:
 
@@ -101,7 +101,7 @@ gcloud services enable iam.googleapis.com
 
 ### Service Account
 
-CDS API Spot service is a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](config/cds-api-spot-mgr-role-definition.yaml)
+CDS API Spot service is a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](./config/cds-api-spot-mgr-role-definition.yaml)
 
 #### Setup Service Account
 
@@ -224,12 +224,12 @@ _Note_ - There are a few environment variables that need to be set before the ap
       --allow-unauthenticated \
       --platform managed \
       --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
-      --set-env-vars=FULFILLMENT_CONFIG_BUCKET_NAME=${BUCKET_NAME} \
-      --set-env-vars=FULFILLMENT_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID}
+      --set-env-vars=SPOT_SERVICE_CONFIG_BUCKET_NAME=${BUCKET_NAME} \
+      --set-env-vars=SPOT_SERVICE_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID}
 
 Open the app URL in your browser. You can return the FQDN via:
 
-    gcloud run services describe cds-api-spot-service --platform managed --format="value(status.domain)"
+    gcloud run services describe cds-api-spot-service --platform managed --format="value(status.url)"
 
 #### Confirm your API is running
 
@@ -292,8 +292,8 @@ Start the service.\
 _Note_ - There are a few environment variables that need to be set before the application starts (see below). [Nodemon](https://nodemon.io/) is leveraged to read file changes and reload automatically.
 
     export GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS};
-    export FULFILLMENT_CONFIG_BUCKET_NAME=${BUCKET_NAME};
-    export FULFILLMENT_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID};
+    export SPOT_SERVICE_CONFIG_BUCKET_NAME=${BUCKET_NAME};
+    export SPOT_SERVICE_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID};
 
     npm run dev
 
