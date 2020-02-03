@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 Google LLC
+ * Copyright 2020 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ const options = {
         }
     },
     // Path to the API docs
-    apis: ['./index.js', './src/index.js', './src/spots/index.js']
+    apis: ['./index.js', './src/index.js', './spots/index.js', './src/spots/index.js']
 };
 
 const openapiSpec = swaggerJSDoc(options);
@@ -72,12 +72,6 @@ app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.raw({type: 'application/octet-stream'}));
-
-const dataManager = require("./dataManager");
-
-// Import the validation functions for the API
-const validateManager = require('./validateManager');
-const FULFILLMENT_CONFIG = require('./validateManager').FULFILLMENT_CONFIG;
 
 // Import the Spots API router
 const spots = require('./spots/index');
@@ -101,10 +95,27 @@ app.use('/' + apiVersion, spots);
 /**
  * @swagger
  *
+ * tags:
+ *   - name: welcome
+ *     description: The welcome message for the CDS API
+ *   - name: spots
+ *     description: The CDS API Spot Services
+ *   - name: docs
+ *     description: The OpenAPI specification documents for the CDS API services
+ *   - name: default
+ *     description: The default routes for the CDS API
+ *
+ */
+
+/**
+ * @swagger
+ *
  * /:
  *   get:
  *     summary: Welcome message status
  *     description: Returns a welcome message for the API
+ *     tags:
+ *       - welcome
  *     responses:
  *       200:
  *         description: Welcome Message Response
@@ -127,34 +138,8 @@ router.get('/', function(req, res) {
     res.status(200).json({
         success: true,
         code: 200,
-        message: 'Welcome to the CDS API (' + apiVersion + ')!'
+        message: 'Welcome to the CDS API (' + apiVersion + ')! Docs available "VERSION/docs"'
     });
-});
-
-router.post('/fulfillmentSubscriber', validateManager.fulfillmentWebhookParams, async(req, res) => {
-    const options = {
-        config: FULFILLMENT_CONFIG,
-        ... req.body
-    };
-    console.log(`Options: ${JSON.stringify(options)}`);
-    try {
-        const data = validateManager.fulfillmentWebhookPayload(options)
-        // Don't wait for the response
-        dataManager.processFulfillmentSubscriptionRequest(data.options).catch (err => {
-            console.warn(`processFulfillmentSubscriptionRequest error: ${err.message}`);
-        });
-        res.status(202).json({
-            success: true,
-            code: 202,
-            data: { requestId: data.requestId }
-        });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            code: 500,
-            errors: [err.message]
-        })
-    }
 });
 
 /**
@@ -162,8 +147,10 @@ router.post('/fulfillmentSubscriber', validateManager.fulfillmentWebhookParams, 
  *
  * /docs:
  *   get:
- *     summary: Swagger UI for CDS API Spot Service OpenAPI Specification
- *     description: Returns the Swagger UI with the OpenAPI specification for the CDS API Spot Service
+ *     summary: Swagger UI for CDS API OpenAPI Specification
+ *     description: Returns the Swagger UI with the OpenAPI specification for the CDS API services
+ *     tags:
+ *       - docs
  *     responses:
  *       200:
  *         description: Welcome Message Response
@@ -180,8 +167,10 @@ router.get(['/docs', '/api-docs'], swaggerUi.setup(openapiSpec));
  *
  * /docs/openapi_spec:
  *   get:
- *     summary: CDS API Spot Service OpenAPI Specification
- *     description: Returns the OpenAPI specification for the CDS API Spot Service
+ *     summary: CDS API OpenAPI Specification
+ *     description: Returns the OpenAPI specification for the CDS API services
+ *     tags:
+ *       - docs
  *     responses:
  *       200:
  *         description: Welcome Message Response
@@ -210,6 +199,8 @@ router.use(spots);
  *   get:
  *     summary: Default 404 Response
  *     description: Returns the default 404 response after all other routes exhausted
+ *     tags:
+ *       - default
  *     responses:
  *       404:
  *         description: Default 404 Response

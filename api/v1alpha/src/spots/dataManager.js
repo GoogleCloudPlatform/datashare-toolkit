@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 Google LLC
+ * Copyright 2020 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,22 @@ let bigqueryUtil;
 const storageUtil = new StorageUtil();
 
 const validateManager = require('./validateManager');
-const fulfillmentMessageSchema = require('./validateManager').fulfillmentMessageSchema;
+const SPOT_SERVICE_CONFIG = require('./validateManager').SPOT_SERVICE_CONFIG;
 
 /**
  * @param  {string} name
  * Creates a file name string based off name parameter.
  */
 function createFileName(name) {
-    const directoryName = 'fulfillments';
+    const directoryName = 'spots';
     return `${directoryName}/${name}.jsonl.gz`;
+}
+
+/**
+ * get the Spot service environment configuration.
+ */
+function getSpotConfig() {
+    return SPOT_SERVICE_CONFIG;
 }
 
 /**
@@ -40,12 +47,26 @@ function createFileName(name) {
  * Creates a message to execute a job/query based on the request and parameters.
  * Returns the request Id and query string for bucket object
  */
-async function createFulfillmentRequest(options) {
+async function createSpot(options) {
     const requestId = uuidv4();
     const bucketName = options.destination.bucketName;
     const fileName = createFileName(requestId);
     options['destination']['fileName'] = fileName;
     console.log(`RequestId: ${requestId}, options: ${JSON.stringify(options)}`);
+
+    if (!bucketName || !fileName) {
+        const message = 'No Bucket Name or File Name is supplied.';
+        console.warn(message);
+        return { success: false, code: 400, errors: [message] };
+    }
+
+    const exists = await storageUtil.checkIfFileExists(bucketName, fileName).catch(err => {
+        console.warn(err);
+        return { success: false, errors: [err.message] };
+    });
+    if (exists.success === false) {
+        return { ...exists };
+    }
 
     const query = querystring.encode({
         bucketName: bucketName,
@@ -57,9 +78,9 @@ async function createFulfillmentRequest(options) {
         bucketName: bucketName,
         fileName: fileName
     }
-    // create the fulfillment request now
+    // create the spot job request now
     if (options.wait === true) {
-        const data = await createFulfillment(requestId, options).catch(err => {
+        const data = await createSpotJob(requestId, options).catch(err => {
             console.warn(err);
             return { success: false, errors: [err.message] };
         });
@@ -69,8 +90,8 @@ async function createFulfillmentRequest(options) {
         return { data: { ...responseData, ...data }, success: true };
     } else {
         // Don't wait for the response
-        createFulfillment(requestId, options).catch(err => {
-            console.warn(`createFulfillment error: ${err.message}`);
+        createSpotJob(requestId, options).catch(err => {
+            console.warn(`createSpotJob error: ${err.message}`);
         });
         return { data: { ...responseData }, code: 202, success: true };
     }
@@ -82,8 +103,7 @@ async function createFulfillmentRequest(options) {
  * @param  {string} fileName
  * Checks if the file exists and metadata matches the requestId
  */
-async function getFulfillmentRequest(requestId, bucketName, fileName) {
-    var message;
+async function getSpot(requestId, bucketName, fileName) {
     console.log(`RequestId: ${requestId}, bucketName: ${bucketName}, fileName: ${fileName}`);
 
     const query = querystring.encode({
@@ -111,7 +131,7 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
     });
     if (metadata.metadata === undefined || metadata.metadata.requestId === undefined || metadata.metadata.requestId !== requestId) {
         console.log(metadata);
-        message = `fileName: '${fileName}' does not have the signature for requestId: '${requestId}'`;
+        const message = `fileName: '${fileName}' does not have the signature for requestId: '${requestId}'`;
         return { success: false, code: 400, errors: [message] };
     }
 
@@ -128,15 +148,9 @@ async function getFulfillmentRequest(requestId, bucketName, fileName) {
  * Executes BigQuery job, extracts contents, creates file, and signs it.
  * This is a long running operation that should be run in the background.
  */
-async function createFulfillment(requestId, options) {
-    var message;
-    if (!options.destination.bucketName || !options.destination.fileName) {
-        message = 'No Bucket Name or File Name is supplied.';
-        console.warn(message);
-        return { success: false, code: 400, errors: [message] };
-    }
+async function createSpotJob(requestId, options) {
     // Build up query based off of user request options
-    const queryOptions = await validateManager.getDynamicQueryOptions(options).catch(err => {
+    const queryOptions = await validateManager.getDynamicSpotOptions(options).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -151,14 +165,7 @@ async function createFulfillment(requestId, options) {
     const tableId = requestId.replace(/-/g, "_");
 
     console.log(`Will execute query with options: ${JSON.stringify(queryOptions)}`);
-    // Check if fileName exists
-    var exists = await storageUtil.checkIfFileExists(bucketName, fileName).catch(err => {
-        console.warn(err);
-        return { success: false, errors: [err.message] };
-    });
-    if (exists === true) {
-        return { success: false, code: 409, errors: ['Storage file [' + fileName + '] already exists'] };
-    }
+
     // Set query options to execute BQ job and extract to table
     const today = new Date();
     today.setDate(today.getDate() + 1);
@@ -219,7 +226,7 @@ async function createFulfillment(requestId, options) {
         bigqueryUtil.setTableMetadata(datasetId, tableId, metadata);
         return signedUrl;
     }).catch(error => {
-        message = `Create Fulfillment failed: ${error}`;
+        const message = `Create Fulfillment failed: ${error}`;
         console.warn(message);
         const metadata = {
             expirationTime: expiryTime
@@ -236,7 +243,8 @@ async function createFulfillment(requestId, options) {
 }
 
 module.exports = {
-    createFulfillmentRequest,
-    getFulfillmentRequest,
-    createFulfillment
+    getSpotConfig,
+    createSpot,
+    getSpot,
+    createSpotJob
 };
