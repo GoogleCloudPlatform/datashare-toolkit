@@ -16,11 +16,7 @@
 
 'use strict';
 
-var compression = require('compression');
 const express = require('express');
-const bodyParser = require('body-parser');
-const swaggerJSDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
 
 const dataManager = require("./dataManager");
 
@@ -33,7 +29,6 @@ const validateManager = require('./validateManager');
 // Define the routes for the REST API
 var spots = express.Router();
 // methods that require multiple routes
-var routes = [];
 
 /**
  * @swagger
@@ -236,12 +231,12 @@ spots.get('/', function(req, res) {
  */
 spots.get('/projects/:projectId/spots::custom', async(req, res) => {
     var data;
+    const options = {
+        includeAvailableValues: req.query.includeAvailableValues ? req.query.includeAvailableValues === "true" : false,
+        config: dataManager.getSpotConfig()
+    };
     switch (req.params.custom) {
         case "options":
-            const options = {
-                includeAvailableValues: req.query.includeAvailableValues ? req.query.includeAvailableValues === "true" : false,
-                config: dataManager.getSpotConfig()
-            };
             data = await validateManager.getSpotOptions(options)
             var code;
             if (data && data.success === false) {
