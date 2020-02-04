@@ -19,7 +19,7 @@
 const querystring = require('querystring');
 const uuidv4 = require('uuid/v4');
 
-const { BigQueryUtil, StorageUtil, PubSubUtil } = require('bqds-shared');
+const { BigQueryUtil, StorageUtil } = require('bqds-shared');
 let bigqueryUtil;
 const storageUtil = new StorageUtil();
 
@@ -156,7 +156,7 @@ async function getSpot(requestId, bucketName, fileName) {
         return { success: false, errors: [err.message] };
     });
     if (!exists) {
-        message = `fileName: '${fileName}' does not exist in bucketName: '${bucketName}'`;
+        const message = `fileName: '${fileName}' does not exist in bucketName: '${bucketName}'`;
         return { success: false, errors: [message] };
     }
 
@@ -184,8 +184,6 @@ async function getSpot(requestId, bucketName, fileName) {
  * This is a long running operation that should be run in the background.
  */
 async function createSpotJobQueryOptions(requestId, options) {
-    const bucketName = options.destination.bucketName;
-    const fileName = options.destination.fileName;
     const projectId = options.config.destination.projectId;
     const datasetId = options.config.destination.datasetId;
     // Dynamically create unique tableIds for the extractToBucket method
