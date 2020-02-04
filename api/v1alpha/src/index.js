@@ -62,7 +62,7 @@ const options = {
         }
     },
     // Path to the API docs
-    apis: ['./index.js', './src/index.js', './spots/index.js', './src/spots/index.js']
+    apis: ['./index.js', './src/index.js', './*/index.js', './src/*/index.js']
 };
 
 const openapiSpec = swaggerJSDoc(options);
@@ -73,8 +73,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.raw({type: 'application/octet-stream'}));
 
-// Import the Spots API router
+// Import the CDS API Spots service router
 const spots = require('./spots/index');
+// Import the CDS API Datasets service router
+const datasets = require('./datasets/index');
 
 /************************************************************
   API Endpoints
@@ -86,11 +88,6 @@ var routes = [];
 
 // CORS will be controlled by the API GW layer
 router.all('*', cors());
-
-// All of the API routes will be prefixed with /apiVersion
-app.use('/' + apiVersion, router);
-// All of the API sub routes will be prefixed with /apiVersion
-app.use('/' + apiVersion, spots);
 
 /**
  * @swagger
@@ -104,6 +101,24 @@ app.use('/' + apiVersion, spots);
  *     description: The OpenAPI specification documents for the CDS API services
  *   - name: default
  *     description: The default routes for the CDS API
+ *
+ * definitions:
+ *   Error:
+ *     type: object
+ *     description: Error object
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: Success of the request
+ *       code:
+ *         type: integer
+ *         description: HTTP status code
+ *       errors:
+ *         type: array
+ *         items:
+ *           type: string
+ *           properties:
+ *             message: message string
  *
  */
 
@@ -138,7 +153,7 @@ router.get('/', function(req, res) {
     res.status(200).json({
         success: true,
         code: 200,
-        message: 'Welcome to the CDS API (' + apiVersion + ')! Docs available "VERSION/docs"'
+        message: 'Welcome to the CDS API (' + apiVersion + ')! Docs available via /docs'
     });
 });
 
@@ -191,6 +206,7 @@ router.get(routes, function(req, res) {
 
 // Import the other API routes before wildcard '*'
 router.use(spots);
+router.use(datasets);
 
 /**
  * @swagger
@@ -227,6 +243,9 @@ router.get('*', function(req, res) {
         message: 'Not Found.'
     });
 });
+
+// All of the API routes will be prefixed with /apiVersion
+app.use('/' + apiVersion, router);
 
 // default app route redirects to current API version for now
 app.get('/', function(req, res) {

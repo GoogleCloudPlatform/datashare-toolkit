@@ -18,6 +18,8 @@
 const { BigQuery } = require('@google-cloud/bigquery');
 const { Storage } = require('@google-cloud/storage');
 const storage = new Storage();
+const underscore = require("underscore");
+const QUERY_FOR_LABELS = process.env.QUERY_FOR_LABELS === 'true';
 
 class BigQueryUtil {
     constructor(projectId) {
@@ -50,6 +52,13 @@ class BigQueryUtil {
             console.log(`Job '${job.id}' started for query: ${JSON.stringify(options)}`);
         }
         return await job.getQueryResults();
+    }
+
+    /**
+     * @param  {} options
+     */
+    async executeQuery(options) {
+        return this.bigqueryClient.query(options);
     }
 
     /**
@@ -442,6 +451,7 @@ class BigQueryUtil {
         if (this.VERBOSE_MODE) {
             console.log(`Dataset ${dataset.id} created.`);
         }
+        return dataset
     }
 
     /**
@@ -518,18 +528,18 @@ class BigQueryUtil {
     async setTableLabel(datasetId, tableId, key, value) {
         const dataset = this.bigqueryClient.dataset(datasetId);
         const [table] = await dataset.table(tableId).get();
-    
+
         // Retrieve current table metadata
         const [metadata] = await table.getMetadata();
-    
+
         if (!metadata.labels) {
-            metadata.labels = { };
+            metadata.labels = {};
         }
 
         // Set label in table metadata
         metadata.labels[key] = value;
 
-        const [apiResponse] = await table.setMetadata(metadata);    
+        const [apiResponse] = await table.setMetadata(metadata);
         if (this.VERBOSE_MODE) {
             console.log(`${tableId} labels:`);
             console.log(apiResponse.labels);
@@ -556,12 +566,27 @@ class BigQueryUtil {
      * @param  {string} datasetId
      * @param  {string} tableId
      * @param  {string} rows
-     * inset rows into a dataset tabl
+     * insert rows into a dataset table
      */
     async insertRows(datasetId, tableId, rows) {
         const dataset = this.bigqueryClient.dataset(datasetId);
         const table = dataset.table(tableId);
-        return table.insert(rows);
+        table.insert(rows, { raw: false }).then((data) => {
+            let insertErrors = data[1];
+            if (insertErrors) {
+                logger.info(`insertErrors: ${JSON.stringify(insertErrors)}`);
+                // Some rows failed to insert, while others may have succeeded.
+                insertErrors.map((insertError) => {
+                    insertError.errors.map((error) => {
+                        logger.error(`PartialFailureError: BigQuery insert failed due to: ${JSON.stringify(error)}`);
+                    });
+                });
+                return false;
+            }
+            return true;
+        }).catch((error) => {
+            throw new Error(`Error inserting into BigQuery: ${JSON.stringify(error)}`);
+        });
     }
 
     /**
@@ -589,6 +614,367 @@ class BigQueryUtil {
             throw err;
         }
         return true;
+    }
+
+    /**
+     * @param  {} labelFilter Provided in format 'labels.color:green'
+     * Lists all datasets in current GCP project, filtering by label.
+     * Not using currently for UI.
+     */
+    async getDatasetsByLabelFilter(labelFilter) {
+        const options = {
+            filter: labelFilter
+        };
+        const [datasets] = await this.bigqueryClient.getDatasets(options);
+        // console.log(`Datasets: ${JSON.stringify(datasets, null, 3)}`);
+        datasets.forEach(dataset => console.log(dataset.id));
+        return datasets.map(d => d.id);
+    }
+
+    /**
+     * @param  {} projectId
+     * @param  {} datasetId
+     * @param  {} labelKey
+     */
+    async getDatasetByLabel(projectId, datasetId, labelKey) {
+        let accessTypes = ["userByEmail", "groupByEmail"];
+
+        // let bqClient = new BigQuery({ projectId: projectId });
+        if (!QUERY_FOR_LABELS) {
+            const [datasets] = this.bigqueryClient.getDataset(datasetId);
+            let list = [];
+            for (const dataset of datasets) {
+                const [metadata] = await dataset.getMetadata();
+                const labels = metadata.labels;
+                if (underscore.has(labels, labelKey)) {
+                    console.log(`${JSON.stringify(metadata, null, 3)}`);
+                    let accounts = [];
+                    metadata.access.forEach(a => {
+                        if (a.role === 'READER') {
+                            const keys = Object.keys(a);
+                            if (keys.length === 2) {
+                                const accessType = keys[1];
+                                const accessId = a[accessType];
+                                if (accessTypes.includes(accessType)) {
+                                    accounts.push({ email: accessId, type: accessType });
+                                }
+                            }
+                        }
+                    });
+                    list.push({ datasetId: dataset.id, description: metadata.description, modifiedTime: metadata.lastModifiedTime, accounts: accounts });
+                }
+            }
+            return list;
+        }
+        else {
+            const sqlQuery = `WITH parseOption as (
+                SELECT
+                  catalog_name,
+                  schema_name,
+                  REGEXP_EXTRACT_ALL(option_value, 'STRUCT\\\\([^\\\\)]+\\\\)') as value
+                FROM INFORMATION_SCHEMA.SCHEMATA_OPTIONS
+                WHERE option_name = 'labels'
+              ),
+              parseSplit as (
+                select
+                  catalog_name,
+                  schema_name,
+                  REGEXP_REPLACE(substr(substr(t, 8), 0, LENGTH(t) - 8), '["\\\\s]', '') as value
+                from parseOption po,
+                unnest(po.value) as t
+              ),
+              labels as (
+                select
+                  -- catalog_name,
+                  schema_name,
+                  split(value)[offset(0)] as key
+                  -- split(value)[offset(1)] as value
+                 from parseSplit s
+              )
+              select distinct
+                schema_name as datasetId
+              from labels
+              where key = @keyName and schema_name = @schema_name`;
+
+            const options = {
+                query: sqlQuery,
+                params: { keyName: labelKey, schema_name: datasetId },
+            };
+
+            // console.log(`Query: ${sqlQuery}`);
+            const [rows] = await this.bigqueryClient.query(options);
+            return rows;
+        }
+    }
+
+    /**
+     * @param  {} projectId
+     * @param  {} labelKey
+     */
+    async getDatasetsByLabel(projectId, labelKey) {
+        let accessTypes = ["userByEmail", "groupByEmail"];
+
+        // let bqClient = new BigQuery({ projectId: projectId });
+        if (!QUERY_FOR_LABELS) {
+            const [datasets] = await this.bigqueryClient.getDatasets();
+            let list = [];
+            for (const dataset of datasets) {
+                const [metadata] = await dataset.getMetadata();
+                const labels = metadata.labels;
+                if (underscore.has(labels, labelKey)) {
+                    console.log(`${JSON.stringify(metadata, null, 3)}`);
+                    let accounts = [];
+                    metadata.access.forEach(a => {
+                        if (a.role === 'READER') {
+                            const keys = Object.keys(a);
+                            if (keys.length === 2) {
+                                const accessType = keys[1];
+                                const accessId = a[accessType];
+                                if (accessTypes.includes(accessType)) {
+                                    accounts.push({ email: accessId, type: accessType });
+                                }
+                            }
+                        }
+                    });
+                    list.push({ datasetId: dataset.id, description: metadata.description, modifiedTime: metadata.lastModifiedTime, accounts: accounts });
+                }
+            }
+            return list;
+        }
+        else {
+            const sqlQuery = `WITH parseOption as (
+                SELECT
+                  catalog_name,
+                  schema_name,
+                  REGEXP_EXTRACT_ALL(option_value, 'STRUCT\\\\([^\\\\)]+\\\\)') as value
+                FROM INFORMATION_SCHEMA.SCHEMATA_OPTIONS
+                WHERE option_name = 'labels'
+              ),
+              parseSplit as (
+                select
+                  catalog_name,
+                  schema_name,
+                  REGEXP_REPLACE(substr(substr(t, 8), 0, LENGTH(t) - 8), '["\\\\s]', '') as value
+                from parseOption po,
+                unnest(po.value) as t
+              ),
+              labels as (
+                select
+                  -- catalog_name,
+                  schema_name,
+                  split(value)[offset(0)] as key
+                  -- split(value)[offset(1)] as value
+                 from parseSplit s
+              )
+              select distinct
+                schema_name as datasetId
+              from labels
+              where key = @keyName`;
+
+            const options = {
+                query: sqlQuery,
+                params: { keyName: labelKey },
+            };
+
+            // console.log(`Query: ${sqlQuery}`);
+            const [rows] = await this.bigqueryClient.query(options);
+            return rows;
+        }
+    }
+
+    /**
+     * @param  {} projectId
+     * @param  {} datasetId
+     * @param  {} labelKey
+     */
+    async getTablesByLabel(projectId, datasetId, labelKey) {
+        if (!QUERY_FOR_LABELS) {
+            let list = [];
+            if (datasetId) {
+                const dataset = this.bigqueryClient.dataset(datasetId);
+                const [tables] = await dataset.getTables();
+                for (const table of tables) {
+                    const labels = await this.getTableLabels(datasetId, table.id);
+                    if (underscore.has(labels, labelKey)) {
+                        list.push({ datasetId: table.dataset.id, tableId: table.id });
+                    }
+                }
+            }
+            else {
+                const [datasets] = await this.bigqueryClient.getDatasets();
+                for (const dataset of datasets) {
+                    const [tables] = await dataset.getTables();
+                    for (const table of tables) {
+                        const labels = await this.getTableLabels(dataset.id, table.id);
+                        if (underscore.has(labels, labelKey)) {
+                            list.push({ datasetId: table.dataset.id, tableId: table.id });
+                        }
+                    }
+                }
+            }
+            console.log(`List is: ${JSON.stringify(list)}`);
+            return list;
+        }
+        else {
+            const sqlQuery = `WITH parseOption as (
+                SELECT
+                  t2.table_catalog,
+                  t2.table_schema,
+                  t2.table_name,
+                  REGEXP_EXTRACT_ALL(t2.option_value, 'STRUCT\\\\([^\\\\)]+\\\\)') as value
+                FROM \`${datasetId}.INFORMATION_SCHEMA.TABLES\` t
+                join \`${datasetId}.INFORMATION_SCHEMA.TABLE_OPTIONS\` t2 on t.table_name = t2.table_name
+                WHERE /*t.table_type = 'VIEW' and*/ t2.option_name = 'labels'
+              ),
+              parseSplit as (
+                select
+                  table_catalog,
+                  table_schema,
+                  table_name,
+                  REGEXP_REPLACE(substr(substr(t, 8), 0, LENGTH(t) - 8), '["\\\\s]', '') as value
+                from parseOption po,
+                unnest(po.value) as t
+              ),
+              labels as (
+                select
+                  -- table_catalog,
+                  table_schema,
+                  table_name,
+                  split(value)[offset(0)] as key
+                  -- split(value)[offset(1)] as value
+                 from parseSplit s
+              )
+              select distinct
+                table_schema as datasetId,
+                table_name as tableId
+              from labels
+              where key = @keyName`;
+
+            const options = {
+                query: sqlQuery,
+                params: { keyName: labelKey },
+            };
+
+            // console.log(`Query: ${sqlQuery}`);
+            const [rows] = await this.bigqueryClient.query(options);
+            return rows;
+        }
+    }
+
+    /**
+     * @param  {} datasetId
+     * Not used
+     */
+    async getDatasetLabels(datasetId) {
+        const dataset = this.bigqueryClient.dataset(datasetId);
+        const [metadata] = await dataset.getMetadata();
+        const labels = metadata.labels;
+        if (this.VERBOSE_MODE) {
+            console.log(`Dataset labels for ${datasetId}: ${JSON.stringify(labels)}`);
+        }
+        return labels;
+    }
+
+    /**
+     * @param  {} datasetId
+     * @param  {} tableId
+     */
+    async getTableLabels(datasetId, tableId) {
+        const table = this.bigqueryClient.dataset(datasetId).table(tableId);
+        const [metadata] = await table.getMetadata();
+        const labels = metadata.labels;
+        if (this.VERBOSE_MODE) {
+            console.log(`Table labels for ${datasetId}.${tableId}: ${JSON.stringify(labels)}`);
+        }
+        return labels;
+    }
+
+    /**
+     * @param  {} projectId
+     * @param  {} datasetId
+     */
+    async getDatasetsAccessList(projectId, datasetId, labelKey) {
+        let list = [];
+        if (datasetId) {
+            const dataset = this.bigqueryClient.dataset(datasetId);
+            const access = await this.getDatasetAccess(projectId, datasetId);
+            access.forEach((a) => {
+                const keys = Object.keys(a);
+                if (keys.length === 2) {
+                    const accessType = keys[1];
+                    const accessId = a[accessType];
+                    // console.log(`Role: ${a.role} AccessType: ${accessType} AccessId: ${accessId}`);
+                    list.push({ datasetId: dataset.id, accessType: accessType, accessId: accessId, role: a.role });
+                }
+            });
+        }
+        else {
+            // const [datasets] = await this.bigqueryClient.getDatasets();
+            const datasets = await this.getDatasetsByLabel(projectId, labelKey);
+            for (const dataset of datasets) {
+                const access = await this.getDatasetAccess(projectId, dataset.datasetId);
+                // eslint-disable-next-line no-loop-func
+                access.forEach((a) => {
+                    const keys = Object.keys(a);
+                    if (keys.length === 2) {
+                        const accessType = keys[1];
+                        const accessId = a[accessType];
+                        // console.log(`Role: ${a.role} AccessType: ${accessType} AccessId: ${accessId}`);
+                        list.push({ datasetId: dataset.datasetId, accessType: accessType, accessId: accessId, role: a.role });
+                    }
+                });
+            }
+        }
+        // console.log(`List is: ${JSON.stringify(list)}`);
+        return list;
+    }
+
+    /**
+     * @param  {} projectId
+     * @param  {} datasetId
+     */
+    async getDatasetAccess(projectId, datasetId) {
+        const dataset = this.bigqueryClient.dataset(datasetId);
+        const [metadata] = await dataset.getMetadata();
+        const access = metadata.access;
+        if (this.VERBOSE_MODE) {
+            console.log(`Access for ${datasetId}: ${JSON.stringify(access)}`);
+        }
+        return access;
+    }
+
+    isValidDatasetName(name) {
+        let errors = [];
+        if (name) {
+            if (name.length > 1024) {
+                errors.push(`DatasetId '${name}' exceeds maximum allowable length of 1024: ${name.length}}`);
+            }
+            if (!name.match(/^[A-Za-z0-9_]+$/g)) {
+                errors.push(`DatasetId '${name}' name is invalid. See https://cloud.google.com/bigquery/docs/datasets for further information.`);
+            }
+        }
+        else {
+            errors.push(`DatasetId is undefined`);
+        }
+        let isValid = errors.length === 0;
+        return { isValid, errors };
+    }
+
+    isValidTableName(name) {
+        let errors = [];
+        if (name) {
+            if (name.length > 1024) {
+                errors.push(`Destination tableId '${name}' exceeds maximum allowable length of 1024: ${name.length}}`);
+            }
+            if (!name.match(/^[A-Za-z0-9_]+$/g)) {
+                errors.push(`Destination tableId '${name}' name is invalid. See https://cloud.google.com/bigquery/docs/tables for further information.`);
+            }
+        }
+        else {
+            errors.push(`TableId is undefined`);
+        }
+        let isValid = errors.length === 0;
+        return { isValid, errors };
     }
 }
 
