@@ -16,11 +16,7 @@
 
 'use strict';
 
-var compression = require('compression');
 const express = require('express');
-const bodyParser = require('body-parser');
-const swaggerJSDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
 
 const dataManager = require("./dataManager");
 
@@ -30,7 +26,6 @@ const dataManager = require("./dataManager");
 // Define the routes for the REST API
 var datasets = express.Router();
 // methods that require multiple routes
-var routes = [];
 
 /**
  * @swagger
