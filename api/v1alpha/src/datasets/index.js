@@ -144,6 +144,12 @@ datasets.get('/projects/:projectId/datasets', async(req, res) => {
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
  */
 datasets.post('/projects/:projectId/datasets', async(req, res) => {
     const projectId = req.params.projectId;

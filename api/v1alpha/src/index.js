@@ -77,6 +77,8 @@ app.use(bodyParser.raw({type: 'application/octet-stream'}));
 const spots = require('./spots/index');
 // Import the CDS API Datasets service router
 const datasets = require('./datasets/index');
+// Import the CDS API Policies service router
+const policies = require('./policies/index');
 
 /************************************************************
   API Endpoints
@@ -99,6 +101,8 @@ router.all('*', cors());
  *     description: The CDS API Spot Services
  *   - name: docs
  *     description: The OpenAPI specification documents for the CDS API services
+ *   - name: datasets
+ *     description: The CDS API Dataset Services
  *   - name: default
  *     description: The default routes for the CDS API
  *
@@ -207,6 +211,7 @@ router.get(routes, function(req, res) {
 // Import the other API routes before wildcard '*'
 router.use(spots);
 router.use(datasets);
+router.use(policies);
 
 /**
  * @swagger
