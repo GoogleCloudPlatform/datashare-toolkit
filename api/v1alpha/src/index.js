@@ -97,12 +97,14 @@ router.all('*', cors());
  * tags:
  *   - name: welcome
  *     description: The welcome message for the CDS API
- *   - name: spots
- *     description: The CDS API Spot Services
  *   - name: docs
  *     description: The OpenAPI specification documents for the CDS API services
  *   - name: datasets
  *     description: The CDS API Dataset Services
+ *   - name: policies
+ *     description: The CDS API Policy Services
+ *   - name: spots
+ *     description: The CDS API Spot Services
  *   - name: default
  *     description: The default routes for the CDS API
  *
