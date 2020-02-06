@@ -63,22 +63,22 @@ async function listPolicies(projectId) {
  * @param  {object} values
  * Create a Policy based off value
  */
-async function createPolicy(projectId, payload) {
-    // Can this be done at startup?
-    //await setupDatasharePrerequisites(projectId);
-
+async function createPolicy(projectId, policyId, payload) {
     const rowId = uuidv4();
-    const policyId = uuidv4();
+    if (!policyId)  {
+        policyId = uuidv4();
+    };
+
     const table = getTableFqdn(projectId, cdsDatasetId, cdsPolicyTableId);
-    //const fields = ['rowId', 'policyId', 'name', 'description', 'createdBy', 'createdAt', 'datasets', 'rowAccessTags'].join();
-    //const values = ['@rowId', '@policyId', '@name', '@description', '@createdBy', 'current_timestamp()',
-    const fields = ['uuid', 'id', 'rowId', 'policyId', 'name', 'description', 'createdBy', 'createdAt', 'datasets', 'rowAccessTags'].join();
-    const values = ['@uuid', '@id', '@rowId', '@policyId', '@name', '@description', '@createdBy', 'current_timestamp()',
-        '@datasets', '@rowAccessTags'].join();
+    const fields = ['rowId', 'policyId', 'name', 'description', 'createdBy',
+        'createdAt', 'datasets', 'rowAccessTags'].join();
+    const values = ['@rowId', '@policyId', '@name', '@description', '@createdBy',
+        '@createdAt', '@datasets', '@rowAccessTags'].join();
     const sqlQuery = `INSERT INTO \`${table}\` (${fields}) VALUES (${values})`;
+
+    const createdAt = new Date().toISOString();
     // merge the payload and extra values together
-    // payload = {...payload, ...{ rowId: rowId, policyId: policyId } };
-    payload = {...payload, ...{ uuid: rowId, id: policyId, rowId: rowId, policyId: policyId } };
+    payload = {...payload, ...{ rowId: rowId, policyId: policyId, createdAt: createdAt } };
     console.log(payload);
     const options = {
         query: sqlQuery,
@@ -86,11 +86,13 @@ async function createPolicy(projectId, payload) {
     };
     const bigqueryUtil = new BigQueryUtil(projectId);
     const [rows] = await bigqueryUtil.executeQuery(options);
-    console.log(rows);
-    if (rows.length >= 1) {
-        return { success: true, data: rows };
+    if (rows.length === 0) {
+        // Retrieving the record after insert makes another round-trip and is not
+        // efficient. For now, just return the original payload.
+        //return await getPolicy(projectId, policyId);
+        return { success: true, data: payload };
     } else {
-        const message = `Policies did not create with payload values: '${payload}'`;
+        const message = `Policy did not create with payload values: '${payload}'`;
         return { success: false, code: 500, errors: [message] };
     };
 }
@@ -104,16 +106,16 @@ async function getPolicy(projectId, policyId) {
     const table = getTableFqdn(projectId, cdsDatasetId, cdsPolicyViewId);
     const fields = cdsPolicyFields.join();
     const limit = 1;
-    const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE id = @policy_id LIMIT ${limit};`
+    const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE policyId = @policyId LIMIT ${limit};`
     const options = {
         query: sqlQuery,
-        params: { policy_id: policyId }
+        params: { policyId: policyId }
     };
     const [rows] = await bigqueryUtil.executeQuery(options);
     if (rows.length === 1) {
         return { success: true, data: rows[0] };
     } else {
-        const message = `Policies do not exist with in tableName: '${tableName}'`;
+        const message = `Policies do not exist with in table: '${table}'`;
         return { success: false, code: 400, errors: [message] };
     }
 }
