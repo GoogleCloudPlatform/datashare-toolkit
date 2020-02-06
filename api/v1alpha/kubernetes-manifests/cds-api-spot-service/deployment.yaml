@@ -2,22 +2,22 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: bqds-spot-fulfillment-api
+  name: cds-api-spot-service
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: bqds-spot-fulfillment-api
+        app: cds-api-spot-service
         version: v1
     spec:
       volumes:
       - name: google-cloud-key
         secret:
-          secretName: bqds-spot-fulfillment-api-creds
+          secretName: cds-api-spot-service-creds
       containers:
-        - name: bqds-spot-fulfillment-api
-          image: gcr.io/chrispage-dev/bqds-spot-fulfillment-api
+        - name: cds-api-spot-service
+          image: gcr.io/chrispage-dev/cds-api-spot-service
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5555
@@ -32,13 +32,3 @@ spec:
               configMapKeyRef:
                 name: environment-config
                 key: FULFILLMENT_CONFIG_BUCKET_NAME
-          - name: FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME
-            valueFrom:
-              configMapKeyRef:
-                name: environment-config
-                key: FULFILLMENT_CONFIG_PUBSUB_TOPIC_NAME
-          - name: FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME
-            valueFrom:
-              configMapKeyRef:
-                name: environment-config
-                key: FULFILLMENT_CONFIG_PUBSUB_SUBSCRIPTION_NAME

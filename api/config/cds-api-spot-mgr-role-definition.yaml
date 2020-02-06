@@ -1,5 +1,5 @@
-title: "BQDS Spot Fulfillment Manager Role"
-description: "Custom BQDS Spot Fulfillment role for the API services to interface with GCP services"
+title: "CDS API Spot Manager Role"
+description: "Custom CDS API role for the Spot services to interface with GCP services"
 stage: "BETA"
 includedPermissions:
 - bigquery.datasets.create
@@ -13,8 +13,6 @@ includedPermissions:
 - bigquery.tables.update
 - bigquery.tables.updateData
 - iam.serviceAccounts.signBlob
-- pubsub.subscriptions.get
-- pubsub.subscriptions.consume
 - storage.buckets.list
 - storage.objects.get
 - storage.objects.list
