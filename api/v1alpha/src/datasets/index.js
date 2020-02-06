@@ -36,7 +36,7 @@ var datasets = express.Router();
  *     type: object
  *     description: Dataset object
  *     properties:
- *       id:
+ *       datasetId:
  *         type: string
  *         description: Dataset ID
  */
@@ -153,7 +153,7 @@ datasets.get('/projects/:projectId/datasets', async(req, res) => {
  */
 datasets.post('/projects/:projectId/datasets', async(req, res) => {
     const projectId = req.params.projectId;
-    const datasetId = req.body.id;
+    const datasetId = req.body.datasetId;
     if (!datasetId) {
         return res.status(400).json({
             success: false,
