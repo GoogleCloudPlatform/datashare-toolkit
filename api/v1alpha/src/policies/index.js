@@ -201,7 +201,7 @@ policies.post('/projects/:projectId/policies', async(req, res) => {
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags
     };
-    const data = await dataManager.createPolicy(projectId, null, values);
+    const data = await dataManager.createPolicy(projectId, values);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -283,7 +283,7 @@ policies.get('/projects/:projectId/policies/:policyId', async(req, res) => {
  *
  * /projects/{projectId}/policies/{policyId}:
  *   put:
- *     summary: Update Policy based off request body
+ *     summary: Update Policy based off policy ID and request body
  *     description: Returns the Policy response
  *     tags:
  *       - policies
@@ -354,7 +354,89 @@ policies.put('/projects/:projectId/policies/:policyId', async(req, res) => {
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags
     };
-    const data = await dataManager.createPolicy(projectId, policyId, values);
+    const data = await dataManager.updatePolicy(projectId, policyId, values);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/policies/{policyId}:
+ *   delete:
+ *     summary: Delete Policy based off policy ID and request body
+ *     description: Returns the Policy response
+ *     tags:
+ *       - policies
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Policy request
+ *     - in: path
+ *       name: policyId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Policy Id of the Policy request
+ *     requestBody:
+ *       description: Request parameters for Policy
+ *       content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/definitions/Policy'
+ *     responses:
+ *       200:
+ *         description: Policy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   description: HTTP status code
+ *                 data:
+ *                   type: object
+ *                   items:
+ *                     $ref: '#/definitions/Policy'
+ *       404:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
+policies.delete('/projects/:projectId/policies/:policyId', async(req, res) => {
+    const projectId = req.params.projectId;
+    const policyId = req.params.policyId;
+    const values = {
+        name: req.body.name,
+        description: req.body.description,
+        createdBy: req.body.createdBy,
+        datasets: req.body.datasets,
+        rowAccessTags: req.body.rowAccessTags
+    };
+    const data = await dataManager.deletePolicy(projectId, policyId, values);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

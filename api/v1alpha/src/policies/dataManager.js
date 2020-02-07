@@ -24,8 +24,11 @@ const labelName = "cds";
 const cdsDatasetId = "datashare";
 const cdsPolicyViewId = "currentPolicy";
 const cdsPolicyTableId = "policy";
-const cdsPolicyFields = ['rowId', 'policyId', 'name', 'description', 'modifiedTime', 'modifiedBy',
-    'version', 'datasets', 'rowAccessTags'];
+const cdsPolicyTableFields = new Set(['rowId', 'policyId', 'name', 'description',
+    'createdAt', 'createdBy', 'datasets', 'rowAccessTags', 'isDeleted']);
+const cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description',
+    'modifiedAt', 'modifiedBy', 'version', 'datasets', 'rowAccessTags',
+    'isDeleted']);
 
 /**
  * @param  {string} projectId
@@ -39,11 +42,28 @@ function getTableFqdn(projectId, datasetId, tableId) {
 
 /**
  * @param  {string} projectId
+ * @param  {object} data
+ * Insert policy data
+ */
+async function _insertData(projectId, fields, values, data) {
+    const table = getTableFqdn(projectId, cdsDatasetId, cdsPolicyTableId);
+    const sqlQuery = `INSERT INTO \`${table}\` (${fields}) VALUES (${values})`;
+    console.log(sqlQuery);
+    const options = {
+        query: sqlQuery,
+        params: data
+    };
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    return await bigqueryUtil.executeQuery(options);
+}
+
+/**
+ * @param  {string} projectId
  * Get a list of Policies
  */
 async function listPolicies(projectId) {
     const table = getTableFqdn(projectId, cdsDatasetId, cdsPolicyViewId);
-    const fields = cdsPolicyFields.join();
+    const fields = Array.from(cdsPolicyViewFields).join();
     const limit = 10;
     const sqlQuery = `SELECT ${fields} FROM \`${table}\` LIMIT ${limit};`
     const options = {
@@ -60,39 +80,71 @@ async function listPolicies(projectId) {
 
 /**
  * @param  {string} projectId
- * @param  {object} values
- * Create a Policy based off value
+ * @param  {object} data
+ * Create a Policy based off data values
  */
-async function createPolicy(projectId, policyId, payload) {
+async function createPolicy(projectId, data) {
+    let fields = cdsPolicyTableFields, values = cdsPolicyTableFields;
+    fields.delete('isDeleted');
+    fields = Array.from(fields).join();
+    values.delete('isDeleted');
+    values = Array.from(values).map(i => '@' + i).join();
+
     const rowId = uuidv4();
-    if (!policyId)  {
-        policyId = uuidv4();
-    };
-
-    const table = getTableFqdn(projectId, cdsDatasetId, cdsPolicyTableId);
-    const fields = ['rowId', 'policyId', 'name', 'description', 'createdBy',
-        'createdAt', 'datasets', 'rowAccessTags'].join();
-    const values = ['@rowId', '@policyId', '@name', '@description', '@createdBy',
-        '@createdAt', '@datasets', '@rowAccessTags'].join();
-    const sqlQuery = `INSERT INTO \`${table}\` (${fields}) VALUES (${values})`;
-
+    const policyId = uuidv4();
     const createdAt = new Date().toISOString();
-    // merge the payload and extra values together
-    payload = {...payload, ...{ rowId: rowId, policyId: policyId, createdAt: createdAt } };
-    console.log(payload);
-    const options = {
-        query: sqlQuery,
-        params: payload
+    // merge the data and extra values together
+    data = {...data,
+        ...{
+            rowId: rowId,
+            policyId: policyId,
+            createdAt: createdAt
+        }
     };
-    const bigqueryUtil = new BigQueryUtil(projectId);
-    const [rows] = await bigqueryUtil.executeQuery(options);
+    console.log(data);
+    const [rows] = await _insertData(projectId, fields, values, data);
     if (rows.length === 0) {
         // Retrieving the record after insert makes another round-trip and is not
-        // efficient. For now, just return the original payload.
+        // efficient. For now, just return the original data.
         //return await getPolicy(projectId, policyId);
-        return { success: true, data: payload };
+        return { success: true, data: data };
     } else {
-        const message = `Policy did not create with payload values: '${payload}'`;
+        const message = `Policy did not create with data values: '${data}'`;
+        return { success: false, code: 500, errors: [message] };
+    };
+}
+
+/**
+ * @param  {string} projectId
+ * @param  {object} data
+ * Updated a Policy based off policyId and data values
+ */
+async function updatePolicy(projectId, policyId, data) {
+    let fields = cdsPolicyTableFields, values = cdsPolicyTableFields;
+    fields.delete('isDeleted');
+    fields = Array.from(fields).join();
+    values.delete('isDeleted');
+    values = Array.from(values).map(i => '@' + i).join();
+
+    const rowId = uuidv4();
+    const createdAt = new Date().toISOString();
+    // merge the data and extra values together
+    data = {...data,
+        ...{
+            rowId: rowId,
+            policyId: policyId,
+            createdAt: createdAt
+        }
+    };
+    console.log(data);
+    const [rows] = await _insertData(projectId, fields, values, data);
+    if (rows.length === 0) {
+        // Retrieving the record after insert makes another round-trip and is not
+        // efficient. For now, just return the original data.
+        //return await getPolicy(projectId, policyId);
+        return { success: true, data: data };
+    } else {
+        const message = `Policy did not update with data values: '${data}'`;
         return { success: false, code: 500, errors: [message] };
     };
 }
@@ -104,7 +156,7 @@ async function createPolicy(projectId, policyId, payload) {
  */
 async function getPolicy(projectId, policyId) {
     const table = getTableFqdn(projectId, cdsDatasetId, cdsPolicyViewId);
-    const fields = cdsPolicyFields.join();
+    const fields = Array.from(cdsPolicyViewFields).join();
     const limit = 1;
     const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE policyId = @policyId LIMIT ${limit};`
     const options = {
@@ -120,8 +172,42 @@ async function getPolicy(projectId, policyId) {
     }
 }
 
+/**
+ * @param  {string} projectId
+ * @param  {object} data
+ * Updated a Policy based off policyId and data values
+ */
+async function deletePolicy(projectId, policyId, data) {
+    let fields = cdsPolicyTableFields, values = cdsPolicyTableFields;
+    fields = Array.from(fields).join();
+    values = Array.from(values).map(i => '@' + i).join();
+
+    const rowId = uuidv4();
+    const isDeleted = true;
+    const createdAt = new Date().toISOString();
+    // merge the data and extra values together
+    data = {...data,
+        ...{
+            rowId: rowId,
+            policyId: policyId,
+            createdAt: createdAt,
+            isDeleted: isDeleted
+        }
+    };
+    console.log(data);
+    const [rows] = await _insertData(projectId, fields, values, data);
+    if (rows.length === 0) {
+        return { success: true, data: {} };
+    } else {
+        const message = `Policy did not delete with data values: '${data}'`;
+        return { success: false, code: 500, errors: [message] };
+    };
+}
+
 module.exports = {
     listPolicies,
     createPolicy,
+    updatePolicy,
+    deletePolicy,
     getPolicy
 };
