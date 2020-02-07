@@ -27,8 +27,8 @@ spec:
           env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/key.json
-          - name: FULFILLMENT_CONFIG_BUCKET_NAME
+          - name: SPOT_SERVICE_CONFIG_BUCKET_NAME
             valueFrom:
               configMapKeyRef:
                 name: environment-config
-                key: FULFILLMENT_CONFIG_BUCKET_NAME
+                key: SPOT_SERVICE_CONFIG_BUCKET_NAME
