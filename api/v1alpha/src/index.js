@@ -79,6 +79,8 @@ const spots = require('./spots/index');
 const datasets = require('./datasets/index');
 // Import the CDS API Policies service router
 const policies = require('./policies/index');
+// Import the CDS API Accounts service router
+const accounts = require('./accounts/index');
 
 /************************************************************
   API Endpoints
@@ -103,6 +105,8 @@ router.all('*', cors());
  *     description: The CDS API Dataset Services
  *   - name: policies
  *     description: The CDS API Policy Services
+ *   - name: accounts
+ *     description: The CDS API Account Services
  *   - name: spots
  *     description: The CDS API Spot Services
  *   - name: default
@@ -214,6 +218,7 @@ router.get(routes, function(req, res) {
 router.use(spots);
 router.use(datasets);
 router.use(policies);
+router.use(accounts);
 
 /**
  * @swagger

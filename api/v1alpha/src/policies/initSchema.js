@@ -22,8 +22,8 @@ const labelName = "cds";
 const cdsDatasetId = "datashare";
 const cdsPolicyViewId = "currentPolicy";
 const cdsPolicyTableId = "policy";
-const cdsConsumerViewId = "currentConsumer";
-const cdsConsumerTableId = "consumer";
+const cdsAccountViewId = "currentAccount";
+const cdsAccountTableId = "account";
 
 /**
  * @param  {string} projectId
@@ -115,12 +115,12 @@ async function setupDatasharePrerequisites(projectId) {
 
     console.log("Creating latest policies view");
     const policyTable = getTableFqdn(projectId, cdsDatasetId, cdsPolicyTableId);
-    viewSql = `WITH ranked AS (\n  select\n    p.*,\n    DENSE_RANK() OVER (PARTITION BY policyId ORDER BY createdAt) as rank\n  from \`${policyTable}\` p\n),\nrowIdentifiers AS (\n  SELECT r.rowId\n  from RANKED r\n  where r.rank = (select max(r2.rank) from RANKED r2 where r2.policyId = r.policyId)\n)\nSELECT\n * EXCEPT(rank, createdAt, createdBy),\n UNIX_MILLIS(createdAt) as modifiedTime,\n createdBy as modifiedBy,\n rank as version\nFROM ranked t\nWHERE EXISTS (SELECT 1 from rowIdentifiers r WHERE t.rowId = r.rowId) and (isDeleted is null or isDeleted is false)`;
+    viewSql = `WITH ranked AS (\n  select\n    p.*,\n    DENSE_RANK() OVER (PARTITION BY policyId ORDER BY createdAt) as rank\n  from \`${policyTable}\` p\n),\nrowIdentifiers AS (\n  SELECT r.rowId\n  from RANKED r\n  where r.rank = (select max(r2.rank) from RANKED r2 where r2.policyId = r.policyId)\n)\nSELECT\n * EXCEPT(rank, createdAt, createdBy),\n UNIX_MILLIS(createdAt) as modifiedAt,\n createdBy as modifiedBy,\n rank as version\nFROM ranked t\nWHERE EXISTS (SELECT 1 from rowIdentifiers r WHERE t.rowId = r.rowId) and (isDeleted is null or isDeleted is false)`;
     await bigqueryUtil.createView(cdsDatasetId, cdsPolicyViewId, viewSql);
 
-    console.log("Creating consumer table");
+    console.log("Creating account table");
     options = {
-        description: 'CDS Datashare Consumer Table',
+        description: 'CDS Datashare Account Table',
         schema: [
             {
                 "mode": "REQUIRED",
@@ -129,12 +129,17 @@ async function setupDatasharePrerequisites(projectId) {
             },
             {
                 "mode": "REQUIRED",
-                "name": "consumerId",
+                "name": "accountId",
                 "type": "STRING"
             },
             {
                 "mode": "REQUIRED",
                 "name": "email",
+                "type": "STRING"
+            },
+            {
+                "mode": "REQUIRED",
+                "name": "emailType",
                 "type": "STRING"
             },
             {
@@ -162,16 +167,21 @@ async function setupDatasharePrerequisites(projectId) {
                 "mode": "REQUIRED",
                 "name": "createdAt",
                 "type": "TIMESTAMP"
+            },
+            {
+                "mode": "NULLABLE",
+                "name": "isDeleted",
+                "type": "BOOLEAN"
             }
         ]
     };
-    await bigqueryUtil.createTable(cdsDatasetId, cdsConsumerTableId, options);
+    await bigqueryUtil.createTable(cdsDatasetId, cdsAccountTableId, options);
 
-    console.log("Creating latest consumer view");
-    const consumerTable = getTableFqdn(projectId, cdsDatasetId, cdsConsumerTableId);
+    console.log("Creating latest account view");
+    const accountTable = getTableFqdn(projectId, cdsDatasetId, cdsAccountTableId);
     const policyView = getTableFqdn(projectId, cdsDatasetId, cdsPolicyViewId);
-    viewSql = `WITH ranked AS (\n  select\n    a.*,\n    DENSE_RANK() OVER (PARTITION BY createdBy, accountType ORDER BY createdAt) as rank\n  from \`${consumerTable}\` a\n),\nrowIdentifiers AS (\n  SELECT r.rowId\n  from RANKED r\n  where r.rank = (select max(r2.rank) from RANKED r2 where r2.createdBy = r.createdBy and r2.accountType = r.accountType)\n)\nSELECT\n * EXCEPT(rank, createdAt, policies),\n UNIX_MILLIS(createdAt) as modifiedTime,\n createdBy as modifiedBy,\n rank as version,\n array(\n  select as struct pm.policyId as policyId, pm.name\n  from unnest(t.policies) p\n  join \`${policyView}\` pm on p.policyId = pm.policyId\n ) as policies\nFROM ranked t\nWHERE EXISTS (SELECT 1 from rowIdentifiers r WHERE t.rowId = r.rowId)`;
-    await bigqueryUtil.createView(cdsDatasetId, cdsConsumerViewId, viewSql);
+    viewSql = `WITH ranked AS (\n  select\n    a.*,\n    DENSE_RANK() OVER (PARTITION BY createdBy, emailType, accountType ORDER BY createdAt) as rank\n  from \`${accountTable}\` a\n),\nrowIdentifiers AS (\n  SELECT r.rowId\n  from RANKED r\n  where r.rank = (select max(r2.rank) from RANKED r2 where r2.createdBy = r.createdBy and r2.accountType = r.accountType and r2.emailType = r.emailType)\n)\nSELECT\n * EXCEPT(rank, createdAt, policies),\n UNIX_MILLIS(createdAt) as modifiedAt,\n createdBy as modifiedBy,\n rank as version,\n array(\n  select as struct pm.policyId as policyId, pm.name\n  from unnest(t.policies) p\n  join \`${policyView}\` pm on p.policyId = pm.policyId\n ) as policies\nFROM ranked t\nWHERE EXISTS (SELECT 1 from rowIdentifiers r WHERE t.rowId = r.rowId)`;
+    await bigqueryUtil.createView(cdsDatasetId, cdsAccountViewId, viewSql);
 
 };
 
