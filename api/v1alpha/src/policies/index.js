@@ -36,11 +36,11 @@ var policies = express.Router();
  *     type: object
  *     description: Policy object
  *     properties:
- *       policy_id:
+ *       policyId:
  *         type: string
  *         readOnly: true
  *         description: Policy ID
- *       row_id:
+ *       rowId:
  *         type: string
  *         readOnly: true
  *         description: Policy Row ID
@@ -119,7 +119,7 @@ var policies = express.Router();
  */
 policies.get('/projects/:projectId/policies', async(req, res) => {
     const projectId = req.params.projectId;
-    const data = await dataManager.listPolicies(projectId);
+    const data = await dataManager.listPolicies(projectId, null);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -437,6 +437,135 @@ policies.delete('/projects/:projectId/policies/:policyId', async(req, res) => {
         rowAccessTags: req.body.rowAccessTags
     };
     const data = await dataManager.deletePolicy(projectId, policyId, values);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/policies/{policyId}/accounts:
+ *   get:
+ *     summary: List Accounts of policy based off request parameters
+ *     description: Returns the Account list response
+ *     tags:
+ *       - policies
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Policy request
+ *     - in: path
+ *       name: policyId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Policy Id of the Policy request
+ *     responses:
+ *       200:
+ *         description: Account list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   default: 200
+ *                   description: HTTP status code
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                      $ref: '#/definitions/Account'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
+policies.get('/projects/:projectId/policies/:policyId/accounts', async(req, res) => {
+    const projectId = req.params.projectId;
+    const policyId = req.params.policyId;
+    const data = await dataManager.listAccounts(projectId, policyId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/datasets/{datasetId}/policies:
+ *   get:
+ *     summary: List Policy based off request parameters
+ *     description: Returns the PolicyList response
+ *     tags:
+ *       - datasets
+ *       - policies
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Policy request
+ *     - in: path
+ *       name: datasetId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Dataset Id of the Policy request
+ *     responses:
+ *       200:
+ *         description: Policy list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   default: 200
+ *                   description: HTTP status code
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                      $ref: '#/definitions/Policy'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
+policies.get('/projects/:projectId/datasets/:datasetId/policies', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const data = await dataManager.listPolicies(projectId, datasetId);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

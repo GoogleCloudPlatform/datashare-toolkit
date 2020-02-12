@@ -36,11 +36,11 @@ var accounts = express.Router();
  *     type: object
  *     description: Account object
  *     properties:
- *       account_id:
+ *       accountId:
  *         type: string
  *         readOnly: true
  *         description: Account ID
- *       row_id:
+ *       rowId:
  *         type: string
  *         readOnly: true
  *         description: Account Row ID
@@ -97,7 +97,7 @@ var accounts = express.Router();
  * /projects/{projectId}/accounts:
  *   get:
  *     summary: List Account based off request parameters
- *     description: Returns the DatsetList response
+ *     description: Returns the PolicyList response
  *     tags:
  *       - accounts
  *     parameters:

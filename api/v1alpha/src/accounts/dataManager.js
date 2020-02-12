@@ -58,15 +58,23 @@ async function _insertData(projectId, fields, values, data) {
 
 /**
  * @param  {string} projectId
+ * @param  {policyId} policyId
  * Get a list of Accounts
  */
-async function listAccounts(projectId) {
+async function listAccounts(projectId, policyId) {
     const table = getTableFqdn(projectId, cdsDatasetId, cdsAccountViewId);
     const fields = Array.from(cdsAccountViewFields).join();
     const limit = 10;
-    const sqlQuery = `SELECT ${fields} FROM \`${table}\` LIMIT ${limit};`
-    const options = {
+    let sqlQuery = `SELECT ${fields} FROM \`${table}\` LIMIT ${limit};`
+    let options = {
         query: sqlQuery
+    };
+    if (policyId) {
+        sqlQuery = `SELECT ${fields} FROM \`${table}\`, UNNEST(policies) AS policies WHERE policies.policyId = @policyId LIMIT ${limit};`
+        options = {
+            query: sqlQuery,
+            params: { policyId: policyId }
+        };
     };
     const [rows] = await bigqueryUtil.executeQuery(options);
     if (rows.length >= 1) {
