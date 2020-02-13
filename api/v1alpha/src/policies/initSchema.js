@@ -18,7 +18,6 @@
 
 const { BigQueryUtil } = require('bqds-shared');
 
-const labelName = "cds";
 const cdsDatasetId = "datashare";
 const cdsPolicyViewId = "currentPolicy";
 const cdsPolicyTableId = "policy";
@@ -183,7 +182,7 @@ async function setupDatasharePrerequisites(projectId) {
     viewSql = `WITH ranked AS (\n  select\n    a.*,\n    DENSE_RANK() OVER (PARTITION BY createdBy, emailType, accountType ORDER BY createdAt) as rank\n  from \`${accountTable}\` a\n),\nrowIdentifiers AS (\n  SELECT r.rowId\n  from RANKED r\n  where r.rank = (select max(r2.rank) from RANKED r2 where r2.createdBy = r.createdBy and r2.accountType = r.accountType and r2.emailType = r.emailType)\n)\nSELECT\n * EXCEPT(rank, createdAt, policies),\n UNIX_MILLIS(createdAt) as modifiedAt,\n createdBy as modifiedBy,\n rank as version,\n array(\n  select as struct pm.policyId as policyId, pm.name\n  from unnest(t.policies) p\n  join \`${policyView}\` pm on p.policyId = pm.policyId\n ) as policies\nFROM ranked t\nWHERE EXISTS (SELECT 1 from rowIdentifiers r WHERE t.rowId = r.rowId)`;
     await bigqueryUtil.createView(cdsDatasetId, cdsAccountViewId, viewSql);
 
-};
+}
 
 //**
 setupDatasharePrerequisites(process.argv[2]);

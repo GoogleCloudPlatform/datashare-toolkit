@@ -20,7 +20,6 @@ const { BigQueryUtil } = require('bqds-shared');
 let bigqueryUtil = new BigQueryUtil();
 const uuidv4 = require('uuid/v4');
 
-const labelName = "cds";
 const cdsDatasetId = "datashare";
 const cdsPolicyViewId = "currentPolicy";
 const cdsAccountViewId = "currentAccount";
@@ -113,7 +112,7 @@ async function listAccounts(projectId, datasetId, policyId) {
             query: sqlQuery,
             params: { policyId: policyId }
         };
-    };
+    }
     const [rows] = await bigqueryUtil.executeQuery(options);
     if (rows.length >= 1) {
         return { success: true, data: rows };
@@ -156,7 +155,7 @@ async function createAccount(projectId, data) {
     } else {
         const message = `Account did not create with data values: '${data}'`;
         return { success: false, code: 500, errors: [message] };
-    };
+    }
 }
 
 /**
@@ -191,7 +190,7 @@ async function updateAccount(projectId, accountId, data) {
     } else {
         const message = `Account did not update with data values: '${data}'`;
         return { success: false, code: 500, errors: [message] };
-    };
+    }
 }
 
 /**
@@ -246,7 +245,7 @@ async function deleteAccount(projectId, accountId, data) {
     } else {
         const message = `Account did not delete with data values: '${data}'`;
         return { success: false, code: 500, errors: [message] };
-    };
+    }
 }
 
 module.exports = {
