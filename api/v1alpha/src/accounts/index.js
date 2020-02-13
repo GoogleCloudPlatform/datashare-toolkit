@@ -465,4 +465,133 @@ accounts.delete('/projects/:projectId/accounts/:accountId', async(req, res) => {
     });
 });
 
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/policies/{policyId}/accounts:
+ *   get:
+ *     summary: List Accounts of policy based off policyId and request parameters
+ *     description: Returns the Account list response
+ *     tags:
+ *       - policies
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Policy request
+ *     - in: path
+ *       name: policyId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Policy Id of the Policy request
+ *     responses:
+ *       200:
+ *         description: Account list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   default: 200
+ *                   description: HTTP status code
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                      $ref: '#/definitions/Account'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
+accounts.get('/projects/:projectId/policies/:policyId/accounts', async(req, res) => {
+    const projectId = req.params.projectId;
+    const policyId = req.params.policyId;
+    const data = await dataManager.listAccounts(projectId, null, policyId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/datasets/{datasetId}/accounts:
+ *   get:
+ *     summary: List Accounts based off datasetId and request parameters
+ *     description: Returns the AccountList response
+ *     tags:
+ *       - datasets
+ *       - accounts
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Policy request
+ *     - in: path
+ *       name: datasetId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Dataset Id of the Policy request
+ *     responses:
+ *       200:
+ *         description: Account list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   default: 200
+ *                   description: HTTP status code
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                      $ref: '#/definitions/Account'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
+accounts.get('/projects/:projectId/datasets/:datasetId/accounts', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const data = await dataManager.listAccounts(projectId, datasetId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
 module.exports = accounts;

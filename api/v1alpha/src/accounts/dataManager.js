@@ -22,6 +22,7 @@ const uuidv4 = require('uuid/v4');
 
 const labelName = "cds";
 const cdsDatasetId = "datashare";
+const cdsPolicyViewId = "currentPolicy";
 const cdsAccountViewId = "currentAccount";
 const cdsAccountTableId = "account";
 const cdsAccountTableFields = new Set(['rowId', 'accountId', 'email', 'emailType',
@@ -58,24 +59,62 @@ async function _insertData(projectId, fields, values, data) {
 
 /**
  * @param  {string} projectId
+ * @param  {datasetId} datasetId
  * @param  {policyId} policyId
  * Get a list of Accounts
  */
-async function listAccounts(projectId, policyId) {
+async function listAccounts(projectId, datasetId, policyId) {
     const table = getTableFqdn(projectId, cdsDatasetId, cdsAccountViewId);
-    const fields = Array.from(cdsAccountViewFields).join();
+    let fields = cdsAccountViewFields;
+    fields.delete('isDeleted');
+    fields = Array.from(fields).join();
     const limit = 10;
     let sqlQuery = `SELECT ${fields} FROM \`${table}\` LIMIT ${limit};`
     let options = {
         query: sqlQuery
     };
-    if (policyId) {
+    if (datasetId) {
+        let fields = cdsAccountViewFields;
+        fields.delete('isDeleted');
+        fields.delete('policies');
+        fields = Array.from(fields).map(i => 'up.' + i).join();
+        const policyTable = getTableFqdn(projectId, cdsDatasetId, cdsPolicyViewId);
+        sqlQuery = `WITH policies AS (
+            SELECT DISTINCT
+              cp.policyId,
+              cp.name,
+              d.datasetId
+            FROM \`${policyTable}\` cp
+            CROSS JOIN UNNEST(cp.datasets) d
+            WHERE d.datasetId = @datasetId AND
+                (cp.isDeleted IS false OR cp.isDeleted IS null)
+          ),
+          userPolicies AS (
+            SELECT
+              ca.* EXCEPT(policies),
+              cp.policyId,
+              cp.name
+            FROM \`${table}\` ca
+            CROSS JOIN UNNEST(ca.policies) AS p
+            JOIN policies cp ON p.policyId = cp.policyId
+            WHERE (ca.isDeleted IS false OR ca.isDeleted IS null)
+          )
+          SELECT ${fields},
+          ARRAY_AGG(struct(policyId, name)) AS policies
+          FROM userPolicies up
+          GROUP BY ${fields}`;
+        options = {
+            query: sqlQuery,
+            params: { datasetId: datasetId }
+        };
+    } else if (policyId) {
         sqlQuery = `SELECT ${fields} FROM \`${table}\`, UNNEST(policies) AS policies WHERE policies.policyId = @policyId LIMIT ${limit};`
         options = {
             query: sqlQuery,
             params: { policyId: policyId }
         };
     };
+    console.log(options);
     const [rows] = await bigqueryUtil.executeQuery(options);
     if (rows.length >= 1) {
         return { success: true, data: rows };
