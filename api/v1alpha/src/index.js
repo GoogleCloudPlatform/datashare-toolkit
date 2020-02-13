@@ -65,6 +65,20 @@ const options = {
     apis: ['./index.js', './src/index.js', './*/index.js', './src/*/index.js']
 };
 
+const swaggerOptions = {
+    swaggerOptions: {
+        operationsSorter: (a, b) => {
+            var methodsOrder = ["get", "post", "put", "patch", "delete", "options", "trace"];
+            var result = methodsOrder.indexOf(a.get("method")) - methodsOrder.indexOf(b.get("method"));
+
+            if (result === 0) {
+                result = a.get("path").localeCompare(b.get("path"));
+            }
+            return result;
+        }
+    }
+};
+
 const openapiSpec = swaggerJSDoc(options);
 
 const app = express();
@@ -99,8 +113,6 @@ router.all('*', cors());
  * tags:
  *   - name: welcome
  *     description: The welcome message for the CDS API
- *   - name: docs
- *     description: The OpenAPI specification documents for the CDS API services
  *   - name: datasets
  *     description: The CDS API Dataset Services
  *   - name: policies
@@ -109,6 +121,8 @@ router.all('*', cors());
  *     description: The CDS API Account Services
  *   - name: spots
  *     description: The CDS API Spot Services
+ *   - name: docs
+ *     description: The OpenAPI specification documents for the CDS API services
  *   - name: default
  *     description: The default routes for the CDS API
  *
@@ -185,7 +199,7 @@ router.get('/', function(req, res) {
  *                type: object
  */
 router.use(['/docs', '/api-docs'], swaggerUi.serve);
-router.get(['/docs', '/api-docs'], swaggerUi.setup(openapiSpec));
+router.get(['/docs', '/api-docs'], swaggerUi.setup(openapiSpec, swaggerOptions));
 
 /**
  * @swagger
