@@ -2,22 +2,22 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: cds-api-spot-service
+  name: cds-api
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: cds-api-spot-service
+        app: cds-api
         version: v1
     spec:
       volumes:
       - name: google-cloud-key
         secret:
-          secretName: cds-api-spot-service-creds
+          secretName: cds-api-creds
       containers:
-        - name: cds-api-spot-service
-          image: gcr.io/chrispage-dev/cds-api-spot-service
+        - name: cds-api
+          image: gcr.io/chrispage-dev/cds-api
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5555
