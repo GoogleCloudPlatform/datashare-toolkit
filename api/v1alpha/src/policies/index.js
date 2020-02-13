@@ -452,13 +452,76 @@ policies.delete('/projects/:projectId/policies/:policyId', async(req, res) => {
 /**
  * @swagger
  *
+ * /projects/{projectId}/accounts/{accountId}/policies:
+ *   get:
+ *     summary: List Policy based off accountId and request parameters
+ *     description: Returns the PolicyList response
+ *     tags:
+ *       - accounts
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Policy request
+ *     - in: path
+ *       name: accountId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Account Id of the Policy request
+ *     responses:
+ *       200:
+ *         description: Policy list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   default: 200
+ *                   description: HTTP status code
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                      $ref: '#/definitions/Policy'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
+policies.get('/projects/:projectId/accounts/:accountId/policies', async(req, res) => {
+    const projectId = req.params.projectId;
+    const accountId = req.params.accountId;
+    const data = await dataManager.listPolicies(projectId, null, accountId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+/**
+ * @swagger
+ *
  * /projects/{projectId}/datasets/{datasetId}/policies:
  *   get:
  *     summary: List Policy based off datasetId and request parameters
  *     description: Returns the PolicyList response
  *     tags:
  *       - datasets
- *       - policies
  *     parameters:
  *     - in: path
  *       name: projectId

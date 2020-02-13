@@ -538,7 +538,6 @@ accounts.get('/projects/:projectId/policies/:policyId/accounts', async(req, res)
  *     description: Returns the AccountList response
  *     tags:
  *       - datasets
- *       - accounts
  *     parameters:
  *     - in: path
  *       name: projectId

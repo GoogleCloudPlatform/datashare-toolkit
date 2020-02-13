@@ -114,7 +114,6 @@ async function listAccounts(projectId, datasetId, policyId) {
             params: { policyId: policyId }
         };
     };
-    console.log(options);
     const [rows] = await bigqueryUtil.executeQuery(options);
     if (rows.length >= 1) {
         return { success: true, data: rows };

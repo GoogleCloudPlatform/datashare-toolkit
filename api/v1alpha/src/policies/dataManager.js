@@ -78,35 +78,21 @@ async function listPolicies(projectId, datasetId, accountId) {
             params: { datasetId: datasetId }
         };
     } else if (accountId) {
-        // TODO This is not the correct query
         let fields = cdsPolicyViewFields;
         fields.delete('isDeleted');
-        fields = Array.from(fields).map(i => 'up.' + i).join();
-        const policyTable = getTableFqdn(projectId, cdsDatasetId, cdsPolicyViewId);
-        sqlQuery = `WITH policies AS (
-            SELECT DISTINCT
-              cp.policyId,
-              cp.name,
-              d.datasetId
-            FROM \`${policyTable}\` cp
-            CROSS JOIN UNNEST(cp.datasets) d
-            WHERE d.accountId = @accountId AND
-                (cp.isDeleted IS false OR cp.isDeleted IS null)
-          ),
-          userPolicies AS (
-            SELECT
-              ca.* EXCEPT(policies),
-              cp.policyId,
-              cp.name
-            FROM \`${table}\` ca
-            CROSS JOIN UNNEST(ca.policies) AS p
-            JOIN policies cp ON p.policyId = cp.policyId
-            WHERE (ca.isDeleted IS false OR ca.isDeleted IS null)
+        fields = Array.from(fields).map(i => 'cp.' + i).join();
+        const accountTable = getTableFqdn(projectId, cdsDatasetId, cdsAccountViewId);
+        sqlQuery = `WITH currentAccount AS (
+            SELECT policies.policyId
+            FROM \`${accountTable}\` ca
+            CROSS JOIN UNNEST(policies) policies
+            WHERE accountId = @accountId AND
+                (ca.isDeleted IS false OR ca.isDeleted IS null)
           )
-          SELECT ${fields},
-          ARRAY_AGG(struct(policyId, name)) AS policies
-          FROM userPolicies up
-          GROUP BY ${fields}`;
+        SELECT ${fields}
+        FROM \`${table}\` cp
+        LEFT JOIN currentAccount ca ON ca.policyId = cp.policyId
+        WHERE (cp.isDeleted IS false OR cp.isDeleted IS null)`;
         options = {
             query: sqlQuery,
             params: { accountId: accountId }
