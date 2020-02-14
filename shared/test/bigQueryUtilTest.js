@@ -248,7 +248,7 @@ describe('BigQueryUtil', () => {
                     }).then(() => {
                         const rows = [{ column1: "value 1", column2: "value 2" }, { column1: "value 3", column2: "value 4" }];
                         return bigqueryUtil.insertRows(uuid, uuid, rows);
-                    }).then(() => {
+                    }).then((result) => {
                         const options = { query: `select * from \`${argv.projectId}.${uuid}.${uuid}\`` };
                         return bigqueryUtil.executeQuerySync(options);
                     }).then((result) => {

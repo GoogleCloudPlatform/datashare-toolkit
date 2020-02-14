@@ -571,7 +571,7 @@ class BigQueryUtil {
     async insertRows(datasetId, tableId, rows) {
         const dataset = this.bigqueryClient.dataset(datasetId);
         const table = dataset.table(tableId);
-        table.insert(rows, { raw: false }).then((data) => {
+        await table.insert(rows, { raw: false }).then((data) => {
             let insertErrors = data[1];
             if (insertErrors) {
                 logger.info(`insertErrors: ${JSON.stringify(insertErrors)}`);
