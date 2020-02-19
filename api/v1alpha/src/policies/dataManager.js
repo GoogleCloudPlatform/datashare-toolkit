@@ -20,15 +20,8 @@ const { BigQueryUtil } = require('bqds-shared');
 let bigqueryUtil = new BigQueryUtil();
 const uuidv4 = require('uuid/v4');
 
-const cdsDatasetId = "datashare";
-const cdsPolicyViewId = "currentPolicy";
-const cdsAccountViewId = "currentAccount";
-const cdsPolicyTableId = "policy";
-const cdsPolicyTableFields = new Set(['rowId', 'policyId', 'name', 'description',
-    'createdAt', 'createdBy', 'datasets', 'rowAccessTags', 'isDeleted']);
-const cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description',
-    'modifiedAt', 'modifiedBy', 'version', 'datasets', 'rowAccessTags',
-    'isDeleted']);
+const cfg = require('../lib/config');
+const metaManager = require('../lib/metaManager');
 
 /**
  * @param  {string} projectId
@@ -46,7 +39,7 @@ function getTableFqdn(projectId, datasetId, tableId) {
  * Insert policy data
  */
 async function _insertData(projectId, fields, values, data) {
-    const table = getTableFqdn(projectId, cdsDatasetId, cdsPolicyTableId);
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyTableId);
     const sqlQuery = `INSERT INTO \`${table}\` (${fields}) VALUES (${values})`;
     console.log(sqlQuery);
     const options = {
@@ -63,8 +56,8 @@ async function _insertData(projectId, fields, values, data) {
  * Get a list of Policies
  */
 async function listPolicies(projectId, datasetId, accountId) {
-    const table = getTableFqdn(projectId, cdsDatasetId, cdsPolicyViewId);
-    const fields = Array.from(cdsPolicyViewFields).join();
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+    const fields = Array.from(cfg.cdsPolicyViewFields).join();
     const limit = 10;
     let sqlQuery = `SELECT ${fields} FROM \`${table}\` LIMIT ${limit};`
     let options = {
@@ -77,10 +70,10 @@ async function listPolicies(projectId, datasetId, accountId) {
             params: { datasetId: datasetId }
         };
     } else if (accountId) {
-        let fields = cdsPolicyViewFields;
+        let fields = cfg.cdsPolicyViewFields;
         fields.delete('isDeleted');
         fields = Array.from(fields).map(i => 'cp.' + i).join();
-        const accountTable = getTableFqdn(projectId, cdsDatasetId, cdsAccountViewId);
+        const accountTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
         sqlQuery = `WITH currentAccount AS (
             SELECT policies.policyId
             FROM \`${accountTable}\` ca
@@ -112,26 +105,36 @@ async function listPolicies(projectId, datasetId, accountId) {
  * Create a Policy based off data values
  */
 async function createPolicy(projectId, data) {
-    let fields = cdsPolicyTableFields, values = cdsPolicyTableFields;
-    fields.delete('isDeleted');
+    let fields = cfg.cdsPolicyTableFields, values = cfg.cdsPolicyTableFields;
     fields = Array.from(fields).join();
-    values.delete('isDeleted');
     values = Array.from(values).map(i => '@' + i).join();
 
     const rowId = uuidv4();
+    let isDeleted = false;
     const policyId = uuidv4();
-    const createdAt = new Date().toISOString();
+    let createdAt = new Date().toISOString();
     // merge the data and extra values together
     data = {...data,
         ...{
             rowId: rowId,
             policyId: policyId,
+            isDeleted: isDeleted,
             createdAt: createdAt
         }
     };
     console.log(data);
     const [rows] = await _insertData(projectId, fields, values, data);
     if (rows.length === 0) {
+        try {
+            await metaManager.performMetadataUpdate(projectId, [policyId]);
+        } catch (err) {
+            // cleanup and don't wait
+            isDeleted = true;
+            createdAt = new Date().toISOString();
+            data = {...data, ...{ isDeleted: isDeleted, createdAt: createdAt } };
+            _insertData(projectId, fields, values, data);
+            return { success: false, code: 500, errors: [err.message] };
+        }
         // Retrieving the record after insert makes another round-trip and is not
         // efficient. For now, just return the original data.
         //return await getPolicy(projectId, policyId);
@@ -148,25 +151,30 @@ async function createPolicy(projectId, data) {
  * Updated a Policy based off policyId and data values
  */
 async function updatePolicy(projectId, policyId, data) {
-    let fields = cdsPolicyTableFields, values = cdsPolicyTableFields;
-    fields.delete('isDeleted');
+    let fields = cfg.cdsPolicyTableFields, values = cfg.cdsPolicyTableFields;
     fields = Array.from(fields).join();
-    values.delete('isDeleted');
     values = Array.from(values).map(i => '@' + i).join();
 
     const rowId = uuidv4();
+    const isDeleted = true;
     const createdAt = new Date().toISOString();
     // merge the data and extra values together
     data = {...data,
         ...{
             rowId: rowId,
             policyId: policyId,
+            isDeleted: isDeleted,
             createdAt: createdAt
         }
     };
     console.log(data);
     const [rows] = await _insertData(projectId, fields, values, data);
     if (rows.length === 0) {
+        try {
+            await metaManager.performMetadataUpdate(projectId, [policyId]);
+        } catch (err) {
+            return { success: false, code: 500, errors: [err.message] };
+        }
         // Retrieving the record after insert makes another round-trip and is not
         // efficient. For now, just return the original data.
         //return await getPolicy(projectId, policyId);
@@ -183,8 +191,8 @@ async function updatePolicy(projectId, policyId, data) {
  * Get a Policy based off projectId and policyId
  */
 async function getPolicy(projectId, policyId) {
-    const table = getTableFqdn(projectId, cdsDatasetId, cdsPolicyViewId);
-    const fields = Array.from(cdsPolicyViewFields).join();
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+    const fields = Array.from(cfg.cdsPolicyViewFields).join();
     const limit = 1;
     const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE policyId = @policyId LIMIT ${limit};`
     const options = {
@@ -206,7 +214,7 @@ async function getPolicy(projectId, policyId) {
  * Updated a Policy based off policyId and data values
  */
 async function deletePolicy(projectId, policyId, data) {
-    let fields = cdsPolicyTableFields, values = cdsPolicyTableFields;
+    let fields = cfg.cdsPolicyTableFields, values = cfg.cdsPolicyTableFields;
     fields = Array.from(fields).join();
     values = Array.from(values).map(i => '@' + i).join();
 
@@ -225,6 +233,12 @@ async function deletePolicy(projectId, policyId, data) {
     console.log(data);
     const [rows] = await _insertData(projectId, fields, values, data);
     if (rows.length === 0) {
+        try {
+            // TODO - This will not work as the object was already deleted.
+            await metaManager.performMetadataUpdate(projectId, [policyId]);
+        } catch (err) {
+            return { success: false, code: 500, errors: [err.message] };
+        }
         return { success: true, data: {} };
     } else {
         const message = `Policy did not delete with data values: '${data}'`;
