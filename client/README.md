@@ -16,7 +16,7 @@
 * [Contributing](#contributing)
 * [License](#license)
 * [Authors](#authors)
-* [Notes](#notes)
+* [Acronyms](#acronyms)
 
 
 # Overview
@@ -27,7 +27,7 @@ _Note_ Translating Pub/Sub messages to multicast is currently out of scope.
 
 
 ## Architecture
-![alt text](files/images/cds-multicast-client-cloud-architecture.png)
+![alt text](files/images/cds-multicast-client-private-cloud-architecture.png)
 
 
 ## Getting Started
@@ -131,7 +131,6 @@ The *Hello World* example will utilize the CDMC service to simlulate multicast m
 
 #### Pub/Sub Publisher
 Open a terminal and run the following command. Specify the GOOGLE_APPLICATION_CREDENTIALS, PROJECT_ID, TOPIC_NAME, multicast address and interface name. The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS json file created above. This is only for demo purposes.
-_Note_ For localhost, *lo0*, you would use the reserved 224.0.0/24 subnet block
 
     docker run -it --rm --name publisher -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json -v ${PWD}/${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/key.json gcr.io/chrispage-dev/cdmc:dev multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i eth0 -v
 
@@ -152,6 +151,7 @@ Open another terminal and tun the following command(s) to pull the messages from
 
 ### Replay messages
 The *replay messages* example will utilize [tcpreplay](https://tcpreplay.appneta.com/) to replay an existing pcap file to simlulate multicast message(s) (producer), receive the multicast message(s) to a Pub/Sub topic (publisher), and consume the message(s) via Pub/Sub subsription with *gcloud* (subscriber). We will start two Docker containers; one for the multicast producer and one for the Pub/Sub publisher.
+
 _Note_ This was tested on a 8CPU and 30GB mem virtual machine. Docker for Mac did not have enough resources.
 
 #### Pub/Sub Publisher
@@ -163,6 +163,7 @@ You should see `Listening to messages...`
 
 #### Multicast Producer
 Open another terminal and run the following command(s). You can capture a multicast stream with [tcpdump](https://www.tcpdump.org/) or use a public data set. For this example, we will use the from (https://iextrading.com/trading/market-data/). Download one of the [Sample pcap](https://www.googleapis.com/download/storage/v1/b/iex/o/data%2Ffeeds%2F20180127%2F20180127_IEXTP1_DEEP1.0.pcap.gz?generation=1517101215560431&alt=media) files and unzip. You will need to change the *-D* option to replace the destination multicast group address, the *-r* to replace the port number, and the pcap file location, */temp/data_feeds_20180127_20180127_IEXTP1_DEEP1.0.pcap* if using a different pcap file. The *-t* option will send the feed as fast as possible.
+
 _Note_ You can loop `tcpreplay` with the *-l <# of loops>* option
 
     docker run -it --rm --name producer -v "${PWD}":"${PWD}" williamofockham/tcpreplay:4.3.0 tcpreplay-edit -i eth0 -D 233.215.21.4/32:239.0.0.1/32 -r 10378:9999 -C -t ${PWD}/temp/data_feeds_20180127_20180127_IEXTP1_DEEP1.0.pcap
@@ -176,7 +177,6 @@ You can debug via tcpdump:
 #### Pub/Sub Publisher (con't)
 Now that you verified the above works, you can change the publisher command from `listen` to `publish` with appropriate parameters.\
 Open a terminal and run the following command. Specify the GOOGLE_APPLICATION_CREDENTIALS, PROJECT_ID, TOPIC_NAME, multicast address and interface name. The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS json file created above (This is only for demo purposes). Raise the buffer to 5MB.
-_Note_ For localhost, *lo0*, you would use the reserved 224.0.0/24 subnet block
 
     docker run -it --rm --name publisher -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json -v ${PWD}/${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/key.json gcr.io/chrispage-dev/cdmc:dev multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i eth0 -r 5242880
 
@@ -202,7 +202,8 @@ Run the main.go command:
 
     go run main.go -h
 
-If you want to purge the Pub/Sub subscription, run the following command:\
+If you want to purge the Pub/Sub subscription, run the following command:
+
 _Note_ This is non-reversable!
 
     gcloud pubsub subscriptions seek ${PULL_SUBSCRIPTION_NAME} --time=$(date +%Y-%m-%dT%H:%M:%S)
@@ -213,18 +214,16 @@ TBD
 
 
 ## Deployment
-Verify you have Docker running to build the image.\
-_Note_ GCP cloud build will be added in the future
+Verify you have Docker running to build the image. You can build the Docker image from the parent directory [client](./):
 
-You can build the Docker image from the parent directory [client](./)
-_Note_ Change your project name appropriately:
+_Note_ Change your project name appropriately
 
     docker build -t gcr.io/chrispage-dev/cdmc:dev .
 
 
 ## ToDo
 * Add GCP cloud build for CDMC service
-* Add k8s example
+* Add k8s example (GKE currently does not support mulitcast)
 * Add Pub/Sub to multicast feature
 
 
@@ -241,3 +240,13 @@ This project is licensed under the Apache License - see the [LICENSE](../LICENSE
 ## Authors
 
 * **Chris Page** - *Initial work*
+
+
+## Acronyms
+
+This section lista all the relevant acronyms for Cloud Datashare Multicast Client.
+
+| **Acronym**   | **Definition**  | **Description** |
+|:-------------:|:---------------:|:----------------|
+| CDS | Cloud Datashare | The name of the this tool kit that enables data producers to expose data on GCP to consumers |
+| CDMC | Cloud Datashare Multicast Client | The name of the CDS multicast client and application binary |
