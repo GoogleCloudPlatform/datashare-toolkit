@@ -19,8 +19,8 @@ steps:
   - --ciphertext-file=/workspace/shared/ciphertexts/client_secret.json.enc
   - --plaintext-file=/workspace/shared/ciphertexts/client_secret.json
   - --location=global
-  - --keyring=bqds-cloud-build-ring
-  - --key=bqds-cloud-build
+  - --keyring=cds-cloud-build-ring
+  - --key=cds-cloud-build
 - name: 'node:12.11.1'
   dir: 'shared'
   entrypoint: 'npm'
