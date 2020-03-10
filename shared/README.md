@@ -161,7 +161,7 @@ Execute the cloud tests:
 
 Execute the tests with GCB:
 
-**Note**: _`cloud-build-local` *--config* does not like relative paths so needs to be exectuted in parent directory. This will leverage Cloud KMS to decrypt the SA credentials for the npm tests_
+**Note**: _GCB will leverage Cloud KMS to decrypt the SA credentials for the npm tests. `cloud-build-local` *--config* does not like relative paths. If you need to run a GCB for all tests, then you need to execute in the parent directory._
 
     cloud-build-local --config=cloudbuild.yaml --dryrun=false .
 

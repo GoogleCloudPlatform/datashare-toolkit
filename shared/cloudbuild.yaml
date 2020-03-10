@@ -1,0 +1,18 @@
+steps:
+- name: gcr.io/cloud-builders/gcloud
+  #dir: 'shared'
+  args:
+  - kms
+  - decrypt
+  - --ciphertext-file=/workspace/ciphertexts/client_secret.json.enc
+  - --plaintext-file=/workspace/ciphertexts/client_secret.json
+  - --location=global
+  - --keyring=cds-cloud-build-ring
+  - --key=cds-cloud-build
+- name: 'node:12.11.1'
+  #dir: 'shared'
+  entrypoint: 'npm'
+  args: ['run', 'cloudtest']
+  env:
+  - 'GOOGLE_APPLICATION_CREDENTIALS=/workspace/ciphertexts/client_secret.json'
+  - 'PROJECT_ID=$PROJECT_ID'

@@ -25,7 +25,9 @@ steps:
   dir: 'shared'
   entrypoint: 'npm'
   args: ['run', 'cloudtest']
-  env: ['GOOGLE_APPLICATION_CREDENTIALS=/workspace/shared/ciphertexts/client_secret.json']
+  env:
+  - 'GOOGLE_APPLICATION_CREDENTIALS=/workspace/shared/ciphertexts/client_secret.json'
+  - 'PROJECT_ID=$PROJECT_ID'
 - name: 'node:12.11.1'
   dir: 'entitlements/bqdsEntitlements'
   entrypoint: 'npm'
