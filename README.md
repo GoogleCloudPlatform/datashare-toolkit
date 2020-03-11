@@ -64,7 +64,7 @@ The function is triggered off mutations to a specified Cloud Storage Bucket.
 
 ## Roadmap
 
-The [roadmap](roadmap) section details currently planned features of Datashare. We'd love to hear your feedback as well.
+The [roadmap](roadmap) section details currently planned features of Datashare. We'd love to hear your feedback!
 
 ## Ingestion and transformation
 
