@@ -19,13 +19,15 @@ steps:
   - --ciphertext-file=/workspace/shared/ciphertexts/client_secret.json.enc
   - --plaintext-file=/workspace/shared/ciphertexts/client_secret.json
   - --location=global
-  - --keyring=bqds-cloud-build-ring
-  - --key=bqds-cloud-build
+  - --keyring=cds-cloud-build-ring
+  - --key=cds-cloud-build
 - name: 'node:12.11.1'
   dir: 'shared'
   entrypoint: 'npm'
   args: ['run', 'cloudtest']
-  env: ['GOOGLE_APPLICATION_CREDENTIALS=/workspace/shared/ciphertexts/client_secret.json']
+  env:
+  - 'GOOGLE_APPLICATION_CREDENTIALS=/workspace/shared/ciphertexts/client_secret.json'
+  - 'PROJECT_ID=$PROJECT_ID'
 - name: 'node:12.11.1'
   dir: 'entitlements/bqdsEntitlements'
   entrypoint: 'npm'

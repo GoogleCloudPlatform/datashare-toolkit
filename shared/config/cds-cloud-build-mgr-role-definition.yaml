@@ -1,5 +1,5 @@
-title: "BQDS Cloud Build Manager Role"
-description: "Custom BQDS Cloud Build role for the Cloud Build service to interface with GCP services"
+title: "CDS Cloud Build Manager Role"
+description: "Custom CDS Cloud Build role for the Cloud Build service to interface with GCP services"
 stage: "BETA"
 includedPermissions:
 - bigquery.datasets.create
