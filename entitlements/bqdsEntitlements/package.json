@@ -18,7 +18,7 @@
   "dependencies": {
     "jsonschema": "^1.2.4",
     "uuid": "^3.3.3",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.2",
     "lint": "^0.7.0",
     "underscore": "^1.9.1",
     "bqds-shared": "file:../../shared"
