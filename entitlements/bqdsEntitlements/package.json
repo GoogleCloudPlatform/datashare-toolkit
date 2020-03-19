@@ -9,7 +9,7 @@
     "start": "node main.js",
     "lint": "eslint .",
     "test": "nyc mocha --timeout 60000",
-    "cloudtest": "nyc mocha --timeout 60000 --projectId='bqds-ci' --runCloudTests",
+    "cloudtest": "nyc mocha --timeout 60000 --projectId='cds-ci' --runCloudTests",
     "coverage": "nyc report --reporter=html" 
   },
   "bin": {
