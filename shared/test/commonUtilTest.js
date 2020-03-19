@@ -37,7 +37,7 @@ it("should return false for invalid json string", () => {
 it("should return true for valid yaml string", () => {
     expect(commonUtil.isYamlString(`---
     name: mlb_simple
-    projectId: bqds-ci
+    projectId: cds-ci
     accessControl:
       datasetId: access_control
       viewId: groupEntities
@@ -53,7 +53,7 @@ it("should return true for valid yaml string", () => {
 it("should return false for invalid yaml string", () => {
     expect(commonUtil.isYamlString(`---
     name mlb_simple
-    projectId: bqds-ci
+    projectId: cds-ci
     accessControl:
       datasetId: access_control
       viewId: groupEntities
@@ -69,7 +69,7 @@ it("should return false for invalid yaml string", () => {
 it("should parse yaml string", () => {
     expect(commonUtil.parseYaml(`---
   name: mlb_simple
-  projectId: bqds-ci
+  projectId: cds-ci
   accessControl:
     datasetId: access_control
     viewId: groupEntities
@@ -86,7 +86,7 @@ it("should fail to parse yaml string", () => {
     expect(() => {
         commonUtil.parseYaml(`---
     name mlb_simple
-    projectId: bqds-ci
+    projectId: cds-ci
     accessControl:
       datasetId: access_control
       viewId: groupEntities
