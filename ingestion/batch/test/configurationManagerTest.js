@@ -27,7 +27,7 @@ chai.use(chaiAsPromised);
 
 const configManager = require('../configurationManager');
 const uuid = uuidv4().replace(/-/gi, '');
-const bucketName = "bqds-unit-tests";
+const bucketName = "cds-unit-tests";
 
 it("checking metadata defaults with no values provided", () => {
     const dict = { metadata: {} };
