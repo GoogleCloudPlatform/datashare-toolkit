@@ -32,7 +32,7 @@ chai.use(chaiAsPromised);
 process.env.ARCHIVE_FILES = "true";
 const ingestion = require("../index");
 const uuid = uuidv4().replace(/-/gi, '');
-const bucketName = "bqds-unit-tests";
+const bucketName = "cds-unit-tests";
 
 it("getExceptionString empty dictionary", () => {
     const e = {};
