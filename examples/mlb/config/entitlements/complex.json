@@ -1,6 +1,6 @@
 {
   "name": "mlb_complex",
-  "projectId": "bqds-ci",
+  "projectId": "cds-ci",
   "accessControl": {
     "datasetId": "access_control",
     "viewId": "groupEntities"

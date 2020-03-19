@@ -1,6 +1,6 @@
 {
   "name": "mlb_simple",
-  "projectId": "bqds-ci",
+  "projectId": "cds-ci",
   "accessControl": {
     "datasetId": "access_control",
     "viewId": "groupEntities"
