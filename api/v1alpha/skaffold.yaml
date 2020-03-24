@@ -17,11 +17,11 @@ apiVersion: skaffold/v1beta2
 kind: Config
 build:
   artifacts:
-  - image: cds-api-spot-service
+  - image: cds-api
     context: ../../.
     docker:
       dockerfile: api/v1alpha/Dockerfile
 deploy:
   kubectl:
     manifests:
-    - ./kubernetes-manifests/cds-api-spot-service/*.yaml
+    - ./kubernetes-manifests/cds-api/*.yaml

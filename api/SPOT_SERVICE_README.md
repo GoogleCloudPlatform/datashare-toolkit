@@ -1,10 +1,12 @@
-# CDS API
+# CDS API - Spot Service
 
 * [Overview](#overview)
   * [Architecture](#architecture)
   * [Configuration](#configuration)
   * [Documentation (OpenAPI Spec)](#documentation)
 * [Getting Started](#getting-started)
+  * [Create Storage Bucket](#create-storage-bucket)
+  * [Create Configuration](#create-configuration)
   * [Enable APIs](#enable-apis)
   * [Service Account](#service-account)
   * [Examples](#examples)
@@ -22,31 +24,21 @@
 
 # Overview
 
-The CDS API allows data producers the ability to programmatically enforce access control or Entitlements on their organization's Dataset(s) in Google Cloud Platform (GCP). The CDS Policies are access control configurations that are constructed by the data producers with relationships between who can access what specific data assets. The policies enable data producers fine-grained control of their datasets down to row level fields or attributes for one or many data Account Consumer(s).
-
-The CDS API also enables data producers unique Fulfillments operations on their datasets. These fulfillments can be one-time Spot Request(s) for consumption of data for non GCP data consumers.
+This documentation provides the details for the CDS API Spot Service. The Spot service provides data producers the ability to expose a limited subset of their datasets programatically. Data producers can configure explicit query parameters for data consumers to discover and execute queries against larger consumer datasets. The sub-datasets are extracted for short-term storage in buckets with signed urls for distribution to the data consumers.
 
 
 ## Architecture
-
-### Entitlement Services
-
-![alt text](files/images/cds-api-entitlement-architecture.png)
-
-### Fulfillment Services
-
 ![alt text](files/images/cds-api-spot-architecture.png)
 
 
 ## Configuration
-
-There are configuration settings for Entitlements and Fulfillment services. Currently, the Entitlements configuration is via the UI and Filfillment is configured [here](SPOT_SERVICE_README.md#create-configuration)
+The CDS API Spot service configuration overview and definition is [here](docs/CONFIGURATION.md)
 
 
 ### Documentation
 _OpenAPI Specification_
 
-The CDS API service(s) utilize the open standard for API documentation, [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) (OAS) for documenting the API's resources, parameters, responses, etc. The OAS definitions and paths are rendered via [swagger-jsdoc](https://www.npmjs.com/package/swagger-jsdoc) in the route comments of [index](v1alpha/index.js)
+The CDS API Spot service utilizes the open standard for API documentation, [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) (OAS) for documenting the API's resources, parameters, responses, etc. The OAS definitions and paths are rendered via [swagger-jsdoc](https://www.npmjs.com/package/swagger-jsdoc) in the route comments of [index](v1alpha/index.js)
 
 You can access the OAS directly via:
 
@@ -59,7 +51,7 @@ You can also access an instance of Swagger UI to render the OAS docs:
 
 ## Getting Started
 
-These instructions will setup an instance of the CDS API Service in your GCP project.
+These instructions will setup an instance of the CDS API Spot Service in your GCP project.
 
 ### Setup GCloud
 * Install the [Google Cloud SDK](https://cloud.google.com/sdk/install) on your local machine.
@@ -73,9 +65,34 @@ Set `gcloud` connect to your current project.
 
     gcloud config set project YOUR_PROJECT_NAME
 
+### Create Storage Bucket
+
+Create a storage bucket to persist the API Configuration. This does not have to be the same storage bucket for the initial dataset injestion.
+
+Set your **BUCKET_NAME** environment variable:
+
+    export BUCKET_NAME=chrispage-dev-cds-test
+
+Set your **BUCKET_REGION** environment variable:
+
+    export BUCKET_REGION=us-east4
+
+Create the new storage bucket:
+
+    gsutil mb -l ${BUCKET_REGION} gs://${BUCKET_NAME}/
+
+### Create Configuration
+
+The CDS API Spot Service configuration definitions are defined [above](#configuration). You can view an example in the MLB examples config [here](../../examples/mlb/config/api/config.json). Make the appropriate modifications and then copy to your storage bucket.
+
+Copy configuration to the storage bucket:
+
+    gsutil cp ../examples/mlb/config/api/config.json gs://${BUCKET_NAME}/cds/api/config.json
+
+
 ### Enable APIs
 
-These are the GCP project APIs that require the CDS API service(s) access.
+These are the GCP project APIs that require the CDS API Spot Service access.
 
 ```
 gcloud services enable bigquery-json.googleapis.com
@@ -84,7 +101,7 @@ gcloud services enable iam.googleapis.com
 
 ### Service Account
 
-CDS API service(s) are a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](./config/cds-api-mgr-role-definition.yaml)
+CDS API Spot service is a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](./config/cds-api-spot-mgr-role-definition.yaml)
 
 #### Setup Service Account
 
@@ -94,26 +111,32 @@ Set your **PROJECT\_ID** if you have not already:
 
 Set the **SERVICE\_ACCOUNT\_NAME** environment variable(s):
 
-    export SERVICE_ACCOUNT_NAME=cds-api-mgr;
+    export SERVICE_ACCOUNT_NAME=cds-api-spot-mgr;
 
 Set the **SERVICE\_ACCOUNT\_DESC** environment variable(s):
 
-    export SERVICE_ACCOUNT_DESC="CDS API Manager";
+    export SERVICE_ACCOUNT_DESC="CDS API Spot Manager";
 
-Create the custom CDS API service-account:
+Create the custom CDS API Spot service-account:
 
     gcloud iam service-accounts create ${SERVICE_ACCOUNT_NAME} --display-name "${SERVICE_ACCOUNT_DESC}";
 
 Set the **CUSTOM\_ROLE\_NAME** environment variable(s):
 
-    export CUSTOM_ROLE_NAME=custom.cds.api.mgr;
+    export CUSTOM_ROLE_NAME=custom.cds.spot.api.mgr;
 
 *Note* We could use the the following roles, but it's better to follow the principle of least privilege. \
-_The permissions for the custom role are defined in [config/cds-api-mgr-role-definition.yaml](config/cds-api-mgr-role-definition.yaml)_
+_The permissions for the custom role are defined in [config/cds-api-spot-mgr-role-definition.yaml](config/cds-api-spot-mgr-role-definition.yaml)_
+```
+--role="roles/viewer"
+--role="roles/bigquery.dataEditor"
+--role="roles/bigquery.jobUser"
+# This role is only required if deploying the API service to GCP Cloud Run
+--role="roles/serverless.serviceAgent";
+```
+Create custom CDS API Spot role:
 
-Create custom CDS API role:
-
-    gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/cds-api-mgr-role-definition.yaml
+    gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/cds-api-spot-mgr-role-definition.yaml
 
 *Note* If the custom role already exists, just update the stage:
 
@@ -124,6 +147,28 @@ Grant the new GCP service role to service account:
     gcloud projects add-iam-policy-binding ${PROJECT_ID} \
       --member serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
       --role="projects/${PROJECT_ID}/roles/${CUSTOM_ROLE_NAME}"
+
+#### Setup Bucket ACLs:
+
+Set the **BUCKET_NAME** environment variable(s):\
+_Note_ **objectCreator** is required for the destination GCS Bucket for authorization to persist the spot fulfillment data. You will need to run these commands for both the source and destination GCS Bucket if they are different.
+
+    export BUCKET_NAME=chrispage-dev-cds-test
+
+Set the Bucket ACL for the service account:
+
+    gsutil iam ch serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com:objectViewer \
+      gs://${BUCKET_NAME};
+    gsutil iam ch serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com:objectCreator \
+      gs://${BUCKET_NAME};
+    gsutil iam ch serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com:legacyBucketReader \
+      gs://${BUCKET_NAME};
+
+View the Bucket IAM permissions:
+
+    gsutil iam get gs://${BUCKET_NAME}
+
+![alt text](files/images/cds-api-spot-mgr-gcs-bucket-permissions.png)
 
 #### Configure Service Account Secret
 
@@ -143,7 +188,7 @@ You can deploy the API service via various methods below based off developer pre
   * [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/) via [Skaffold](https://github.com/GoogleContainerTools/skaffold)
   * [Google Cloud App Engine](https://cloud.google.com/appengine/) via [Deployment Manager](https://cloud.google.com/deployment-manager/) and gcloud - TODO
 
-[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the CDS API Service content and generate a unique URL for consumption.
+[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the CDS API Spot Service content and generate a unique URL for consumption.
 
 There are some environment variables that need to be set for all build and deployment options.
 
@@ -173,17 +218,8 @@ _Cloud Build needs to run from parent directory for build context_
 Deploy with Cloud Run Beta:
 _Note_ - There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--set-env-vars) provides details for how they are set.
 
-    gcloud run deploy cds-api \
-      --image gcr.io/${PROJECT_ID}/cds-api:${TAG} \
-      --region=us-central1 \
-      --allow-unauthenticated \
-      --platform managed \
-      --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
-
-Spot service environment:
-
-    gcloud run deploy cds-api \
-      --image gcr.io/${PROJECT_ID}/cds-api:${TAG} \
+    gcloud run deploy cds-api-spot-service \
+      --image gcr.io/${PROJECT_ID}/cds-api-spot-service:${TAG} \
       --region=us-central1 \
       --allow-unauthenticated \
       --platform managed \
@@ -193,7 +229,7 @@ Spot service environment:
 
 Open the app URL in your browser. You can return the FQDN via:
 
-    gcloud run services describe cds-api --platform managed --format="value(status.url)"
+    gcloud run services describe cds-api-spot-service --platform managed --format="value(status.url)"
 
 #### Confirm your API is running
 
@@ -215,11 +251,11 @@ These instructions are to build and deploy in a k8s environment via Skaffold.
 Create a kubernetes secret with the appropriate service account key file from above:\
 _Note_ Change the file path to the appropriate destination. Secrets management for multiple k8s clusters is outside the scope of this example.
 
-    kubectl create secret generic cds-api-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
+    kubectl create secret generic cds-api-spot-service-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
 
-Modify the ConfigMap with the appropriate CDS API environment variables:
+Modify the ConfigMap with the appropriate Spot Fulfillment environment variables:
 
-    vi kubernetes-manifests/cds-api/configmaps.yaml
+    vi kubernetes-manifests/cds-api-spot-service/configmaps.yaml
 
 Set the default GCR project repository:
 
@@ -256,9 +292,6 @@ Start the service.\
 _Note_ - There are a few environment variables that need to be set before the application starts (see below). [Nodemon](https://nodemon.io/) is leveraged to read file changes and reload automatically.
 
     export GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS};
-
-Spot service environment:
-
     export SPOT_SERVICE_CONFIG_BUCKET_NAME=${BUCKET_NAME};
     export SPOT_SERVICE_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID};
 

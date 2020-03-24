@@ -47,8 +47,7 @@ WORKDIR /app
 # Bundle shared dep
 COPY shared/*.js /shared/
 # Bundle app source
-COPY api/v1alpha/src/*.js /app/
-COPY api/v1alpha/src/spots/*.js /app/spots/
+COPY api/v1alpha/src/ /app/
 
 # --- Release with Alpine ----
 FROM node:12.6-alpine as release
