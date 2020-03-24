@@ -10,18 +10,18 @@
     "lint": "eslint .",
     "test": "nyc mocha --timeout 60000",
     "cloudtest": "nyc mocha --timeout 60000 --projectId='cds-ci' --runCloudTests",
-    "coverage": "nyc report --reporter=html" 
+    "coverage": "nyc report --reporter=html"
   },
   "bin": {
     "entitlement-engine": "main.js"
   },
   "dependencies": {
+    "bqds-shared": "file:../../shared",
     "jsonschema": "^1.2.4",
-    "uuid": "^3.3.3",
-    "minimist": "^1.2.2",
     "lint": "^0.7.0",
+    "minimist": "^1.2.5",
     "underscore": "^1.9.1",
-    "bqds-shared": "file:../../shared"
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "eslint": "^5.12.0",
