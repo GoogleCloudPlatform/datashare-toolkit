@@ -143,13 +143,6 @@ var spots = express.Router();
  *         required: true
  *
  */
-spots.get('/', function(req, res) {
-    res.status(200).json({
-        success: true,
-        code: 200,
-        message: 'Welcome!'
-    });
-});
 
 /**
  * @swagger

@@ -62,7 +62,21 @@ const options = {
         }
     },
     // Path to the API docs
-    apis: ['./index.js', './src/index.js', './spots/index.js', './src/spots/index.js']
+    apis: ['./index.js', './src/index.js', './*/index.js', './src/*/index.js']
+};
+
+const swaggerOptions = {
+    swaggerOptions: {
+        operationsSorter: (a, b) => {
+            var methodsOrder = ["get", "post", "put", "patch", "delete", "options", "trace"];
+            var result = methodsOrder.indexOf(a.get("method")) - methodsOrder.indexOf(b.get("method"));
+
+            if (result === 0) {
+                result = a.get("path").localeCompare(b.get("path"));
+            }
+            return result;
+        }
+    }
 };
 
 const openapiSpec = swaggerJSDoc(options);
@@ -73,8 +87,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.raw({type: 'application/octet-stream'}));
 
-// Import the Spots API router
+// Import the CDS API Spots service router
 const spots = require('./spots/index');
+// Import the CDS API Datasets service router
+const datasets = require('./datasets/index');
+// Import the CDS API Policies service router
+const policies = require('./policies/index');
+// Import the CDS API Accounts service router
+const accounts = require('./accounts/index');
 
 /************************************************************
   API Endpoints
@@ -87,23 +107,42 @@ var routes = [];
 // CORS will be controlled by the API GW layer
 router.all('*', cors());
 
-// All of the API routes will be prefixed with /apiVersion
-app.use('/' + apiVersion, router);
-// All of the API sub routes will be prefixed with /apiVersion
-app.use('/' + apiVersion, spots);
-
 /**
  * @swagger
  *
  * tags:
  *   - name: welcome
  *     description: The welcome message for the CDS API
+ *   - name: datasets
+ *     description: The CDS API Dataset Services
+ *   - name: policies
+ *     description: The CDS API Policy Services
+ *   - name: accounts
+ *     description: The CDS API Account Services
  *   - name: spots
  *     description: The CDS API Spot Services
  *   - name: docs
  *     description: The OpenAPI specification documents for the CDS API services
  *   - name: default
  *     description: The default routes for the CDS API
+ *
+ * definitions:
+ *   Error:
+ *     type: object
+ *     description: Error object
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: Success of the request
+ *       code:
+ *         type: integer
+ *         description: HTTP status code
+ *       errors:
+ *         type: array
+ *         items:
+ *           type: string
+ *           properties:
+ *             message: message string
  *
  */
 
@@ -138,7 +177,7 @@ router.get('/', function(req, res) {
     res.status(200).json({
         success: true,
         code: 200,
-        message: 'Welcome to the CDS API (' + apiVersion + ')! Docs available "VERSION/docs"'
+        message: 'Welcome to the CDS API (' + apiVersion + ')! Docs available via /docs'
     });
 });
 
@@ -160,7 +199,7 @@ router.get('/', function(req, res) {
  *                type: object
  */
 router.use(['/docs', '/api-docs'], swaggerUi.serve);
-router.get(['/docs', '/api-docs'], swaggerUi.setup(openapiSpec));
+router.get(['/docs', '/api-docs'], swaggerUi.setup(openapiSpec, swaggerOptions));
 
 /**
  * @swagger
@@ -191,6 +230,9 @@ router.get(routes, function(req, res) {
 
 // Import the other API routes before wildcard '*'
 router.use(spots);
+router.use(datasets);
+router.use(policies);
+router.use(accounts);
 
 /**
  * @swagger
@@ -227,6 +269,9 @@ router.get('*', function(req, res) {
         message: 'Not Found.'
     });
 });
+
+// All of the API routes will be prefixed with /apiVersion
+app.use('/' + apiVersion, router);
 
 // default app route redirects to current API version for now
 app.get('/', function(req, res) {

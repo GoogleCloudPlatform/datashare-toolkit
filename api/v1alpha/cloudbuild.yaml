@@ -2,9 +2,9 @@ steps:
 - name: "gcr.io/cloud-builders/docker"
   args:
   - build
-  - "--tag=gcr.io/$PROJECT_ID/cds-api-spot-service:$TAG_NAME"
+  - "--tag=gcr.io/$PROJECT_ID/cds-api:$TAG_NAME"
   - "--file=./api/v1alpha/Dockerfile"
   - .
 images:
-  - "gcr.io/$PROJECT_ID/cds-api-spot-service:$TAG_NAME"
+  - "gcr.io/$PROJECT_ID/cds-api:$TAG_NAME"
 
