@@ -1,0 +1,10 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+  - image: bqds-frontend-ui
+    context: .
+deploy:
+  kubectl:
+    manifests:
+    - ./kubernetes-manifests/bqds-frontend-ui/*.yaml

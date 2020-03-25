@@ -62,7 +62,15 @@ async function listAccounts(projectId, datasetId, policyId) {
     fields.delete('isDeleted');
     fields = Array.from(fields).join();
     const limit = 10;
-    let sqlQuery = `SELECT ${fields} FROM \`${table}\` LIMIT ${limit};`
+    let sqlQuery = `SELECT ca.* except(policies),
+        array(
+            select as struct pm.policyId, pm.name
+            from unnest(ca.policies) p
+            join \`${projectId}.datashare.currentPolicy\` pm on p.policyId = pm.policyId
+            where pm.isDeleted is false
+           ) as policies
+        FROM \`${projectId}.datashare.currentAccount\` ca
+        where ca.isDeleted is false;`
     let options = {
         query: sqlQuery
     };
@@ -72,30 +80,36 @@ async function listAccounts(projectId, datasetId, policyId) {
         fields.delete('policies');
         fields = Array.from(fields).map(i => 'up.' + i).join();
         const policyTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
-        sqlQuery = `WITH policies AS (
-            SELECT DISTINCT
+        sqlQuery = `with policies as (
+            select distinct
               cp.policyId,
               cp.name,
               d.datasetId
             FROM \`${policyTable}\` cp
-            CROSS JOIN UNNEST(cp.datasets) d
-            WHERE d.datasetId = @datasetId AND
-                (cp.isDeleted IS false OR cp.isDeleted IS null)
+            cross join unnest(cp.datasets) d
+            where d.datasetId = @datasetId and cp.isDeleted is false
           ),
-          userPolicies AS (
-            SELECT
+          userPolicies as (
+            select
               ca.* EXCEPT(policies),
               cp.policyId,
               cp.name
             FROM \`${table}\` ca
-            CROSS JOIN UNNEST(ca.policies) AS p
-            JOIN policies cp ON p.policyId = cp.policyId
-            WHERE (ca.isDeleted IS false OR ca.isDeleted IS null)
+            cross join unnest(ca.policies) as p
+            join policies cp on p.policyId = cp.policyId
+            where ca.isDeleted is false
           )
-          SELECT ${fields},
-          ARRAY_AGG(struct(policyId, name)) AS policies
-          FROM userPolicies up
-          GROUP BY ${fields}`;
+          select
+            up.rowId,
+            up.email,
+            up.emailType,
+            up.accountId,
+            up.createdAt,
+            up.createdBy,
+            up.version,
+            ARRAY_AGG(struct(policyId, name)) as policies
+          from userPolicies up
+          group by up.rowId, up.email, up.emailType, up.accountId, up.createdAt, up.createdBy, up.version`;
         options = {
             query: sqlQuery,
             params: { datasetId: datasetId }

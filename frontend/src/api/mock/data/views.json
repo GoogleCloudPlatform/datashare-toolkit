@@ -1,0 +1,14 @@
+[
+  {
+    "datasetId": "test",
+    "tableId": "ACMEX Futures",
+    "sourceDatasetId": "weather",
+    "sourceTableId": "observation"
+  },
+  {
+    "datasetId": "test",
+    "tableId": "ACMEX Swaps",
+    "sourceDatasetId": "weather",
+    "sourceTableId": "observation"
+  }
+]

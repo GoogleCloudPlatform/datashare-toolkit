@@ -1,0 +1,19 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: bqds-frontend-ui
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bqds-frontend-ui
+        version: v1
+    spec:
+      containers:
+        - name: bqds-frontend-ui
+          image: gcr.io/chrispage-dev/bqds-frontend-ui
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80

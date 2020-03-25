@@ -154,6 +154,8 @@ datasets.get('/projects/:projectId/datasets', async(req, res) => {
 datasets.post('/projects/:projectId/datasets', async(req, res) => {
     const projectId = req.params.projectId;
     const datasetId = req.body.datasetId;
+    const description = req.body.description;
+
     if (!datasetId) {
         return res.status(400).json({
             success: false,
@@ -161,7 +163,7 @@ datasets.post('/projects/:projectId/datasets', async(req, res) => {
             errors: ['dataset name parameter is required']
         });
     }
-    const data = await dataManager.createDataset(projectId, datasetId);
+    const data = await dataManager.createDataset(projectId, datasetId, description);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

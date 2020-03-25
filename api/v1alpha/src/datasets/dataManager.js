@@ -18,7 +18,7 @@
 
 const { BigQueryUtil } = require('bqds-shared');
 let bigqueryUtil = new BigQueryUtil();
-const labelName = "cds";
+const labelName = "cds_managed";
 
 /**
  * @param  {string} projectId
@@ -42,10 +42,14 @@ async function listDatasets(projectId) {
  * @param  {string} datasetId
  * Create a Dataset based off labelKey string
  */
-async function createDataset(projectId, datasetId) {
-    const labels = { [labelName]: "true" };
+async function createDataset(projectId, datasetId, description) {
+    const options = {};
+    options.labels = { [labelName]: "true" };
+    if (description) {
+        options.description = description;
+    }
     const bigqueryUtil = new BigQueryUtil(projectId);
-    const dataset = await bigqueryUtil.createDataset(datasetId, { labels: labels }).catch(err => {
+    const dataset = await bigqueryUtil.createDataset(datasetId, options).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });

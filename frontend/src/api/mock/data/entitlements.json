@@ -1,0 +1,38 @@
+[
+  {
+    "gcpAccount": "mktdata@liquidmnt.com",
+    "accessType": "groupByEmail",
+    "datasetAccess": ["Energy", "Metals"],
+    "datasetId": "test1"
+  },
+  {
+    "gcpAccount": "mktdata@goldrock.com",
+    "accessType": "groupByEmail",
+    "datasetAccess": ["Metals"],
+    "datasetId": "test2"
+  },
+  {
+    "gcpAccount": "commodities@bow.com",
+    "accessType": "groupByEmail",
+    "datasetAccess": ["Energy", "Metals", "Agriculture"],
+    "datasetId": "test1"
+  },
+  {
+    "gcpAccount": "rwm@bow.com",
+    "accessType": "userByEmail",
+    "datasetAccess": ["Energy"],
+    "datasetId": "test2"
+  },
+  {
+    "gcpAccount": "mktdata@pineroad.com",
+    "accessType": "groupByEmail",
+    "datasetAccess": [],
+    "datasetId": "test3"
+  },
+  {
+    "gcpAccount": "mktdata@bou.com",
+    "accessType": "groupByEmail",
+    "datasetAccess": ["Metals"],
+    "datasetId": "test4"
+  }
+]

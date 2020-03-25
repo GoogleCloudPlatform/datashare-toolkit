@@ -1,0 +1,27 @@
+{
+  "name": "ny_game_logs",
+  "expiration": {
+    "delete": true,
+    "time": 1597944246000,
+    "enabled": false
+  },
+  "source": {
+    "datasetId": "mlb",
+    "tableId": "game_logs",
+    "accessControl": {
+      "enabled": true,
+      "datasetEnabled": false,
+      "labelColumn": "label",
+      "labelColumnDelimiter": "|"
+    },
+    "visibleColumns": [
+      "Price",
+      "Date"
+    ],
+    "publicAccess": {
+      "enabled": true,
+      "queryFilter": "h_game_number = 1 or v_game_number = 1",
+      "limit": 20
+    }
+  }
+}

@@ -645,7 +645,7 @@ class BigQueryUtil {
             for (const dataset of datasets) {
                 const [metadata] = await dataset.getMetadata();
                 const labels = metadata.labels;
-                if (underscore.has(labels, labelKey)) {
+                if (underscore.has(labels, labelKey) || !labelKey) {
                     console.log(`${JSON.stringify(metadata, null, 3)}`);
                     let accounts = [];
                     metadata.access.forEach(a => {
@@ -660,7 +660,7 @@ class BigQueryUtil {
                             }
                         }
                     });
-                    list.push({ datasetId: dataset.id, description: metadata.description, modifiedTime: metadata.lastModifiedTime, accounts: accounts });
+                    list.push({ datasetId: dataset.id, description: metadata.description, modifiedAt: metadata.lastModifiedTime, accounts: accounts });
                 }
             }
             return list;
@@ -672,14 +672,14 @@ class BigQueryUtil {
                   schema_name,
                   REGEXP_EXTRACT_ALL(option_value, 'STRUCT\\\\([^\\\\)]+\\\\)') as value
                 FROM INFORMATION_SCHEMA.SCHEMATA_OPTIONS
-                WHERE option_name = 'labels'
+                WHERE option_name = 'labels' 
               ),
               parseSplit as (
                 select
                   catalog_name,
                   schema_name,
                   REGEXP_REPLACE(substr(substr(t, 8), 0, LENGTH(t) - 8), '["\\\\s]', '') as value
-                from parseOption po,
+                from parseOption po, 
                 unnest(po.value) as t
               ),
               labels as (
