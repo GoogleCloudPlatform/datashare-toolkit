@@ -96,11 +96,12 @@
               <ValidationProvider
                 v-slot="{ errors }"
                 name="Dataset Id"
-                rules="required|max:1024"
+                rules="required|bigQueryTableIdRule"
               >
                 <v-text-field
                   v-model="newDataset.datasetId"
                   :error-messages="errors"
+                  :counter="1024"
                   label="Dataset Id"
                   required
                 ></v-text-field>
@@ -188,6 +189,15 @@ extend('required', {
 extend('max', {
   ...max,
   message: '{_field_} may not be greater than {length} characters'
+});
+
+extend('bigQueryTableIdRule', value => {
+  if (value.length > 1024) {
+    return `DatasetId '${value}' exceeds maximum allowable length of 1024: ${value.length}}`;
+  } else if (!value.match(/^[A-Za-z0-9_]+$/g)) {
+    return `DatasetId '${value}' name is invalid. See https://cloud.google.com/bigquery/docs/datasets for further information.`;
+  }
+  return true;
 });
 
 import { mdiDatabase, mdiDotsVertical, mdiPencil, mdiPlus } from '@mdi/js';
