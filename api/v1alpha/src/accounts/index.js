@@ -225,7 +225,7 @@ accounts.post('/projects/:projectId/accounts', async(req, res) => {
         createdBy: req.body.createdBy,
         policies: req.body.policies
     };
-    const data = await dataManager.createAccount(projectId, values);
+    const data = await dataManager.createOrUpdateAccount(projectId, values);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -369,6 +369,13 @@ accounts.put('/projects/:projectId/accounts/:accountId', async(req, res) => {
             success: false,
             code: 400,
             errors: ['account email parameter is required']
+        });
+    }
+    if (!req.body.rowId) {
+        return res.status(400).json({
+            success: false,
+            code: 400,
+            errors: ['rowId parameter is required']
         });
     }
     const values = {

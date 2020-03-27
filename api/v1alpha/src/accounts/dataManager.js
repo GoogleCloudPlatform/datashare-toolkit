@@ -51,6 +51,28 @@ async function _insertData(projectId, fields, values, data) {
 }
 
 /**
+ * @param  {} projectId
+ * @param  {} fields
+ * @param  {} values
+ * @param  {} data
+ */
+async function _deleteData(projectId, fields, values, data) {
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountTableId);
+    const sqlQuery = `INSERT INTO \`${table}\` (${fields})
+        SELECT ${values}
+        FROM \`${table}\`
+        WHERE rowId = @incomingRowId`;
+
+    console.log(sqlQuery);
+    const options = {
+        query: sqlQuery,
+        params: data
+    };
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    return await bigqueryUtil.executeQuery(options);
+}
+
+/**
  * @param  {string} projectId
  * @param  {datasetId} datasetId
  * @param  {policyId} policyId
@@ -135,19 +157,41 @@ async function listAccounts(projectId, datasetId, policyId) {
  * @param  {object} data
  * Create a Account based off data values
  */
-async function createAccount(projectId, data) {
+async function createOrUpdateAccount(projectId, data) {
+    let impactedPolicies = [...data.policies];
+    const currentAccount = await getAccount(projectId, data.accountId, data.email, data.emailType);
+    let accountId;
+    if (currentAccount.success && data.accountId && data.rowId) {
+        accountId = currentAccount.data.accountId;
+        // Update logic
+        if (currentAccount.data.rowId !== data.rowId) {
+            return { success: false, code: 500, errors: ["STALE"] };
+        }
+        else {
+            impactedPolicies.push(currentAccount.policies.map(p => p.policyId));
+        }
+    }
+    else {
+        accountId = uuidv4();
+    }
+
     let fields = cfg.cdsAccountTableFields, values = cfg.cdsAccountTableFields;
     fields = Array.from(fields).join();
     values = Array.from(values).map(i => '@' + i).join();
 
     const rowId = uuidv4();
     const isDeleted = false;
-    const accountId = uuidv4();
     const createdAt = new Date().toISOString();
+    
+    // reformat policies object for saving
+    let policies = data.policies;
+    delete data.policies;
+    data.policies = policies.map(p => { return { policyId: p.policyId }; })
+
     // merge the data and extra values together
     data = {
         ...data,
-        ...{ 
+        ...{
             rowId: rowId,
             accountId: accountId,
             isDeleted: isDeleted,
@@ -159,7 +203,7 @@ async function createAccount(projectId, data) {
     const [rows] = await _insertData(projectId, fields, values, data);
     if (rows.length === 0) {
         try {
-            await metaManager.performMetadataUpdate(projectId, data.policies);
+            await metaManager.performMetadataUpdate(projectId, impactedPolicies);
         } catch (err) {
             return { success: false, code: 500, errors: [err.message] };
         }
@@ -175,58 +219,29 @@ async function createAccount(projectId, data) {
 
 /**
  * @param  {string} projectId
- * @param  {object} data
- * Updated a Account based off accountId and data values
- */
-async function updateAccount(projectId, accountId, data) {
-    let fields = cfg.cdsAccountTableFields, values = cfg.cdsAccountTableFields;
-    fields = Array.from(fields).join();
-    values = Array.from(values).map(i => '@' + i).join();
-
-    const rowId = uuidv4();
-    const isDeleted = false;
-    const createdAt = new Date().toISOString();
-    // merge the data and extra values together
-    data = {
-        ...data,
-        ...{
-            rowId: rowId,
-            accountId: accountId,
-            isDeleted: isDeleted,
-            createdAt: createdAt
-        }
-    };
-    console.log(data);
-    const [rows] = await _insertData(projectId, fields, values, data);
-    if (rows.length === 0) {
-        try {
-            await metaManager.performMetadataUpdate(projectId, data.policies);
-        } catch (err) {
-            return { success: false, code: 500, errors: [err.message] };
-        }
-        // Retrieving the record after insert makes another round-trip and is not
-        // efficient. For now, just return the original data.
-        //return await getAccount(projectId, accountId);
-        return { success: true, data: data };
-    } else {
-        const message = `Account did not update with data values: '${data}'`;
-        return { success: false, code: 500, errors: [message] };
-    }
-}
-
-/**
- * @param  {string} projectId
  * @param  {string} accountId
+ * @param  {string} email
+ * @param  {string} emailType
  * Get a Account based off projectId and accountId
  */
-async function getAccount(projectId, accountId) {
+async function getAccount(projectId, accountId, email, emailType) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
     const fields = Array.from(cfg.cdsAccountViewFields).join();
     const limit = 1;
-    const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE accountId = @accountId LIMIT ${limit};`
+    let filter = 'WHERE accountId = @accountId AND isDeleted is false';
+    let params = {};
+    if (accountId) {
+        params.accountId = accountId;
+    }
+    else if (email && emailType) {
+        filter = 'WHERE email = @email AND emailType = @emailType AND isDeleted is true';
+        params = { email: email, emailType: emailType };
+    }
+
+    const sqlQuery = `SELECT ${fields} FROM \`${table}\` ${filter} LIMIT ${limit};`
     const options = {
         query: sqlQuery,
-        params: { accountId: accountId }
+        params: params
     };
     const [rows] = await bigqueryUtil.executeQuery(options);
     if (rows.length === 1) {
@@ -244,37 +259,27 @@ async function getAccount(projectId, accountId) {
  */
 async function deleteAccount(projectId, accountId, data) {
     const currentAccount = await getAccount(projectId, accountId);
+    if (!currentAccount.success) {
+        return { success: false, code: 404, errors: ["AccountId not found"] };
+    }
     if (currentAccount.success && currentAccount.data.rowId !== data.rowId) {
         return { success: false, code: 500, errors: ["STALE"] };
     }
-    console.log(`Deleting account with uuid: ${data.rowId}`);
-    const rowId = uuidv4();
-    const sqlQuery = `insert into \`${projectId}.datashare.account\` (rowId, email, emailType, accountType, createdBy, createdAt, accountId, policies, isDeleted)
-    select @rowId, email, emailType, accountType, @createdBy, current_timestamp(), accountId, policies, true
-    from \`${projectId}.datashare.account\`
-    where rowId = @incomingRowId`
-    const options = {
-        query: sqlQuery,
-        params: { rowId: rowId, createdBy: data.createdBy, incomingRowId: data.rowId }
-    };
-    const [rows] = await bigqueryUtil.executeQuery(options);
-    console.log(`Delete account result: ${JSON.stringify(rows, null, 3)}`);
 
-    const policyQuery = `SELECT p.policyId
-    FROM \`${projectId}.datashare.account\` a
-    cross join unnest(policies) p
-    where a.rowId = @rowId`;
-    const policyOptions = {
-        query: policyQuery,
-        params: { rowId: data.rowId }
-    };
-    const [policies] = await bigqueryUtil.executeQuery(policyOptions);
-    console.log(`Get policy id's requiring refresh result ${JSON.stringify(policies, null, 3)}`);
+    let fields = cfg.cdsAccountTableFields;
+    let values = ['@rowId', 'accountId', 'email', 'emailType', 'accountType', '@createdBy', 'current_timestamp()', 'policies', 'true'];
+    fields = Array.from(fields).join();
+    values = Array.from(values).join();
+
+    const rowId = uuidv4();
+    let params = { rowId: rowId, createdBy: data.createdBy, incomingRowId: data.rowId };
+    await _deleteData(projectId, fields, values, params);
 
     let policyIds = [];
-    policies.forEach(p => {
+    currentAccount.data.policies.forEach(p => {
         policyIds.push(p.policyId);
     })
+    console.log(`Policy id's requiring refresh result ${JSON.stringify(policyIds)}`);
     if (policyIds.length > 0) {
         try {
             await metaManager.performMetadataUpdate(projectId, policyIds);
@@ -290,8 +295,7 @@ async function deleteAccount(projectId, accountId, data) {
 
 module.exports = {
     listAccounts,
-    createAccount,
-    updateAccount,
+    createOrUpdateAccount,
     deleteAccount,
     getAccount
 };
