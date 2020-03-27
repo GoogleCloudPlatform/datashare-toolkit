@@ -81,9 +81,8 @@ export default {
   },
   deleteDataset(projectId, datasetId) {
     return axios
-      .delete(this._apiBaseUrl() + '/dataset', {
+      .delete(this._apiBaseUrl() + '/datasets/' + datasetId, {
         params: {
-          projectId: projectId,
           datasetId: datasetId
         }
       })

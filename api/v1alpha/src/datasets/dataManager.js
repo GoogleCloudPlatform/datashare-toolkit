@@ -97,8 +97,23 @@ async function getDataset(projectId, datasetId) {
     return { success: true, data: data }
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} datasetId
+ */
+async function deleteDataset(projectId, datasetId) {
+    const result = await bigqueryUtil.deleteDataset(datasetId, false);
+    if (result) {
+        return { success: true }
+    }
+    else {
+        return { success: false, errors: ['Failed to delete dataset'] };
+    }
+}
+
 module.exports = {
     listDatasets,
     createDataset,
-    getDataset
+    getDataset,
+    deleteDataset
 };

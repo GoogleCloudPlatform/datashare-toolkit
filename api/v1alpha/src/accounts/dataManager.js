@@ -23,6 +23,8 @@ const uuidv4 = require('uuid/v4');
 const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');
 
+const underscore = require("underscore");
+
 /**
  * @param  {string} projectId
  * @param  {string} datasetId
@@ -159,22 +161,24 @@ async function createOrUpdateAccount(projectId, accountId, data) {
     const currentAccount = await getAccount(projectId, accountId, data.email, data.emailType);
     console.log(`currentAccount response: ${JSON.stringify(currentAccount)}`);
     if (currentAccount.success) {
-        // In case getAccount was found based on email and emailType from a previously deleted record.
-        _accountId = currentAccount.data.accountId;
         // Update logic
         if (data.rowId && currentAccount.data.rowId !== data.rowId) {
             // If user is updating an existing record, compare the rowId to ensure they're making updates from the latest record.
             return { success: false, code: 500, errors: ["STALE"] };
         }
-        else if (data.accountId && data.rowId) {
+        else if (accountId) {
             // Only merge the existing policies if user is updating an existing row.
             // If user is re-instating a deleted record, ignore the old policies.
-            impactedPolicies.push(currentAccount.policies.map(p => p.policyId));
+            impactedPolicies = underscore.union(impactedPolicies, currentAccount.data.policies.map(p => p.policyId));
         }
+        // In case getAccount was found based on email and emailType from a previously deleted record.
+        _accountId = currentAccount.data.accountId;
     }
     else {
         _accountId = uuidv4();
     }
+
+    console.log(`Impacted policies is: ${JSON.stringify(impactedPolicies, null, 3)}`);
 
     const rowId = uuidv4();
     const isDeleted = false;

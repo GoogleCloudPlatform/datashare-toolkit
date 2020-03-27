@@ -72,7 +72,12 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text color="blue darken-1" @click.stop="cancel">Cancel</v-btn>
-          <v-btn text color="green darken-1" class="mr-4" @click.stop="submit"
+          <v-btn
+            text
+            color="green darken-1"
+            class="mr-4"
+            @click.stop="submit"
+            :disabled="!hasPolicyChanges"
             >Save</v-btn
           >
         </v-card-actions>
@@ -148,32 +153,36 @@ export default {
     this.loadAccount();
     this.loadPolicies();
   },
+  computed: {
+    hasPolicyChanges() {
+      let added = [];
+      let removed = [];
+      if (
+        this.initialSelectedPolicies &&
+        this.initialSelectedPolicies.length > 0
+      ) {
+        added = this.user.policies.diff(this.initialSelectedPolicies);
+        removed = this.initialSelectedPolicies.diff(this.user.policies);
+      } else {
+        // New record, handle all as added
+        added = this.user.policies;
+      }
+      console.log(`Added: ${JSON.stringify(added)}`);
+      console.log(`Removed: ${JSON.stringify(removed)}`);
+      if (this.user.accountId && added.length === 0 && removed.length === 0) {
+        console.log('No policy changes made');
+        return false;
+      } else {
+        return true;
+      }
+    }
+  },
   methods: {
     submit() {
       this.$refs.observer.validate().then(result => {
-        let added = [];
-        let removed = [];
         if (result) {
           // https://vuejs.org/v2/guide/components-custom-events.html
-          if (
-            this.initialSelectedPolicies &&
-            this.initialSelectedPolicies.length > 0
-          ) {
-            added = this.user.policies.diff(this.initialSelectedPolicies);
-            removed = this.initialSelectedPolicies.diff(this.user.policies);
-          } else {
-            // New record, handle all as added
-            added = this.user.policies;
-          }
-          console.log(`Added: ${JSON.stringify(added)}`);
-          console.log(`Removed: ${JSON.stringify(removed)}`);
-          if (
-            this.user.accountId &&
-            added.length === 0 &&
-            removed.length === 0
-          ) {
-            console.log('No policy changes made');
-          } else {
+          if (this.hasPolicyChanges) {
             this.loading = true;
             let data = {};
             if (!this.userData) {

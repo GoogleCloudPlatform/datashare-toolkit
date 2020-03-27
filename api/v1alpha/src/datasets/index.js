@@ -240,4 +240,79 @@ datasets.get('/projects/:projectId/datasets/:datasetId', async(req, res) => {
     });
 });
 
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/datasets/{datasetId}:
+ *   delete:
+ *     summary: Delete Dataset based off dataset ID and request body
+ *     description: Returns the Account response
+ *     tags:
+ *       - accounts
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Dataset request
+ *     - in: path
+ *       name: datasetId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Dataset Id of the Dataset request
+ *     requestBody:
+ *       description: Request parameters for Dataset
+ *       content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/definitions/Dataset'
+ *     responses:
+ *       200:
+ *         description: Dataset
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   description: HTTP status code
+ *                 data:
+ *                   type: object
+ *                   items:
+ *                     $ref: '#/definitions/Dataset'
+ *       404:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
+datasets.delete('/projects/:projectId/datasets/:datasetId', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const data = await dataManager.deleteDataset(projectId, datasetId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
 module.exports = datasets;

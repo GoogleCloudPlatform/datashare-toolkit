@@ -256,7 +256,8 @@ export default {
           section: 'Ingestion',
           name: 'ingestion',
           title: 'Ingestion',
-          icon: mdiApplicationImport
+          icon: mdiApplicationImport,
+          hidden: true
         },
         {
           section: 'Spot Fulfillment',
