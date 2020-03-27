@@ -158,11 +158,14 @@ async function listAccounts(projectId, datasetId, policyId) {
  * Create a Account based off data values
  */
 async function createOrUpdateAccount(projectId, accountId, data) {
-    console.log(`createOrUpdateAccount called with: ${JSON.stringify(data, null, 3)}`);
+    console.log(`createOrUpdateAccount called with accountId: ${accountId}`);
     let _accountId = accountId;
     let impactedPolicies = Array.from(data.policies);
-    const currentAccount = await getAccount(projectId, data.accountId, data.email, data.emailType);
+    const currentAccount = await getAccount(projectId, accountId, data.email, data.emailType);
+    console.log(`currentAccount response: ${JSON.stringify(currentAccount)}`);
     if (currentAccount.success) {
+        // In case getAccount was found based on email and emailType from a previously deleted record.
+        _accountId = currentAccount.data.accountId;
         // Update logic
         if (data.rowId && currentAccount.data.rowId !== data.rowId) {
             // If user is updating an existing record, compare the rowId to ensure they're making updates from the latest record.
@@ -178,18 +181,27 @@ async function createOrUpdateAccount(projectId, accountId, data) {
         _accountId = uuidv4();
     }
 
-    let fields = cfg.cdsAccountTableFields, values = cfg.cdsAccountTableFields;
-    fields = Array.from(fields).join();
-    values = Array.from(values).map(i => '@' + i).join();
-
     const rowId = uuidv4();
     const isDeleted = false;
     const createdAt = new Date().toISOString();
-    
+
+    let fields = [...cfg.cdsAccountTableFields], values = [...cfg.cdsAccountTableFields];
+
     // reformat policies object for saving
     let policies = data.policies;
-    delete data.policies;
-    data.policies = policies.map(p => { return { policyId: p }; })
+    if (policies.length === 0) {
+        delete data.policies;
+        const index = fields.indexOf('policies');
+        if (index > -1) {
+            fields.splice(index, 1);
+            values.splice(index, 1);
+        }
+    } else {
+        data.policies = policies.map(p => { return { policyId: p }; })
+    }
+
+    fields = Array.from(fields).join();
+    values = Array.from(values).map(i => '@' + i).join();
 
     // merge the data and extra values together
     data = {
@@ -234,9 +246,11 @@ async function getAccount(projectId, accountId, email, emailType) {
     let filter = 'WHERE accountId = @accountId AND isDeleted is false';
     let params = {};
     if (accountId) {
+        console.log(`getAccount performing lookup by accountId: ${accountId}`);
         params.accountId = accountId;
     }
     else if (email && emailType) {
+        console.log(`getAccount performing lookup by email and emailType: ${email}:${emailType}`);
         filter = 'WHERE email = @email AND emailType = @emailType AND isDeleted is true';
         params = { email: email, emailType: emailType };
     }

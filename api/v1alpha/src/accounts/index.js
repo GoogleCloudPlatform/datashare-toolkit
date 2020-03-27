@@ -225,7 +225,7 @@ accounts.post('/projects/:projectId/accounts', async(req, res) => {
         createdBy: req.body.createdBy,
         policies: req.body.policies
     };
-    const data = await dataManager.createOrUpdateAccount(projectId, values);
+    const data = await dataManager.createOrUpdateAccount(projectId, null, values);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
