@@ -175,15 +175,17 @@ export default {
             console.log('No policy changes made');
           } else {
             this.loading = true;
+            const policyList = [];
+            this.user.policies.forEach(element => {
+              policyList.push({ policyId: element });
+            });
             this.$store
               .dispatch('saveAccount', {
-                projectId: this.$store.state.settings.projectId,
                 rowId: this.user.rowId,
                 accountId: this.user.accountId,
                 email: this.user.email,
                 emailType: this.user.emailType,
-                added: added,
-                removed: removed,
+                policies: policyList,
                 createdBy: this.$store.state.user.data.email
               })
               .then(() => {
@@ -199,24 +201,24 @@ export default {
     },
     loadPolicies() {
       this.loading = true;
-      this.$store
-        .dispatch('getPolicy', {
-          projectId: this.$store.state.settings.projectId
-        })
-        .then(result => {
-          this.policies = result;
-          this.loading = false;
-        });
+      this.$store.dispatch('getPolicies', {}).then(response => {
+        if (response.success) {
+          this.policies = response.data;
+        } else {
+          this.policies = [];
+        }
+        this.loading = false;
+      });
     },
     loadAccount() {
       this.loading = true;
       this.$store
         .dispatch('getAccount', {
-          projectId: this.$store.state.settings.projectId,
           accountId: this.user.accountId
         })
-        .then(account => {
-          if (account) {
+        .then(response => {
+          if (response.success) {
+            const account = response.data;
             this.user.rowId = account.rowId;
             this.user.accountId = account.accountId;
             this.user.emailType = account.emailType;

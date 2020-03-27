@@ -123,12 +123,16 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
  * TODO - This won't work for deletes currently because it uses ids. The deleted records aren't returned in views currently.
  */
 async function performMetadataUpdate(projectId, policyIds, datasetIds) {
+    console.log(`performMetadataUpdate called for policyIds: ${JSON.stringify(policyIds)} and datasetIds: ${JSON.stringify(datasetIds)}`);
     let filter = "";
-    if (policyIds) {
-        filter = "cp.policyId IN UNNEST(@policy_ids)";
+    if (policyIds && policyIds.length > 0 && datasetIds && datasetIds.length > 0) {
+        filter = "(cp.policyId IN UNNEST(@policy_ids) or (cp.isDeleted is false and d.datasetId IN UNNEST(@dataset_ids)))";
     }
-    else if (datasetIds) {
-        filter = "cp.isDeleted is false and d.datasetId IN UNNEST(@dataset_ids)";
+    if (policyIds && policyIds.length > 0) {
+        filter = "(cp.policyId IN UNNEST(@policy_ids))";
+    }
+    else if (datasetIds && datasetIds.length > 0) {
+        filter = "(cp.isDeleted is false and d.datasetId IN UNNEST(@dataset_ids))";
     }
     else {
         throw new Error("A filter must be provided");
@@ -170,23 +174,32 @@ async function performMetadataUpdate(projectId, policyIds, datasetIds) {
         params: {}
     };
 
-    if (policyIds) {
+    if (policyIds && policyIds.length > 0) {
         options.params.policy_ids = policyIds;
     }
-    else if (datasetIds) {
+    if (datasetIds && datasetIds.length > 0) {
         options.params.dataset_ids = datasetIds;
     }
 
     const [rows] = await bigqueryUtil.executeQuery(options);
     console.log(`Rows response from query: ${JSON.stringify(rows, null, 3)}`);
 
+    let updatedDatasets = [];
+
     if (policyIds) {
         for (const row of rows) {
+            updatedDatasets.push(row.datasetId);
             await performDatasetMetadataUpdate(projectId, row.datasetId, row.accounts);
         }
     }
-    else if (datasetIds) {
+
+    if (datasetIds) {
         for (const datasetId of datasetIds) {
+            // Skip if the dataset was already updated
+            if (updatedDatasets && updatedDatasets.includes(datasetId)) {
+                continue;
+            }
+            updatedDatasets.push(datasetId);
             let accounts = [];
             const found = underscore.findWhere(rows, { datasetId: datasetId });
             if (found) {

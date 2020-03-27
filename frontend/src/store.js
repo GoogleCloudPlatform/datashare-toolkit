@@ -201,14 +201,20 @@ const store = new Vuex.Store({
       });
     },
     // eslint-disable-next-line no-unused-vars
-    getAccount({ commit }, payload) {
-      return client.getAccount(payload).catch(error => {
+    getAccounts({ commit }, payload) {
+      return client.getAccounts(payload).catch(error => {
         notify(error);
       });
     },
     // eslint-disable-next-line no-unused-vars
-    getPolicy({ commit }, payload) {
-      return client.getPolicy(payload).catch(error => {
+    getAccount({ commit }, payload) {
+      return client.getAccount(payload.accountId).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getPolicies({ commit }, payload) {
+      return client.getPolicies().catch(error => {
         notify(error);
       });
     },
@@ -232,9 +238,14 @@ const store = new Vuex.Store({
     },
     // eslint-disable-next-line no-unused-vars
     deleteAccount({ commit }, payload) {
-      return client.deleteAccount(payload).catch(error => {
-        notify(error);
-      });
+      return client
+        .deleteAccount(payload.accountId, {
+          rowId: payload.rowId,
+          createdBy: payload.createdBy
+        })
+        .catch(error => {
+          notify(error);
+        });
     },
     // eslint-disable-next-line no-unused-vars
     deleteView({ commit }, payload) {

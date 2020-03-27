@@ -135,7 +135,8 @@ var accounts = express.Router();
  */
 accounts.get('/projects/:projectId/accounts', async(req, res) => {
     const projectId = req.params.projectId;
-    const data = await dataManager.listAccounts(projectId);
+    const datasetId = req.query.datasetId;
+    const data = await dataManager.listAccounts(projectId, datasetId);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -208,6 +209,13 @@ accounts.post('/projects/:projectId/accounts', async(req, res) => {
             success: false,
             code: 400,
             errors: ['account email parameter is required']
+        });
+    }
+    if (req.body.rowId || req.body.accountId) {
+        return res.status(400).json({
+            success: false,
+            code: 400,
+            errors: ['rowId and accountId should not be provided']
         });
     }
     const values = {
@@ -446,11 +454,8 @@ accounts.delete('/projects/:projectId/accounts/:accountId', async(req, res) => {
     const projectId = req.params.projectId;
     const accountId = req.params.accountId;
     const values = {
-        email: req.body.email,
-        emailType: req.body.emailType,
-        accountType: req.body.accountType,
-        createdBy: req.body.createdBy,
-        policies: req.body.policies
+        rowId: req.body.rowId,
+        createdBy: req.body.createdBy
     };
     const data = await dataManager.deleteAccount(projectId, accountId, values);
     var code;

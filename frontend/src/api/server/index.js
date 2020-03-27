@@ -11,6 +11,17 @@ const validContentTypes = [
   'application/json; charset=utf-8'
 ];
 
+/*axios.interceptors.request.use(function(config) {
+  if (store.getters.user) {
+    console.log(`User object is ${JSON.stringify(store.getters.user)}`);
+    const account = store.state.user.data.email;
+    if (account) {
+      config.headers.GcpAccount = account;
+    }
+  }
+  return config;
+});*/
+
 // reject anything that is not application/json
 axios.interceptors.response.use(
   response => {
@@ -111,39 +122,19 @@ export default {
       })
       .then(response => response);
   },
-  getAccount(payload) {
+  getAccounts(payload) {
     return axios
       .get(this._apiBaseUrl() + '/accounts', {
         params: {
-          accountId: payload.accountId,
           datasetId: payload.datasetId
         }
       })
       .then(response => response);
   },
-  getEntitlementsOld(
-    projectId,
-    datasetId,
-    gcpAccount,
-    accessType,
-    groupByUser
-  ) {
+  getAccount(accountId) {
     return axios
-      .get(this._apiBaseUrl() + '/entitlementsOld', {
-        params: {
-          projectId: projectId,
-          datasetId: datasetId,
-          gcpAccount: gcpAccount,
-          accessType: accessType,
-          groupByUser: groupByUser
-        }
-      })
-      .then(response => response);
-  },
-  deleteEntitlementsOld(items) {
-    return axios
-      .delete(this._apiBaseUrl() + '/entitlementsOld', {
-        data: { entitlements: items }
+      .get(this._apiBaseUrl() + '/accounts/' + accountId, {
+        params: {}
       })
       .then(response => response);
   },
@@ -156,22 +147,7 @@ export default {
       )}`
     );
     return axios
-      .patch(this._apiBaseUrl() + '/account', payload)
-      .then(response => response);
-  },
-  updateAccountEntitlementsOld(gcpAccount, accessType, added, removed) {
-    console.log(
-      `Performing account entitlement update for: gcpAccount: ${gcpAccount}, accessType: ${accessType}, added: ${JSON.stringify(
-        added
-      )}, removed: ${JSON.stringify(removed)}`
-    );
-    return axios
-      .put(this._apiBaseUrl() + '/accountEntitlementsOld', {
-        gcpAccount: gcpAccount,
-        accessType: accessType,
-        added: added,
-        removed: removed
-      })
+      .post(this._apiBaseUrl() + '/accounts', payload)
       .then(response => response);
   },
   getView(payload) {
@@ -213,11 +189,9 @@ export default {
       .post(this._apiBaseUrl() + '/validateView', payload)
       .then(response => response);
   },
-  getPolicy(payload) {
+  getPolicies() {
     return axios
-      .get(this._apiBaseUrl() + '/policy', {
-        params: payload
-      })
+      .get(this._apiBaseUrl() + '/policies', {})
       .then(response => response);
   },
   syncAllPolicies(payload) {
@@ -240,9 +214,9 @@ export default {
       })
       .then(response => response);
   },
-  deleteAccount(payload) {
+  deleteAccount(accountId, payload) {
     return axios
-      .delete(this._apiBaseUrl() + '/account', {
+      .delete(this._apiBaseUrl() + '/accounts/' + accountId, {
         data: payload
       })
       .then(response => response);

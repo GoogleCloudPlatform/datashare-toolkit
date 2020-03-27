@@ -30,7 +30,7 @@ async function listDatasets(projectId) {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
-    if (datasets === undefined || datasets.length == 0) {
+    if (datasets === undefined) {
         const message = `Datasets do not exist with labelKey: '${labelKey}'`;
         return { success: false, code: 400, errors: [message] };
     }

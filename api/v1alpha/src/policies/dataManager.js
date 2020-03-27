@@ -59,7 +59,17 @@ async function listPolicies(projectId, datasetId, accountId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const fields = Array.from(cfg.cdsPolicyViewFields).join();
     const limit = 10;
-    let sqlQuery = `SELECT ${fields} FROM \`${table}\` LIMIT ${limit};`
+    let sqlQuery = `with accountCounts AS (
+        select p.policyId, count(ca.accountId) as count
+        from \`${projectId}.datashare.currentAccount\` ca
+        cross join unnest(policies) p
+        where ca.isDeleted is false
+        group by p.policyId
+      )
+    SELECT rowId, cp.policyId, name, description, createdAt, createdBy, version, ifnull(ac.count, 0) as accountCount
+    FROM \`${projectId}.datashare.currentPolicy\` cp
+    left join accountCounts ac on ac.policyId = cp.policyId
+    where cp.isDeleted is false;`;
     let options = {
         query: sqlQuery
     };
@@ -114,7 +124,8 @@ async function createPolicy(projectId, data) {
     const policyId = uuidv4();
     let createdAt = new Date().toISOString();
     // merge the data and extra values together
-    data = {...data,
+    data = {
+        ...data,
         ...{
             rowId: rowId,
             policyId: policyId,
@@ -131,7 +142,7 @@ async function createPolicy(projectId, data) {
             // cleanup and don't wait
             isDeleted = true;
             createdAt = new Date().toISOString();
-            data = {...data, ...{ isDeleted: isDeleted, createdAt: createdAt } };
+            data = { ...data, ...{ isDeleted: isDeleted, createdAt: createdAt } };
             _insertData(projectId, fields, values, data);
             return { success: false, code: 500, errors: [err.message] };
         }
@@ -159,7 +170,8 @@ async function updatePolicy(projectId, policyId, data) {
     const isDeleted = true;
     const createdAt = new Date().toISOString();
     // merge the data and extra values together
-    data = {...data,
+    data = {
+        ...data,
         ...{
             rowId: rowId,
             policyId: policyId,
@@ -222,7 +234,8 @@ async function deletePolicy(projectId, policyId, data) {
     const isDeleted = true;
     const createdAt = new Date().toISOString();
     // merge the data and extra values together
-    data = {...data,
+    data = {
+        ...data,
         ...{
             rowId: rowId,
             policyId: policyId,

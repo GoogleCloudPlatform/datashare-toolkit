@@ -145,12 +145,14 @@ async function createAccount(projectId, data) {
     const accountId = uuidv4();
     const createdAt = new Date().toISOString();
     // merge the data and extra values together
-    data = {...data,
-        ...{
+    data = {
+        ...data,
+        ...{ 
             rowId: rowId,
             accountId: accountId,
             isDeleted: isDeleted,
-            createdAt: createdAt
+            createdAt: createdAt,
+            accountType: 'consumer'
         }
     };
     console.log(data);
@@ -185,7 +187,8 @@ async function updateAccount(projectId, accountId, data) {
     const isDeleted = false;
     const createdAt = new Date().toISOString();
     // merge the data and extra values together
-    data = {...data,
+    data = {
+        ...data,
         ...{
             rowId: rowId,
             accountId: accountId,
@@ -240,27 +243,41 @@ async function getAccount(projectId, accountId) {
  * Updated a Account based off accountId and data values
  */
 async function deleteAccount(projectId, accountId, data) {
-    let fields = cfg.cdsAccountTableFields, values = cfg.cdsAccountTableFields;
-    fields = Array.from(fields).join();
-    values = Array.from(values).map(i => '@' + i).join();
-
+    const currentAccount = await getAccount(projectId, accountId);
+    if (currentAccount.success && currentAccount.data.rowId !== data.rowId) {
+        return { success: false, code: 500, errors: ["STALE"] };
+    }
+    console.log(`Deleting account with uuid: ${data.rowId}`);
     const rowId = uuidv4();
-    const isDeleted = true;
-    const createdAt = new Date().toISOString();
-    // merge the data and extra values together
-    data = {...data,
-        ...{
-            rowId: rowId,
-            accountId: accountId,
-            createdAt: createdAt,
-            isDeleted: isDeleted
-        }
+    const sqlQuery = `insert into \`${projectId}.datashare.account\` (rowId, email, emailType, accountType, createdBy, createdAt, accountId, policies, isDeleted)
+    select @rowId, email, emailType, accountType, @createdBy, current_timestamp(), accountId, policies, true
+    from \`${projectId}.datashare.account\`
+    where rowId = @incomingRowId`
+    const options = {
+        query: sqlQuery,
+        params: { rowId: rowId, createdBy: data.createdBy, incomingRowId: data.rowId }
     };
-    console.log(data);
-    const [rows] = await _insertData(projectId, fields, values, data);
-    if (rows.length === 0) {
+    const [rows] = await bigqueryUtil.executeQuery(options);
+    console.log(`Delete account result: ${JSON.stringify(rows, null, 3)}`);
+
+    const policyQuery = `SELECT p.policyId
+    FROM \`${projectId}.datashare.account\` a
+    cross join unnest(policies) p
+    where a.rowId = @rowId`;
+    const policyOptions = {
+        query: policyQuery,
+        params: { rowId: data.rowId }
+    };
+    const [policies] = await bigqueryUtil.executeQuery(policyOptions);
+    console.log(`Get policy id's requiring refresh result ${JSON.stringify(policies, null, 3)}`);
+
+    let policyIds = [];
+    policies.forEach(p => {
+        policyIds.push(p.policyId);
+    })
+    if (policyIds.length > 0) {
         try {
-            await metaManager.performMetadataUpdate(projectId, data.policies);
+            await metaManager.performMetadataUpdate(projectId, policyIds);
         } catch (err) {
             return { success: false, code: 500, errors: [err.message] };
         }

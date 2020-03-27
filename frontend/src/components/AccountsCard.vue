@@ -183,6 +183,8 @@ export default {
   created() {
     if (this.selectedDataset) {
       this.showAddAccountButton = false;
+    } else if (this.$route.query.datasetId) {
+      this.selectedDataset = { datasetId: this.$route.query.datasetId };
     }
     this.loadAccounts();
   },
@@ -233,8 +235,7 @@ export default {
     loadAccounts() {
       this.loading = true;
       this.$store
-        .dispatch('getAccount', {
-          projectId: this.$store.state.settings.projectId,
+        .dispatch('getAccounts', {
           datasetId: this.datasetId
         })
         .then(response => {
@@ -250,7 +251,6 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('deleteAccount', {
-          projectId: this.$store.state.settings.projectId,
           rowId: item.rowId,
           accountId: item.accountId,
           createdBy: this.$store.state.user.data.email
