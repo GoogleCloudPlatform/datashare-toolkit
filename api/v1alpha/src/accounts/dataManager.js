@@ -144,12 +144,7 @@ async function listAccounts(projectId, datasetId, policyId) {
         };
     }
     const [rows] = await bigqueryUtil.executeQuery(options);
-    if (rows.length >= 1) {
-        return { success: true, data: rows };
-    } else {
-        const message = `Account(s) do not exist with in table/view: '${table}'`;
-        return { success: false, code: 400, errors: [message] };
-    }
+    return { success: true, data: rows };
 }
 
 /**
