@@ -171,14 +171,14 @@ export default {
     },
     loadPolicies() {
       this.loading = true;
-      this.$store
-        .dispatch('getPolicy', {
-          projectId: this.$store.state.settings.projectId
-        })
-        .then(result => {
-          this.policies = result;
-          this.loading = false;
-        });
+      this.$store.dispatch('getPolicies', {}).then(response => {
+        if (response.success) {
+          this.policies = response.data;
+        } else {
+          this.policies = [];
+        }
+        this.loading = false;
+      });
     },
     toLocalTime(epoch) {
       let d = new Date(epoch);
