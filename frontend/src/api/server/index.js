@@ -146,9 +146,17 @@ export default {
         payload.removed
       )}`
     );
-    return axios
-      .post(this._apiBaseUrl() + '/accounts', payload)
-      .then(response => response);
+    if (!payload.accountId) {
+      return axios
+        .post(this._apiBaseUrl() + '/accounts', payload)
+        .then(response => response);
+    } else {
+      let accountId = payload.accountId;
+      delete payload.accountId;
+      return axios
+        .put(this._apiBaseUrl() + '/accounts/' + accountId, payload)
+        .then(response => response);
+    }
   },
   getView(payload) {
     return axios

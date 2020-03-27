@@ -385,7 +385,7 @@ accounts.put('/projects/:projectId/accounts/:accountId', async(req, res) => {
         createdBy: req.body.createdBy,
         policies: req.body.policies
     };
-    const data = await dataManager.updateAccount(projectId, accountId, values);
+    const data = await dataManager.createOrUpdateAccount(projectId, accountId, values);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

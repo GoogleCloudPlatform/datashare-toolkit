@@ -175,23 +175,31 @@ export default {
             console.log('No policy changes made');
           } else {
             this.loading = true;
-            const policyList = [];
-            this.user.policies.forEach(element => {
-              policyList.push({ policyId: element });
-            });
-            this.$store
-              .dispatch('saveAccount', {
+            let data = {};
+            if (!this.userData) {
+              // New account
+              data = {
+                email: this.user.email,
+                emailType: this.user.emailType,
+                policies: this.user.policies,
+                createdBy: this.$store.state.user.data.email
+              };
+            } else {
+              // Existing account
+              data = {
                 rowId: this.user.rowId,
                 accountId: this.user.accountId,
                 email: this.user.email,
                 emailType: this.user.emailType,
-                policies: policyList,
+                policies: this.user.policies,
                 createdBy: this.$store.state.user.data.email
-              })
-              .then(() => {
-                this.loading = false;
-                this.$emit('close');
-              });
+              };
+            }
+
+            this.$store.dispatch('saveAccount', data).then(() => {
+              this.loading = false;
+              this.$emit('close');
+            });
           }
         }
       });

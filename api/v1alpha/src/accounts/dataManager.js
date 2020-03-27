@@ -157,22 +157,25 @@ async function listAccounts(projectId, datasetId, policyId) {
  * @param  {object} data
  * Create a Account based off data values
  */
-async function createOrUpdateAccount(projectId, data) {
-    let impactedPolicies = [...data.policies];
+async function createOrUpdateAccount(projectId, accountId, data) {
+    console.log(`createOrUpdateAccount called with: ${JSON.stringify(data, null, 3)}`);
+    let _accountId = accountId;
+    let impactedPolicies = Array.from(data.policies);
     const currentAccount = await getAccount(projectId, data.accountId, data.email, data.emailType);
-    let accountId;
-    if (currentAccount.success && data.accountId && data.rowId) {
-        accountId = currentAccount.data.accountId;
+    if (currentAccount.success) {
         // Update logic
-        if (currentAccount.data.rowId !== data.rowId) {
+        if (data.rowId && currentAccount.data.rowId !== data.rowId) {
+            // If user is updating an existing record, compare the rowId to ensure they're making updates from the latest record.
             return { success: false, code: 500, errors: ["STALE"] };
         }
-        else {
+        else if (data.accountId && data.rowId) {
+            // Only merge the existing policies if user is updating an existing row.
+            // If user is re-instating a deleted record, ignore the old policies.
             impactedPolicies.push(currentAccount.policies.map(p => p.policyId));
         }
     }
     else {
-        accountId = uuidv4();
+        _accountId = uuidv4();
     }
 
     let fields = cfg.cdsAccountTableFields, values = cfg.cdsAccountTableFields;
@@ -186,14 +189,14 @@ async function createOrUpdateAccount(projectId, data) {
     // reformat policies object for saving
     let policies = data.policies;
     delete data.policies;
-    data.policies = policies.map(p => { return { policyId: p.policyId }; })
+    data.policies = policies.map(p => { return { policyId: p }; })
 
     // merge the data and extra values together
     data = {
         ...data,
         ...{
             rowId: rowId,
-            accountId: accountId,
+            accountId: _accountId,
             isDeleted: isDeleted,
             createdAt: createdAt,
             accountType: 'consumer'
@@ -209,7 +212,7 @@ async function createOrUpdateAccount(projectId, data) {
         }
         // Retrieving the record after insert makes another round-trip and is not
         // efficient. For now, just return the original data.
-        //return await getAccount(projectId, accountId);
+        // return await getAccount(projectId, accountId);
         return { success: true, data: data };
     } else {
         const message = `Account did not create with data values: '${data}'`;
