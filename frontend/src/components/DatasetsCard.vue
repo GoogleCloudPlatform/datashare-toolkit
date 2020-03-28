@@ -53,6 +53,7 @@
               <v-list-item-title>Accounts</v-list-item-title>
             </v-list-item>
             <v-list-item
+              v-if="false"
               key="ingestion"
               @click="navigateIngestion(item.datasetId)"
             >
