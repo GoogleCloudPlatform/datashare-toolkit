@@ -159,7 +159,6 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('deletePolicy', {
-          projectId: this.$store.state.settings.projectId,
           rowId: item.rowId,
           policyId: item.policyId,
           createdBy: this.$store.state.user.data.email

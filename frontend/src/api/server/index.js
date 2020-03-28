@@ -81,7 +81,7 @@ export default {
   },
   deleteDataset(projectId, datasetId) {
     return axios
-      .delete(this._apiBaseUrl() + '/datasets/' + datasetId, {
+      .delete(this._apiBaseUrl() + `/datasets/${datasetId}`, {
         params: {
           datasetId: datasetId
         }
@@ -132,7 +132,7 @@ export default {
   },
   getAccount(accountId) {
     return axios
-      .get(this._apiBaseUrl() + '/accounts/' + accountId)
+      .get(this._apiBaseUrl() + `/accounts/${accountId}`)
       .then(response => response);
   },
   saveAccount(payload) {
@@ -151,7 +151,7 @@ export default {
       let accountId = payload.accountId;
       delete payload.accountId;
       return axios
-        .put(this._apiBaseUrl() + '/accounts/' + accountId, payload)
+        .put(this._apiBaseUrl() + `/accounts/${accountId}`, payload)
         .then(response => response);
     }
   },
@@ -201,7 +201,7 @@ export default {
   },
   getPolicy(policyId) {
     return axios
-      .get(this._apiBaseUrl() + '/policies/' + policyId)
+      .get(this._apiBaseUrl() + `/policies/${policyId}`)
       .then(response => response);
   },
   syncAllPolicies(payload) {
@@ -215,16 +215,16 @@ export default {
       .get(this._apiBaseUrl() + `/policies/${policyId}/accounts`)
       .then(response => response);
   },
-  deletePolicy(payload) {
+  deletePolicy(policyId, payload) {
     return axios
-      .delete(this._apiBaseUrl() + '/policy', {
+      .delete(this._apiBaseUrl() + `/policies/${policyId}`, {
         data: payload
       })
       .then(response => response);
   },
   deleteAccount(accountId, payload) {
     return axios
-      .delete(this._apiBaseUrl() + '/accounts/' + accountId, {
+      .delete(this._apiBaseUrl() + `/accounts/${accountId}`, {
         data: payload
       })
       .then(response => response);

@@ -430,11 +430,8 @@ policies.delete('/projects/:projectId/policies/:policyId', async(req, res) => {
     const projectId = req.params.projectId;
     const policyId = req.params.policyId;
     const values = {
-        name: req.body.name,
-        description: req.body.description,
-        createdBy: req.body.createdBy,
-        datasets: req.body.datasets,
-        rowAccessTags: req.body.rowAccessTags
+        rowId: req.body.rowId,
+        createdBy: req.body.createdBy
     };
     const data = await dataManager.deletePolicy(projectId, policyId, values);
     var code;

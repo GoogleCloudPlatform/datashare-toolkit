@@ -51,6 +51,28 @@ async function _insertData(projectId, fields, values, data) {
 }
 
 /**
+ * @param  {} projectId
+ * @param  {} fields
+ * @param  {} values
+ * @param  {} data
+ */
+async function _deleteData(projectId, fields, values, data) {
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyTableId);
+    const sqlQuery = `INSERT INTO \`${table}\` (${fields})
+        SELECT ${values}
+        FROM \`${table}\`
+        WHERE rowId = @incomingRowId`;
+
+    console.log(sqlQuery);
+    const options = {
+        query: sqlQuery,
+        params: data
+    };
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    return await bigqueryUtil.executeQuery(options);
+}
+
+/**
  * @param  {string} projectId
  * @param  {string} datasetId
  * Get a list of Policies
@@ -222,41 +244,34 @@ async function getPolicy(projectId, policyId) {
 
 /**
  * @param  {string} projectId
+ * @param  {string} policyId
  * @param  {object} data
  * Updated a Policy based off policyId and data values
  */
 async function deletePolicy(projectId, policyId, data) {
-    let fields = cfg.cdsPolicyTableFields, values = cfg.cdsPolicyTableFields;
+    const currentPolicy = await getPolicy(projectId, policyId);
+    if (!currentPolicy.success) {
+        return { success: false, code: 404, errors: ["PolicyId not found"] };
+    }
+    if (currentPolicy.success && currentPolicy.data.rowId !== data.rowId) {
+        return { success: false, code: 500, errors: ["STALE"] };
+    }
+
+    let fields = cfg.cdsPolicyTableFields;
+    let values = ['@rowId', 'policyId', 'name', 'description', 'datasets', 'rowAccessTags', '@createdBy', 'current_timestamp()', 'true'];
     fields = Array.from(fields).join();
-    values = Array.from(values).map(i => '@' + i).join();
+    values = Array.from(values).join();
 
     const rowId = uuidv4();
-    const isDeleted = true;
-    const createdAt = new Date().toISOString();
-    // merge the data and extra values together
-    data = {
-        ...data,
-        ...{
-            rowId: rowId,
-            policyId: policyId,
-            createdAt: createdAt,
-            isDeleted: isDeleted
-        }
-    };
-    console.log(data);
-    const [rows] = await _insertData(projectId, fields, values, data);
-    if (rows.length === 0) {
-        try {
-            // TODO - This will not work as the object was already deleted.
-            await metaManager.performMetadataUpdate(projectId, [policyId]);
-        } catch (err) {
-            return { success: false, code: 500, errors: [err.message] };
-        }
-        return { success: true, data: {} };
-    } else {
-        const message = `Policy did not delete with data values: '${data}'`;
-        return { success: false, code: 500, errors: [message] };
+    let params = { rowId: rowId, createdBy: data.createdBy, incomingRowId: data.rowId };
+    await _deleteData(projectId, fields, values, params);
+
+    try {
+        await metaManager.performMetadataUpdate(projectId, [policyId]);
+    } catch (err) {
+        return { success: false, code: 500, errors: [err.message] };
     }
+    return { success: true, data: {} };
 }
 
 module.exports = {

@@ -237,9 +237,14 @@ const store = new Vuex.Store({
     },
     // eslint-disable-next-line no-unused-vars
     deletePolicy({ commit }, payload) {
-      return client.deletePolicy(payload).catch(error => {
-        notify(error);
-      });
+      return client
+        .deletePolicy(payload.policyId, {
+          rowId: payload.rowId,
+          createdBy: payload.createdBy
+        })
+        .catch(error => {
+          notify(error);
+        });
     },
     // eslint-disable-next-line no-unused-vars
     deleteAccount({ commit }, payload) {

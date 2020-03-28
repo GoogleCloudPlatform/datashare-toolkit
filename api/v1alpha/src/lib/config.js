@@ -30,7 +30,7 @@ config.cdsAccountViewFields = new Set(['rowId', 'accountId', 'email', 'emailType
 
 config.cdsPolicyTableId = "policy";
 config.cdsPolicyTableFields = new Set(['rowId', 'policyId', 'name', 'description',
-    'createdAt', 'createdBy', 'datasets', 'rowAccessTags', 'isDeleted']);
+    'datasets', 'rowAccessTags', 'createdBy', 'createdAt', 'isDeleted']);
 
 config.cdsPolicyViewId = "currentPolicy";
 config.cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description',
