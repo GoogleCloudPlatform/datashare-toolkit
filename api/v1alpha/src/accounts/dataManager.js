@@ -37,6 +37,8 @@ function getTableFqdn(projectId, datasetId, tableId) {
 
 /**
  * @param  {string} projectId
+ * @param  {object} fields
+ * @param  {object} values
  * @param  {object} data
  * Insert account data
  */
@@ -163,7 +165,7 @@ async function listAccounts(projectId, datasetId, policyId) {
  * Create a Account based off data values
  */
 async function createOrUpdateAccount(projectId, accountId, data) {
-    console.log(`createOrUpdateAccount called with accountId: ${accountId}`);
+    console.log(`createOrUpdateAccount called with accountId: ${accountId} and data: ${JSON.stringify(data)}`);
     let _accountId = accountId;
     let impactedPolicies = Array.from(data.policies);
     const currentAccount = await getAccount(projectId, accountId, data.email, data.emailType);

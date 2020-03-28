@@ -35,6 +35,8 @@ function getTableFqdn(projectId, datasetId, tableId) {
 
 /**
  * @param  {string} projectId
+ * @param  {object} fields
+ * @param  {object} values
  * @param  {object} data
  * Insert policy data
  */
@@ -75,6 +77,7 @@ async function _deleteData(projectId, fields, values, data) {
 /**
  * @param  {string} projectId
  * @param  {string} datasetId
+ * @param  {string} accountId
  * Get a list of Policies
  */
 async function listPolicies(projectId, datasetId, accountId) {
@@ -138,11 +141,12 @@ async function listPolicies(projectId, datasetId, accountId) {
  * Create a Policy based off data values
  */
 async function createOrUpdatePolicy(projectId, policyId, data) {
-    console.log(`createOrUpdateAccount called with policyId: ${policyId}`);
+    console.log(`createOrUpdateAccount called with policyId: ${policyId} and data: ${JSON.stringify(data)}`);
     let _policyId = policyId;
     let previousDatasetIds = [];
     if (policyId) {
         const currentPolicy = await getPolicy(projectId, policyId);
+        console.log(`currentPolicy response: ${JSON.stringify(currentPolicy)}`);
         if (currentPolicy.success) {
             if (currentPolicy && currentPolicy.data.rowId !== data.rowId) {
                 // If user is updating an existing record, compare the rowId to ensure they're making updates from the latest record.

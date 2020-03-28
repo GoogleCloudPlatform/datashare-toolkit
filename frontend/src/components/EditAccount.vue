@@ -161,8 +161,8 @@ export default {
       this.user.email = this.userData.email;
       this.user.policies = this.userData.policies;
       this.initialSelectedPolicies = this.userData.policies;
+      this.loadAccount();
     }
-    this.loadAccount();
     this.loadPolicies();
   },
   computed: {

@@ -637,8 +637,6 @@ class BigQueryUtil {
      */
     async getDatasetsByLabel(projectId, labelKey) {
         let accessTypes = ["userByEmail", "groupByEmail"];
-
-        // let bqClient = new BigQuery({ projectId: projectId });
         if (!QUERY_FOR_LABELS) {
             const [datasets] = await this.bigqueryClient.getDatasets();
             let list = [];
@@ -646,7 +644,6 @@ class BigQueryUtil {
                 const [metadata] = await dataset.getMetadata();
                 const labels = metadata.labels;
                 if (underscore.has(labels, labelKey) || !labelKey) {
-                    console.log(`${JSON.stringify(metadata, null, 3)}`);
                     let accounts = [];
                     metadata.access.forEach(a => {
                         if (a.role === 'READER') {

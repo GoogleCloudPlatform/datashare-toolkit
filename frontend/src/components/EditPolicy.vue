@@ -437,7 +437,7 @@ export default {
 
           this.loading = true;
           let data = {};
-          if (!this.userData) {
+          if (!this.policyData) {
             // New account
             data = {
               name: this.policy.name,

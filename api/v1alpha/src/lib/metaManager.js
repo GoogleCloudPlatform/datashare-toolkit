@@ -57,12 +57,11 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
     let i = metadata.access.length;
     while (i--) {
         let a = metadata.access[i];
-        // console.log(`Access record: ${JSON.stringify(a)}`);
         if (a.view && a.view.projectId && a.view.datasetId && a.view.tableId) {
-            console.log(`Check if view exists: ${a.view.datasetId}.${a.view.tableId}`);
             const _viewExists = await bigqueryUtil.viewExists(a.view.datasetId, a.view.tableId);
             // If view no longer exists, remove it.
             if (_viewExists === false) {
+                console.log(`Removing authorized view as it does not exist: ${a.view.datasetId}.${a.view.tableId}`);
                 metadata.access.splice(i, 1);
                 isDirty = true;
             }
@@ -74,15 +73,11 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
             if (aKeys.length === 2) {
                 const accessType = aKeys[1];
                 const accessId = a[accessType];
-
                 if (accessTypes.includes(accessType)) {
                     // If we find the record, remove it
-                    console.log(`Found user: ${accessType}:${accessId}, deleting`);
+                    console.log(`Deleting user: ${accessType}:${accessId} from datasetId: ${datasetId}`);
                     metadata.access.splice(i, 1);
                     isDirty = true;
-                }
-                else {
-                    console.log(`Skipping access type: ${accessType}`);
                 }
             }
         }
@@ -110,7 +105,6 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
         } catch (err) {
             throw err;
         }
-        console.log(`Metadata updated to: ${JSON.stringify(metadata, null, 3)}`);
     }
 
     return isDirty;
@@ -182,7 +176,7 @@ async function performMetadataUpdate(projectId, policyIds, datasetIds) {
     }
 
     const [rows] = await bigqueryUtil.executeQuery(options);
-    console.log(`Rows response from query: ${JSON.stringify(rows, null, 3)}`);
+    console.log(`User access to update: ${JSON.stringify(rows, null, 3)}`);
 
     let updatedDatasets = [];
 

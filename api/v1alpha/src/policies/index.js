@@ -362,6 +362,7 @@ policies.put('/projects/:projectId/policies/:policyId', async(req, res) => {
         });
     }
     const values = {
+        rowId: req.body.rowId,
         name: req.body.name,
         description: req.body.description,
         createdBy: req.body.createdBy,

@@ -379,6 +379,7 @@ accounts.put('/projects/:projectId/accounts/:accountId', async(req, res) => {
         });
     }
     const values = {
+        rowId: req.body.rowId,
         email: req.body.email,
         emailType: req.body.emailType,
         accountType: req.body.accountType,
