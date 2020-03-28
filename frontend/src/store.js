@@ -130,43 +130,10 @@ const store = new Vuex.Store({
         });
     },
     // eslint-disable-next-line no-unused-vars
-    getEntitlementsOld({ commit }, payload) {
-      return client
-        .getEntitlementsOld(
-          payload.projectId,
-          payload.datasetId,
-          payload.gcpAccount,
-          payload.accessType,
-          payload.groupByUser
-        )
-        .catch(error => {
-          notify(error);
-        });
-    },
-    // eslint-disable-next-line no-unused-vars
-    deleteEntitlementsOld({ commit }, payload) {
-      return client.deleteEntitlementsOld(payload.entitlements).catch(error => {
-        notify(error);
-      });
-    },
-    // eslint-disable-next-line no-unused-vars
     saveAccount({ commit }, payload) {
       return client.saveAccount(payload).catch(error => {
         notify(error);
       });
-    },
-    // eslint-disable-next-line no-unused-vars
-    updateAccountEntitlementsOld({ commit }, payload) {
-      return client
-        .updateAccountEntitlementsOld(
-          payload.gcpAccount,
-          payload.accessType,
-          payload.added,
-          payload.removed
-        )
-        .catch(error => {
-          notify(error);
-        });
     },
     // eslint-disable-next-line no-unused-vars
     getIngestion({ commit }, payload) {

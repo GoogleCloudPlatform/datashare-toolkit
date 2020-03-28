@@ -436,35 +436,47 @@ export default {
           }
 
           this.loading = true;
-          this.$store
-            .dispatch('savePolicy', {
+          let data = {};
+          if (!this.userData) {
+            // New account
+            data = {
+              name: this.policy.name,
+              description: this.policy.description,
+              createdBy: this.$store.state.user.data.email,
+              datasets: this.policy.datasets,
+              rowAccessTags: this.policy.rowAccessTags
+            };
+          } else {
+            // Existing account
+            data = {
               rowId: this.policy.rowId,
-              projectId: this.$store.state.settings.projectId,
               policyId: this.policy.policyId,
               name: this.policy.name,
               description: this.policy.description,
               createdBy: this.$store.state.user.data.email,
               datasets: this.policy.datasets,
               rowAccessTags: this.policy.rowAccessTags
-            })
-            .then(result => {
-              this.loading = false;
+            };
+          }
 
-              if (result.error && result.error === 'STALE') {
-                this.errorDialogTitle = 'Policy data is stale';
-                this.errorDialogText =
-                  'This policy has been updated since you last refreshed the page, please reload the page to make changes.';
-                this.showError = true;
-              } else if (result.error) {
-                this.errorDialogTitle = 'Error saving policy';
-                this.errorDialogText =
-                  'Failed to save policy. Please reload and try again.';
-                this.showError = true;
-              } else {
-                // Success
-                this.$emit('close');
-              }
-            });
+          this.$store.dispatch('savePolicy', data).then(result => {
+            this.loading = false;
+
+            if (result.error && result.error === 'STALE') {
+              this.errorDialogTitle = 'Policy data is stale';
+              this.errorDialogText =
+                'This policy has been updated since you last refreshed the page, please reload the page to make changes.';
+              this.showError = true;
+            } else if (result.error) {
+              this.errorDialogTitle = 'Error saving policy';
+              this.errorDialogText =
+                'Failed to save policy. Please reload and try again.';
+              this.showError = true;
+            } else {
+              // Success
+              this.$emit('close');
+            }
+          });
         }
       });
     },
@@ -472,11 +484,14 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getDatasets', {
-          projectId: this.$store.state.settings.projectId,
           labelKey: 'cds_managed'
         })
-        .then(datasets => {
-          this.datasets = datasets;
+        .then(response => {
+          if (response.success) {
+            this.datasets = response.data;
+          } else {
+            this.datasets = [];
+          }
           this.loading = false;
         });
     },

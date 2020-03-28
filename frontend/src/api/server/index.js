@@ -136,13 +136,6 @@ export default {
       .then(response => response);
   },
   saveAccount(payload) {
-    console.log(
-      `Performing account save for email: ${payload.email}, emailType: ${
-        payload.emailType
-      }, added: ${JSON.stringify(payload.added)}, removed: ${JSON.stringify(
-        payload.removed
-      )}`
-    );
     if (!payload.accountId) {
       return axios
         .post(this._apiBaseUrl() + '/accounts', payload)
@@ -180,9 +173,17 @@ export default {
       .then(response => response);
   },
   savePolicy(payload) {
-    return axios
-      .post(this._apiBaseUrl() + '/policy', payload)
-      .then(response => response);
+    if (!payload.policyId) {
+      return axios
+        .post(this._apiBaseUrl() + '/policies', payload)
+        .then(response => response);
+    } else {
+      let policyId = payload.policyId;
+      delete payload.policyId;
+      return axios
+        .put(this._apiBaseUrl() + `/policies/${policyId}`, payload)
+        .then(response => response);
+    }
   },
   saveView(payload) {
     return axios

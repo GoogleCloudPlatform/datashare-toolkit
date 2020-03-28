@@ -194,6 +194,13 @@ policies.post('/projects/:projectId/policies', async(req, res) => {
             errors: ['policy name parameter is required']
         });
     }
+    if (req.body.rowId || req.body.policyId) {
+        return res.status(400).json({
+            success: false,
+            code: 400,
+            errors: ['rowId and policyId should not be provided']
+        });
+    }
     const values = {
         name: req.body.name,
         description: req.body.description,
@@ -201,7 +208,7 @@ policies.post('/projects/:projectId/policies', async(req, res) => {
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags
     };
-    const data = await dataManager.createPolicy(projectId, values);
+    const data = await dataManager.createOrUpdatePolicy(projectId, null, values);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -347,6 +354,13 @@ policies.put('/projects/:projectId/policies/:policyId', async(req, res) => {
             errors: ['policy name parameter is required']
         });
     }
+    if (!req.body.rowId) {
+        return res.status(400).json({
+            success: false,
+            code: 400,
+            errors: ['rowId parameter is required']
+        });
+    }
     const values = {
         name: req.body.name,
         description: req.body.description,
@@ -354,7 +368,7 @@ policies.put('/projects/:projectId/policies/:policyId', async(req, res) => {
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags
     };
-    const data = await dataManager.updatePolicy(projectId, policyId, values);
+    const data = await dataManager.createOrUpdatePolicy(projectId, policyId, values);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

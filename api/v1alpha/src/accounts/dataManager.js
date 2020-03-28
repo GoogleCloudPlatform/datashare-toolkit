@@ -197,6 +197,7 @@ async function createOrUpdateAccount(projectId, accountId, data) {
     // reformat policies object for saving
     let policies = data.policies;
     if (policies.length === 0) {
+        // If there are no supplied policies, remove policies column field and value from insert statement.
         delete data.policies;
         const index = fields.indexOf('policies');
         if (index > -1) {

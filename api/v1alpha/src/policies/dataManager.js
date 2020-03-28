@@ -133,24 +133,68 @@ async function listPolicies(projectId, datasetId, accountId) {
 
 /**
  * @param  {string} projectId
+ * @param  {string} policyId
  * @param  {object} data
  * Create a Policy based off data values
  */
-async function createPolicy(projectId, data) {
-    let fields = cfg.cdsPolicyTableFields, values = cfg.cdsPolicyTableFields;
+async function createOrUpdatePolicy(projectId, policyId, data) {
+    console.log(`createOrUpdateAccount called with policyId: ${policyId}`);
+    let _policyId = policyId;
+    let previousDatasetIds = [];
+    if (policyId) {
+        const currentPolicy = await getPolicy(projectId, policyId);
+        if (currentPolicy.success) {
+            if (currentPolicy && currentPolicy.data.rowId !== data.rowId) {
+                // If user is updating an existing record, compare the rowId to ensure they're making updates from the latest record.
+                return { success: false, code: 500, errors: ["STALE"] };
+            }
+            previousDatasetIds = currentPolicy.data.datasets.map(p => p.datasetId);
+            _policyId = currentPolicy.data.policyId;
+        }
+    }
+    
+    if (!_policyId) {
+        _policyId = uuidv4();
+    }
+
+    const rowId = uuidv4();
+    const isDeleted = false;
+    const createdAt = new Date().toISOString();
+
+    let fields = [...cfg.cdsPolicyTableFields], values = [...cfg.cdsPolicyTableFields];
+
+    // reformat datasets object for saving
+    let datasets = data.datasets;
+    if (datasets.length === 0) {
+        // If there are no supplied datasets, remove datasets column field and value from insert statement.
+        delete data.datasets;
+        const index = fields.indexOf('datasets');
+        if (index > -1) {
+            fields.splice(index, 1);
+            values.splice(index, 1);
+        }
+    }
+
+    // reformat datasets object for saving
+    let rowAccessTags = data.rowAccessTags;
+    if (rowAccessTags.length === 0) {
+        // If there are no supplied rowAccessTags, remove rowAccessTags column field and value from insert statement.
+        delete data.rowAccessTags;
+        const index = fields.indexOf('rowAccessTags');
+        if (index > -1) {
+            fields.splice(index, 1);
+            values.splice(index, 1);
+        }
+    }
+
     fields = Array.from(fields).join();
     values = Array.from(values).map(i => '@' + i).join();
 
-    const rowId = uuidv4();
-    let isDeleted = false;
-    const policyId = uuidv4();
-    let createdAt = new Date().toISOString();
-    // merge the data and extra values together
     data = {
         ...data,
         ...{
             rowId: rowId,
-            policyId: policyId,
+            policyId: _policyId,
             isDeleted: isDeleted,
             createdAt: createdAt
         }
@@ -159,62 +203,16 @@ async function createPolicy(projectId, data) {
     const [rows] = await _insertData(projectId, fields, values, data);
     if (rows.length === 0) {
         try {
-            await metaManager.performMetadataUpdate(projectId, [policyId]);
+            await metaManager.performMetadataUpdate(projectId, [_policyId], previousDatasetIds);
         } catch (err) {
-            // cleanup and don't wait
-            isDeleted = true;
-            createdAt = new Date().toISOString();
-            data = { ...data, ...{ isDeleted: isDeleted, createdAt: createdAt } };
-            _insertData(projectId, fields, values, data);
             return { success: false, code: 500, errors: [err.message] };
         }
         // Retrieving the record after insert makes another round-trip and is not
         // efficient. For now, just return the original data.
-        //return await getPolicy(projectId, policyId);
+        // return await getPolicy(projectId, accountId);
         return { success: true, data: data };
     } else {
         const message = `Policy did not create with data values: '${data}'`;
-        return { success: false, code: 500, errors: [message] };
-    }
-}
-
-/**
- * @param  {string} projectId
- * @param  {object} data
- * Updated a Policy based off policyId and data values
- */
-async function updatePolicy(projectId, policyId, data) {
-    let fields = cfg.cdsPolicyTableFields, values = cfg.cdsPolicyTableFields;
-    fields = Array.from(fields).join();
-    values = Array.from(values).map(i => '@' + i).join();
-
-    const rowId = uuidv4();
-    const isDeleted = true;
-    const createdAt = new Date().toISOString();
-    // merge the data and extra values together
-    data = {
-        ...data,
-        ...{
-            rowId: rowId,
-            policyId: policyId,
-            isDeleted: isDeleted,
-            createdAt: createdAt
-        }
-    };
-    console.log(data);
-    const [rows] = await _insertData(projectId, fields, values, data);
-    if (rows.length === 0) {
-        try {
-            await metaManager.performMetadataUpdate(projectId, [policyId]);
-        } catch (err) {
-            return { success: false, code: 500, errors: [err.message] };
-        }
-        // Retrieving the record after insert makes another round-trip and is not
-        // efficient. For now, just return the original data.
-        //return await getPolicy(projectId, policyId);
-        return { success: true, data: data };
-    } else {
-        const message = `Policy did not update with data values: '${data}'`;
         return { success: false, code: 500, errors: [message] };
     }
 }
@@ -276,8 +274,7 @@ async function deletePolicy(projectId, policyId, data) {
 
 module.exports = {
     listPolicies,
-    createPolicy,
-    updatePolicy,
+    createOrUpdatePolicy,
     deletePolicy,
     getPolicy
 };

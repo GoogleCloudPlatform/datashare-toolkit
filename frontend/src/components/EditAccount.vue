@@ -83,6 +83,14 @@
         </v-card-actions>
       </form>
     </ValidationObserver>
+    <Dialog
+      v-if="showError"
+      v-model="showError"
+      :title="errorDialogTitle"
+      :text="errorDialogText"
+      :cancelButtonEnabled="false"
+      v-on:confirmed="showError = false"
+    />
   </v-card>
 </template>
 
@@ -114,6 +122,8 @@ extend('email', {
   message: 'Email must be valid'
 });
 
+import Dialog from '@/components/Dialog.vue';
+
 Array.prototype.diff = function(a) {
   return this.filter(function(i) {
     return a.indexOf(i) < 0;
@@ -123,7 +133,8 @@ Array.prototype.diff = function(a) {
 export default {
   components: {
     ValidationProvider,
-    ValidationObserver
+    ValidationObserver,
+    Dialog
   },
   props: {
     userData: Object
@@ -139,7 +150,8 @@ export default {
       email: null,
       policies: []
     },
-    emailTypes: ['userByEmail', 'groupByEmail']
+    emailTypes: ['userByEmail', 'groupByEmail'],
+    showError: false
   }),
   created() {
     if (this.userData) {
@@ -205,9 +217,23 @@ export default {
               };
             }
 
-            this.$store.dispatch('saveAccount', data).then(() => {
+            this.$store.dispatch('saveAccount', data).then(result => {
               this.loading = false;
-              this.$emit('close');
+
+              if (result.error && result.error === 'STALE') {
+                this.errorDialogTitle = 'Account data is stale';
+                this.errorDialogText =
+                  'This account has been updated since you last opened the page, please reload the page to make changes.';
+                this.showError = true;
+              } else if (result.error) {
+                this.errorDialogTitle = 'Error saving account';
+                this.errorDialogText =
+                  'Failed to save account. Please reload and try again.';
+                this.showError = true;
+              } else {
+                // Success
+                this.$emit('close');
+              }
             });
           }
         }
