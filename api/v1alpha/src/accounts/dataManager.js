@@ -139,7 +139,15 @@ async function listAccounts(projectId, datasetId, policyId) {
             params: { datasetId: datasetId }
         };
     } else if (policyId) {
-        sqlQuery = `SELECT ${fields} FROM \`${table}\`, UNNEST(policies) AS policies WHERE policies.policyId = @policyId LIMIT ${limit};`
+        let fields = cfg.cdsAccountViewFields;
+        let remove = ['rowId', 'accountId', 'accountType', 'createdBy', 'policies', 'createdAt', 'version', 'isDeleted'];
+        remove.forEach(f => fields.delete(f));
+        fields = Array.from(fields).map(i => 'ca.' + i).join();
+        sqlQuery = `SELECT ${fields}
+        FROM \`${table}\` ca
+        CROSS JOIN UNNEST(ca.policies) as p
+        WHERE p.policyId = @policyId
+        LIMIT ${limit}`
         options = {
             query: sqlQuery,
             params: { policyId: policyId }

@@ -218,6 +218,11 @@ const store = new Vuex.Store({
         notify(error);
       });
     },
+    getPolicy({ commit }, payload) {
+      return client.getPolicy(payload.policyId).catch(error => {
+        notify(error);
+      });
+    },
     // eslint-disable-next-line no-unused-vars
     getView({ commit }, payload) {
       return client.getView(payload).catch(error => {
@@ -226,7 +231,7 @@ const store = new Vuex.Store({
     },
     // eslint-disable-next-line no-unused-vars
     getPolicyAccounts({ commit }, payload) {
-      return client.getPolicyAccounts(payload).catch(error => {
+      return client.getPolicyAccounts(payload.policyId).catch(error => {
         notify(error);
       });
     },

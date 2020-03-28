@@ -206,7 +206,7 @@ async function getPolicy(projectId, policyId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const fields = Array.from(cfg.cdsPolicyViewFields).join();
     const limit = 1;
-    const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE policyId = @policyId LIMIT ${limit};`
+    const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE policyId = @policyId AND isDeleted is false LIMIT ${limit};`
     const options = {
         query: sqlQuery,
         params: { policyId: policyId }

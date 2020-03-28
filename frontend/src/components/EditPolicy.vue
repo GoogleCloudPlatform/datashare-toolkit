@@ -484,11 +484,11 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getPolicy', {
-          projectId: this.$store.state.settings.projectId,
           policyId: this.policy.policyId
         })
-        .then(p => {
-          if (p) {
+        .then(response => {
+          if (response.success) {
+            const p = response.data;
             this.policy.rowId = p.rowId;
             this.policy.policyId = p.policyId;
             this.policy.name = p.name;
@@ -505,12 +505,13 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getPolicyAccounts', {
-          projectId: this.$store.state.settings.projectId,
           policyId: this.policy.policyId
         })
-        .then(p => {
-          if (p) {
-            this.accounts = p;
+        .then(response => {
+          if (response.success) {
+            this.accounts = response.data;
+          } else {
+            this.accounts = [];
           }
           this.loading = false;
         });

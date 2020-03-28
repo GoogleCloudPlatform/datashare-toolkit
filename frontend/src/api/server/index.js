@@ -132,9 +132,7 @@ export default {
   },
   getAccount(accountId) {
     return axios
-      .get(this._apiBaseUrl() + '/accounts/' + accountId, {
-        params: {}
-      })
+      .get(this._apiBaseUrl() + '/accounts/' + accountId)
       .then(response => response);
   },
   saveAccount(payload) {
@@ -198,7 +196,12 @@ export default {
   },
   getPolicies() {
     return axios
-      .get(this._apiBaseUrl() + '/policies', {})
+      .get(this._apiBaseUrl() + '/policies')
+      .then(response => response);
+  },
+  getPolicy(policyId) {
+    return axios
+      .get(this._apiBaseUrl() + '/policies/' + policyId)
       .then(response => response);
   },
   syncAllPolicies(payload) {
@@ -207,11 +210,9 @@ export default {
       .patch(this._apiBaseUrl() + '/syncPolicies', payload)
       .then(response => response);
   },
-  getPolicyAccounts(payload) {
+  getPolicyAccounts(policyId) {
     return axios
-      .get(this._apiBaseUrl() + '/policyAccounts', {
-        params: payload
-      })
+      .get(this._apiBaseUrl() + `/policies/${policyId}/accounts`)
       .then(response => response);
   },
   deletePolicy(payload) {
