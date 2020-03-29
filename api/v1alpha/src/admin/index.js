@@ -18,7 +18,7 @@
 
 const express = require('express');
 
-const dataManager = require("../lib/initSchema");
+const dataManager = require("./dataManager");
 
 /************************************************************
   API Endpoints
@@ -77,6 +77,69 @@ var admin = express.Router();
 admin.post('/projects/:projectId/initSchema', async(req, res) => {
     const projectId = req.params.projectId;
     const data = await dataManager.initializeSchema(projectId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/initSchema:
+ *   post:
+ *     summary: Initialize the CDS schema creation
+ *     description: Returns the schema creation response
+ *     tags:
+ *       - datasets
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the init schema request
+ *     responses:
+ *       200:
+ *         description: Dataset
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   description: HTTP status code
+ *                 data:
+ *                   type: object
+ *                   items:
+ *                     $ref: '#/definitions/Dataset'
+ *       404:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
+admin.post('/projects/:projectId/sync/:type', async(req, res) => {
+    const projectId = req.params.projectId;
+    const syncType = req.params.type;
+    const data = await dataManager.syncResources(projectId, syncType);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

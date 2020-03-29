@@ -16,22 +16,9 @@
 
 'use strict';
 
-const { BigQueryUtil, StorageUtil } = require('bqds-shared');
+const { BigQueryUtil } = require('bqds-shared');
 const underscore = require("underscore");
 let bigqueryUtil = new BigQueryUtil();
-let storageUtil = new StorageUtil();
-const path = require("path");
-const uuidv4 = require('uuid/v4');
-
-/**
- * @param  {} projectId
- */
-async function syncAllPolicies(projectId) {
-    const datasets = await getDatasets(projectId, "bqds_configuration_name");
-    const datasetIds = datasets.map(d => d.datasetId);
-    console.log(`Performing policy sync for datasets: ${JSON.stringify(datasetIds)})`);
-    await performMetadataUpdate(projectId, null, datasetIds);
-}
 
 /**
  * @param  {} projectId

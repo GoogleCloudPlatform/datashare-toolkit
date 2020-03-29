@@ -224,10 +224,10 @@ export default {
       .post(this._apiBaseUrl() + '/initSchema')
       .then(response => response);
   },
-  syncAllPolicies(payload) {
-    console.log(`Performing sync all policies`);
+  syncResources(type) {
+    console.log(`Performing sync for type: ${type}`);
     return axios
-      .patch(this._apiBaseUrl() + '/syncPolicies', payload)
+      .post(this._apiBaseUrl() + `/sync/${type}`)
       .then(response => response);
   }
 };

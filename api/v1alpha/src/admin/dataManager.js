@@ -17,8 +17,10 @@
 'use strict';
 
 const { BigQueryUtil } = require('bqds-shared');
+let bigqueryUtil = new BigQueryUtil();
 
-const cfg = require('./config');
+const cfg = require('../lib/config');
+const metaManager = require('../lib/metaManager');
 
 /**
  * @param  {string} projectId
@@ -36,6 +38,30 @@ function getTableFqdn(projectId, datasetId, tableId) {
 async function initializeSchema(projectId) {
     try {
         await setupDatasharePrerequisites(projectId);
+    } catch (err) {
+        return { success: false, code: 500, errors: [err.message] };
+    }
+    return { success: true, data: {} };
+}
+
+/**
+ * @param  {} projectId
+ */
+async function syncResources(projectId, type) {
+    try {
+        if (type === 'PERMISSIONS') {
+            console.log('Sync permissions called');
+        }
+        else if (type === 'VIEWS') {
+            console.log('Sync views called');
+        }
+        else if (type === 'ALL') {
+            console.log('Sync all called');
+            const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, 'cds_managed');
+            const datasetIds = datasets.map(d => d.datasetId);
+            console.log(`Performing policy sync for datasets: ${JSON.stringify(datasetIds)})`);
+            await metaManager.performMetadataUpdate(projectId, null, datasetIds);
+        }
     } catch (err) {
         return { success: false, code: 500, errors: [err.message] };
     }
@@ -437,6 +463,7 @@ async function setupDatasharePrerequisites(projectId) {
 }
 
 module.exports = {
-    initializeSchema
+    initializeSchema,
+    syncResources
 };
 

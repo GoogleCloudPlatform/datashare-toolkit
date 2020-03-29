@@ -105,15 +105,17 @@ export default {
       console.log(`object returned from dialog is ${JSON.stringify(object)}`);
       if (object.type === 'sync') {
         this.loading = true;
-        this.$store.dispatch('syncAllPolicies').then(() => {
-          this.dialogButtonConfirmText = 'Ok';
-          this.dialogCancelButtonEnabled = false;
-          this.dialogTitle = 'Sync All';
-          this.dialogText = 'Sync all has completed.';
-          this.dialogObject = { type: 'finalConfirm' };
-          this.showDialog = true;
-          this.loading = false;
-        });
+        this.$store
+          .dispatch('syncResources', { type: object.syncType })
+          .then(() => {
+            this.dialogButtonConfirmText = 'Ok';
+            this.dialogCancelButtonEnabled = false;
+            this.dialogTitle = 'Sync All';
+            this.dialogText = 'Sync all has completed.';
+            this.dialogObject = { type: 'finalConfirm' };
+            this.showDialog = true;
+            this.loading = false;
+          });
       } else if (object.type === 'initSchema') {
         this.loading = true;
         this.$store.dispatch('initSchema').then(() => {
