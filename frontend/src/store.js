@@ -267,6 +267,12 @@ const store = new Vuex.Store({
       });
     },
     // eslint-disable-next-line no-unused-vars
+    initSchema({ commit }) {
+      return client.initSchema().catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
     syncAllPolicies({ commit }, payload) {
       return client.syncAllPolicies(payload).catch(error => {
         notify(error);

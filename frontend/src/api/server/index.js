@@ -219,6 +219,11 @@ export default {
       .put(this._apiBaseUrl() + '/ingestion', payload)
       .then(response => response);
   },
+  initSchema(payload) {
+    return axios
+      .post(this._apiBaseUrl() + '/initSchema')
+      .then(response => response);
+  },
   syncAllPolicies(payload) {
     console.log(`Performing sync all policies`);
     return axios
