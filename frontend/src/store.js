@@ -51,7 +51,7 @@ const store = new Vuex.Store({
           'chrispage@google.com',
           'cmbrown@google.com',
           'sferrazza@google.com',
-          'ramsy@google.com'
+          'paulmibus@google.com'
         ];
         return (
           state.user.loggedIn === true &&
@@ -76,6 +76,18 @@ const store = new Vuex.Store({
   },
 
   actions: {
+    fetchUser({ commit }, user) {
+      commit('setLoggedIn', user !== null);
+      if (user) {
+        commit('setUser', {
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL
+        });
+      } else {
+        commit('setUser', null);
+      }
+    },
     getSettings({ commit }) {
       if (!this._vm.$session.exists()) {
         this._vm.$session.start();
@@ -109,18 +121,6 @@ const store = new Vuex.Store({
         .catch(error => {
           notify(error);
         });
-    },
-    fetchUser({ commit }, user) {
-      commit('setLoggedIn', user !== null);
-      if (user) {
-        commit('setUser', {
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL
-        });
-      } else {
-        commit('setUser', null);
-      }
     },
     // eslint-disable-next-line no-unused-vars
     getDatasets({ commit }, payload) {

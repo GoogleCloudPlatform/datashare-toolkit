@@ -109,17 +109,6 @@ export default {
       })
       .then(response => response);
   },
-  deleteTable(projectId, datasetId, tableId) {
-    return axios
-      .delete(this._apiBaseUrl() + '/table', {
-        params: {
-          projectId: projectId,
-          datasetId: datasetId,
-          tableId: tableId
-        }
-      })
-      .then(response => response);
-  },
   getAccounts(payload) {
     return axios
       .get(this._apiBaseUrl() + '/accounts', {
