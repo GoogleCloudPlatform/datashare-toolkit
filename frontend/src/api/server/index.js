@@ -87,28 +87,6 @@ export default {
       })
       .then(response => response);
   },
-  getTables(projectId, datasetId, labelKey) {
-    return axios
-      .get(this._apiBaseUrl() + '/tables', {
-        params: {
-          projectId: projectId,
-          datasetId: datasetId,
-          labelKey: labelKey
-        }
-      })
-      .then(response => response);
-  },
-  getTableColumns(projectId, datasetId, tableId) {
-    return axios
-      .get(this._apiBaseUrl() + '/tableColumns', {
-        params: {
-          projectId: projectId,
-          datasetId: datasetId,
-          tableId: tableId
-        }
-      })
-      .then(response => response);
-  },
   getAccounts(payload) {
     return axios
       .get(this._apiBaseUrl() + '/accounts', {
@@ -136,10 +114,45 @@ export default {
         .then(response => response);
     }
   },
-  getView(payload) {
+  deleteAccount(accountId, payload) {
     return axios
-      .get(this._apiBaseUrl() + '/authorizedView', {
-        params: payload
+      .delete(this._apiBaseUrl() + `/accounts/${accountId}`, {
+        data: payload
+      })
+      .then(response => response);
+  },
+  getPolicies() {
+    return axios
+      .get(this._apiBaseUrl() + '/policies')
+      .then(response => response);
+  },
+  getPolicy(policyId) {
+    return axios
+      .get(this._apiBaseUrl() + `/policies/${policyId}`)
+      .then(response => response);
+  },
+  getPolicyAccounts(policyId) {
+    return axios
+      .get(this._apiBaseUrl() + `/policies/${policyId}/accounts`)
+      .then(response => response);
+  },
+  savePolicy(payload) {
+    if (!payload.policyId) {
+      return axios
+        .post(this._apiBaseUrl() + '/policies', payload)
+        .then(response => response);
+    } else {
+      let policyId = payload.policyId;
+      delete payload.policyId;
+      return axios
+        .put(this._apiBaseUrl() + `/policies/${policyId}`, payload)
+        .then(response => response);
+    }
+  },
+  deletePolicy(policyId, payload) {
+    return axios
+      .delete(this._apiBaseUrl() + `/policies/${policyId}`, {
+        data: payload
       })
       .then(response => response);
   },
@@ -160,22 +173,33 @@ export default {
       .put(this._apiBaseUrl() + '/ingestion', payload)
       .then(response => response);
   },
-  savePolicy(payload) {
-    if (!payload.policyId) {
-      return axios
-        .post(this._apiBaseUrl() + '/policies', payload)
-        .then(response => response);
-    } else {
-      let policyId = payload.policyId;
-      delete payload.policyId;
-      return axios
-        .put(this._apiBaseUrl() + `/policies/${policyId}`, payload)
-        .then(response => response);
-    }
-  },
-  saveView(payload) {
+  getView(payload) {
     return axios
-      .post(this._apiBaseUrl() + '/authorizedView', payload)
+      .get(this._apiBaseUrl() + '/authorizedView', {
+        params: payload
+      })
+      .then(response => response);
+  },
+  getTables(projectId, datasetId, labelKey) {
+    return axios
+      .get(this._apiBaseUrl() + '/tables', {
+        params: {
+          projectId: projectId,
+          datasetId: datasetId,
+          labelKey: labelKey
+        }
+      })
+      .then(response => response);
+  },
+  getTableColumns(projectId, datasetId, tableId) {
+    return axios
+      .get(this._apiBaseUrl() + '/tableColumns', {
+        params: {
+          projectId: projectId,
+          datasetId: datasetId,
+          tableId: tableId
+        }
+      })
       .then(response => response);
   },
   validateView(payload) {
@@ -183,39 +207,9 @@ export default {
       .post(this._apiBaseUrl() + '/validateView', payload)
       .then(response => response);
   },
-  getPolicies() {
+  saveView(payload) {
     return axios
-      .get(this._apiBaseUrl() + '/policies')
-      .then(response => response);
-  },
-  getPolicy(policyId) {
-    return axios
-      .get(this._apiBaseUrl() + `/policies/${policyId}`)
-      .then(response => response);
-  },
-  syncAllPolicies(payload) {
-    console.log(`Performing sync all policies`);
-    return axios
-      .patch(this._apiBaseUrl() + '/syncPolicies', payload)
-      .then(response => response);
-  },
-  getPolicyAccounts(policyId) {
-    return axios
-      .get(this._apiBaseUrl() + `/policies/${policyId}/accounts`)
-      .then(response => response);
-  },
-  deletePolicy(policyId, payload) {
-    return axios
-      .delete(this._apiBaseUrl() + `/policies/${policyId}`, {
-        data: payload
-      })
-      .then(response => response);
-  },
-  deleteAccount(accountId, payload) {
-    return axios
-      .delete(this._apiBaseUrl() + `/accounts/${accountId}`, {
-        data: payload
-      })
+      .post(this._apiBaseUrl() + '/authorizedView', payload)
       .then(response => response);
   },
   deleteView(payload) {
@@ -223,6 +217,12 @@ export default {
       .delete(this._apiBaseUrl() + '/authorizedView', {
         data: payload
       })
+      .then(response => response);
+  },
+  syncAllPolicies(payload) {
+    console.log(`Performing sync all policies`);
+    return axios
+      .patch(this._apiBaseUrl() + '/syncPolicies', payload)
       .then(response => response);
   }
 };
