@@ -156,23 +156,6 @@ export default {
       })
       .then(response => response);
   },
-  getIngestion(bucketName, datasetId, tableId) {
-    return axios
-      .get(this._apiBaseUrl() + '/ingestion', {
-        params: {
-          bucketName: bucketName,
-          datasetId: datasetId,
-          tableId: tableId
-        }
-      })
-      .then(response => response);
-  },
-  saveIngestion(payload) {
-    console.log(`Performing ingestion update`);
-    return axios
-      .put(this._apiBaseUrl() + '/ingestion', payload)
-      .then(response => response);
-  },
   getView(payload) {
     return axios
       .get(this._apiBaseUrl() + '/authorizedView', {
@@ -217,6 +200,23 @@ export default {
       .delete(this._apiBaseUrl() + '/authorizedView', {
         data: payload
       })
+      .then(response => response);
+  },
+  getIngestion(bucketName, datasetId, tableId) {
+    return axios
+      .get(this._apiBaseUrl() + '/ingestion', {
+        params: {
+          bucketName: bucketName,
+          datasetId: datasetId,
+          tableId: tableId
+        }
+      })
+      .then(response => response);
+  },
+  saveIngestion(payload) {
+    console.log(`Performing ingestion update`);
+    return axios
+      .put(this._apiBaseUrl() + '/ingestion', payload)
       .then(response => response);
   },
   syncAllPolicies(payload) {

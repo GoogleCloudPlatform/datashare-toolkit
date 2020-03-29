@@ -213,20 +213,6 @@ const store = new Vuex.Store({
         });
     },
     // eslint-disable-next-line no-unused-vars
-    getIngestion({ commit }, payload) {
-      return client
-        .getIngestion(payload.bucketName, payload.datasetId, payload.tableId)
-        .catch(error => {
-          notify(error);
-        });
-    },
-    // eslint-disable-next-line no-unused-vars
-    saveIngestion({ commit }, payload) {
-      return client.saveIngestion(payload).catch(error => {
-        notify(error);
-      });
-    },
-    // eslint-disable-next-line no-unused-vars
     getView({ commit }, payload) {
       return client.getView(payload).catch(error => {
         notify(error);
@@ -263,6 +249,20 @@ const store = new Vuex.Store({
     // eslint-disable-next-line no-unused-vars
     deleteView({ commit }, payload) {
       return client.deleteView(payload).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getIngestion({ commit }, payload) {
+      return client
+        .getIngestion(payload.bucketName, payload.datasetId, payload.tableId)
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
+    saveIngestion({ commit }, payload) {
+      return client.saveIngestion(payload).catch(error => {
         notify(error);
       });
     },
