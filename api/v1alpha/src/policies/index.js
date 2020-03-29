@@ -204,7 +204,7 @@ policies.post('/projects/:projectId/policies', async(req, res) => {
     const values = {
         name: req.body.name,
         description: req.body.description,
-        createdBy: req.body.createdBy,
+        createdBy: req.header('GcpAccount'),
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags
     };
@@ -365,7 +365,7 @@ policies.put('/projects/:projectId/policies/:policyId', async(req, res) => {
         rowId: req.body.rowId,
         name: req.body.name,
         description: req.body.description,
-        createdBy: req.body.createdBy,
+        createdBy: req.header('GcpAccount'),
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags
     };
@@ -446,7 +446,7 @@ policies.delete('/projects/:projectId/policies/:policyId', async(req, res) => {
     const policyId = req.params.policyId;
     const values = {
         rowId: req.body.rowId,
-        createdBy: req.body.createdBy
+        createdBy: req.header('GcpAccount')
     };
     const data = await dataManager.deletePolicy(projectId, policyId, values);
     var code;

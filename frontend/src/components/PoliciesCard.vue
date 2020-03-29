@@ -160,8 +160,7 @@ export default {
       this.$store
         .dispatch('deletePolicy', {
           rowId: item.rowId,
-          policyId: item.policyId,
-          createdBy: this.$store.state.user.data.email
+          policyId: item.policyId
         })
         .then(() => {
           this.loadPolicies();

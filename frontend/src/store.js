@@ -76,166 +76,6 @@ const store = new Vuex.Store({
   },
 
   actions: {
-    // eslint-disable-next-line no-unused-vars
-    getDatasets({ commit }, payload) {
-      return client
-        .getDatasets(payload.projectId, payload.labelKey)
-        .catch(error => {
-          notify(error);
-        });
-    },
-    // eslint-disable-next-line no-unused-vars
-    deleteDataset({ commit }, payload) {
-      return client
-        .deleteDataset(payload.projectId, payload.datasetId)
-        .catch(error => {
-          notify(error);
-        });
-    },
-    // eslint-disable-next-line no-unused-vars
-    deleteTable({ commit }, payload) {
-      return client
-        .deleteTable(payload.projectId, payload.datasetId, payload.tableId)
-        .catch(error => {
-          notify(error);
-        });
-    },
-    // eslint-disable-next-line no-unused-vars
-    createDataset({ commit }, payload) {
-      return client
-        .createDataset(
-          payload.projectId,
-          payload.datasetId,
-          payload.description
-        )
-        .then(result => result)
-        .catch(error => {
-          notify(error);
-        });
-    },
-    // eslint-disable-next-line no-unused-vars
-    getTables({ commit }, payload) {
-      return client
-        .getTables(payload.projectId, payload.datasetId, payload.labelKey)
-        .catch(error => {
-          notify(error);
-        });
-    },
-    // eslint-disable-next-line no-unused-vars
-    getTableColumns({ commit }, payload) {
-      return client
-        .getTableColumns(payload.projectId, payload.datasetId, payload.tableId)
-        .catch(error => {
-          notify(error);
-        });
-    },
-    // eslint-disable-next-line no-unused-vars
-    saveAccount({ commit }, payload) {
-      return client.saveAccount(payload).catch(error => {
-        notify(error);
-      });
-    },
-    // eslint-disable-next-line no-unused-vars
-    getIngestion({ commit }, payload) {
-      return client
-        .getIngestion(payload.bucketName, payload.datasetId, payload.tableId)
-        .catch(error => {
-          notify(error);
-        });
-    },
-    // eslint-disable-next-line no-unused-vars
-    saveIngestion({ commit }, payload) {
-      return client.saveIngestion(payload).catch(error => {
-        notify(error);
-      });
-    },
-    // eslint-disable-next-line no-unused-vars
-    savePolicy({ commit }, payload) {
-      return client.savePolicy(payload).catch(error => {
-        notify(error);
-      });
-    },
-    // eslint-disable-next-line no-unused-vars
-    saveView({ commit }, payload) {
-      return client.saveView(payload).catch(error => {
-        notify(error);
-      });
-    },
-    // eslint-disable-next-line no-unused-vars
-    validateView({ commit }, payload) {
-      return client.validateView(payload).catch(error => {
-        notify(error);
-      });
-    },
-    // eslint-disable-next-line no-unused-vars
-    getAccounts({ commit }, payload) {
-      return client.getAccounts(payload).catch(error => {
-        notify(error);
-      });
-    },
-    // eslint-disable-next-line no-unused-vars
-    getAccount({ commit }, payload) {
-      return client.getAccount(payload.accountId).catch(error => {
-        notify(error);
-      });
-    },
-    // eslint-disable-next-line no-unused-vars
-    getPolicies({ commit }, payload) {
-      return client.getPolicies().catch(error => {
-        notify(error);
-      });
-    },
-    getPolicy({ commit }, payload) {
-      return client.getPolicy(payload.policyId).catch(error => {
-        notify(error);
-      });
-    },
-    // eslint-disable-next-line no-unused-vars
-    getView({ commit }, payload) {
-      return client.getView(payload).catch(error => {
-        notify(error);
-      });
-    },
-    // eslint-disable-next-line no-unused-vars
-    getPolicyAccounts({ commit }, payload) {
-      return client.getPolicyAccounts(payload.policyId).catch(error => {
-        notify(error);
-      });
-    },
-    // eslint-disable-next-line no-unused-vars
-    deletePolicy({ commit }, payload) {
-      return client
-        .deletePolicy(payload.policyId, {
-          rowId: payload.rowId,
-          createdBy: payload.createdBy
-        })
-        .catch(error => {
-          notify(error);
-        });
-    },
-    // eslint-disable-next-line no-unused-vars
-    deleteAccount({ commit }, payload) {
-      return client
-        .deleteAccount(payload.accountId, {
-          rowId: payload.rowId,
-          createdBy: payload.createdBy
-        })
-        .catch(error => {
-          notify(error);
-        });
-    },
-    // eslint-disable-next-line no-unused-vars
-    deleteView({ commit }, payload) {
-      return client.deleteView(payload).catch(error => {
-        notify(error);
-      });
-    },
-    // eslint-disable-next-line no-unused-vars
-    syncAllPolicies({ commit }, payload) {
-      return client.syncAllPolicies(payload).catch(error => {
-        notify(error);
-      });
-    },
     getSettings({ commit }) {
       if (!this._vm.$session.exists()) {
         this._vm.$session.start();
@@ -281,6 +121,156 @@ const store = new Vuex.Store({
       } else {
         commit('setUser', null);
       }
+    },
+    // eslint-disable-next-line no-unused-vars
+    getDatasets({ commit }, payload) {
+      return client
+        .getDatasets(payload.projectId, payload.labelKey)
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
+    createDataset({ commit }, payload) {
+      return client
+        .createDataset(
+          payload.projectId,
+          payload.datasetId,
+          payload.description
+        )
+        .then(result => result)
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
+    deleteDataset({ commit }, payload) {
+      return client
+        .deleteDataset(payload.projectId, payload.datasetId)
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getAccounts({ commit }, payload) {
+      return client.getAccounts(payload).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getAccount({ commit }, payload) {
+      return client.getAccount(payload.accountId).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    saveAccount({ commit }, payload) {
+      return client.saveAccount(payload).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    deleteAccount({ commit }, payload) {
+      return client
+        .deleteAccount(payload.accountId, {
+          rowId: payload.rowId
+        })
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getPolicies({ commit }, payload) {
+      return client.getPolicies().catch(error => {
+        notify(error);
+      });
+    },
+    getPolicy({ commit }, payload) {
+      return client.getPolicy(payload.policyId).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getPolicyAccounts({ commit }, payload) {
+      return client.getPolicyAccounts(payload.policyId).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    savePolicy({ commit }, payload) {
+      return client.savePolicy(payload).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    deletePolicy({ commit }, payload) {
+      return client
+        .deletePolicy(payload.policyId, {
+          rowId: payload.rowId
+        })
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getIngestion({ commit }, payload) {
+      return client
+        .getIngestion(payload.bucketName, payload.datasetId, payload.tableId)
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
+    saveIngestion({ commit }, payload) {
+      return client.saveIngestion(payload).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getView({ commit }, payload) {
+      return client.getView(payload).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getTables({ commit }, payload) {
+      return client
+        .getTables(payload.projectId, payload.datasetId, payload.labelKey)
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getTableColumns({ commit }, payload) {
+      return client
+        .getTableColumns(payload.projectId, payload.datasetId, payload.tableId)
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
+    validateView({ commit }, payload) {
+      return client.validateView(payload).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    saveView({ commit }, payload) {
+      return client.saveView(payload).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    deleteView({ commit }, payload) {
+      return client.deleteView(payload).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    syncAllPolicies({ commit }, payload) {
+      return client.syncAllPolicies(payload).catch(error => {
+        notify(error);
+      });
     }
   }
 });

@@ -442,7 +442,6 @@ export default {
             data = {
               name: this.policy.name,
               description: this.policy.description,
-              createdBy: this.$store.state.user.data.email,
               datasets: this.policy.datasets.map(d => d.datasetId),
               rowAccessTags: this.policy.rowAccessTags.map(t => t.tag)
             };
@@ -453,7 +452,6 @@ export default {
               policyId: this.policy.policyId,
               name: this.policy.name,
               description: this.policy.description,
-              createdBy: this.$store.state.user.data.email,
               datasets: this.policy.datasets.map(d => d.datasetId),
               rowAccessTags: this.policy.rowAccessTags.map(t => t.tag)
             };

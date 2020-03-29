@@ -202,8 +202,7 @@ export default {
               data = {
                 email: this.user.email,
                 emailType: this.user.emailType,
-                policies: this.user.policies,
-                createdBy: this.$store.state.user.data.email
+                policies: this.user.policies
               };
             } else {
               // Existing account
@@ -212,8 +211,7 @@ export default {
                 accountId: this.user.accountId,
                 email: this.user.email,
                 emailType: this.user.emailType,
-                policies: this.user.policies,
-                createdBy: this.$store.state.user.data.email
+                policies: this.user.policies
               };
             }
 

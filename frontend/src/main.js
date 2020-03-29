@@ -42,11 +42,11 @@ firebase.auth().onAuthStateChanged(user => {
   } else {
     console.log('No user is signed in');
   }
-});
 
-new Vue({
-  vuetify,
-  router,
-  store,
-  render: h => h(App)
-}).$mount('#app');
+  new Vue({
+    vuetify,
+    router,
+    store,
+    render: h => h(App)
+  }).$mount('#app');
+});

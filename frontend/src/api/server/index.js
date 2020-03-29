@@ -11,16 +11,15 @@ const validContentTypes = [
   'application/json; charset=utf-8'
 ];
 
-/*axios.interceptors.request.use(function(config) {
-  if (store.getters.user) {
-    console.log(`User object is ${JSON.stringify(store.getters.user)}`);
+axios.interceptors.request.use(function(config) {
+  if (store.getters.isLoggedIn) {
     const account = store.state.user.data.email;
     if (account) {
       config.headers.GcpAccount = account;
     }
   }
   return config;
-});*/
+});
 
 // reject anything that is not application/json
 axios.interceptors.response.use(

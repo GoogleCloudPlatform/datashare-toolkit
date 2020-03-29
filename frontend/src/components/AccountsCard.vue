@@ -252,8 +252,7 @@ export default {
       this.$store
         .dispatch('deleteAccount', {
           rowId: item.rowId,
-          accountId: item.accountId,
-          createdBy: this.$store.state.user.data.email
+          accountId: item.accountId
         })
         .then(() => {
           this.loadAccounts();

@@ -292,8 +292,7 @@ export default {
         .dispatch('deleteView', {
           projectId: this.$store.state.settings.projectId,
           rowId: item.rowId,
-          authorizedViewId: item.authorizedViewId,
-          createdBy: this.$store.state.user.data.email
+          authorizedViewId: item.authorizedViewId
         })
         .then(() => {
           this.loading = false;
