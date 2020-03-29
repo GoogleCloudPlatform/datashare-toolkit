@@ -177,6 +177,8 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
             fields.splice(index, 1);
             values.splice(index, 1);
         }
+    } else {
+        data.datasets = datasets.map(d => { return { datasetId: d }; })
     }
 
     // reformat datasets object for saving
@@ -189,6 +191,8 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
             fields.splice(index, 1);
             values.splice(index, 1);
         }
+    } else {
+        data.rowAccessTags = rowAccessTags.map(t => { return { tag: t }; })
     }
 
     fields = Array.from(fields).join();

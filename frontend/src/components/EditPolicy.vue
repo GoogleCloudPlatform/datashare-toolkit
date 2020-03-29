@@ -443,8 +443,8 @@ export default {
               name: this.policy.name,
               description: this.policy.description,
               createdBy: this.$store.state.user.data.email,
-              datasets: this.policy.datasets,
-              rowAccessTags: this.policy.rowAccessTags
+              datasets: this.policy.datasets.map(d => d.datasetId),
+              rowAccessTags: this.policy.rowAccessTags.map(t => t.tag)
             };
           } else {
             // Existing account
@@ -454,8 +454,8 @@ export default {
               name: this.policy.name,
               description: this.policy.description,
               createdBy: this.$store.state.user.data.email,
-              datasets: this.policy.datasets,
-              rowAccessTags: this.policy.rowAccessTags
+              datasets: this.policy.datasets.map(d => d.datasetId),
+              rowAccessTags: this.policy.rowAccessTags.map(t => t.tag)
             };
           }
 
