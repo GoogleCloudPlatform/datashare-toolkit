@@ -17,7 +17,6 @@
 'use strict';
 
 const { BigQueryUtil } = require('bqds-shared');
-let bigqueryUtil = new BigQueryUtil();
 
 const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');
@@ -48,19 +47,33 @@ async function initializeSchema(projectId) {
  * @param  {} projectId
  */
 async function syncResources(projectId, type) {
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    let permissions = false;
+    let views = false;
     try {
         if (type === 'PERMISSIONS') {
             console.log('Sync permissions called');
+            permissions = true;
         }
         else if (type === 'VIEWS') {
             console.log('Sync views called');
+            views = true;
         }
         else if (type === 'ALL') {
             console.log('Sync all called');
+            permissions = true;
+            views = true;
+        }
+
+        if (permissions) {
+            console.log('Syncing permissions');
             const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, 'cds_managed');
             const datasetIds = datasets.map(d => d.datasetId);
             console.log(`Performing policy sync for datasets: ${JSON.stringify(datasetIds)})`);
             await metaManager.performMetadataUpdate(projectId, null, datasetIds);
+        }
+        if (views) {
+            console.log('Syncing views not yet implemented');
         }
     } catch (err) {
         return { success: false, code: 500, errors: [err.message] };
@@ -69,6 +82,7 @@ async function syncResources(projectId, type) {
 }
 
 /**
+ * @param  {} projectId
  */
 async function setupDatasharePrerequisites(projectId) {
     const bigqueryUtil = new BigQueryUtil(projectId);
