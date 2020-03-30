@@ -31,7 +31,6 @@ const firebaseConfig = {
 };
 
 const defaultProject = firebase.initializeApp(firebaseConfig);
-console.log(defaultProject.name);
 firebase.analytics();
 
 firebase.auth().useDeviceLanguage();
