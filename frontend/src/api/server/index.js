@@ -88,13 +88,15 @@ export default {
       .then(response => response);
   },
   getAccounts(payload) {
-    return axios
-      .get(this._apiBaseUrl() + '/accounts', {
-        params: {
-          datasetId: payload.datasetId
-        }
-      })
-      .then(response => response);
+    if (!payload.datasetId) {
+      return axios
+        .get(this._apiBaseUrl() + '/accounts')
+        .then(response => response);
+    } else {
+      return axios
+        .get(this._apiBaseUrl() + `/datasets/${payload.datasetId}/accounts`)
+        .then(response => response);
+    }
   },
   getAccount(accountId) {
     return axios

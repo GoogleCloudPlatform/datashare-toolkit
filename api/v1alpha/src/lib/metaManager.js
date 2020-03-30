@@ -116,7 +116,7 @@ async function performMetadataUpdate(projectId, policyIds, datasetIds) {
         filter = "(cp.isDeleted is false and d.datasetId IN UNNEST(@dataset_ids))";
     }
     else {
-        throw new Error("A filter must be provided");
+        return;
     }
 
     const sqlQuery = `with policies as (

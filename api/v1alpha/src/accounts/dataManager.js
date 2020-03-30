@@ -84,9 +84,6 @@ async function _deleteData(projectId, fields, values, data) {
  */
 async function listAccounts(projectId, datasetId, policyId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
-    let fields = cfg.cdsAccountViewFields;
-    fields.delete('isDeleted');
-    fields = Array.from(fields).join();
     const limit = 10;
     let sqlQuery = `SELECT ca.* except(policies),
         array(
@@ -101,10 +98,6 @@ async function listAccounts(projectId, datasetId, policyId) {
         query: sqlQuery
     };
     if (datasetId) {
-        let fields = cfg.cdsAccountViewFields;
-        fields.delete('isDeleted');
-        fields.delete('policies');
-        fields = Array.from(fields).map(i => 'up.' + i).join();
         const policyTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
         sqlQuery = `with policies as (
             select distinct

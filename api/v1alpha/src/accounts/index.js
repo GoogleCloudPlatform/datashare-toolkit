@@ -135,8 +135,7 @@ var accounts = express.Router();
  */
 accounts.get('/projects/:projectId/accounts', async(req, res) => {
     const projectId = req.params.projectId;
-    const datasetId = req.query.datasetId;
-    const data = await dataManager.listAccounts(projectId, datasetId);
+    const data = await dataManager.listAccounts(projectId);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

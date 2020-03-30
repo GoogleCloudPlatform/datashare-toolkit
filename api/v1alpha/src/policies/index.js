@@ -119,7 +119,7 @@ var policies = express.Router();
  */
 policies.get('/projects/:projectId/policies', async(req, res) => {
     const projectId = req.params.projectId;
-    const data = await dataManager.listPolicies(projectId, null);
+    const data = await dataManager.listPolicies(projectId);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

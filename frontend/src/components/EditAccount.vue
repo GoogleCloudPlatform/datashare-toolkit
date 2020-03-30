@@ -179,10 +179,10 @@ export default {
         // New record, handle all as added
         added = this.user.policies;
       }
-      console.log(`Added: ${JSON.stringify(added)}`);
-      console.log(`Removed: ${JSON.stringify(removed)}`);
+      // console.log(`Added: ${JSON.stringify(added)}`);
+      // console.log(`Removed: ${JSON.stringify(removed)}`);
       if (this.user.accountId && added.length === 0 && removed.length === 0) {
-        console.log('No policy changes made');
+        // console.log('No policy changes made');
         return false;
       } else {
         return true;

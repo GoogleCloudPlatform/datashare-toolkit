@@ -445,6 +445,12 @@ async function setupDatasharePrerequisites(projectId) {
                     "type": "STRING"
                 },
                 {
+                    "description": "The generated view sql",
+                    "mode": "NULLABLE",
+                    "name": "viewSql",
+                    "type": "STRING"
+                },
+                {
                     "description": "The flag to indicate the account was deleted",
                     "name": "isDeleted",
                     "type": "BOOLEAN"
