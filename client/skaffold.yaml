@@ -25,3 +25,4 @@ deploy:
   kubectl:
     manifests:
     - ./kubernetes-manifests/cdmc-listener-service/*.yaml
+    - ./kubernetes-manifests/cdmc-publisher-service/*.yaml

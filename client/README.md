@@ -7,9 +7,11 @@
   * [Service Account](#service-account)
   * [Create Pub/Sub Topic](#create-pubsub-topic)
   * [Create Pub/Sub Subscription](#create-pubsub-subscription)
+  * [Setup Kubernetes](#setup-kubernetes)
 * [Examples](#examples)
   * [Hello World](#hello-world)
-  * [Replay Messages](#replay-messages)
+  * [Hello World - Docker](#hello-world---docker)
+  * [Replay Messages - Docker](#replay-messages---docker)
 * [Development](#development)
 * [Testing](#testing)
 * [Deployment](#deployment)
@@ -32,7 +34,7 @@ This documentation provides the details for the Cloud Datashare Multicast Client
 
 ## Getting Started
 
-These instructions will setup an instance of the CDMC service in your GCP project.
+These instructions will setup a demo instance of the CDMC service in your GCP project.
 
 ### Enable APIs
 
@@ -117,13 +119,57 @@ List the subscriptions for the topic:
 
     gcloud beta pubsub topics list-subscriptions ${TOPIC_NAME}
 
+### Setup Kubernetes
+These instructions are to setup a GKE cluster, a managed k8s environment,
+via the **[gcloud SDK](https://cloud.google.com/sdk/)**
+
+*Note* You can also setup a GKE cluster via the GCP console.
+
+Set your **CLUSTER\_NAME** environment variable:
+
+    export CLUSTER_NAME=cdmc-demo
+
+Set your **ZONE** environment variable:
+
+*Note* If you specify a region name instead of zone name for the
+**ZONE** environment variable, it will result in X nodes in each zone of
+the region.
+
+    export ZONE=us-central1-c
+
+Create a GKE cluster via **gcloud** CLI and verify the instances are
+created:
+
+    gcloud container clusters create ${CLUSTER_NAME} \
+      --zone ${ZONE} \
+      --machine-type=n2-standard-2 \
+      --num-nodes 3 \
+      --cluster-version=1.15 \
+      --no-enable-legacy-authorization;
+
+Enable cluster-admin-binding clusterrolebinding in the cluster:
+
+    kubectl create clusterrolebinding cluster-admin-binding \
+      --clusterrole=cluster-admin \
+      --user=$(gcloud config get-value core/account);
+
+Create a kubernetes secret with the appropriate service account key file from above:\
+_Note_ Change the file path to the appropriate destination. Secrets management for multiple k8s clusters is outside the scope of this example.
+
+    kubectl create secret generic cdmc-service-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
+
+Modify the ConfigMap with the appropriate CDMC service environment variables:
+
+    vi kubernetes-manifests/cdmc-listener-service/configmaps.yaml
+    vi kubernetes-manifests/cdmc-publisher-service/configmaps.yaml
+
 
 ## Examples
-The examples are currently executed in an isolated Docker environment. Kubernetes support for the CDMC service will be added in a future release.
+The examples are currently executed in an isolated Kubernetes (GKE) or Docker environment.
 
-**Note**: _Currently, GCP networking does not support multicast layer 2 so you will need to run the examples in an isolated environment._
+**Note**: _Currently, GCP VPC networking does not support multicast layer 2 across instances so you will need to run the examples in an isolated environment._
 
-Verify Docker is running and server is > 19.03 version.
+If using Docker, verify Docker client running and server is > 19.03 version.
 
     docker version
 
@@ -133,7 +179,36 @@ Change the ownership of the GAE crednetials file so the Docker executable can re
 
 
 ### Hello World
-The *Hello World* example will utilize the CDMC service to simlulate multicast message(s) (producer), receive the multicast message(s) to a Pub/Sub topic (publisher), and consume the message(s) via Pub/Sub subsription with *gcloud* (subscriber). We will start two Docker containers; one for the Pub/Sub publisher and one for the multicast producer.
+The *Hello World* example will utilize the CDMC service to simlulate multicast message(s) (producer), receive the multicast message(s) to a Pub/Sub topic (publisher), and consume the message(s) via Pub/Sub subsription with *gcloud* (subscriber). We will start two k8s deployments; one for the Pub/Sub publisher and one for the multicast producer.
+
+#### Pub/Sub Publisher
+The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS k8s secret created above.
+
+Modify the ConfigMap with the appropriate CDMC service environment variables:
+
+    vi kubernetes-manifests/cdmc-publisher-service/configmaps.yaml
+
+Apply the new configmap to the service:
+
+    kubectl create -f kubernetes-manifests/cdmc-publisher-service/configmaps.yaml
+
+You should see `Listening and Publishing messages...`
+
+#### Multicast Producer
+Open another terminal and run the following command(s). You can specify the message body with the *-m* flag. You need to keep the multicast group address the same as above.
+
+    docker run -it --rm --name producer gcr.io/chrispage-dev/cdmc:dev multicast broadcast -a 239.0.0.1:9999 -i eth0 -v -m "sample message"
+
+You should see `Completed` in this terminal and the same message payload in the Publisher terminal above.
+
+#### Subscriber
+Open another terminal and tun the following command(s) to pull the messages from the Pub/Sub subscription:
+
+    while ((1)); do gcloud alpha pubsub subscriptions pull ${PULL_SUBSCRIPTION_NAME} --auto-ack; done
+
+
+### Hello World - Docker
+The *Hello World Docker* example will utilize the CDMC service to simlulate multicast message(s) (producer), receive the multicast message(s) to a Pub/Sub topic (publisher), and consume the message(s) via Pub/Sub subsription with *gcloud* (subscriber). We will start two Docker containers; one for the Pub/Sub publisher and one for the multicast producer.
 
 #### Pub/Sub Publisher
 Open a terminal and run the following command. Specify the GOOGLE_APPLICATION_CREDENTIALS, PROJECT_ID, TOPIC_NAME, multicast address and interface name. The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS json file created above. This is only for demo purposes.
@@ -155,7 +230,7 @@ Open another terminal and tun the following command(s) to pull the messages from
     while ((1)); do gcloud alpha pubsub subscriptions pull ${PULL_SUBSCRIPTION_NAME} --auto-ack; done
 
 
-### Replay messages
+### Replay Messages - Docker
 The *replay messages* example will utilize [tcpreplay](https://tcpreplay.appneta.com/) to replay an existing pcap file to simlulate multicast message(s) (producer), receive the multicast message(s) to a Pub/Sub topic (publisher), and consume the message(s) via Pub/Sub subsription with *gcloud* (subscriber). We will start two Docker containers; one for the multicast producer and one for the Pub/Sub publisher.
 
 **Note**: _This was tested on a 8CPU and 30GB mem virtual machine. Docker for Mac did not have enough resources._
@@ -229,7 +304,7 @@ Verify you have Docker running to build the image. You can build the Docker imag
 
 ## ToDo
 * Add GCP cloud build for CDMC service
-* Add k8s example (GKE currently does not support mulitcast)
+* Add k8s example (GCP currently does not support mulitcast)
 * Add Pub/Sub to multicast feature
 
 

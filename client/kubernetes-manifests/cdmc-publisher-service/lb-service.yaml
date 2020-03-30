@@ -2,16 +2,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cdmc-listener-service-lb
+  name: cdmc-publisher-service-lb
   labels:
-    app: cdmc-listener-service
+    app: cdmc-publisher-service
 spec:
   type: LoadBalancer
   ports:
     - protocol: UDP
-      port: 49999
+      port: 50000
       name: multicast
-      targetPort: 49999
+      targetPort: 50000
   selector:
-    app: cdmc-listener-service
+    app: cdmc-publisher-service
     version: v1

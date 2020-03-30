@@ -2,15 +2,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cdmc-listener-service
+  name: cdmc-publisher-service
   labels:
-    app: cdmc-listener-service
+    app: cdmc-publisher-service
 spec:
   type: ClusterIP
   ports:
     - protocol: UDP
-      port: 49999
+      port: 50000
       name: multicast
   selector:
-    app: cdmc-listener-service
+    app: cdmc-publisher-service
     version: v1

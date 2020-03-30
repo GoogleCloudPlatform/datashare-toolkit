@@ -2,13 +2,13 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: cdmc-listener-service
+  name: cdmc-publisher-service
 spec:
   replicas: 2
   template:
     metadata:
       labels:
-        app: cdmc-listener-service
+        app: cdmc-publisher-service
         version: v1
     spec:
       volumes:
@@ -18,23 +18,33 @@ spec:
       containers:
         - name: cdmc-service
           image: gcr.io/chrispage-dev/cdmc
-          args: ["multicast", "listen", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-v"]
+          args: ["multicast", "publish", "-p", "$(PROJECT_ID)", "-t", "$(TOPIC_NAME)", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)"]
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 49999
+            - containerPort: 50000
           volumeMounts:
           - name: google-cloud-key
             mountPath: /var/secrets/google
           env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/key.json
+          - name: PROJECT_ID
+            valueFrom:
+              configMapKeyRef:
+                name: cdmc-publisher-env-config
+                key: PROJECT_ID
+          - name: TOPIC_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: cdmc-publisher-env-config
+                key: TOPIC_NAME
           - name: ADDRESS
             valueFrom:
               configMapKeyRef:
-                name: cdmc-listener-env-config
+                name: cdmc-publisher-env-config
                 key: ADDRESS
           - name: IF_NAME
             valueFrom:
               configMapKeyRef:
-                name: cdmc-listener-env-config
+                name: cdmc-publisher-env-config
                 key: IF_NAME
