@@ -1,31 +1,31 @@
 <template>
-  <v-progress-circular
-    v-if="loading"
-    indeterminate
-    color="primary"
-  ></v-progress-circular>
-  <v-card class="pa-4" v-else>
+  <v-card class="pa-4" :loading="loading">
     <form>
       <v-card-title primary-title>
         Admin
       </v-card-title>
       <div class="my-2">
-        <v-btn color="primary" dark @click.stop="initSchema()"
+        <v-btn :disabled="loading" color="primary" @click.stop="initSchema()"
           >Initialize Schema</v-btn
         >
       </div>
       <div class="my-2">
-        <v-btn color="primary" dark @click.stop="sync('PERMISSIONS')"
+        <v-btn
+          :disabled="loading"
+          color="primary"
+          @click.stop="sync('PERMISSIONS')"
           >Sync BigQuery Permissions</v-btn
         >
       </div>
       <div class="my-2">
-        <v-btn color="primary" dark @click.stop="sync('VIEWS')"
+        <v-btn :disabled="loading" color="primary" @click.stop="sync('VIEWS')"
           >Sync BigQuery Views</v-btn
         >
       </div>
       <div class="my-2">
-        <v-btn color="primary" dark @click.stop="sync('ALL')">Sync All</v-btn>
+        <v-btn :disabled="loading" color="primary" @click.stop="sync('ALL')"
+          >Sync All</v-btn
+        >
       </div>
     </form>
     <Dialog
@@ -110,8 +110,18 @@ export default {
           .then(() => {
             this.dialogButtonConfirmText = 'Ok';
             this.dialogCancelButtonEnabled = false;
-            this.dialogTitle = 'Sync All';
-            this.dialogText = 'Sync all has completed.';
+
+            if (object.syncType === 'ALL') {
+              this.dialogTitle = 'Sync All';
+              this.dialogText = 'Sync all has completed.';
+            } else if (object.syncType === 'PERMISSIONS') {
+              this.dialogTitle = 'Sync Permissions';
+              this.dialogText = 'Sync all permissions has completed.';
+            } else if (object.syncType === 'VIEWS') {
+              this.dialogTitle = 'Sync Views';
+              this.dialogText = 'Sync all views completed.';
+            }
+
             this.dialogObject = { type: 'finalConfirm' };
             this.showDialog = true;
             this.loading = false;
