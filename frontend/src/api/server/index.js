@@ -15,7 +15,7 @@ axios.interceptors.request.use(function(config) {
   if (store.getters.isLoggedIn) {
     const account = store.state.user.data.email;
     if (account) {
-      config.headers.GcpAccount = account;
+      config.headers['x-gcp-account'] = account;
     }
   }
   return config;

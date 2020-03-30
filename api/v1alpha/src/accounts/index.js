@@ -221,7 +221,7 @@ accounts.post('/projects/:projectId/accounts', async(req, res) => {
         email: req.body.email,
         emailType: req.body.emailType,
         accountType: req.body.accountType,
-        createdBy: req.header('GcpAccount'),
+        createdBy: req.header('x-gcp-account'),
         policies: req.body.policies
     };
     const data = await dataManager.createOrUpdateAccount(projectId, null, values);
@@ -382,7 +382,7 @@ accounts.put('/projects/:projectId/accounts/:accountId', async(req, res) => {
         email: req.body.email,
         emailType: req.body.emailType,
         accountType: req.body.accountType,
-        createdBy: req.header('GcpAccount'),
+        createdBy: req.header('x-gcp-account'),
         policies: req.body.policies
     };
     const data = await dataManager.createOrUpdateAccount(projectId, accountId, values);
@@ -462,7 +462,7 @@ accounts.delete('/projects/:projectId/accounts/:accountId', async(req, res) => {
     const accountId = req.params.accountId;
     const values = {
         rowId: req.body.rowId,
-        createdBy: req.header('GcpAccount')
+        createdBy: req.header('x-gcp-account')
     };
     const data = await dataManager.deleteAccount(projectId, accountId, values);
     var code;
