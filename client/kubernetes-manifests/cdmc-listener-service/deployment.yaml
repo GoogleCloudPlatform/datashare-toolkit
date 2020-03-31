@@ -18,7 +18,7 @@ spec:
       containers:
         - name: cdmc-service
           image: gcr.io/chrispage-dev/cdmc
-          args: ["multicast", "listen", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-v"]
+          args: ["multicast", "listen", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-v=$(VERBOSE)"]
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 49999
@@ -38,3 +38,8 @@ spec:
               configMapKeyRef:
                 name: cdmc-listener-env-config
                 key: IF_NAME
+          - name: VERBOSE
+            valueFrom:
+              configMapKeyRef:
+                name: cdmc-listener-env-config
+                key: VERBOSE

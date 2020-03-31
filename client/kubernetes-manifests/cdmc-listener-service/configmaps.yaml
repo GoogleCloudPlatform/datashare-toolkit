@@ -9,3 +9,4 @@ data:
   #TOPIC_NAME: "cds-multicast-demo-broadcast"
   ADDRESS: "239.0.0.1:49999"
   IF_NAME: "eth0"
+  VERBOSE: "true"

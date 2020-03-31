@@ -18,7 +18,7 @@ spec:
       containers:
         - name: cdmc-service
           image: gcr.io/chrispage-dev/cdmc
-          args: ["multicast", "publish", "-p", "$(PROJECT_ID)", "-t", "$(TOPIC_NAME)", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)"]
+          args: ["multicast", "publish", "-p", "$(PROJECT_ID)", "-t", "$(TOPIC_NAME)", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-v=$(VERBOSE)"]
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 50000
@@ -48,3 +48,8 @@ spec:
               configMapKeyRef:
                 name: cdmc-publisher-env-config
                 key: IF_NAME
+          - name: VERBOSE
+            valueFrom:
+              configMapKeyRef:
+                name: cdmc-publisher-env-config
+                key: VERBOSE
