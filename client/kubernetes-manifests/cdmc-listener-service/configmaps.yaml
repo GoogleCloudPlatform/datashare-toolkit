@@ -4,9 +4,9 @@ kind: ConfigMap
 metadata:
   name: cdmc-listener-env-config
 data:
-  # PROJECT_ID and TOPIC_NAME are only required for publisher
+  ## PROJECT_ID and TOPIC_NAME are only required for publisher
   #PROJECT_ID: "chrispage-dev"
   #TOPIC_NAME: "cds-multicast-demo-broadcast"
-  ADDRESS: "239.0.0.1:49999"
+  ADDRESS: "239.0.0.1:50001"
   IF_NAME: "eth0"
   VERBOSE: "true"

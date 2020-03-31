@@ -17,11 +17,11 @@ spec:
           secretName: cdmc-service-creds
       containers:
         - name: cdmc-service
-          image: gcr.io/chrispage-dev/cdmc
+          image: gcr.io/chrispage-dev/cdmc:dev
           args: ["multicast", "listen", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-v=$(VERBOSE)"]
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 49999
+            - containerPort: 50001
           volumeMounts:
           - name: google-cloud-key
             mountPath: /var/secrets/google

@@ -8,10 +8,7 @@
   * [Create Pub/Sub Topic](#create-pubsub-topic)
   * [Create Pub/Sub Subscription](#create-pubsub-subscription)
   * [Setup Kubernetes](#setup-kubernetes)
-* [Examples](#examples)
-  * [Hello World](#hello-world)
-  * [Hello World - Docker](#hello-world---docker)
-  * [Replay Messages - Docker](#replay-messages---docker)
+* [Examples](EXAMPLES.md)
 * [Development](#development)
 * [Testing](#testing)
 * [Deployment](#deployment)
@@ -25,7 +22,7 @@
 
 This documentation provides the details for the Cloud Datashare Multicast Client (CDMC). The CDMC service enables data providers the abilitiy to subscribe to a multicast broadcast group and publish those messages (unicast) onto a Google Cloud Platform (GCP) Pub/Sub Topic securely. GCP Pub/Sub is a fully-managed real-time messaging service that allows you to send and receive messages between independent applications. The GCP IAM security controls enable data producers the ability to authorize specific consumers of the multicast Pub/Sub topic subscriptions.
 
-**Note**: _Translating Pub/Sub messages to multicast is currently out of scope._
+**Note**: Translating Pub/Sub messages to multicast is currently out of scope.
 
 
 ## Architecture
@@ -123,7 +120,7 @@ List the subscriptions for the topic:
 These instructions are to setup a GKE cluster, a managed k8s environment,
 via the **[gcloud SDK](https://cloud.google.com/sdk/)**
 
-*Note* You can also setup a GKE cluster via the GCP console.
+**Note**: You can also setup a GKE cluster via the GCP console.
 
 Set your **CLUSTER\_NAME** environment variable:
 
@@ -131,7 +128,7 @@ Set your **CLUSTER\_NAME** environment variable:
 
 Set your **ZONE** environment variable:
 
-*Note* If you specify a region name instead of zone name for the
+**Note**: If you specify a region name instead of zone name for the
 **ZONE** environment variable, it will result in X nodes in each zone of
 the region.
 
@@ -154,122 +151,10 @@ Enable cluster-admin-binding clusterrolebinding in the cluster:
       --user=$(gcloud config get-value core/account);
 
 Create a kubernetes secret with the appropriate service account key file from above:\
-_Note_ Change the file path to the appropriate destination. Secrets management for multiple k8s clusters is outside the scope of this example.
+
+**Note**: Change the file path to the appropriate destination. Secrets management for multiple k8s clusters is outside the scope of this example.
 
     kubectl create secret generic cdmc-service-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
-
-Modify the ConfigMap with the appropriate CDMC service environment variables:
-
-    vi kubernetes-manifests/cdmc-listener-service/configmaps.yaml
-    vi kubernetes-manifests/cdmc-publisher-service/configmaps.yaml
-
-
-## Examples
-The examples are currently executed in an isolated Kubernetes (GKE) or Docker environment.
-
-**Note**: _Currently, GCP VPC networking does not support multicast layer 2 across instances so you will need to run the examples in an isolated environment._
-
-If using Docker, verify Docker client running and server is > 19.03 version.
-
-    docker version
-
-Change the ownership of the GAE crednetials file so the Docker executable can read it.
-
-    chmod 0444 ${GOOGLE_APPLICATION_CREDENTIALS}
-
-
-### Hello World
-The *Hello World* example will utilize the CDMC service to simlulate multicast message(s) (producer), receive the multicast message(s) to a Pub/Sub topic (publisher), and consume the message(s) via Pub/Sub subsription with *gcloud* (subscriber). We will start two k8s deployments; one for the Pub/Sub publisher and one for the multicast producer.
-
-#### Pub/Sub Publisher
-The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS k8s secret created above.
-
-Modify the ConfigMap with the appropriate CDMC service environment variables:
-
-    vi kubernetes-manifests/cdmc-publisher-service/configmaps.yaml
-
-Apply the new configmap to the service:
-
-    kubectl create -f kubernetes-manifests/cdmc-publisher-service/configmaps.yaml
-
-You should see `Listening and Publishing messages...`
-
-#### Multicast Producer
-Open another terminal and run the following command(s). You can specify the message body with the *-m* flag. You need to keep the multicast group address the same as above.
-
-    docker run -it --rm --name producer gcr.io/chrispage-dev/cdmc:dev multicast broadcast -a 239.0.0.1:9999 -i eth0 -v -m "sample message"
-
-You should see `Completed` in this terminal and the same message payload in the Publisher terminal above.
-
-#### Subscriber
-Open another terminal and tun the following command(s) to pull the messages from the Pub/Sub subscription:
-
-    while ((1)); do gcloud alpha pubsub subscriptions pull ${PULL_SUBSCRIPTION_NAME} --auto-ack; done
-
-
-### Hello World - Docker
-The *Hello World Docker* example will utilize the CDMC service to simlulate multicast message(s) (producer), receive the multicast message(s) to a Pub/Sub topic (publisher), and consume the message(s) via Pub/Sub subsription with *gcloud* (subscriber). We will start two Docker containers; one for the Pub/Sub publisher and one for the multicast producer.
-
-#### Pub/Sub Publisher
-Open a terminal and run the following command. Specify the GOOGLE_APPLICATION_CREDENTIALS, PROJECT_ID, TOPIC_NAME, multicast address and interface name. The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS json file created above. This is only for demo purposes.
-
-    docker run -it --rm --name publisher -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json -v ${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/key.json gcr.io/chrispage-dev/cdmc:dev multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i eth0 -v
-
-You should see `Listening and Publishing messages...`
-
-#### Multicast Producer
-Open another terminal and run the following command(s). You can specify the message body with the *-m* flag. You need to keep the multicast group address the same as above.
-
-    docker run -it --rm --name producer gcr.io/chrispage-dev/cdmc:dev multicast broadcast -a 239.0.0.1:9999 -i eth0 -v -m "sample message"
-
-You should see `Completed` in this terminal and the same message payload in the Publisher terminal above.
-
-#### Subscriber
-Open another terminal and tun the following command(s) to pull the messages from the Pub/Sub subscription:
-
-    while ((1)); do gcloud alpha pubsub subscriptions pull ${PULL_SUBSCRIPTION_NAME} --auto-ack; done
-
-
-### Replay Messages - Docker
-The *replay messages* example will utilize [tcpreplay](https://tcpreplay.appneta.com/) to replay an existing pcap file to simlulate multicast message(s) (producer), receive the multicast message(s) to a Pub/Sub topic (publisher), and consume the message(s) via Pub/Sub subsription with *gcloud* (subscriber). We will start two Docker containers; one for the multicast producer and one for the Pub/Sub publisher.
-
-**Note**: _This was tested on a 8CPU and 30GB mem virtual machine. Docker for Mac did not have enough resources._
-
-#### Pub/Sub Publisher
-Open a terminal and run the following command(s). First, we will initially try the `listen` subcommand before `publish` to verify the tcpreplay works. Specify a multicast address, *eth0* interface name, and custom interface read buffer (2MB).
-
-    docker run -it --rm --name listener gcr.io/chrispage-dev/cdmc:dev multicast listen -a 239.0.0.1:9999 -i eth0 -r 2097152 -v
-
-You should see `Listening to messages...`
-
-#### Multicast Producer
-Open another terminal and run the following command(s). You can capture a multicast stream with [tcpdump](https://www.tcpdump.org/) or use a public data set. For this example, we will use the from (https://iextrading.com/trading/market-data/). Download one of the [Sample pcap](https://www.googleapis.com/download/storage/v1/b/iex/o/data%2Ffeeds%2F20180127%2F20180127_IEXTP1_DEEP1.0.pcap.gz?generation=1517101215560431&alt=media) files and unzip. You will need to change the *-D* option to replace the destination multicast group address, the *-r* to replace the port number, and the pcap file location, */temp/data_feeds_20180127_20180127_IEXTP1_DEEP1.0.pcap* if using a different pcap file. The *-t* option will send the feed as fast as possible.
-
-**Note**: _You can loop `tcpreplay` with the *-l <# of loops>* option._
-
-    docker run -it --rm --name producer -v "${PWD}":"${PWD}" williamofockham/tcpreplay:4.3.0 tcpreplay-edit -i eth0 -D 233.215.21.4/32:239.0.0.1/32 -r 10378:9999 -C -t ${PWD}/temp/data_feeds_20180127_20180127_IEXTP1_DEEP1.0.pcap
-
-You will see messages running through the producer and publisher terminals.
-
-You can debug via tcpdump:
-
-    tcpdump -n -s0 -vv -X -e udp port 9999
-
-#### Pub/Sub Publisher (con't)
-Now that you verified the above works, you can change the publisher command from `listen` to `publish` with appropriate parameters.\
-Open a terminal and run the following command. Specify the GOOGLE_APPLICATION_CREDENTIALS, PROJECT_ID, TOPIC_NAME, multicast address and interface name. The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS json file created above (This is only for demo purposes). Raise the buffer to 5MB.
-
-    docker run -it --rm --name publisher -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json -v ${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/key.json gcr.io/chrispage-dev/cdmc:dev multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i eth0 -r 5242880
-
-You should see `Listening and Publishing messages...`
-
-#### Multicast Producer (con't)
-Re-run the same producer command above. You will see messages running through the producer and publisher terminals.
-
-#### Subscriber
-Open another terminal and tun the following command to pull the messages from the Pub/Sub subscription:
-
-    while ((1)); do gcloud alpha pubsub subscriptions pull ${PULL_SUBSCRIPTION_NAME} --auto-ack; done
 
 
 ## Development
@@ -285,7 +170,7 @@ Run the main.go command:
 
 If you want to purge the Pub/Sub subscription, run the following command:
 
-**Note** _This command is non-reversable!_
+**Note**: This command is non-reversable!
 
     gcloud pubsub subscriptions seek ${PULL_SUBSCRIPTION_NAME} --time=$(date +%Y-%m-%dT%H:%M:%S)
 
@@ -297,14 +182,14 @@ TBD
 ## Deployment
 Verify you have Docker running to build the image. You can build the Docker image from the parent directory [client](./):
 
-**Note**: _Change your project name appropriately._
+**Note**: Change your project name appropriately.
 
     docker build -t gcr.io/chrispage-dev/cdmc:dev .
 
 
 ## ToDo
 * Add GCP cloud build for CDMC service
-* Add k8s example (GCP currently does not support mulitcast)
+* ~~Add k8s example (GCP currently does not support mulitcast)~~
 * Add Pub/Sub to multicast feature
 
 
@@ -331,3 +216,6 @@ This section lista all the relevant acronyms for Cloud Datashare Multicast Clien
 |:-------------:|:---------------:|:----------------|
 | CDS | Cloud Datashare | The name of the this tool kit that enables data producers to expose data on GCP to consumers |
 | CDMC | Cloud Datashare Multicast Client | The name of the CDS multicast client and application binary |
+
+----
+* [Home](./README.md)

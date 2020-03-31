@@ -9,7 +9,7 @@ spec:
   type: ClusterIP
   ports:
     - protocol: UDP
-      port: 49999
+      port: 50001
       name: multicast
   selector:
     app: cdmc-listener-service

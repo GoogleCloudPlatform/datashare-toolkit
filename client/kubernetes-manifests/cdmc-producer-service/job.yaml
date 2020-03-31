@@ -1,0 +1,40 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cdmc-producer-service
+spec:
+  template:
+    metadata:
+      labels:
+        app: cdmc-producer-service
+        version: v1
+    spec:
+      restartPolicy: Never
+      #ttlSecondsAfterFinished: 60
+      containers:
+        - name: cdmc-service
+          image: gcr.io/chrispage-dev/cdmc:dev
+          args: ["multicast", "broadcast", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-v=$(VERBOSE)", "-m", "$(MESSAGE)"]
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                name: cdmc-producer-env-config
+                key: ADDRESS
+          - name: IF_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: cdmc-producer-env-config
+                key: IF_NAME
+          - name: VERBOSE
+            valueFrom:
+              configMapKeyRef:
+                name: cdmc-producer-env-config
+                key: VERBOSE
+          - name: MESSAGE
+            valueFrom:
+              configMapKeyRef:
+                name: cdmc-producer-env-config
+                key: MESSAGE
