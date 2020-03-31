@@ -111,9 +111,57 @@ async function deleteDataset(projectId, datasetId) {
     }
 }
 
+/**
+ * @param  {} projectId
+ */
+async function listViews(projectId) {
+    return listDatasetViews(projectId, null);
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} datasetId
+ */
+async function listDatasetViews(projectId, datasetId) {
+    return { success: true }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} datasetId
+ * @param  {} viewId
+ */
+async function getDatasetView(projectId, datasetId, viewId) {
+    return { success: true }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} datasetId
+ * @param  {} viewId
+ * @param  {} view
+ */
+async function createOrUpdateDatasetView(projectId, datasetId, viewId, view) {
+    return { success: true }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} datasetId
+ * @param  {} viewId
+ */
+async function deleteDatasetView(projectId, datasetId, viewId) {
+    return { success: true }
+}
+
 module.exports = {
     listDatasets,
     createDataset,
     getDataset,
-    deleteDataset
+    deleteDataset,
+    listViews,
+    listDatasetViews,
+    getDatasetView,
+    createOrUpdateDatasetView,
+    deleteDatasetView
 };

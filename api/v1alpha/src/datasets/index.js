@@ -315,4 +315,104 @@ datasets.delete('/projects/:projectId/datasets/:datasetId', async(req, res) => {
     });
 });
 
+datasets.get('/projects/:projectId/views', async(req, res) => {
+    const projectId = req.params.projectId;
+    const data = await dataManager.listViews(projectId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.get('/projects/:projectId/datasets/:datasetId/views', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const data = await dataManager.listDatasetViews(projectId, datasetId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.get('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const viewId = req.params.viewId;
+    const data = await dataManager.getDatasetView(projectId, datasetId, viewId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.post('/projects/:projectId/datasets/:datasetId/views', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const view = req.body.view;
+    const data = await dataManager.createOrUpdateDatasetView(projectId, datasetId, null, view);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.put('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const viewId = req.params.viewId;
+    const view = req.body.view;
+    const data = await dataManager.createOrUpdateDatasetView(projectId, datasetId, viewId, view);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.delete('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const viewId = req.params.viewId;
+    const data = await dataManager.deleteDatasetView(projectId, datasetId, viewId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
 module.exports = datasets;
