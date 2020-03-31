@@ -15,7 +15,7 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/pkg/multicast"
+	"github.com/GoogleCloudPlatform/cloud-datashare-toolkit/client/pkg/multicast"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

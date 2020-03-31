@@ -18,7 +18,7 @@ package cmd
 import (
 	log "github.com/sirupsen/logrus"
 
-	"github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/internal/injestion"
+	"github.com/GoogleCloudPlatform/cloud-datashare-toolkit/client/internal/injestion"
 	"github.com/spf13/cobra"
 )
 

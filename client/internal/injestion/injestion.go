@@ -17,8 +17,8 @@ package injestion
 
 import (
 	"fmt"
-	"github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/internal/pubsubutil"
-	"github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/internal/validate"
+	"github.com/GoogleCloudPlatform/cloud-datashare-toolkit/client/internal/pubsubutil"
+	"github.com/GoogleCloudPlatform/cloud-datashare-toolkit/client/internal/validate"
 	log "github.com/sirupsen/logrus"
 )
 

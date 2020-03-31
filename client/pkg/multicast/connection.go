@@ -5,7 +5,7 @@ package multicast
 import (
 	"cloud.google.com/go/pubsub"
 	"fmt"
-	"github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/internal/pubsubutil"
+	"github.com/GoogleCloudPlatform/cloud-datashare-toolkit/client/internal/pubsubutil"
 	log "github.com/sirupsen/logrus"
 	"net"
 	"os"

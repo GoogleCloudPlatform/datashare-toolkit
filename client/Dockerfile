@@ -22,7 +22,7 @@ FROM golang:1.13-alpine3.11 AS base
 MAINTAINER Chris Page <chrispage@google.com>
 
 # Set the application directory
-WORKDIR /go/src/github.com/GoogleCloudPlatform/bq-datashare-toolkit/client
+WORKDIR /go/src/github.com/GoogleCloudPlatform/cloud-datashare-toolkit/client
 
 # Install Git, Go dependencies, and build the app
 RUN apk --no-cache add git

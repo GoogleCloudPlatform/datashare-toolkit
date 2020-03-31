@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/GoogleCloudPlatform/bq-datashare-toolkit/client/cmd/cdmc/cmd"
+import "github.com/GoogleCloudPlatform/cloud-datashare-toolkit/client/cmd/cdmc/cmd"
 
 var (
 	// VERSION is set during build
