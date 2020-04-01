@@ -84,12 +84,13 @@ async function _deleteData(projectId, fields, values, data) {
  */
 async function listAccounts(projectId, datasetId, policyId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+    const policyTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const limit = 10;
     let sqlQuery = `SELECT ca.* except(policies),
         array(
             select as struct pm.policyId, pm.name
             from unnest(ca.policies) p
-            join \`${projectId}.datashare.currentPolicy\` pm on p.policyId = pm.policyId
+            join \`${policyTable}\` pm on p.policyId = pm.policyId
             where pm.isDeleted is false
            ) as policies
         FROM \`${projectId}.datashare.currentAccount\` ca
@@ -98,7 +99,6 @@ async function listAccounts(projectId, datasetId, policyId) {
         query: sqlQuery
     };
     if (datasetId) {
-        const policyTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
         sqlQuery = `with policies as (
             select distinct
               cp.policyId,

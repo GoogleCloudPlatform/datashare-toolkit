@@ -302,12 +302,15 @@ export default {
     loadViews() {
       this.loading = true;
       this.$store
-        .dispatch('getView', {
-          projectId: this.$store.state.settings.projectId,
+        .dispatch('getViews', {
           datasetId: this.$route.query.datasetId
         })
-        .then(views => {
-          this.views = views;
+        .then(response => {
+          if (response) {
+            this.views = response.data;
+          } else {
+            this.views = [];
+          }
           this.loading = false;
         });
     },

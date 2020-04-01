@@ -39,6 +39,10 @@ config.cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description'
 
 config.cdsAuthorizedViewTableId = "authorizedView";
 config.cdsAuthorizedViewViewId = "currentAuthorizedView";
+config.cdsAuthorizedViewViewFields = new Set(['rowId', 'authorizedViewId', 'name', 'description',
+    'datasetId', 'source', 'expiration', 'custom', 'createdBy', 'createdAt', 'viewSql', 
+    'version', 'isDeleted']);
+
 config.cdsCurrentUserDatasetViewId = "currentUserDataset";
 
 module.exports = config;

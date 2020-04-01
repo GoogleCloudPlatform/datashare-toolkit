@@ -19,6 +19,18 @@
 const { BigQueryUtil } = require('bqds-shared');
 let bigqueryUtil = new BigQueryUtil();
 const labelName = "cds_managed";
+const configValidator = require('./views/configValidator');
+const cfg = require('../lib/config');
+
+/**
+ * @param  {string} projectId
+ * @param  {string} datasetId
+ * @param  {string} tableId
+ * Get the FQDN format for a project's table or view name
+ */
+function getTableFqdn(projectId, datasetId, tableId) {
+    return `${projectId}.${datasetId}.${tableId}`;
+}
 
 /**
  * @param  {string} projectId
@@ -54,7 +66,7 @@ async function createDataset(projectId, datasetId, description) {
         return { success: false, errors: [err.message] };
     });
     if (dataset.success === false) {
-        return { code: 400, ... dataset };
+        return { code: 400, ...dataset };
     }
     if (dataset === undefined || dataset === null) {
         const message = `DatasetId: '${datasetId}' creation failed.`;
@@ -83,7 +95,7 @@ async function getDataset(projectId, datasetId) {
         return { success: false, errors: [err.message] };
     });
     if (dataset.success === false) {
-        return { code: 400, ... dataset };
+        return { code: 400, ...dataset };
     }
     if (dataset.labels === undefined || dataset.labels[labelName] != "true") {
         const message = `Dataset do not exist with datasetId: '${datasetId}', labelKey: '${labelKey}'`;
@@ -187,7 +199,29 @@ async function listViews(projectId) {
  * @param  {} datasetId
  */
 async function listDatasetViews(projectId, datasetId) {
-    return { success: true }
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
+    let fields = cfg.cdsAuthorizedViewViewFields;
+    let remove = ['source', 'expiration', 'custom', 'viewSql', 'isDeleted'];
+        remove.forEach(f => fields.delete(f));
+        fields = Array.from(fields).map(i => 'v.' + i).join();
+    let sqlQuery = `SELECT ${fields}
+      FROM \`${table}\` v
+      where isDeleted is false`;
+
+    if (datasetId) {
+        sqlQuery += '\nand datasetId = @datasetId'
+    }
+
+    let options = {
+        query: sqlQuery
+    };
+
+    if (datasetId) {
+        options.params = { datasetId: datasetId };
+    }
+
+    const [rows] = await bigqueryUtil.executeQuery(options);
+    return { success: true, data: rows }
 }
 
 /**
@@ -197,6 +231,16 @@ async function listDatasetViews(projectId, datasetId) {
  */
 async function getDatasetView(projectId, datasetId, viewId) {
     return { success: true }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} datasetId
+ * @param  {} view
+ */
+async function validateDatasetView(projectId, datasetId, view) {
+    const result = await configValidator.validate(view);
+    return { success: result.isValid, errors: result.issues };
 }
 
 /**
@@ -223,9 +267,9 @@ module.exports = {
     createDataset,
     getDataset,
     deleteDataset,
-    listViews,
     listDatasetViews,
     getDatasetView,
+    validateDatasetView,
     createOrUpdateDatasetView,
     deleteDatasetView
 };

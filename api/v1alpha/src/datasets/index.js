@@ -318,7 +318,7 @@ datasets.delete('/projects/:projectId/datasets/:datasetId', async(req, res) => {
 
 datasets.get('/projects/:projectId/views', async(req, res) => {
     const projectId = req.params.projectId;
-    const data = await dataManager.listViews(projectId);
+    const data = await dataManager.listDatasetViews(projectId, null);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -352,6 +352,23 @@ datasets.get('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req
     const datasetId = req.params.datasetId;
     const viewId = req.params.viewId;
     const data = await dataManager.getDatasetView(projectId, datasetId, viewId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.post('/projects/:projectId/datasets/:datasetId/views/validate', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const view = req.body.view;
+    const data = await dataManager.validateDatasetView(projectId, datasetId, view);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

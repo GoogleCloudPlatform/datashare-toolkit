@@ -158,12 +158,16 @@ export default {
       })
       .then(response => response);
   },
-  getView(payload) {
-    return axios
-      .get(this._apiBaseUrl() + '/authorizedView', {
-        params: payload
-      })
-      .then(response => response);
+  getViews(payload) {
+    if (!payload.datasetId) {
+      return axios
+        .get(this._apiBaseUrl() + '/views')
+        .then(response => response);
+    } else {
+      return axios
+        .get(this._apiBaseUrl() + `/datasets/${payload.datasetId}/views`)
+        .then(response => response);
+    }
   },
   getTables(projectId, datasetId, labelKey) {
     return axios

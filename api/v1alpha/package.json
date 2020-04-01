@@ -14,7 +14,8 @@
         "swagger-ui-express": "^4.1.2",
         "underscore": "^1.9.1",
         "uuid": "^3.3.3",
-        "bqds-shared": "file:../../shared"
+        "bqds-shared": "file:../../shared",
+        "jsonschema": "^1.2.6"
     },
     "scripts": {
         "dev": "nodemon src/index.js",

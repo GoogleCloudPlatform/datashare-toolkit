@@ -213,8 +213,8 @@ const store = new Vuex.Store({
         });
     },
     // eslint-disable-next-line no-unused-vars
-    getView({ commit }, payload) {
-      return client.getView(payload).catch(error => {
+    getViews({ commit }, payload) {
+      return client.getViews(payload).catch(error => {
         notify(error);
       });
     },
