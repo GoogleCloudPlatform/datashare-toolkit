@@ -302,7 +302,8 @@ datasets.get('/projects/:projectId/datasets/:datasetId', async(req, res) => {
 datasets.delete('/projects/:projectId/datasets/:datasetId', async(req, res) => {
     const projectId = req.params.projectId;
     const datasetId = req.params.datasetId;
-    const data = await dataManager.deleteDataset(projectId, datasetId);
+    const createdBy = req.header('x-gcp-account');
+    const data = await dataManager.deleteDataset(projectId, datasetId, createdBy);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

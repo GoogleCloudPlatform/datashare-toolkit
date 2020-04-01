@@ -100,10 +100,74 @@ async function getDataset(projectId, datasetId) {
 /**
  * @param  {} projectId
  * @param  {} datasetId
+ * @param  {} createdBy
  */
-async function deleteDataset(projectId, datasetId) {
+async function deleteDataset(projectId, datasetId, createdBy) {
     const result = await bigqueryUtil.deleteDataset(datasetId, false);
+    console.log(result);
     if (result) {
+        // Update and delete related views
+        const viewStatement = `insert into \`datashare.authorizedView\` (rowId, authorizedViewId, name, description, datasetId, source, expiration, custom, createdAt, createdBy, viewSql, isDeleted)
+        select GENERATE_UUID(), authorizedViewId, name, description, datasetId, source, expiration, custom, CURRENT_TIMESTAMP(), @createdBy, viewSql, true
+        from \`datashare.currentAuthorizedView\`
+        where datasetId = @datasetId and isDeleted = false`;
+
+        const bigqueryUtil = new BigQueryUtil(projectId);
+
+        console.log(`Executing view update: ${viewStatement}`);
+        const viewOptions = {
+            query: viewStatement,
+            params: { createdBy: createdBy, datasetId: datasetId }
+        };
+        await bigqueryUtil.executeQuery(viewOptions);
+
+        // Updated related policies to remove the deleted dataset
+        const policyStatement = `INSERT INTO \`datashare.policy\` (rowId, policyId, name, description, datasets, rowAccessTags, createdBy, createdAt, isDeleted)
+    WITH datasetRows as (
+      SELECT rowId
+      FROM \`datashare.currentPolicy\` cp
+      WHERE cp.isDeleted = false AND EXISTS (SELECT 1
+        FROM UNNEST(cp.datasets)
+        WHERE datasetId = @datasetId)
+    ),
+    datasets as (
+      SELECT cp.rowId, d.datasetId
+      FROM \`datashare.currentPolicy\` cp
+      CROSS JOIN cp.datasets d
+      JOIN datasetRows dr on cp.rowId = dr.rowId
+    ),
+    availableDatasets as (
+      SELECT schema_name as datasetId
+      FROM INFORMATION_SCHEMA.SCHEMATA
+      -- WHERE catalog_name = 'cds-demo-1-271622' -- filter isn't required as current project is set already
+    ),
+    policyDatasets as (
+      SELECT d.rowId, ARRAY_AGG(STRUCT(d.datasetId)) as datasets
+      FROM datasets d
+      JOIN availableDatasets a on a.datasetId = d.datasetId
+      GROUP BY d.rowId
+    )
+    select
+      GENERATE_UUID() as rowId,
+      policyId,
+      name,
+      description,
+      pd.datasets,
+      rowAccessTags,
+      @createdBy,
+      CURRENT_TIMESTAMP() as createdAt,
+      isDeleted
+    FROM datasetRows dr
+    JOIN \`datashare.currentPolicy\` cp on dr.rowId = cp.rowId
+    LEFT JOIN policyDatasets pd on cp.rowId = pd.rowId;`;
+
+        console.log(`Executing policy update: ${policyStatement}`);
+        const policyOptions = {
+            query: policyStatement,
+            params: { createdBy: createdBy, datasetId: datasetId }
+        };
+        await bigqueryUtil.executeQuery(policyOptions);
+
         return { success: true }
     }
     else {
