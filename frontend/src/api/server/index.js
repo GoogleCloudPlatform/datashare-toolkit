@@ -60,14 +60,9 @@ export default {
   resetSettings() {
     return mock.resetSettings();
   },
-  getDatasets(projectId, labelKey) {
+  getDatasets(labelKey) {
     return axios
-      .get(this._apiBaseUrl() + '/datasets', {
-        params: {
-          projectId: projectId,
-          labelKey: labelKey
-        }
-      })
+      .get(this._apiBaseUrl() + '/datasets')
       .then(response => response);
   },
   createDataset(projectId, datasetId, description) {
@@ -176,24 +171,14 @@ export default {
   },
   getTables(projectId, datasetId, labelKey) {
     return axios
-      .get(this._apiBaseUrl() + '/tables', {
-        params: {
-          projectId: projectId,
-          datasetId: datasetId,
-          labelKey: labelKey
-        }
-      })
+      .get(this._apiBaseUrl() + `/datasets/${datasetId}/tables`)
       .then(response => response);
   },
   getTableColumns(projectId, datasetId, tableId) {
     return axios
-      .get(this._apiBaseUrl() + '/tableColumns', {
-        params: {
-          projectId: projectId,
-          datasetId: datasetId,
-          tableId: tableId
-        }
-      })
+      .get(
+        this._apiBaseUrl() + `/datasets/${datasetId}/tables/${tableId}/columns`
+      )
       .then(response => response);
   },
   validateView(payload) {

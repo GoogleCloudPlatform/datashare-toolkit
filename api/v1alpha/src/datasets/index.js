@@ -316,6 +316,39 @@ datasets.delete('/projects/:projectId/datasets/:datasetId', async(req, res) => {
     });
 });
 
+datasets.get('/projects/:projectId/datasets/:datasetId/tables', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const data = await dataManager.listTables(projectId, datasetId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.get('/projects/:projectId/datasets/:datasetId/tables/:tableId/columns', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const tableId = req.params.tableId;
+    const data = await dataManager.listTableColumns(projectId, datasetId, tableId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
 datasets.get('/projects/:projectId/views', async(req, res) => {
     const projectId = req.params.projectId;
     const data = await dataManager.listDatasetViews(projectId, null);
@@ -364,7 +397,7 @@ datasets.get('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req
     });
 });
 
-datasets.post('/projects/:projectId/datasets/:datasetId/views/validate', async(req, res) => {
+datasets.post('/projects/:projectId/datasets/:datasetId/views::validate', async(req, res) => {
     const projectId = req.params.projectId;
     const datasetId = req.params.datasetId;
     const view = req.body.view;

@@ -901,14 +901,14 @@ export default {
     },
     loadDatasets() {
       this.loading = true;
-      return this.$store
-        .dispatch('getDatasets', {
-          projectId: this.$store.state.settings.projectId
-        })
-        .then(datasets => {
-          this.referenceData.datasets = datasets;
-          this.loading = false;
-        });
+      return this.$store.dispatch('getDatasets', {}).then(response => {
+        if (response.success) {
+          this.referenceData.datasets = response.data;
+        } else {
+          this.referenceData.datasets = [];
+        }
+        this.loading = false;
+      });
     },
     sourceDatasetChanged() {
       this.view.source.tableId = null;
@@ -926,11 +926,14 @@ export default {
       this.loading = true;
       return this.$store
         .dispatch('getTables', {
-          projectId: this.$store.state.settings.projectId,
           datasetId: datasetId
         })
-        .then(tables => {
-          this.referenceData.tables = tables;
+        .then(response => {
+          if (response.success) {
+            this.referenceData.tables = response.data;
+          } else {
+            this.referenceData.tables = [];
+          }
           this.loading = false;
         });
     },
@@ -942,12 +945,15 @@ export default {
       this.loading = true;
       return this.$store
         .dispatch('getTableColumns', {
-          projectId: this.$store.state.settings.projectId,
           datasetId: datasetId,
           tableId: tableId
         })
-        .then(columns => {
-          this.referenceData.availableColumns = columns;
+        .then(response => {
+          if (response.success) {
+            this.referenceData.availableColumns = response.data;
+          } else {
+            this.referenceData.availableColumns = [];
+          }
           this.loading = false;
         });
     },

@@ -190,6 +190,34 @@ async function deleteDataset(projectId, datasetId, createdBy) {
 /**
  * @param  {} projectId
  * @param  {} datasetId
+ * @param  {} labelKey
+ */
+async function listTables(projectId, datasetId, labelKey) {
+    try {
+        let tables = await bigqueryUtil.getTablesByLabel(projectId, datasetId, labelKey);
+        return { success: true, data: tables }
+    } catch (err) {
+        return { success: false, errors: ['Failed to retrieve tables'] };
+    }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} datasetId
+ * @param  {} tableId
+ */
+async function listTableColumns(projectId, datasetId, tableId) {
+    try {
+        let availableColumns = await bigqueryUtil.tableColumns(datasetId, tableId);
+        return { success: true, data: availableColumns }
+    } catch (err) {
+        return { success: false, errors: ['Failed to retrieve columns'] };
+    }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} datasetId
  */
 async function listDatasetViews(projectId, datasetId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
@@ -243,7 +271,8 @@ async function getDatasetView(projectId, datasetId, viewId) {
             // When querying using the node lib time is returned in a 'value' key
             result.expiration.time = result.expiration.time.value;
         }
-        return { success: true, data: rows }
+        console.log(result);
+        return { success: true, data: result }
     }
     else {
         const message = `View not found with authorizedViewId: '${viewId}'`;
@@ -285,6 +314,8 @@ module.exports = {
     createDataset,
     getDataset,
     deleteDataset,
+    listTables,
+    listTableColumns,
     listDatasetViews,
     getDatasetView,
     validateDatasetView,

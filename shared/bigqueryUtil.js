@@ -714,11 +714,18 @@ class BigQueryUtil {
             if (datasetId) {
                 const dataset = this.bigqueryClient.dataset(datasetId);
                 const [tables] = await dataset.getTables();
-                for (const table of tables) {
-                    const labels = await this.getTableLabels(datasetId, table.id);
-                    if (underscore.has(labels, labelKey)) {
-                        list.push({ datasetId: table.dataset.id, tableId: table.id });
+                if (labelKey) {
+                    for (const table of tables) {
+                        const labels = await this.getTableLabels(datasetId, table.id);
+                        if (underscore.has(labels, labelKey)) {
+                            list.push({ datasetId: table.dataset.id, tableId: table.id });
+                        }
                     }
+                }
+                else {
+                    tables.forEach(table => {
+                        list.push({ datasetId: table.dataset.id, tableId: table.id });
+                    });
                 }
             }
             else {
@@ -753,7 +760,7 @@ class BigQueryUtil {
                   table_schema,
                   table_name,
                   REGEXP_REPLACE(substr(substr(t, 8), 0, LENGTH(t) - 8), '["\\\\s]', '') as value
-                from parseOption po,
+                from parseOption po, 
                 unnest(po.value) as t
               ),
               labels as (

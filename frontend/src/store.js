@@ -124,11 +124,9 @@ const store = new Vuex.Store({
     },
     // eslint-disable-next-line no-unused-vars
     getDatasets({ commit }, payload) {
-      return client
-        .getDatasets(payload.projectId, payload.labelKey)
-        .catch(error => {
-          notify(error);
-        });
+      return client.getDatasets().catch(error => {
+        notify(error);
+      });
     },
     // eslint-disable-next-line no-unused-vars
     createDataset({ commit }, payload) {

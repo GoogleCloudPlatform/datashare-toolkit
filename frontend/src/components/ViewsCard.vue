@@ -33,13 +33,6 @@
           <v-btn color="primary" dark @click.stop="createView()"
             >Create Authorized View</v-btn
           >
-          <v-btn
-            class="ml-4"
-            color="primary"
-            dark
-            @click.stop="syncAllPolicies()"
-            >Sync All</v-btn
-          >
         </v-toolbar>
       </template>
       <template v-slot:item.createdAt="{ item }">

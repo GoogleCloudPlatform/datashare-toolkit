@@ -24,7 +24,7 @@ const storageUtil = new StorageUtil();
 const stagingTableExpiryDays = 2;
 const processPrefix = "bqds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
-const labelName = "bqds_ingestion_managed";
+const labelName = "cds_managed";
 let batchId;
 const archiveEnabled = process.env.ARCHIVE_FILES ? (process.env.ARCHIVE_FILES.toLowerCase() === "true") : false;
 
