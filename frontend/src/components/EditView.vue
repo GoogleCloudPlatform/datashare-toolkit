@@ -622,6 +622,10 @@ export default {
           delete copy.source.tableId;
         }
 
+        if (!copy.source.queryFilter) {
+          delete copy.source.queryFilter;
+        }
+
         if (
           copy.source &&
           copy.source.accessControl &&
@@ -693,6 +697,11 @@ export default {
             .then(response => {
               this.loading = false;
               if (response.success) {
+                console.log('Validation passed');
+                this.dialogTitle = 'Validation Status';
+                this.dialogText = 'The view configuration is valid.';
+                this.showDialog = true;
+              } else {
                 const result = response.data;
                 if (result.error && result.error === 'STALE') {
                   this.dialogTitle = 'View data is stale';
@@ -710,11 +719,6 @@ export default {
                       `Setting errors to ${JSON.stringify(result.issues)}`
                     );
                     this.$refs.observer.setErrors(result.issues);
-                  } else {
-                    console.log('Validation passed');
-                    this.dialogTitle = 'Validation Status';
-                    this.dialogText = 'The view configuration is valid.';
-                    this.showDialog = true;
                   }
                 }
               }
@@ -736,6 +740,8 @@ export default {
             .then(response => {
               this.loading = false;
               if (response.success) {
+                this.$emit('close');
+              } else {
                 const result = response.data;
                 if (result.error && result.error === 'STALE') {
                   this.dialogTitle = 'View data is stale';
@@ -753,10 +759,6 @@ export default {
                       `Setting errors to ${JSON.stringify(result.issues)}`
                     );
                     this.$refs.observer.setErrors(result.issues);
-                  } else {
-                    console.log('Validation passed');
-                    // Success
-                    this.$emit('close');
                   }
                 }
               }

@@ -18,7 +18,6 @@
 
 const configUtil = require("./configUtil");
 const endOfLine = require('os').EOL;
-const underscore = require("underscore");
 const accessControlDatasetId = 'datashare';
 const accessControlViewId = 'currentUserDataset';
 

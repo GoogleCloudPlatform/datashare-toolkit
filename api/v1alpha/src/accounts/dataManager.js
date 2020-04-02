@@ -134,7 +134,7 @@ async function listAccounts(projectId, datasetId, policyId) {
             params: { datasetId: datasetId }
         };
     } else if (policyId) {
-        let fields = cfg.cdsAccountViewFields;
+        let fields = [...cfg.cdsAccountViewFields];
         let remove = ['rowId', 'accountId', 'accountType', 'createdBy', 'policies', 'createdAt', 'version', 'isDeleted'];
         remove.forEach(f => fields.delete(f));
         fields = Array.from(fields).map(i => 'ca.' + i).join();
@@ -286,7 +286,7 @@ async function deleteAccount(projectId, accountId, data) {
         return { success: false, code: 500, errors: ["STALE"] };
     }
 
-    let fields = cfg.cdsAccountTableFields;
+    let fields = [...cfg.cdsAccountTableFields];
     let values = ['@rowId', 'accountId', 'email', 'emailType', 'accountType', '@createdBy', 'current_timestamp()', 'policies', 'true'];
     fields = Array.from(fields).join();
     values = Array.from(values).join();

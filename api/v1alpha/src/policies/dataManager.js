@@ -105,7 +105,7 @@ async function listPolicies(projectId, datasetId, accountId) {
             params: { datasetId: datasetId }
         };
     } else if (accountId) {
-        let fields = cfg.cdsPolicyViewFields;
+        let fields = [...cfg.cdsPolicyViewFields];
         fields.delete('isDeleted');
         fields = Array.from(fields).map(i => 'cp.' + i).join();
         const accountTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
@@ -258,7 +258,7 @@ async function deletePolicy(projectId, policyId, data) {
         return { success: false, code: 500, errors: ["STALE"] };
     }
 
-    let fields = cfg.cdsPolicyTableFields;
+    let fields =[...cfg.cdsPolicyTableFields];
     let values = ['@rowId', 'policyId', 'name', 'description', 'datasets', 'rowAccessTags', '@createdBy', 'current_timestamp()', 'true'];
     fields = Array.from(fields).join();
     values = Array.from(values).join();

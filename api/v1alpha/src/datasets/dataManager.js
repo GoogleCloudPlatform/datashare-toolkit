@@ -22,6 +22,8 @@ const uuidv4 = require('uuid/v4');
 
 const labelName = "cds_managed";
 const configValidator = require('./views/configValidator');
+const sqlBuilder = require('./views/sqlBuilder');
+const runtimeConfiguration = require("./views/runtimeConfiguration");
 const cfg = require('../lib/config');
 
 /**
@@ -32,18 +34,6 @@ const cfg = require('../lib/config');
  */
 function getTableFqdn(projectId, datasetId, tableId) {
     return `${projectId}.${datasetId}.${tableId}`;
-}
-
-async function _insertData(projectId, fields, values, data) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId);
-    const sqlQuery = `INSERT INTO \`${table}\` (${fields}) VALUES (${values})`;
-    console.log(sqlQuery);
-    const options = {
-        query: sqlQuery,
-        params: data
-    };
-    const bigqueryUtil = new BigQueryUtil(projectId);
-    return await bigqueryUtil.executeQuery(options);
 }
 
 /**
@@ -257,7 +247,7 @@ async function listTableColumns(projectId, datasetId, tableId) {
  */
 async function listDatasetViews(projectId, datasetId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
-    let fields = cfg.cdsAuthorizedViewViewFields;
+    let fields = [...cfg.cdsAuthorizedViewViewFields];
     let remove = ['source', 'expiration', 'custom', 'viewSql', 'isDeleted'];
     remove.forEach(f => fields.delete(f));
     fields = Array.from(fields).map(i => 'v.' + i).join();
@@ -288,7 +278,7 @@ async function listDatasetViews(projectId, datasetId) {
  */
 async function getDatasetView(projectId, datasetId, viewId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
-    let fields = cfg.cdsAuthorizedViewViewFields;
+    let fields = [...cfg.cdsAuthorizedViewViewFields];
     let remove = ['version', 'isDeleted', 'createdBy', 'createdAt', 'viewSql'];
     remove.forEach(f => fields.delete(f));
     fields = Array.from(fields).map(i => 'v.' + i).join();
@@ -299,7 +289,6 @@ async function getDatasetView(projectId, datasetId, viewId) {
         query: sqlQuery,
         params: { authorizedViewId: viewId }
     };
-    console.log(options);
     const [rows] = await bigqueryUtil.executeQuery(options);
     if (rows.length === 1) {
         const result = rows[0];
@@ -330,8 +319,8 @@ async function validateDatasetView(projectId, datasetId, view) {
     }
     try {
         const result = await configValidator.validate(view);
-        return { success: true, data: result };
-    } catch(err) {
+        return { success: result.isValid, data: result, code: result.isValid ? 200 : 400 };
+    } catch (err) {
         const message = `Failed to validate view`;
         return { success: false, isValid: false, code: 500, errors: [message] };
     }
@@ -343,11 +332,11 @@ async function validateDatasetView(projectId, datasetId, view) {
  * @param  {} viewId
  * @param  {} data
  */
-async function createOrUpdateDatasetView(projectId, datasetId, viewId, data) {
+async function createOrUpdateDatasetView(projectId, datasetId, viewId, view) {
     let _viewId = viewId;
     if (viewId) {
         const currentView = await getDatasetView(projectId, datasetId, viewId);
-        if (currentView.success && currentView.data.rowId !== data.rowId) {
+        if (currentView.success && currentView.data.rowId !== view.rowId) {
             return { success: false, code: 500, errors: ["STALE"] };
         }
     }
@@ -355,71 +344,155 @@ async function createOrUpdateDatasetView(projectId, datasetId, viewId, data) {
         _viewId = uuidv4();
     }
 
-    console.log(data);
     // Perform validation
     console.log('performing validation');
-    const result = await configValidator.validate(data);
+    const result = await configValidator.validate(view);
     console.log(`validation response: ${JSON.stringify(result)}`);
     if (!result.isValid) {
-        return { success: false, data: result, code: 500, errors: ['View validation failed'] };
+        return { success: false, data: result, code: 400, errors: ['View validation failed'] };
     }
+
+    const viewSql = await sqlBuilder.generateSql(view);
 
     const rowId = uuidv4();
     const isDeleted = false;
     const createdAt = new Date().toISOString();
 
-    let fields = [...cfg.cdsAuthorizedViewTableFields], values = [...cfg.cdsAuthorizedViewTableFields];
-
-    // merge the data and extra values together
-    data = {
-        ...data,
-        ...{
-            rowId: rowId,
-            authorizedViewId: _viewId,
-            isDeleted: isDeleted,
-            createdAt: createdAt
-        }
+    let data = {
+        rowId: rowId,
+        authorizedViewId: _viewId,
+        name: data.name,
+        description: data.description,
+        datasetId: data.datasetId, 
+        createdBy: data.createdBy,
+        createdAt: createdAt,
+        isDeleted: isDeleted,
+        viewSql: viewSql
     };
     
-    if (!data.source) {
-        // If there is no supplied source remove column field and value from insert statement.
-        const index = fields.indexOf('source');
-        if (index > -1) {
-            fields.splice(index, 1);
-            values.splice(index, 1);
+    if (view.source) {
+        data.source = {};
+        Object.assign(data.source, view.source);
+    }
+    if (view.expiration) {
+        data.expiration = {};
+        Object.assign(data.expiration, view.expiration);
+
+        if (view.expiration.time) {
+            data.expiration.time = new Date(view.expiration.time);
         }
     }
-    if (!data.expiration) {
-        // If there is no supplied expiration remove column field and value from insert statement.
-        const index = fields.indexOf('expiration');
-        if (index > -1) {
-            fields.splice(index, 1);
-            values.splice(index, 1);
-        }
-    }
-    else if (data.expiration.time) {
-        data.expiration.time = new Date(data.expiration.time);
-    }
-    if (!data.custom) {
-        // If there is no supplied expiration remove column field and value from insert statement.
-        const index = fields.indexOf('custom');
-        if (index > -1) {
-            fields.splice(index, 1);
-            values.splice(index, 1);
-        }
+    if (view.custom) {
+        data.custom = {};
+        Object.assign(data.custom, view.custom);
     }
 
     console.log(data);
-    const [rows] = await _insertData(projectId, fields, values, data);
-    if (rows.length === 0) {
-        // Retrieving the record after insert makes another round-trip and is not
-        // efficient. For now, just return the original data.
-        // return await getDatasetView(projectId, datasetId, _viewId);
-        return { success: true, data: data };
-    } else {
-        const message = `View did not create with data values: '${data}'`;
-        return { success: false, code: 500, errors: [message] };
+
+    await bigqueryUtil.insertRows(cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId, data);
+    return await createView(view);
+}
+
+/**
+ * @param  {} view
+ */
+async function createView(view) {
+    let success = false;
+
+    const viewSql = await sqlBuilder.generateSql(view);
+    let metadataResult = await bigqueryUtil.getTableMetadata(view.datasetId, view.name);
+
+    let viewMetadata = metadataResult.metadata;
+    const viewExists = metadataResult.exists;
+
+    let createViewResult;
+    let configuredExpirationTime = view.expiration && view.expiration.delete === true ? view.expiration.time : null;
+
+    let viewDescription = `This view was generated by ${runtimeConfiguration.PRODUCT_NAME}. ${view.description}`;
+    let labels = {};
+    labels[labelName] = true;
+
+    const viewOptions = {
+        description: viewDescription,
+        labels: labels,
+        expirationTime: configuredExpirationTime
+    };
+
+    if (viewExists === true) {
+        console.log("View '%s' already exists, checking if it's up to date", view.name);
+        const viewDefinition = viewMetadata.view.query;
+
+        if (viewSql.replace("\n", "") === viewDefinition.replace("\n", "")) {
+            console.log("SQL text is identitical");
+        }
+        else {
+            // Validate query was already run by configValidator
+            /*const result = await bigqueryUtil.validateQuery(viewSql, 5);
+            if (result.isValid === false) {
+                console.log("Query is invalid, skipping to next view");
+            }*/
+            console.log(`SQL text is different, need to re-create view\nView Definition:\n${viewDefinition}\n\nConfig SQL:\n${viewSql}`);
+
+            createViewResult = await bigqueryUtil.createView(view.datasetId, view.name, viewSql, viewOptions, true);
+            if (createViewResult.success === false) {
+                console.log("Failed to create view, skipping to next view");
+                return { isValid: false, success: false };
+            }
+            else {
+                // If view is deleted and recreated we need to refresh metadata
+                viewMetadata = createViewResult.metadata;
+            }
+        }
+
+        const currentExpiryTime = viewMetadata.expirationTime;
+        console.log(`expirationTime for view '${view.name}' is ${currentExpiryTime}`);
+
+        // Update expirationTime for view
+        // Deleting the property doesn't remove it from metadata, setting it to null removes it
+        if (configuredExpirationTime !== currentExpiryTime) {
+            console.log(`Configured expirationTime is different than the value for view '${view.name}'`);
+            viewMetadata.expirationTime = configuredExpirationTime;
+            await bigqueryUtil.setTableMetadata(view.datasetId, view.name, viewMetadata);
+        }
+        else {
+            if (runtimeConfiguration.VERBOSE_MODE) {
+                console.log(`expirationTime for view '${view.name}' is in-sync`);
+            }
+        }
     }
+    else {
+        // This else block is a bit redundant as it has the same code as above (except the deleteIfExists flag)
+        // Validate query was already run by configValidator
+        /*const result = bigqueryUtil.validateQuery(viewSql, 5);
+        if (result.isValid === false) {
+            console.log("Query is invalid, skipping to next view");
+        }*/
+        createViewResult = await bigqueryUtil.createView(view.datasetId, view.name, viewSql, viewOptions, true);
+    }
+
+    let viewCreated = createViewResult && createViewResult.success;
+    console.log("Authorizing view objects for access from other datasets");
+    if (!view.hasOwnProperty('custom')) {
+        let source = view.source;
+        // Need to authorize the view from the source tables
+        await bigqueryUtil.shareAuthorizeView(source.datasetId, view.projectId, view.datasetId, view.name, viewCreated);
+
+        if (source.accessControl && source.accessControl.enabled === true) {
+            await bigqueryUtil.shareAuthorizeView('datashare', view.projectId, view.datasetId, view.name, viewCreated);
+        }
+    }
+    else {
+        // Custom sql
+        let custom = view.custom;
+        if (custom.authorizeFromDatasetIds && custom.authorizeFromDatasetIds.length > 0) {
+            for (const d of view.custom.authorizeFromDatasetIds) {
+                // const ads = configUtil.performTextVariableReplacements(config, null, d);
+                await bigqueryUtil.shareAuthorizeView(d, view.projectId, view.datasetId, view.name, viewCreated);
+            }
+        }
+    }
+
+    return { isValid: true, success: success, issues: [] };
 }
 
 /**
@@ -437,7 +510,7 @@ async function deleteDatasetView(projectId, datasetId, viewId, data) {
         return { success: false, code: 500, errors: ["STALE"] };
     }
 
-    let fields = cfg.cdsAuthorizedViewTableFields;
+    let fields = [...cfg.cdsAuthorizedViewTableFields];
     let values = ['@rowId', 'authorizedViewId', 'name', 'description', 'datasetId', 'source', 'expiration', 'custom', 'current_timestamp()', '@createdBy', 'viewSql', 'true'];
     fields = Array.from(fields).join();
     values = Array.from(values).join();
