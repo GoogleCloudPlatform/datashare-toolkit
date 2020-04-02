@@ -219,6 +219,14 @@ const store = new Vuex.Store({
       });
     },
     // eslint-disable-next-line no-unused-vars
+    getView({ commit }, payload) {
+      return client
+        .getView(payload.datasetId, payload.authorizedViewId)
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
     getTables({ commit }, payload) {
       return client
         .getTables(payload.projectId, payload.datasetId, payload.labelKey)

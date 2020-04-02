@@ -189,24 +189,17 @@ async function deleteDataset(projectId, datasetId, createdBy) {
 
 /**
  * @param  {} projectId
- */
-async function listViews(projectId) {
-    return listDatasetViews(projectId, null);
-}
-
-/**
- * @param  {} projectId
  * @param  {} datasetId
  */
 async function listDatasetViews(projectId, datasetId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
     let fields = cfg.cdsAuthorizedViewViewFields;
     let remove = ['source', 'expiration', 'custom', 'viewSql', 'isDeleted'];
-        remove.forEach(f => fields.delete(f));
-        fields = Array.from(fields).map(i => 'v.' + i).join();
+    remove.forEach(f => fields.delete(f));
+    fields = Array.from(fields).map(i => 'v.' + i).join();
     let sqlQuery = `SELECT ${fields}
       FROM \`${table}\` v
-      where isDeleted is false`;
+      WHERE isDeleted is false`;
 
     if (datasetId) {
         sqlQuery += '\nand datasetId = @datasetId'
@@ -230,7 +223,32 @@ async function listDatasetViews(projectId, datasetId) {
  * @param  {} viewId
  */
 async function getDatasetView(projectId, datasetId, viewId) {
-    return { success: true }
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
+    let fields = cfg.cdsAuthorizedViewViewFields;
+    let remove = ['version', 'isDeleted', 'createdBy', 'createdAt', 'viewSql'];
+    remove.forEach(f => fields.delete(f));
+    fields = Array.from(fields).map(i => 'v.' + i).join();
+    const sqlQuery = `SELECT ${fields}
+        FROM \`${table}\` v
+        WHERE authorizedViewId = @authorizedViewId and isDeleted is false`;
+    const options = {
+        query: sqlQuery,
+        params: { authorizedViewId: viewId }
+    };
+    console.log(options);
+    const [rows] = await bigqueryUtil.executeQuery(options);
+    if (rows.length === 1) {
+        const result = rows[0];
+        if (result.expiration && result.expiration.time && result.expiration.time.value) {
+            // When querying using the node lib time is returned in a 'value' key
+            result.expiration.time = result.expiration.time.value;
+        }
+        return { success: true, data: rows }
+    }
+    else {
+        const message = `View not found with authorizedViewId: '${viewId}'`;
+        return { success: false, code: 500, errors: [message] };
+    }
 }
 
 /**

@@ -764,73 +764,80 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getView', {
-          projectId: this.$store.state.settings.projectId,
+          datasetId: this.viewData.datasetId,
           authorizedViewId: this.viewData.authorizedViewId
         })
-        .then(view => {
-          /*console.log(
-            `Updating view response: ${JSON.stringify(view, null, 3)}`
-          );*/
-          this.isCustomQuery = view.custom != null;
+        .then(response => {
+          if (response.success) {
+            const view = response.data;
+            /*console.log(
+              `Updating view response: ${JSON.stringify(view, null, 3)}`
+            );*/
+            this.isCustomQuery = view.custom != null;
 
-          this.loadDatasets().then(() => {
-            console.log(`Datasets loaded, setting datasetId`);
-          });
+            this.loadDatasets().then(() => {
+              console.log(`Datasets loaded, setting datasetId`);
+            });
 
-          if (view.source && view.source.datasetId) {
-            this.loadTables(view.source.datasetId).then(() => {
-              console.log(`Tables loaded, setting datasetId`);
-            });
-            this.loadTableColumns(
-              view.source.datasetId,
-              view.source.tableId
-            ).then(() => {
-              console.log(`Table Columns loaded, setting datasetId`);
-              this.includeAllColumns = view.source.visibleColumns.length === 0;
-            });
-          }
-          if (!view.custom) {
-            view.custom = {};
-            view.custom.authorizeFromDatasetIds = [];
-          }
-          if (view.custom.authorizeFromDatasetIds.length > 0) {
-            let a = [];
-            view.custom.authorizeFromDatasetIds.forEach(ds => {
-              a.push({ datasetId: ds });
-            });
-            view.custom.authorizeFromDatasetIds = a;
-          }
-          if (!view.source) {
-            view.source = {};
-          }
-          if (!view.source.datasetId) {
-            view.source.datasetId = null;
-          }
-          if (
-            !view.source.accessControl ||
-            view.source.accessControl === null
-          ) {
-            view.source.accessControl = { enabled: false };
-          }
-          if (!view.source.publicAccess || view.source.publicAccess === null) {
-            view.source.publicAccess = { enabled: false };
-          }
-          if (!view.expiration || view.expiration === null) {
-            view.expiration = { enabled: false };
-          } else if (view.expiration.time) {
-            // v-time-picker handles the value format: Time picker model (ISO 8601 format, 24hr hh:mm)
-            // https://vuetifyjs.com/en/components/time-pickers/
-            const formattedDate = moment(view.expiration.time).format(
-              'YYYY-MM-DDTHH:mm'
-            );
-            const expirationStr = formattedDate.split('T');
-            if (expirationStr.length === 2) {
-              this.expirationDate = expirationStr[0];
-              this.expirationTime = expirationStr[1];
+            if (view.source && view.source.datasetId) {
+              this.loadTables(view.source.datasetId).then(() => {
+                console.log(`Tables loaded, setting datasetId`);
+              });
+              this.loadTableColumns(
+                view.source.datasetId,
+                view.source.tableId
+              ).then(() => {
+                console.log(`Table Columns loaded, setting datasetId`);
+                this.includeAllColumns =
+                  view.source.visibleColumns.length === 0;
+              });
             }
+            if (!view.custom) {
+              view.custom = {};
+              view.custom.authorizeFromDatasetIds = [];
+            }
+            if (view.custom.authorizeFromDatasetIds.length > 0) {
+              let a = [];
+              view.custom.authorizeFromDatasetIds.forEach(ds => {
+                a.push({ datasetId: ds });
+              });
+              view.custom.authorizeFromDatasetIds = a;
+            }
+            if (!view.source) {
+              view.source = {};
+            }
+            if (!view.source.datasetId) {
+              view.source.datasetId = null;
+            }
+            if (
+              !view.source.accessControl ||
+              view.source.accessControl === null
+            ) {
+              view.source.accessControl = { enabled: false };
+            }
+            if (
+              !view.source.publicAccess ||
+              view.source.publicAccess === null
+            ) {
+              view.source.publicAccess = { enabled: false };
+            }
+            if (!view.expiration || view.expiration === null) {
+              view.expiration = { enabled: false };
+            } else if (view.expiration.time) {
+              // v-time-picker handles the value format: Time picker model (ISO 8601 format, 24hr hh:mm)
+              // https://vuetifyjs.com/en/components/time-pickers/
+              const formattedDate = moment(view.expiration.time).format(
+                'YYYY-MM-DDTHH:mm'
+              );
+              const expirationStr = formattedDate.split('T');
+              if (expirationStr.length === 2) {
+                this.expirationDate = expirationStr[0];
+                this.expirationTime = expirationStr[1];
+              }
+            }
+            // console.log(`Setting this.view to: ${JSON.stringify(view, null, 3)}`);
+            this.view = view;
           }
-          // console.log(`Setting this.view to: ${JSON.stringify(view, null, 3)}`);
-          this.view = view;
           this.loading = false;
         });
     },

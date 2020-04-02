@@ -169,6 +169,11 @@ export default {
         .then(response => response);
     }
   },
+  getView(datasetId, viewId) {
+    return axios
+      .get(this._apiBaseUrl() + `/datasets/${datasetId}/views/${viewId}`)
+      .then(response => response);
+  },
   getTables(projectId, datasetId, labelKey) {
     return axios
       .get(this._apiBaseUrl() + '/tables', {
