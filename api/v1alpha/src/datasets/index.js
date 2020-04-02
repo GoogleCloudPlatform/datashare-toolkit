@@ -453,7 +453,18 @@ datasets.delete('/projects/:projectId/datasets/:datasetId/views/:viewId', async(
     const projectId = req.params.projectId;
     const datasetId = req.params.datasetId;
     const viewId = req.params.viewId;
-    const data = await dataManager.deleteDatasetView(projectId, datasetId, viewId);
+    if (!req.body.rowId) {
+        return res.status(400).json({
+            success: false,
+            code: 400,
+            errors: ['rowId parameter is required']
+        });
+    }
+    const values = {
+        rowId: req.body.rowId,
+        createdBy: req.header('x-gcp-account')
+    };
+    const data = await dataManager.deleteDatasetView(projectId, datasetId, viewId, values);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

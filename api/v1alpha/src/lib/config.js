@@ -38,6 +38,9 @@ config.cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description'
     'isDeleted']);
 
 config.cdsAuthorizedViewTableId = "authorizedView";
+config.cdsAuthorizedViewTableFields = new Set(['rowId', 'authorizedViewId', 'name', 'description',
+    'datasetId', 'source', 'expiration', 'custom', 'createdAt', 'createdBy', 'viewSql', 'isDeleted']);
+
 config.cdsAuthorizedViewViewId = "currentAuthorizedView";
 config.cdsAuthorizedViewViewFields = new Set(['rowId', 'authorizedViewId', 'name', 'description',
     'datasetId', 'source', 'expiration', 'custom', 'createdBy', 'createdAt', 'viewSql', 

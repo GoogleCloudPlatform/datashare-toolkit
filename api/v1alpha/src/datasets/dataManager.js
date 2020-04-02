@@ -18,6 +18,8 @@
 
 const { BigQueryUtil } = require('bqds-shared');
 let bigqueryUtil = new BigQueryUtil();
+const uuidv4 = require('uuid/v4');
+
 const labelName = "cds_managed";
 const configValidator = require('./views/configValidator');
 const cfg = require('../lib/config');
@@ -30,6 +32,28 @@ const cfg = require('../lib/config');
  */
 function getTableFqdn(projectId, datasetId, tableId) {
     return `${projectId}.${datasetId}.${tableId}`;
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} fields
+ * @param  {} values
+ * @param  {} data
+ */
+async function _deleteData(projectId, fields, values, data) {
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId);
+    const sqlQuery = `INSERT INTO \`${table}\` (${fields})
+        SELECT ${values}
+        FROM \`${table}\`
+        WHERE rowId = @incomingRowId`;
+
+    console.log(sqlQuery);
+    const options = {
+        query: sqlQuery,
+        params: data
+    };
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    return await bigqueryUtil.executeQuery(options);
 }
 
 /**
@@ -304,9 +328,33 @@ async function createOrUpdateDatasetView(projectId, datasetId, viewId, view) {
  * @param  {} projectId
  * @param  {} datasetId
  * @param  {} viewId
+ * @param  {} data
  */
-async function deleteDatasetView(projectId, datasetId, viewId) {
-    return { success: true }
+async function deleteDatasetView(projectId, datasetId, viewId, data) {
+    const currentView = await getDatasetView(projectId, datasetId, viewId);
+    if (!currentView.success) {
+        return { success: false, code: 404, errors: ["ViewId not found"] };
+    }
+    if (currentView.success && currentView.data.rowId !== data.rowId) {
+        return { success: false, code: 500, errors: ["STALE"] };
+    }
+
+    let fields = cfg.cdsAuthorizedViewTableFields;
+    let values = ['@rowId', 'authorizedViewId', 'name', 'description', 'datasetId', 'source', 'expiration', 'custom', 'current_timestamp()', '@createdBy', 'viewSql', 'true'];
+    fields = Array.from(fields).join();
+    values = Array.from(values).join();
+
+    const rowId = uuidv4();
+    let params = { rowId: rowId, createdBy: data.createdBy, incomingRowId: data.rowId };
+    try {
+        await _deleteData(projectId, fields, values, params);
+        await bigqueryUtil.deleteTable(currentView.data.datasetId, currentView.data.name, false);
+        return { success: true, data: {} };
+    } catch (err) {
+        console.log(err);
+        const message = `View did not delete with data values: '${data}'`;
+        return { success: false, code: 500, errors: [message] };
+    }
 }
 
 module.exports = {

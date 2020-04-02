@@ -191,10 +191,10 @@ export default {
       .post(this._apiBaseUrl() + '/authorizedView', payload)
       .then(response => response);
   },
-  deleteView(payload) {
+  deleteView(datasetId, viewId, rowId) {
     return axios
-      .delete(this._apiBaseUrl() + '/authorizedView', {
-        data: payload
+      .delete(this._apiBaseUrl() + `/datasets/${datasetId}/views/${viewId}`, {
+        data: { rowId: rowId }
       })
       .then(response => response);
   },

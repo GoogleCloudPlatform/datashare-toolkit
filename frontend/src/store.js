@@ -254,9 +254,11 @@ const store = new Vuex.Store({
     },
     // eslint-disable-next-line no-unused-vars
     deleteView({ commit }, payload) {
-      return client.deleteView(payload).catch(error => {
-        notify(error);
-      });
+      return client
+        .deleteView(payload.datasetId, payload.authorizedViewId, payload.rowId)
+        .catch(error => {
+          notify(error);
+        });
     },
     // eslint-disable-next-line no-unused-vars
     getIngestion({ commit }, payload) {
