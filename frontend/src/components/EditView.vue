@@ -731,32 +731,36 @@ export default {
             'Client side data is valid, will do server side validation and save'
           );
           this.loading = true;
-          this.$store.dispatch('saveView', this.sanitizedView).then(result => {
-            this.loading = false;
-
-            if (result.error && result.error === 'STALE') {
-              this.dialogTitle = 'View data is stale';
-              this.dialogText =
-                'This view has been updated since you last refreshed the page, please reload the page to make changes.';
-              this.showDialog = true;
-            } else if (result.error) {
-              this.dialogTitle = 'Error saving view';
-              this.dialogText =
-                'Failed to save view. Please reload and try again.';
-              this.showDialog = true;
-            } else {
-              if (result.isValid === false) {
-                console.log(
-                  `Setting errors to ${JSON.stringify(result.issues)}`
-                );
-                this.$refs.observer.setErrors(result.issues);
-              } else {
-                console.log('Validation passed');
-                // Success
-                this.$emit('close');
+          this.$store
+            .dispatch('saveView', this.sanitizedView)
+            .then(response => {
+              this.loading = false;
+              if (response.success) {
+                const result = response.data;
+                if (result.error && result.error === 'STALE') {
+                  this.dialogTitle = 'View data is stale';
+                  this.dialogText =
+                    'This view has been updated since you last refreshed the page, please reload the page to make changes.';
+                  this.showDialog = true;
+                } else if (result.error) {
+                  this.dialogTitle = 'Error saving view';
+                  this.dialogText =
+                    'Failed to save view. Please reload and try again.';
+                  this.showDialog = true;
+                } else {
+                  if (result.isValid === false) {
+                    console.log(
+                      `Setting errors to ${JSON.stringify(result.issues)}`
+                    );
+                    this.$refs.observer.setErrors(result.issues);
+                  } else {
+                    console.log('Validation passed');
+                    // Success
+                    this.$emit('close');
+                  }
+                }
               }
-            }
-          });
+            });
         } else {
           console.log('View is not valid');
         }
