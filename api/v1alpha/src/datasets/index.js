@@ -417,7 +417,7 @@ datasets.post('/projects/:projectId/datasets/:datasetId/views::validate', async(
 datasets.post('/projects/:projectId/datasets/:datasetId/views', async(req, res) => {
     const projectId = req.params.projectId;
     const datasetId = req.params.datasetId;
-    const view = req.body.view;
+    const view = req.body;
     const data = await dataManager.createOrUpdateDatasetView(projectId, datasetId, null, view);
     var code;
     if (data && data.success === false) {
@@ -435,7 +435,7 @@ datasets.put('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req
     const projectId = req.params.projectId;
     const datasetId = req.params.datasetId;
     const viewId = req.params.viewId;
-    const view = req.body.view;
+    const view = req.body;
     const data = await dataManager.createOrUpdateDatasetView(projectId, datasetId, viewId, view);
     var code;
     if (data && data.success === false) {

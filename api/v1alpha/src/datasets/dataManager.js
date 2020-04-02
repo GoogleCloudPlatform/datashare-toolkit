@@ -34,6 +34,18 @@ function getTableFqdn(projectId, datasetId, tableId) {
     return `${projectId}.${datasetId}.${tableId}`;
 }
 
+async function _insertData(projectId, fields, values, data) {
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId);
+    const sqlQuery = `INSERT INTO \`${table}\` (${fields}) VALUES (${values})`;
+    console.log(sqlQuery);
+    const options = {
+        query: sqlQuery,
+        params: data
+    };
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    return await bigqueryUtil.executeQuery(options);
+}
+
 /**
  * @param  {} projectId
  * @param  {} fields
@@ -329,10 +341,85 @@ async function validateDatasetView(projectId, datasetId, view) {
  * @param  {} projectId
  * @param  {} datasetId
  * @param  {} viewId
- * @param  {} view
+ * @param  {} data
  */
-async function createOrUpdateDatasetView(projectId, datasetId, viewId, view) {
-    return { success: true }
+async function createOrUpdateDatasetView(projectId, datasetId, viewId, data) {
+    let _viewId = viewId;
+    if (viewId) {
+        const currentView = await getDatasetView(projectId, datasetId, viewId);
+        if (currentView.success && currentView.data.rowId !== data.rowId) {
+            return { success: false, code: 500, errors: ["STALE"] };
+        }
+    }
+    else {
+        _viewId = uuidv4();
+    }
+
+    console.log(data);
+    // Perform validation
+    console.log('performing validation');
+    const result = await configValidator.validate(data);
+    console.log(`validation response: ${JSON.stringify(result)}`);
+    if (!result.isValid) {
+        return { success: false, data: result, code: 500, errors: ['View validation failed'] };
+    }
+
+    const rowId = uuidv4();
+    const isDeleted = false;
+    const createdAt = new Date().toISOString();
+
+    let fields = [...cfg.cdsAuthorizedViewTableFields], values = [...cfg.cdsAuthorizedViewTableFields];
+
+    // merge the data and extra values together
+    data = {
+        ...data,
+        ...{
+            rowId: rowId,
+            authorizedViewId: _viewId,
+            isDeleted: isDeleted,
+            createdAt: createdAt
+        }
+    };
+    
+    if (!data.source) {
+        // If there is no supplied source remove column field and value from insert statement.
+        const index = fields.indexOf('source');
+        if (index > -1) {
+            fields.splice(index, 1);
+            values.splice(index, 1);
+        }
+    }
+    if (!data.expiration) {
+        // If there is no supplied expiration remove column field and value from insert statement.
+        const index = fields.indexOf('expiration');
+        if (index > -1) {
+            fields.splice(index, 1);
+            values.splice(index, 1);
+        }
+    }
+    else if (data.expiration.time) {
+        data.expiration.time = new Date(data.expiration.time);
+    }
+    if (!data.custom) {
+        // If there is no supplied expiration remove column field and value from insert statement.
+        const index = fields.indexOf('custom');
+        if (index > -1) {
+            fields.splice(index, 1);
+            values.splice(index, 1);
+        }
+    }
+
+    console.log(data);
+    const [rows] = await _insertData(projectId, fields, values, data);
+    if (rows.length === 0) {
+        // Retrieving the record after insert makes another round-trip and is not
+        // efficient. For now, just return the original data.
+        // return await getDatasetView(projectId, datasetId, _viewId);
+        return { success: true, data: data };
+    } else {
+        const message = `View did not create with data values: '${data}'`;
+        return { success: false, code: 500, errors: [message] };
+    }
 }
 
 /**

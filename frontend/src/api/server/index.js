@@ -190,9 +190,22 @@ export default {
       .then(response => response);
   },
   saveView(payload) {
-    return axios
-      .post(this._apiBaseUrl() + '/authorizedView', payload)
-      .then(response => response);
+    if (!payload.authorizedViewId) {
+      return axios
+        .post(
+          this._apiBaseUrl() + `/datasets/${payload.datasetId}/views`,
+          payload
+        )
+        .then(response => response);
+    } else {
+      return axios
+        .put(
+          this._apiBaseUrl() +
+            `/datasets/${payload.datasetId}/views/${payload.authorizedViewId}`,
+          payload
+        )
+        .then(response => response);
+    }
   },
   deleteView(datasetId, viewId, rowId) {
     return axios
