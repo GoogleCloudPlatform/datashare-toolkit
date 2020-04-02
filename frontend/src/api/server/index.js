@@ -183,7 +183,10 @@ export default {
   },
   validateView(payload) {
     return axios
-      .post(this._apiBaseUrl() + '/validateView', payload)
+      .post(
+        this._apiBaseUrl() + `/datasets/${payload.datasetId}/views::validate`,
+        payload
+      )
       .then(response => response);
   },
   saveView(payload) {

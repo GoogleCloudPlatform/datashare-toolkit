@@ -690,30 +690,32 @@ export default {
           this.loading = true;
           this.$store
             .dispatch('validateView', this.sanitizedView)
-            .then(result => {
+            .then(response => {
               this.loading = false;
-
-              if (result.error && result.error === 'STALE') {
-                this.dialogTitle = 'View data is stale';
-                this.dialogText =
-                  'This view has been updated since you last refreshed the page, please reload the page to make changes.';
-                this.showDialog = true;
-              } else if (result.error) {
-                this.dialogTitle = 'Error validating view';
-                this.dialogText =
-                  'Failed to validate view. Please reload and try again.';
-                this.showDialog = true;
-              } else {
-                if (result.isValid === false) {
-                  console.log(
-                    `Setting errors to ${JSON.stringify(result.issues)}`
-                  );
-                  this.$refs.observer.setErrors(result.issues);
-                } else {
-                  console.log('Validation passed');
-                  this.dialogTitle = 'Validation Status';
-                  this.dialogText = 'The view configuration is valid.';
+              if (response.success) {
+                const result = response.data;
+                if (result.error && result.error === 'STALE') {
+                  this.dialogTitle = 'View data is stale';
+                  this.dialogText =
+                    'This view has been updated since you last refreshed the page, please reload the page to make changes.';
                   this.showDialog = true;
+                } else if (result.error) {
+                  this.dialogTitle = 'Error validating view';
+                  this.dialogText =
+                    'Failed to validate view. Please reload and try again.';
+                  this.showDialog = true;
+                } else {
+                  if (result.isValid === false) {
+                    console.log(
+                      `Setting errors to ${JSON.stringify(result.issues)}`
+                    );
+                    this.$refs.observer.setErrors(result.issues);
+                  } else {
+                    console.log('Validation passed');
+                    this.dialogTitle = 'Validation Status';
+                    this.dialogText = 'The view configuration is valid.';
+                    this.showDialog = true;
+                  }
                 }
               }
             });

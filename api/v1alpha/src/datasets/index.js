@@ -400,7 +400,7 @@ datasets.get('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req
 datasets.post('/projects/:projectId/datasets/:datasetId/views::validate', async(req, res) => {
     const projectId = req.params.projectId;
     const datasetId = req.params.datasetId;
-    const view = req.body.view;
+    const view = req.body;
     const data = await dataManager.validateDatasetView(projectId, datasetId, view);
     var code;
     if (data && data.success === false) {

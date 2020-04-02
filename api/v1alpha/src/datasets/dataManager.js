@@ -310,8 +310,19 @@ async function getDatasetView(projectId, datasetId, viewId) {
  * @param  {} view
  */
 async function validateDatasetView(projectId, datasetId, view) {
-    const result = await configValidator.validate(view);
-    return { success: result.isValid, errors: result.issues };
+    if (view.authorizedViewId) {
+        const currentView = await getDatasetView(projectId, datasetId, view.authorizedViewId);
+        if (currentView.success && currentView.data.rowId !== view.rowId) {
+            return { success: false, code: 500, errors: ["STALE"] };
+        }
+    }
+    try {
+        const result = await configValidator.validate(view);
+        return { success: true, data: result };
+    } catch(err) {
+        const message = `Failed to validate view`;
+        return { success: false, isValid: false, code: 500, errors: [message] };
+    }
 }
 
 /**

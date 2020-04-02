@@ -87,10 +87,10 @@ class BigQueryUtil {
         // Purposefully handle this error as needed to validate the query.
         try {
             const [rows] = await this.executeQuerySync(options);
-            return true;
+            return { isValid: true };
         } catch (error) {
             console.warn("ERROR: %s - Query: '%s' is invalid", error, _sql);
-            return false;
+            return { isValid: false, message: error.message };
         }
     }
 
