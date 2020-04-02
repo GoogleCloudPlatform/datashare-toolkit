@@ -13,11 +13,13 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-apiVersion: skaffold/v1beta2
+apiVersion: skaffold/v2beta1
 kind: Config
+metadata:
+  name: client
 build:
   artifacts:
-  - image: cdmc
+  - image: gcr.io/chrispage-dev/cdmc
     context: .
     docker:
       dockerfile: Dockerfile
@@ -26,3 +28,12 @@ deploy:
     manifests:
     - ./kubernetes-manifests/cdmc-listener-service/*.yaml
     - ./kubernetes-manifests/cdmc-publisher-service/*.yaml
+    #- ./kubernetes-manifests/cdmc-producer-job/*.yaml
+profiles:
+- name: "hello-world"
+  deploy:
+    kubectl:
+      manifests:
+      - ./kubernetes-manifests/cdmc-publisher-service/*.yaml
+        #- ./kubernetes-manifests/cdmc-producer-job/*.yaml
+

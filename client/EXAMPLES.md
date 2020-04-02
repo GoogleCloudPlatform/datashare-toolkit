@@ -4,8 +4,8 @@
 * [Examples](#examples)
   * [Hello World](#hello-world)
   * [Replay Messages](#replay-messages)
-  * [Hello World - Docker](#hello-world---docker)
   * [Replay Messages - Docker](#replay-messages---docker)
+  * [Troubleshooting](#troubleshooting)
 * [License](#license)
 * [Authors](#authors)
 
@@ -20,68 +20,72 @@ The examples are currently executed in an isolated Kubernetes (GKE) or Docker en
 
 **Note**: Currently, GCP VPC networking does not support multicast layer 2 across instances so you will need to run the examples in an isolated environment.
 
-The *Hello World* example will utilize three CDMC services to simlulate the multicast to unicast flow.
-1) The *producer* will simulate sending multicast message(s) to a multicast receiver (publisher). \
-2) The *publisher* will receive the multicast message(s) and send to a Pub/Sub topic. \
+The [**Hello World**](#hello-world) example will utilize two CDMC services to simlulate the multicast to unicast flow. *gcloud* will be utilized as the consumer to subscribe and pull the messages from the Pub/Sub topic.
+
+1) The *producer* will simulate sending multicast message(s) to a multicast receiver (publisher).\
+2) The *publisher* will receive the multicast message(s) and send to a Pub/Sub topic.\
 3) The *consumer* will consume the message(s) via Pub/Sub subsription via *gcloud*.
 
 ## Prerequites
+
+### Kubernetes (GKE)
 If using GKE, get the latest credentials for the cluster:
 
     gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${ZONE}
 
+[**Skaffold**](https://skaffold.dev/docs/install/) >= v1.6.0 is also required to deploy the application to GKE:
+
+    skaffold version
+
+### Docker
 If using Docker, verify Docker client running and server is > 19.03 version.
 
     docker version
 
-Also if using Docker, change the ownership of the GAE crednetials file so the Docker executable can read it.
+Change the ownership of the GAE crednetials file so the Docker executable can read it.
 
     chmod 0444 ${GOOGLE_APPLICATION_CREDENTIALS}
 
 
 ## Hello World
-We will start one k8s deployments for the Pub/Sub publisher and one k8s job for the multicast producer. *gcloud* will be utilized as the consumer to subscribe and pull the messages from the Pub/Sub topic.
-
+We will start one k8s deployments for the Pub/Sub publisher and one k8s job for the multicast producer.
 
 ### Pub/Sub Publisher
-The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS k8s secret created above.
-
 Modify the CDMC Publisher service *ConfigMap* with your appropriate GCP variables: **PROJECT_ID**, **TOPIC_NAME**
+
+**Note**: The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS k8s secret created above.
 
     vi kubernetes-manifests/cdmc-publisher-service/configmaps.yaml
 
-Deploy the application:
+
+### Multicast Producer
+Modify the CDMC producer job *ConfigMap* with a unique **MESSAGE** variable:
+
+**Note**: The **ADDRESS** variable is set to the service name of the publisher service so the sample message gets routed properly bwtween GKE nodes. e.g. *cdmc-publisher-service:50000*. You can only broadcast a message to a multicast group n GKE if the producer is on the same node as the publisher. e.g. *239.0.0.1:50000*.
+
+    vi kubernetes-manifests/cdmc-producer-job/configmaps.yaml
+
+### Subscriber
+Open another terminal and tun the following command(s) to pull the messages from the Pub/Sub subscription:
+
+    while ((1)); do gcloud alpha pubsub subscriptions pull ${PULL_SUBSCRIPTION_NAME} --auto-ack; sleep 1; done
+
+### Run the Demo:
+Deploy the application and tail the logs:
+
+    skaffold run -p hello-world -t dev --tail
+
+**Note**: You can also deploy via `kubectl` directly too. You will need to wait for the services to start before viewing the logs:
 
     kubectl apply -f kubernetes-manifests/cdmc-publisher-service
 
-Check the service(s) is ready:
-
     kubectl get po,svc,deploy
-
-Tail the logs and you should see `Listening and Publishing messages...`:
 
     kubectl logs -f -l app=cdmc-publisher-service
 
-### Multicast Producer
-Open another terminal, in the same directory, and run the following command(s).
+Send a sample message:
 
-Modify the CDMC producer service *ConfigMap* with a unique **MESSAGE** variable:
-
-**Note**: The **ADDRESS** variable is set to the service name of the publisher service so the message gets routed properly bwtween GKE nodes. e.g. *cdmc-publisher-service:50000*. You can only broadcast a message to a multicast group n GKE if the producer is on the same node as the publisher. e.g. *239.0.0.1:50000*.
-
-    vi kubernetes-manifests/cdmc-producer-service/configmaps.yaml
-
-Deploy the application:
-
-    kubectl apply -f kubernetes-manifests/cdmc-producer-service
-
-Check the service(s) is ready:
-
-    kubectl get po,svc,deploy
-
-Tail the logs and you should see `Completed`:
-
-    kubectl logs -f -l app=cdmc-producer-service
+    kubectl apply -f kubernetes-manifests/cdmc-producer-job
 
 Check the logs of the publisher above and you should see `Message published to topic...`
 
@@ -89,38 +93,11 @@ Check the logs of the publisher above and you should see `Message published to t
 
 You can *delete* the job artifacts and *apply* again to send another message(s):
 
-    kubectl delete -f kubernetes-manifests/cdmc-producer-service && kubectl apply -f kubernetes-manifests/cdmc-producer-service
-
-### Subscriber
-Open another terminal and tun the following command(s) to pull the messages from the Pub/Sub subscription:
-
-    while ((1)); do gcloud alpha pubsub subscriptions pull ${PULL_SUBSCRIPTION_NAME} --auto-ack; done
+    kubectl delete -f kubernetes-manifests/cdmc-producer-job && kubectl apply -f kubernetes-manifests/cdmc-producer-job
 
 
 ## Replay Messages
 TBD for k8s. Check Docker example below.
-
-## Hello World - Docker
-We will start two Docker containers; one for the Pub/Sub publisher and one for the multicast producer.
-
-### Pub/Sub Publisher
-Open a terminal and run the following command. Specify the GOOGLE_APPLICATION_CREDENTIALS, PROJECT_ID, TOPIC_NAME, multicast address and interface name. The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS json file created above. This is only for demo purposes.
-
-    docker run -it --rm --name publisher -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json -v ${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/key.json gcr.io/chrispage-dev/cdmc:dev multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i eth0 -v
-
-You should see `Listening and Publishing messages...`
-
-### Multicast Producer
-Open another terminal and run the following command(s). You can specify the message body with the *-m* flag. You need to keep the multicast group address the same as above.
-
-    docker run -it --rm --name producer gcr.io/chrispage-dev/cdmc:dev multicast broadcast -a 239.0.0.1:9999 -i eth0 -v -m "sample message"
-
-You should see `Completed` in this terminal and the same message payload in the Publisher terminal above.
-
-### Subscriber
-Open another terminal and tun the following command(s) to pull the messages from the Pub/Sub subscription:
-
-    while ((1)); do gcloud alpha pubsub subscriptions pull ${PULL_SUBSCRIPTION_NAME} --auto-ack; done
 
 
 ## Replay Messages - Docker
@@ -162,15 +139,23 @@ Re-run the same producer command above. You will see messages running through th
 ### Subscriber
 Open another terminal and tun the following command to pull the messages from the Pub/Sub subscription:
 
-    while ((1)); do gcloud alpha pubsub subscriptions pull ${PULL_SUBSCRIPTION_NAME} --auto-ack; done
+    while ((1)); do gcloud alpha pubsub subscriptions pull ${PULL_SUBSCRIPTION_NAME} --auto-ack; sleep 1; done
 
 
-## License
+## Troubleshooting
+Services fail to start:
+
+```MountVolume.SetUp failed for volume "google-cloud-key" : secret "cdmc-service-creds" not found```
+
+Add the k8s SA credential secret above
+
+
+# License
 
 This project is licensed under the Apache License - see the [LICENSE](../LICENSE.txt) file for details
 
 
-## Authors
+# Authors
 
 * **Chris Page** - *Initial work*
 

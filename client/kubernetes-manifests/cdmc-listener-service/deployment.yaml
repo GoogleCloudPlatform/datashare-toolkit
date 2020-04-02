@@ -17,7 +17,7 @@ spec:
           secretName: cdmc-service-creds
       containers:
         - name: cdmc-service
-          image: gcr.io/chrispage-dev/cdmc:dev
+          image: gcr.io/chrispage-dev/cdmc
           args: ["multicast", "listen", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-v=$(VERBOSE)"]
           imagePullPolicy: IfNotPresent
           ports:

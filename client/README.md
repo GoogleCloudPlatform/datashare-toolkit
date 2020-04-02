@@ -8,10 +8,12 @@
   * [Create Pub/Sub Topic](#create-pubsub-topic)
   * [Create Pub/Sub Subscription](#create-pubsub-subscription)
   * [Setup Kubernetes](#setup-kubernetes)
-* [Examples](EXAMPLES.md)
+  * [Examples](EXAMPLES.md)
+* [Deployment](#deployment)
+  * [Deploy Cloud Run](#deploy-cloud-run)
+  * [Deploy Kubernetes](#deploy-kubernetes)
 * [Development](#development)
 * [Testing](#testing)
-* [Deployment](#deployment)
 * [Contributing](#contributing)
 * [License](#license)
 * [Authors](#authors)
@@ -150,11 +152,64 @@ Enable cluster-admin-binding clusterrolebinding in the cluster:
       --clusterrole=cluster-admin \
       --user=$(gcloud config get-value core/account);
 
-Create a kubernetes secret with the appropriate service account key file from above:\
+Create a kubernetes secret with the appropriate service account key file from above:
 
 **Note**: Change the file path to the appropriate destination. Secrets management for multiple k8s clusters is outside the scope of this example.
 
     kubectl create secret generic cdmc-service-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
+
+
+## Deployment
+You can deploy the CDMC services via various methods below based off developer preference and/or environment. These are the options available:
+
+  * [Google Cloud Run](https://cloud.google.com/run/) via [gcloud](https://cloud.google.com/sdk/)
+  * [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/) via [Skaffold](https://github.com/GoogleContainerTools/skaffold)
+
+[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the CDMC services and generate a unique URL for consumption.
+
+### Prerequisites:
+There are some environment variables that need to be set for all build and deployment options.
+
+* Download and start **Docker for Desktop** or **Minikube** for a local k8s cluster.
+* Download **Skaffold** [>= v1.6.0](https://skaffold.dev/docs/install/)
+
+Export the GCP Project ID as *PROJECT_ID* environment variable:
+
+    export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
+
+Export the image/build *TAG* environment variable:
+
+    export TAG=dev;
+
+
+### Deploy Cloud Run
+TBD
+
+
+### Deploy Kubernetes
+These instructions are to build and deploy in a k8s environment via Skaffold.
+
+Create a kubernetes secret with the appropriate service account key file from above:
+
+**Note**: Change the file path to the appropriate destination. Secrets management for multiple k8s clusters is outside the scope of this example.
+
+    kubectl create secret generic cdmc-service-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
+
+Modify the ConfigMap with the appropriate CDMC environment variables:
+
+    vi kubernetes-manifests/cdmc-publisher-service/configmaps.yaml
+
+Set the default GCR project repository:
+
+    skaffold config set default-repo gcr.io/${PROJECT_ID}
+
+Run `skaffold` with the dev parameter to deploy locally:
+
+    skaffold dev
+
+Build the image with the `skaffold run -t <TAG>` command:
+
+    skaffold run -t $TAG
 
 
 ## Development
@@ -174,23 +229,29 @@ If you want to purge the Pub/Sub subscription, run the following command:
 
     gcloud pubsub subscriptions seek ${PULL_SUBSCRIPTION_NAME} --time=$(date +%Y-%m-%dT%H:%M:%S)
 
-
-## Testing
-TBD
-
-
-## Deployment
-Verify you have Docker running to build the image. You can build the Docker image from the parent directory [client](./):
-
-**Note**: Change your project name appropriately.
-
-    docker build -t gcr.io/chrispage-dev/cdmc:dev .
-
-
-## ToDo
+### ToDo
 * Add GCP cloud build for CDMC service
 * ~~Add k8s example (GCP currently does not support mulitcast)~~
 * Add Pub/Sub to multicast feature
+
+
+## Testing
+Unit testing is TBD
+
+### Integration:
+You can leverage [netcat](http://netcat.sourceforge.net/) or the CDMC broadcast command to test. e.g.
+
+#### Netcat
+Run through a for loop and send 5 UDP packets:
+
+**Note**: Change the IP address/FQDN and port number accordingly
+
+    for i in {0..5}; do echo "sending message $i"; echo "hello world: $i" | nc -u localhost 50001 -w1; done
+
+#### Broadcast
+Apply a k8s job that sends a custome message via CDMC broadcast argument:
+
+    kubectl apply -f kubernetes-manifests/cdmc-producer-service
 
 
 ## Contributing

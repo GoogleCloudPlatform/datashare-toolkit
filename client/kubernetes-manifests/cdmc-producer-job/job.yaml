@@ -2,12 +2,12 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cdmc-producer-service
+  name: cdmc-producer-job
 spec:
   template:
     metadata:
       labels:
-        app: cdmc-producer-service
+        app: cdmc-producer-job
         version: v1
     spec:
       restartPolicy: Never
