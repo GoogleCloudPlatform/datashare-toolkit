@@ -21,7 +21,7 @@ let bigqueryUtil;
 
 const configUtil = require("./configUtil");
 const sqlBuilder = require("./sqlBuilder");
-const runtimeConfiguration = require("../../lib/runtimeConfiguration");
+const cfg = require('../../lib/config');
 const Validator = require('jsonschema').Validator;
 const underscore = require("underscore");
 
@@ -103,7 +103,7 @@ async function validateSchema(config) {
 
     let validationResult = v.validate(config, schema);
 
-    if (runtimeConfiguration.VERBOSE_MODE) {
+    if (cfg.verboseMode) {
         console.log(validationResult);
     }
 
@@ -143,18 +143,18 @@ async function validateView(view) {
         }
         else {
             datasetFound = true;
-            let labelValue = await bigqueryUtil.getDatasetLabelValue(view.datasetId, runtimeConfiguration.CDS_MANAGED_LABEL_KEY);
+            let labelValue = await bigqueryUtil.getDatasetLabelValue(view.datasetId, cfg.cdsManagedLabelKey);
             if (labelValue !== 'true') {
-                logIssue(IssueType.ERROR, `An existing dataset exists for '${view.projectId}.${view.datasetId}'. In order to modify this dataset, the label '${runtimeConfiguration.CDS_MANAGED_LABEL_KEY}' must be defined on the dataset with current configuration value '${view.datasetId}'. You may also resolve the issue by giving the dataset a unique name that does not currently exist in BigQuery.`, 'datasetId');
+                logIssue(IssueType.ERROR, `An existing dataset exists for '${view.projectId}.${view.datasetId}'. In order to modify this dataset, the label '${cfg.cdsManagedLabelKey}' must be defined on the dataset with current configuration value '${view.datasetId}'. You may also resolve the issue by giving the dataset a unique name that does not currently exist in BigQuery.`, 'datasetId');
             }
         }
     }
 
     if (datasetFound && view.name) {
         if (await bigqueryUtil.viewExists(view.datasetId, view.name)) {
-            let labelValue = await bigqueryUtil.getTableLabelValue(view.datasetId, view.name, runtimeConfiguration.CDS_MANAGED_LABEL_KEY);
+            let labelValue = await bigqueryUtil.getTableLabelValue(view.datasetId, view.name, cfg.cdsManagedLabelKey);
             if (labelValue !== 'true') {
-                logIssue(IssueType.ERROR, `An existing view exists for '${view.projectId}.${view.name}'. In order to modify this view, the label '${runtimeConfiguration.CDS_MANAGED_LABEL_KEY}' must be defined on the view with current configuration value '${view.name}'. You may also resolve the issue by giving the view a unique name that does not currently exist in BigQuery.`);
+                logIssue(IssueType.ERROR, `An existing view exists for '${view.projectId}.${view.name}'. In order to modify this view, the label '${cfg.cdsManagedLabelKey}' must be defined on the view with current configuration value '${view.name}'. You may also resolve the issue by giving the view a unique name that does not currently exist in BigQuery.`);
             }
         }
     }
@@ -300,7 +300,7 @@ async function validateQueries(view) {
     if (_isValid === true) {
         let sql = await sqlBuilder.generateSql(view);
 
-        if (true) { //runtimeConfiguration.VERBOSE_MODE) {
+        if (cfg.verboseMode) {
             console.log(`Validating query for view name: '${view.name}' in dataset: '${view.datasetId}': \n${sql}`);
         }
         else {

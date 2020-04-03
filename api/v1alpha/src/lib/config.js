@@ -18,6 +18,13 @@
 
 var config = {};
 
+config.verboseMode = false;
+config.productName = 'CDS';
+config.productVersion = '0.0.1';
+config.cdsAccessControlDatasetId = 'datashare';
+config.cdsAccessControlViewId = 'datashare';
+config.cdsManagedLabelKey = 'cds_managed';
+
 config.cdsDatasetId = "datashare";
 
 config.cdsAccountTableId = "account";
