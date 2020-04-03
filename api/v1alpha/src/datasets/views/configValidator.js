@@ -21,7 +21,7 @@ let bigqueryUtil;
 
 const configUtil = require("./configUtil");
 const sqlBuilder = require("./sqlBuilder");
-const runtimeConfiguration = require("./runtimeConfiguration");
+const runtimeConfiguration = require("../../lib/runtimeConfiguration");
 const Validator = require('jsonschema').Validator;
 const underscore = require("underscore");
 

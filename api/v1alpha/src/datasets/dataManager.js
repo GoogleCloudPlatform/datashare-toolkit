@@ -23,7 +23,7 @@ const uuidv4 = require('uuid/v4');
 const labelName = "cds_managed";
 const configValidator = require('./views/configValidator');
 const sqlBuilder = require('./views/sqlBuilder');
-const runtimeConfiguration = require("./views/runtimeConfiguration");
+const runtimeConfiguration = require("../lib/runtimeConfiguration");
 const cfg = require('../lib/config');
 
 /**
