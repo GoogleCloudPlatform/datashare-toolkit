@@ -36,4 +36,11 @@ profiles:
       manifests:
       - ./kubernetes-manifests/cdmc-publisher-service/*.yaml
         #- ./kubernetes-manifests/cdmc-producer-job/*.yaml
+- name: "tcpreplay"
+  deploy:
+    kubectl:
+      manifests:
+      - ./kubernetes-manifests/cdmc-listener-service/*.yaml
+      - ./kubernetes-manifests/cdmc-publisher-service/*.yaml
+        #- ./kubernetes-manifests/tcpreplay-job/*.yaml
 

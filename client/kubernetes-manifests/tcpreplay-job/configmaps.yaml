@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tcpreplay-env-config
+data:
+  ADDRESS: "239.0.0.1"
+  PORT: "50001"
+  IF_NAME: "eth0"

@@ -13,7 +13,7 @@ spec:
       restartPolicy: Never
       #ttlSecondsAfterFinished: 60
       containers:
-        - name: cdmc-service
+        - name: cdmc-producer
           image: gcr.io/chrispage-dev/cdmc:dev
           args: ["multicast", "broadcast", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-v=$(VERBOSE)", "-m", "$(MESSAGE)"]
           imagePullPolicy: IfNotPresent
