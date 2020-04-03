@@ -177,7 +177,6 @@ async function deleteDataset(projectId, datasetId, createdBy) {
     availableDatasets as (
       SELECT schema_name as datasetId
       FROM INFORMATION_SCHEMA.SCHEMATA
-      -- WHERE catalog_name = 'cds-demo-1-271622' -- filter isn't required as current project is set already
     ),
     policyDatasets as (
       SELECT d.rowId, ARRAY_AGG(STRUCT(d.datasetId)) as datasets

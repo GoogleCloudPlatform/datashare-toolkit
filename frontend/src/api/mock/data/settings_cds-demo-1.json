@@ -1,5 +1,4 @@
 {
-  "apiBaseUrlX": "http://localhost:5555/v1alpha",
   "apiBaseUrl": "https://cds-api-fpzzs22lla-uc.a.run.app/v1alpha",
   "apiKey": "AIzaSyD7x6j6LGziQZIcUTcTItOXFjcsUs3Losg",
   "authDomain": "cds-demo-1-271622.firebaseapp.com",
