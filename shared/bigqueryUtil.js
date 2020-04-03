@@ -101,7 +101,7 @@ class BigQueryUtil {
      */
     async tableColumns(datasetId, tableId) {
         const options = {
-            query: "select column_name from `" + datasetId + ".INFORMATION_SCHEMA.COLUMNS` where table_name = @_tableName order by ordinal_position",
+            query: "select column_name from `" + datasetId + ".INFORMATION_SCHEMA.COLUMNS` where table_name = @_tableName and is_hidden	= 'NO' order by ordinal_position",
             params: { _tableName: tableId },
         };
         const [rows] = await this.executeQuerySync(options);
@@ -113,15 +113,16 @@ class BigQueryUtil {
     /**
      * @param  {string} datasetId
      * @param  {string} tableId
+     * @param  {string} typeCheck Flag indicating if the metadata should be checked to verify if object is of type table. If the object is of type VIEW, an Error will throw
      * Checks for the existence of a table.
      */
-    async tableExists(datasetId, tableId) {
+    async tableExists(datasetId, tableId, typeCheck) {
         const dataset = this.bigqueryClient.dataset(datasetId);
         const table = dataset.table(tableId);
         const response = await table.exists();
         const exists = response[0];
 
-        if (exists === true) {
+        if (typeCheck === true && exists === true) {
             const meta = await table.getMetadata();
             const type = meta[0].type;
             if (type !== "TABLE") {
@@ -155,7 +156,7 @@ class BigQueryUtil {
         }
 
         if (this.VERBOSE_MODE) {
-            console.log(`Checking if table exists: '${tableId}': ${exists}`);
+            console.log(`Checking if view exists: '${tableId}': ${exists}`);
         }
         return exists;
     }
@@ -451,7 +452,6 @@ class BigQueryUtil {
         if (this.VERBOSE_MODE) {
             console.log(`Dataset ${dataset.id} created.`);
         }
-        return dataset;
     }
 
     /**
@@ -571,7 +571,7 @@ class BigQueryUtil {
     async insertRows(datasetId, tableId, rows) {
         const dataset = this.bigqueryClient.dataset(datasetId);
         const table = dataset.table(tableId);
-        await table.insert(rows, { raw: false }).then((data) => {
+        table.insert(rows, { raw: false }).then((data) => {
             let insertErrors = data[1];
             if (insertErrors) {
                 logger.info(`insertErrors: ${JSON.stringify(insertErrors)}`);
