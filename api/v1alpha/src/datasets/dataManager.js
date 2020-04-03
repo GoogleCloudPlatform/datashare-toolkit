@@ -205,7 +205,7 @@ async function deleteDataset(projectId, datasetId, createdBy) {
         return { success: true }
     }
     else {
-        console.log(`Failed to delete dataset '${datasetId}'`);
+        console.error(`Failed to delete dataset '${datasetId}'`);
         return { success: false, errors: ['Failed to delete dataset'] };
     }
 }
