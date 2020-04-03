@@ -40,18 +40,6 @@
           </ValidationProvider>
           <ValidationProvider
             v-slot="{ errors }"
-            name="Database URL"
-            rules="required"
-          >
-            <v-text-field
-              v-model="settings.databaseURL"
-              label="Database URL"
-              :error-messages="errors"
-              required
-            ></v-text-field>
-          </ValidationProvider>
-          <ValidationProvider
-            v-slot="{ errors }"
             name="Project Id"
             rules="required"
           >
@@ -76,36 +64,12 @@
           </ValidationProvider>
           <ValidationProvider
             v-slot="{ errors }"
-            name="Messaging Sender Id"
-            rules="required"
-          >
-            <v-text-field
-              v-model="settings.messagingSenderId"
-              label="Messaging Sender Id"
-              :error-messages="errors"
-              required
-            ></v-text-field>
-          </ValidationProvider>
-          <ValidationProvider
-            v-slot="{ errors }"
             name="App Id"
             rules="required"
           >
             <v-text-field
               v-model="settings.appId"
               label="App Id"
-              :error-messages="errors"
-              required
-            ></v-text-field>
-          </ValidationProvider>
-          <ValidationProvider
-            v-slot="{ errors }"
-            name="Measurement Id"
-            rules="required"
-          >
-            <v-text-field
-              v-model="settings.measurementId"
-              label="Measurement Id"
               :error-messages="errors"
               required
             ></v-text-field>

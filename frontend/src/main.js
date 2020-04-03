@@ -22,12 +22,9 @@ const firebase = require('firebase');
 const firebaseConfig = {
   apiKey: store.state.settings.apiKey,
   authDomain: store.state.settings.authDomain,
-  databaseURL: store.state.settings.databaseURL,
   projectId: store.state.settings.projectId,
   storageBucket: store.state.settings.storageBucket,
-  messagingSenderId: store.state.settings.messagingSenderId,
   appId: store.state.settings.appId,
-  measurementId: store.state.settings.measurementId
 };
 
 const defaultProject = firebase.initializeApp(firebaseConfig);
