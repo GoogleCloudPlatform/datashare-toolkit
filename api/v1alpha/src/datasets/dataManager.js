@@ -139,7 +139,6 @@ async function getDataset(projectId, datasetId) {
  */
 async function deleteDataset(projectId, datasetId, createdBy) {
     const result = await bigqueryUtil.deleteDataset(datasetId, false);
-    console.log(result);
     if (result) {
         // Update and delete related views
         const viewStatement = `insert into \`datashare.authorizedView\` (rowId, authorizedViewId, name, description, datasetId, source, expiration, custom, createdAt, createdBy, viewSql, isDeleted)

@@ -75,11 +75,7 @@ export default {
   },
   deleteDataset(projectId, datasetId) {
     return axios
-      .delete(this._apiBaseUrl() + `/datasets/${datasetId}`, {
-        params: {
-          datasetId: datasetId
-        }
-      })
+      .delete(this._apiBaseUrl() + `/datasets/${datasetId}`)
       .then(response => response);
   },
   getAccounts(payload) {
