@@ -247,7 +247,7 @@ async function listTableColumns(projectId, datasetId, tableId) {
  */
 async function listDatasetViews(projectId, datasetId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
-    let fields = [...cfg.cdsAuthorizedViewViewFields];
+    let fields = new Set(cfg.cdsAuthorizedViewViewFields);
     let remove = ['source', 'expiration', 'custom', 'viewSql', 'isDeleted'];
     remove.forEach(f => fields.delete(f));
     fields = Array.from(fields).map(i => 'v.' + i).join();
@@ -278,7 +278,7 @@ async function listDatasetViews(projectId, datasetId) {
  */
 async function getDatasetView(projectId, datasetId, viewId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
-    let fields = [...cfg.cdsAuthorizedViewViewFields];
+    let fields = new Set(cfg.cdsAuthorizedViewViewFields);
     let remove = ['version', 'isDeleted', 'createdBy', 'createdAt', 'viewSql'];
     remove.forEach(f => fields.delete(f));
     fields = Array.from(fields).map(i => 'v.' + i).join();
@@ -332,7 +332,7 @@ async function validateDatasetView(projectId, datasetId, view) {
  * @param  {} viewId
  * @param  {} data
  */
-async function createOrUpdateDatasetView(projectId, datasetId, viewId, view) {
+async function createOrUpdateDatasetView(projectId, datasetId, viewId, view, createdBy) {
     let _viewId = viewId;
     if (viewId) {
         const currentView = await getDatasetView(projectId, datasetId, viewId);
@@ -361,10 +361,10 @@ async function createOrUpdateDatasetView(projectId, datasetId, viewId, view) {
     let data = {
         rowId: rowId,
         authorizedViewId: _viewId,
-        name: data.name,
-        description: data.description,
-        datasetId: data.datasetId, 
-        createdBy: data.createdBy,
+        name: view.name,
+        description: view.description,
+        datasetId: view.datasetId, 
+        createdBy: createdBy,
         createdAt: createdAt,
         isDeleted: isDeleted,
         viewSql: viewSql
@@ -397,8 +397,6 @@ async function createOrUpdateDatasetView(projectId, datasetId, viewId, view) {
  * @param  {} view
  */
 async function createView(view) {
-    let success = false;
-
     const viewSql = await sqlBuilder.generateSql(view);
     let metadataResult = await bigqueryUtil.getTableMetadata(view.datasetId, view.name);
 
@@ -492,7 +490,8 @@ async function createView(view) {
         }
     }
 
-    return { isValid: true, success: success, issues: [] };
+    console.log('Returning true');
+    return { isValid: true, success: true, issues: [] };
 }
 
 /**

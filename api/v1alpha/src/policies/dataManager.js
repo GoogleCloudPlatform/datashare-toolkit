@@ -105,7 +105,7 @@ async function listPolicies(projectId, datasetId, accountId) {
             params: { datasetId: datasetId }
         };
     } else if (accountId) {
-        let fields = [...cfg.cdsPolicyViewFields];
+        let fields = new Set(cfg.cdsPolicyViewFields);
         fields.delete('isDeleted');
         fields = Array.from(fields).map(i => 'cp.' + i).join();
         const accountTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);

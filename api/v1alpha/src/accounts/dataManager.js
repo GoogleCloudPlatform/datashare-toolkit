@@ -134,7 +134,7 @@ async function listAccounts(projectId, datasetId, policyId) {
             params: { datasetId: datasetId }
         };
     } else if (policyId) {
-        let fields = [...cfg.cdsAccountViewFields];
+        let fields = new Set(cfg.cdsAccountViewFields);
         let remove = ['rowId', 'accountId', 'accountType', 'createdBy', 'policies', 'createdAt', 'version', 'isDeleted'];
         remove.forEach(f => fields.delete(f));
         fields = Array.from(fields).map(i => 'ca.' + i).join();

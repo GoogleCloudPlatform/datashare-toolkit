@@ -675,7 +675,6 @@ export default {
       }
 
       copy.projectId = this.$store.state.settings.projectId;
-      copy.createdBy = this.$store.state.user.data.email;
 
       return copy;
     }

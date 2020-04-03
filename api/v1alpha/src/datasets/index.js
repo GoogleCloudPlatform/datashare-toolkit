@@ -418,7 +418,8 @@ datasets.post('/projects/:projectId/datasets/:datasetId/views', async(req, res) 
     const projectId = req.params.projectId;
     const datasetId = req.params.datasetId;
     const view = req.body;
-    const data = await dataManager.createOrUpdateDatasetView(projectId, datasetId, null, view);
+    const createdBy = req.header('x-gcp-account');
+    const data = await dataManager.createOrUpdateDatasetView(projectId, datasetId, null, view, createdBy);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -436,7 +437,8 @@ datasets.put('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req
     const datasetId = req.params.datasetId;
     const viewId = req.params.viewId;
     const view = req.body;
-    const data = await dataManager.createOrUpdateDatasetView(projectId, datasetId, viewId, view);
+    const createdBy = req.header('x-gcp-account');
+    const data = await dataManager.createOrUpdateDatasetView(projectId, datasetId, viewId, view, createdBy);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
