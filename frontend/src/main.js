@@ -25,6 +25,7 @@ const firebaseConfig = {
   projectId: store.state.settings.projectId,
   storageBucket: store.state.settings.storageBucket,
   appId: store.state.settings.appId,
+  measurementId: store.state.settings.measurementId
 };
 
 const defaultProject = firebase.initializeApp(firebaseConfig);

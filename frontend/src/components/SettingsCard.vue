@@ -76,6 +76,18 @@
           </ValidationProvider>
           <ValidationProvider
             v-slot="{ errors }"
+            name="Measurement Id"
+            rules="required"
+          >
+            <v-text-field
+              v-model="settings.measurementId"
+              label="Measurement Id"
+              :error-messages="errors"
+              required
+            ></v-text-field>
+          </ValidationProvider>
+          <ValidationProvider
+            v-slot="{ errors }"
             name="API Base URL"
             rules="required|max:2000"
           >

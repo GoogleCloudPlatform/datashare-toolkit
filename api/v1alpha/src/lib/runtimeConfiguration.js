@@ -19,30 +19,27 @@
 class RuntimeConfiguration {
     constructor() {
         this.verboseMode = false;
-        this.labelValidation = true;
-        this.dryRun = false;
-        this.prerequisiteSetupOnly = false;
         this.refreshDatasetPermissionTable = true;
-
-        // const _package = require('../package');
-        this.productName = 'CDS'; // _package.description;
-        this.productVersion = '0.0.1'; // _package.version;
     }
 
     get PRODUCT_NAME() {
-        return this.productName;
+        return 'CDS';
     }
 
     get PRODUCT_VERSION() {
-        return this.productVersion;
+        return '0.0.1';
     }
 
-    get BQDS_CONFIGURATION_NAME_LABEL_KEY() {
-        return "bqds_configuration_name";
+    get ACCESS_CONTROL_DATASET_ID() {
+        return 'datashare';
+    }
+
+    get ACCESS_CONTROL_VIEW_ID() {
+        return 'currentUserDataset';
     }
 
     get CDS_MANAGED_LABEL_KEY() {
-        return "cds_managed";
+        return 'cds_managed';
     }
 
     get VERBOSE_MODE() {
@@ -51,21 +48,7 @@ class RuntimeConfiguration {
     set VERBOSE_MODE(flag) {
         this.verboseMode = flag;
     }
-
-    get DRY_RUN() {
-        return this.dryRun;
-    }
-    set DRY_RUN(flag) {
-        this.dryRun = flag;
-    }
-
-    get PREREQUISITE_SETUP_ONLY() {
-        return this.prerequisiteSetupOnly;
-    }
-    set PREREQUISITE_SETUP_ONLY(flag) {
-        this.prerequisiteSetupOnly = flag;
-    }
-
+    
     get REFRESH_DATASET_PERMISSION_TABLE() {
         return this.refreshDatasetPermissionTable;
     }

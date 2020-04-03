@@ -16,10 +16,9 @@
 
 'use strict';
 
-const configUtil = require("./configUtil");
+const configUtil = require('./configUtil');
 const endOfLine = require('os').EOL;
-const accessControlDatasetId = 'datashare';
-const accessControlViewId = 'currentUserDataset';
+const runtimeConfiguration = require('../../lib/runtimeConfiguration');
 
 /**
  * @param  {} view
@@ -125,11 +124,11 @@ async function generateDatasetEntitySubquery(view) {
         let useNesting = accessControlLabelColumnDelimiter && accessControlLabelColumnDelimiter.length > 0;
         if (useNesting === true) {
             query += `select 1 from unnest(split(s.${accessControlLabelColumn}, "${accessControlLabelColumnDelimiter}")) as flattenedLabel\n`;
-            query += `join \`${view.projectId}.${accessControlDatasetId}.${accessControlViewId}\` e on lower(flattenedLabel) = lower(e.tag)\n`;
+            query += `join \`${view.projectId}.${runtimeConfiguration.ACCESS_CONTROL_DATASET_ID}.${untimeConfiguration.ACCESS_CONTROL_VIEW_ID}\` e on lower(flattenedLabel) = lower(e.tag)\n`;
             query += `where lower(e.datasetId) = '${view.datasetId.toLowerCase()}'\n`;
         }
         else {
-            query += `select 1 from \`${view.projectId}.${accessControlDatasetId}.${accessControlViewId}\` e\n`;
+            query += `select 1 from \`${view.projectId}.${runtimeConfiguration.ACCESS_CONTROL_DATASET_ID}.${runtimeConfiguration.ACCESS_CONTROL_VIEW_ID}\` e\n`;
             query += `where lower(e.datasetId) = '${view.datasetId.toLowerCase()}' and lower(e.tag) = lower(s.${accessControlLabelColumn})\n`;
         }
 
