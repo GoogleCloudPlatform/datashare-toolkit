@@ -2,14 +2,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: bqds-frontend-ui
+  name: cds-frontend-ui
   labels:
-    app: bqds-frontend-ui
+    app: cds-frontend-ui
 spec:
   type: ClusterIP
   ports:
     - port: 8080
       name: http
   selector:
-    app: bqds-frontend-ui
+    app: cds-frontend-ui
     version: v1
