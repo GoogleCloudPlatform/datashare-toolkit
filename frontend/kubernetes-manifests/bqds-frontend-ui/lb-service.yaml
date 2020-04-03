@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: bqds-frontend-ui-lb
+  name: cds-frontend-ui-lb
   labels:
-    app: bqds-frontend-ui
+    app: cds-frontend-ui
 spec:
   type: LoadBalancer
   ports:
@@ -12,5 +12,5 @@ spec:
       name: http
       targetPort: 8080
   selector:
-    app: bqds-frontend-ui
+    app: cds-frontend-ui
     version: v1
