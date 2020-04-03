@@ -87,10 +87,10 @@ class BigQueryUtil {
         // Purposefully handle this error as needed to validate the query.
         try {
             const [rows] = await this.executeQuerySync(options);
-            return { isValid: true };
+            return { success: true };
         } catch (error) {
             console.warn("ERROR: %s - Query: '%s' is invalid", error, _sql);
-            return { isValid: false, message: error.message };
+            return { success: false, message: error.message };
         }
     }
 
@@ -571,7 +571,7 @@ class BigQueryUtil {
     async insertRows(datasetId, tableId, rows) {
         const dataset = this.bigqueryClient.dataset(datasetId);
         const table = dataset.table(tableId);
-        table.insert(rows, { raw: false }).then((data) => {
+        await table.insert(rows, { raw: false }).then((data) => {
             let insertErrors = data[1];
             if (insertErrors) {
                 logger.info(`insertErrors: ${JSON.stringify(insertErrors)}`);

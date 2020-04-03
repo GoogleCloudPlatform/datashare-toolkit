@@ -584,7 +584,8 @@ async function validateQueries(config) {
                     console.log(`Validating query for view name: '${v.name}' in dataset: '${d}'`);
                 }
 
-                if (await bigqueryUtil.validateQuery(sql, 5) === false) {
+                const vr = await bigqueryUtil.validateQuery(sql, 5);
+                if (vr.success === false) {
                     logIssue(IssueType.ERROR, `Invalid query for view '${v.name}': '${sql}'`);
                 }
             }

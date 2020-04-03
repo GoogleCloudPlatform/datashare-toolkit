@@ -21,7 +21,7 @@ let bigqueryUtil = new BigQueryUtil();
 const uuidv4 = require('uuid/v4');
 
 const labelName = "cds_managed";
-const configValidator = require('./views/configValidator');
+const ConfigValidator = require('./views/configValidator');
 const sqlBuilder = require('./views/sqlBuilder');
 const cfg = require('../lib/config');
 
@@ -315,9 +315,12 @@ async function validateDatasetView(projectId, datasetId, view) {
         }
     }
     try {
+        let configValidator = new ConfigValidator();
         const result = await configValidator.validate(view);
+        console.log(result);
         return { success: result.isValid, data: result, code: result.isValid ? 200 : 400 };
     } catch (err) {
+        console.log(err);
         const message = `Failed to validate view`;
         return { success: false, isValid: false, code: 500, errors: [message] };
     }
@@ -343,6 +346,7 @@ async function createOrUpdateDatasetView(projectId, datasetId, viewId, view, cre
 
     // Perform validation
     console.log('performing validation');
+    let configValidator = new ConfigValidator();
     const result = await configValidator.validate(view);
     console.log(`validation response: ${JSON.stringify(result)}`);
     if (!result.isValid) {
@@ -421,11 +425,6 @@ async function createView(view) {
             console.log("SQL text is identitical");
         }
         else {
-            // Validate query was already run by configValidator
-            /*const result = await bigqueryUtil.validateQuery(viewSql, 5);
-            if (result.isValid === false) {
-                console.log("Query is invalid, skipping to next view");
-            }*/
             console.log(`SQL text is different, need to re-create view\nView Definition:\n${viewDefinition}\n\nConfig SQL:\n${viewSql}`);
 
             createViewResult = await bigqueryUtil.createView(view.datasetId, view.name, viewSql, viewOptions, true);
@@ -456,12 +455,6 @@ async function createView(view) {
         }
     }
     else {
-        // This else block is a bit redundant as it has the same code as above (except the deleteIfExists flag)
-        // Validate query was already run by configValidator
-        /*const result = bigqueryUtil.validateQuery(viewSql, 5);
-        if (result.isValid === false) {
-            console.log("Query is invalid, skipping to next view");
-        }*/
         createViewResult = await bigqueryUtil.createView(view.datasetId, view.name, viewSql, viewOptions, true);
     }
 
