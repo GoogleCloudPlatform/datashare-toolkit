@@ -201,9 +201,11 @@ async function deleteDataset(projectId, datasetId, createdBy) {
         };
         await bigqueryUtil.executeQuery(policyOptions);
 
+        console.log(`Dataset '${datasetId} deleted`);
         return { success: true }
     }
     else {
+        console.log(`Failed to delete dataset '${datasetId}'`);
         return { success: false, errors: ['Failed to delete dataset'] };
     }
 }
