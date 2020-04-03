@@ -312,7 +312,11 @@ class ConfigValidator {
 
             const v = await bigqueryUtil.validateQuery(sql, 5);
             if (v.success === false) {
-                this.logIssue(IssueType.ERROR, `Invalid query for view '${view.name}': '${sql}'`);
+                if (view.custom) {
+                    this.logIssue(IssueType.ERROR, v.message, 'custom.query');
+                } else {
+                    this.logIssue(IssueType.ERROR, v.message, 'source.queryFilter');
+                }
             }
         }
     }
