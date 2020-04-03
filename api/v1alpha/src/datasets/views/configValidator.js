@@ -38,7 +38,6 @@ const IssueType = {
 
 class ConfigValidator {
     constructor() {
-        console.log('constructor called');
         this.issues = [];
     }
 
@@ -64,7 +63,6 @@ class ConfigValidator {
 
         let _isValid = true;
         console.log("-------------------START - Validation Result-------------------");
-        console.log(`Issues is: ${JSON.stringify(this.issues)}`);
         if (this.issues.length > 0) {
             this.issues.forEach((i) => {
                 console.log(`${i.issueType}: ${i.attribute}: ${i.message}`);
@@ -327,7 +325,6 @@ class ConfigValidator {
      */
     logIssue(issueType, message, attribute) {
         this.issues.push({ issueType: issueType, message: message, attribute: attribute });
-        console.log(`Issues is: ${JSON.stringify(this.issues)}`);
     }
 
     /**
