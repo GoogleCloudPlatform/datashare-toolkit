@@ -448,10 +448,10 @@ class BigQueryUtil {
     async createDataset(datasetId, options) {
         let _options = options || {};
         const [dataset] = await this.bigqueryClient.createDataset(datasetId, _options);
-
         if (this.VERBOSE_MODE) {
             console.log(`Dataset ${dataset.id} created.`);
         }
+        return { success: true, metadata: dataset.metadata };
     }
 
     /**

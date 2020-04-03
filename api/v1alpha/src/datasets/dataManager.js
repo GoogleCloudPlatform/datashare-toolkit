@@ -99,12 +99,10 @@ async function createDataset(projectId, datasetId, description) {
         return { success: false, errors: [message] };
     }
     return {
+        success: dataset.success,
         data: {
             datasetId: dataset.id,
-            metadata: {
-                labels: dataset.metadata.labels,
-                location: dataset.metadata.location
-            }
+            metadata: dataset.metadata
         }
     };
 }
