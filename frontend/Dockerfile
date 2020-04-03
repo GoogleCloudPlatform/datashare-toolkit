@@ -1,9 +1,9 @@
 ###############################################################################
 ##  Name:   Dockerfile
-##  Date:   2019-12-05
+##  Date:   2020-04-03
 ##  Developer:  Chris Page
 ##  Email:  chrispage@google.com
-##  Purpose:   This Dockerfile contains the bqds-frontend-ui application
+##  Purpose:   This Dockerfile contains the cds-frontend-ui application
 ################################################################################
 ## STAGE 1: Build stage
 # Using official node runtime base apline image
@@ -30,7 +30,7 @@ RUN npm run build
 
 
 ### STAGE 2: Production Environment
-FROM nginx:1.15-alpine
+FROM nginx:1.17-alpine
 COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build-env /app/dist /usr/share/nginx/html
