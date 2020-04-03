@@ -446,7 +446,7 @@ async function setupDatasharePrerequisites(projectId) {
                 },
                 {
                     "description": "The generated view sql",
-                    "mode": "NULLABLE",
+                    "mode": "REQUIRED",
                     "name": "viewSql",
                     "type": "STRING"
                 },
