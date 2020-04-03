@@ -1,5 +1,5 @@
-# BQDS Frontend UI
-This documentation provides details for how to develop, build, and deploy new versions of the BQDS Frontend UI. There are a few different deployment options for you to choose based on developer pererence and/or environment.
+# CDS Frontend UI
+This documentation provides details for how to develop, build, and deploy new versions of the CDS Frontend UI. There are a few different deployment options for you to choose based on developer pererence and/or environment.
 
 * [Prerequisites](#prereqs)
   * [Setup Backend API](#setup_backend)
@@ -12,9 +12,9 @@ These are the prerequisites for the BQDS Frontend UI Development
 
 
 ### <a name="setup_backend">Setup Backend API</a>
-BQDS Admin REST API setup is a dependency for the Frontend UI if you do not plan to use mock data or do not have an existing BQDS Admin REST API endpoint URL.
+CDS API setup is a dependency for the Frontend UI if you do not plan to use mock data or do not have an existing CDS API endpoint URL.
 
-    TBD
+[CDS API Documentation](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/tree/master/api)
 
 
 ## <a name="develop">Develop</a>
@@ -42,4 +42,7 @@ or Using API client data from an endpoint URL:
 
     VUE_APP_APICLIENT=server npm run serve
 
-Point your browser to http://localhost:8080
+Point your browser to http://localhost:8080 and update your CDS Frontend `API Base URL` in the UI settings [page](http://localhost:8080/settings)
+
+   http://localhost:8080
+
