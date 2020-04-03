@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: cdmc-publisher-service
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -18,7 +18,7 @@ spec:
       containers:
         - name: cdmc-service
           image: gcr.io/chrispage-dev/cdmc
-          args: ["multicast", "publish", "-p", "$(PROJECT_ID)", "-t", "$(TOPIC_NAME)", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-v=$(VERBOSE)"]
+          args: ["multicast", "publish", "-p", "$(PROJECT_ID)", "-t", "$(TOPIC_NAME)", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-r", "$(READ_BUFFER_BYTES)", "-v=$(VERBOSE)"]
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 50000
@@ -48,6 +48,11 @@ spec:
               configMapKeyRef:
                 name: cdmc-publisher-env-config
                 key: IF_NAME
+          - name: READ_BUFFER_BYTES
+            valueFrom:
+              configMapKeyRef:
+                name: cdmc-publisher-env-config
+                key: READ_BUFFER_BYTES
           - name: VERBOSE
             valueFrom:
               configMapKeyRef:

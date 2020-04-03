@@ -4,6 +4,7 @@ kind: ConfigMap
 metadata:
   name: tcpreplay-env-config
 data:
-  ADDRESS: "239.0.0.1"
-  PORT: "50001"
+  #ADDRESS: "cdmc-publisher-service" # tcpreplay-edit cannot lookup hostnames
+  ADDRESS: "239.0.0.1/32"
+  PORT: "50000"
   IF_NAME: "eth0"

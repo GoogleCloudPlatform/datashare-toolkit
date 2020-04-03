@@ -9,4 +9,5 @@ data:
   #TOPIC_NAME: "cds-multicast-demo-broadcast"
   ADDRESS: "239.0.0.1:50001"
   IF_NAME: "eth0"
+  READ_BUFFER_BYTES: "5242880" # 5MB
   VERBOSE: "true"

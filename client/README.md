@@ -141,8 +141,8 @@ created:
 
     gcloud container clusters create ${CLUSTER_NAME} \
       --zone ${ZONE} \
-      --machine-type=n2-standard-2 \
-      --num-nodes 3 \
+      --machine-type=n2-standard-8 \
+      --num-nodes 1 \
       --cluster-version=1.15 \
       --no-enable-legacy-authorization;
 
