@@ -245,7 +245,7 @@ batch instance that appended each individual record. Hence, the
 records appended for each ingestion instance (that is, a single file
 ingested from GCS) will contain a distinct batch ID.
 
-The data stored within the ```bqds_batch_id``` column is of a
+The data stored within the ```cds_batch_id``` column is of a
 ```STRING``` type that adheres to the following convention:
 
 ```

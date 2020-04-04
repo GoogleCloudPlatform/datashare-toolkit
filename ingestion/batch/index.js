@@ -22,7 +22,7 @@ const bigqueryUtil = new BigQueryUtil();
 const cloudFunctionUtil = new CloudFunctionUtil();
 const storageUtil = new StorageUtil();
 const stagingTableExpiryDays = 2;
-const processPrefix = "bqds";
+const processPrefix = "cds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
 const labelName = "cds_managed";
 let batchId;
