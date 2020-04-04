@@ -1,6 +1,6 @@
 {
-  "apiBaseUrlX": "https://cds-api-jaa4rm3j3a-uc.a.run.app/v1alpha",
-  "apiBaseUrl": "http://localhost:5555/v1alpha",
+  "apiBaseUrl": "https://cds-api-jaa4rm3j3a-uc.a.run.app/v1alpha",
+  "apiBaseUrlX": "http://localhost:5555/v1alpha",
   "apiKey": "AIzaSyAIg7AUkAoZ3f_Ney3DBojzfCnfjIHAaXU",
   "authDomain": "cds-demo-2.firebaseapp.com",
   "projectId": "cds-demo-2",
