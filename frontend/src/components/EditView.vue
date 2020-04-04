@@ -419,8 +419,11 @@
       <v-btn color="blue darken-1" text @click.stop="showConfig = true">
         JSON
       </v-btn>
-      <v-btn text color="purple darken-1" @click.stop="validate">
+      <v-btn text color="purple darken-1" @click.stop="validate(false)">
         Validate
+      </v-btn>
+      <v-btn color="blue darken-1" text @click.stop="validate(true)">
+        Sample Data
       </v-btn>
       <v-btn text color="green darken-1" @click.stop="save">
         Save
@@ -440,6 +443,24 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="showConfig = false"
+            >Close</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="showSampleData">
+      <v-card class="px-4 py-4">
+        <v-card-title primary-title>
+          Sample Data
+        </v-card-title>
+        <v-data-table
+          :headers="sampleDataHeaders"
+          :items="sampleData"
+          :items-per-page="10"
+        ></v-data-table>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="showSampleData = false"
             >Close</v-btn
           >
         </v-card-actions>
@@ -541,6 +562,9 @@ export default {
     showDialog: false,
     loading: false,
     showConfig: false,
+    showSampleData: false,
+    sampleDataHeaders: [],
+    sampleData: [],
     menuExpirationDate: false,
     expirationDate: null,
     menuExpirationTime: false,
@@ -692,7 +716,7 @@ export default {
     cancel() {
       this.$emit('cancel');
     },
-    validate() {
+    validate(showSampleData) {
       // First do client side validation
       this.$refs.observer.validate().then(result => {
         console.log(`Validation response: ${result}`);
@@ -702,14 +726,39 @@ export default {
           );
           this.loading = true;
           this.$store
-            .dispatch('validateView', this.sanitizedView)
+            .dispatch('validateView', {
+              view: this.sanitizedView,
+              includeSampleData: showSampleData
+            })
             .then(response => {
               this.loading = false;
               if (response.success) {
                 console.log('Validation passed');
-                this.dialogTitle = 'Validation Status';
-                this.dialogText = 'The view configuration is valid.';
-                this.showDialog = true;
+                if (!showSampleData) {
+                  this.dialogTitle = 'Validation Status';
+                  this.dialogText = 'The view configuration is valid.';
+                  this.showDialog = true;
+                } else {
+                  if (response.data && response.data.rows) {
+                    this.showSampleData = true;
+                    this.sampleData = response.data.rows;
+
+                    let headers = [];
+                    let keys = [];
+                    this.sampleData.forEach(row => {
+                      Object.keys(row).forEach(function(key) {
+                        if (!keys.includes(key)) {
+                          keys.push(key);
+                        }
+                      });
+                    });
+                    keys.forEach(key => {
+                      headers.push({ text: key, value: key });
+                    });
+
+                    this.sampleDataHeaders = headers;
+                  }
+                }
               } else {
                 const result = response.data;
                 if (result.error && result.error === 'STALE') {

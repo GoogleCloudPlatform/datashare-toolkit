@@ -306,8 +306,9 @@ async function getDatasetView(projectId, datasetId, viewId) {
  * @param  {} projectId
  * @param  {} datasetId
  * @param  {} view
+ * @param  {} includeSampleData
  */
-async function validateDatasetView(projectId, datasetId, view) {
+async function validateDatasetView(projectId, datasetId, view, includeSampleData) {
     if (view.authorizedViewId) {
         const currentView = await getDatasetView(projectId, datasetId, view.authorizedViewId);
         if (currentView.success && currentView.data.rowId !== view.rowId) {
@@ -318,7 +319,14 @@ async function validateDatasetView(projectId, datasetId, view) {
         let configValidator = new ConfigValidator();
         const result = await configValidator.validate(view);
         console.log(result);
-        return { success: result.isValid, data: result, code: result.isValid ? 200 : 400 };
+
+        let response = { success: result.isValid, data: result, code: result.isValid ? 200 : 400 };
+        if (result.isValid && includeSampleData) {
+            const sql = await sqlBuilder.generateSql(view);
+            const validateQueryResponse = await bigqueryUtil.validateQuery(sql, 20, includeSampleData);
+            response.data.rows = validateQueryResponse.rows;
+        }
+        return response;
     } catch (err) {
         console.log(err);
         const message = `Failed to validate view`;

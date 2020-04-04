@@ -64,9 +64,10 @@ class BigQueryUtil {
     /**
      * @param  {string} sql
      * @param  {integer} sql
+     * @param {boolean} includeRows
      * execute SQL query with a limit and returnn true/false
      */
-    async validateQuery(sql, limit) {
+    async validateQuery(sql, limit, includeRows) {
         let _sql = sql.trim();
         if (limit && limit > 0) {
             let regex = /(.+limit\s)([\d]+)$/gi;
@@ -87,6 +88,9 @@ class BigQueryUtil {
         // Purposefully handle this error as needed to validate the query.
         try {
             const [rows] = await this.executeQuerySync(options);
+            if (includeRows) {
+                return { success: true, rows: rows };
+            }
             return { success: true };
         } catch (error) {
             console.warn("ERROR: %s - Query: '%s' is invalid", error, _sql);

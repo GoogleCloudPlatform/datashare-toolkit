@@ -180,7 +180,8 @@ export default {
   validateView(payload) {
     return axios
       .post(
-        this._apiBaseUrl() + `/datasets/${payload.datasetId}/views::validate`,
+        this._apiBaseUrl() +
+          `/datasets/${payload.view.datasetId}/views::validate`,
         payload
       )
       .then(response => response);
