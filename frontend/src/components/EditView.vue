@@ -8,6 +8,13 @@
     </v-card-title>
     <v-card-subtitle v-if="view.name">{{ view.name }}</v-card-subtitle>
     <form>
+      <v-alert
+        v-if="this.errorString"
+        style="white-space: pre-line;"
+        type="error"
+      >
+        {{ this.errorString }}
+      </v-alert>
       <ValidationObserver ref="observer" v-slot="{}">
         <ValidationProvider
           v-slot="{ errors }"
@@ -256,6 +263,7 @@
                   v-model="view.custom.query"
                   :error-messages="errors"
                   label="Query"
+                  style="font-family: monospace; font-size: 12px;"
                   required
                   hint="SQL based custom query"
                 ></v-textarea>
@@ -489,7 +497,7 @@
 <script>
 import Vue from 'vue';
 
-import { required, max } from 'vee-validate/dist/rules';
+import { required } from 'vee-validate/dist/rules';
 import {
   extend,
   ValidationObserver,
@@ -566,7 +574,8 @@ export default {
     },
     showAddDataset: false,
     newDatasetId: null,
-    datasetSearch: ''
+    datasetSearch: '',
+    errorString: ''
   }),
   created() {
     if (this.viewData && this.viewData.authorizedViewId) {
@@ -686,6 +695,7 @@ export default {
     validate() {
       // First do client side validation
       this.$refs.observer.validate().then(result => {
+        console.log(`Validation response: ${result}`);
         if (result) {
           console.log(
             'Client side data is valid, will do server side validation'
@@ -720,10 +730,16 @@ export default {
                     this.$refs.observer.setErrors(result.issues);
                   }
                 }
+                this.setErrors(result.issues);
               }
             });
         } else {
-          console.log('Client side data is invalid');
+          console.log(
+            `Client side data is invalid: ${JSON.stringify(
+              this.$refs.observer.errors
+            )}`
+          );
+          this.setErrors(null);
         }
       });
     },
@@ -760,10 +776,16 @@ export default {
                     this.$refs.observer.setErrors(result.issues);
                   }
                 }
+                this.setErrors(result.issues);
               }
             });
         } else {
-          console.log('View is not valid');
+          console.log(
+            `Client side data is invalid: ${JSON.stringify(
+              this.$refs.observer.errors
+            )}`
+          );
+          this.setErrors(null);
         }
       });
     },
@@ -977,6 +999,18 @@ export default {
           console.log('adding view.custom.authorizeFromDatasetIds');
           this.view.custom.authorizeFromDatasetIds = [];
         }
+      }
+    },
+    setErrors(dictionary) {
+      if (dictionary) {
+        let errMsg = '';
+        Object.keys(dictionary).forEach(function(key) {
+          errMsg += `- ${key}: ${dictionary[key]}
+`;
+        });
+        this.errorString = errMsg;
+      } else {
+        this.errorString = null;
       }
     }
   }
