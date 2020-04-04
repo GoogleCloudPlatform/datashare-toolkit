@@ -747,8 +747,20 @@ export default {
                     let keys = [];
                     this.sampleData.forEach(row => {
                       Object.keys(row).forEach(function(key) {
-                        if (!keys.includes(key)) {
-                          keys.push(key);
+                        const val = row[key];
+                        if (
+                          typeof val === 'object' &&
+                          !Array.isArray(val) &&
+                          val !== null
+                        ) {
+                          const valKey = `${key}.value`;
+                          if (!keys.includes(valKey)) {
+                            keys.push(valKey);
+                          }
+                        } else {
+                          if (!keys.includes(key)) {
+                            keys.push(key);
+                          }
                         }
                       });
                     });
