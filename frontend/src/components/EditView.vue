@@ -756,16 +756,15 @@ export default {
                           const valKey = `${key}.value`;
                           if (!keys.includes(valKey)) {
                             keys.push(valKey);
+                            headers.push({ text: key, value: valKey });
                           }
                         } else {
                           if (!keys.includes(key)) {
                             keys.push(key);
+                            headers.push({ text: key, value: key });
                           }
                         }
                       });
-                    });
-                    keys.forEach(key => {
-                      headers.push({ text: key, value: key });
                     });
 
                     this.sampleDataHeaders = headers;
