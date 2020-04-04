@@ -689,6 +689,10 @@ export default {
         // Custom-based
         delete copy.source;
 
+        if (!copy.custom.query) {
+          delete copy.custom.query;
+        }
+
         if (
           copy.custom.authorizeFromDatasetIds &&
           copy.custom.authorizeFromDatasetIds.length === 0
