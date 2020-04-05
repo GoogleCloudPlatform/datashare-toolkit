@@ -746,31 +746,10 @@ export default {
                   if (response.data && response.data.rows) {
                     this.showSampleData = true;
                     this.sampleData = response.data.rows;
-
                     let headers = [];
-                    let keys = [];
-                    this.sampleData.forEach(row => {
-                      Object.keys(row).forEach(function(key) {
-                        const val = row[key];
-                        if (
-                          typeof val === 'object' &&
-                          !Array.isArray(val) &&
-                          val !== null
-                        ) {
-                          const valKey = `${key}.value`;
-                          if (!keys.includes(valKey)) {
-                            keys.push(valKey);
-                            headers.push({ text: key, value: valKey });
-                          }
-                        } else {
-                          if (!keys.includes(key)) {
-                            keys.push(key);
-                            headers.push({ text: key, value: key });
-                          }
-                        }
-                      });
+                    response.data.columns.forEach(col => {
+                      headers.push({ text: col.name, value: col.path });
                     });
-
                     this.sampleDataHeaders = headers;
                   }
                 }

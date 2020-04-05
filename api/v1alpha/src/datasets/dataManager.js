@@ -323,7 +323,38 @@ async function validateDatasetView(projectId, datasetId, view, includeSampleData
         if (result.isValid && includeSampleData) {
             const sql = await sqlBuilder.generateSql(view);
             const validateQueryResponse = await bigqueryUtil.validateQuery(sql, 20, includeSampleData);
-            response.data.rows = validateQueryResponse.rows;
+            if (validateQueryResponse.rows.length > 0) {
+                response.data.rows = validateQueryResponse.rows;
+
+                let columns = [];
+                let keys = [];
+                validateQueryResponse.rows.forEach(row => {
+                    Object.keys(row).forEach(function (key) {
+                        const val = row[key];
+                        if (
+                            typeof val === 'object' &&
+                            !Array.isArray(val) &&
+                            val !== null
+                        ) {
+                            const valKey = `${key}.value`;
+                            if (!keys.includes(valKey)) {
+                                keys.push(valKey);
+                                columns.push({ name: key, path: valKey });
+                            }
+                        } else {
+                            if (!keys.includes(key)) {
+                                keys.push(key);
+                                columns.push({ name: key, path: key });
+                            }
+                        }
+                    });
+                });
+
+                response.data.columns = columns;
+            } else {
+                response.data.rows = [];
+                response.data.columns = [];
+            }
         }
         return response;
     } catch (err) {
