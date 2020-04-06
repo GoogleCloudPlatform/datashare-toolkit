@@ -142,6 +142,19 @@ const store = new Vuex.Store({
         });
     },
     // eslint-disable-next-line no-unused-vars
+    updateDataset({ commit }, payload) {
+      return client
+        .updateDataset(
+          payload.projectId,
+          payload.datasetId,
+          payload.description
+        )
+        .then(result => result)
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
     deleteDataset({ commit }, payload) {
       return client
         .deleteDataset(payload.projectId, payload.datasetId)

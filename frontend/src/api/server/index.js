@@ -73,6 +73,13 @@ export default {
       })
       .then(response => response);
   },
+  updateDataset(projectId, datasetId, description) {
+    return axios
+      .put(this._apiBaseUrl() + `/datasets/${datasetId}`, {
+        description: description
+      })
+      .then(response => response);
+  },
   deleteDataset(projectId, datasetId) {
     return axios
       .delete(this._apiBaseUrl() + `/datasets/${datasetId}`)

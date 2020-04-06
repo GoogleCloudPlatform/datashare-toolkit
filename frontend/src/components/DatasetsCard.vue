@@ -29,13 +29,17 @@
             label="Search"
           ></v-text-field>
           <v-divider class="mx-4" inset vertical></v-divider>
-          <v-btn color="primary" dark @click.stop="presentCreateDialog()"
+          <v-btn color="primary" dark @click.stop="presentDatasetDialog()"
             >Create Dataset</v-btn
           >
         </v-toolbar>
       </template>
       <template v-slot:item.modifiedAt="{ item }">
-        {{ toLocalTime(item.modifiedAt) }}
+        {{ toLocalTime(item.modifiedAt) }} </template
+      ><template v-slot:item.viewAction="{ item }">
+        <v-icon class="mr-2" @click="navigateToDataset(item)">
+          {{ icons.databaseSearch }}
+        </v-icon>
       </template>
       <template v-slot:item.action="{ item }">
         <v-menu bottom offset-y>
@@ -43,6 +47,9 @@
             <v-icon v-on="on">{{ icons.dotsVertical }}</v-icon>
           </template>
           <v-list>
+            <v-list-item key="edit" @click="presentDatasetDialog(item)">
+              <v-list-item-title>Edit Dataset</v-list-item-title>
+            </v-list-item>
             <v-list-item key="delete" @click="presentDeleteDialog(item)">
               <v-list-item-title style="color:red"
                 >Delete Dataset</v-list-item-title
@@ -91,7 +98,9 @@
         max-width="390"
       >
         <v-card>
-          <v-card-title class="headline">Create Dataset</v-card-title>
+          <v-card-title class="headline">{{
+            !this.dialogDataset.editing ? 'Create Dataset' : 'Edit Dataset'
+          }}</v-card-title>
           <ValidationObserver ref="observer" v-slot="{}">
             <v-form class="px-4">
               <ValidationProvider
@@ -100,6 +109,7 @@
                 rules="required|bigQueryTableIdRule"
               >
                 <v-text-field
+                  :readonly="dialogDataset.editing === true"
                   v-model="dialogDataset.datasetId"
                   :error-messages="errors"
                   :counter="1024"
@@ -129,9 +139,9 @@
               @click.stop="showCreateDataset = false"
               >Cancel</v-btn
             >
-            <v-btn color="green darken-1" text @click.stop="createDataset"
-              >Create</v-btn
-            >
+            <v-btn color="green darken-1" text @click.stop="saveDataset">{{
+              !this.dialogDataset.editing ? 'Create' : 'Update'
+            }}</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -160,7 +170,7 @@
           bottom
           right
           fab
-          @click="presentCreateDialog()"
+          @click="presentDatasetDialog()"
         >
           <v-icon>{{ icons.plus }}</v-icon>
         </v-btn>
@@ -201,7 +211,13 @@ extend('bigQueryTableIdRule', value => {
   return true;
 });
 
-import { mdiDatabase, mdiDotsVertical, mdiPencil, mdiPlus } from '@mdi/js';
+import {
+  mdiDatabase,
+  mdiDatabaseSearch,
+  mdiDotsVertical,
+  mdiPencil,
+  mdiPlus
+} from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 import AccountsCard from '@/components/AccountsCard.vue';
 
@@ -226,7 +242,8 @@ export default {
       database: mdiDatabase,
       dotsVertical: mdiDotsVertical,
       pencil: mdiPencil,
-      plus: mdiPlus
+      plus: mdiPlus,
+      databaseSearch: mdiDatabaseSearch
     },
     search: '',
     itemsPerPageOptions: [20, 50, 100, 200],
@@ -235,6 +252,7 @@ export default {
       { text: 'Dataset Id', value: 'datasetId' },
       { text: 'Description', value: 'description' },
       { text: 'Modified At', value: 'modifiedAt' },
+      { text: '', value: 'viewAction', sortable: false },
       { text: '', value: 'action', sortable: false }
     ]
   }),
@@ -250,8 +268,13 @@ export default {
     this.loadDatasets();
   },
   methods: {
-    presentCreateDialog() {
-      this.dialogDataset = {};
+    presentDatasetDialog(selectedItem) {
+      this.dialogDataset = { editing: false };
+      if (selectedItem) {
+        this.dialogDataset.editing = true;
+        this.dialogDataset.datasetId = selectedItem.datasetId;
+        this.dialogDataset.description = selectedItem.description;
+      }
       this.showCreateDataset = true;
     },
     presentDeleteDialog(item) {
@@ -271,31 +294,54 @@ export default {
           this.loadDatasets();
         });
     },
-    createDataset() {
+    saveDataset() {
       this.$refs.observer
         .validate()
         .then(result => {
           if (result) {
-            this.$store
-              .dispatch('createDataset', {
-                projectId: this.$store.state.settings.projectId,
-                datasetId: this.dialogDataset.datasetId,
-                description: this.dialogDataset.description
-              })
-              .then(result => {
-                this.loading = false;
-                if (result.error) {
-                  this.showError = true;
-                  this.errorDialogTitle = 'Error creating dataset';
-                  this.errorDialogText = result.error;
-                } else {
-                  this.showCreateDataset = false;
-                  this.loadDatasets();
-                }
-              })
-              .catch(error => {
-                console.error(`Error creating dataset: ${error}`);
-              });
+            if (this.dialogDataset.editing === false) {
+              this.$store
+                .dispatch('createDataset', {
+                  projectId: this.$store.state.settings.projectId,
+                  datasetId: this.dialogDataset.datasetId,
+                  description: this.dialogDataset.description
+                })
+                .then(result => {
+                  this.loading = false;
+                  if (result.error) {
+                    this.showError = true;
+                    this.errorDialogTitle = 'Error creating dataset';
+                    this.errorDialogText = result.error;
+                  } else {
+                    this.showCreateDataset = false;
+                    this.loadDatasets();
+                  }
+                })
+                .catch(error => {
+                  console.error(`Error creating dataset: ${error}`);
+                });
+            } else {
+              this.$store
+                .dispatch('updateDataset', {
+                  projectId: this.$store.state.settings.projectId,
+                  datasetId: this.dialogDataset.datasetId,
+                  description: this.dialogDataset.description
+                })
+                .then(result => {
+                  this.loading = false;
+                  if (result.error) {
+                    this.showError = true;
+                    this.errorDialogTitle = 'Error updating dataset';
+                    this.errorDialogText = result.error;
+                  } else {
+                    this.showCreateDataset = false;
+                    this.loadDatasets();
+                  }
+                })
+                .catch(error => {
+                  console.error(`Error updating dataset: ${error}`);
+                });
+            }
           }
         })
         .catch(error => {
@@ -337,6 +383,10 @@ export default {
       let d = new Date(0);
       d.setUTCMilliseconds(epoch);
       return d.toLocaleString();
+    },
+    navigateToDataset(item) {
+      const url = `https://pantheon.corp.google.com/bigquery?project=${this.$store.state.settings.projectId}&p=${this.$store.state.settings.projectId}&d=${item.datasetId}`;
+      window.open(url, '_blank');
     }
   }
 };
