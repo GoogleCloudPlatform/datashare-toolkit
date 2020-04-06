@@ -27,7 +27,6 @@ async function generateSql(view) {
     let sql;
     if (view.hasOwnProperty('custom')) {
         console.log(`Generating query using custom SQL for view '${view.name}'`);
-        // sql = prepareCustomSql(view);
         sql = view.custom.query;
     }
     else {
@@ -77,7 +76,7 @@ async function generateSelectStatement(view, includeFrom) {
     let sql = "";
     if (visibleColumns && visibleColumns.length > 0) {
         // Column selects
-        sql += "select\n";
+        sql += "SELECT\n";
         let i;
         for (i = 0; i < visibleColumns.length; i++) {
             if (i !== 0) {
@@ -88,22 +87,22 @@ async function generateSelectStatement(view, includeFrom) {
         }
     }
     else if (hiddenColumns && hiddenColumns.length > 0) {
-        sql += "select *";
+        sql += "SELECT *";
 
         if (hiddenColumns.length > 0) {
-            sql += " except (";
+            sql += " EXCEPT (";
             sql += hiddenColumns.join(", ");
             sql += ")";
         }
     }
     else {
         // Use all columns
-        sql += "select *";
+        sql += "SELECT *";
     }
 
     if (includeFrom === true) {
         sql += "\n";
-        sql += `from \`${view.projectId}.${source.datasetId}.${source.tableId}\` s`;
+        sql += `FROM \`${view.projectId}.${source.datasetId}.${source.tableId}\` s`;
     }
 
     return sql;
@@ -119,17 +118,17 @@ async function generateDatasetEntitySubquery(view) {
     const accessControlLabelColumnDelimiter = source.accessControl.labelColumnDelimiter;
 
     if (accessControlEnabled === true) {
-        let sql = "exists (\n";
+        let sql = "EXISTS (\n";
         let query = "";
         let useNesting = accessControlLabelColumnDelimiter && accessControlLabelColumnDelimiter.length > 0;
         if (useNesting === true) {
-            query += `select 1 from unnest(split(s.${accessControlLabelColumn}, "${accessControlLabelColumnDelimiter}")) as flattenedLabel\n`;
-            query += `join \`${view.projectId}.${cfg.cdsAccessControlDatasetId}.${cfg.cdsAccessControlViewId}\` e on lower(flattenedLabel) = lower(e.tag)\n`;
-            query += `where lower(e.datasetId) = '${view.datasetId.toLowerCase()}'\n`;
+            query += `SELECT 1 FROM UNNEST(split(s.${accessControlLabelColumn}, "${accessControlLabelColumnDelimiter}")) AS flattenedLabel\n`;
+            query += `JOIN \`${view.projectId}.${cfg.cdsAccessControlDatasetId}.${cfg.cdsAccessControlViewId}\` e ON LOWER(flattenedLabel) = LOWER(e.tag)\n`;
+            query += `WHERE LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}'\n`;
         }
         else {
-            query += `select 1 from \`${view.projectId}.${cfg.cdsAccessControlDatasetId}.${cfg.cdsAccessControlViewId}\` e\n`;
-            query += `where lower(e.datasetId) = '${view.datasetId.toLowerCase()}' and lower(e.tag) = lower(s.${accessControlLabelColumn})\n`;
+            query += `SELECT 1 FROM \`${view.projectId}.${cfg.cdsAccessControlDatasetId}.${cfg.cdsAccessControlViewId}\` e\n`;
+            query += `WHERE LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}' AND LOWER(e.tag) = LOWER(s.${accessControlLabelColumn})\n`;
         }
 
         sql += await prependLines(query, "\t", 1);
@@ -189,7 +188,7 @@ async function prependLines(inputText, prepend, occurences) {
 async function generateSqlWithPublicAccess(view) {
     let source = view.source;
 
-    let sql = "with filteredSourceData as (\n";
+    let sql = "WITH filteredSourceData AS (\n";
     let selectSql = await generateSelectStatement(view, true);
     sql += await prependLines(selectSql, "\t", 1);
 
@@ -201,25 +200,25 @@ async function generateSqlWithPublicAccess(view) {
     // Closing paranthesis for CTE
     sql += "\n)";
 
-    sql += ",\nrecordCount as (\n";
-    sql += "\tselect count(*) as count from filteredSourceData";
+    sql += ",\nrecordCount AS (\n";
+    sql += "\tSELECT COUNT(*) AS count FROM filteredSourceData";
     sql += "\n),";
-    sql += "\npublicData as (\n";
+    sql += "\npublicData AS (\n";
 
     let publicSql = selectSql;
-    publicSql += `\nwhere ${source.publicAccess.queryFilter.trim()}`;
+    publicSql += `\nWHERE ${source.publicAccess.queryFilter.trim()}`;
 
     if (source.publicAccess.limit) {
-        publicSql += `\nlimit ${source.publicAccess.limit}`;
+        publicSql += `\nLIMIT ${source.publicAccess.limit}`;
     }
 
     sql += await prependLines(publicSql, "\t", 1);
     sql += "\n)";
 
-    sql += "\nselect * from filteredSourceData";
+    sql += "\nSELECT * FROM filteredSourceData";
 
     sql += "\nunion all\n";
-    sql += "select * from publicData\nwhere (select sum(count) from recordCount) = 0";
+    sql += "SELECT * FROM publicData\nWHERE (SELECT SUM(count) FROM recordCount) = 0";
 
     return sql.trim();
 }
@@ -233,7 +232,7 @@ async function generateWhereClause(view) {
     let whereAdded = false;
     const sqlFilter = source.queryFilter;
     if (sqlFilter !== undefined && sqlFilter.trim().length > 0) {
-        sql += `where ${sqlFilter}`;
+        sql += `WHERE ${sqlFilter}`;
         whereAdded = true;
     }
 
@@ -242,7 +241,7 @@ async function generateWhereClause(view) {
         console.log("Using dataset entitlements");
         let entityFilter = await generateDatasetEntitySubquery(view);
         if (entityFilter) {
-            sql += (whereAdded ? " and " : "where ") + entityFilter;
+            sql += (whereAdded ? " AND " : "WHERE ") + entityFilter;
         }
     }
 
@@ -250,23 +249,14 @@ async function generateWhereClause(view) {
 }
 
 /**
- * @param  {} config
- * @param  {} view
- */
-function prepareCustomSql(config, view) {
-    const sql = view.custom.query;
-    return configUtil.performTextVariableReplacements(config, view, sql);
-}
-
-/**
  * @param  {} view
  */
 async function generateWhereSqlForTest(view) {
-    let sql = `select * from \`${view.projectId}.${view.source.datasetId}.${view.source.tableId}\``;
+    let sql = `SELECT * FROM \`${view.projectId}.${view.source.datasetId}.${view.source.tableId}\``;
 
     const sqlFilter = view.source.queryFilter;
     if (sqlFilter !== undefined && sqlFilter.trim().length > 0) {
-        sql += `where ${sqlFilter}`;
+        sql += `WHERE ${sqlFilter}`;
     }
 
     return sql;
@@ -276,11 +266,11 @@ async function generateWhereSqlForTest(view) {
  * @param  {} view
  */
 async function generatePublicWhereSqlForTest(view) {
-    let sql = `select * from \`${view.projectId}.${view.source.datasetId}.${view.source.tableId}\``;
+    let sql = `SELECT * FROM \`${view.projectId}.${view.source.datasetId}.${view.source.tableId}\``;
 
     const sqlFilter = view.source.publicAccess.queryFilter;
     if (sqlFilter !== undefined && sqlFilter.trim().length > 0) {
-        sql += `where ${sqlFilter}`;
+        sql += `WHERE ${sqlFilter}`;
     }
 
     return sql;
