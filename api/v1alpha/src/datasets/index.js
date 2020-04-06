@@ -176,6 +176,59 @@ datasets.post('/projects/:projectId/datasets', async(req, res) => {
     });
 });
 
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/datasets:
+ *   put:
+ *     summary: Update Dataset based off request body
+ *     description: Returns the Datset response
+ *     tags:
+ *       - datasets
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Dataset request
+ *     requestBody:
+ *       description: Request parameters for Dataset
+ *       content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/definitions/Dataset'
+ *     responses:
+ *       200:
+ *         description: Dataset
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   description: HTTP status code
+ *                 data:
+ *                   type: object
+ *                   items:
+ *                     $ref: '#/definitions/Dataset'
+ *       404:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
 datasets.put('/projects/:projectId/datasets/:datasetId', async(req, res) => {
     const projectId = req.params.projectId;
     const datasetId = req.params.datasetId;
