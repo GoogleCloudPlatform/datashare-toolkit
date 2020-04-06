@@ -100,7 +100,7 @@
                 rules="required|bigQueryTableIdRule"
               >
                 <v-text-field
-                  v-model="newDataset.datasetId"
+                  v-model="dialogDataset.datasetId"
                   :error-messages="errors"
                   :counter="1024"
                   label="Dataset Id"
@@ -113,7 +113,7 @@
                 rules="required|max:1024"
               >
                 <v-textarea
-                  v-model="newDataset.description"
+                  v-model="dialogDataset.description"
                   :error-messages="errors"
                   label="Description"
                   required
@@ -220,7 +220,7 @@ export default {
     showDialog: false,
     showError: false,
     showCreateDataset: false,
-    newDataset: {},
+    dialogDataset: { editing: false },
     selectedItem: null,
     icons: {
       database: mdiDatabase,
@@ -251,7 +251,7 @@ export default {
   },
   methods: {
     presentCreateDialog() {
-      this.newDataset = {};
+      this.dialogDataset = {};
       this.showCreateDataset = true;
     },
     presentDeleteDialog(item) {
@@ -279,8 +279,8 @@ export default {
             this.$store
               .dispatch('createDataset', {
                 projectId: this.$store.state.settings.projectId,
-                datasetId: this.newDataset.datasetId,
-                description: this.newDataset.description
+                datasetId: this.dialogDataset.datasetId,
+                description: this.dialogDataset.description
               })
               .then(result => {
                 this.loading = false;

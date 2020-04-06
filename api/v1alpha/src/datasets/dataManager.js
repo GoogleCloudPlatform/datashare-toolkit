@@ -106,6 +106,24 @@ async function createDataset(projectId, datasetId, description) {
 }
 
 /**
+ * @param  {} projectId
+ * @param  {} datasetId
+ * @param  {} description
+ */
+async function updateDataset(projectId, datasetId, description) {
+    try {
+        const metadata = await bigqueryUtil.getDatasetMetadata(datasetId);
+        metadata.description = description;
+        await bigqueryUtil.setDatasetMetadata(datasetId, metadata);
+        return { success: true };
+    }
+    catch (err) {
+        const message = `Error setting metadata for datasetId: ${datasetId}`;
+        return { success: false, errors: [message] };
+    }
+}
+
+/**
  * @param  {string} projectId
  * @param  {string} datasetId
  * Get a Datasets based off datasetId and labelKey string
@@ -558,6 +576,7 @@ async function deleteDatasetView(projectId, datasetId, viewId, data) {
 module.exports = {
     listDatasets,
     createDataset,
+    updateDataset,
     getDataset,
     deleteDataset,
     listTables,

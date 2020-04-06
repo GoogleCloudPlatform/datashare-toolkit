@@ -176,6 +176,24 @@ datasets.post('/projects/:projectId/datasets', async(req, res) => {
     });
 });
 
+datasets.put('/projects/:projectId/datasets/:datasetId', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const description = req.body.description;
+
+    const data = await dataManager.updateDataset(projectId, datasetId, description);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
 /**
  * @swagger
  *
