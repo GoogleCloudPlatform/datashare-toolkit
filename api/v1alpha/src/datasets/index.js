@@ -468,7 +468,7 @@ datasets.get('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req
     });
 });
 
-datasets.post('/projects/:projectId/datasets/:datasetId/views::validate', async(req, res) => {
+datasets.post('/projects/:projectId/datasets/:datasetId/views:validate', async(req, res) => {
     const projectId = req.params.projectId;
     const datasetId = req.params.datasetId;
     const view = req.body.view;

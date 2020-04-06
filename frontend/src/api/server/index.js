@@ -188,7 +188,7 @@ export default {
     return axios
       .post(
         this._apiBaseUrl() +
-          `/datasets/${payload.view.datasetId}/views::validate`,
+          `/datasets/${payload.view.datasetId}/views:validate`,
         payload
       )
       .then(response => response);
