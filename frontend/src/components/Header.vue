@@ -57,7 +57,7 @@
             icon
             dark
             v-on="on"
-            href="https://github.com/GoogleCloudPlatform/bq-datashare-toolkit"
+            href="https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit"
             target="_blank"
           >
             <v-icon>{{ icons.helpCircle }}</v-icon>
@@ -65,6 +65,7 @@
         </template>
         <span>Help</span>
       </v-tooltip>
+      <!--
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
           <v-btn icon dark v-on="on">
@@ -81,6 +82,7 @@
         </template>
         <span>More items</span>
       </v-tooltip>
+-->
       <v-tooltip bottom v-if="!user.loggedIn">
         <template v-slot:activator="{ on }">
           <v-btn icon @click.prevent="signIn" dark v-on="on">
