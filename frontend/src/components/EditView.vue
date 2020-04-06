@@ -1101,6 +1101,24 @@ export default {
           this.view.custom.authorizeFromDatasetIds = [];
         }
       }
+      else {
+        if (!this.view.hasOwnProperty('source')) {
+          console.log('adding view.source');
+          this.view.source = {};
+        }
+        if (!this.view.source.hasOwnProperty('visibleColumns')) {
+          console.log('adding view.source.visibleColumns');
+          this.view.source.visibleColumns = [];
+        }
+        if (!this.view.source.hasOwnProperty('accessControl')) {
+          console.log('adding view.source.accessControl');
+          this.view.source.accessControl = {};
+        }
+        if (!this.view.source.hasOwnProperty('publicAccess')) {
+          console.log('adding view.source.publicAccess');
+          this.view.source.publicAccess = {};
+        }
+      }
     },
     setErrors(dictionary) {
       if (dictionary) {
