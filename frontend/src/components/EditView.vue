@@ -266,6 +266,7 @@
                   style="font-family: monospace; font-size: 12px;"
                   required
                   hint="SQL based custom query"
+                  @blur="validate(true)"
                 ></v-textarea>
               </ValidationProvider>
               <v-subheader>Authorized from Dataset Id's</v-subheader>
@@ -315,6 +316,42 @@
                   </v-icon>
                 </template>
               </v-data-table>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel v-if="this.viewLevelEnabledAccessControl">
+            <v-expansion-panel-header
+              >Row Level Access</v-expansion-panel-header
+            >
+            <v-expansion-panel-content>
+              <v-switch
+                label="Enabled"
+                v-model="view.source.accessControl.enabled"
+              ></v-switch>
+              <ValidationProvider
+                v-if="
+                  view.source.accessControl && view.source.accessControl.enabled
+                "
+                v-slot="{ errors }"
+                name="Label Column"
+                rules="required"
+                vid="source.accessControl.labelColumn"
+              >
+                <v-select
+                  :items="referenceData.availableColumns"
+                  v-model="view.source.accessControl.labelColumn"
+                  :error-messages="errors"
+                  label="Label Column"
+                  required
+                ></v-select>
+              </ValidationProvider>
+              <v-text-field
+                v-if="
+                  view.source.accessControl && view.source.accessControl.enabled
+                "
+                v-model="view.source.accessControl.labelColumnDelimiter"
+                hint="If column field contains multiple delimited values, what is the delimiter?"
+                label="Label Column Delimiter"
+              ></v-text-field>
             </v-expansion-panel-content>
           </v-expansion-panel>
           <v-expansion-panel>
@@ -422,7 +459,7 @@
       <v-btn text color="purple darken-1" @click.stop="validate(false)">
         Validate
       </v-btn>
-      <v-btn color="blue darken-1" text @click.stop="validate(true)">
+      <v-btn color="blue darken-1" text @click.stop="validate(true, true)">
         Sample Data
       </v-btn>
       <v-btn text color="green darken-1" @click.stop="save">
@@ -599,7 +636,8 @@ export default {
     showAddDataset: false,
     newDatasetId: null,
     datasetSearch: '',
-    errorString: ''
+    errorString: '',
+    viewLevelEnabledAccessControl: false
   }),
   created() {
     if (this.viewData && this.viewData.authorizedViewId) {
@@ -720,7 +758,10 @@ export default {
     cancel() {
       this.$emit('cancel');
     },
-    validate(showSampleData) {
+    validate(includeSampleData, displaySampleDialog) {
+      console.log(
+        `Performing validate with includeSampleData: ${includeSampleData}`
+      );
       // First do client side validation
       this.$refs.observer.validate().then(result => {
         console.log(`Validation response: ${result}`);
@@ -732,25 +773,28 @@ export default {
           this.$store
             .dispatch('validateView', {
               view: this.sanitizedView,
-              includeSampleData: showSampleData
+              includeSampleData: includeSampleData
             })
             .then(response => {
               this.loading = false;
               if (response.success) {
                 console.log('Validation passed');
-                if (!showSampleData) {
+                if (!includeSampleData) {
                   this.dialogTitle = 'Validation Status';
                   this.dialogText = 'The view configuration is valid.';
                   this.showDialog = true;
                 } else {
                   if (response.data && response.data.rows) {
-                    this.showSampleData = true;
+                    this.showSampleData = displaySampleDialog;
                     this.sampleData = response.data.rows;
                     let headers = [];
+                    let availCols = [];
                     response.data.columns.forEach(col => {
                       headers.push({ text: col.name, value: col.path });
+                      availCols.push(col.name);
                     });
                     this.sampleDataHeaders = headers;
+                    this.referenceData.availableColumns = availCols;
                   }
                 }
               } else {
