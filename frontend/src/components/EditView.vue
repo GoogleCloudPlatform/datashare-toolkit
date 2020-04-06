@@ -1100,8 +1100,7 @@ export default {
           console.log('adding view.custom.authorizeFromDatasetIds');
           this.view.custom.authorizeFromDatasetIds = [];
         }
-      }
-      else {
+      } else {
         if (!this.view.hasOwnProperty('source')) {
           console.log('adding view.source');
           this.view.source = {};

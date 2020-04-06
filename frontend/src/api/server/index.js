@@ -2,6 +2,8 @@ import store from './../../store';
 import axios from 'axios';
 import mock from './../mock';
 
+const firebase = require('firebase');
+
 // set the default Accept header to application/json
 axios.defaults.headers.common['Accept'] = 'application/json';
 
@@ -11,12 +13,14 @@ const validContentTypes = [
   'application/json; charset=utf-8'
 ];
 
-axios.interceptors.request.use(function(config) {
+axios.interceptors.request.use(async function(config) {
   if (store.getters.isLoggedIn) {
     const account = store.state.user.data.email;
     if (account) {
       config.headers['x-gcp-account'] = account;
     }
+    const token = await firebase.auth().currentUser.getIdToken();
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
