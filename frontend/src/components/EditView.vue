@@ -784,17 +784,31 @@ export default {
                   this.dialogText = 'The view configuration is valid.';
                   this.showDialog = true;
                 } else {
-                  if (response.data && response.data.rows) {
+                  if (response.data) {
+                    if (response.data.rows && response.data.rows.length > 0) {
+                      this.sampleData = response.data.rows;
+                    } else {
+                      this.sampleData = [];
+                    }
+
+                    if (
+                      response.data.columns &&
+                      response.data.columns.length > 0
+                    ) {
+                      let headers = [];
+                      let availCols = [];
+                      response.data.columns.forEach(col => {
+                        headers.push({ text: col.name, value: col.path });
+                        availCols.push(col.name);
+                      });
+                      this.sampleDataHeaders = headers;
+                      this.referenceData.availableColumns = availCols;
+                    } else {
+                      this.sampleDataHeaders = [];
+                      this.referenceData.availableColumns = [];
+                    }
+
                     this.showSampleData = displaySampleDialog;
-                    this.sampleData = response.data.rows;
-                    let headers = [];
-                    let availCols = [];
-                    response.data.columns.forEach(col => {
-                      headers.push({ text: col.name, value: col.path });
-                      availCols.push(col.name);
-                    });
-                    this.sampleDataHeaders = headers;
-                    this.referenceData.availableColumns = availCols;
                   }
                 }
               } else {
