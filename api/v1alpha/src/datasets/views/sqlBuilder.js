@@ -111,13 +111,13 @@ async function generateSelectStatement(view, includeFrom) {
 /**
  * @param  {} view
  */
-async function generateDatasetEntitySubquery(view) {
+async function generateAccessControlSubquery(view) {
     let source = view.source;
     const accessControlEnabled = source.accessControl.enabled || false;
-    const accessControlLabelColumn = source.accessControl.labelColumn;
-    const accessControlLabelColumnDelimiter = source.accessControl.labelColumnDelimiter;
 
     if (accessControlEnabled === true) {
+        const accessControlLabelColumn = source.accessControl.labelColumn;
+        const accessControlLabelColumnDelimiter = source.accessControl.labelColumnDelimiter;
         let sql = "EXISTS (\n";
         let query = "";
         let useNesting = accessControlLabelColumnDelimiter && accessControlLabelColumnDelimiter.length > 0;
@@ -239,7 +239,7 @@ async function generateWhereClause(view) {
     const accessControlEnabled = (source.accessControl && source.accessControl.enabled) || false;
     if (accessControlEnabled === true) {
         console.log("Using dataset entitlements");
-        let entityFilter = await generateDatasetEntitySubquery(view);
+        let entityFilter = await generateAccessControlSubquery(view);
         if (entityFilter) {
             sql += (whereAdded ? " AND " : "WHERE ") + entityFilter;
         }
