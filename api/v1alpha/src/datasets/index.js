@@ -104,7 +104,7 @@ datasets.get('/projects/:projectId/datasets', async(req, res) => {
  * /projects/{projectId}/datasets:
  *   post:
  *     summary: Create Dataset based off request body
- *     description: Returns the Datset response
+ *     description: Returns the Dataset response
  *     tags:
  *       - datasets
  *     parameters:
@@ -182,7 +182,7 @@ datasets.post('/projects/:projectId/datasets', async(req, res) => {
  * /projects/{projectId}/datasets:
  *   put:
  *     summary: Update Dataset based off request body
- *     description: Returns the Datset response
+ *     description: Returns the Dataset response
  *     tags:
  *       - datasets
  *     parameters:
