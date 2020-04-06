@@ -123,6 +123,8 @@ router.all('*', cors());
  *     description: The CDS API Account Services
  *   - name: spots
  *     description: The CDS API Spot Services
+ *   - name: admin
+ *     description: The CDS API Admin Services
  *   - name: docs
  *     description: The OpenAPI specification documents for the CDS API services
  *   - name: default

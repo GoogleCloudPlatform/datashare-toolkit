@@ -237,13 +237,15 @@ export default {
   },
   initSchema(payload) {
     return axios
-      .post(this._apiBaseUrl() + '/initSchema')
+      .post(this._apiBaseUrl() + '/admin:initSchema')
       .then(response => response);
   },
   syncResources(type) {
     console.log(`Performing sync for type: ${type}`);
     return axios
-      .post(this._apiBaseUrl() + `/sync/${type}`)
+      .post(this._apiBaseUrl() + `/admin:syncResources`, {
+        type: type
+      })
       .then(response => response);
   }
 };

@@ -30,74 +30,36 @@ var admin = express.Router();
 /**
  * @swagger
  *
- * /projects/{projectId}/initSchema:
- *   post:
- *     summary: Initialize the CDS schema creation
- *     description: Returns the schema creation response
- *     tags:
- *       - datasets
- *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the init schema request
- *     responses:
- *       200:
- *         description: Dataset
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Dataset'
- *       404:
- *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
- *       500:
- *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *
+ * definitions:
+ *   SyncronizeResourcesType:
+ *     type: string
+ *     description: Syncronize Resources Type
+ *     enum:
+ *       - PERMISSIONS
+ *       - VIEWS
+ *       - ALL
+ *
+ *   SyncronizeResourcesRequest:
+ *     type: object
+ *     description: Syncronize Resources Request object
+ *     properties:
+ *       type:
+ *         type: string
+ *         description: Syncronize Resources Type
+ *         $ref: '#/definitions/SyncronizeResourcesType'
+ *
  */
-admin.post('/projects/:projectId/initSchema', async(req, res) => {
-    const projectId = req.params.projectId;
-    const data = await dataManager.initializeSchema(projectId);
-    var code;
-    if (data && data.success === false) {
-        code = (data.code === undefined ) ? 500 : data.code;
-    } else {
-        code = (data.code === undefined ) ? 200 : data.code;
-    }
-    res.status(code).json({
-        code: code,
-        ... data
-    });
-});
 
 /**
  * @swagger
  *
- * /projects/{projectId}/initSchema:
+ * /projects/{projectId}/admin:initSchema:
  *   post:
  *     summary: Initialize the CDS schema creation
  *     description: Returns the schema creation response
  *     tags:
- *       - datasets
+ *       - admin
  *     parameters:
  *     - in: path
  *       name: projectId
@@ -107,7 +69,7 @@ admin.post('/projects/:projectId/initSchema', async(req, res) => {
  *       description: Project Id of the init schema request
  *     responses:
  *       200:
- *         description: Dataset
+ *         description: initSchema response
  *         content:
  *           application/json:
  *             schema:
@@ -121,8 +83,6 @@ admin.post('/projects/:projectId/initSchema', async(req, res) => {
  *                   description: HTTP status code
  *                 data:
  *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Dataset'
  *       404:
  *         description: Error
  *         content:
@@ -136,20 +96,96 @@ admin.post('/projects/:projectId/initSchema', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-admin.post('/projects/:projectId/sync/:type', async(req, res) => {
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/admin:syncResources:
+ *   post:
+ *     summary: Syncronize the CDS resources and metadata
+ *     description: Returns the syncronize resources response
+ *     tags:
+ *       - admin
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the syncronize resources request
+ *     requestBody:
+ *       description: Request parameters for Syncronize Resources
+ *       content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/definitions/SyncronizeResourcesRequest'
+ *       required: true
+ *     responses:
+ *       200:
+ *         description: Syncronize resources response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   description: HTTP status code
+ *                 data:
+ *                   type: object
+ *       404:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
+admin.post('/projects/:projectId/admin::custom', async(req, res) => {
+    var data;
     const projectId = req.params.projectId;
-    const syncType = req.params.type;
-    const data = await dataManager.syncResources(projectId, syncType);
-    var code;
-    if (data && data.success === false) {
-        code = (data.code === undefined ) ? 500 : data.code;
-    } else {
-        code = (data.code === undefined ) ? 200 : data.code;
-    }
-    res.status(code).json({
-        code: code,
-        ... data
-    });
+
+    switch (req.params.custom) {
+        case "initSchema":
+            data = await dataManager.initializeSchema(projectId);
+            var code;
+            if (data && data.success === false) {
+                code = (data.code === undefined ) ? 500 : data.code;
+            } else {
+                code = (data.code === undefined ) ? 200 : data.code;
+            }
+            return res.status(code).json({
+                code: code,
+                ... data
+            });
+        case "syncResources":
+            const syncType = req.body.type;
+            if (!syncType) {
+                return res.status(400).json({
+                    success: false,
+                    code: 400,
+                    errors: ['sync type parameter(s) are required']
+                });
+            }
+            data = await dataManager.syncResources(projectId, syncType);
+            var code;
+            if (data && data.success === false) {
+                code = (data.code === undefined ) ? 500 : data.code;
+            } else {
+                code = (data.code === undefined ) ? 200 : data.code;
+            }
+            return res.status(code).json({
+                code: code,
+                ... data
+            });
+    };
 });
 
 module.exports = admin;
