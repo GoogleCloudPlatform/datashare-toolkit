@@ -451,7 +451,7 @@
     <v-dialog v-model="showSampleData">
       <v-card class="px-4 py-4">
         <v-card-title primary-title>
-          {{ this.view.name }} sample data
+          {{ this.view.datasetId + '.' + this.view.name }} sample data
         </v-card-title>
         <v-data-table
           :headers="sampleDataHeaders"
