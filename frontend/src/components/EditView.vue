@@ -318,7 +318,7 @@
               </v-data-table>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-expansion-panel v-if="this.viewLevelEnabledAccessControl">
+          <v-expansion-panel v-if="viewLevelEnabledAccessControl">
             <v-expansion-panel-header
               >Row Level Access</v-expansion-panel-header
             >
