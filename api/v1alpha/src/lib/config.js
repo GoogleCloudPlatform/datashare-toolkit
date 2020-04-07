@@ -21,8 +21,6 @@ var config = {};
 config.verboseMode = false;
 config.productName = 'CDS';
 config.productVersion = '0.0.1';
-config.cdsAccessControlDatasetId = 'datashare';
-config.cdsAccessControlViewId = 'datashare';
 config.cdsManagedLabelKey = 'cds_managed';
 
 config.cdsDatasetId = "datashare";
@@ -46,11 +44,11 @@ config.cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description'
 
 config.cdsAuthorizedViewTableId = "authorizedView";
 config.cdsAuthorizedViewTableFields = new Set(['rowId', 'authorizedViewId', 'name', 'description',
-    'datasetId', 'source', 'expiration', 'custom', 'createdAt', 'createdBy', 'viewSql', 'isDeleted']);
+    'datasetId', 'source', 'custom', 'accessControl', 'expiration', 'createdAt', 'createdBy', 'viewSql', 'isDeleted']);
 
 config.cdsAuthorizedViewViewId = "currentAuthorizedView";
 config.cdsAuthorizedViewViewFields = new Set(['rowId', 'authorizedViewId', 'name', 'description',
-    'datasetId', 'source', 'expiration', 'custom', 'createdBy', 'createdAt', 'viewSql', 
+    'datasetId', 'source', 'custom', 'accessControl', 'expiration', 'createdBy', 'createdAt', 'viewSql', 
     'version', 'isDeleted']);
 
 config.cdsCurrentUserDatasetViewId = "currentUserDataset";

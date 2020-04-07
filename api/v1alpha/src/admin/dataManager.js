@@ -320,31 +320,6 @@ async function setupDatasharePrerequisites(projectId) {
                             "type": "STRING"
                         },
                         {
-                            "description": "Access control data",
-                            "fields": [
-                                {
-                                    "description": "Flag indicating if row-level access control is enabled",
-                                    "mode": "REQUIRED",
-                                    "name": "enabled",
-                                    "type": "BOOLEAN"
-                                },
-                                {
-                                    "description": "The column in the source table to be used for filtering access at a row-level",
-                                    "mode": "REQUIRED",
-                                    "name": "labelColumn",
-                                    "type": "STRING"
-                                },
-                                {
-                                    "description": "The column delimiter to use to split the source value",
-                                    "mode": "REQUIRED",
-                                    "name": "labelColumnDelimiter",
-                                    "type": "STRING"
-                                }
-                            ],
-                            "name": "accessControl",
-                            "type": "RECORD"
-                        },
-                        {
                             "description": "Public access data",
                             "fields": [
                                 {
@@ -387,6 +362,51 @@ async function setupDatasharePrerequisites(projectId) {
                     "type": "RECORD"
                 },
                 {
+                    "description": "The custom data",
+                    "fields": [
+                        {
+                            "description": "Optionally used to provide a custom query",
+                            "mode": "REQUIRED",
+                            "name": "query",
+                            "type": "STRING"
+                        },
+                        {
+                            "description": "The datasets that need to authorize access to the new view.",
+                            "mode": "REPEATED",
+                            "name": "authorizeFromDatasetIds",
+                            "type": "STRING"
+                        }
+                    ],
+                    "mode": "NULLABLE",
+                    "name": "custom",
+                    "type": "RECORD"
+                },
+                {
+                    "description": "Access control data",
+                    "fields": [
+                        {
+                            "description": "Flag indicating if row-level access control is enabled",
+                            "mode": "REQUIRED",
+                            "name": "enabled",
+                            "type": "BOOLEAN"
+                        },
+                        {
+                            "description": "The column in the source table to be used for filtering access at a row-level",
+                            "mode": "REQUIRED",
+                            "name": "labelColumn",
+                            "type": "STRING"
+                        },
+                        {
+                            "description": "The column delimiter to use to split the source value",
+                            "mode": "NULLABLE",
+                            "name": "labelColumnDelimiter",
+                            "type": "STRING"
+                        }
+                    ],
+                    "name": "accessControl",
+                    "type": "RECORD"
+                },
+                {
                     "description": "The view expiration data",
                     "fields": [
                         {
@@ -410,26 +430,6 @@ async function setupDatasharePrerequisites(projectId) {
                     ],
                     "mode": "NULLABLE",
                     "name": "expiration",
-                    "type": "RECORD"
-                },
-                {
-                    "description": "The custom data",
-                    "fields": [
-                        {
-                            "description": "Optionally used to provide a custom query",
-                            "mode": "REQUIRED",
-                            "name": "query",
-                            "type": "STRING"
-                        },
-                        {
-                            "description": "The datasets that need to authorize access to the new view.",
-                            "mode": "REPEATED",
-                            "name": "authorizeFromDatasetIds",
-                            "type": "STRING"
-                        }
-                    ],
-                    "mode": "NULLABLE",
-                    "name": "custom",
                     "type": "RECORD"
                 },
                 {
@@ -475,7 +475,7 @@ async function setupDatasharePrerequisites(projectId) {
         console.log("Creating latest currentUserDataset view");
         const policyView = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
         const accountView = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
-        const viewSql = `with policies as (\n  select distinct\n    cp.policyId,\n    cp.name as policyName,\n    d.datasetId,\n    t.tag\n  from \`${policyView}\` cp\n  cross join unnest(cp.datasets) d\n  cross join unnest(cp.rowAccessTags) t\n  where cp.isDeleted is false\n),\nuserPolicies as (\n  select\n    ca.rowId as accountRowId,\n    ca.accountId,\n    ca.email,\n    ca.emailType,\n    cp.datasetId,\n    cp.tag\n  from \`${accountView}\` ca\n  cross join unnest(ca.policies) as p\n  join policies cp on p.policyId = cp.policyId\n  where ca.isDeleted is false\n)\nselect distinct\n  up.accountRowId,\n  up.accountId,\n  up.email,\n  up.emailType,\n  up.datasetId,\n  up.tag\nfrom userPolicies up`;
+        const viewSql = `with policies as (\n  select distinct\n    cp.policyId,\n    cp.name as policyName,\n    d.datasetId,\n    t.tag\n  from \`${policyView}\` cp\n  cross join unnest(cp.datasets) d\n  cross join unnest(cp.rowAccessTags) t\n  where cp.isDeleted is false\n),\nuserPolicies as (\n  select\n    ca.rowId as accountRowId,\n    ca.accountId,\n    ca.email,\n    ca.emailType,\n    cp.datasetId,\n    cp.tag\n  from \`${accountView}\` ca\n  cross join unnest(ca.policies) as p\n  join policies cp on p.policyId = cp.policyId\n  where ca.isDeleted is false\n)\nselect distinct\n  up.accountRowId,\n  up.accountId,\n  up.email,\n  up.emailType,\n  up.datasetId,\n  up.tag\nfrom userPolicies up\nWHERE up.email = SESSION_USER() AND up.emailType = 'userByEmail'`;
         await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsCurrentUserDatasetViewId, viewSql);
     } else {
         console.log('Current user dataset view already exists');

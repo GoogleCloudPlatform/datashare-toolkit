@@ -164,44 +164,6 @@
                 </v-expansion-panel>
                 <v-expansion-panel>
                   <v-expansion-panel-header
-                    >Row Level Access</v-expansion-panel-header
-                  >
-                  <v-expansion-panel-content>
-                    <v-switch
-                      label="Enabled"
-                      v-model="view.source.accessControl.enabled"
-                    ></v-switch>
-                    <ValidationProvider
-                      v-if="
-                        view.source.accessControl &&
-                          view.source.accessControl.enabled
-                      "
-                      v-slot="{ errors }"
-                      name="Label Column"
-                      rules="required"
-                      vid="source.accessControl.labelColumn"
-                    >
-                      <v-select
-                        :items="referenceData.availableColumns"
-                        v-model="view.source.accessControl.labelColumn"
-                        :error-messages="errors"
-                        label="Label Column"
-                        required
-                      ></v-select>
-                    </ValidationProvider>
-                    <v-text-field
-                      v-if="
-                        view.source.accessControl &&
-                          view.source.accessControl.enabled
-                      "
-                      v-model="view.source.accessControl.labelColumnDelimiter"
-                      hint="If column field contains multiple delimited values, what is the delimiter?"
-                      label="Label Column Delimiter"
-                    ></v-text-field>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel>
-                  <v-expansion-panel-header
                     >Public Access</v-expansion-panel-header
                   >
                   <v-expansion-panel-content>
@@ -318,37 +280,33 @@
               </v-data-table>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-expansion-panel v-if="viewLevelEnabledAccessControl">
+          <v-expansion-panel>
             <v-expansion-panel-header
               >Row Level Access</v-expansion-panel-header
             >
             <v-expansion-panel-content>
               <v-switch
                 label="Enabled"
-                v-model="view.source.accessControl.enabled"
+                v-model="view.accessControl.enabled"
               ></v-switch>
               <ValidationProvider
-                v-if="
-                  view.source.accessControl && view.source.accessControl.enabled
-                "
+                v-if="view.accessControl && view.accessControl.enabled"
                 v-slot="{ errors }"
                 name="Label Column"
                 rules="required"
-                vid="source.accessControl.labelColumn"
+                vid="view.accessControl.labelColumn"
               >
                 <v-select
                   :items="referenceData.availableColumns"
-                  v-model="view.source.accessControl.labelColumn"
+                  v-model="view.accessControl.labelColumn"
                   :error-messages="errors"
                   label="Label Column"
                   required
                 ></v-select>
               </ValidationProvider>
               <v-text-field
-                v-if="
-                  view.source.accessControl && view.source.accessControl.enabled
-                "
-                v-model="view.source.accessControl.labelColumnDelimiter"
+                v-if="view.accessControl && view.accessControl.enabled"
+                v-model="view.accessControl.labelColumnDelimiter"
                 hint="If column field contains multiple delimited values, what is the delimiter?"
                 label="Label Column Delimiter"
               ></v-text-field>
@@ -618,12 +576,12 @@ export default {
         datasetId: null,
         tableId: null,
         visibleColumns: [],
-        accessControl: {
-          enabled: false
-        },
         publicAccess: {
           enabled: false
         }
+      },
+      accessControl: {
+        enabled: false
       },
       custom: {
         query: '',
@@ -637,7 +595,7 @@ export default {
     newDatasetId: null,
     datasetSearch: '',
     errorString: '',
-    viewLevelEnabledAccessControl: false
+    viewLevelEnabledAccessControl: true
   }),
   created() {
     if (this.viewData && this.viewData.authorizedViewId) {
@@ -699,14 +657,6 @@ export default {
 
         if (
           copy.source &&
-          copy.source.accessControl &&
-          !copy.source.accessControl.enabled
-        ) {
-          delete copy.source.accessControl;
-        }
-
-        if (
-          copy.source &&
           copy.source.publicAccess &&
           !copy.source.publicAccess.enabled
         ) {
@@ -741,6 +691,12 @@ export default {
             d => d.datasetId
           );
         }
+      }
+
+      if (copy.accessControl && !copy.accessControl.enabled) {
+        delete copy.accessControl;
+      } else if (!copy.accessControl.labelColumnDelimiter) {
+        delete copy.accessControl.labelColumnDelimiter;
       }
 
       if (copy.expiration && !copy.expiration.enabled) {
@@ -858,26 +814,23 @@ export default {
               if (response.success) {
                 this.$emit('close');
               } else {
+                this.dialogTitle = 'Failed to save view';
+                let errorMessage = 'View failed to create. Please retry.';
+                if (response.errors && response.errors.length > 0) {
+                  errorMessage = response.errors.join(', ');
+                }
+                this.dialogText = errorMessage;
+                this.showDialog = true;
                 const result = response.data;
-                if (result.error && result.error === 'STALE') {
-                  this.dialogTitle = 'View data is stale';
-                  this.dialogText =
-                    'This view has been updated since you last refreshed the page, please reload the page to make changes.';
-                  this.showDialog = true;
-                } else if (result.error) {
-                  this.dialogTitle = 'Error saving view';
-                  this.dialogText =
-                    'Failed to save view. Please reload and try again.';
-                  this.showDialog = true;
-                } else {
+                if (result) {
                   if (result.isValid === false) {
                     console.log(
                       `Setting errors to ${JSON.stringify(result.issues)}`
                     );
                     this.$refs.observer.setErrors(result.issues);
                   }
+                  this.setErrors(result.issues);
                 }
-                this.setErrors(result.issues);
               }
             });
         } else {
@@ -939,11 +892,12 @@ export default {
             if (!view.source.datasetId) {
               view.source.datasetId = null;
             }
-            if (
-              !view.source.accessControl ||
-              view.source.accessControl === null
-            ) {
-              view.source.accessControl = { enabled: false };
+            if (!view.accessControl || view.accessControl === null) {
+              view.accessControl = { enabled: false };
+            } else if (view.accessControl.labelColumn) {
+              this.referenceData.availableColumns = [
+                view.accessControl.labelColumn
+              ];
             }
             if (
               !view.source.publicAccess ||
@@ -1109,9 +1063,9 @@ export default {
           console.log('adding view.source.visibleColumns');
           this.view.source.visibleColumns = [];
         }
-        if (!this.view.source.hasOwnProperty('accessControl')) {
-          console.log('adding view.source.accessControl');
-          this.view.source.accessControl = {};
+        if (!this.view.hasOwnProperty('accessControl')) {
+          console.log('adding view.accessControl');
+          this.view.accessControl = {};
         }
         if (!this.view.source.hasOwnProperty('publicAccess')) {
           console.log('adding view.source.publicAccess');

@@ -197,22 +197,6 @@ class ConfigValidator {
                 }
             }
 
-            if (source.hasOwnProperty('accessControl')) {
-                let accessControl = source.accessControl;
-
-                // If accessControlEnabled is true, than accessControlLabelColumn must be provided.
-                if (accessControl.enabled && accessControl.enabled === true) {
-                    if (!accessControl.labelColumn || accessControl.labelColumn.length === 0) {
-                        this.logIssue(IssueType.ERROR, `'accessControl.labelColumn' must be provided for view '${view.name}'`, 'source.accessControl.labelColumn');
-                    }
-
-                    if (_tableExists === true) {
-                        // Check for the existance of labelColumn
-                        await this.areAllColumnsAvailable([accessControl.labelColumn], source.datasetId, source.tableId, `View '${view.name}' has a 'labelColumn' defined that is not available in source table '${source.datasetId}.${source.tableId}'`, 'accessControl.labelColumn');
-                    }
-                }
-            }
-
             if (source.hasOwnProperty('publicAccess')) {
                 let publicAccess = source.publicAccess;
 
@@ -252,6 +236,23 @@ class ConfigValidator {
             }
         }
 
+        /*
+        if (source.hasOwnProperty('accessControl')) {
+            let accessControl = source.accessControl;
+
+            // If accessControlEnabled is true, than accessControlLabelColumn must be provided.
+            if (accessControl.enabled && accessControl.enabled === true) {
+                if (!accessControl.labelColumn || accessControl.labelColumn.length === 0) {
+                    this.logIssue(IssueType.ERROR, `'accessControl.labelColumn' must be provided for view '${view.name}'`, 'source.accessControl.labelColumn');
+                }
+
+                if (_tableExists === true) {
+                    // Check for the existance of labelColumn
+                    await this.areAllColumnsAvailable([accessControl.labelColumn], source.datasetId, source.tableId, `View '${view.name}' has a 'labelColumn' defined that is not available in source table '${source.datasetId}.${source.tableId}'`, 'accessControl.labelColumn');
+                }
+            }
+        }*/
+        
         if (view.hasOwnProperty('custom')) {
             let custom = view.custom;
 

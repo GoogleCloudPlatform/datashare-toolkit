@@ -35,6 +35,9 @@
         "custom": {
             "$ref": "#/definitions/custom"
         },
+        "accessControl": {
+            "$ref": "#/definitions/sourceAccessControl"
+        },
         "expiration": {
             "$ref": "#/definitions/expiration"
         }
@@ -125,9 +128,6 @@
                 },
                 "publicAccess": {
                     "$ref": "#/definitions/publicAccess"
-                },
-                "accessControl": {
-                    "$ref": "#/definitions/sourceAccessControl"
                 }
             },
             "required": [

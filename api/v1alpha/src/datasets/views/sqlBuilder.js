@@ -28,6 +28,24 @@ async function generateSql(view) {
     if (view.hasOwnProperty('custom')) {
         console.log(`Generating query using custom SQL for view '${view.name}'`);
         sql = view.custom.query;
+
+        // If statement ends with a ';' remove it
+        if (sql.substring(sql.length - 1) === ";") {
+            sql = sql.substring(0, sql.length - 1);
+        }
+
+        const accessControlEnabled = (view.accessControl && view.accessControl.enabled) || false;
+        if (accessControlEnabled === true) {
+            console.log("Using dataset entitlements");
+            let newSql = `SELECT * FROM (\n`;
+            newSql += await prependLines(sql, "\t", 1);
+            newSql += '\n) s';
+            let entityFilter = await generateAccessControlSubquery(view);
+            if (entityFilter) {
+                newSql += "\nWHERE\n" + entityFilter;
+            }
+            sql = newSql.trim();
+        }
     }
     else {
         if (configUtil.isPublicAccessEnabled(view) === true) {
@@ -112,22 +130,21 @@ async function generateSelectStatement(view, includeFrom) {
  * @param  {} view
  */
 async function generateAccessControlSubquery(view) {
-    let source = view.source;
-    const accessControlEnabled = source.accessControl.enabled || false;
+    const accessControlEnabled = view.accessControl.enabled || false;
 
     if (accessControlEnabled === true) {
-        const accessControlLabelColumn = source.accessControl.labelColumn;
-        const accessControlLabelColumnDelimiter = source.accessControl.labelColumnDelimiter;
+        const accessControlLabelColumn = view.accessControl.labelColumn;
+        const accessControlLabelColumnDelimiter = view.accessControl.labelColumnDelimiter;
         let sql = "EXISTS (\n";
         let query = "";
         let useNesting = accessControlLabelColumnDelimiter && accessControlLabelColumnDelimiter.length > 0;
         if (useNesting === true) {
             query += `SELECT 1 FROM UNNEST(split(s.${accessControlLabelColumn}, "${accessControlLabelColumnDelimiter}")) AS flattenedLabel\n`;
-            query += `JOIN \`${view.projectId}.${cfg.cdsAccessControlDatasetId}.${cfg.cdsAccessControlViewId}\` e ON LOWER(flattenedLabel) = LOWER(e.tag)\n`;
+            query += `JOIN \`${view.projectId}.${cfg.cdsDatasetId}.${cfg.cdsCurrentUserDatasetViewId}\` e ON LOWER(flattenedLabel) = LOWER(e.tag)\n`;
             query += `WHERE LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}'\n`;
         }
         else {
-            query += `SELECT 1 FROM \`${view.projectId}.${cfg.cdsAccessControlDatasetId}.${cfg.cdsAccessControlViewId}\` e\n`;
+            query += `SELECT 1 FROM \`${view.projectId}.${cfg.cdsDatasetId}.${cfg.cdsCurrentUserDatasetViewId}\` e\n`;
             query += `WHERE LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}' AND LOWER(e.tag) = LOWER(s.${accessControlLabelColumn})\n`;
         }
 
@@ -236,7 +253,7 @@ async function generateWhereClause(view) {
         whereAdded = true;
     }
 
-    const accessControlEnabled = (source.accessControl && source.accessControl.enabled) || false;
+    const accessControlEnabled = (view.accessControl && view.accessControl.enabled) || false;
     if (accessControlEnabled === true) {
         console.log("Using dataset entitlements");
         let entityFilter = await generateAccessControlSubquery(view);
