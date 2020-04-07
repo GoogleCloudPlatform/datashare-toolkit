@@ -23,6 +23,8 @@ const cors = require('cors')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
+const { checkIfAuthenticated } = require('./lib/fb/auth');
+
 const apiVersion = "v1alpha";
 const PORT = process.env.PORT || 5555;
 /************************************************************
@@ -108,6 +110,13 @@ var routes = [];
 
 // CORS will be controlled by the API GW layer
 router.all('*', cors());
+
+if (
+    process.env.NODE_ENV === 'production' ||
+    process.env.VUE_APP_APICLIENT == 'server'
+) {
+    router.all('*', checkIfAuthenticated);
+}
 
 /**
  * @swagger

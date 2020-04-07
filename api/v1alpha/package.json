@@ -15,7 +15,8 @@
         "underscore": "^1.9.1",
         "uuid": "^3.3.3",
         "bqds-shared": "file:../../shared",
-        "jsonschema": "^1.2.6"
+        "jsonschema": "^1.2.6",
+        "firebase-admin": "^8.10.0"
     },
     "scripts": {
         "dev": "nodemon src/index.js",
