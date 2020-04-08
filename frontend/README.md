@@ -159,7 +159,7 @@ i  hosting[cds-demo-3]: releasing new version...
 ✔  Deploy complete!
 
 Project Console: https://console.firebase.google.com/project/cds-demo-3/overview
-Hosting URL: https://cds-demo-3.web.app/settings
+Hosting URL: https://cds-demo-3.web.app
 
 ```
 
