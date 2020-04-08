@@ -48,9 +48,6 @@ export default {
   deleteTable(projectId, datasetId, tableId) {
     console.log(`Mock delete dataset: ${projectId}:${datasetId}:${tableId}`);
   },
-  getEntitlementsOld() {
-    return get(entitlements, 2000); // wait 2s before returning config
-  },
   getIngestion() {
     return get(ingestion, 2000); // wait 2s before returning config
   },
@@ -70,9 +67,6 @@ export default {
   getPolicyAccounts() {
     return null;
   },
-  deleteEntitlementsOld(items) {
-    console.log(`Mock delete entitlements: ${JSON.stringify(items)}`);
-  },
   saveAccount(payload) {
     console.log(
       `Performing account update for: gcpAccount: ${
@@ -80,13 +74,6 @@ export default {
       }, accessType: ${payload.accessType}, added: ${JSON.stringify(
         payload.added
       )}, removed: ${JSON.stringify(payload.removed)}`
-    );
-  },
-  updateAccountEntitlementsOld(gcpAccount, accessType, added, removed) {
-    console.log(
-      `Performing account entitlement update for: gcpAccount: ${gcpAccount}, accessType: ${accessType}, added: ${JSON.stringify(
-        added
-      )}, removed: ${JSON.stringify(removed)}`
     );
   },
   getSettings() {

@@ -24,7 +24,7 @@ For publisher projects that do not have the Cloud Functions API enabled at the t
 ### Consumers
 
 - A GCP account with billing enabled
-- Entitlements granted by the publsiher to your specific licensed datasets
+- Entitlements granted by the publisher to your specific licensed datasets
 
 ## Principles
 
@@ -60,7 +60,7 @@ Ingestion is performed by a [Google Cloud Function](https://cloud.google.com/fun
 
 The function is triggered off mutations to a specified Cloud Storage Bucket.
 
-[Entitlements](entitlements) are configured in a separate workflow, but generally reference tables created during the ingestion stage. Entitlements must be regenerated each time access control lists or authorized views change.
+Entitlements are configured in a separate workflow, but generally reference tables created during the ingestion stage. Entitlements must be regenerated each time access control lists or authorized views change.
 
 ## Roadmap
 
