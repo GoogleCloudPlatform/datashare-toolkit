@@ -104,7 +104,7 @@ datasets.get('/projects/:projectId/datasets', async(req, res) => {
  * /projects/{projectId}/datasets:
  *   post:
  *     summary: Create Dataset based off request body
- *     description: Returns the Datset response
+ *     description: Returns the Dataset response
  *     tags:
  *       - datasets
  *     parameters:
@@ -154,6 +154,8 @@ datasets.get('/projects/:projectId/datasets', async(req, res) => {
 datasets.post('/projects/:projectId/datasets', async(req, res) => {
     const projectId = req.params.projectId;
     const datasetId = req.body.datasetId;
+    const description = req.body.description;
+
     if (!datasetId) {
         return res.status(400).json({
             success: false,
@@ -161,7 +163,78 @@ datasets.post('/projects/:projectId/datasets', async(req, res) => {
             errors: ['dataset name parameter is required']
         });
     }
-    const data = await dataManager.createDataset(projectId, datasetId);
+    const data = await dataManager.createDataset(projectId, datasetId, description);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/datasets:
+ *   put:
+ *     summary: Update Dataset based off request body
+ *     description: Returns the Dataset response
+ *     tags:
+ *       - datasets
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Dataset request
+ *     requestBody:
+ *       description: Request parameters for Dataset
+ *       content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/definitions/Dataset'
+ *     responses:
+ *       200:
+ *         description: Dataset
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   description: HTTP status code
+ *                 data:
+ *                   type: object
+ *                   items:
+ *                     $ref: '#/definitions/Dataset'
+ *       404:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
+datasets.put('/projects/:projectId/datasets/:datasetId', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const description = req.body.description;
+
+    const data = await dataManager.updateDataset(projectId, datasetId, description);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -226,6 +299,246 @@ datasets.get('/projects/:projectId/datasets/:datasetId', async(req, res) => {
     const projectId = req.params.projectId;
     const datasetId = req.params.datasetId;
     const data = await dataManager.getDataset(projectId, datasetId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/datasets/{datasetId}:
+ *   delete:
+ *     summary: Delete Dataset based off dataset ID and request body
+ *     description: Returns the Account response
+ *     tags:
+ *       - accounts
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Dataset request
+ *     - in: path
+ *       name: datasetId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Dataset Id of the Dataset request
+ *     requestBody:
+ *       description: Request parameters for Dataset
+ *       content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/definitions/Dataset'
+ *     responses:
+ *       200:
+ *         description: Dataset
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   description: HTTP status code
+ *                 data:
+ *                   type: object
+ *                   items:
+ *                     $ref: '#/definitions/Dataset'
+ *       404:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
+datasets.delete('/projects/:projectId/datasets/:datasetId', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const createdBy = req.header('x-gcp-account');
+    const data = await dataManager.deleteDataset(projectId, datasetId, createdBy);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.get('/projects/:projectId/datasets/:datasetId/tables', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const data = await dataManager.listTables(projectId, datasetId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.get('/projects/:projectId/datasets/:datasetId/tables/:tableId/columns', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const tableId = req.params.tableId;
+    const data = await dataManager.listTableColumns(projectId, datasetId, tableId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.get('/projects/:projectId/views', async(req, res) => {
+    const projectId = req.params.projectId;
+    const data = await dataManager.listDatasetViews(projectId, null);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.get('/projects/:projectId/datasets/:datasetId/views', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const data = await dataManager.listDatasetViews(projectId, datasetId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.get('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const viewId = req.params.viewId;
+    const data = await dataManager.getDatasetView(projectId, datasetId, viewId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.post('/projects/:projectId/datasets/:datasetId/views:validate', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const view = req.body.view;
+    const includeSampleData = req.body.includeSampleData;
+    const data = await dataManager.validateDatasetView(projectId, datasetId, view, includeSampleData);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.post('/projects/:projectId/datasets/:datasetId/views', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const view = req.body;
+    const createdBy = req.header('x-gcp-account');
+    const data = await dataManager.createOrUpdateDatasetView(projectId, datasetId, null, view, createdBy);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.put('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const viewId = req.params.viewId;
+    const view = req.body;
+    const createdBy = req.header('x-gcp-account');
+    const data = await dataManager.createOrUpdateDatasetView(projectId, datasetId, viewId, view, createdBy);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+datasets.delete('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req, res) => {
+    const projectId = req.params.projectId;
+    const datasetId = req.params.datasetId;
+    const viewId = req.params.viewId;
+    if (!req.body.rowId) {
+        return res.status(400).json({
+            success: false,
+            code: 400,
+            errors: ['rowId parameter is required']
+        });
+    }
+    const values = {
+        rowId: req.body.rowId,
+        createdBy: req.header('x-gcp-account')
+    };
+    const data = await dataManager.deleteDatasetView(projectId, datasetId, viewId, values);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

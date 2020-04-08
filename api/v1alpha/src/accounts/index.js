@@ -210,14 +210,21 @@ accounts.post('/projects/:projectId/accounts', async(req, res) => {
             errors: ['account email parameter is required']
         });
     }
+    if (req.body.rowId || req.body.accountId) {
+        return res.status(400).json({
+            success: false,
+            code: 400,
+            errors: ['rowId and accountId should not be provided']
+        });
+    }
     const values = {
         email: req.body.email,
         emailType: req.body.emailType,
         accountType: req.body.accountType,
-        createdBy: req.body.createdBy,
+        createdBy: req.header('x-gcp-account'),
         policies: req.body.policies
     };
-    const data = await dataManager.createAccount(projectId, values);
+    const data = await dataManager.createOrUpdateAccount(projectId, null, values);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -363,14 +370,22 @@ accounts.put('/projects/:projectId/accounts/:accountId', async(req, res) => {
             errors: ['account email parameter is required']
         });
     }
+    if (!req.body.rowId) {
+        return res.status(400).json({
+            success: false,
+            code: 400,
+            errors: ['rowId parameter is required']
+        });
+    }
     const values = {
+        rowId: req.body.rowId,
         email: req.body.email,
         emailType: req.body.emailType,
         accountType: req.body.accountType,
-        createdBy: req.body.createdBy,
+        createdBy: req.header('x-gcp-account'),
         policies: req.body.policies
     };
-    const data = await dataManager.updateAccount(projectId, accountId, values);
+    const data = await dataManager.createOrUpdateAccount(projectId, accountId, values);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -446,11 +461,8 @@ accounts.delete('/projects/:projectId/accounts/:accountId', async(req, res) => {
     const projectId = req.params.projectId;
     const accountId = req.params.accountId;
     const values = {
-        email: req.body.email,
-        emailType: req.body.emailType,
-        accountType: req.body.accountType,
-        createdBy: req.body.createdBy,
-        policies: req.body.policies
+        rowId: req.body.rowId,
+        createdBy: req.header('x-gcp-account')
     };
     const data = await dataManager.deleteAccount(projectId, accountId, values);
     var code;

@@ -1,0 +1,19 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cds-frontend-ui
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cds-frontend-ui
+        version: v1
+    spec:
+      containers:
+        - name: cds-frontend-ui
+          image: gcr.io/chrispage-dev/cds-frontend-ui
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80

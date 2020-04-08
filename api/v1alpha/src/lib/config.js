@@ -18,24 +18,39 @@
 
 var config = {};
 
+config.verboseMode = false;
+config.productName = 'CDS';
+config.productVersion = '0.0.1';
+config.cdsManagedLabelKey = 'cds_managed';
+
 config.cdsDatasetId = "datashare";
 
 config.cdsAccountTableId = "account";
 config.cdsAccountTableFields = new Set(['rowId', 'accountId', 'email', 'emailType',
-    'accountType', 'policies', 'createdAt', 'createdBy', 'isDeleted']);
+    'accountType', 'createdBy', 'createdAt', 'policies', 'isDeleted']);
 
 config.cdsAccountViewId = "currentAccount";
 config.cdsAccountViewFields = new Set(['rowId', 'accountId', 'email', 'emailType',
-    'accountType', 'policies', 'modifiedAt', 'modifiedBy', 'version', 'isDeleted']);
+    'accountType', 'createdBy', 'policies', 'createdAt', 'version', 'isDeleted']);
 
 config.cdsPolicyTableId = "policy";
 config.cdsPolicyTableFields = new Set(['rowId', 'policyId', 'name', 'description',
-    'createdAt', 'createdBy', 'datasets', 'rowAccessTags', 'isDeleted']);
+    'datasets', 'rowAccessTags', 'createdBy', 'createdAt', 'isDeleted']);
 
 config.cdsPolicyViewId = "currentPolicy";
 config.cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description',
-    'modifiedAt', 'modifiedBy', 'version', 'datasets', 'rowAccessTags',
+    'datasets', 'rowAccessTags', 'createdBy', 'createdAt', 'version',
     'isDeleted']);
 
-module.exports = config;
+config.cdsAuthorizedViewTableId = "authorizedView";
+config.cdsAuthorizedViewTableFields = new Set(['rowId', 'authorizedViewId', 'name', 'description',
+    'datasetId', 'source', 'custom', 'accessControl', 'expiration', 'createdAt', 'createdBy', 'viewSql', 'isDeleted']);
 
+config.cdsAuthorizedViewViewId = "currentAuthorizedView";
+config.cdsAuthorizedViewViewFields = new Set(['rowId', 'authorizedViewId', 'name', 'description',
+    'datasetId', 'source', 'custom', 'accessControl', 'expiration', 'createdBy', 'createdAt', 'viewSql', 
+    'version', 'isDeleted']);
+
+config.cdsCurrentUserDatasetViewId = "currentUserDataset";
+
+module.exports = config;

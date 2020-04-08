@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/GoogleCloudPlatform/bq-datashare-toolkit"
+    "url": "https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit"
   },
   "dependencies": {
     "ws": "~3.3.1",

@@ -64,9 +64,10 @@ class BigQueryUtil {
     /**
      * @param  {string} sql
      * @param  {integer} sql
+     * @param {boolean} includeRows
      * execute SQL query with a limit and returnn true/false
      */
-    async validateQuery(sql, limit) {
+    async validateQuery(sql, limit, includeRows) {
         let _sql = sql.trim();
         if (limit && limit > 0) {
             let regex = /(.+limit\s)([\d]+)$/gi;
@@ -87,10 +88,13 @@ class BigQueryUtil {
         // Purposefully handle this error as needed to validate the query.
         try {
             const [rows] = await this.executeQuerySync(options);
-            return true;
+            if (includeRows) {
+                return { success: true, rows: rows };
+            }
+            return { success: true };
         } catch (error) {
             console.warn("ERROR: %s - Query: '%s' is invalid", error, _sql);
-            return false;
+            return { success: false, message: error.message };
         }
     }
 
@@ -101,7 +105,7 @@ class BigQueryUtil {
      */
     async tableColumns(datasetId, tableId) {
         const options = {
-            query: "select column_name from `" + datasetId + ".INFORMATION_SCHEMA.COLUMNS` where table_name = @_tableName order by ordinal_position",
+            query: "select column_name from `" + datasetId + ".INFORMATION_SCHEMA.COLUMNS` where table_name = @_tableName and is_hidden	= 'NO' order by ordinal_position",
             params: { _tableName: tableId },
         };
         const [rows] = await this.executeQuerySync(options);
@@ -113,15 +117,16 @@ class BigQueryUtil {
     /**
      * @param  {string} datasetId
      * @param  {string} tableId
+     * @param  {string} typeCheck Flag indicating if the metadata should be checked to verify if object is of type table. If the object is of type VIEW, an Error will throw
      * Checks for the existence of a table.
      */
-    async tableExists(datasetId, tableId) {
+    async tableExists(datasetId, tableId, typeCheck) {
         const dataset = this.bigqueryClient.dataset(datasetId);
         const table = dataset.table(tableId);
         const response = await table.exists();
         const exists = response[0];
 
-        if (exists === true) {
+        if (typeCheck === true && exists === true) {
             const meta = await table.getMetadata();
             const type = meta[0].type;
             if (type !== "TABLE") {
@@ -155,7 +160,7 @@ class BigQueryUtil {
         }
 
         if (this.VERBOSE_MODE) {
-            console.log(`Checking if table exists: '${tableId}': ${exists}`);
+            console.log(`Checking if view exists: '${tableId}': ${exists}`);
         }
         return exists;
     }
@@ -447,11 +452,10 @@ class BigQueryUtil {
     async createDataset(datasetId, options) {
         let _options = options || {};
         const [dataset] = await this.bigqueryClient.createDataset(datasetId, _options);
-
         if (this.VERBOSE_MODE) {
             console.log(`Dataset ${dataset.id} created.`);
         }
-        return dataset;
+        return { success: true, metadata: dataset.metadata };
     }
 
     /**
@@ -637,16 +641,13 @@ class BigQueryUtil {
      */
     async getDatasetsByLabel(projectId, labelKey) {
         let accessTypes = ["userByEmail", "groupByEmail"];
-
-        // let bqClient = new BigQuery({ projectId: projectId });
         if (!QUERY_FOR_LABELS) {
             const [datasets] = await this.bigqueryClient.getDatasets();
             let list = [];
             for (const dataset of datasets) {
                 const [metadata] = await dataset.getMetadata();
                 const labels = metadata.labels;
-                if (underscore.has(labels, labelKey)) {
-                    console.log(`${JSON.stringify(metadata, null, 3)}`);
+                if (underscore.has(labels, labelKey) || !labelKey) {
                     let accounts = [];
                     metadata.access.forEach(a => {
                         if (a.role === 'READER') {
@@ -660,7 +661,7 @@ class BigQueryUtil {
                             }
                         }
                     });
-                    list.push({ datasetId: dataset.id, description: metadata.description, modifiedTime: metadata.lastModifiedTime, accounts: accounts });
+                    list.push({ datasetId: dataset.id, description: metadata.description, modifiedAt: metadata.lastModifiedTime, accounts: accounts });
                 }
             }
             return list;
@@ -672,14 +673,14 @@ class BigQueryUtil {
                   schema_name,
                   REGEXP_EXTRACT_ALL(option_value, 'STRUCT\\\\([^\\\\)]+\\\\)') as value
                 FROM INFORMATION_SCHEMA.SCHEMATA_OPTIONS
-                WHERE option_name = 'labels'
+                WHERE option_name = 'labels' 
               ),
               parseSplit as (
                 select
                   catalog_name,
                   schema_name,
                   REGEXP_REPLACE(substr(substr(t, 8), 0, LENGTH(t) - 8), '["\\\\s]', '') as value
-                from parseOption po,
+                from parseOption po, 
                 unnest(po.value) as t
               ),
               labels as (
@@ -717,11 +718,18 @@ class BigQueryUtil {
             if (datasetId) {
                 const dataset = this.bigqueryClient.dataset(datasetId);
                 const [tables] = await dataset.getTables();
-                for (const table of tables) {
-                    const labels = await this.getTableLabels(datasetId, table.id);
-                    if (underscore.has(labels, labelKey)) {
-                        list.push({ datasetId: table.dataset.id, tableId: table.id });
+                if (labelKey) {
+                    for (const table of tables) {
+                        const labels = await this.getTableLabels(datasetId, table.id);
+                        if (underscore.has(labels, labelKey)) {
+                            list.push({ datasetId: table.dataset.id, tableId: table.id });
+                        }
                     }
+                }
+                else {
+                    tables.forEach(table => {
+                        list.push({ datasetId: table.dataset.id, tableId: table.id });
+                    });
                 }
             }
             else {
@@ -756,7 +764,7 @@ class BigQueryUtil {
                   table_schema,
                   table_name,
                   REGEXP_REPLACE(substr(substr(t, 8), 0, LENGTH(t) - 8), '["\\\\s]', '') as value
-                from parseOption po,
+                from parseOption po, 
                 unnest(po.value) as t
               ),
               labels as (

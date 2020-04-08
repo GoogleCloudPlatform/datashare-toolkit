@@ -23,6 +23,8 @@ const cors = require('cors')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
+const { checkIfAuthenticated } = require('./lib/fb/auth');
+
 const apiVersion = "v1alpha";
 const PORT = process.env.PORT || 5555;
 /************************************************************
@@ -40,7 +42,7 @@ const options = {
             },
             license: {
                 name: 'Apache 2.0',
-                url: 'https://github.com/GoogleCloudPlatform/bq-datashare-toolkit/blob/master/LICENSE.txt'
+                url: 'https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/blob/master/LICENSE.txt'
             }
         },
         servers: [{
@@ -58,7 +60,7 @@ const options = {
         }],
         externalDocs: {
             description: 'Find out more about Cloud Datashare Toolkit',
-            url: 'https://github.com/GoogleCloudPlatform/bq-datashare-toolkit'
+            url: 'https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit'
         }
     },
     // Path to the API docs
@@ -95,6 +97,8 @@ const datasets = require('./datasets/index');
 const policies = require('./policies/index');
 // Import the CDS API Accounts service router
 const accounts = require('./accounts/index');
+// Import the CDS API Admin service router
+const admin = require('./admin/index');
 
 /************************************************************
   API Endpoints
@@ -106,6 +110,13 @@ var routes = [];
 
 // CORS will be controlled by the API GW layer
 router.all('*', cors());
+
+if (
+    process.env.NODE_ENV === 'production' ||
+    process.env.VUE_APP_APICLIENT == 'server'
+) {
+    router.all('*', checkIfAuthenticated);
+}
 
 /**
  * @swagger
@@ -121,6 +132,8 @@ router.all('*', cors());
  *     description: The CDS API Account Services
  *   - name: spots
  *     description: The CDS API Spot Services
+ *   - name: admin
+ *     description: The CDS API Admin Services
  *   - name: docs
  *     description: The OpenAPI specification documents for the CDS API services
  *   - name: default
@@ -233,6 +246,7 @@ router.use(spots);
 router.use(datasets);
 router.use(policies);
 router.use(accounts);
+router.use(admin);
 
 /**
  * @swagger

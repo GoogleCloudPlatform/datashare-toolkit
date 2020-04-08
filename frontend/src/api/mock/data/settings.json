@@ -1,0 +1,10 @@
+{
+  "apiBaseUrl": "https://cds-api-jaa4rm3j3a-uc.a.run.app/v1alpha",
+  "apiBaseUrlX": "http://localhost:5555/v1alpha",
+  "apiKey": "AIzaSyAIg7AUkAoZ3f_Ney3DBojzfCnfjIHAaXU",
+  "authDomain": "cds-demo-2.firebaseapp.com",
+  "projectId": "cds-demo-2",
+  "storageBucket": "cds-demo-2.appspot.com",
+  "appId": "1:863461568634:web:f9f4a9a103338eabff4bc3",
+  "measurementId": "G-G0HJN10N0C"
+}

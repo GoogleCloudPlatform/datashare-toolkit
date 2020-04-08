@@ -89,6 +89,19 @@ class StorageUtil {
         }
         return true;
     }
+    
+    /**
+     */
+    async listBuckets() {
+        const [buckets] = await this.storage.getBuckets();
+        if (this.VERBOSE_MODE) {
+            console.log('Buckets:');
+            buckets.forEach(bucket => {
+                console.log(bucket.name);
+            });
+        }
+        return buckets.map(b => b.name);
+    }
 
     /**
      * @param  {string} bucketName
@@ -230,9 +243,27 @@ class StorageUtil {
             return url[0];
         }
     }
-
+    
+    /**
+     * @param  {} bucketName
+     * @param  {} options
+     */
     getBucket(bucketName, options) {
         return this.storage.bucket(bucketName, options);
+    }
+
+    /**
+     * @param  {} bucketName
+     */
+    async getAvailableFiles(bucketName, options) {
+        const [files] = await this.storage.bucket(bucketName).getFiles(options);
+        if (this.VERBOSE_MODE) {
+            console.log('Files:');
+            files.forEach(file => {
+                console.log(file.name);
+            });
+        }
+        return files.map(f => f.name);
     }
 }
 

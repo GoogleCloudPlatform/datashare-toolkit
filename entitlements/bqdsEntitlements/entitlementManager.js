@@ -282,8 +282,8 @@ async function processConfig(config) {
                     console.log("SQL text is identitical");
                 }
                 else {
-                    const isValid = await bigqueryUtil.validateQuery(viewSql, 5);
-                    if (isValid === false) {
+                    const v = await bigqueryUtil.validateQuery(viewSql, 5);
+                    if (v.success === false) {
                         console.log("Query is invalid, skipping to next view");
                         continue;
                     }
@@ -321,8 +321,8 @@ async function processConfig(config) {
             }
             else {
                 // This else block is a bit redundant as it has the same code as above (except the deleteIfExists flag)
-                const isValid = bigqueryUtil.validateQuery(viewSql, 5);
-                if (isValid === false) {
+                const v = bigqueryUtil.validateQuery(viewSql, 5);
+                if (v.success === false) {
                     console.log("Query is invalid, skipping to next view");
                     continue;
                 }

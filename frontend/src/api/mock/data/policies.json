@@ -1,0 +1,34 @@
+[
+    {
+      "policyId": "a0d87162-4fd4-4bd7-a12c-505a9cd8d85c",
+      "name": "MLB Game Log Reader Policy",
+      "description": "MLB game log readers",
+      "modifiedTime": 1579922442855,
+      "modifiedBy": "cloud.datashare.test.1@gmail.com",
+      "version": 1
+    },
+    {
+      "policyId": "c0d87162-4fd4-4bd7-a12c-505a9cd8d85c",
+      "name": "MLB Game Log Reader Policy",
+      "description": "MLB game log readers",
+      "modifiedTime": 1579922340808,
+      "modifiedBy": "cloud.datashare.test.1@gmail.com",
+      "version": 2
+    },
+    {
+      "policyId": "b0d87162-4fd4-4bd7-a12c-505a9cd8d85c",
+      "name": "MLB Game Log Reader Policy",
+      "description": "MLB game log readers",
+      "modifiedTime": 1580087041912,
+      "modifiedBy": "cloud.datashare.test.1@gmail.com",
+      "version": 3
+    },
+    {
+      "policyId": "f0d87162-4fd4-4bd7-a12c-505a9cd8d85c",
+      "name": "MLB Game Log Reader Policy",
+      "description": "MLB game log readers",
+      "modifiedTime": 1580095428134,
+      "modifiedBy": "cloud.datashare.test.1@gmail.com",
+      "version": 4
+    }
+  ]

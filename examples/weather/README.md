@@ -9,7 +9,7 @@ we are going to restrict the transformed data to only three columns: a
 timestamp, the measurement's coordinates as a `GEOGRAPHY` type (manufactured by calling the
 [ST_GeogPoint](https://cloud.google.com/bigquery/docs/reference/standard-sql/geography_functions#st_geogpoint)
 function), and the mean temperature that comprises the observation. The
-destination table will also contain the `bqds_batch_id` column, that
+destination table will also contain the `cds_batch_id` column, that
 is added automatically by `BQDS`, so that you may
 associate the table data with its specific ingestion cycle.
 

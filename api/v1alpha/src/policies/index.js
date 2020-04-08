@@ -119,7 +119,7 @@ var policies = express.Router();
  */
 policies.get('/projects/:projectId/policies', async(req, res) => {
     const projectId = req.params.projectId;
-    const data = await dataManager.listPolicies(projectId, null);
+    const data = await dataManager.listPolicies(projectId);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -194,14 +194,21 @@ policies.post('/projects/:projectId/policies', async(req, res) => {
             errors: ['policy name parameter is required']
         });
     }
+    if (req.body.rowId || req.body.policyId) {
+        return res.status(400).json({
+            success: false,
+            code: 400,
+            errors: ['rowId and policyId should not be provided']
+        });
+    }
     const values = {
         name: req.body.name,
         description: req.body.description,
-        createdBy: req.body.createdBy,
+        createdBy: req.header('x-gcp-account'),
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags
     };
-    const data = await dataManager.createPolicy(projectId, values);
+    const data = await dataManager.createOrUpdatePolicy(projectId, null, values);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -347,14 +354,22 @@ policies.put('/projects/:projectId/policies/:policyId', async(req, res) => {
             errors: ['policy name parameter is required']
         });
     }
+    if (!req.body.rowId) {
+        return res.status(400).json({
+            success: false,
+            code: 400,
+            errors: ['rowId parameter is required']
+        });
+    }
     const values = {
+        rowId: req.body.rowId,
         name: req.body.name,
         description: req.body.description,
-        createdBy: req.body.createdBy,
+        createdBy: req.header('x-gcp-account'),
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags
     };
-    const data = await dataManager.updatePolicy(projectId, policyId, values);
+    const data = await dataManager.createOrUpdatePolicy(projectId, policyId, values);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
@@ -430,11 +445,8 @@ policies.delete('/projects/:projectId/policies/:policyId', async(req, res) => {
     const projectId = req.params.projectId;
     const policyId = req.params.policyId;
     const values = {
-        name: req.body.name,
-        description: req.body.description,
-        createdBy: req.body.createdBy,
-        datasets: req.body.datasets,
-        rowAccessTags: req.body.rowAccessTags
+        rowId: req.body.rowId,
+        createdBy: req.header('x-gcp-account')
     };
     const data = await dataManager.deletePolicy(projectId, policyId, values);
     var code;

@@ -14,7 +14,9 @@
         "swagger-ui-express": "^4.1.2",
         "underscore": "^1.9.1",
         "uuid": "^3.3.3",
-        "bqds-shared": "file:../../shared"
+        "bqds-shared": "file:../../shared",
+        "jsonschema": "^1.2.6",
+        "firebase-admin": "^8.10.0"
     },
     "scripts": {
         "dev": "nodemon src/index.js",
@@ -33,6 +35,6 @@
     },
     "repository": {
         "type": "git",
-        "url": "git://github.com/GoogleCloudPlatform/bq-datashare-toolkit.git"
+        "url": "git@github.com:GoogleCloudPlatform/cloud-datashare-toolkit.git"
     }
 }
