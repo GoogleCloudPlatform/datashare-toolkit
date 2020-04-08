@@ -116,11 +116,11 @@ else
     UNAME=$(uname | awk '{print tolower($0)}')
     if [ "$UNAME" == "darwin" ]; then
         # macOS
-        echo 'Running on macOS, performing package.json replacement for bqds-shared module'
+        echo 'Running on macOS, performing package.json replacement for cds-shared module'
         sed -i '' -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../../batch/package.json
     else
         # linux
-        echo 'Running on linux, performing package.json replacement for bqds-shared module'
+        echo 'Running on linux, performing package.json replacement for cds-shared module'
         sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../../batch/package.json
     fi
 

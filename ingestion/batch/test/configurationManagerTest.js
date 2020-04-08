@@ -18,7 +18,7 @@
 /* eslint-disable promise/catch-or-return */
 
 const { argv, uuidv4 } = require('./testSetup');
-const { StorageUtil } = require('bqds-shared');
+const { StorageUtil } = require('cds-shared');
 const storageUtil = new StorageUtil();
 
 const chai = require('chai'), expect = chai.expect, should = chai.should();
