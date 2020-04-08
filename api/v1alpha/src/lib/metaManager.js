@@ -16,7 +16,7 @@
 
 'use strict';
 
-const { BigQueryUtil } = require('bqds-shared');
+const { BigQueryUtil } = require('cds-shared');
 const underscore = require("underscore");
 let bigqueryUtil = new BigQueryUtil();
 

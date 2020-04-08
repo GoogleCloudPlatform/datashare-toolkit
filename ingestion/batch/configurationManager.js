@@ -16,7 +16,7 @@
 
 'use strict';
 
-const { StorageUtil, CommonUtil } = require('bqds-shared');
+const { StorageUtil, CommonUtil } = require('cds-shared');
 const storageUtil = new StorageUtil();
 const commonUtil = CommonUtil;
 const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
