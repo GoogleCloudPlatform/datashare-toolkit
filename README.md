@@ -70,12 +70,6 @@ The [roadmap](roadmap) section details currently planned features of Datashare. 
 
 The [ingestion](ingestion) page has details on the toolkit's embedded ingestion and transformation features.
 
-## Entitlements and view management
-The [entitlementEngine](entitlements) sections go into more detail on using Datashare's entitlement capabilities.
-
-## Examples
-The [examples](examples) directory has several configurations highlighting various usage models.
-
 ## Disclaimers
 
 _This is not an officially supported Google product._
