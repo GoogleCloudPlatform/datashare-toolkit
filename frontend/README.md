@@ -115,7 +115,7 @@ Copy the values for apiKey, authDomain, projectId, storageBucket, appId, and mea
 
 4. Setup the Google Auth, be sure to toggle the "Enabled" button and click "Save".
 
-<img src="assets/setup_google_auth.png" alt="Setup Google Auth" />
+<img src="assets/setup_google_auth.png" alt="Setup Google Auth" height="150" />
 
 ### <a name="deployment">Deployment</a>
 Navigate to the frontend directory and modify the .firebaserc file with the Firebase projectId and save changes.
