@@ -16,7 +16,7 @@
 
 'use strict';
 
-const { BigQueryUtil } = require('bqds-shared');
+const { BigQueryUtil } = require('cds-shared');
 
 const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');

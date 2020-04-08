@@ -18,7 +18,7 @@
 /* eslint-disable promise/catch-or-return */
 
 const { argv, uuidv4 } = require('./testSetup');
-const { BigQueryUtil, StorageUtil } = require('bqds-shared');
+const { BigQueryUtil, StorageUtil } = require('cds-shared');
 const storageUtil = new StorageUtil();
 const bigqueryUtil = new BigQueryUtil(argv.projectId);
 const fs = require('fs');

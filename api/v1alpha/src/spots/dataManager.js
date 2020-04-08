@@ -19,7 +19,7 @@
 const querystring = require('querystring');
 const uuidv4 = require('uuid/v4');
 
-const { BigQueryUtil, StorageUtil } = require('bqds-shared');
+const { BigQueryUtil, StorageUtil } = require('cds-shared');
 let bigqueryUtil;
 const storageUtil = new StorageUtil();
 
