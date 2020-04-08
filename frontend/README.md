@@ -8,6 +8,7 @@ This documentation provides details for how to develop, build, and deploy new ve
 * [Deploy to Firebase](#deploy)
   * [Install Firebase CLI](#firebase_cli)
   * [New Firebase Setup](#new_firebase)
+  * [Enable Authentication](#authentication)
   * [Deployment](#deployment)
 
 
@@ -99,6 +100,23 @@ The Firebase project will begin to provision, this should take less than a minut
 
 Copy the values for apiKey, authDomain, projectId, storageBucket, appId, and measurementId overwriting the existing values for each respective attribute within the /src/api/mock/data/settings.json configuration file.
 
+### <a name="authentication">Enable Athentication</a>
+1. Select "Authentication" on the left navigation menu for the Firebase console.
+
+<img src="assets/authentication_menu.png" alt="Authentication" height="150"/>
+
+2. Select "Set up sign-in method".
+
+<img src="assets/set_up_sign-in_method.png" alt="Set up sign-in method" height="150"/>
+
+3. Click the edit button on the Google row.
+
+<img src="assets/edit_google_auth.png" alt="Enable Google Auth" />
+
+4. Setup the Google Auth, be sure to toggle the "Enabled" button and click "Save".
+
+<img src="assets/setup_google_auth.png" alt="Setup Google Auth" />
+
 ### <a name="deployment">Deployment</a>
 Navigate to the frontend directory and modify the .firebaserc file with the Firebase projectId and save changes.
 
@@ -141,8 +159,8 @@ i  hosting[cds-demo-3]: releasing new version...
 ✔  Deploy complete!
 
 Project Console: https://console.firebase.google.com/project/cds-demo-3/overview
-Hosting URL: https://cds-demo-3.web.app
+Hosting URL: https://cds-demo-3.web.app/settings
 
 ```
 
-Now, navigate to the Hosting URL and the CDS UI should load.
+Navigate to the Hosting URL and on the top right click the right most button to sign-in using Google authentication. Lastly, to initialize the 'Datashare' dataset within BigQuery, navigate to the Admin page and click the "Initialize Schema" button.
