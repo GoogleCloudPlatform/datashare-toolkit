@@ -49,14 +49,6 @@ const routerOptions = [
     }
   },
   {
-    path: '/entitlementsOld',
-    name: 'entitlementsOld',
-    component: 'EntitlementsOld',
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
     path: '/editView',
     name: 'editView',
     component: 'EditView',

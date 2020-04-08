@@ -14,7 +14,7 @@
         "swagger-ui-express": "^4.1.2",
         "underscore": "^1.9.1",
         "uuid": "^3.3.3",
-        "bqds-shared": "file:../../shared",
+        "cds-shared": "file:../../shared",
         "jsonschema": "^1.2.6",
         "firebase-admin": "^8.10.0"
     },

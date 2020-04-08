@@ -16,7 +16,7 @@
 
 'use strict';
 
-const { BigQueryUtil } = require('bqds-shared');
+const { BigQueryUtil } = require('cds-shared');
 let bigqueryUtil = new BigQueryUtil();
 const uuidv4 = require('uuid/v4');
 

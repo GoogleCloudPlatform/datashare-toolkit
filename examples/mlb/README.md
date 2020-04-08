@@ -111,17 +111,10 @@ Removing gs://713573366abd762a58fce9752b55b610/...
         CONCAT(v_name, '|', h_name) AS label
         ```
 
-## Entitlements
-- Simple Example - [JSON](./config/entitlements/simple.json) | [YAML](./config/entitlements/simple.yaml)
-    - In the simple example, there are two audiences - New York fans, and Chicago fans. We create two datasets to manage separate permissions for each - ny_fans and chicago_fans. We create two views, both have `accessControl` enabled, and are filtering rows by the team column label. For the `ny_game_logs` view we also configured `publicAccess` which allows a user with view access but no row-level access to view rows where the game_number is 1 - limited to 20 results.
-- Complex Example - [JSON](./config/entitlements.complex.json) | [YAML](./config/entitlements/complex.yaml)
-    - For the complex example, custom queries are configured for each of the three configured views. Additionally, the `authorizeFromDatasetIds` property  was added within `custom` to ensure that the `mlb` dataset is authorized for access by these newly created views.
-
 ## Directories
 The following directories are included in the example:
 - [config](./config) 
     - [ingestion](./config/ingestion) - Contains the ingestion configuration files.
-    - [entitlements](./config/entitlements) - Contains the entitlement engine configuration files.
 - [data](./data) - Contains a raw, compressed data archive and license file used for the example.
 
 ## License

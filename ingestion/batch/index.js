@@ -16,7 +16,7 @@
 
 'use strict';
 
-const { BigQueryUtil, CloudFunctionUtil, StorageUtil } = require('bqds-shared');
+const { BigQueryUtil, CloudFunctionUtil, StorageUtil } = require('cds-shared');
 const configManager = require('./configurationManager');
 const bigqueryUtil = new BigQueryUtil();
 const cloudFunctionUtil = new CloudFunctionUtil();

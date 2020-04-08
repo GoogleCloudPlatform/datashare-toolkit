@@ -16,7 +16,7 @@
 
 'use strict';
 
-const { BigQueryUtil, StorageUtil } = require('bqds-shared');
+const { BigQueryUtil, StorageUtil } = require('cds-shared');
 let bigqueryUtil;
 const storageUtil = new StorageUtil();
 
