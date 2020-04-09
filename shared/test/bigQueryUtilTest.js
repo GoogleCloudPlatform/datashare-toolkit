@@ -82,7 +82,7 @@ describe('BigQueryUtil', () => {
         const uuid = uuidv4().replace(/-/g, "_");
         const viewName = `v_${uuid}`;
 
-        const labelName = "bqds_configuration_name";
+        const labelName = "cds_configuration_name";
         const labelValue = "unit_tests";
         let labels = {};
         labels[labelName] = labelValue;

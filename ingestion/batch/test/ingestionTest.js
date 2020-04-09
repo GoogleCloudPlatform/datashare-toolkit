@@ -58,10 +58,10 @@ if (argv.runCloudTests) {
         const datasetName = `${uuid}`;
         const tableName = "observation";
 
-        let schemaBucketFile = `bqds/${datasetName}/${tableName}/config/schema.json`;
-        let sqlBucketFile = `bqds/${datasetName}/${tableName}/config/transform.sql`;
-        let dataBucketFile = `bqds/${datasetName}/${tableName}/data/weather.observation.csv`;
-        let dataArchiveBucketFile = `bqds/${datasetName}/${tableName}/data/archive/weather.observation.csv`;
+        let schemaBucketFile = `cds/${datasetName}/${tableName}/config/schema.json`;
+        let sqlBucketFile = `cds/${datasetName}/${tableName}/config/transform.sql`;
+        let dataBucketFile = `cds/${datasetName}/${tableName}/data/weather.observation.csv`;
+        let dataArchiveBucketFile = `cds/${datasetName}/${tableName}/data/archive/weather.observation.csv`;
 
         let schemaFileCreated = false;
         let sqlFileCreated = false;

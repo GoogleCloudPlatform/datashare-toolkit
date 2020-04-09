@@ -3,12 +3,12 @@
       "key": "mstest1|test",
       "datasetId": "mstest1",
       "tableId": "test",
-      "basePath": "bqds/mstest1/test",
+      "basePath": "cds/mstest1/test",
       "configPathFound": true,
       "schemaFileFound": true,
-      "schemaFile": "bqds/mstest1/test/config/schema.json",
+      "schemaFile": "cds/mstest1/test/config/schema.json",
       "transformFileFound": true,
-      "transformFile": "bqds/mstest1/test/config/transform.sql",
+      "transformFile": "cds/mstest1/test/config/transform.sql",
       "dataPathFound": true,
       "archivePathFound": true
     },
@@ -16,7 +16,7 @@
       "key": "mstest1|test2",
       "datasetId": "mstest1",
       "tableId": "test2",
-      "basePath": "bqds/mstest1/test2",
+      "basePath": "cds/mstest1/test2",
       "dataPathFound": true
     }
   ]

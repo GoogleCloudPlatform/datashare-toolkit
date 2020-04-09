@@ -38,7 +38,7 @@ Project setup:
 
     npm install
 
-You can choose to use mock API data or point to a BQDS Admin REST API endpoint in the applicaiton settings page. The *VUE_APP_APICLIENT* environment variable will dynamically load between the two options.
+You can choose to use mock API data or point to a CDS Admin REST API endpoint in the applicaiton settings page. The *VUE_APP_APICLIENT* environment variable will dynamically load between the two options.
 
 Using API client data that is mocked:
 

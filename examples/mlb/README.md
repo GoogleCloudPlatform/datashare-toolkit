@@ -1,9 +1,9 @@
-[Back to BQDS](../../README.md)
+[Back to CDS](../../README.md)
 
 # Example scenario using Major League Baseball game logs
 
 ## Overview
-For this BQDS example, we configure and load Major League Baseball [1871-2018 Game Logs](https://www.retrosheet.org/gamelogs/gl1871_2018.zip) which were sourced from [Retrosheet](https://www.retrosheet.org/gamelogs/index.html).
+For this CDS example, we configure and load Major League Baseball [1871-2018 Game Logs](https://www.retrosheet.org/gamelogs/gl1871_2018.zip) which were sourced from [Retrosheet](https://www.retrosheet.org/gamelogs/index.html).
 
 ## Quick start
 
@@ -15,8 +15,8 @@ gsutil mb gs://${BUCKET}
 cd bq-datashare-toolkit/ingestion/function
 npm run deploy -- --trigger-bucket=gs://${BUCKET}
 cd ../../examples/mlb/config/ingestion
-gsutil cp game_logs.schema.json gs://${BUCKET}/bqds/
-gsutil cp game_logs.transform.sql gs://${BUCKET}/bqds/
+gsutil cp game_logs.schema.json gs://${BUCKET}/cds/
+gsutil cp game_logs.transform.sql gs://${BUCKET}/cds/
 cd ../../data
 gsutil cp mlb.game_logs.csv.gz gs://${BUCKET}
 sleep 60 # wait for ingestion
@@ -61,11 +61,11 @@ timeout: 540s
 updateTime: '2019-10-29T17:22:49Z'
 versionId: '21'
 host:bin thisuser$ cd ../../examples/mlb/config/ingestion
-host:ingestion thisuser$ gsutil cp game_logs.schema.json gs://${BUCKET}/bqds/
+host:ingestion thisuser$ gsutil cp game_logs.schema.json gs://${BUCKET}/cds/
 Copying file://game_logs.schema.json [Content-Type=application/json]...
 / [1 files][ 21.4 KiB/ 21.4 KiB]                                                
 Operation completed over 1 objects/21.4 KiB.                                     
-host:ingestion thisuser$ gsutil cp game_logs.transform.sql gs://${BUCKET}/bqds/
+host:ingestion thisuser$ gsutil cp game_logs.transform.sql gs://${BUCKET}/cds/
 Copying file://game_logs.transform.sql [Content-Type=application/x-sql]...
 / [1 files][  158.0 B/  158.0 B]                                                
 Operation completed over 1 objects/158.0 B.                                      
@@ -83,8 +83,8 @@ host:data thisuser$
 host:data thisuser$ # clean up bucket
 host:data thisuser$ gsutil rm -r -f gs://${BUCKET}
 Removing gs://713573366abd762a58fce9752b55b610/mlb.game_logs.csv.gz#1572369785409249...
-Removing gs://713573366abd762a58fce9752b55b610/bqds/game_logs.schema.json#1572369771326950...
-Removing gs://713573366abd762a58fce9752b55b610/bqds/game_logs.transform.sql#1572369772972359...
+Removing gs://713573366abd762a58fce9752b55b610/cds/game_logs.schema.json#1572369771326950...
+Removing gs://713573366abd762a58fce9752b55b610/cds/game_logs.transform.sql#1572369772972359...
 / [3 objects]                                                                   
 Operation completed over 3 objects.                                              
 Removing gs://713573366abd762a58fce9752b55b610/...

@@ -1,6 +1,6 @@
 {
-    "name": "bqds-api",
-    "description": "BQDS API service",
+    "name": "cds-api",
+    "description": "CDS API service",
     "version": "0.0.1",
     "license": "Apache-2.0",
     "dependencies": {
@@ -21,7 +21,7 @@
     "scripts": {
         "dev": "nodemon src/index.js",
         "start": "functions-framework --target=processEvent",
-        "deploy": "gcloud functions deploy bqds --memory=2GB --timeout=120s --runtime nodejs8 --trigger-http --entry-point app",
+        "deploy": "gcloud functions deploy cds --memory=2GB --timeout=120s --runtime nodejs8 --trigger-http --entry-point app",
         "lint": "eslint src",
         "test": "mocha 'tests/*_tests.js' --exit"
     },
