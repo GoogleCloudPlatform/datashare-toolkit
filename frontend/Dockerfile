@@ -5,9 +5,10 @@
 ##  Email:  chrispage@google.com
 ##  Purpose:   This Dockerfile contains the cds-frontend-ui application
 ################################################################################
-## STAGE 1: Build stage
+
+## ---- Base Node ----
 # Using official node runtime base apline image
-FROM node:12.6-alpine as build-env
+FROM node:12.6-alpine as base
 
 # Set the file maintainer (your name - the file's author)
 MAINTAINER Chris Page <chrispage@google.com>
@@ -16,23 +17,26 @@ MAINTAINER Chris Page <chrispage@google.com>
 RUN mkdir -p /app
 WORKDIR /app
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json /app/
+## ---- Dependencies ----
+FROM base as dependencies
 
-# Install app dependencies
+COPY package*.json /app/
+# install app dependencies including 'devDependencies'
 RUN npm install
 
+## ---- Copy Files/Build ----
+FROM dependencies AS build
+WORKDIR /app
+
 # Bundle app source
-COPY . .
+COPY src src/
+COPY *.js ./
 RUN npm run build
 
-
-### STAGE 2: Production Environment
-FROM nginx:1.17-alpine
+# --- Release with Alpine ----
+FROM nginx:1.17-alpine as release
 COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/default.conf /etc/nginx/conf.d/default.conf
-COPY --from=build-env /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]

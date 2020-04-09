@@ -5,15 +5,17 @@ This documentation provides details for how to develop, build, and deploy new ve
   * [Setup Backend API](#setup_backend)
 * [Develop](#develop)
   * [Setup Node](#setup_node)
-* [Deploy to Firebase](#deploy)
-  * [Install Firebase CLI](#firebase_cli)
-  * [New Firebase Setup](#new_firebase)
-  * [Enable Authentication](#authentication)
-  * [Deployment](#deployment)
+* [Deployment](#deployment)
+  * [Deploy Prerequisites](#deploy_prereqs)
+    * [New Firebase Setup](#new_firebase)
+    * [Enable Authentication](#authentication)
+    * [Install Firebase CLI](#firebase_cli)
+  * [Deploy Cloud Run](#deploy_cloud_run)
+  * [Deploy Firebase](#deploy_firebase)
 
 
 ## <a name="prereqs">Prerequisites</a>
-These are the prerequisites for the BQDS Frontend UI Development
+These are the prerequisites for the CDS Frontend UI
 
 
 ### <a name="setup_backend">Setup Backend API</a>
@@ -51,19 +53,31 @@ Point your browser to http://localhost:8080 and update your CDS Frontend `API Ba
    http://localhost:8080
 
 
-## <a name="deploy">Deploy to Firebase</a>
-Once you've deployed the [CDS API](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/tree/master/api), you should only then proceed to setup the UI. We're providing documentation for doing this through Firebase, though you may use other hosting options.
+## <a name="deployment">Deployment</a>
+Once you've deployed the [CDS API](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/tree/master/api), you should only then proceed to setup the UI. You can deploy the Frontend content via various methods below based off developer preference and/or environment. These are the examples we provide, though you may use other hosting options:
 
-### <a name="firebase_cli">Install Firebase CLI</a>
-If you have not already installed the Firebase CLI, follow the instructions in the [Firebase CLI reference](https://firebase.google.com/docs/cli) document to do so.
+  * [Google Cloud Run](https://cloud.google.com/run/) via [gcloud](https://cloud.google.com/sdk/)
+  * [Firebase Hosting](https://firebase.google.com/docs/hosting) via [firebase cli](https://firebase.google.com/docs/cli)
 
-Ensure that your CLI is working by running the following command:
+[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the CDS Frontend content and generate a unique URL for consumption.
 
-```
-firebase projects:list
-```
+There are some Firebase configuration and environment variables that need to be set for all build and deployment options.
 
-### <a name="new_firebase">New Firebase Setup</a>
+### <a name="deploy_prereqs">Deploy Prerequisites</a>
+The CDS Frontend is currently configured for Firebase authentication. A new Firebase project and Firebase application credentials are required for deployment.
+
+There are some environment variables that need to be set for all build and deployment options.
+
+Export the GCP Project ID as *PROJECT_ID* environment variable:
+
+    export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
+
+Export the image/build *TAG* environment variable:
+
+    export TAG=dev;
+
+
+#### <a name="new_firebase">New Firebase Setup</a>
 If you already have Firebase setup for your existing GCP project, skip this step.
 
 1. Go to https://console.firebase.google.com/
@@ -100,7 +114,7 @@ The Firebase project will begin to provision, this should take less than a minut
 
 Copy the values for apiKey, authDomain, projectId, storageBucket, appId, and measurementId overwriting the existing values for each respective attribute within the /src/api/mock/data/settings.json configuration file.
 
-### <a name="authentication">Enable Athentication</a>
+#### <a name="authentication">Enable Athentication</a>
 1. Select "Authentication" on the left navigation menu for the Firebase console.
 
 <img src="assets/authentication_menu.png" alt="Authentication" height="150"/>
@@ -117,7 +131,40 @@ Copy the values for apiKey, authDomain, projectId, storageBucket, appId, and mea
 
 <img src="assets/setup_google_auth.png" alt="Setup Google Auth" height="150" />
 
-### <a name="deployment">Deployment</a>
+
+#### <a name="firebase_cli">Install Firebase CLI</a>
+If you have not already installed the Firebase CLI, follow the instructions in the [Firebase CLI reference](https://firebase.google.com/docs/cli) document to do so.
+
+Ensure that your CLI is working by running the following command:
+
+```
+firebase projects:list
+```
+
+### <a name="deploy_cloud_run">Deploy Cloud Run</a>
+Deploy with Cloud Run allows stateless HTTP containers on a fully managed environment or GKE cluster. [Cloud Build](https://cloud.google.com/run/docs/quickstarts/build-and-deploy#containerizing) packages the Docker image into your Google Container repository.
+_Cloud Run and Cloud Build APIs will need to be enabled in your GCP project._
+
+Build with Cloud Build and TAG:
+
+    gcloud builds submit --config cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
+
+Deploy with Cloud Run:
+_Note_ - There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--set-env-vars) provides details for how they are set.
+
+    gcloud run deploy cds-frontend-ui \
+      --image gcr.io/${PROJECT_ID}/cds-frontend-ui:${TAG} \
+      --region=us-central1 \
+      --allow-unauthenticated \
+      --platform managed \
+      --set-env-vars=FIREBASE_API_KEY=${FIREBASE_API_KEY}
+
+Open the app URL in your browser. You can return the FQDN via:
+
+    gcloud run services describe cds-frontend-ui --platform managed --format="value(status.url)"
+
+
+### <a name="deploy_firebase">Deploy Firebase</a>
 Navigate to the frontend directory and modify the .firebaserc file with the Firebase projectId and save changes.
 
 ```
@@ -143,7 +190,7 @@ Upon successful completion of the Firebase deployment you should see output as f
 ```
  DONE  Build complete. The dist directory is ready to be deployed.
  INFO  Check out deployment instructions at https://cli.vuejs.org/guide/deployment.html
-      
+
 
 === Deploying to 'cds-demo-3'...
 
