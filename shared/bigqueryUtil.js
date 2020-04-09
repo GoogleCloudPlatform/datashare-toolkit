@@ -580,11 +580,14 @@ class BigQueryUtil {
             if (insertErrors) {
                 logger.info(`insertErrors: ${JSON.stringify(insertErrors)}`);
                 // Some rows failed to insert, while others may have succeeded.
-                insertErrors.map((insertError) => {
-                    insertError.errors.map((error) => {
-                        logger.error(`PartialFailureError: BigQuery insert failed due to: ${JSON.stringify(error)}`);
+                const errorList = insertErrors.map((insertError) => {
+                    return insertError.errors.map((error) => {
+                        return `PartialFailureError: BigQuery insert failed due to: ${JSON.stringify(error)}`;
                     });
                 });
+                if (errorList.length > 0) {
+                    console.error(errorList.join(', '));
+                }
                 return false;
             }
             return true;
