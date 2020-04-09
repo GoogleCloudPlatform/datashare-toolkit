@@ -165,7 +165,7 @@ Deploy with Cloud Run allows stateless HTTP containers on a fully managed enviro
 _Cloud Run and Cloud Build APIs will need to be enabled in your GCP project._
 
 Build with Cloud Build and TAG:
-_Cloud Build needs to run from parent directory for build context_
+**Note**: Cloud Build needs to run from parent directory for build context and the [shared](../shared) directory
 
     cd ../../
     gcloud builds submit --config api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
