@@ -59,7 +59,7 @@ it("options are valid", async () => {
     const options = {
         eventId: 1,
         bucketName: bucketName,
-        fileName: "/bqds/dataset/table/data/myFile.txt"
+        fileName: "/cds/dataset/table/data/myFile.txt"
     };
     const v = await configManager.validateOptions(options, false);
     console.log(JSON.stringify(v));
@@ -71,7 +71,7 @@ it("options are invalid, dataset name not valid", async () => {
     const options = {
         eventId: 1,
         bucketName: bucketName,
-        fileName: "/bqds/data$set/table/data/myFile.txt"
+        fileName: "/cds/data$set/table/data/myFile.txt"
     };
     const v = await configManager.validateOptions(options, false);
     console.log(JSON.stringify(v));
@@ -83,7 +83,7 @@ it("options are invalid, config file placed in config path", async () => {
     const options = {
         eventId: 1,
         bucketName: bucketName,
-        fileName: "/bqds/dataset/table/config/schema.json"
+        fileName: "/cds/dataset/table/config/schema.json"
     };
     const v = await configManager.validateOptions(options, false);
     console.log(JSON.stringify(v));
@@ -95,7 +95,7 @@ it("options are invalid, config file placed in config path", async () => {
     const options = {
         eventId: 1,
         bucketName: bucketName,
-        fileName: "/bqds/dataset/table/config/schema.json"
+        fileName: "/cds/dataset/table/config/schema.json"
     };
     const v = await configManager.validateOptions(options, false);
     console.log(JSON.stringify(v));
@@ -106,7 +106,7 @@ it("options are invalid, dataset and table length too long", async () => {
     const options = {
         eventId: 1,
         bucketName: bucketName,
-        fileName: "/bqds/abcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabas/abcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabas/data/myFile.txt"
+        fileName: "/cds/abcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabas/abcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabcefgabas/data/myFile.txt"
     };
     const v = await configManager.validateOptions(options, false);
     console.log(JSON.stringify(v));
@@ -118,7 +118,7 @@ it("options are invalid, table name not valid", async () => {
     const options = {
         eventId: 1,
         bucketName: bucketName,
-        fileName: "/bqds/dataset/tab%le/data/myFile.txt"
+        fileName: "/cds/dataset/tab%le/data/myFile.txt"
     };
     const v = await configManager.validateOptions(options, false);
     console.log(JSON.stringify(v));
@@ -130,7 +130,7 @@ it("options are valid with archived file", async () => {
     const options = {
         eventId: 1,
         bucketName: bucketName,
-        fileName: "/bqds/dataset/table/data/archive/myFile.csv"
+        fileName: "/cds/dataset/table/data/archive/myFile.csv"
     };
     const v = await configManager.validateOptions(options, false);
     expect(v.isArchiveFile).is.true;
@@ -141,7 +141,7 @@ it("options are invalid with bad path", async () => {
     const options = {
         eventId: 1,
         bucketName: bucketName,
-        fileName: "/bqds/bqds/table/data/myFile.txt"
+        fileName: "/cds/cds/table/data/myFile.txt"
     };
     const result = await configManager.validateOptions(options, false);
     console.log(`Test result ${JSON.stringify(result)}`);
@@ -162,7 +162,7 @@ it("options file is a path directory", async () => {
     const options = {
         eventId: 1,
         bucketName: bucketName,
-        fileName: "/bqds/bqds/table/data/"
+        fileName: "/cds/cds/table/data/"
     };
     const result = await configManager.validateOptions(options, false);
     expect(result.isDirectoryPath).is.true;
@@ -170,7 +170,7 @@ it("options file is a path directory", async () => {
 });
 
 if (argv.runCloudTests) {
-    let configFileName = `bqds/${uuid}/table/config/schema.json`;
+    let configFileName = `cds/${uuid}/table/config/schema.json`;
 
     it("create schema.json configuration file", async () => {
         const config = {
@@ -200,15 +200,15 @@ if (argv.runCloudTests) {
         const options = {
             eventId: 1,
             bucketName: bucketName,
-            fileName: `bqds/${uuid}/table/data/myFile.${uuid}.txt`
+            fileName: `cds/${uuid}/table/data/myFile.${uuid}.txt`
         };
         const config = await configManager.getConfiguration(options);
         const expected = {
             bucket: bucketName,
             bucketPath: {
-                archive: `bqds/${uuid}/table/data/archive/myFile.${uuid}.txt`,
+                archive: `cds/${uuid}/table/data/archive/myFile.${uuid}.txt`,
                 schema: configFileName,
-                transform: `bqds/${uuid}/table/config/transform.sql`
+                transform: `cds/${uuid}/table/config/transform.sql`
             },
             datasetId: uuid,
             destinationTableId: "table",
@@ -231,7 +231,7 @@ if (argv.runCloudTests) {
                 skipLeadingRows: 1,
                 sourceFormat: "CSV"
             },
-            sourceFile: `bqds/${uuid}/table/data/myFile.${uuid}.txt`,
+            sourceFile: `cds/${uuid}/table/data/myFile.${uuid}.txt`,
             stagingTable: `TMP_table_1`,
             truncate: true
         };

@@ -42,7 +42,7 @@ In many of today's typical scenarios, for each published dataset, a consumer mus
 
 - _Make it easy for data publishers to grant permissioned access for existing GCP consumers of their datasets_
 
-Commercial data publishing models rely on entitlements to grant access permission to licensed consuners. For large data publishers, their electronic entitlements solution may be entirely bespoke. BQDS provides a simple solution for controlling access to data by using GCP's native access control mechanism combined with BigQuery authorized views and Publisher-defined groupings.
+Commercial data publishing models rely on entitlements to grant access permission to licensed consuners. For large data publishers, their electronic entitlements solution may be entirely bespoke. CDS provides a simple solution for controlling access to data by using GCP's native access control mechanism combined with BigQuery authorized views and Publisher-defined groupings.
 
 - _Favor instrumenting the solution's configuration via convention_
 

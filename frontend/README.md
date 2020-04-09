@@ -13,7 +13,7 @@ This documentation provides details for how to develop, build, and deploy new ve
 
 
 ## <a name="prereqs">Prerequisites</a>
-These are the prerequisites for the BQDS Frontend UI Development
+These are the prerequisites for the CDS Frontend UI Development
 
 
 ### <a name="setup_backend">Setup Backend API</a>
@@ -36,7 +36,7 @@ Project setup:
 
     npm install
 
-You can choose to use mock API data or point to a BQDS Admin REST API endpoint in the applicaiton settings page. The *VUE_APP_APICLIENT* environment variable will dynamically load between the two options.
+You can choose to use mock API data or point to a CDS Admin REST API endpoint in the applicaiton settings page. The *VUE_APP_APICLIENT* environment variable will dynamically load between the two options.
 
 Using API client data that is mocked:
 

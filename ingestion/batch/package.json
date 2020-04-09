@@ -1,7 +1,7 @@
 {
   "name": "processUpload",
   "version": "0.0.1",
-  "description": "BQDS processUpload ingestion function",
+  "description": "CDS processUpload ingestion function",
   "license": "Apache-2.0",
   "repository": {},
   "dependencies": {
