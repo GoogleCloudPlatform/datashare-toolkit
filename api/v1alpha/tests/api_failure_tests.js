@@ -19,7 +19,7 @@ var chai = require('chai');
 var request = require('supertest');
 
 const apiVersion = 'v1alpha';
-const bucketId = 'chrispage-dev-bqds-test';
+const bucketId = 'chrispage-dev-cds-test';
 var expect = chai.expect;
 
 describe('API Failure Tests (/' + apiVersion + ')', function() {

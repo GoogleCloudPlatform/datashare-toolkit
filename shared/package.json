@@ -1,7 +1,7 @@
 {
   "name": "cds-shared",
   "version": "1.0.0",
-  "description": "BQDS shared library",
+  "description": "CDS shared library",
   "license": "Apache-2.0",
   "repository": {},
   "main": "index.js",

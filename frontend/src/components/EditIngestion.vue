@@ -204,7 +204,7 @@ export default {
       this.$store
         .dispatch('getDatasets', {
           projectId: this.$store.state.settings.projectId,
-          labelKey: 'bqds_ingestion_managed'
+          labelKey: 'cds_ingestion_managed'
         })
         .then(datasets => {
           this.datasets = datasets;
@@ -218,7 +218,7 @@ export default {
         .dispatch('getTables', {
           projectId: this.$store.state.settings.projectId,
           datasetId: this.config.datasetId,
-          labelKey: 'bqds_ingestion_managed'
+          labelKey: 'cds_ingestion_managed'
         })
         .then(tables => {
           this.tables = tables;

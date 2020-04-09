@@ -1,16 +1,16 @@
-[Back to BQDS](../../README.md)
+[Back to CDS](../../README.md)
 
 # Example scenario using weather observation data
 
 ## Overview
-For this BQDS example, we configure and load weather observation
+For this CDS example, we configure and load weather observation
 data. While the raw data used in this scenario contains many columns,
 we are going to restrict the transformed data to only three columns: a
 timestamp, the measurement's coordinates as a `GEOGRAPHY` type (manufactured by calling the
 [ST_GeogPoint](https://cloud.google.com/bigquery/docs/reference/standard-sql/geography_functions#st_geogpoint)
 function), and the mean temperature that comprises the observation. The
 destination table will also contain the `cds_batch_id` column, that
-is added automatically by `BQDS`, so that you may
+is added automatically by `CDS`, so that you may
 associate the table data with its specific ingestion cycle.
 
 ## Quick start
@@ -26,8 +26,8 @@ npm run deploy -- --trigger-bucket=gs://${BUCKET}
 cd ../../examples/weather/config/ingestion
 
 # deploy configuration files for source data
-gsutil cp observation.schema.json gs://${BUCKET}/bqds/
-gsutil cp observation.transform.sql gs://${BUCKET}/bqds/
+gsutil cp observation.schema.json gs://${BUCKET}/cds/
+gsutil cp observation.transform.sql gs://${BUCKET}/cds/
 cd ../../data
 
 # copy source data to bucket
@@ -82,8 +82,8 @@ Copying file://weather.observation.csv.gz [Content-Type=text/csv]...
 Operation completed over 1 objects/353.9 KiB.                                    
 [{"entry_count":"100"}]
 Removing gs://8579a775c4e8a114b13b94fdd07677c0/weather.observation.csv.gz#1572590184078408...
-Removing gs://8579a775c4e8a114b13b94fdd07677c0/bqds/observation.schema.json#1572590178619078...
-Removing gs://8579a775c4e8a114b13b94fdd07677c0/bqds/observation.transform.sql#1572590181630862...
+Removing gs://8579a775c4e8a114b13b94fdd07677c0/cds/observation.schema.json#1572590178619078...
+Removing gs://8579a775c4e8a114b13b94fdd07677c0/cds/observation.transform.sql#1572590181630862...
 / [3 objects]                                                                   
 Operation completed over 3 objects.                                              
 Removing gs://8579a775c4e8a114b13b94fdd07677c0/...
@@ -118,7 +118,7 @@ The `transform.sql` is:
   HLY_TEMP_NORMAL AS `mean_temperature`
 ```
 
-(`BQDS` adds the `SELECT` and `FROM` clauses dynamically at runtime,
+(`CDS` adds the `SELECT` and `FROM` clauses dynamically at runtime,
 so they are always omitted from the contents of `transform.sql`.)
 
 Since the date is already provided in a format BigQuery

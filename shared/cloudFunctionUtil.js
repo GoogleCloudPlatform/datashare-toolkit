@@ -24,7 +24,7 @@ class CloudFunctionUtil {
     /**
      * @param  {} event
      * @param  {} context
-     * Generates the BQDS batch Id.
+     * Generates the CDS batch Id.
      */
     generateBatchId(eventId, bucketName, fileName) {
         return [
