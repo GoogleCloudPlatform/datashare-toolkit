@@ -17,7 +17,7 @@
 'use strict';
 
 const { BigQueryUtil } = require('cds-shared');
-
+const underscore = require("underscore");
 const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');
 
@@ -65,18 +65,28 @@ async function syncResources(projectId, type) {
             views = true;
         }
 
+        const labelKey = cfg.cdsManagedLabelKey;
         if (permissions) {
             console.log('Syncing permissions');
-            const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, 'cds_managed');
+            const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
             const datasetIds = datasets.map(d => d.datasetId);
             console.log(`Performing policy sync for datasets: ${JSON.stringify(datasetIds)})`);
             await metaManager.performMetadataUpdate(projectId, null, datasetIds);
         }
         if (views) {
-            console.log('Syncing views not yet implemented');
-            // Iterate all datasets with the 'cds_managed' label.
-            //      Iterate all objects of type view with the 'cds_managed' label and delete them.
-            //      Create new view objects
+            const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
+            const datasetIds = datasets.map(d => d.datasetId);
+            for (const datasetId of datasetIds) {
+                const tables = await bigqueryUtil.getTablesByLabel(projectId, datasetId, labelKey);
+                if (tables.length > 0) {
+                    const views = underscore.where(tables, { type: 'VIEW' });
+                    if (views.length > 0) {
+                        console.log(`Dataset: ${datasetId} - Views: ${JSON.stringify(views, null, 3)}`);
+                        // Delete object
+                        // Create new object
+                    }
+                }
+            }
         }
     } catch (err) {
         return { success: false, code: 500, errors: [err.message] };
