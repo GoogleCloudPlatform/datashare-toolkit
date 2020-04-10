@@ -259,11 +259,16 @@ async function listTableColumns(projectId, datasetId, tableId) {
 /**
  * @param  {} projectId
  * @param  {} datasetId
+ * @param  {} includeAllFields
  */
-async function listDatasetViews(projectId, datasetId) {
+async function listDatasetViews(projectId, datasetId, includeAllFields) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
     let fields = new Set(cfg.cdsAuthorizedViewViewFields);
-    let remove = ['source', 'expiration', 'custom', 'viewSql', 'isDeleted'];
+    let remove = [];
+    if (!includeAllFields) {
+        remove.push('source', 'expiration', 'custom', 'viewSql', 'isDeleted');
+    }
+    console.log(remove);
     remove.forEach(f => fields.delete(f));
     fields = Array.from(fields).map(i => 'v.' + i).join();
     let sqlQuery = `SELECT ${fields}

@@ -74,6 +74,9 @@ async function syncResources(projectId, type) {
         }
         if (views) {
             console.log('Syncing views not yet implemented');
+            // Iterate all datasets with the 'cds_managed' label.
+            //      Iterate all objects of type view with the 'cds_managed' label and delete them.
+            //      Create new view objects
         }
     } catch (err) {
         return { success: false, code: 500, errors: [err.message] };
