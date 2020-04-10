@@ -114,7 +114,7 @@ The Firebase project will begin to provision, this should take less than a minut
 
 Copy the values for apiKey, authDomain, projectId, storageBucket, appId, and measurementId overwriting the existing values for each respective attribute within the /src/api/mock/data/settings.json configuration file.
 
-#### <a name="authentication">Enable Athentication</a>
+#### <a name="authentication">Enable Authentication</a>
 1. Select "Authentication" on the left navigation menu for the Firebase console.
 
 <img src="assets/authentication_menu.png" alt="Authentication" height="150"/>
