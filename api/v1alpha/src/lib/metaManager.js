@@ -92,7 +92,7 @@ async function createView(view, overrideSql) {
 
         let viewCreated = createViewResult && createViewResult.success;
         console.log("Authorizing view objects for access from other datasets");
-        if (view.hasOwnProperty('source')) {
+        if (view.hasOwnProperty('source') && view.source !== null) {
             let source = view.source;
             if (source.datasetId !== view.datasetId) {
                 // Need to authorize the view from the source tables
@@ -102,7 +102,7 @@ async function createView(view, overrideSql) {
                 await bigqueryUtil.shareAuthorizeView(cfg.cdsDatasetId, view.projectId, view.datasetId, view.name, viewCreated);
             }
         }
-        else if(view.hasOwnProperty('custom')) {
+        else if(view.hasOwnProperty('custom') && view.custom !== null) {
             // Custom sql
             let custom = view.custom;
             if (custom.authorizeFromDatasetIds && custom.authorizeFromDatasetIds.length > 0) {
@@ -115,7 +115,7 @@ async function createView(view, overrideSql) {
         return { success: true, data: {} };
     }
     catch (err) {
-        console.error(`Failed to create view: ${JSON.stringify(view)} - ${JSON.stringify(err.message)}`);
+        console.error(`Failed to create view: ${JSON.stringify(view)} - ${JSON.stringify(err)}`);
         return { success: false, code: 500, errors: [err.message] };
     }
 }

@@ -264,19 +264,18 @@ async function listTableColumns(projectId, datasetId, tableId) {
 async function listDatasetViews(projectId, datasetId, includeAllFields) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
     let fields = new Set(cfg.cdsAuthorizedViewViewFields);
-    let remove = [];
     if (!includeAllFields) {
+        let remove = [];
         remove.push('source', 'expiration', 'custom', 'viewSql', 'isDeleted');
+        remove.forEach(f => fields.delete(f));
     }
-    console.log(remove);
-    remove.forEach(f => fields.delete(f));
     fields = Array.from(fields).map(i => 'v.' + i).join();
     let sqlQuery = `SELECT ${fields}
       FROM \`${table}\` v
-      WHERE isDeleted is false`;
+      WHERE isDeleted IS false`;
 
     if (datasetId) {
-        sqlQuery += '\nand datasetId = @datasetId'
+        sqlQuery += '\nAND datasetId = @datasetId'
     }
 
     let options = {

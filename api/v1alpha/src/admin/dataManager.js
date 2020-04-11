@@ -20,6 +20,7 @@ const { BigQueryUtil } = require('cds-shared');
 const underscore = require("underscore");
 const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');
+const datasetManager = require('../datasets/dataManager');
 
 /**
  * @param  {string} projectId
@@ -44,7 +45,8 @@ async function initializeSchema(projectId) {
 }
 
 /**
- * @param  {} projectId
+ * @param  {string} projectId
+ * @param  {string} type
  */
 async function syncResources(projectId, type) {
     const bigqueryUtil = new BigQueryUtil(projectId);
@@ -75,16 +77,33 @@ async function syncResources(projectId, type) {
         }
         if (views) {
             const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
-            const datasetIds = datasets.map(d => d.datasetId);
-            for (const datasetId of datasetIds) {
-                const tables = await bigqueryUtil.getTablesByLabel(projectId, datasetId, labelKey);
+            for (const dataset of datasets) {
+                const tables = await bigqueryUtil.getTablesByLabel(projectId, dataset.datasetId, labelKey);
                 if (tables.length > 0) {
                     const views = underscore.where(tables, { type: 'VIEW' });
                     if (views.length > 0) {
-                        console.log(`Dataset: ${datasetId} - Views: ${JSON.stringify(views, null, 3)}`);
-                        // Delete object
-                        // Create new object
+                        for (const view of views) {
+                            console.log(`Deleting view: ${view.datasetId}.${view.tableId}`);
+                            await bigqueryUtil.deleteTable(view.datasetId, view.tableId);
+                        }
                     }
+                }
+            }
+
+            // Get all views and create them from viewSql field
+            const viewResult = await datasetManager.listDatasetViews(projectId, null, true);
+            if (viewResult.success) {
+                const viewList = viewResult.data;
+                for (const view of viewList) {
+                    let viewClone = JSON.parse(JSON.stringify(view));
+                    const sql = viewClone.viewSql;
+                    console.log(`Creating view ${viewClone.datasetId}.${viewClone.name}`);
+                    viewClone.projectId = projectId;
+                    if (view.expiration.time) {
+                        viewClone.expiration.time = new Date(view.expiration.time);
+                    }
+                    // console.log(viewClone);
+                    await metaManager.createView(viewClone, sql);
                 }
             }
         }
