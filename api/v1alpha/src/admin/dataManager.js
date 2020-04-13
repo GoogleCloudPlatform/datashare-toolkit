@@ -105,7 +105,7 @@ async function syncResources(projectId, type) {
                         viewClone.expiration.time = new Date(view.expiration.time);
                     }
                     // console.log(viewClone);
-                    await metaManager.createView(viewClone, sql);
+                    await datasetManager.createView(viewClone, sql);
                 }
             }
         }
