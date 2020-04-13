@@ -17,9 +17,10 @@
 'use strict';
 
 const { BigQueryUtil } = require('cds-shared');
-
+const underscore = require("underscore");
 const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');
+const datasetManager = require('../datasets/dataManager');
 
 /**
  * @param  {string} projectId
@@ -44,7 +45,8 @@ async function initializeSchema(projectId) {
 }
 
 /**
- * @param  {} projectId
+ * @param  {string} projectId
+ * @param  {string} type
  */
 async function syncResources(projectId, type) {
     const bigqueryUtil = new BigQueryUtil(projectId);
@@ -65,15 +67,53 @@ async function syncResources(projectId, type) {
             views = true;
         }
 
+        const labelKey = cfg.cdsManagedLabelKey;
         if (permissions) {
             console.log('Syncing permissions');
-            const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, 'cds_managed');
+            const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
             const datasetIds = datasets.map(d => d.datasetId);
             console.log(`Performing policy sync for datasets: ${JSON.stringify(datasetIds)})`);
             await metaManager.performMetadataUpdate(projectId, null, datasetIds);
         }
         if (views) {
-            console.log('Syncing views not yet implemented');
+            // Get list of configured views
+            const viewResult = await datasetManager.listDatasetViews(projectId, null, true);
+            if (viewResult.success) {
+                const viewList = viewResult.data;
+                const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
+
+                for (const dataset of datasets) {
+                    const tables = await bigqueryUtil.getTablesByLabel(projectId, dataset.datasetId, labelKey);
+                    if (tables.length > 0) {
+                        const views = underscore.where(tables, { type: 'VIEW' });
+                        if (views.length > 0) {
+                            for (const view of views) {
+                                // Only delete the view if it no longer is configured
+                                const found = underscore.findWhere(viewResult.data, { datasetId: view.datasetId, name: view.tableId });
+                                if (!found) {
+                                    console.log(`Deleting view: ${view.datasetId}.${view.tableId}`);
+                                    await bigqueryUtil.deleteTable(view.datasetId, view.tableId);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Iterate all views and create/modify them.
+                for (const view of viewList) {
+                    let viewClone = JSON.parse(JSON.stringify(view));
+                    const sql = viewClone.viewSql;
+                    console.log(`Creating view ${viewClone.datasetId}.${viewClone.name}`);
+                    viewClone.projectId = projectId;
+                    if (view.expiration.time) {
+                        // This logic should probably be re-factored to a shared place maybe in createView using a type check
+                        // See datasets dataManager as the logic should be re-factored out of there from createOrUpdateDatasetView.
+                        viewClone.expiration.time = new Date(view.expiration.time);
+                    }
+                    // console.log(viewClone);
+                    await datasetManager.createView(viewClone, sql);
+                }
+            }
         }
     } catch (err) {
         return { success: false, code: 500, errors: [err.message] };

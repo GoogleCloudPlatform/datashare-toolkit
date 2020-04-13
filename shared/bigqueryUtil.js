@@ -633,7 +633,6 @@ class BigQueryUtil {
             filter: labelFilter
         };
         const [datasets] = await this.bigqueryClient.getDatasets(options);
-        // console.log(`Datasets: ${JSON.stringify(datasets, null, 3)}`);
         datasets.forEach(dataset => console.log(dataset.id));
         return datasets.map(d => d.id);
     }
@@ -704,7 +703,6 @@ class BigQueryUtil {
                 params: { keyName: labelKey },
             };
 
-            // console.log(`Query: ${sqlQuery}`);
             const [rows] = await this.bigqueryClient.query(options);
             return rows;
         }
@@ -725,13 +723,13 @@ class BigQueryUtil {
                     for (const table of tables) {
                         const labels = await this.getTableLabels(datasetId, table.id);
                         if (underscore.has(labels, labelKey)) {
-                            list.push({ datasetId: table.dataset.id, tableId: table.id });
+                            list.push({ datasetId: table.dataset.id, tableId: table.id, type: table.metadata.type });
                         }
                     }
                 }
                 else {
                     tables.forEach(table => {
-                        list.push({ datasetId: table.dataset.id, tableId: table.id });
+                        list.push({ datasetId: table.dataset.id, tableId: table.id, type: table.metadata.type });
                     });
                 }
             }
@@ -742,12 +740,11 @@ class BigQueryUtil {
                     for (const table of tables) {
                         const labels = await this.getTableLabels(dataset.id, table.id);
                         if (underscore.has(labels, labelKey)) {
-                            list.push({ datasetId: table.dataset.id, tableId: table.id });
+                            list.push({ datasetId: table.dataset.id, tableId: table.id, type: table.metadata.type });
                         }
                     }
                 }
             }
-            console.log(`List is: ${JSON.stringify(list)}`);
             return list;
         }
         else {
@@ -790,7 +787,6 @@ class BigQueryUtil {
                 params: { keyName: labelKey },
             };
 
-            // console.log(`Query: ${sqlQuery}`);
             const [rows] = await this.bigqueryClient.query(options);
             return rows;
         }
@@ -838,13 +834,11 @@ class BigQueryUtil {
                 if (keys.length === 2) {
                     const accessType = keys[1];
                     const accessId = a[accessType];
-                    // console.log(`Role: ${a.role} AccessType: ${accessType} AccessId: ${accessId}`);
                     list.push({ datasetId: dataset.id, accessType: accessType, accessId: accessId, role: a.role });
                 }
             });
         }
         else {
-            // const [datasets] = await this.bigqueryClient.getDatasets();
             const datasets = await this.getDatasetsByLabel(projectId, labelKey);
             for (const dataset of datasets) {
                 const access = await this.getDatasetAccess(projectId, dataset.datasetId);
@@ -854,13 +848,11 @@ class BigQueryUtil {
                     if (keys.length === 2) {
                         const accessType = keys[1];
                         const accessId = a[accessType];
-                        // console.log(`Role: ${a.role} AccessType: ${accessType} AccessId: ${accessId}`);
                         list.push({ datasetId: dataset.datasetId, accessType: accessType, accessId: accessId, role: a.role });
                     }
                 });
             }
         }
-        // console.log(`List is: ${JSON.stringify(list)}`);
         return list;
     }
 
