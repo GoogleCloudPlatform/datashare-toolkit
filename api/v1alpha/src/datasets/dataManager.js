@@ -614,5 +614,6 @@ module.exports = {
     getDatasetView,
     validateDatasetView,
     createOrUpdateDatasetView,
-    deleteDatasetView
+    deleteDatasetView,
+    createView
 };

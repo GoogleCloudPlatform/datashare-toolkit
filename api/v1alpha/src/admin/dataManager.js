@@ -76,24 +76,30 @@ async function syncResources(projectId, type) {
             await metaManager.performMetadataUpdate(projectId, null, datasetIds);
         }
         if (views) {
-            const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
-            for (const dataset of datasets) {
-                const tables = await bigqueryUtil.getTablesByLabel(projectId, dataset.datasetId, labelKey);
-                if (tables.length > 0) {
-                    const views = underscore.where(tables, { type: 'VIEW' });
-                    if (views.length > 0) {
-                        for (const view of views) {
-                            console.log(`Deleting view: ${view.datasetId}.${view.tableId}`);
-                            await bigqueryUtil.deleteTable(view.datasetId, view.tableId);
-                        }
-                    }
-                }
-            }
-
-            // Get all views and create them from viewSql field
+            // Get list of configured views
             const viewResult = await datasetManager.listDatasetViews(projectId, null, true);
             if (viewResult.success) {
                 const viewList = viewResult.data;
+                const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
+
+                for (const dataset of datasets) {
+                    const tables = await bigqueryUtil.getTablesByLabel(projectId, dataset.datasetId, labelKey);
+                    if (tables.length > 0) {
+                        const views = underscore.where(tables, { type: 'VIEW' });
+                        if (views.length > 0) {
+                            for (const view of views) {
+                                // Only delete the view if it no longer is configured
+                                const found = underscore.findWhere(viewResult.data, { datasetId: view.datasetId, name: view.tableId });
+                                if (!found) {
+                                    console.log(`Deleting view: ${view.datasetId}.${view.tableId}`);
+                                    await bigqueryUtil.deleteTable(view.datasetId, view.tableId);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Iterate all views and create/modify them.
                 for (const view of viewList) {
                     let viewClone = JSON.parse(JSON.stringify(view));
                     const sql = viewClone.viewSql;
