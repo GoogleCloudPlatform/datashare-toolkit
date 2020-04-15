@@ -547,7 +547,7 @@ async function createView(view, overrideSql) {
                 // Need to authorize the view from the source tables
                 await bigqueryUtil.shareAuthorizeView(source.datasetId, view.projectId, view.datasetId, view.name, viewCreated);
             }
-            if (source.accessControl && source.accessControl.enabled === true && cfg.cdsDatasetId !== view.datasetId) {
+            if (view.accessControl && view.accessControl.enabled === true && cfg.cdsDatasetId !== view.datasetId) {
                 await bigqueryUtil.shareAuthorizeView(cfg.cdsDatasetId, view.projectId, view.datasetId, view.name, viewCreated);
             }
         }
