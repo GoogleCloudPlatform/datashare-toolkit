@@ -25,6 +25,7 @@ const stagingTableExpiryDays = 2;
 const processPrefix = "cds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
 const labelName = "cds_managed";
+const queryResultTimeoutMs = 540000;
 let batchId;
 const archiveEnabled = process.env.ARCHIVE_FILES ? (process.env.ARCHIVE_FILES.toLowerCase() === "true") : false;
 
@@ -137,14 +138,16 @@ async function transform(config) {
     if (transformExists === true) {
         transformQuery = await storageUtil.fetchFileContent(config.bucket, config.bucketPath.transform);
     }
-    
+
     const query = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.datasetId}.${config.stagingTable}\``;
     console.log(`Executing transform query: ${query}`);
     const [job] = await createTransformJob(config, query);
-    await job.getQueryResults({ maxApiCalls: 1, maxResults: 0 });
+    await job.getQueryResults({ maxApiCalls: 1, maxResults: 0, timeoutMs: queryResultTimeoutMs });
 
+    console.log('Setting table label');
     // Label the table for managing and tracking
     await bigqueryUtil.setTableLabel(config.datasetId, config.destinationTableId, labelName, "true");
+    console.log('Setting table label done');
 
     console.log(`Transform job: ${job.metadata.id} ${job.metadata.statistics.query.statementType} ${job.metadata.configuration.jobType} ${job.metadata.status.state}`);
     return;
