@@ -46,7 +46,6 @@ class StorageUtil {
         const file = bucket.file(fileName);
         await file.save(contents, options).catch((err) => {
             console.warn(err.message);
-            console.warn(JSON.stringify(err));
             throw err;
         });
         if (this.VERBOSE_MODE) {
