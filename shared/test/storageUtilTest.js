@@ -111,7 +111,7 @@ describe('StorageUtil', () => {
 
             const jsonString = JSON.stringify({ foo: 'bar' });
             const buf = Buffer.from(jsonString);
-            const options = { gzip: true, private: true };
+            const options = { gzip: true };
 
             context('checkIfFileExists with arguments', () => {
                 it("should return true", async () => {
