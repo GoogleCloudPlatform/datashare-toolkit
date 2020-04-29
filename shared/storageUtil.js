@@ -80,12 +80,13 @@ class StorageUtil {
 
     /*
      * @param  {string} bucketName
+     * @param  {object} metadata
      * Creates a Cloud Storage bucket and returns true.
      */
-    async createBucket(bucketName) {
-        await this.storage.createBucket(bucketName);
+    async createBucket(bucketName, metadata) {
+        await this.storage.createBucket(bucketName, metadata);
         if (this.VERBOSE_MODE) {
-            console.log(`Storage bucket '${bucketName}' created.`);
+            console.log(`Storage bucket '${bucketName}' created with metadata: ${JSON.stringify(metadata)}.`);
         }
         return true;
     }
