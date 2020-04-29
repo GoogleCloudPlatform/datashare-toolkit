@@ -27,14 +27,6 @@ chai.use(chaiAsPromised);
 const StorageUtil = require("../storageUtil");
 const storageUtil = new StorageUtil(argv.projectId, process.env.GOOGLE_APPLICATION_CREDENTIALS);
 
-const bucketMetadata = {
-    iamConfiguration: {
-        uniformBucketLevelAccess: {
-            enabled: false,
-        },
-    },
-};
-
 describe('StorageUtil', () => {
 
     if (argv.runCloudTests) {
@@ -45,7 +37,7 @@ describe('StorageUtil', () => {
         context('createBucket with arguments', () => {
             it("should return true", async () => {
                 let uuid = uuidv4();
-                await storageUtil.createBucket(uuid, bucketMetadata).then((result) => {
+                await storageUtil.createBucket(uuid).then((result) => {
                     expect(result).to.be.a('boolean');
                     expect(result).to.equal(true);
                 }).then(() => {
@@ -67,7 +59,7 @@ describe('StorageUtil', () => {
         describe('Bucket created/deleted in pre/post setup', () => {
 
             before(async () => {
-                await storageUtil.createBucket(uuid, bucketMetadata);
+                await storageUtil.createBucket(uuid);
             });
             after(async () => {
                 await storageUtil.deleteBucket(uuid);
@@ -75,7 +67,7 @@ describe('StorageUtil', () => {
 
             const jsonString = JSON.stringify({ foo: 'bar' });
             const buf = Buffer.from(jsonString);
-            const options = { gzip: true, private: true };
+            const options = { gzip: true };
 
             context('checkIfBucketExists with arguments', () => {
                 it("should return true", async () => {
