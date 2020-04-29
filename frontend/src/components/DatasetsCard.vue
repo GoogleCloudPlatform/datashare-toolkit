@@ -308,10 +308,10 @@ export default {
                 })
                 .then(result => {
                   this.loading = false;
-                  if (result.error) {
+                  if (!result.success) {
                     this.showError = true;
                     this.errorDialogTitle = 'Error creating dataset';
-                    this.errorDialogText = result.error;
+                    this.errorDialogText = result.errors.join(', ');
                   } else {
                     this.showCreateDataset = false;
                     this.loadDatasets();
