@@ -73,14 +73,6 @@ const routerOptions = [
     }
   },
   {
-    path: '/editAccountOld',
-    name: 'editAccountOld',
-    component: 'EditAccountOld',
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
     path: '/policies',
     name: 'policies',
     component: 'Policies',
@@ -92,6 +84,14 @@ const routerOptions = [
     path: '/editPolicy',
     name: 'editPolicy',
     component: 'EditPolicy',
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/approvals',
+    name: 'approvals',
+    component: 'Approvals',
     meta: {
       requiresAuth: true
     }
