@@ -130,7 +130,8 @@ import {
   mdiPoliceBadge,
   mdiAccount,
   mdiShieldKey,
-  mdiAccountMultipleCheck
+  mdiAccountMultipleCheck,
+  mdiShopping
 } from '@mdi/js';
 
 const firebase = require('firebase');
@@ -257,9 +258,9 @@ export default {
         },
         {
           section: 'Marketplace',
-          name: 'approvals',
-          title: 'Approvals',
-          icon: mdiAccountMultipleCheck
+          name: 'procurements',
+          title: 'Procurement Requests',
+          icon: mdiShopping
         },
         {
           section: 'Ingestion',

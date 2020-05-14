@@ -89,9 +89,9 @@ const routerOptions = [
     }
   },
   {
-    path: '/approvals',
-    name: 'approvals',
-    component: 'Approvals',
+    path: '/procurements',
+    name: 'procurements',
+    component: 'Procurements',
     meta: {
       requiresAuth: true
     }
