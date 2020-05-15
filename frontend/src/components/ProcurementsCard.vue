@@ -74,12 +74,13 @@
         v-if="showReviewProcurement"
         v-model="showReviewProcurement"
         persistent
-        max-width="390"
+        max-width="450"
       >
         <v-card>
           <v-card-title class="headline"
             >Review Procurement Request</v-card-title
           >
+          <v-card-text v-html="selectedItemSummary"></v-card-text>
           <ValidationObserver ref="observer" v-slot="{}">
             <v-form class="px-4">
               <v-radio-group
@@ -194,6 +195,13 @@ export default {
   created() {
     this.loadProcurementRequests();
   },
+  computed: {
+    selectedItemSummary() {
+      return `<b>Solution Id</b>: ${this.selectedItem.solutionId}<br/>
+      <b>Requestor Account Id</b>: ${this.selectedItem.requestorAccountId}<br/>
+      <b>Requested At</b>: ${this.toLocalTime(this.selectedItem.createdAt)}`;
+    }
+  },
   methods: {
     resetApprovalDialogData() {
       this.approvalDialogData = {
@@ -203,12 +211,14 @@ export default {
       };
     },
     presentApprovalDialog(selectedItem, approvalStatus) {
+      this.selectedItem = selectedItem;
       this.resetApprovalDialogData();
       this.approvalDialogData.approvalStatus = approvalStatus;
       this.showReviewProcurement = true;
     },
     closeApprovalDialog() {
       this.showReviewProcurement = false;
+      this.selectedItem = null;
       this.resetApprovalDialogData();
     },
     saveDataset() {
