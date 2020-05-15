@@ -32,15 +32,33 @@
       </template>
       <template v-slot:item.createdAt="{ item }">
         {{ toLocalTime(item.createdAt) }} </template
-      ><template v-slot:item.approveAction="{ item }">
-        <v-icon class="mr-2" @click="approveItem(item)">
-          {{ icons.check }}
-        </v-icon>
-      </template>
-      <template v-slot:item.rejectAction="{ item }">
-        <v-icon class="mr-2" @click="rejectItem(item)">
-          {{ icons.cancel }}
-        </v-icon>
+      ><template v-slot:item.action="{ item }">
+        <v-tooltip v-model="showTooltip" top>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              v-on="on"
+              class="mr-2"
+              color="red"
+              @click="rejectItem(item)"
+            >
+              {{ icons.cancel }}
+            </v-icon>
+          </template>
+          <span>Reject</span>
+        </v-tooltip>
+        <v-tooltip v-model="show" top>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              v-on="on"
+              class="mr-2"
+              color="green"
+              @click="approveItem(item)"
+            >
+              {{ icons.check }}
+            </v-icon>
+          </template>
+          <span>Approve</span>
+        </v-tooltip>
       </template>
     </v-data-table>
     <Dialog
@@ -105,7 +123,7 @@
             <v-btn
               color="blue darken-1"
               text
-              @click.stop="this.closeApprovalDialog()"
+              @click.stop="closeApprovalDialog()"
               >Cancel</v-btn
             >
             <v-btn color="green darken-1" text @click.stop="saveDataset"
@@ -170,8 +188,7 @@ export default {
       { text: 'Solution Id', value: 'solutionId' },
       { text: 'Requestor Account Id', value: 'requestorAccountId' },
       { text: 'Requested At', value: 'createdAt' },
-      { text: '', value: 'rejectAction', sortable: false },
-      { text: '', value: 'approveAction', sortable: false }
+      { text: '', value: 'action', sortable: false }
     ]
   }),
   created() {
@@ -199,8 +216,9 @@ export default {
         .validate()
         .then(result => {
           if (result) {
-            console.log('Validateion passed');
+            console.log('Validation passed');
           }
+          this.closeApprovalDialog();
         })
         .catch(error => {
           alert(`Validation failed: ${error}`);
