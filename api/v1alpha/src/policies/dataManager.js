@@ -91,7 +91,7 @@ async function listPolicies(projectId, datasetId, accountId) {
         where ca.isDeleted is false
         group by p.policyId
       )
-    SELECT rowId, cp.policyId, name, description, createdAt, createdBy, version, ifnull(ac.count, 0) as accountCount
+    SELECT rowId, cp.policyId, name, description, createdAt, createdBy, version, ifnull(ac.count, 0) as accountCount, marketplace
     FROM \`${projectId}.datashare.currentPolicy\` cp
     left join accountCounts ac on ac.policyId = cp.policyId
     where cp.isDeleted is false;`;
@@ -188,6 +188,15 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
         }
     } else {
         data.rowAccessTags = rowAccessTags.map(t => { return { tag: t }; })
+    }
+
+    if (!(data.marketplace && data.marketplace.solutionId && data.marketplace.planId)) {
+        delete data.marketplace;
+        const index = fields.indexOf('marketplace');
+        if (index > -1) {
+            fields.splice(index, 1);
+            values.splice(index, 1);
+        }
     }
 
     fields = Array.from(fields).join();
