@@ -33,7 +33,7 @@
       <template v-slot:item.createdAt="{ item }">
         {{ toLocalTime(item.createdAt) }} </template
       ><template v-slot:item.action="{ item }">
-        <v-tooltip v-model="showTooltip" top>
+        <v-tooltip top>
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
@@ -46,7 +46,7 @@
           </template>
           <span>Reject</span>
         </v-tooltip>
-        <v-tooltip v-model="show" top>
+        <v-tooltip top>
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
