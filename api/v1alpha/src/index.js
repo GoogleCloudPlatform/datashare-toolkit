@@ -99,6 +99,8 @@ const policies = require('./policies/index');
 const accounts = require('./accounts/index');
 // Import the CDS API Admin service router
 const admin = require('./admin/index');
+// Import the CDS API Procurement service router
+const procurements = require('./procurements/index');
 
 /************************************************************
   API Endpoints
@@ -247,6 +249,7 @@ router.use(datasets);
 router.use(policies);
 router.use(accounts);
 router.use(admin);
+router.use(procurements);
 
 /**
  * @swagger
