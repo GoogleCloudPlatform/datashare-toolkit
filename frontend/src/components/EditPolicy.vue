@@ -515,6 +515,19 @@ export default {
             };
           }
 
+          if (
+            this.policy.marketplace &&
+            this.policy.marketplace.solutionId &&
+            this.policy.marketplace.planId
+          ) {
+            data.marketplace = {
+              solutionId: this.policy.marketplace.solutionId,
+              planId: this.policy.marketplace.planId
+            };
+          } else {
+            console.log('MP not found');
+          }
+
           this.$store.dispatch('savePolicy', data).then(result => {
             this.loading = false;
 
@@ -572,7 +585,7 @@ export default {
             if (p.marketplace) {
               this.policy.marketplace = p.marketplace;
             } else {
-              this.policy.marketplace = { solutionId: null, planId: null };
+              this.policy.marketplace = { solutionId: '', planId: '' };
             }
           }
           this.loading = false;

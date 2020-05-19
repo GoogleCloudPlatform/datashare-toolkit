@@ -111,6 +111,8 @@ export default {
         { text: 'Name', value: 'name' },
         { text: 'Description', value: 'description' },
         { text: 'Account Usage', value: 'accountCount' },
+        { text: 'Marketplace Solution', value: 'marketplace.solutionId' },
+        { text: 'Marketplace Plan', value: 'marketplace.planId' },
         { text: 'Modified At', value: 'createdAt' },
         { text: 'Modified By', value: 'createdBy' },
         // { text: 'Version', value: 'version' },

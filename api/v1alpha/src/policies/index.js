@@ -201,12 +201,28 @@ policies.post('/projects/:projectId/policies', async(req, res) => {
             errors: ['rowId and policyId should not be provided']
         });
     }
+    if (req.body.marketplace) {
+        if (req.body.marketplace.solutionId && !req.body.marketplace.planId) {
+            return res.status(400).json({
+                success: false,
+                code: 400,
+                errors: ['planId must be provided when a marketplace solutionId is provided']
+            }); 
+        } else if (!req.body.marketplace.solutionId && req.body.marketplace.planId) {
+            return res.status(400).json({
+                success: false,
+                code: 400,
+                errors: ['solutionId must be provided when a marketplace planId is provided']
+            }); 
+        }
+    }
     const values = {
         name: req.body.name,
         description: req.body.description,
         createdBy: req.header('x-gcp-account'),
         datasets: req.body.datasets,
-        rowAccessTags: req.body.rowAccessTags
+        rowAccessTags: req.body.rowAccessTags,
+        marketplace: req.body.marketplace
     };
     const data = await dataManager.createOrUpdatePolicy(projectId, null, values);
     var code;
@@ -361,13 +377,29 @@ policies.put('/projects/:projectId/policies/:policyId', async(req, res) => {
             errors: ['rowId parameter is required']
         });
     }
+    if (req.body.marketplace) {
+        if (req.body.marketplace.solutionId && !req.body.marketplace.planId) {
+            return res.status(400).json({
+                success: false,
+                code: 400,
+                errors: ['planId must be provided when a marketplace solutionId is provided']
+            }); 
+        } else if (!req.body.marketplace.solutionId && req.body.marketplace.planId) {
+            return res.status(400).json({
+                success: false,
+                code: 400,
+                errors: ['solutionId must be provided when a marketplace planId is provided']
+            }); 
+        }
+    }
     const values = {
         rowId: req.body.rowId,
         name: req.body.name,
         description: req.body.description,
         createdBy: req.header('x-gcp-account'),
         datasets: req.body.datasets,
-        rowAccessTags: req.body.rowAccessTags
+        rowAccessTags: req.body.rowAccessTags,
+        marketplace: req.body.marketplace
     };
     const data = await dataManager.createOrUpdatePolicy(projectId, policyId, values);
     var code;
