@@ -239,6 +239,11 @@ export default {
       .put(this._apiBaseUrl() + '/ingestion', payload)
       .then(response => response);
   },
+  getProcurementRequests() {
+    return axios
+      .get(this._apiBaseUrl() + '/procurements')
+      .then(response => response);
+  },
   initSchema(payload) {
     return axios
       .post(this._apiBaseUrl() + '/admin:initSchema')

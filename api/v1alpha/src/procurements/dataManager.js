@@ -22,3 +22,30 @@ const uuidv4 = require('uuid/v4');
 
 const cfg = require('../lib/config');
 
+/**
+ * @param  {string} projectId
+ * @param  {string} datasetId
+ * @param  {string} tableId
+ * Get the FQDN format for a project's table or view name
+ */
+function getTableFqdn(projectId, datasetId, tableId) {
+    return `${projectId}.${datasetId}.${tableId}`;
+}
+
+/**
+ * @param  {string} projectId
+ * Get a list of Procurements
+ */
+async function listProcurements(projectId) {
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsProcurementViewId);
+    const fields = Array.from(cfg.cdsProcurementViewFields).join();
+    const options = {
+        query: `SELECT ${fields} FROM \`${table}\``
+    }
+    const [rows] = await bigqueryUtil.executeQuery(options);
+    return { success: true, data: rows };
+}
+
+module.exports = {
+    listProcurements
+};

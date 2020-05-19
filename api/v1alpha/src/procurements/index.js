@@ -27,4 +27,99 @@ const dataManager = require("./dataManager");
 var procurements = express.Router();
 // methods that require multiple routes
 
+/**
+ * @swagger
+ *
+ *
+ * definitions:
+ *   Policy:
+ *     type: object
+ *     description: Procurement object
+ *     properties:
+ *       rowId:
+ *         type: string
+ *         readOnly: true
+ *         description: Procurement Row ID
+ *       eventId:
+ *         type: string
+ *         readOnly: true
+ *         description: Marketplace Pub/Sub message eventId
+ *       eventType:
+ *         type: string
+ *         description: Marketplace Pub/Sub message eventType
+ *       acknowledged:
+ *         type: boolean
+ *         description: Indicates if the event was acknowledged.
+ *       createdAt:
+ *         type: string
+ *         description: Record creation time
+ *       accountId:
+ *         type: string
+ *         description: Billing accountId of the consumer
+ *       entitlementId:
+ *         type: string
+ *         description: Entitlement Id of the purchased SKU
+ *     required:
+ *       - rowId
+ *       - eventId
+ *       - eventType
+ */
+
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/procurements:
+ *   get:
+ *     summary: List Procurements based off request parameters
+ *     description: Returns the ProcurementList response
+ *     tags:
+ *       - procurements
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Procurement request
+ *     responses:
+ *       200:
+ *         description: Procurement list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   default: 200
+ *                   description: HTTP status code
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                      $ref: '#/definitions/Procurement'
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
+procurements.get('/projects/:projectId/procurements', async (req, res) => {
+    const projectId = req.params.projectId;
+    const data = await dataManager.listProcurements(projectId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ...data
+    });
+});
+
 module.exports = procurements;

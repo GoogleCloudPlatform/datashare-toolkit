@@ -83,7 +83,6 @@ async function _deleteData(projectId, fields, values, data) {
 async function listPolicies(projectId, datasetId, accountId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const fields = Array.from(cfg.cdsPolicyViewFields).join();
-    const limit = 10;
     let sqlQuery = `with accountCounts AS (
         select p.policyId, count(ca.accountId) as count
         from \`${projectId}.datashare.currentAccount\` ca
@@ -99,7 +98,7 @@ async function listPolicies(projectId, datasetId, accountId) {
         query: sqlQuery
     };
     if (datasetId) {
-        sqlQuery = `SELECT ${fields} FROM \`${table}\`, UNNEST(datasets) AS datasets WHERE datasets.datasetId = @datasetId LIMIT ${limit};`
+        sqlQuery = `SELECT ${fields} FROM \`${table}\`, UNNEST(datasets) AS datasets WHERE datasets.datasetId = @datasetId;`
         options = {
             query: sqlQuery,
             params: { datasetId: datasetId }

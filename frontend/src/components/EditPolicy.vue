@@ -524,8 +524,6 @@ export default {
               solutionId: this.policy.marketplace.solutionId,
               planId: this.policy.marketplace.planId
             };
-          } else {
-            console.log('MP not found');
           }
 
           this.$store.dispatch('savePolicy', data).then(result => {
