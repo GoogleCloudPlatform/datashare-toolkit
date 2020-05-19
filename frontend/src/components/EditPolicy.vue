@@ -137,6 +137,22 @@
               </v-data-table>
             </v-expansion-panel-content>
           </v-expansion-panel>
+          <v-expansion-panel>
+            <v-expansion-panel-header>Marketplace</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-text-field
+                v-model="policy.marketplace.solutionId"
+                :error-messages="errors"
+                label="Solution Id"
+                required
+              ></v-text-field>
+              <v-text-field
+                v-model="policy.marketplace.planId"
+                :error-messages="errors"
+                label="Plan Id"
+              ></v-text-field>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
           <v-expansion-panel v-if="editMode">
             <v-expansion-panel-header>Account Access</v-expansion-panel-header>
             <v-expansion-panel-content>
@@ -331,7 +347,8 @@ export default {
       datasets: [],
       rowAccessTags: [],
       initialDatasets: [],
-      initialRowAccessTags: []
+      initialRowAccessTags: [],
+      marketplace: { solutionId: null, planId: null }
     },
     datasetSearch: '',
     accountSearch: '',
@@ -510,6 +527,7 @@ export default {
             this.policy.rowAccessTags = p.rowAccessTags;
             this.policy.initialDatasets = p.datasets;
             this.policy.initialRowAccessTags = p.rowAccessTags;
+            this.policy.marketplace = p.marketplace;
           }
           this.loading = false;
         });
