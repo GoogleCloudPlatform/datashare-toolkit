@@ -140,17 +140,28 @@
           <v-expansion-panel>
             <v-expansion-panel-header>Marketplace</v-expansion-panel-header>
             <v-expansion-panel-content>
-              <v-text-field
-                v-model="policy.marketplace.solutionId"
-                :error-messages="errors"
-                label="Solution Id"
-                required
-              ></v-text-field>
-              <v-text-field
-                v-model="policy.marketplace.planId"
-                :error-messages="errors"
-                label="Plan Id"
-              ></v-text-field>
+              <ValidationProvider
+                v-slot="{ errors }"
+                name="solutionId"
+                rules="solution:@planId"
+              >
+                <v-text-field
+                  v-model="policy.marketplace.solutionId"
+                  :error-messages="errors"
+                  label="Solution Id"
+                ></v-text-field>
+              </ValidationProvider>
+              <ValidationProvider
+                v-slot="{ errors }"
+                name="planId"
+                rules="plan:@solutionId"
+              >
+                <v-text-field
+                  v-model="policy.marketplace.planId"
+                  :error-messages="errors"
+                  label="Plan Id"
+                ></v-text-field>
+              </ValidationProvider>
             </v-expansion-panel-content>
           </v-expansion-panel>
           <v-expansion-panel v-if="editMode">
@@ -309,6 +320,36 @@ extend('required', {
   ...required,
   message: '{_field_} can not be empty'
 });
+
+extend('plan', {
+  params: ['target'],
+  validate(value, { target }) {
+    if (isPopulated(value) && !isPopulated(target)) {
+      return false;
+    } else if (!isPopulated(value) && isPopulated(target)) {
+      return false;
+    }
+    return true;
+  },
+  message: 'You must provide a solutionId if a planId is provided'
+});
+
+extend('solution', {
+  params: ['target'],
+  validate(value, { target }) {
+    if (isPopulated(value) && !isPopulated(target)) {
+      return false;
+    } else if (!isPopulated(value) && isPopulated(target)) {
+      return false;
+    }
+    return true;
+  },
+  message: 'You must provide a planId if a solutionId is provided'
+});
+
+function isPopulated(value) {
+  return value !== null && value !== undefined && value.trim() !== '';
+}
 
 import Dialog from '@/components/Dialog.vue';
 
@@ -527,7 +568,12 @@ export default {
             this.policy.rowAccessTags = p.rowAccessTags;
             this.policy.initialDatasets = p.datasets;
             this.policy.initialRowAccessTags = p.rowAccessTags;
-            this.policy.marketplace = p.marketplace;
+
+            if (p.marketplace) {
+              this.policy.marketplace = p.marketplace;
+            } else {
+              this.policy.marketplace = { solutionId: null, planId: null };
+            }
           }
           this.loading = false;
         });
