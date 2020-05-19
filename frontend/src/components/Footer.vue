@@ -1,6 +1,6 @@
 <template>
   <v-footer dark color="#1876D2" app>
-    Cloud FSI &copy; {{ new Date().getFullYear() }}
+    Cloud FSI Solutions &copy; {{ new Date().getFullYear() }}
     <v-spacer></v-spacer>
     {{ settings.projectId }}:{{ settings.storageBucket }}
   </v-footer>

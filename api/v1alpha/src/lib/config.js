@@ -53,4 +53,12 @@ config.cdsAuthorizedViewViewFields = new Set(['rowId', 'authorizedViewId', 'name
 
 config.cdsCurrentUserDatasetViewId = "currentUserDataset";
 
+config.cdsProcurementTableId = "procurement";
+config.cdsProcurementTableFields = new Set(['rowId', 'eventId', 'eventType', 'message',
+    'acknowledged', 'createdAt']);
+
+config.cdsProcurementViewId = "procurementFormatted";
+config.cdsProcurementViewFields = new Set(['rowId', 'eventId', 'eventType', 'acknowledged',
+'createdAt', 'accountId', 'entitlementId', 'updateTime']);
+
 module.exports = config;
