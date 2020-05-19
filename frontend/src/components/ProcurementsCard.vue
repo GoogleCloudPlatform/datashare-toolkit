@@ -187,7 +187,7 @@ export default {
     itemsPerPage: 50,
     headers: [
       { text: 'Solution Id', value: 'solutionId' },
-      { text: 'Requestor Account Id', value: 'requestorAccountId' },
+      { text: 'Requestor Account Id', value: 'accountId' },
       { text: 'Requested At', value: 'createdAt' },
       { text: '', value: 'action', sortable: false }
     ]
@@ -198,7 +198,7 @@ export default {
   computed: {
     selectedItemSummary() {
       return `<b>Solution Id</b>: ${this.selectedItem.solutionId}<br/>
-      <b>Requestor Account Id</b>: ${this.selectedItem.requestorAccountId}<br/>
+      <b>Requestor Account Id</b>: ${this.selectedItem.accountId}<br/>
       <b>Requested At</b>: ${this.toLocalTime(this.selectedItem.createdAt)}`;
     }
   },

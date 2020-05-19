@@ -59,6 +59,6 @@ config.cdsProcurementTableFields = new Set(['rowId', 'eventId', 'eventType', 'me
 
 config.cdsProcurementViewId = "procurementFormatted";
 config.cdsProcurementViewFields = new Set(['rowId', 'eventId', 'eventType', 'acknowledged',
-'createdAt', 'accountId', 'entitlementId', 'updateTime']);
+'createdAt', 'accountId', 'solutionId', 'updateTime']);
 
 module.exports = config;
