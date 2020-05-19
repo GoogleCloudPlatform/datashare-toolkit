@@ -582,7 +582,7 @@ async function setupDatasharePrerequisites(projectId) {
     if (await bigqueryUtil.viewExists(cfg.cdsDatasetId, cfg.cdsProcurementViewId) === false) {
         console.log("Creating procurements formatted view");
         const procurementTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsProcurementTableId);
-        const viewSql = `SELECT\n  rowId,\n  eventId,\n  eventType,\n  acknowledged,\n  UNIX_MILLIS(createdAt) as createdAt,\n  JSON_EXTRACT(message, '$.account.id') as accountId,\n  JSON_EXTRACT(message, '$.entitlement.id') as entitlementId,\n  CASE\n    WHEN eventType = 'ACCOUNT_ACTIVE' THEN  JSON_EXTRACT(message, '$.account.updateTime')\n    WHEN eventType = 'ENTITLEMENT_CREATION_REQUESTED' THEN  JSON_EXTRACT(message, '$.entitlement.updateTime')\n  END AS updateTime\nFROM \`${procurementTable}\``;
+        const viewSql = `SELECT\n  rowId,\n  eventId,\n  eventType,\n  acknowledged,\n  UNIX_MILLIS(createdAt) as createdAt,\n  JSON_EXTRACT(message, '$.account.id') as accountId,\n  JSON_EXTRACT(message, '$.entitlement.id') as solutionId,\n  CASE\n    WHEN eventType = 'ACCOUNT_ACTIVE' THEN  JSON_EXTRACT(message, '$.account.updateTime')\n    WHEN eventType = 'ENTITLEMENT_CREATION_REQUESTED' THEN  JSON_EXTRACT(message, '$.entitlement.updateTime')\n  END AS updateTime\nFROM \`${procurementTable}\``;
         console.log(viewSql);
         await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsProcurementViewId, viewSql);
     } else {
