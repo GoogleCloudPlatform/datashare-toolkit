@@ -89,7 +89,9 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
     if (isDirty === true) {
         try {
             await bigqueryUtil.setDatasetMetadata(datasetId, metadata);
+            console.info(`Metadata set successfully for dataset '${datasetId}'`);
         } catch (err) {
+            console.error(`Failed to set metadata for dataset '${datasetId}' with error '${err}' and payload: ${JSON.stringify(metadata)}`);
             throw err;
         }
     }
