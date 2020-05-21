@@ -528,16 +528,9 @@ export default {
 
           this.$store.dispatch('savePolicy', data).then(result => {
             this.loading = false;
-
-            if (result.error && result.error === 'STALE') {
-              this.errorDialogTitle = 'Policy data is stale';
-              this.errorDialogText =
-                'This policy has been updated since you last refreshed the page, please reload the page to make changes.';
-              this.showError = true;
-            } else if (result.error) {
-              this.errorDialogTitle = 'Error saving policy';
-              this.errorDialogText =
-                'Failed to save policy. Please reload and try again.';
+            if (!result.success) {
+              this.errorDialogTitle = 'Error saving account';
+              this.errorDialogText = result.errors.join(', ');
               this.showError = true;
             } else {
               // Success

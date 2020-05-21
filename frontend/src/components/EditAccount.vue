@@ -217,16 +217,9 @@ export default {
 
             this.$store.dispatch('saveAccount', data).then(result => {
               this.loading = false;
-
-              if (result.error && result.error === 'STALE') {
-                this.errorDialogTitle = 'Account data is stale';
-                this.errorDialogText =
-                  'This account has been updated since you last opened the page, please reload the page to make changes.';
-                this.showError = true;
-              } else if (result.error) {
+              if (!result.success) {
                 this.errorDialogTitle = 'Error saving account';
-                this.errorDialogText =
-                  'Failed to save account. Please reload and try again.';
+                this.errorDialogText = result.errors.join(', ');
                 this.showError = true;
               } else {
                 // Success
