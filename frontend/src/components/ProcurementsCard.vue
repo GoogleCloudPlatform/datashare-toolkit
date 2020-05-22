@@ -187,6 +187,7 @@ export default {
     itemsPerPage: 50,
     headers: [
       { text: 'Solution Id', value: 'solutionId' },
+      { text: 'Plan Id', value: 'planId' },
       { text: 'Requestor Account Id', value: 'accountId' },
       { text: 'Requested At', value: 'createdAt' },
       { text: '', value: 'action', sortable: false }
