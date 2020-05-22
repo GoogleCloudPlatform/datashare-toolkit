@@ -64,7 +64,8 @@ export default {
     dialogButtonConfirmText: '',
     dialogButtonCancelText: '',
     dialogCancelButtonEnabled: true,
-    dialogObject: {}
+    dialogObject: {},
+    showError: false
   }),
   methods: {
     initSchema() {
@@ -107,7 +108,7 @@ export default {
         this.loading = true;
         this.$store
           .dispatch('syncResources', { type: object.syncType })
-          .then(() => {
+          .then(result => {
             this.dialogButtonConfirmText = 'Ok';
             this.dialogCancelButtonEnabled = false;
 
@@ -122,17 +123,28 @@ export default {
               this.dialogText = 'Sync all views completed.';
             }
 
+            if (!result.success) {
+              this.dialogTitle += ' Failed';
+              this.dialogText = result.errors.join(', ');
+            }
+
             this.dialogObject = { type: 'finalConfirm' };
             this.showDialog = true;
             this.loading = false;
           });
       } else if (object.type === 'initSchema') {
         this.loading = true;
-        this.$store.dispatch('initSchema').then(() => {
+        this.$store.dispatch('initSchema').then(result => {
           this.dialogButtonConfirmText = 'Ok';
           this.dialogCancelButtonEnabled = false;
           this.dialogTitle = 'Initialize Schema';
           this.dialogText = 'Initialize schema has completed.';
+
+          if (!result.success) {
+            this.dialogTitle += ' Failed';
+            this.dialogText = result.errors.join(', ');
+          }
+
           this.dialogObject = { type: 'finalConfirm' };
           this.showDialog = true;
           this.loading = false;
