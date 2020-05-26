@@ -159,7 +159,7 @@ export default {
       shieldKey: mdiShieldKey
     },
     toolbar: {
-      title: 'Cloud Datashare'
+      title: 'Datashare'
     }
   }),
   mounted() {
