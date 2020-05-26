@@ -28,3 +28,4 @@ steps:
   dir: 'ingestion/batch'
   entrypoint: 'npm'
   args: ['run', 'cloudtest']
+  
