@@ -59,7 +59,7 @@ const options = {
             }
         }],
         externalDocs: {
-            description: 'Find out more about Cloud Datashare Toolkit',
+            description: 'Find out more about Datashare Toolkit',
             url: 'https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit'
         }
     },
