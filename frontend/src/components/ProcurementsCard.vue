@@ -127,7 +127,7 @@
               @click.stop="closeApprovalDialog()"
               >Cancel</v-btn
             >
-            <v-btn color="green darken-1" text @click.stop="saveDataset"
+            <v-btn color="green darken-1" text @click.stop="submitApproval"
               >Submit</v-btn
             >
           </v-card-actions>
@@ -222,14 +222,15 @@ export default {
       this.selectedItem = null;
       this.resetApprovalDialogData();
     },
-    saveDataset() {
+    submitApproval() {
+      console.log('Submit approval clicked');
       this.$refs.observer
         .validate()
         .then(result => {
           if (result) {
             console.log('Validation passed');
+            this.closeApprovalDialog();
           }
-          this.closeApprovalDialog();
         })
         .catch(error => {
           alert(`Validation failed: ${error}`);
