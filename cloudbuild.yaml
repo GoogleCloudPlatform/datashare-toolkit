@@ -3,7 +3,7 @@ steps:
   dir: 'shared'
   entrypoint: 'npm'
   args: ['install']
-- name: 'node:8.16.2'
+- name: 'node:10.20.1'
   dir: 'ingestion/batch'
   entrypoint: 'npm'
   args: ['install']
@@ -24,7 +24,8 @@ steps:
   env:
   - 'GOOGLE_APPLICATION_CREDENTIALS=/workspace/shared/ciphertexts/client_secret.json'
   - 'PROJECT_ID=$PROJECT_ID'
-- name: 'node:8.16.2'
+- name: 'node:10.20.1'
   dir: 'ingestion/batch'
   entrypoint: 'npm'
   args: ['run', 'cloudtest']
+  

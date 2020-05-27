@@ -64,7 +64,7 @@ eventTrigger:
 labels:
   deployment-tool: cli-gcloud
 name: projects/thisuser-cloud-sandbox/locations/us-central1/functions/processUpload
-runtime: nodejs8
+runtime: nodejs10
 serviceAccountEmail: thisuser-cloud-sandbox@appspot.gserviceaccount.com
 sourceUploadUrl: https://storage.googleapis.com/gcf-upload-us-central1-081d71f7-3b71-4e31-bbb2-8668bf287101/4204b952-a3a0-44a5-be90-fbf569ecb457.zip?GoogleAccessId=service-283242825526@gcf-admin-robot.iam.gserviceaccount.com&Expires=1572591933&Signature=o6HiVvFxkC9IOFkI2WCR6%2F%2FrgUGqL5CzWZQRQrbKdD2Yiv7RmddkmoGNDJwUnagVf9Yaa8ZMvpoI32M%2BxKA1ZqcV2ztGiPuUd%2BvrEd937ffTig8GBtNSnIctBeU7vU6MOs5yVWRFOxXG32onRO18GD2dRt4F7Lgegw99xvpYODHaNhsHOKkl2VBpblPgBDbRwpUkRC6jMdOmkrXWirnHuATxRcbCC2Xt7lHRPk85Z4tL1fBaL1WndCWAO1q5cIIbQGX0O4uValRd8YjEFyYeNhDpgdLgwndcVbW%2B1uCF9D4wcK7ZezX1ZlgVHv%2BjviSDX4w1sDYqmEV7UPnJOF2vAQ%3D%3D
 status: ACTIVE
