@@ -228,8 +228,26 @@ export default {
         .validate()
         .then(result => {
           if (result) {
-            console.log('Validation passed');
-            this.closeApprovalDialog();
+            console.log('Validation passed, saving.');
+            this.$store
+              .dispatch('setProcurementApprovalState', {
+                projectId: this.$store.state.settings.projectId
+              })
+              .then(result => {
+                this.loading = false;
+                if (!result.success) {
+                  this.showError = true;
+                  this.errorDialogTitle = 'Error setting approval state';
+                  this.errorDialogText = result.errors.join(', ');
+                } else {
+                  this.showError = false;
+                  this.loadProcurementRequests();
+                  this.closeApprovalDialog();
+                }
+              })
+              .catch(error => {
+                console.error(`Error creating dataset: ${error}`);
+              });
           }
         })
         .catch(error => {

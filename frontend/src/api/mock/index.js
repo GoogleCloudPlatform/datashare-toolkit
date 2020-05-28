@@ -94,5 +94,8 @@ export default {
   },
   getProcurementRequests() {
     return get(procurementRequests, 2000); // wait 2s before returning config
+  },
+  setProcurementApprovalState() {
+    console.log(`Mock setProcurementApprovalState: ${projectId}`);
   }
 };
