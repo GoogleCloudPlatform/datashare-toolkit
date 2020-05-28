@@ -122,4 +122,21 @@ procurements.get('/projects/:projectId/procurements', async (req, res) => {
     });
 });
 
+procurements.post('/projects/:projectId/procurements/approve', async(req, res) => {
+    const projectId = req.params.projectId;
+    const body = req.body;
+    console.log(`Approve called for project ${projectId} with body: ${JSON.stringify(body)}`);
+    const data = { code: 200, success: true };
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
 module.exports = procurements;
