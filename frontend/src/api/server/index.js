@@ -234,7 +234,6 @@ export default {
       .then(response => response);
   },
   saveIngestion(payload) {
-    console.log(`Performing ingestion update`);
     return axios
       .put(this._apiBaseUrl() + '/ingestion', payload)
       .then(response => response);
@@ -242,6 +241,12 @@ export default {
   getProcurementRequests() {
     return axios
       .get(this._apiBaseUrl() + '/procurements')
+      .then(response => response);
+  },
+  setProcurementApprovalState(payload) {
+    console.log(`Performing setProcurementApprovalState`);
+    return axios
+      .post(this._apiBaseUrl() + '/procurements/approve', payload)
       .then(response => response);
   },
   initSchema(payload) {
