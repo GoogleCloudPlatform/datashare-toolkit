@@ -35,6 +35,6 @@
     },
     "repository": {
         "type": "git",
-        "url": "git@github.com:GoogleCloudPlatform/cloud-datashare-toolkit.git"
+        "url": "git@github.com:GoogleCloudPlatform/datashare-toolkit.git"
     }
 }

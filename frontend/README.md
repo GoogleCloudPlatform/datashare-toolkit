@@ -21,7 +21,7 @@ These are the prerequisites for the DS Frontend UI
 ### <a name="setup_backend">Setup Backend API</a>
 DS API setup is a dependency for the Frontend UI if you do not plan to use mock data or do not have an existing DS API endpoint URL.
 
-[DS API Documentation](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/tree/master/api)
+[DS API Documentation](https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/api)
 
 ## <a name="develop">Develop</a>
 You can develop the locally for now. [NodeJS](https://nodejs.org/en/)
@@ -54,7 +54,7 @@ Point your browser to http://localhost:8080 and update your DS Frontend `API Bas
 
 
 ## <a name="deployment">Deployment</a>
-Once you've deployed the [DS API](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/tree/master/api), you should only then proceed to setup the UI. You can deploy the Frontend content via various methods below based off developer preference and/or environment. These are the examples we provide, though you may use other hosting options:
+Once you've deployed the [DS API](https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/api), you should only then proceed to setup the UI. You can deploy the Frontend content via various methods below based off developer preference and/or environment. These are the examples we provide, though you may use other hosting options:
 
   * [Google Cloud Run](https://cloud.google.com/run/) via [gcloud](https://cloud.google.com/sdk/)
   * [Firebase Hosting](https://firebase.google.com/docs/hosting) via [firebase cli](https://firebase.google.com/docs/cli)
@@ -168,7 +168,7 @@ Open the app URL in your browser. You can return the FQDN via:
 Navigate to the frontend directory and modify the .firebaserc file with the Firebase projectId and save changes.
 
 ```
-cd ~/Git/cloud-datashare-toolkit/frontend
+cd ~/Git/datashare-toolkit/frontend
 vi .firebaserc
 
 {

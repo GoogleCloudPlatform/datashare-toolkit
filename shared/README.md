@@ -14,7 +14,7 @@
 
 # Overview
 
-The [Datashare (DS)](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit) Shared Modules directory provides a library of utility classes for the DS services which include additional functionality or capabilities while avoiding duplicate logic. The majority of DS services leverage the [Google Cloud Platform (GCP)](https://cloud.google.com/) [NodeJS SDK libraries](https://github.com/googleapis/google-cloud-node).
+The [Datashare (DS)](https://github.com/GoogleCloudPlatform/datashare-toolkit) Shared Modules directory provides a library of utility classes for the DS services which include additional functionality or capabilities while avoiding duplicate logic. The majority of DS services leverage the [Google Cloud Platform (GCP)](https://cloud.google.com/) [NodeJS SDK libraries](https://github.com/googleapis/google-cloud-node).
 
 **Note**: _The DS Shared Modules are for internal use only and the public DS interfaces are through the API or CLI._
 
