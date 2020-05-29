@@ -1,4 +1,4 @@
-# CDS API - Spot Service
+# DS API - Spot Service
 
 * [Overview](#overview)
   * [Architecture](#architecture)
@@ -24,7 +24,7 @@
 
 # Overview
 
-This documentation provides the details for the CDS API Spot Service. The Spot service provides data producers the ability to expose a limited subset of their datasets programatically. Data producers can configure explicit query parameters for data consumers to discover and execute queries against larger consumer datasets. The sub-datasets are extracted for short-term storage in buckets with signed urls for distribution to the data consumers.
+This documentation provides the details for the DS API Spot Service. The Spot service provides data producers the ability to expose a limited subset of their datasets programatically. Data producers can configure explicit query parameters for data consumers to discover and execute queries against larger consumer datasets. The sub-datasets are extracted for short-term storage in buckets with signed urls for distribution to the data consumers.
 
 
 ## Architecture
@@ -32,13 +32,13 @@ This documentation provides the details for the CDS API Spot Service. The Spot s
 
 
 ## Configuration
-The CDS API Spot service configuration overview and definition is [here](docs/CONFIGURATION.md)
+The DS API Spot service configuration overview and definition is [here](docs/CONFIGURATION.md)
 
 
 ### Documentation
 _OpenAPI Specification_
 
-The CDS API Spot service utilizes the open standard for API documentation, [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) (OAS) for documenting the API's resources, parameters, responses, etc. The OAS definitions and paths are rendered via [swagger-jsdoc](https://www.npmjs.com/package/swagger-jsdoc) in the route comments of [index](v1alpha/index.js)
+The DS API Spot service utilizes the open standard for API documentation, [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) (OAS) for documenting the API's resources, parameters, responses, etc. The OAS definitions and paths are rendered via [swagger-jsdoc](https://www.npmjs.com/package/swagger-jsdoc) in the route comments of [index](v1alpha/index.js)
 
 You can access the OAS directly via:
 
@@ -51,7 +51,7 @@ You can also access an instance of Swagger UI to render the OAS docs:
 
 ## Getting Started
 
-These instructions will setup an instance of the CDS API Spot Service in your GCP project.
+These instructions will setup an instance of the DS API Spot Service in your GCP project.
 
 ### Setup GCloud
 * Install the [Google Cloud SDK](https://cloud.google.com/sdk/install) on your local machine.
@@ -83,7 +83,7 @@ Create the new storage bucket:
 
 ### Create Configuration
 
-The CDS API Spot Service configuration definitions are defined [above](#configuration). You can view an example in the MLB examples config [here](../../examples/mlb/config/api/config.json). Make the appropriate modifications and then copy to your storage bucket.
+The DS API Spot Service configuration definitions are defined [above](#configuration). You can view an example in the MLB examples config [here](../../examples/mlb/config/api/config.json). Make the appropriate modifications and then copy to your storage bucket.
 
 Copy configuration to the storage bucket:
 
@@ -92,7 +92,7 @@ Copy configuration to the storage bucket:
 
 ### Enable APIs
 
-These are the GCP project APIs that require the CDS API Spot Service access.
+These are the GCP project APIs that require the DS API Spot Service access.
 
 ```
 gcloud services enable bigquery-json.googleapis.com
@@ -101,7 +101,7 @@ gcloud services enable iam.googleapis.com
 
 ### Service Account
 
-CDS API Spot service is a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](./config/cds-api-spot-mgr-role-definition.yaml)
+DS API Spot service is a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](./config/cds-api-spot-mgr-role-definition.yaml)
 
 #### Setup Service Account
 
@@ -115,9 +115,9 @@ Set the **SERVICE\_ACCOUNT\_NAME** environment variable(s):
 
 Set the **SERVICE\_ACCOUNT\_DESC** environment variable(s):
 
-    export SERVICE_ACCOUNT_DESC="CDS API Spot Manager";
+    export SERVICE_ACCOUNT_DESC="DS API Spot Manager";
 
-Create the custom CDS API Spot service-account:
+Create the custom DS API Spot service-account:
 
     gcloud iam service-accounts create ${SERVICE_ACCOUNT_NAME} --display-name "${SERVICE_ACCOUNT_DESC}";
 
@@ -134,7 +134,7 @@ _The permissions for the custom role are defined in [config/cds-api-spot-mgr-rol
 # This role is only required if deploying the API service to GCP Cloud Run
 --role="roles/serverless.serviceAgent";
 ```
-Create custom CDS API Spot role:
+Create custom DS API Spot role:
 
     gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/cds-api-spot-mgr-role-definition.yaml
 
@@ -188,7 +188,7 @@ You can deploy the API service via various methods below based off developer pre
   * [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/) via [Skaffold](https://github.com/GoogleContainerTools/skaffold)
   * [Google Cloud App Engine](https://cloud.google.com/appengine/) via [Deployment Manager](https://cloud.google.com/deployment-manager/) and gcloud - TODO
 
-[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the CDS API Spot Service content and generate a unique URL for consumption.
+[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the DS API Spot Service content and generate a unique URL for consumption.
 
 There are some environment variables that need to be set for all build and deployment options.
 

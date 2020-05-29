@@ -1,5 +1,5 @@
-# CDS Frontend UI
-This documentation provides details for how to develop, build, and deploy new versions of the CDS Frontend UI. There are a few different deployment options for you to choose based on developer pererence and/or environment.
+# DS Frontend UI
+This documentation provides details for how to develop, build, and deploy new versions of the DS Frontend UI. There are a few different deployment options for you to choose based on developer pererence and/or environment.
 
 * [Prerequisites](#prereqs)
   * [Setup Backend API](#setup_backend)
@@ -15,13 +15,13 @@ This documentation provides details for how to develop, build, and deploy new ve
 
 
 ## <a name="prereqs">Prerequisites</a>
-These are the prerequisites for the CDS Frontend UI
+These are the prerequisites for the DS Frontend UI
 
 
 ### <a name="setup_backend">Setup Backend API</a>
-CDS API setup is a dependency for the Frontend UI if you do not plan to use mock data or do not have an existing CDS API endpoint URL.
+DS API setup is a dependency for the Frontend UI if you do not plan to use mock data or do not have an existing DS API endpoint URL.
 
-[CDS API Documentation](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/tree/master/api)
+[DS API Documentation](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/tree/master/api)
 
 ## <a name="develop">Develop</a>
 You can develop the locally for now. [NodeJS](https://nodejs.org/en/)
@@ -38,7 +38,7 @@ Project setup:
 
     npm install
 
-You can choose to use mock API data or point to a CDS Admin REST API endpoint in the applicaiton settings page. The *VUE_APP_APICLIENT* environment variable will dynamically load between the two options.
+You can choose to use mock API data or point to a DS Admin REST API endpoint in the applicaiton settings page. The *VUE_APP_APICLIENT* environment variable will dynamically load between the two options.
 
 Using API client data that is mocked:
 
@@ -48,23 +48,23 @@ or Using API client data from an endpoint URL:
 
     VUE_APP_APICLIENT=server npm run serve
 
-Point your browser to http://localhost:8080 and update your CDS Frontend `API Base URL` in the UI settings [page](http://localhost:8080/settings)
+Point your browser to http://localhost:8080 and update your DS Frontend `API Base URL` in the UI settings [page](http://localhost:8080/settings)
 
    http://localhost:8080
 
 
 ## <a name="deployment">Deployment</a>
-Once you've deployed the [CDS API](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/tree/master/api), you should only then proceed to setup the UI. You can deploy the Frontend content via various methods below based off developer preference and/or environment. These are the examples we provide, though you may use other hosting options:
+Once you've deployed the [DS API](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/tree/master/api), you should only then proceed to setup the UI. You can deploy the Frontend content via various methods below based off developer preference and/or environment. These are the examples we provide, though you may use other hosting options:
 
   * [Google Cloud Run](https://cloud.google.com/run/) via [gcloud](https://cloud.google.com/sdk/)
   * [Firebase Hosting](https://firebase.google.com/docs/hosting) via [firebase cli](https://firebase.google.com/docs/cli)
 
-[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the CDS Frontend content and generate a unique URL for consumption.
+[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the DS Frontend content and generate a unique URL for consumption.
 
 There are some Firebase configuration and environment variables that need to be set for all build and deployment options.
 
 ### <a name="deploy_prereqs">Deploy Prerequisites</a>
-The CDS Frontend is currently configured for Firebase authentication. A new Firebase project and Firebase application credentials are required for deployment.
+The DS Frontend is currently configured for Firebase authentication. A new Firebase project and Firebase application credentials are required for deployment.
 
 There are some environment variables that need to be set for all build and deployment options.
 

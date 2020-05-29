@@ -1,12 +1,12 @@
-# CDS API - Spot Service Configuration
+# DS API - Spot Service Configuration
 
 * [Overview](#overview)
 
 # Overview
 
-This documentation provides the details for the CDS API Spot Service Configuration. The CDS API Spot configuration contains the attributes required to validate and generate spot fulfillment requests for specific clients and applications consuming the API service. The configuration is a list of entities that includes the following attributes. You can view an example in the MLB examples config [here](../../examples/mlb/config/api/config.json).
+This documentation provides the details for the DS API Spot Service Configuration. The DS API Spot configuration contains the attributes required to validate and generate spot fulfillment requests for specific clients and applications consuming the API service. The configuration is a list of entities that includes the following attributes. You can view an example in the MLB examples config [here](../../examples/mlb/config/api/config.json).
 
-_Note_ The CDS API OpenAPI [spec](#documentation) currently only provides context about the CDS API Spot Service client requests
+_Note_ The DS API OpenAPI [spec](#documentation) currently only provides context about the DS API Spot Service client requests
 
 ### Project ID:
 

@@ -1,16 +1,16 @@
-[Back to CDS](../../README.md)
+[Back to DS](../../README.md)
 
 # Example scenario using weather observation data
 
 ## Overview
-For this CDS example, we configure and load weather observation
+For this DS example, we configure and load weather observation
 data. While the raw data used in this scenario contains many columns,
 we are going to restrict the transformed data to only three columns: a
 timestamp, the measurement's coordinates as a `GEOGRAPHY` type (manufactured by calling the
 [ST_GeogPoint](https://cloud.google.com/bigquery/docs/reference/standard-sql/geography_functions#st_geogpoint)
 function), and the mean temperature that comprises the observation. The
 destination table will also contain the `cds_batch_id` column, that
-is added automatically by `CDS`, so that you may
+is added automatically by `DS`, so that you may
 associate the table data with its specific ingestion cycle.
 
 ## Quick start
@@ -118,7 +118,7 @@ The `transform.sql` is:
   HLY_TEMP_NORMAL AS `mean_temperature`
 ```
 
-(`CDS` adds the `SELECT` and `FROM` clauses dynamically at runtime,
+(`DS` adds the `SELECT` and `FROM` clauses dynamically at runtime,
 so they are always omitted from the contents of `transform.sql`.)
 
 Since the date is already provided in a format BigQuery
