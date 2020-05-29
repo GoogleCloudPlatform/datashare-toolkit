@@ -32,7 +32,6 @@ const getAuthToken = (req, res, next) => {
 };
 
 const checkIfAuthenticated = (req, res, next) => {
-    console.log('checkIfAuthenticated called');
     // Ignore the docs path
     if (req.path.startsWith('/docs/')) {
         return next();
