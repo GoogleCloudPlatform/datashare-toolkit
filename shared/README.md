@@ -1,4 +1,4 @@
-# Cloud Datashare - Shared Modules
+# Datashare - Shared Modules
 
 * [Overview](#overview)
 * [Testing](#testing)
@@ -14,7 +14,7 @@
 
 # Overview
 
-The [Cloud Datashare (CDS)](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit) Shared Modules directory provides a library of utility classes for the CDS services which include additional functionality or capabilities while avoiding duplicate logic. The majority of CDS services leverage the [Google Cloud Platform (GCP)](https://cloud.google.com/) [NodeJS SDK libraries](https://github.com/googleapis/google-cloud-node).
+The [Datashare (CDS)](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit) Shared Modules directory provides a library of utility classes for the CDS services which include additional functionality or capabilities while avoiding duplicate logic. The majority of CDS services leverage the [Google Cloud Platform (GCP)](https://cloud.google.com/) [NodeJS SDK libraries](https://github.com/googleapis/google-cloud-node).
 
 **Note**: _The CDS Shared Modules are for internal use only and the public CDS interfaces are through the API or CLI._
 
