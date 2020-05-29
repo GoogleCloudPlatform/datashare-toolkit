@@ -61,4 +61,6 @@ config.cdsProcurementViewId = "procurementFormatted";
 config.cdsProcurementViewFields = new Set(['rowId', 'eventId', 'eventType', 'acknowledged',
 'createdAt', 'accountId', 'solutionId', 'updateTime']);
 
+config.adminUsers = process.env.ADMIN_USERS.split(',') || [];
+
 module.exports = config;

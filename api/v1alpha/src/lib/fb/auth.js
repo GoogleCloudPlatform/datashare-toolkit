@@ -17,6 +17,7 @@
 'use strict';
 
 const { admin } = require('./firebase-service');
+const cfg = require('../config');
 
 const getAuthToken = (req, res, next) => {
     if (
@@ -31,6 +32,7 @@ const getAuthToken = (req, res, next) => {
 };
 
 const checkIfAuthenticated = (req, res, next) => {
+    console.log('checkIfAuthenticated called');
     // Ignore the docs path
     if (req.path.startsWith('/docs/')) {
         return next();
@@ -42,7 +44,21 @@ const checkIfAuthenticated = (req, res, next) => {
                 .auth()
                 .verifyIdToken(authToken);
             req.authId = userInfo.uid;
-            return next();
+            
+            const email = userInfo.email;
+            const index = cfg.adminUsers.findIndex(element => {
+                if (email.toLowerCase() === element.toLowerCase()) {
+                    return true;
+                }
+            });
+
+            if (index > -1) {
+                return next();
+            } else {
+                return res
+                .status(401)
+                .send({ error: 'You are not authorized to make this request' });
+            }
         } catch (e) {
             return res
                 .status(401)
