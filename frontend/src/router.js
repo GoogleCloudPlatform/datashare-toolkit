@@ -97,6 +97,14 @@ const routerOptions = [
     }
   },
   {
+    path: '/activation',
+    name: 'activation',
+    component: 'Activation',
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/spotFulfillment',
     name: 'spotFulfillment',
     component: 'SpotFulfillment',
