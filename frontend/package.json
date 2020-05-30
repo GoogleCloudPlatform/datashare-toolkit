@@ -13,7 +13,7 @@
     "@mdi/js": "^5.0.45",
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
-    "firebase": "^7.10.0",
+    "firebase": "^7.14.6",
     "moment": "2.24.0",
     "uuid4": "^1.1.4",
     "vee-validate": "^3.2.5",
