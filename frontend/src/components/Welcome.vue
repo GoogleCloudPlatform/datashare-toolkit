@@ -55,13 +55,13 @@ export default {
       {
         text: 'CDS Frontend UI Doc',
         href:
-          'https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/frontend'
+          'https://github.com/GoogleCloudPlatform/datashare-toolkit/frontend'
       }
     ],
     importantLinks: [
       {
         text: 'CDS Home',
-        href: 'https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit'
+        href: 'https://github.com/GoogleCloudPlatform/datashare-toolkit'
       },
       {
         text: 'Google Cloud',

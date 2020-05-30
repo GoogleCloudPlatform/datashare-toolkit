@@ -1,9 +1,9 @@
-# ```Cloud Datashare Toolkit```
+# ```Datashare Toolkit```
 ## _DIY commercial datasets on Google Cloud Platform_
 
 _This is not an officially supported Google product._
 
-The ```Cloud Datashare Toolkit``` is a solution for data publishers to easily manage datasets residing within [BigQuery](https://cloud.google.com/bigquery/). The toolkit includes functionality to ingest and entitle data, relieving consumers from much of the toil involved in onboarding datasets from a variety of providers. Publishers upload data files to a storage bucket and allocate permissioned datasets for their consumers to use with BigQuery [authorized views](https://cloud.google.com/bigquery/docs/authorized-views). 
+The ```Datashare Toolkit``` is a solution for data publishers to easily manage datasets residing within [BigQuery](https://cloud.google.com/bigquery/). The toolkit includes functionality to ingest and entitle data, relieving consumers from much of the toil involved in onboarding datasets from a variety of providers. Publishers upload data files to a storage bucket and allocate permissioned datasets for their consumers to use with BigQuery [authorized views](https://cloud.google.com/bigquery/docs/authorized-views). 
 
 While these tools are used for data management and entitlement, they follow a bring-your-own-license (BYOL) for entitling publisher data. Hence, publishers should already have licensing arrangements for those consumers withing to access their data within GCP, and the consumers can furnish the GCP account ID's corresponding to their entitled user principals. These account IDs are required for the creation of the authorized views.
 
@@ -42,7 +42,7 @@ In many of today's typical scenarios, for each published dataset, a consumer mus
 
 - _Make it easy for data publishers to grant permissioned access for existing GCP consumers of their datasets_
 
-Commercial data publishing models rely on entitlements to grant access permission to licensed consuners. For large data publishers, their electronic entitlements solution may be entirely bespoke. CDS provides a simple solution for controlling access to data by using GCP's native access control mechanism combined with BigQuery authorized views and Publisher-defined groupings.
+Commercial data publishing models rely on entitlements to grant access permission to licensed consuners. For large data publishers, their electronic entitlements solution may be entirely bespoke. DS provides a simple solution for controlling access to data by using GCP's native access control mechanism combined with BigQuery authorized views and Publisher-defined groupings.
 
 - _Favor instrumenting the solution's configuration via convention_
 
@@ -74,7 +74,7 @@ The [ingestion](ingestion) page has details on the toolkit's embedded ingestion 
 
 _This is not an officially supported Google product._
 
-Cloud Datashare is under active development. Interfaces and functionality may change at any time.
+Datashare is under active development. Interfaces and functionality may change at any time.
 
 ## License
 
