@@ -35,7 +35,7 @@ A summary of the logic within the function is:
 After cloning the repository, this command will attach the Cloud Function to a storage bucket of your choosing:
 
 ```
-cd bq-datashare-toolkit/ingestion/bin
+cd datashare-toolkit/ingestion/bin
 ./deploy.sh --trigger-bucket=gs://<mybucket>
 ```
 At this point, any files uploaded to that bucket will trigger the
