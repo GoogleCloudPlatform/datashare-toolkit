@@ -129,6 +129,10 @@ procurements.post('/projects/:projectId/procurements/activate/:solutionId', asyn
     console.log(`Activate called for project ${projectId}, solution: ${solutionId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
     const data = { code: 200, success: true };
     var code;
+
+    // Response write out for 302 redirect if valid JWT, otherwise 302 redirect to invalid request page
+    // Record sub in the db table with the incoming accountId
+    // If we have to pass any data back to the UI, use a session-based cookie
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
     } else {
