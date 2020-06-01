@@ -312,7 +312,7 @@ export default {
       return d.toLocaleString();
     },
     navigateToTable(item) {
-      const url = `https://pantheon.corp.google.com/bigquery?project=${this.$store.state.settings.projectId}&p=${this.$store.state.settings.projectId}&d=${item.datasetId}&t=${item.name}&page=table`;
+      const url = `https://console.cloud.google.com/bigquery?project=${this.$store.state.settings.projectId}&p=${this.$store.state.settings.projectId}&d=${item.datasetId}&t=${item.name}&page=table`;
       window.open(url, '_blank');
     }
   }
