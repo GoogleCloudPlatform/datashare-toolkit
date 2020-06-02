@@ -176,8 +176,7 @@ procurements.post('/projects/:projectId/procurements/activate/:solutionId', asyn
         const accountId = decoded.payload.sub;
         if (!accountId || accountId.trim() === '') {
             console.error(`sub should not be empty`);
-        }
-        
+        }        
     } catch (err) {
         console.error(err);
     }
