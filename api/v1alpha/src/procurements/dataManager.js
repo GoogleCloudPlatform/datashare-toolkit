@@ -97,10 +97,10 @@ async function activate(projectId, solutionId, token) {
                     console.log(result);
                     resolve({ success: true, code: 200 });
                 } catch (err) {
-                    resolve({ success: true, code: 401, errors: [err] });
+                    resolve({ success: false, code: 401, errors: [err] });
                 }
             } else {
-                reject(err);
+                resolve({ success: false, code: 500, errors: [err] });
             }
         });
     });

@@ -128,22 +128,17 @@ procurements.post('/projects/:projectId/procurements/activate/:solutionId', asyn
     const solutionId = req.params.solutionId;
     const token = req.headers['x-gcp-marketplace-token'];
     console.log(`Activate called for project ${projectId}, solution: ${solutionId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
-    var code;
 
     const data = await dataManager.activate(projectId, solutionId, token);
     console.log(`Data: ${JSON.stringify(data)}`);
 
     if (data && data.success === false) {
-        code = (data.code === undefined ) ? 500 : data.code;
         res.clearCookie(gcpMarketplaceTokenCookieName);
+        res.redirect(req.headers.host + '/activationError');
     } else {
-        code = (data.code === undefined ) ? 200 : data.code;
         res.cookie(gcpMarketplaceTokenCookieName, token, { secure: true, expires: 0 });
+        res.redirect(req.headers.host + '/activate');
     }
-    res.status(code).json({
-        code: code,
-        ... data
-    });
 });
 
 procurements.post('/projects/:projectId/procurements/approve', async(req, res) => {
