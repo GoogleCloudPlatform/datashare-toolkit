@@ -244,7 +244,7 @@ function setMetadataDefaults(dict) {
         meta.sourceFormat = 'CSV';
     }
 
-    if (!meta.skipLeadingRows) {
+    if (meta.sourceFormat.toLowerCase() === 'csv' && !meta.skipLeadingRows) {
         meta.skipLeadingRows = 1;
     }
 
