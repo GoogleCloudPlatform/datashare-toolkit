@@ -385,7 +385,7 @@ export default {
       return d.toLocaleString();
     },
     navigateToDataset(item) {
-      const url = `https://pantheon.corp.google.com/bigquery?project=${this.$store.state.settings.projectId}&p=${this.$store.state.settings.projectId}&d=${item.datasetId}`;
+      const url = `https://console.cloud.google.com/bigquery?project=${this.$store.state.settings.projectId}&p=${this.$store.state.settings.projectId}&d=${item.datasetId}`;
       window.open(url, '_blank');
     }
   }
