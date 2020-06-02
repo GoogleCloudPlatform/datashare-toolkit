@@ -16,7 +16,9 @@
         "uuid": "^3.3.3",
         "cds-shared": "file:../../shared",
         "jsonschema": "^1.2.6",
-        "firebase-admin": "^8.10.0"
+        "firebase-admin": "^8.10.0",
+        "axios": "^0.19.2",
+        "jsonwebtoken": "^8.5.1"
     },
     "scripts": {
         "dev": "nodemon src/index.js",
