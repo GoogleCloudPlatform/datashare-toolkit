@@ -156,6 +156,23 @@ procurements.post('/projects/:projectId/procurements/activate/:solutionId', asyn
     const kid = decoded.header.kid;
     console.log(`jwt header kid: ${kid}`);
 
+    var jwksClient = require('jwks-rsa');
+    var client = jwksClient({
+        jwksUri: 'https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com'
+    });
+    function getKey(header, callback) {
+        client.getSigningKey(header.kid, function (err, key) {
+            console.log(`Error: ${err}`);
+            console.log(`Key: ${JSON.stringify(key, null, 3)}`);
+            callback(null, key);
+        });
+    }
+
+    jwt.verify(token, getKey, options, function (err, decoded) {
+        console.log(decoded);
+    });
+
+    /*
     const axios = require('axios');
     let keyDictionary = {};
     await axios.get(options.issuer)
@@ -180,7 +197,7 @@ procurements.post('/projects/:projectId/procurements/activate/:solutionId', asyn
     } catch (err) {
         console.error(err);
     }
-
+    */
     // Response write out for 302 redirect if valid JWT, otherwise 302 redirect to invalid request page
     // Record sub in the db table with the incoming accountId
     // If we have to pass any data back to the UI, use a session-based cookie
