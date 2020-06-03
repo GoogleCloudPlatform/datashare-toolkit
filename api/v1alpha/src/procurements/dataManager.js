@@ -74,7 +74,10 @@ async function activate(projectId, solutionId, token) {
 
     const options = {
         algorithms: ['RS256'],
+
+        // TODO: Should be passed in dynamically from solution configuration.
         audience: 'storage.cloud.google.com',
+
         issuer: cfg.procurementIssuer,
         ignoreExpiration: false,
         complete: true
