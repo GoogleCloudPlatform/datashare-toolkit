@@ -32,10 +32,22 @@ export default {
       console.log(user);
     }
   },
+  methods: {
+    getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2)
+        return parts
+          .pop()
+          .split(';')
+          .shift();
+    }
+  },
   computed: {
     userSummary() {
       return `<b>Display Name</b>: ${this.user.displayName}<br/>
-      <b>Email</b>: ${this.user.email}`;
+      <b>Email</b>: ${this.user.email}<br/>
+      <b>Token</b>: ${this.getCookie('gmt')}`;
     }
   },
   mounted() {
