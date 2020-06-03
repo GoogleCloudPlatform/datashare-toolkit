@@ -88,6 +88,7 @@ async function activate(projectId, solutionId, token) {
     // console.log(`jwt header kid: ${kid}`);
 
     const kid = cfg.procurementKid;
+    // eslint-disable-next-line no-unused-vars
     return new Promise((resolve, reject) => {
         client.getSigningKey(kid, (err, key) => {
             if (!err) {
