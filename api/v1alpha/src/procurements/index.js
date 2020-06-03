@@ -18,6 +18,7 @@
 
 const express = require('express');
 
+const cfg = require('../lib/config');
 const dataManager = require("./dataManager");
 const gcpMarketplaceTokenCookieName = 'gmt';
 
@@ -134,10 +135,10 @@ procurements.post('/projects/:projectId/procurements/activate/:solutionId', asyn
 
     if (data && data.success === false) {
         res.clearCookie(gcpMarketplaceTokenCookieName);
-        res.redirect(req.headers.host + '/activationError');
+        res.redirect(cfg.uiBaseUrl + '/activationError');
     } else {
         res.cookie(gcpMarketplaceTokenCookieName, token, { secure: true, expires: 0 });
-        res.redirect(req.headers.host + '/activate');
+        res.redirect(cfg.uiBaseUrl + '/activate');
     }
 });
 

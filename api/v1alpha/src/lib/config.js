@@ -68,4 +68,6 @@ if (process.env.ADMIN_USERS) {
 config.procurementJwksUri = process.env.PROCUREMENT_JWKS_URI || 'https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com';
 config.procurementIssuer = process.env.PROCUREMENT_ISSUER || 'https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com';
 
+config.uiBaseUrl = process.env.UI_BASE_URL || 'http://localhost:8080';
+
 module.exports = config;
