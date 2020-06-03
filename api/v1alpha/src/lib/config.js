@@ -66,7 +66,6 @@ if (process.env.ADMIN_USERS) {
 }
 
 config.procurementJwksUri = process.env.PROCUREMENT_JWKS_URI || 'https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com';
-config.procurementKid = process.env.PROCUREMENT_KID || '7b0075f93b9f8ced6e0af89f02a6d0ad04bfab00';
 config.procurementIssuer = process.env.PROCUREMENT_ISSUER || 'https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com';
 
 module.exports = config;

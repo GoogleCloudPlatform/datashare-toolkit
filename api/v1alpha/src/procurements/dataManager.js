@@ -81,13 +81,13 @@ async function activate(projectId, solutionId, token) {
         complete: true
     };
 
-    // If we want to dynamically get the kid value.
-    // const decoded = jwt.decode(token, options);
-    // kid indicates the key ID that was used to secure the JWT. Use the key ID to look up the key from the JSON object in the iss attribute in the payload.
-    // const kid = decoded.header.kid;
-    // console.log(`jwt header kid: ${kid}`);
+    // Get the kid value
+    const decoded = jwt.decode(token, options);
+    // kid indicates the key ID that was used to secure the JWT. Use the key ID to 
+    // look up the key from the JSON object in the iss attribute in the payload.
+    const kid = decoded.header.kid;
+    console.log(`jwt kid: ${kid}`);
 
-    const kid = cfg.procurementKid;
     // eslint-disable-next-line no-unused-vars
     return new Promise((resolve, reject) => {
         client.getSigningKey(kid, (err, key) => {
