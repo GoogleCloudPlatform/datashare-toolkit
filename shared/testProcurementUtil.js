@@ -21,21 +21,21 @@ let commerceProcurementUtil = new CommerceProcurementUtil();
 const uuidv4 = require('uuid/v4');
 
 
-async function listAccounts (projectId) {
+async function listAccounts(projectId) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
         const accounts = await procurementUtil.listAccounts();
-        return { success: true, data: accounts }
+        return { success: true, data: accounts };
     } catch (err) {
         return { success: false, errors: ['Failed to retrieve accounts'] };
     }
 }
 
-async function listEntitlements (projectId) {
+async function listEntitlements(projectId) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
         const entitlements = await procurementUtil.listEntitlements();
-        return { success: true, data: entitlements }
+        return { success: true, data: entitlements };
     } catch (err) {
         return { success: false, errors: ['Failed to retrieve entitlements'] };
     }
@@ -46,9 +46,11 @@ listAccounts('cds-demo-2')
     .then((res) => {
         console.log(JSON.stringify(res));
         console.log('Finished');
+        return true;
     }).catch(console.error);
 listEntitlements('cds-demo-2')
     .then((res) => {
         console.log(JSON.stringify(res));
         console.log('Finished');
+        return true;
     }).catch(console.error);
