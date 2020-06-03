@@ -16,6 +16,7 @@
     "@google-cloud/functions-framework": "^1.3.2",
     "@google-cloud/pubsub": "^1.1.5",
     "@google-cloud/storage": "^4.1.3",
+    "googleapis": "file:temp_npm_packages/google-api-nodejs-client",
     "jsonschema": "^1.2.4",
     "lint": "^0.7.0",
     "minimist": "^1.2.5",
@@ -24,11 +25,11 @@
     "yaml": "^1.7.2"
   },
   "devDependencies": {
-    "eslint": "^5.12.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "mocha": "^6.2.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "eslint": "^5.16.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "mocha": "^6.2.2",
     "nyc": "^14.1.1"
   }
 }
