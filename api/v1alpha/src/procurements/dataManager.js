@@ -18,7 +18,6 @@
 
 const { BigQueryUtil } = require('cds-shared');
 let bigqueryUtil = new BigQueryUtil();
-const uuidv4 = require('uuid/v4');
 const cfg = require('../lib/config');
 const jwksClient = require('jwks-rsa');
 const ms = require('ms');
