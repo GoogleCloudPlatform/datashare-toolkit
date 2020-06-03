@@ -1,0 +1,30 @@
+{% include "license.njk" %}
+
+/*! THIS FILE IS AUTO-GENERATED */
+
+import {
+  AuthPlus, 
+  getAPI, 
+  GoogleConfigurable
+} from 'googleapis-common';
+{% for versionName, version in api %}
+  import { {{ name }}_{{ version|replace('.','_') }} } from './{{ version }}';
+{% endfor %}
+
+export const VERSIONS = {
+  {% for versionName, version in api %}
+    '{{ version }}': {{ name }}_{{ version|replace('.','_') }}.{{name|capitalize}},
+  {% endfor %}
+};
+
+{% for versionName, version in api %}
+  {% set Version = version|replace('.','_') %}
+  export function {{ name }}(version: '{{ version }}'): {{ name }}_{{ Version }}.{{ name|capitalize }};
+  export function {{ name }}(options: {{ name }}_{{ Version }}.Options): {{ name }}_{{ Version }}.{{ name|capitalize }};
+{% endfor %}
+export function {{ name }}<T = {% for versionName, version in api %}{{ name }}_{{ version|replace('.','_') }}.{{name|capitalize}}{% if not loop.last %}|{% endif %}{% endfor %}>(this: GoogleConfigurable, versionOrOptions: {% for versionName, version in api %}'{{ version }}'|{{ name }}_{{ version|replace('.','_') }}.Options{% if not loop.last %}|{% endif %}{% endfor %}) {
+  return getAPI<T>('{{ name }}', versionOrOptions, VERSIONS, this);
+}
+
+const auth = new AuthPlus();
+export {auth};

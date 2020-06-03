@@ -1,0 +1,83 @@
+{% import "method-partial.njk" as method %}
+{% macro render(api, rootApi, classPath) %}
+{% if api.resources %}
+  {% for rname, r in api.resources|dictsort %}
+    {% set ClassName = classPath + rname|capitalize|camelify %}
+    export class {{ ClassName }} {
+      context: APIRequestContext;
+      {% if r.resources %}
+        {% for rname, r2 in r.resources|dictsort %}
+          {% set innerClassName = ClassName + "$" + rname|capitalize|camelify %}
+          {{ rname|camelify }}: {{ innerClassName }};
+        {% endfor %}
+      {% endif %}
+      constructor(context: APIRequestContext) {
+        this.context = context;
+        {% if r.resources %}
+          {% for rname, r2 in r.resources|dictsort %}
+            {% set innerClassName = ClassName + "$" + rname|capitalize|camelify %}
+            this.{{ rname|camelify }} = new {{ innerClassName }}(this.context);
+          {% endfor %}
+        {% endif %}
+      }
+
+      {% if r.methods %}
+        {% for mname, m in r.methods|dictsort %}
+          {{ method.render(m, mname, r, rootApi, ClassName) }}
+        {% endfor %}
+      {% endif %}
+    }
+
+    {% if r.methods %}
+      {% for mname, m in r.methods|dictsort %}
+        export interface Params${{ClassName}}${{ mname|camelify|capitalize }} extends StandardParameters {
+          /**
+           * Auth client or API Key for the request
+           */
+          auth?: string|OAuth2Client|JWT|Compute|UserRefreshClient;
+
+          {% if m.parameters %}
+            {% for pname, p in m.parameters|dictsort %}
+              /**
+               * {{ p.description|oneLine|cleanComments|safe }}
+               */
+              {{ pname|cleanPropertyName|safe }}?: {{ p|getType }}{% if p.repeated %}[]{% endif %};
+            {% endfor %}
+          {% endif %}
+
+          {% if m.request %}
+            /**
+              * Request body metadata
+              */
+            requestBody?: Schema${{ m.request.$ref }};
+          {% elif m.supportsMediaUpload and m.mediaUpload.protocols.simple.multipart %}
+            /**
+              * Request body metadata
+              */
+            requestBody?: {};
+          {% endif %}
+
+          {% if m.supportsMediaUpload %}
+            /**
+              * Media metadata
+              */
+            media?: {
+              /**
+                * Media mime-type
+                */
+              mimeType?: string;
+
+              /**
+                * Media body contents
+                */
+              body?: any;
+            };
+          {% endif %}
+        }
+      {% endfor %}
+    {% endif %}
+
+    {{ render(r, rootApi, ClassName + "$") }}
+  {% endfor %}
+{% endif %}
+{% endmacro %}
