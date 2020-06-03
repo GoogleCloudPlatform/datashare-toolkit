@@ -63,7 +63,7 @@ async function listProcurements(projectId) {
  */
 async function activate(projectId, solutionId, token) {
     // https://cloud.google.com/marketplace/docs/partners/integrated-saas/frontend-integration#verify-jwt
-    var jwt = require('jsonwebtoken');
+    const jwt = require('jsonwebtoken');
 
     /*
         1. Verify that the JWT signature is using the public key from Google.
