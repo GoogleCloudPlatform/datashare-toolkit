@@ -124,6 +124,7 @@ procurements.get('/projects/:projectId/procurements', async (req, res) => {
     });
 });
 
+// Move to accounts index.js as custom function
 procurements.post('/projects/:projectId/procurements/activate/:solutionId', async(req, res) => {
     const projectId = req.params.projectId;
     const solutionId = req.params.solutionId;
