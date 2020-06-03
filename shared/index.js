@@ -19,11 +19,13 @@ const cloudFunctionUtil = require("./cloudFunctionUtil");
 const pubSubUtil = require("./pubSubUtil");
 const storageUtil = require("./storageUtil");
 const commonUtil = require("./commonUtil");
+const commerceProcurementUtil = require("./commerceProcurementUtil");
 
 module.exports = {
     BigQueryUtil: bigqueryUtil,
     CloudFunctionUtil: cloudFunctionUtil,
     PubSubUtil: pubSubUtil,
     StorageUtil: storageUtil,
-    CommonUtil: commonUtil
+    CommonUtil: commonUtil,
+    CommerceProcurementUtil: commerceProcurementUtil
 };
