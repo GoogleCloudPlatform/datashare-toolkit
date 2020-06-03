@@ -19,6 +19,7 @@
 const express = require('express');
 
 const dataManager = require("./dataManager");
+const gcpMarketplaceTokenCookieName = 'gmt';
 
 /************************************************************
   API Endpoints
@@ -127,89 +128,17 @@ procurements.post('/projects/:projectId/procurements/activate/:solutionId', asyn
     const solutionId = req.params.solutionId;
     const token = req.headers['x-gcp-marketplace-token'];
     console.log(`Activate called for project ${projectId}, solution: ${solutionId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
-    const data = { code: 200, success: true };
-    var code;
 
-    // https://cloud.google.com/marketplace/docs/partners/integrated-saas/frontend-integration#verify-jwt
-    var jwt = require('jsonwebtoken');
+    const data = await dataManager.activate(projectId, solutionId, token);
+    console.log(`Data: ${JSON.stringify(data)}`);
 
-    /*
-        1. Verify that the JWT signature is using the public key from Google.
-        2. Verify that the JWT has not expired, by checking the exp claim.
-        3. Verify that aud claim is the correct domain for your solution.
-        4. Verify that the iss claim is https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com
-        5. Verify that sub is not empty.
-    */
-
-    const options = {
-        // alg is always RS256
-        algorithms: ['RS256'],
-        audience: 'storage.cloud.google.com',
-        issuer: 'https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com',
-        ignoreExpiration: false,
-        complete: true
-    };
-
-    const decoded = jwt.decode(token, options);
-
-    // kid indicates the key ID that was used to secure the JWT. Use the key ID to look up the key from the JSON object in the iss attribute in the payload.
-    const kid = decoded.header.kid;
-    console.log(`jwt header kid: ${kid}`);
-
-    var jwksClient = require('jwks-rsa');
-    var client = jwksClient({
-        jwksUri: 'https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com'
-    });
-    function getKey(header, callback) {
-        client.getSigningKey(header.kid, function (err, key) {
-            console.log(`Error: ${err}`);
-            console.log(`Key: ${JSON.stringify(key, null, 3)}`);
-            callback(null, key);
-        });
-    }
-
-    jwt.verify(token, getKey, options, function (err, decoded) {
-        console.log(decoded);
-    });
-
-    /*
-    const axios = require('axios');
-    let keyDictionary = {};
-    await axios.get(options.issuer)
-        .then(response => {
-            keyDictionary = response.data;
-        })
-        .catch(error => {
-            console.log(error);
-        });
-
-    let secretOrPublicKey = keyDictionary[kid]
-
-    try {
-        const decoded = jwt.verify(token, secretOrPublicKey, options);
-        console.log(`Success: ${JSON.stringify(decoded, null, 3)}`);
-
-        // sub is the user's Google account ID. You must use this ID to link the user's Google account to their account in your system.
-        const accountId = decoded.payload.sub;
-        if (!accountId || accountId.trim() === '') {
-            console.error(`sub should not be empty`);
-        }        
-    } catch (err) {
-        console.error(err);
-    }
-    */
-    // Response write out for 302 redirect if valid JWT, otherwise 302 redirect to invalid request page
-    // Record sub in the db table with the incoming accountId
-    // If we have to pass any data back to the UI, use a session-based cookie
     if (data && data.success === false) {
-        code = (data.code === undefined ) ? 500 : data.code;
+        res.clearCookie(gcpMarketplaceTokenCookieName);
+        res.redirect(req.headers.host + '/activationError');
     } else {
-        code = (data.code === undefined ) ? 200 : data.code;
+        res.cookie(gcpMarketplaceTokenCookieName, token, { secure: true, expires: 0 });
+        res.redirect(req.headers.host + '/activate');
     }
-    res.status(code).json({
-        code: code,
-        ... data
-    });
 });
 
 procurements.post('/projects/:projectId/procurements/approve', async(req, res) => {
