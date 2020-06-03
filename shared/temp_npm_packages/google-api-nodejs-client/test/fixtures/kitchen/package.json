@@ -1,0 +1,20 @@
+{
+  "name": "google-api-nodejs-client-fixture",
+  "version": "1.0.0",
+  "description": "An app we're using to test the library. ",
+  "scripts": {
+    "compile": "tsc -p .",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "start": "node build/src/index.js"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "googleapis": "file:./googleapis.tgz"
+  },
+  "devDependencies": {
+    "@types/node": "^13.13.4",
+    "typescript": "~3.8.3",
+    "gts": "^2.0.0"
+  }
+}

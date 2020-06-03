@@ -1,0 +1,23 @@
+{% include "license.njk" %}
+/*! THIS FILE IS AUTO-GENERATED */
+
+{% for apiName, api in apis %}
+  import * as {{ apiName }} from './{{ apiName }}';
+{% endfor %}
+
+export interface APIList {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [index: string]: { [index: string]: any };
+}
+
+export const APIS: APIList = {
+  {% for apiName, api in apis %}
+    {{ apiName }}: {{ apiName }}.VERSIONS,
+  {% endfor %}
+};
+
+export class GeneratedAPIs {
+  {% for apiName, api in apis %}
+    {{ apiName }} = {{ apiName }}.{{ apiName }};
+  {% endfor %}
+}

@@ -1,0 +1,14 @@
+node_modules/
+build/
+/docs/
+.coverage/
+npm-debug.log
+.nyc_output
+.vscode
+.idea
+.DS_Store
+samples/*.keys.json
+samples/**/credentials.json
+package-lock.json
+yarn.lock
+__pycache__

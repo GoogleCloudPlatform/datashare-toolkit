@@ -1,0 +1,11 @@
+{% include "license.njk" %}
+ /*! THIS FILE IS AUTO-GENERATED */
+
+import {GoogleApis} from './googleapis';
+const google = new GoogleApis();
+export {google, GoogleApis};
+
+{% for apiName, api in apis %}
+  {% for versionName, version in api %}export { {{ apiName }}_{{ version|replace('.','_') }} } from './apis/{{ apiName }}/{{ version }}';
+{% endfor %}
+{% endfor %}
