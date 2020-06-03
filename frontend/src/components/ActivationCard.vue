@@ -30,6 +30,8 @@ export default {
         });
     } else {
       console.log(user);
+      // Idea of where we would post back the cookie and accountId.
+      // Activation success/failure, etc.
     }
   },
   methods: {

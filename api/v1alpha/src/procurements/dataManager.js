@@ -76,6 +76,8 @@ async function activate(projectId, solutionId, token) {
         algorithms: ['RS256'],
 
         // TODO: Should be passed in dynamically from solution configuration.
+        // Host or referrer in the header
+        // req.header.host
         audience: 'storage.cloud.google.com',
 
         issuer: cfg.procurementIssuer,
