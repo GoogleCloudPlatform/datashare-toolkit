@@ -87,10 +87,16 @@ async function activate(projectId, solutionId, token) {
 
     // Get the kid value
     const decoded = jwt.decode(token, options);
-    // kid indicates the key ID that was used to secure the JWT. Use the key ID to 
-    // look up the key from the JSON object in the iss attribute in the payload.
-    const kid = decoded.header.kid;
-    console.log(`jwt kid: ${kid}`);
+
+    let kid = '';
+    if (decoded && decoded.header && decoded.header.kid) {
+        // kid indicates the key ID that was used to secure the JWT. Use the key ID to 
+        // look up the key from the JSON object in the iss attribute in the payload.
+        kid = decoded.header.kid;
+        console.log(`jwt kid: ${kid}`);
+    } else {
+        return { success: false, code: 500, errors: ['Unable to parse JWT token'] };
+    }
 
     // eslint-disable-next-line no-unused-vars
     return new Promise((resolve, reject) => {
