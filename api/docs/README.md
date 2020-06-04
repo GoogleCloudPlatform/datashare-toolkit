@@ -1,4 +1,4 @@
-# CDS API - Spot Service Docs
+# DS API - Spot Service Docs
 
   - [Configuration](CONFIGURATION.md)
 

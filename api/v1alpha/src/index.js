@@ -43,7 +43,7 @@ const options = {
             },
             license: {
                 name: 'Apache 2.0',
-                url: 'https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/blob/master/LICENSE.txt'
+                url: 'https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/LICENSE.txt'
             }
         },
         servers: [{
@@ -61,7 +61,7 @@ const options = {
         }],
         externalDocs: {
             description: 'Find out more about Datashare Toolkit',
-            url: 'https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit'
+            url: 'https://github.com/GoogleCloudPlatform/datashare-toolkit'
         }
     },
     // Path to the API docs

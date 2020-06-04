@@ -1,4 +1,4 @@
-# CDS API
+# DS API
 
 * [Overview](#overview)
   * [Architecture](#architecture)
@@ -22,9 +22,9 @@
 
 # Overview
 
-The CDS API allows data producers the ability to programmatically enforce access control or Entitlements on their organization's Dataset(s) in Google Cloud Platform (GCP). The CDS Policies are access control configurations that are constructed by the data producers with relationships between who can access what specific data assets. The policies enable data producers fine-grained control of their datasets down to row level fields or attributes for one or many data Account Consumer(s).
+The DS API allows data producers the ability to programmatically enforce access control or Entitlements on their organization's Dataset(s) in Google Cloud Platform (GCP). The DS Policies are access control configurations that are constructed by the data producers with relationships between who can access what specific data assets. The policies enable data producers fine-grained control of their datasets down to row level fields or attributes for one or many data Account Consumer(s).
 
-The CDS API also enables data producers unique Fulfillments operations on their datasets. These fulfillments can be one-time Spot Request(s) for consumption of data for non GCP data consumers.
+The DS API also enables data producers unique Fulfillments operations on their datasets. These fulfillments can be one-time Spot Request(s) for consumption of data for non GCP data consumers.
 
 
 ## Architecture
@@ -46,7 +46,7 @@ There are configuration settings for Entitlements and Fulfillment services. Curr
 ### Documentation
 _OpenAPI Specification_
 
-The CDS API service(s) utilize the open standard for API documentation, [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) (OAS) for documenting the API's resources, parameters, responses, etc. The OAS definitions and paths are rendered via [swagger-jsdoc](https://www.npmjs.com/package/swagger-jsdoc) in the route comments of [index](v1alpha/index.js)
+The DS API service(s) utilize the open standard for API documentation, [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) (OAS) for documenting the API's resources, parameters, responses, etc. The OAS definitions and paths are rendered via [swagger-jsdoc](https://www.npmjs.com/package/swagger-jsdoc) in the route comments of [index](v1alpha/index.js)
 
 You can access the OAS directly via:
 
@@ -59,7 +59,7 @@ You can also access an instance of Swagger UI to render the OAS docs:
 
 ## Getting Started
 
-These instructions will setup an instance of the CDS API Service in your GCP project.
+These instructions will setup an instance of the DS API Service in your GCP project.
 
 ### Setup GCloud
 * Install the [Google Cloud SDK](https://cloud.google.com/sdk/install) on your local machine.
@@ -75,7 +75,7 @@ Set `gcloud` connect to your current project.
 
 ### Enable APIs
 
-These are the GCP project APIs that require the CDS API service(s) access.
+These are the GCP project APIs that require the DS API service(s) access.
 
 ```
 gcloud services enable bigquery-json.googleapis.com
@@ -84,7 +84,7 @@ gcloud services enable iam.googleapis.com
 
 ### Service Account
 
-CDS API service(s) are a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](./config/cds-api-mgr-role-definition.yaml)
+DS API service(s) are a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](./config/cds-api-mgr-role-definition.yaml)
 
 #### Setup Service Account
 
@@ -98,9 +98,9 @@ Set the **SERVICE\_ACCOUNT\_NAME** environment variable(s):
 
 Set the **SERVICE\_ACCOUNT\_DESC** environment variable(s):
 
-    export SERVICE_ACCOUNT_DESC="CDS API Manager";
+    export SERVICE_ACCOUNT_DESC="DS API Manager";
 
-Create the custom CDS API service-account:
+Create the custom DS API service-account:
 
     gcloud iam service-accounts create ${SERVICE_ACCOUNT_NAME} --display-name "${SERVICE_ACCOUNT_DESC}";
 
@@ -111,7 +111,7 @@ Set the **CUSTOM\_ROLE\_NAME** environment variable(s):
 *Note* We could use the the following roles, but it's better to follow the principle of least privilege. \
 _The permissions for the custom role are defined in [config/cds-api-mgr-role-definition.yaml](config/cds-api-mgr-role-definition.yaml)_
 
-Create custom CDS API role:
+Create custom DS API role:
 
     gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/cds-api-mgr-role-definition.yaml
 
@@ -143,7 +143,7 @@ You can deploy the API service via various methods below based off developer pre
   * [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/) via [Skaffold](https://github.com/GoogleContainerTools/skaffold)
   * [Google Cloud App Engine](https://cloud.google.com/appengine/) via [Deployment Manager](https://cloud.google.com/deployment-manager/) and gcloud - TODO
 
-[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the CDS API Service content and generate a unique URL for consumption.
+[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the DS API Service content and generate a unique URL for consumption.
 
 There are some environment variables that need to be set for all build and deployment options.
 
@@ -217,7 +217,7 @@ _Note_ Change the file path to the appropriate destination. Secrets management f
 
     kubectl create secret generic cds-api-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
 
-Modify the ConfigMap with the appropriate CDS API environment variables:
+Modify the ConfigMap with the appropriate DS API environment variables:
 
     vi kubernetes-manifests/cds-api/configmaps.yaml
 

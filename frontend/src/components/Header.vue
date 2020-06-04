@@ -57,7 +57,7 @@
             icon
             dark
             v-on="on"
-            href="https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit"
+            href="https://github.com/GoogleCloudPlatform/datashare-toolkit"
             target="_blank"
           >
             <v-icon>{{ icons.helpCircle }}</v-icon>
