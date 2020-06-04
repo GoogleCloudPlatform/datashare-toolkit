@@ -607,7 +607,7 @@ accounts.get('/projects/:projectId/datasets/:datasetId/accounts', async(req, res
     });
 });
 
-accounts.post('/projects/:projectId/accounts:register', async(req, res) => {
+accounts.post('/projects/:projectId/accounts::register', async(req, res) => {
     const projectId = req.params.projectId;
     const token = req.headers['x-gcp-marketplace-token'];
     console.log(`Activate called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
@@ -624,11 +624,15 @@ accounts.post('/projects/:projectId/accounts:register', async(req, res) => {
     }
 });
 
-accounts.post('/projects/:projectId/accounts:approve', async(req, res) => {
+accounts.post('/projects/:projectId/accountsa::approve', async(req, res) => {
     const projectId = req.params.projectId;
-    const body = req.body;
-    console.log(`Approve called for project ${projectId} with body: ${JSON.stringify(body)}`);
-    const data = { code: 200, success: true };
+    const token = req.cookies[gcpMarketplaceTokenCookieName];
+    const accountId = req.body.accountId;
+    console.log(`Approve called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
+    
+    const data = await dataManager.approve(projectId, token, accountId);
+    console.log(`Data: ${JSON.stringify(data)}`);
+
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

@@ -19,6 +19,7 @@
 var compression = require('compression');
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cors = require('cors')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
@@ -88,6 +89,7 @@ app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.raw({type: 'application/octet-stream'}));
+app.use(cookieParser());
 
 // Import the CDS API Spots service router
 const spots = require('./spots/index');

@@ -328,7 +328,6 @@ async function deleteAccount(projectId, accountId, data) {
 
 /**
  * @param  {} projectId
- * @param  {} solutionId
  * @param  {} token
  */
 async function register(projectId, token) {
@@ -392,10 +391,19 @@ async function register(projectId, token) {
     // If we have to pass any data back to the UI, use a session-based cookie
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} token
+ */
+async function approve(projectId, token, accountId) {
+    return { success: true, code: 200, errors: [] }
+}
+
 module.exports = {
     listAccounts,
     createOrUpdateAccount,
     deleteAccount,
     getAccount,
-    register
+    register,
+    approve
 };
