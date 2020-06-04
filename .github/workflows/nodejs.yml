@@ -33,6 +33,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - name: npm install for shared depdendencies
+      run: |
+        cd shared
+        npm install
     - name: npm install and lint for processUpload
       run: |
         cd ingestion/batch
