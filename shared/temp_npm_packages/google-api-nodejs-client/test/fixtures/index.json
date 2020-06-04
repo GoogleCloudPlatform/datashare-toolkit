@@ -1,8 +1,0 @@
-{
-  "items": [
-    {
-      "id": "fake:v1",
-      "discoveryRestUrl": "http://localhost:3030/path"
-    }
-  ]
-}
