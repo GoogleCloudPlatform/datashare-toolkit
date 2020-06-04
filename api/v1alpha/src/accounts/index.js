@@ -19,6 +19,8 @@
 const express = require('express');
 
 const dataManager = require("./dataManager");
+const cfg = require('../lib/config');
+const gcpMarketplaceTokenCookieName = 'gmt';
 
 /************************************************************
   API Endpoints
@@ -593,6 +595,40 @@ accounts.get('/projects/:projectId/datasets/:datasetId/accounts', async(req, res
     const projectId = req.params.projectId;
     const datasetId = req.params.datasetId;
     const data = await dataManager.listAccounts(projectId, datasetId);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+accounts.post('/projects/:projectId/accounts:register', async(req, res) => {
+    const projectId = req.params.projectId;
+    const token = req.headers['x-gcp-marketplace-token'];
+    console.log(`Activate called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
+
+    const data = await dataManager.register(projectId, token);
+    console.log(`Data: ${JSON.stringify(data)}`);
+
+    if (data && data.success === false) {
+        res.clearCookie(gcpMarketplaceTokenCookieName);
+        res.redirect(cfg.uiBaseUrl + '/activationError');
+    } else {
+        res.cookie(gcpMarketplaceTokenCookieName, token, { secure: true, expires: 0 });
+        res.redirect(cfg.uiBaseUrl + '/activate');
+    }
+});
+
+accounts.post('/projects/:projectId/accounts:approve', async(req, res) => {
+    const projectId = req.params.projectId;
+    const body = req.body;
+    console.log(`Approve called for project ${projectId} with body: ${JSON.stringify(body)}`);
+    const data = { code: 200, success: true };
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

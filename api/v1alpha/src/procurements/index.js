@@ -17,10 +17,7 @@
 'use strict';
 
 const express = require('express');
-
-const cfg = require('../lib/config');
 const dataManager = require("./dataManager");
-const gcpMarketplaceTokenCookieName = 'gmt';
 
 /************************************************************
   API Endpoints
@@ -121,42 +118,6 @@ procurements.get('/projects/:projectId/procurements', async (req, res) => {
     res.status(code).json({
         code: code,
         ...data
-    });
-});
-
-// Move to accounts index.js as custom function
-procurements.post('/projects/:projectId/procurements/activate/:solutionId', async(req, res) => {
-    const projectId = req.params.projectId;
-    const solutionId = req.params.solutionId;
-    const token = req.headers['x-gcp-marketplace-token'];
-    console.log(`Activate called for project ${projectId}, solution: ${solutionId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
-
-    const data = await dataManager.activate(projectId, solutionId, token);
-    console.log(`Data: ${JSON.stringify(data)}`);
-
-    if (data && data.success === false) {
-        res.clearCookie(gcpMarketplaceTokenCookieName);
-        res.redirect(cfg.uiBaseUrl + '/activationError');
-    } else {
-        res.cookie(gcpMarketplaceTokenCookieName, token, { secure: true, expires: 0 });
-        res.redirect(cfg.uiBaseUrl + '/activate');
-    }
-});
-
-procurements.post('/projects/:projectId/procurements/approve', async(req, res) => {
-    const projectId = req.params.projectId;
-    const body = req.body;
-    console.log(`Approve called for project ${projectId} with body: ${JSON.stringify(body)}`);
-    const data = { code: 200, success: true };
-    var code;
-    if (data && data.success === false) {
-        code = (data.code === undefined ) ? 500 : data.code;
-    } else {
-        code = (data.code === undefined ) ? 200 : data.code;
-    }
-    res.status(code).json({
-        code: code,
-        ... data
     });
 });
 
