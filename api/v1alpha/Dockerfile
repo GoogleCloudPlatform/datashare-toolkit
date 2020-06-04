@@ -27,12 +27,19 @@ WORKDIR /app
 
 # Create the shared depdendency directory
 RUN mkdir -p /shared
+# Create the shared package depdendency directory (TODO - remove when b/157860568 is resolved)
+RUN mkdir -p /shared/temp_npm_packages/google-api-nodejs-client
 
 ## ---- Dependencies ----
 FROM base as dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
-# install shared dependencies first
+
+# install shared package depdendency first (TODO - remove when b/157860568 is resolved)
+COPY shared/temp_npm_packages/google-api-nodejs-client/package*.json /shared/temp_npm_packages/google-api-nodejs-client/
+RUN cd /shared/temp_npm_packages/google-api-nodejs-client && npm install && cd -
+
+# install shared dependencies next
 COPY shared/package*.json /shared/
 RUN cd /shared && npm install && cd -
 
@@ -52,7 +59,10 @@ COPY api/v1alpha/src/ /app/
 # --- Release with Alpine ----
 FROM node:12.6-alpine as release
 WORKDIR /app
-# Install the shared dependencies first
+# install shared package depdendency first (TODO - remove when b/157860568 is resolved)
+COPY --from=dependencies /shared/temp_npm_packages/google-api-nodejs-client/package.json /shared/temp_npm_packages/google-api-nodejs-client/
+RUN cd /shared/temp_npm_packages/google-api-nodejs-client && npm install --only=production && cd -
+# Install the shared dependencies next
 COPY --from=dependencies /shared/package.json /shared/
 RUN cd /shared && npm install --only=production && cd -
 COPY --from=build /shared /shared
