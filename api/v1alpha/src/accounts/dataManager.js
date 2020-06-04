@@ -394,6 +394,7 @@ async function register(projectId, token) {
 /**
  * @param  {} projectId
  * @param  {} token
+ * @param  {} accountId
  */
 async function approve(projectId, token, accountId) {
     return { success: true, code: 200, errors: [] }
