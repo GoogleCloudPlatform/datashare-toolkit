@@ -20,7 +20,6 @@ const CommerceProcurementUtil = require('./commerceProcurementUtil');
 let commerceProcurementUtil = new CommerceProcurementUtil();
 const uuidv4 = require('uuid/v4');
 
-
 async function listAccounts(projectId) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
