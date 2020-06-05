@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node-version: [10.x, 12.x, 13.x]
     steps:
     - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node-version }}
@@ -33,15 +33,13 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: install shared package dependency first
-      run: |
-        cd $GITHUB_WORKSPACE/shared
-        npm install --only=production
     - name: npm install and lint for processUpload
       run: |
-        cd $GITHUB_WORKSPACE/ingestion/batch
-        npm install
-        npm run lint
-        npm test
+        rm -rf $GITHUB_WORKSPACE/shared/node_modules
+        npm install --prefix $GITHUB_WORKSPACE/shared
+        rm -rf GITHUB_WORKSPACE/ingestion/batch/node_modules
+        npm install --prefix $GITHUB_WORKSPACE/ingestion/batch
+        npm run lint --prefix $GITHUB_WORKSPACE/ingestion/batch
+        npm test --prefix $GITHUB_WORKSPACE/ingestion/batch
       env:
         CI: true
