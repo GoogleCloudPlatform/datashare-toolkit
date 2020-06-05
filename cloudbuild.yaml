@@ -3,10 +3,14 @@ steps:
   dir: 'shared'
   entrypoint: 'npm'
   args: ['install']
+  env:
+  - 'PROJECT_ID=$PROJECT_ID'
 - name: 'node:10.20.1'
   dir: 'ingestion/batch'
   entrypoint: 'npm'
   args: ['install']
+  env:
+  - 'PROJECT_ID=$PROJECT_ID'
 - name: gcr.io/cloud-builders/gcloud
   dir: 'shared'
   args:
@@ -28,4 +32,6 @@ steps:
   dir: 'ingestion/batch'
   entrypoint: 'npm'
   args: ['run', 'cloudtest']
-  
+  env:
+  - 'PROJECT_ID=$PROJECT_ID'
+
