@@ -20,6 +20,26 @@ const CommerceProcurementUtil = require('./commerceProcurementUtil');
 let commerceProcurementUtil = new CommerceProcurementUtil();
 const uuidv4 = require('uuid/v4');
 
+async function getAccount(projectId, name) {
+    try {
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        const account = await procurementUtil.getAccount(name);
+        return { success: true, data: account };
+    } catch (err) {
+        return { success: false, errors: ['Failed to retrieve account'] };
+    }
+}
+
+async function approveAccount(projectId, name, approvalName, reason) {
+    try {
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        const approval = await procurementUtil.approveAccount(name, approvalName, reason);
+        return { success: true, data: approval };
+    } catch (err) {
+        return { success: false, errors: ['Failed to approve account'] };
+    }
+}
+
 async function listAccounts(projectId) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
@@ -41,15 +61,27 @@ async function listEntitlements(projectId) {
 }
 
 console.log('Starting');
+
 listAccounts('cds-demo-2')
     .then((res) => {
-        console.log(JSON.stringify(res));
-        console.log('Finished');
+        console.log(`listAccounts: ${JSON.stringify(res)}`);
         return true;
     }).catch(console.error);
+
 listEntitlements('cds-demo-2')
     .then((res) => {
-        console.log(JSON.stringify(res));
-        console.log('Finished');
+        console.log(`listEntitlements: ${JSON.stringify(res)}`);
+        return true;
+    }).catch(console.error);
+
+getAccount('cds-demo-2', 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D')
+    .then((res) => {
+        console.log(`getAccount: ${JSON.stringify(res)}`);
+        return true;
+    }).catch(console.error);
+
+approveAccount('cds-demo-2', 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D', 'signup', 'test reason')
+    .then((res) => {
+        console.log(`approveAccount: ${JSON.stringify(res)}`);
         return true;
     }).catch(console.error);

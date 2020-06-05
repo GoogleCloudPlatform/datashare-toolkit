@@ -76,6 +76,53 @@ class CommerceProcurementUtil {
     }
 
     /**
+     * get Account resource
+     */
+    async getAccount(name) {
+        console.log(name);
+        const authClient = await this.auth.getClient();
+        try {
+            const res = await this.procurementClient.providers.accounts.get({
+                auth: authClient,
+                name: name
+            });
+            if (this.VERBOSE_MODE) {
+                console.log(res.data);
+            }
+            return res.data;
+        } catch (err) {
+            if (this.VERBOSE_MODE) {
+                console.warn(err);
+            }
+		    throw err;
+        }
+    }
+
+    /**
+     * Grant an approval on Account resource
+     */
+    async approveAccount(name, approvalName, reason) {
+        const authClient = await this.auth.getClient();
+        try {
+            const res = await this.procurementClient.providers.accounts.approve({
+                auth: authClient,
+                name: name,
+                approvalName: approvalName,
+                reason: reason
+            });
+            if (this.VERBOSE_MODE) {
+                console.log(res.data);
+            }
+            return res.data;
+        } catch (err) {
+            if (this.VERBOSE_MODE) {
+                console.warn(err);
+            }
+		    throw err;
+        }
+    }
+
+    /**
      * list Entitlements for the provider
      */
     async listEntitlements() {
