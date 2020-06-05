@@ -16,8 +16,9 @@
 
 'use strict';
 
-const { BigQueryUtil } = require('cds-shared');
+const { BigQueryUtil, CommerceProcurementUtil } = require('cds-shared');
 let bigqueryUtil = new BigQueryUtil();
+let commerceProcurementUtil = new CommerceProcurementUtil('cds-demo-2');
 const cfg = require('../lib/config');
 
 /**
