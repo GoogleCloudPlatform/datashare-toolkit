@@ -36,7 +36,7 @@ FROM base as dependencies
 # where available (npm@5+)
 
 # install shared package depdendency first (TODO - remove when b/157860568 is resolved)
-COPY shared/temp_npm_packages/google-api-nodejs-client/package*.json /shared/temp_npm_packages/google-api-nodejs-client/
+COPY shared/temp_npm_packages/google-api-nodejs-client/. /shared/temp_npm_packages/google-api-nodejs-client/
 RUN cd /shared/temp_npm_packages/google-api-nodejs-client && npm install && cd -
 
 # install shared dependencies next
@@ -60,7 +60,7 @@ COPY api/v1alpha/src/ /app/
 FROM node:12.6-alpine as release
 WORKDIR /app
 # install shared package depdendency first (TODO - remove when b/157860568 is resolved)
-COPY --from=dependencies /shared/temp_npm_packages/google-api-nodejs-client/package.json /shared/temp_npm_packages/google-api-nodejs-client/
+COPY --from=dependencies /shared/temp_npm_packages/google-api-nodejs-client/. /shared/temp_npm_packages/google-api-nodejs-client/
 RUN cd /shared/temp_npm_packages/google-api-nodejs-client && npm install --only=production && cd -
 # Install the shared dependencies next
 COPY --from=dependencies /shared/package.json /shared/
