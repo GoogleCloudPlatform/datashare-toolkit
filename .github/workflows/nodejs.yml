@@ -16,7 +16,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: npm install, lint, and test for shared
       run: |
-        cd shared
+        cd $GITHUB_WORKSPACE/shared
         npm install
         npm run lint
         npm test
@@ -32,14 +32,14 @@ jobs:
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
-        node-version: ${{ matrix.node-version }}
-    - name: npm install for shared depdendencies
+      node-version: ${{ matrix.node-version }}
+    - name: install shared package dependency first
       run: |
-        cd shared
-        npm install
+        cd $GITHUB_WORKSPACE/shared
+        npm install --only=production
     - name: npm install and lint for processUpload
       run: |
-        cd ingestion/batch
+        cd $GITHUB_WORKSPACE/ingestion/batch
         npm install
         npm run lint
         npm test
