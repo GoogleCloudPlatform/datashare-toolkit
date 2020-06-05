@@ -35,6 +35,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: npm install and lint for processUpload
       run: |
+        rm -rf $GITHUB_WORKSPACE/shared/node_modules/temp_npm_packages/google-api-nodejs-client/node_modules
+        npm install -S --prefix $GITHUB_WORKSPACE/shared/temp_npm_packages/google-api-nodejs-client
         rm -rf $GITHUB_WORKSPACE/shared/node_modules
         npm install --prefix $GITHUB_WORKSPACE/shared
         rm -rf GITHUB_WORKSPACE/ingestion/batch/node_modules

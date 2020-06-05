@@ -1,10 +1,13 @@
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cds-api
 spec:
   replicas: 1
+  selector:
+   matchLabels:
+     app: cds-api
   template:
     metadata:
       labels:
@@ -17,7 +20,7 @@ spec:
           secretName: cds-api-creds
       containers:
         - name: cds-api
-          image: gcr.io/chrispage-dev/cds-api
+          image: cds-api
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5555
