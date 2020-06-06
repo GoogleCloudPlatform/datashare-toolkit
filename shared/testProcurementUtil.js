@@ -83,36 +83,36 @@ console.log('Starting');
 
 getEntitlement('cds-demo-2', 'providers/cds-demo-2/entitlements/84b05068-01a9-4ca9-9943-b9babf0b5030')
     .then((res) => {
-        console.log(`getEntitlement: ${JSON.stringify(res)}`);
+        console.log(`getEntitlement:\n${JSON.stringify(res, null, 3)}`);
         return true;
     }).catch(console.error);
 
 updateEntitlementMessage('cds-demo-2', 'providers/cds-demo-2/entitlements/84b05068-01a9-4ca9-9943-b9babf0b5030', 'test message')
     .then((res) => {
-        console.log(`updateEntitlementMessage: ${JSON.stringify(res)}`);
+        console.log(`updateEntitlementMessage:\n${JSON.stringify(res, null, 3)}`);
         return true;
     }).catch(console.error);
 
 listAccounts('cds-demo-2')
     .then((res) => {
-        console.log(`listAccounts: ${JSON.stringify(res)}`);
+        console.log(`listAccounts:\n${JSON.stringify(res, null, 3)}`);
         return true;
     }).catch(console.error);
 
 listEntitlements('cds-demo-2')
     .then((res) => {
-        console.log(`listEntitlements: ${JSON.stringify(res)}`);
+        console.log(`listEntitlements:\n${JSON.stringify(res, null, 3)}`);
         return true;
     }).catch(console.error);
 
 getAccount('cds-demo-2', 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D')
     .then((res) => {
-        console.log(`getAccount: ${JSON.stringify(res)}`);
+        console.log(`getAccount:\n${JSON.stringify(res, null, 3)}`);
         return true;
     }).catch(console.error);
 
 approveAccount('cds-demo-2', 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D', 'signup', 'test reason')
     .then((res) => {
-        console.log(`approveAccount: ${JSON.stringify(res)}`);
+        console.log(`approveAccount:\n${JSON.stringify(res, null, 3)}`);
         return true;
     }).catch(console.error);
