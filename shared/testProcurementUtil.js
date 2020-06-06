@@ -18,7 +18,6 @@
 
 const CommerceProcurementUtil = require('./commerceProcurementUtil');
 let commerceProcurementUtil = new CommerceProcurementUtil();
-const uuidv4 = require('uuid/v4');
 
 async function getAccount(projectId, name) {
     try {
@@ -50,6 +49,26 @@ async function listAccounts(projectId) {
     }
 }
 
+async function getEntitlement(projectId, name) {
+    try {
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        const entitlement = await procurementUtil.getEntitlement(name);
+        return { success: true, data: entitlement };
+    } catch (err) {
+        return { success: false, errors: ['Failed to retrieve entitlement'] };
+    }
+}
+
+async function updateEntitlementMessage(projectId, name, message) {
+    try {
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        const entitlement = await procurementUtil.updateEntitlementMessage(name, message);
+        return { success: true, data: entitlement };
+    } catch (err) {
+        return { success: false, errors: ['Failed to update entitlement'] };
+    }
+}
+
 async function listEntitlements(projectId) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
@@ -61,6 +80,18 @@ async function listEntitlements(projectId) {
 }
 
 console.log('Starting');
+
+getEntitlement('cds-demo-2', 'providers/cds-demo-2/entitlements/84b05068-01a9-4ca9-9943-b9babf0b5030')
+    .then((res) => {
+        console.log(`getEntitlement: ${JSON.stringify(res)}`);
+        return true;
+    }).catch(console.error);
+
+updateEntitlementMessage('cds-demo-2', 'providers/cds-demo-2/entitlements/84b05068-01a9-4ca9-9943-b9babf0b5030', 'test message')
+    .then((res) => {
+        console.log(`updateEntitlementMessage: ${JSON.stringify(res)}`);
+        return true;
+    }).catch(console.error);
 
 listAccounts('cds-demo-2')
     .then((res) => {
