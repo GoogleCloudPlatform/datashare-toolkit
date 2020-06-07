@@ -152,7 +152,8 @@ The Deployment Manager script will create a Cloud Build package that performs th
 **NOTE: If you delete the Deployment Manager template, it will NOT delete any of the resources that it creates (SA, custom role, container, Cloud Run deployment)**
 
 ### Prerequisites
-* [Enable the Cloud Build APIs](https://console.cloud.google.com/flows/enableapi?apiid=cloudbuild.googleapis.com&redirect=https://cloud.google.com/cloud-build/docs/quickstart-build&_ga=2.236246849.1576496594.1591543356-699306765.1591543356)
+* [Enable the Cloud Build API](https://console.cloud.google.com/flows/enableapi?apiid=cloudbuild.googleapis.com&redirect=https://cloud.google.com/cloud-build/docs/quickstart-build&_ga=2.236246849.1576496594.1591543356-699306765.1591543356)
+* [Enable the Deployment Manager API](https://console.cloud.google.com/flows/enableapi?apiid=deploymentmanager,compute_component&_ga=2.237464325.468861850.1591021391-1303493354.1590760221&_gac=1.207880486.1590687938.EAIaIQobChMIxb3HoI7X6QIVN__jBx0L2QMREAAYASAAEgK5CfD_BwE)
 * Add the following roles to the Cloud Build Service Account (**id@cloudbuild.gserviceaccount.com**)
   * Role Administrator
   * Security Admin
