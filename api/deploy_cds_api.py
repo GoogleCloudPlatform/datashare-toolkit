@@ -32,7 +32,7 @@ def GenerateConfig(context):
           'steps': [
               { # Create a service account
               'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
-              'args': ['gcloud', 'iam', 'service-accounts', 'create', '${_SERVICE_ACCOUNT_NAME}', '--display-name=${_SERVICE_ACCOUNT_DESC}']
+              'args': ['gcloud', 'iam', 'service-accounts', 'create', context.properties['serviceAccountName'], '--display-name=' + context.properties['serviceAccountDesc']]
               },
               { # Clone the Datashare repository
               'name': 'gcr.io/cloud-builders/git',
@@ -41,18 +41,14 @@ def GenerateConfig(context):
               },
               { # Create the custom role
               'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
-              'args': ['gcloud', 'iam', 'roles', 'create', '${_CUSTOM_ROLE_NAME}', '--project=$PROJECT_ID', '--file=config/cds-api-mgr-role-definition.yaml'],
+              'args': ['gcloud', 'iam', 'roles', 'create', context.properties['customRoleName'], '--project=$PROJECT_ID', '--file=config/cds-api-mgr-role-definition.yaml'],
               'dir': 'cds/datashare-toolkit/api' # changes the working directory to /workspace/cds/datashare-toolkit/api
               },
               { # Assign the service account to the custom role
               'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
               'args': ['gcloud', 'projects', 'add-iam-policy-binding', '$PROJECT_ID', 
-                '--member=serviceAccount:${_SERVICE_ACCOUNT_NAME}@$PROJECT_ID.iam.gserviceaccount.com', 
-                '--role=projects/$PROJECT_ID/roles/${_CUSTOM_ROLE_NAME}']
-              },
-              {
-              'name': 'ubuntu',
-              'args': ['bash', '-c', 'echo `ls -la /workspace/cds/datashare-toolkit/api/v1alpha`']
+                '--member=serviceAccount:' + context.properties['serviceAccountName'] + '@$PROJECT_ID.iam.gserviceaccount.com', 
+                '--role=projects/$PROJECT_ID/roles/' + context.properties['customRoleName']]
               },
               {   # Submit the build configuration to Cloud Build to be the CDS API container image
                   'name': 'gcr.io/cloud-builders/gcloud',
@@ -61,7 +57,7 @@ def GenerateConfig(context):
                             'submit',
                             '.', # SOURCE current working directory
                             '--config=api/v1alpha/cloudbuild.yaml',
-                            '--substitutions=TAG_NAME=dev'
+                            '--substitutions=TAG_NAME=' + context.properties['containerTag']
                           ]
               },
               {   # Deploy the container image to Cloud Run
@@ -69,24 +65,16 @@ def GenerateConfig(context):
                   'dir': 'cds/datashare-toolkit',
                   'args': ['run',
                             'deploy',
-                            '${_CLOUD_RUN_DEPLOY_NAME}',
-                            '--image=gcr.io/$PROJECT_ID/${_CLOUD_RUN_DEPLOY_NAME}:${_TAG}',
-                            '--region=${_REGION}',
+                            context.properties['cloudRunDeployName'],
+                            '--image=gcr.io/$PROJECT_ID/' + context.properties['cloudRunDeployName'] + ':' + context.properties['containerTag'], 
+                            '--region='+ context.properties['region'],
                             '--allow-unauthenticated',
                             '--platform=managed',
-                            '--service-account=${_SERVICE_ACCOUNT_NAME}@$PROJECT_ID.iam.gserviceaccount.com'
+                            '--service-account=' + context.properties['serviceAccountName'] + '@$PROJECT_ID.iam.gserviceaccount.com'
                           ]
               }
           ],
-          'substitutions': {
-              '_SERVICE_ACCOUNT_NAME': 'cds-api-mgr',
-              '_SERVICE_ACCOUNT_DESC': 'DS API Manager',
-              '_CUSTOM_ROLE_NAME': 'custom.cds.api.mgr8',
-              '_CLOUD_RUN_DEPLOY_NAME': 'cds-api',
-              '_TAG': 'dev',
-              '_REGION': 'us-central1'
-              },
-          'timeout': '360s'
+          'timeout': context.properties['timeout']
       }
   }]
   return { 'resources': resources }

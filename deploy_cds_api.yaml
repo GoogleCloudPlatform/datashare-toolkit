@@ -1,8 +1,0 @@
-imports:
-- path: deploy_cds_api.py
-
-resources:
-- name: build
-  type: deploy_cds_api.py
-  properties:
-    resourceToList: deployments

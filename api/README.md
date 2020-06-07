@@ -8,6 +8,9 @@
   * [Enable APIs](#enable-apis)
   * [Service Account](#service-account)
   * [Examples](#examples)
+* [Deploy to Cloud Run with Deployment Manager](#deploy-to-cloud-run-with-deployment-manager)
+  * [Prerequisites](#prerequisites)
+  * [Deploy to Cloud Run](#deploy-to-cloud-run)
 * [Deployment](#deployment)
   * [Deploy Cloud Run](#deploy-cloud-run)
   * [Deploy Kubernetes](#deploy-kubernetes)
@@ -135,6 +138,39 @@ Create service account credentials and download them:
 Set the **GOOGLE_APPLICATION_CREDENTIALS** environment variable(s):
 
     export GOOGLE_APPLICATION_CREDENTIALS="${SERVICE_ACCOUNT_NAME}.json"
+
+## Deploy to Cloud Run with Deployment Manager
+You can deploy the API service via the Deployment Manager.  
+The Deployment Manager script will create a Cloud Build package that performs the following actions:
+* clones the datashare-tookit repository
+* create a service account
+* create a custom role
+* assign the service account to the custom role
+* create a container image in Container Registry
+* deploy the CDS API to Cloud Run
+
+**NOTE: If you delete the Deployment Manager template, it will NOT delete any of the resources that it creates (SA, custom role, container, Cloud Run deployment)**
+
+### Prerequisites
+* [Enable the Cloud Build APIs](https://console.cloud.google.com/flows/enableapi?apiid=cloudbuild.googleapis.com&redirect=https://cloud.google.com/cloud-build/docs/quickstart-build&_ga=2.236246849.1576496594.1591543356-699306765.1591543356)
+* Add the following roles to the Cloud Build Service Account (**id@cloudbuild.gserviceaccount.com**)
+  * Role Administrator
+  * Security Admin
+  * Service Account Admin
+  * Cloud Run Admin
+  * Cloud Run Service Agent
+
+### Deploy to Cloud Run
+By default it deploys to us-central1 region. Execute the following command from the `datashare-toolkit/api` directory. 
+```
+gcloud deployment-manager deployments create cds-api --config deploy_cds_api.yaml
+```
+
+You can update the region in the `deploy_cds_api.yaml` file. 
+```
+properties:
+    region: us-central1
+```
 
 ## Deployment
 You can deploy the API service via various methods below based off developer preference and/or environment. These are the options available:
