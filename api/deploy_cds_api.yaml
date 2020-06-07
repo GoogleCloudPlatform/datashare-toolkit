@@ -7,7 +7,7 @@ resources:
   properties:
     serviceAccountName: cds-api-mgr
     serviceAccountDesc: DS API Manager
-    customRoleName: custom.cds.api.mgr9
+    customRoleName: custom.cds.api.mgr
     cloudRunDeployName: cds-api
     containerTag: dev
     region: us-central1
