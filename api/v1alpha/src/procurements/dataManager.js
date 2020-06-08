@@ -45,6 +45,28 @@ async function listProcurements(projectId) {
     return { success: true, data: rows };
 }
 
+/**
+ * @param  {} projectId The projectId for the provider
+ * @param  {} name Name of the entitlement resource
+ * @param  {boolean} Indicates an approval (true) or a rejection (false)
+ * @param  {} reason Only provided for a rejection
+ */
+async function approveEntitlement(projectId, name, approve, reason) {
+    try {
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        if (approve === true) {
+            const result = await procurementUtil.approveEntitlement(name);
+            return { success: true, data: result };
+        } else {
+            const result = await procurementUtil.rejectEntitlement(name, reason);
+            return { success: true, data: result };
+        }
+    } catch (err) {
+        return { success: false, errors: ['Failed to approve entitlement', err] };
+    }
+}
+
 module.exports = {
-    listProcurements
+    listProcurements,
+    approveEntitlement
 };

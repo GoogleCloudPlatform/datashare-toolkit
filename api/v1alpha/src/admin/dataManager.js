@@ -305,6 +305,20 @@ async function setupDatasharePrerequisites(projectId) {
                     "description": "List of policies(s) associations for an account"
                 },
                 {
+                    "fields": [
+                        {
+                            "mode": "REQUIRED",
+                            "name": "accountName",
+                            "type": "STRING",
+                            "description": "The resource name of the account."
+                        }
+                    ],
+                    "mode": "REPEATED",
+                    "name": "marketplace",
+                    "type": "RECORD",
+                    "description": "List of policies(s) associations for an account"
+                },
+                {
                     "mode": "NULLABLE",
                     "name": "isDeleted",
                     "type": "BOOLEAN",

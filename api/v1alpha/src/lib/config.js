@@ -27,11 +27,11 @@ config.cdsDatasetId = "datashare";
 
 config.cdsAccountTableId = "account";
 config.cdsAccountTableFields = new Set(['rowId', 'accountId', 'email', 'emailType',
-    'accountType', 'createdBy', 'createdAt', 'policies', 'isDeleted']);
+    'accountType', 'createdBy', 'createdAt', 'policies', 'marketplace', 'isDeleted']);
 
 config.cdsAccountViewId = "currentAccount";
 config.cdsAccountViewFields = new Set(['rowId', 'accountId', 'email', 'emailType',
-    'accountType', 'createdBy', 'policies', 'createdAt', 'version', 'isDeleted']);
+    'accountType', 'createdBy', 'policies', 'marketplace', 'createdAt', 'version', 'isDeleted']);
 
 config.cdsPolicyTableId = "policy";
 config.cdsPolicyTableFields = new Set(['rowId', 'policyId', 'name', 'description',

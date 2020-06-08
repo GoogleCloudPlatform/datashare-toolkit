@@ -121,4 +121,22 @@ procurements.get('/projects/:projectId/procurements', async (req, res) => {
     });
 });
 
+procurements.post('/projects/:projectId/procurements/approve', async (req, res) => {
+    const projectId = req.params.projectId;
+    const entitlementName = req.body.entitlementName;
+    const approve = req.body.approve;
+    const reason = req.body.reason;
+    const data = await dataManager.approveEntitlement(projectId, entitlementName, approve, reason);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ...data
+    });
+});
+
 module.exports = procurements;

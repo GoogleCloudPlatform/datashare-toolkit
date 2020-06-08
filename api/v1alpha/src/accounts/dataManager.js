@@ -18,7 +18,6 @@
 
 const { BigQueryUtil, CommerceProcurementUtil } = require('cds-shared');
 let bigqueryUtil = new BigQueryUtil();
-let commerceProcurementUtil = new CommerceProcurementUtil();
 const uuidv4 = require('uuid/v4');
 
 const cfg = require('../lib/config');
@@ -28,14 +27,15 @@ const underscore = require("underscore");
 
 const jwksClient = require('jwks-rsa');
 const ms = require('ms');
+const approvalName = 'signup';
 
 const client = jwksClient({
-  cache: true, // Default Value
-  cacheMaxEntries: 5, // Default value
-  cacheMaxAge: ms('10m'), // Default value
-  rateLimit: true,
-  jwksRequestsPerMinute: 10, // Default value
-  jwksUri: cfg.procurementJwksUri
+    cache: true, // Default Value
+    cacheMaxEntries: 5, // Default value
+    cacheMaxAge: ms('10m'), // Default value
+    rateLimit: true,
+    jwksRequestsPerMinute: 10, // Default value
+    jwksUri: cfg.procurementJwksUri
 });
 
 /**
@@ -394,10 +394,45 @@ async function register(projectId, token) {
 /**
  * @param  {} projectId
  * @param  {} token
- * @param  {} accountId
+ * @param  {} reason
+ * @param  {} email
  */
-async function approve(projectId, token, accountId) {
-    return { success: true, code: 200, errors: [] }
+async function approve(projectId, token, reason, email) {
+    try {
+        console.log(`Approve called for token: ${token} for email: ${email}`);
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        const registration = await register(projectId, token);
+        if (registration.success === true) {
+            const accountId = registration.data.sub;
+            const accountName = procurementUtil.getAccountName(projectId,  accountId);
+            const accountRecord = { accountName: accountName };
+            console.log(`accountName: ${accountName}`);
+
+            // Insert the account records.
+            let account = await getAccount(projectId, null, email, 'userByEmail');
+            if (account) {
+                if (account.marketplace) {
+                    const found = underscore.findWhere(account.marketplace, accountRecord);
+                    if (!found) {
+                        account.marketplace.append(accountRecord);
+                    }
+                } else {
+                    account.marketplace = [ accountRecord ];  
+                }
+            } else {
+                // Create the account
+                account = { };
+            }
+
+            // This will create or update the account. At this point no new policies will be associated.
+            await createOrUpdateAccount(projectId, null, account);
+            
+            const approval = await procurementUtil.approveAccount(accountName, approvalName, reason);
+            return { success: true, code: 200, data: approval };
+        }
+    } catch (err) {
+        return { success: false, code: 500, errors: ['Failed to approve account'] };
+    }
 }
 
 module.exports = {

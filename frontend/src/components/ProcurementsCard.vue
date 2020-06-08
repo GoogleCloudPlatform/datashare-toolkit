@@ -188,6 +188,7 @@ export default {
     headers: [
       { text: 'Solution Id', value: 'solutionId' },
       { text: 'Plan Id', value: 'planId' },
+      { text: 'Entitlement Name', value: 'entitlementName' },
       { text: 'Requestor Account Id', value: 'accountId' },
       { text: 'Requested At', value: 'createdAt' },
       { text: '', value: 'action', sortable: false }
@@ -231,7 +232,8 @@ export default {
             console.log('Validation passed, saving.');
             this.$store
               .dispatch('setProcurementApprovalState', {
-                projectId: this.$store.state.settings.projectId
+                projectId: this.$store.state.settings.projectId,
+                entitlementName: this.selectedItem.entitlementName
               })
               .then(result => {
                 this.loading = false;
