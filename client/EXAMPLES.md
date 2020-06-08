@@ -62,6 +62,10 @@ Modify the DMC Publisher service *ConfigMap* with your appropriate GCP variables
 
 
 ### Multicast Producer
+Modify the DMC producer job image name *gcr.io/chrispage-dev/dmc:dev* accordingly:
+
+    vi kubernetes-manifests/dmc-producer-job/job.yaml
+
 Modify the DMC producer job *ConfigMap* with a unique **MESSAGE** variable:
 
 **Note**: The **ADDRESS** variable is set to the service name of the publisher service so the sample message gets routed properly bwtween GKE nodes. e.g. *dmc-publisher-service:50000*. You can only broadcast a message to a multicast group, e.g. *239.0.0.1:50000*, in GKE if the producer is on the same node as the publisher.

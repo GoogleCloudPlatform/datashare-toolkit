@@ -1,10 +1,13 @@
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dmc-publisher-service
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: dmc-publisher-service
   template:
     metadata:
       labels:
@@ -17,7 +20,7 @@ spec:
           secretName: dmc-service-creds
       containers:
         - name: dmc-service
-          image: gcr.io/chrispage-dev/dmc
+          image: dmc
           args: ["multicast", "publish", "-p", "$(PROJECT_ID)", "-t", "$(TOPIC_NAME)", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-r", "$(READ_BUFFER_BYTES)", "-v=$(VERBOSE)"]
           imagePullPolicy: IfNotPresent
           ports:

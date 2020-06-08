@@ -19,7 +19,7 @@ metadata:
   name: client
 build:
   artifacts:
-  - image: gcr.io/chrispage-dev/dmc
+  - image: dmc
     context: .
     docker:
       dockerfile: Dockerfile
