@@ -22,7 +22,7 @@
 
 # Overview
 
-This documentation provides the details for the Datashare Multicast Client (DMC). The DMC service enables data providers the abilitiy to subscribe to a multicast broadcast group and publish those messages (unicast) onto a Google Cloud Platform (GCP) Pub/Sub Topic securely. GCP Pub/Sub is a fully-managed real-time messaging service that allows you to send and receive messages between independent applications. The GCP IAM security controls enable data producers the ability to authorize specific consumers of the multicast Pub/Sub topic subscriptions.
+This documentation provides the details for the Datashare Multicast Client (DMC). The DMC service enables data providers the ability to subscribe to a multicast broadcast group and publish those messages (unicast) onto a Google Cloud Platform (GCP) Pub/Sub Topic securely. GCP Pub/Sub is a fully-managed real-time messaging service that allows you to send and receive messages between independent applications. The GCP IAM security controls enable data producers the ability to authorize specific consumers of the multicast Pub/Sub topic subscriptions.
 
 **Note**: Translating Pub/Sub messages to multicast is currently out of scope.
 
