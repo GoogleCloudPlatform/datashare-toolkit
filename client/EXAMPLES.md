@@ -1,4 +1,4 @@
-# Cloud Datashare - Multicast Client - Examples
+# Datashare - Multicast Client - Examples
 
 * [Overview](#overview)
 * [Examples](#examples)
@@ -10,7 +10,7 @@
 
 # Overview
 
-This documentation provides examples for the Cloud Datashare Multicast Client (CDMC).
+This documentation provides examples for the Datashare Multicast Client (DMC).
 
 **Note**: Verify you have completed the getting started guide [here](README.md#getting-started)
 
@@ -19,7 +19,7 @@ The examples are currently executed in an isolated Kubernetes (GKE) or Docker en
 
 **Note**: Currently, GCP VPC networking does not support multicast layer 2 across instances so you will need to run the examples in an isolated environment.
 
-The [**Hello World**](#hello-world) example will utilize two CDMC services to simlulate the multicast to unicast flow. *gcloud* will be utilized as the consumer to subscribe and pull the messages from the Pub/Sub topic.
+The [**Hello World**](#hello-world) example will utilize two DMC services to simlulate the multicast to unicast flow. *gcloud* will be utilized as the consumer to subscribe and pull the messages from the Pub/Sub topic.
 
 The [**Replay Messages**](#replay-messages) example will utilize [tcpreplay](https://tcpreplay.appneta.com/) to replay an existing pcap file to simlulate the multicast to unicast flow.
 
@@ -54,19 +54,19 @@ Change the ownership of the GAE crednetials file so the Docker executable can re
 We will start one k8s deployment(s) for the Pub/Sub publisher and one k8s job for the multicast producer.
 
 ### Pub/Sub Publisher
-Modify the CDMC Publisher service *ConfigMap* with your appropriate GCP variables: **PROJECT_ID**, **TOPIC_NAME**
+Modify the DMC Publisher service *ConfigMap* with your appropriate GCP variables: **PROJECT_ID**, **TOPIC_NAME**
 
 **Note**: The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS k8s secret created above.
 
-    vi kubernetes-manifests/cdmc-publisher-service/configmaps.yaml
+    vi kubernetes-manifests/dmc-publisher-service/configmaps.yaml
 
 
 ### Multicast Producer
-Modify the CDMC producer job *ConfigMap* with a unique **MESSAGE** variable:
+Modify the DMC producer job *ConfigMap* with a unique **MESSAGE** variable:
 
-**Note**: The **ADDRESS** variable is set to the service name of the publisher service so the sample message gets routed properly bwtween GKE nodes. e.g. *cdmc-publisher-service:50000*. You can only broadcast a message to a multicast group, e.g. *239.0.0.1:50000*, in GKE if the producer is on the same node as the publisher.
+**Note**: The **ADDRESS** variable is set to the service name of the publisher service so the sample message gets routed properly bwtween GKE nodes. e.g. *dmc-publisher-service:50000*. You can only broadcast a message to a multicast group, e.g. *239.0.0.1:50000*, in GKE if the producer is on the same node as the publisher.
 
-    vi kubernetes-manifests/cdmc-producer-job/configmaps.yaml
+    vi kubernetes-manifests/dmc-producer-job/configmaps.yaml
 
 ### Subscriber
 Open another terminal and tun the following command(s) to pull the messages from the Pub/Sub subscription:
@@ -80,15 +80,15 @@ Deploy the application and tail the logs:
 
 **Note**: You can also deploy via `kubectl` directly too. You will need to wait for the services to start before viewing the logs:
 
-    kubectl apply -f kubernetes-manifests/cdmc-publisher-service
+    kubectl apply -f kubernetes-manifests/dmc-publisher-service
 
     kubectl get po,svc,deploy
 
-    kubectl logs -f -l app=cdmc-publisher-service
+    kubectl logs -f -l app=dmc-publisher-service
 
 Send a sample message:
 
-    kubectl apply -f kubernetes-manifests/cdmc-producer-job
+    kubectl apply -f kubernetes-manifests/dmc-producer-job
 
 Check the logs of the publisher above and you should see `Message published to topic...`
 
@@ -96,7 +96,7 @@ Check the logs of the publisher above and you should see `Message published to t
 
 You can *delete* the job artifacts and *apply* again to send another message(s):
 
-    kubectl delete -f kubernetes-manifests/cdmc-producer-job && kubectl apply -f kubernetes-manifests/cdmc-producer-job
+    kubectl delete -f kubernetes-manifests/dmc-producer-job && kubectl apply -f kubernetes-manifests/dmc-producer-job
 
 Cleanup:
 
@@ -109,11 +109,11 @@ We will start one k8s deployment(s) for the Pub/Sub publisher and one k8s job fo
 
 
 ### Pub/Sub Publisher
-Modify the CDMC Publisher service *ConfigMap* with your appropriate GCP variables and at least 5MB read buffer (5242880): **PROJECT_ID**, **TOPIC_NAME**, **READ_BUFFER**
+Modify the DMC Publisher service *ConfigMap* with your appropriate GCP variables and at least 5MB read buffer (5242880): **PROJECT_ID**, **TOPIC_NAME**, **READ_BUFFER**
 
 **Note**: The publisher requires ADC by mounting your GOOGLE_APPLICATION_CREDENTIALS k8s secret created above.
 
-    vi kubernetes-manifests/cdmc-publisher-service/configmaps.yaml
+    vi kubernetes-manifests/dmc-publisher-service/configmaps.yaml
 
 ### Multicast Producer
 Modify the tcpreplay job *ConfigMap* with the same **ADDRESS:PORT** variables as above for the publisher.
@@ -134,11 +134,11 @@ Deploy the application and tail the logs:
 
 **Note**: You can also deploy via `kubectl` directly too. You will need to wait for the services to start before viewing the logs:
 
-    kubectl apply -f kubernetes-manifests/cdmc-publisher-service
+    kubectl apply -f kubernetes-manifests/dmc-publisher-service
 
     kubectl get po,svc,deploy
 
-    kubectl logs -f -l app=cdmc-publisher-service
+    kubectl logs -f -l app=dmc-publisher-service
 
 Start the replay messages:
 
@@ -162,9 +162,9 @@ These are vairous troubleshooting steps that you may encounter during the demos.
 
 ### Services fail to start:
 If you receive this error when checking the k8s pod, add the SA credential k8s secret in the setup [here](./README.md#setup-kubernetes):\
-```MountVolume.SetUp failed for volume "google-cloud-key" : secret "cdmc-service-creds" not found```
+```MountVolume.SetUp failed for volume "google-cloud-key" : secret "dmc-service-creds" not found```
 
-    kubectl describe `kubectl get pods --selector=app=cdmc-publisher-service`
+    kubectl describe `kubectl get pods --selector=app=dmc-publisher-service`
 
 ### Cannot connect to the GKE cluster:
 If you cannot connect `kubectl` to the GKE cluster, verify the `kubectl` context and get new GKE credentials:
@@ -180,11 +180,11 @@ Rectrive new credentials from GKE:
 
 ### Docker Commands:
 
-    docker run -it --rm --name listener gcr.io/chrispage-dev/cdmc:dev multicast listen -a 239.0.0.1:9999 -i eth0 -r 2097152 -v
+    docker run -it --rm --name listener gcr.io/chrispage-dev/dmc:dev multicast listen -a 239.0.0.1:9999 -i eth0 -r 2097152 -v
 
     docker run -it --rm --name producer -v "${PWD}":"${PWD}" williamofockham/tcpreplay:4.3.0 tcpreplay-edit -i eth0 -D 233.215.21.4/32:239.0.0.1/32 -r 10378:9999 -C -t ${PWD}/temp/data_feeds_20180127_20180127_IEXTP1_DEEP1.0.pcap
 
-    docker run -it --rm --name publisher -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json -v ${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/key.json gcr.io/chrispage-dev/cdmc:dev multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i eth0 -r 5242880
+    docker run -it --rm --name publisher -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json -v ${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/key.json gcr.io/chrispage-dev/dmc:dev multicast publish -p ${PROJECT_ID} -t ${TOPIC_NAME} -a 239.0.0.1:9999 -i eth0 -r 5242880
 
 ### tcpdump syntax:
 

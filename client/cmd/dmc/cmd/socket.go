@@ -28,8 +28,8 @@ var (
 // socketCmd represents the socket command
 var socketCmd = &cobra.Command{
 	Use:   "socket",
-	Short: "CDS client socket service",
-	Long: `The CDS client socket service will attach to a raw unix or tcp socket and iterate over
+	Short: "DS client socket service",
+	Long: `The DS client socket service will attach to a raw unix or tcp socket and iterate over
 stream data if new line. For example:
 
   -n "unix"

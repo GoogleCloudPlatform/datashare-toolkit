@@ -2,22 +2,22 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: cdmc-publisher-service
+  name: dmc-publisher-service
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: cdmc-publisher-service
+        app: dmc-publisher-service
         version: v1
     spec:
       volumes:
       - name: google-cloud-key
         secret:
-          secretName: cdmc-service-creds
+          secretName: dmc-service-creds
       containers:
-        - name: cdmc-service
-          image: gcr.io/chrispage-dev/cdmc
+        - name: dmc-service
+          image: gcr.io/chrispage-dev/dmc
           args: ["multicast", "publish", "-p", "$(PROJECT_ID)", "-t", "$(TOPIC_NAME)", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-r", "$(READ_BUFFER_BYTES)", "-v=$(VERBOSE)"]
           imagePullPolicy: IfNotPresent
           ports:
@@ -31,30 +31,30 @@ spec:
           - name: PROJECT_ID
             valueFrom:
               configMapKeyRef:
-                name: cdmc-publisher-env-config
+                name: dmc-publisher-env-config
                 key: PROJECT_ID
           - name: TOPIC_NAME
             valueFrom:
               configMapKeyRef:
-                name: cdmc-publisher-env-config
+                name: dmc-publisher-env-config
                 key: TOPIC_NAME
           - name: ADDRESS
             valueFrom:
               configMapKeyRef:
-                name: cdmc-publisher-env-config
+                name: dmc-publisher-env-config
                 key: ADDRESS
           - name: IF_NAME
             valueFrom:
               configMapKeyRef:
-                name: cdmc-publisher-env-config
+                name: dmc-publisher-env-config
                 key: IF_NAME
           - name: READ_BUFFER_BYTES
             valueFrom:
               configMapKeyRef:
-                name: cdmc-publisher-env-config
+                name: dmc-publisher-env-config
                 key: READ_BUFFER_BYTES
           - name: VERBOSE
             valueFrom:
               configMapKeyRef:
-                name: cdmc-publisher-env-config
+                name: dmc-publisher-env-config
                 key: VERBOSE

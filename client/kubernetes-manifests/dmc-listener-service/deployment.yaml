@@ -2,22 +2,22 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: cdmc-listener-service
+  name: dmc-listener-service
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: cdmc-listener-service
+        app: dmc-listener-service
         version: v1
     spec:
       volumes:
       - name: google-cloud-key
         secret:
-          secretName: cdmc-service-creds
+          secretName: dmc-service-creds
       containers:
-        - name: cdmc-service
-          image: gcr.io/chrispage-dev/cdmc
+        - name: dmc-service
+          image: gcr.io/chrispage-dev/dmc
           args: ["multicast", "listen", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-r", "$(READ_BUFFER_BYTES)", "-v=$(VERBOSE)"]
           imagePullPolicy: IfNotPresent
           ports:
@@ -31,20 +31,20 @@ spec:
           - name: ADDRESS
             valueFrom:
               configMapKeyRef:
-                name: cdmc-listener-env-config
+                name: dmc-listener-env-config
                 key: ADDRESS
           - name: IF_NAME
             valueFrom:
               configMapKeyRef:
-                name: cdmc-listener-env-config
+                name: dmc-listener-env-config
                 key: IF_NAME
           - name: READ_BUFFER_BYTES
             valueFrom:
               configMapKeyRef:
-                name: cdmc-listener-env-config
+                name: dmc-listener-env-config
                 key: READ_BUFFER_BYTES
           - name: VERBOSE
             valueFrom:
               configMapKeyRef:
-                name: cdmc-listener-env-config
+                name: dmc-listener-env-config
                 key: VERBOSE

@@ -27,8 +27,8 @@ var (
 // multicastBroadcastCmd represents the mlcstBroadcast command
 var multicastBroadcastCmd = &cobra.Command{
 	Use:   "broadcast",
-	Short: "CDS client multicast broadcaster service",
-	Long: `The CDS client multicast broadcaster service will bind to a specific multicast network interface name and address, then broadcast messages to the network interface. For example:
+	Short: "DS client multicast broadcaster service",
+	Long: `The DS client multicast broadcaster service will bind to a specific multicast network interface name and address, then broadcast messages to the network interface. For example:
 
 -n "udp"
 -a "239.0.0.0:9999"

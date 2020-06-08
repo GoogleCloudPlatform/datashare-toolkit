@@ -1,4 +1,4 @@
-# Cloud Datashare - Multicast Client
+# Datashare - Multicast Client
 
 * [Overview](#overview)
   * [Architecture](#architecture)
@@ -22,22 +22,22 @@
 
 # Overview
 
-This documentation provides the details for the Cloud Datashare Multicast Client (CDMC). The CDMC service enables data providers the abilitiy to subscribe to a multicast broadcast group and publish those messages (unicast) onto a Google Cloud Platform (GCP) Pub/Sub Topic securely. GCP Pub/Sub is a fully-managed real-time messaging service that allows you to send and receive messages between independent applications. The GCP IAM security controls enable data producers the ability to authorize specific consumers of the multicast Pub/Sub topic subscriptions.
+This documentation provides the details for the Datashare Multicast Client (DMC). The DMC service enables data providers the abilitiy to subscribe to a multicast broadcast group and publish those messages (unicast) onto a Google Cloud Platform (GCP) Pub/Sub Topic securely. GCP Pub/Sub is a fully-managed real-time messaging service that allows you to send and receive messages between independent applications. The GCP IAM security controls enable data producers the ability to authorize specific consumers of the multicast Pub/Sub topic subscriptions.
 
 **Note**: Translating Pub/Sub messages to multicast is currently out of scope.
 
 
 ## Architecture
-![alt text](files/images/cds-multicast-client-private-cloud-architecture.png)
+![alt text](files/images/ds-multicast-client-private-cloud-architecture.png)
 
 
 ## Getting Started
 
-These instructions will setup a demo instance of the CDMC service in your GCP project.
+These instructions will setup a demo instance of the DMC service in your GCP project.
 
 ### Enable APIs
 
-These are the GCP project APIs that require the CDMC service authorization.
+These are the GCP project APIs that require the DMC service authorization.
 
 ```
 pubsub.googleapis.com
@@ -45,7 +45,7 @@ pubsub.googleapis.com
 
 ### Service Account
 
-The CDMC service is a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account.
+The DMC service is a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account.
 
 #### Setup Service Account
 
@@ -55,13 +55,13 @@ Set your **PROJECT\_ID** if you have not already:
 
 Set the **SERVICE\_ACCOUNT\_NAME** environment variable(s):
 
-    export SERVICE_ACCOUNT_NAME=cds-multicast-client;
+    export SERVICE_ACCOUNT_NAME=ds-multicast-client;
 
 Set the **SERVICE\_ACCOUNT\_DESC** environment variable(s):
 
-    export SERVICE_ACCOUNT_DESC="Cloud Datashare Multicast Client";
+    export SERVICE_ACCOUNT_DESC="Datashare Multicast Client";
 
-Create the custom Cloud Datashare API service-account:
+Create the custom Datashare API service-account:
 
     gcloud iam service-accounts create ${SERVICE_ACCOUNT_NAME} --display-name "${SERVICE_ACCOUNT_DESC}";
 
@@ -84,12 +84,12 @@ Set the **GOOGLE_APPLICATION_CREDENTIALS** environment variable(s):
 
 ### Create Pub/Sub Topic
 
-A Pub/Sub Topic with the appropriate service account permissions is required for the CDMC Service.
+A Pub/Sub Topic with the appropriate service account permissions is required for the DMC Service.
 
 
 Set your **TOPIC\_NAME** if you have not already:
 
-    export TOPIC_NAME=cds-multicast-demo-broadcast;
+    export TOPIC_NAME=ds-multicast-demo-broadcast;
 
 Create the Topic:
 
@@ -100,11 +100,11 @@ Set the permissions for the service account:
     gcloud beta pubsub topics add-iam-policy-binding ${TOPIC_NAME} --member=serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --role='roles/editor'
 
 ### Create Pub/Sub Subscription:
-A Pub/Sub Subscription is utilzed for the Worker (pull) to process multicast messages from the CDMC service's Pub/Sub topic. This use-case would be for exposing the multicast Pub/Sub topic to a specific customer or end-user. You can create a separate service account(s) for consumption, but for this tutorial, we will use the same one created above.
+A Pub/Sub Subscription is utilzed for the Worker (pull) to process multicast messages from the DMC service's Pub/Sub topic. This use-case would be for exposing the multicast Pub/Sub topic to a specific customer or end-user. You can create a separate service account(s) for consumption, but for this tutorial, we will use the same one created above.
 
 Set your **PULL\_SUBSCRIPTION\_NAME** if you have not already:
 
-    export PULL_SUBSCRIPTION_NAME=cds-multicast-demo-listener;
+    export PULL_SUBSCRIPTION_NAME=ds-multicast-demo-listener;
 
 Create the Subscription:
 
@@ -126,7 +126,7 @@ via the **[gcloud SDK](https://cloud.google.com/sdk/)**
 
 Set your **CLUSTER\_NAME** environment variable:
 
-    export CLUSTER_NAME=cdmc-demo
+    export CLUSTER_NAME=dmc-demo
 
 Set your **ZONE** environment variable:
 
@@ -156,16 +156,16 @@ Create a kubernetes secret with the appropriate service account key file from ab
 
 **Note**: Change the file path to the appropriate destination. Secrets management for multiple k8s clusters is outside the scope of this example.
 
-    kubectl create secret generic cdmc-service-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
+    kubectl create secret generic dmc-service-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
 
 
 ## Deployment
-You can deploy the CDMC services via various methods below based off developer preference and/or environment. These are the options available:
+You can deploy the DMC services via various methods below based off developer preference and/or environment. These are the options available:
 
   * [Google Cloud Run](https://cloud.google.com/run/) via [gcloud](https://cloud.google.com/sdk/)
   * [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/) via [Skaffold](https://github.com/GoogleContainerTools/skaffold)
 
-[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the CDMC services and generate a unique URL for consumption.
+[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the DMC services and generate a unique URL for consumption.
 
 ### Prerequisites:
 There are some environment variables that need to be set for all build and deployment options.
@@ -193,11 +193,11 @@ Create a kubernetes secret with the appropriate service account key file from ab
 
 **Note**: Change the file path to the appropriate destination. Secrets management for multiple k8s clusters is outside the scope of this example.
 
-    kubectl create secret generic cdmc-service-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
+    kubectl create secret generic dmc-service-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
 
-Modify the ConfigMap with the appropriate CDMC environment variables:
+Modify the ConfigMap with the appropriate DMC environment variables:
 
-    vi kubernetes-manifests/cdmc-publisher-service/configmaps.yaml
+    vi kubernetes-manifests/dmc-publisher-service/configmaps.yaml
 
 Set the default GCR project repository:
 
@@ -215,7 +215,7 @@ Build the image with the `skaffold run -t <TAG>` command:
 ## Development
 Verify you have [golang](https://golang.org/) >= 1.13 installed on your machine.
 
-Open a terminal into the [cmd/cdmc/](./cmd/cdmc/) directory and pull the dependencies:
+Open a terminal into the [cmd/dmc/](./cmd/dmc/) directory and pull the dependencies:
 
     go get -d -v
 
@@ -230,7 +230,7 @@ If you want to purge the Pub/Sub subscription, run the following command:
     gcloud pubsub subscriptions seek ${PULL_SUBSCRIPTION_NAME} --time=$(date +%Y-%m-%dT%H:%M:%S)
 
 ### ToDo
-* Add GCP cloud build for CDMC service
+* Add GCP cloud build for DMC service
 * ~~Add k8s example (GCP currently does not support mulitcast)~~
 * Add Pub/Sub to multicast feature
 
@@ -239,7 +239,7 @@ If you want to purge the Pub/Sub subscription, run the following command:
 Unit testing is TBD
 
 ### Integration:
-You can leverage [netcat](http://netcat.sourceforge.net/) or the CDMC broadcast command to test. e.g.
+You can leverage [netcat](http://netcat.sourceforge.net/) or the DMC broadcast command to test. e.g.
 
 #### Netcat
 Run through a for loop and send 5 UDP packets:
@@ -249,9 +249,9 @@ Run through a for loop and send 5 UDP packets:
     for i in {0..5}; do echo "sending message $i"; echo "hello world: $i" | nc -u localhost 50001 -w1; done
 
 #### Broadcast
-Apply a k8s job that sends a custome message via CDMC broadcast argument:
+Apply a k8s job that sends a custome message via DMC broadcast argument:
 
-    kubectl apply -f kubernetes-manifests/cdmc-producer-service
+    kubectl apply -f kubernetes-manifests/dmc-producer-service
 
 
 ## Contributing
@@ -271,12 +271,12 @@ This project is licensed under the Apache License - see the [LICENSE](../LICENSE
 
 ## Acronyms
 
-This section lista all the relevant acronyms for Cloud Datashare Multicast Client.
+This section lista all the relevant acronyms for Datashare Multicast Client.
 
 | **Acronym**   | **Definition**  | **Description** |
 |:-------------:|:---------------:|:----------------|
-| CDS | Cloud Datashare | The name of the this tool kit that enables data producers to expose data on GCP to consumers |
-| CDMC | Cloud Datashare Multicast Client | The name of the CDS multicast client and application binary |
+| DS | Datashare | The name of the this tool kit that enables data producers to expose data on GCP to consumers |
+| DMC | Datashare Multicast Client | The name of the DS multicast client and application binary |
 
 ----
 * [Home](./README.md)

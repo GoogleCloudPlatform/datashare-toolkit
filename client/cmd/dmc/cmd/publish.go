@@ -23,8 +23,8 @@ import (
 // multicastPublishCmd represents the mlcstPublish command
 var multicastPublishCmd = &cobra.Command{
 	Use:   "publish",
-	Short: "CDS client multicast publisher service",
-	Long: `The CDS client multicast publisher service will listen to a specific multicast interface and address, then publish those messages to the specified PubSub Topic. For example:
+	Short: "DS client multicast publisher service",
+	Long: `The DS client multicast publisher service will listen to a specific multicast interface and address, then publish those messages to the specified PubSub Topic. For example:
 
 -n "udp"
 -a "239.0.0.0:9999"

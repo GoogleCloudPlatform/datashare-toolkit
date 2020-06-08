@@ -35,8 +35,8 @@ func msgHandler(src *net.UDPAddr, n int, b []byte) {
 // multicastListenCmd represents the mlcsListen command
 var multicastListenCmd = &cobra.Command{
 	Use:   "listen",
-	Short: "CDS client multicast listener service",
-	Long: `The CDS client multicast listener service will listen to a specific multicast network interface name and address. For example:
+	Short: "DS client multicast listener service",
+	Long: `The DS client multicast listener service will listen to a specific multicast network interface name and address. For example:
 
 -n "udp"
 -a "239.0.0.0:9999"

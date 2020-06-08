@@ -45,8 +45,8 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "client",
-	Short: "CDS client service",
-	Long: `The Cloud Datashare (CDS) client service enables data providers
+	Short: "DS client service",
+	Long: `The Datashare (DS) client service enables data providers
 (or data procuders) the abilitiy to publish their data onto Google Cloud
 Platform (GCP) securely. The service can listen to various POSIX server interfaces
 to stream messages to GCP. For example:

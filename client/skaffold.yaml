@@ -19,27 +19,27 @@ metadata:
   name: client
 build:
   artifacts:
-  - image: gcr.io/chrispage-dev/cdmc
+  - image: gcr.io/chrispage-dev/dmc
     context: .
     docker:
       dockerfile: Dockerfile
 deploy:
   kubectl:
     manifests:
-    - ./kubernetes-manifests/cdmc-listener-service/*.yaml
-    - ./kubernetes-manifests/cdmc-publisher-service/*.yaml
-    #- ./kubernetes-manifests/cdmc-producer-job/*.yaml
+    - ./kubernetes-manifests/dmc-listener-service/*.yaml
+    - ./kubernetes-manifests/dmc-publisher-service/*.yaml
+    #- ./kubernetes-manifests/dmc-producer-job/*.yaml
 profiles:
 - name: "hello-world"
   deploy:
     kubectl:
       manifests:
-      - ./kubernetes-manifests/cdmc-publisher-service/*.yaml
-        #- ./kubernetes-manifests/cdmc-producer-job/*.yaml
+      - ./kubernetes-manifests/dmc-publisher-service/*.yaml
+        #- ./kubernetes-manifests/dmc-producer-job/*.yaml
 - name: "replay-messages"
   deploy:
     kubectl:
       manifests:
-      - ./kubernetes-manifests/cdmc-publisher-service/*.yaml
+      - ./kubernetes-manifests/dmc-publisher-service/*.yaml
         #- ./kubernetes-manifests/tcpreplay-job/*.yaml
 
