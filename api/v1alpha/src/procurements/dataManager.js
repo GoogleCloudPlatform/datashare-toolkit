@@ -55,6 +55,8 @@ async function approveEntitlement(projectId, name, approve, reason) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
         if (approve === true) {
+            // At this point, we could automatically permission the calling email address for access to the policy.
+            // However, given that it could potentially fail, we'll not do this just yet.
             const result = await procurementUtil.approveEntitlement(name);
             return { success: true, data: result };
         } else {
