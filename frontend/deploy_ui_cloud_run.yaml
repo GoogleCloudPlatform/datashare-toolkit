@@ -1,0 +1,11 @@
+imports:
+- path: deploy_ui_cloud_run.py
+
+resources:
+- name: build
+  type: deploy_ui_cloud_run.py
+  properties:
+    firebaseApiKey: YOUR_FIREBASE_WEB_APIKEY
+    containerTag: dev
+    region: us-central1
+    timeout: 360s
