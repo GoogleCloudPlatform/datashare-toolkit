@@ -11,4 +11,4 @@ resources:
     cloudRunDeployName: cds-api
     containerTag: dev
     region: us-central1
-    timeout: 360s
+    timeout: 600s

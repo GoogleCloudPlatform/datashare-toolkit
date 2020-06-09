@@ -32,7 +32,8 @@ def GenerateConfig(context):
           'steps': [
               { # Create a service account
               'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
-              'args': ['gcloud', 'iam', 'service-accounts', 'create', context.properties['serviceAccountName'], '--display-name=' + context.properties['serviceAccountDesc']]
+              'entrypoint': '/bin/bash',
+              'args': ['-c', 'gcloud iam service-accounts create ' + context.properties['serviceAccountName'] + ' --display-name="' + context.properties['serviceAccountDesc'] + '" || exit 0']
               },
               { # Clone the Datashare repository
               'name': 'gcr.io/cloud-builders/git',
@@ -40,8 +41,8 @@ def GenerateConfig(context):
               'args': ['clone', cmd]
               },
               { # Create the custom role
-              'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
-              'args': ['gcloud', 'iam', 'roles', 'create', context.properties['customRoleName'], '--project=$PROJECT_ID', '--file=config/cds-api-mgr-role-definition.yaml'],
+              'entrypoint': '/bin/bash',
+              'args': ['-c', 'gcloud iam roles create ' + context.properties['customRoleName'] + ' --project=$PROJECT_ID --file=config/cds-api-mgr-role-definition.yaml || exit 0'],
               'dir': 'cds/datashare-toolkit/api' # changes the working directory to /workspace/cds/datashare-toolkit/api
               },
               { # Assign the service account to the custom role
