@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/GoogleCloudPlatform/cloud-datashare-toolkit/client/cmd/dmc/cmd"
+import "github.com/GoogleCloudPlatform/datashare-toolkit/client/cmd/dmc/cmd"
 
 var (
 	// VERSION is set during build
