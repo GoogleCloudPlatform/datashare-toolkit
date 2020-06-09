@@ -99,6 +99,10 @@ async function listEntitlements(projectId) {
     }
 }
 
+// REJECTED accounts can be APPROVED but not RESET.
+// APPROVED accounts be be RESET.
+const account1 = 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D';
+const account2 = 'providers/cds-demo-2/accounts/E-41E2-CF7B-BA71-CA8B';
 console.log('Starting');
 
 getEntitlement('cds-demo-2', 'providers/cds-demo-2/entitlements/84b05068-01a9-4ca9-9943-b9babf0b5030')
@@ -125,26 +129,36 @@ listEntitlements('cds-demo-2')
         return true;
     }).catch(console.error);
 
-getAccount('cds-demo-2', 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D')
+getAccount('cds-demo-2', account1)
     .then((res) => {
         console.log(`getAccount:\n${JSON.stringify(res, null, 3)}`);
         return true;
     }).catch(console.error);
 
-approveAccount('cds-demo-2', 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D', 'signup', 'test approve reason')
+/*
+resetAccount('cds-demo-2', account1)
+    .then((res) => {
+        console.log(`resetAccount:\n${JSON.stringify(res, null, 3)}`);
+        return approveAccount('cds-demo-2', account1, 'signup', 'test approve reason');
+    })
+    .catch(console.error);
+
+approveAccount('cds-demo-2', account2)
+    .then((res) => {
+        console.log(`resetAccount:\n${JSON.stringify(res, null, 3)}`);
+        return rejectAccount('cds-demo-2', account2, 'signup', 'test reject reason');
+    })
+    .catch(console.error);
+
+approveAccount('cds-demo-2', account1, 'signup', 'test approve reason')
     .then((res) => {
         console.log(`approveAccount:\n${JSON.stringify(res, null, 3)}`);
         return true;
     }).catch(console.error);
 
-rejectAccount('cds-demo-2', 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D', 'signup', 'test reject reason')
+rejectAccount('cds-demo-2', account1, 'signup', 'test reject reason')
     .then((res) => {
         console.log(`rejectAccount:\n${JSON.stringify(res, null, 3)}`);
         return true;
     }).catch(console.error);
-
-resetAccount('cds-demo-2', 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D')
-    .then((res) => {
-        console.log(`resetAccount:\n${JSON.stringify(res, null, 3)}`);
-        return true;
-    }).catch(console.error);
+*/
