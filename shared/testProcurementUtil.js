@@ -39,6 +39,26 @@ async function approveAccount(projectId, name, approvalName, reason) {
     }
 }
 
+async function rejectAccount(projectId, name, approvalName, reason) {
+    try {
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        const approval = await procurementUtil.rejectAccount(name, approvalName, reason);
+        return { success: true, data: approval };
+    } catch (err) {
+        return { success: false, errors: ['Failed to reject account'] };
+    }
+}
+
+async function resetAccount(projectId, name, approvalName, reason) {
+    try {
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        const approval = await procurementUtil.resetAccount(name);
+        return { success: true, data: approval };
+    } catch (err) {
+        return { success: false, errors: ['Failed to reset account'] };
+    }
+}
+
 async function listAccounts(projectId) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
@@ -111,8 +131,20 @@ getAccount('cds-demo-2', 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D')
         return true;
     }).catch(console.error);
 
-approveAccount('cds-demo-2', 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D', 'signup', 'test reason')
+approveAccount('cds-demo-2', 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D', 'signup', 'test approve reason')
     .then((res) => {
         console.log(`approveAccount:\n${JSON.stringify(res, null, 3)}`);
+        return true;
+    }).catch(console.error);
+
+rejectAccount('cds-demo-2', 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D', 'signup', 'test reject reason')
+    .then((res) => {
+        console.log(`rejectAccount:\n${JSON.stringify(res, null, 3)}`);
+        return true;
+    }).catch(console.error);
+
+resetAccount('cds-demo-2', 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D')
+    .then((res) => {
+        console.log(`resetAccount:\n${JSON.stringify(res, null, 3)}`);
         return true;
     }).catch(console.error);

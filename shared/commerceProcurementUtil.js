@@ -145,6 +145,32 @@ class CommerceProcurementUtil {
     }
 
     /**
+     * Reject an approval on an account
+     */
+    async rejectAccount(name, approvalName, reason) {
+        const authClient = await this.auth.getClient();
+        try {
+            const res = await this.procurementClient.providers.accounts.reject({
+                auth: authClient,
+                name: name,
+                requestBody: {
+                    approvalName: approvalName,
+                    reason: reason
+                }
+            });
+            if (this.VERBOSE_MODE) {
+                console.log(res.data);
+            }
+            return res.data;
+        } catch (err) {
+            if (this.VERBOSE_MODE) {
+                console.warn(err);
+            }
+            throw err;
+        }
+    }
+
+    /**
      * approve Entitlement resource
      */
     async approveEntitlement(name) {
