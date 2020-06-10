@@ -20,6 +20,7 @@ const { BigQueryUtil, CommerceProcurementUtil } = require('cds-shared');
 let bigqueryUtil = new BigQueryUtil();
 let commerceProcurementUtil = new CommerceProcurementUtil('cds-demo-2');
 const cfg = require('../lib/config');
+const underscore = require("underscore");
 
 /**
  * @param  {string} projectId
@@ -36,25 +37,39 @@ function getTableFqdn(projectId, datasetId, tableId) {
  * Get a list of Procurements
  */
 async function listProcurements(projectId) {
-    const procurementUtil = new CommerceProcurementUtil(projectId);
-    const result = await procurementUtil.listEntitlements('state=ENTITLEMENT_ACTIVATION_REQUESTED');
-    // console.log(result);
-    return { success: true, data: result.entitlements };
+    try {
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        const result = await procurementUtil.listEntitlements('state=ENTITLEMENT_ACTIVATION_REQUESTED');
+        const accountNames = underscore.uniq(result.entitlements.map(e => e.account));
+        let entitlements = result.entitlements;
 
-    /*
-        SELECT m.accountName, a.email
-        FROM `datashare.account` a
-        CROSS JOIN UNNEST(a.marketplace) as m
-        where m.accountName in ('a', 'b', 'c');
-    */
-   
-    // Get list of procurements and then get accounts that have matching procurement account names.
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
-    const options = {
-        query: `SELECT ${fields} FROM \`${table}\``
+        if (accountNames && accountNames.length > 0) {
+            const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+            const query = `SELECT m.accountName, a.email
+FROM \`${table}\` a
+CROSS JOIN UNNEST(a.marketplace) as m
+WHERE m.accountName IN UNNEST(@accountNames)`;
+            console.log(query);
+
+            const options = {
+                query: query,
+                params: { accountNames: accountNames },
+            }
+            const [accountRows] = await bigqueryUtil.executeQuery(options);
+            console.log(accountRows);
+
+            if (accountRows && accountRows.length > 0) {
+                entitlements.forEach(e => {
+                    const email = underscore.where(accountRows, { accountName: e.account }).map(e => e.email).join(', ');
+                    e.email = email;
+                });
+            }
+        }
+
+        return { success: true, data: entitlements };
+    } catch (err) {
+        return { success: false, errors: ['Failed to retrieve pending entitlement list', err] };
     }
-    const [rows] = await bigqueryUtil.executeQuery(options);
-    return { success: true, data: rows };
 }
 
 /**
