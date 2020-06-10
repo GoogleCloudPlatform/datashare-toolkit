@@ -15,7 +15,8 @@ export default {
     msg: String
   },
   data: () => ({
-    user: null
+    user: null,
+    activated: false
   }),
   created() {
     const user = firebase.auth().currentUser;
@@ -46,7 +47,6 @@ export default {
           .shift();
     },
     approveAccount() {
-      console.log('Approve account');
       this.loading = true;
       this.$store
         .dispatch('submitProcurementApproval', {
@@ -69,7 +69,7 @@ export default {
       return `<b>Display Name</b>: ${this.user.displayName}<br/>
       <b>Email</b>: ${this.user.email}<br/>
       <b>Token</b>: ${this.jwtToken}<br/>
-      <b>Activation Status: ${this.activated || false}</b>`;
+      <b>Activation Status: ${this.activated}</b>`;
     },
     jwtToken() {
       return this.getCookie('gmt') || this.$route.query.gmt;

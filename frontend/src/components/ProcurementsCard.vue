@@ -30,6 +30,9 @@
           ></v-text-field>
         </v-toolbar>
       </template>
+      <template v-slot:item.email="{ item }">
+        {{ item.email || item.accountName }}
+      </template>
       <template v-slot:item.createTime="{ item }">
         {{ toLocalTime(item.createTime) }}
       </template>
@@ -62,7 +65,7 @@
           </template>
           <span>Comment</span>
         </v-tooltip>
-        <v-tooltip top>
+        <v-tooltip top v-if="item.activated === true">
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
@@ -110,6 +113,7 @@
                   color="amber"
                 ></v-radio>
                 <v-radio
+                  v-if="selectedItem.activated === true"
                   label="Approve"
                   value="approve"
                   color="green"
@@ -199,9 +203,9 @@ export default {
     headers: [
       { text: 'Product', value: 'product' },
       { text: 'Plan', value: 'plan' },
-      { text: 'Entitlement Name', value: 'name' },
-      { text: 'Requestor Email', value: 'email' },
-      { text: 'Message to User', value: 'messageToUser' },
+      { text: 'Email', value: 'email' },
+      { text: 'Activated', value: 'activated' },
+      { text: 'Status Message', value: 'messageToUser' },
       { text: 'Created At', value: 'createTime' },
       { text: 'Modified At', value: 'updateTime' },
       { text: '', value: 'action', sortable: false }
@@ -221,14 +225,14 @@ export default {
     resetApprovalDialogData() {
       this.approvalDialogData = {
         approvalStatus: '',
-        comment: '',
-        accounts: ''
+        comment: ''
       };
     },
     presentApprovalDialog(selectedItem, approvalStatus) {
       this.selectedItem = selectedItem;
       this.resetApprovalDialogData();
       this.approvalDialogData.approvalStatus = approvalStatus;
+      this.approvalDialogData.comment = selectedItem.messageToUser;
       this.showReviewProcurement = true;
     },
     closeApprovalDialog() {
@@ -289,15 +293,12 @@ export default {
       return d.toLocaleString();
     },
     rejectItem(item) {
-      console.log(`Reject called with item: ${JSON.stringify(item)}`);
       this.presentApprovalDialog(item, 'reject');
     },
     commentItem(item) {
-      console.log(`Comment called with item: ${JSON.stringify(item)}`);
       this.presentApprovalDialog(item, 'comment');
     },
     approveItem(item) {
-      console.log(`Approve called with item: ${JSON.stringify(item)}`);
       this.presentApprovalDialog(item, 'approve');
     }
   }

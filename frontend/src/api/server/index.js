@@ -244,11 +244,6 @@ export default {
       .then(response => response);
   },
   submitProcurementApproval(payload) {
-    console.log(
-      `Performing submitProcurementApproval with payload: ${JSON.stringify(
-        payload
-      )}`
-    );
     return axios
       .post(this._apiBaseUrl() + '/accounts:approve', payload)
       .then(response => response);

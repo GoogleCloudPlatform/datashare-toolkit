@@ -43,25 +43,31 @@ async function listProcurements(projectId) {
         const accountNames = underscore.uniq(result.entitlements.map(e => e.account));
         let entitlements = result.entitlements;
 
+        // Set activated flag to false
+        entitlements.forEach(e => {
+            e.activated = false;
+        });
+
         if (accountNames && accountNames.length > 0) {
             const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
             const query = `SELECT m.accountName, a.email
 FROM \`${table}\` a
 CROSS JOIN UNNEST(a.marketplace) as m
 WHERE m.accountName IN UNNEST(@accountNames)`;
-            console.log(query);
 
             const options = {
                 query: query,
                 params: { accountNames: accountNames },
             }
             const [accountRows] = await bigqueryUtil.executeQuery(options);
-            console.log(accountRows);
 
             if (accountRows && accountRows.length > 0) {
                 entitlements.forEach(e => {
                     const email = underscore.where(accountRows, { accountName: e.account }).map(e => e.email).join(', ');
-                    e.email = email;
+                    if (email) {
+                        e.email = email;
+                        e.activated = true;
+                    }
                 });
             }
         }
