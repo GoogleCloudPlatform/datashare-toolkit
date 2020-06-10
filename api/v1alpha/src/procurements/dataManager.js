@@ -41,6 +41,12 @@ async function listProcurements(projectId) {
     console.log(result);
     return { success: true, data: result.entitlements };
 
+    /*
+        SELECT m.accountName, a.email
+        FROM `datashare.account` a
+        CROSS JOIN UNNEST(a.marketplace) as m
+        where m.accountName in ('a', 'b', 'c');
+    */
     // Get list of procurements and then get accounts that have matching procurement account names.
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsProcurementViewId);
     const fields = Array.from(cfg.cdsProcurementViewFields).join();

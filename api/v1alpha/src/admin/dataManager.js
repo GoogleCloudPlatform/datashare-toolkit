@@ -551,57 +551,6 @@ async function setupDatasharePrerequisites(projectId) {
     } else {
         console.log('Current user dataset view already exists');
     }
-
-    if (await bigqueryUtil.tableExists(cfg.cdsDatasetId, cfg.cdsProcurementTableId) === false) {
-        console.log("Creating procurement table");
-        const options = {
-            description: 'CDS Datashare Procurement Table',
-            schema: [{
-                "name": "rowId",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "eventId",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "eventType",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "message",
-                "type": "STRING",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "acknowledged",
-                "type": "BOOLEAN",
-                "mode": "REQUIRED"
-            },
-            {
-                "name": "createdAt",
-                "type": "TIMESTAMP",
-                "mode": "REQUIRED"
-            }
-            ]
-        };
-        await bigqueryUtil.createTable(cfg.cdsDatasetId, cfg.cdsProcurementTableId, options);
-    } else {
-        console.log('Procurement table already exists');
-    }
-
-    if (await bigqueryUtil.viewExists(cfg.cdsDatasetId, cfg.cdsProcurementViewId) === false) {
-        console.log("Creating procurements formatted view");
-        const procurementTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsProcurementTableId);
-        const viewSql = `SELECT\n  rowId,\n  eventId,\n  eventType,\n  acknowledged,\n  UNIX_MILLIS(createdAt) as createdAt,\n  JSON_EXTRACT(message, '$.account.id') as accountId,\n  JSON_EXTRACT(message, '$.entitlement.id') as solutionId,\n  CASE\n    WHEN eventType = 'ACCOUNT_ACTIVE' THEN  JSON_EXTRACT(message, '$.account.updateTime')\n    WHEN eventType = 'ENTITLEMENT_CREATION_REQUESTED' THEN  JSON_EXTRACT(message, '$.entitlement.updateTime')\n  END AS updateTime\nFROM \`${procurementTable}\``;
-        console.log(viewSql);
-        await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsProcurementViewId, viewSql);
-    } else {
-        console.log('Procurements forumatted view already exists');
-    }
 }
 
 module.exports = {

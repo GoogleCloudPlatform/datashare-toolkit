@@ -53,14 +53,6 @@ config.cdsAuthorizedViewViewFields = new Set(['rowId', 'authorizedViewId', 'name
 
 config.cdsCurrentUserDatasetViewId = "currentUserDataset";
 
-config.cdsProcurementTableId = "procurement";
-config.cdsProcurementTableFields = new Set(['rowId', 'eventId', 'eventType', 'message',
-    'acknowledged', 'createdAt']);
-
-config.cdsProcurementViewId = "procurementFormatted";
-config.cdsProcurementViewFields = new Set(['rowId', 'eventId', 'eventType', 'acknowledged',
-'createdAt', 'accountId', 'solutionId', 'updateTime']);
-
 if (process.env.ADMIN_USERS) {
     config.adminUsers = process.env.ADMIN_USERS.split(',') || [];
 }
