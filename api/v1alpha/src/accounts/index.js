@@ -607,6 +607,24 @@ accounts.get('/projects/:projectId/datasets/:datasetId/accounts', async (req, re
     });
 });
 
+// Temporary for development
+accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
+    const projectId = req.params.projectId;
+    const token = req.query.token;
+    console.log(`Activate called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
+
+    const data = await dataManager.register(projectId, token);
+    console.log(`Data: ${JSON.stringify(data)}`);
+
+    if (data && data.success === false) {
+        res.clearCookie(gcpMarketplaceTokenCookieName);
+        res.redirect(cfg.uiBaseUrl + '/activationError');
+    } else {
+        res.cookie(gcpMarketplaceTokenCookieName, token, { secure: true, expires: 0, domain: 'localhost' });
+        res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
+    }
+});
+
 accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
     const projectId = req.params.projectId;
     switch (req.params.custom) {
@@ -622,7 +640,7 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
                 res.redirect(cfg.uiBaseUrl + '/activationError');
             } else {
                 res.cookie(gcpMarketplaceTokenCookieName, token, { secure: true, expires: 0 });
-                res.redirect(cfg.uiBaseUrl + '/activate');
+                res.redirect(cfg.uiBaseUrl + '/activation');
             }
             break;
         }

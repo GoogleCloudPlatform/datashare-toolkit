@@ -49,7 +49,7 @@ export default {
     userSummary() {
       return `<b>Display Name</b>: ${this.user.displayName}<br/>
       <b>Email</b>: ${this.user.email}<br/>
-      <b>Token</b>: ${this.getCookie('gmt')}`;
+      <b>Token</b>: ${this.getCookie('gmt') || this.$route.query.gmt}`;
     }
   },
   mounted() {
