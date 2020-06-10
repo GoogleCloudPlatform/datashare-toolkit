@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Deploy the UI to Cloud Run."""
+"""Deploy the Datashare UI to Cloud Run."""
 
 import json
 
@@ -23,7 +23,7 @@ def GenerateConfig(context):
   cmd = "https://github.com/GoogleCloudPlatform/datashare-toolkit.git"
 
   resources = [{
-      'name': 'cds-ui-build',
+      'name': 'ds-ui-build',
       'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
       'metadata': {
           'runtimePolicy': ['UPDATE_ALWAYS']
@@ -32,12 +32,17 @@ def GenerateConfig(context):
           'steps': [
               { # Clone the Datashare repository
                 'name': 'gcr.io/cloud-builders/git',
-                'dir': 'cds', # changes the working directory to /workspace/cds/
+                'dir': 'ds', # changes the working directory to /workspace/ds/
                 'args': ['clone', cmd]
               },
-              { # Submit the build configuration to Cloud Build to build the CDS UI container image
+              { # Checkout the correct release
+                'name': 'gcr.io/cloud-builders/git',
+                'dir': 'ds/datashare-toolkit', # changes the working directory to /workspace/ds/datashare-toolkit
+                'args': ['checkout', context.properties['datashareGitReleaseTag']]
+              },
+              { # Submit the build configuration to Cloud Build to build the DS UI container image
                   'name': 'gcr.io/cloud-builders/gcloud',
-                  'dir': 'cds/datashare-toolkit/frontend',
+                  'dir': 'ds/datashare-toolkit/frontend',
                   'args': ['builds',
                             'submit',
                             '.', # SOURCE current working directory
@@ -47,7 +52,7 @@ def GenerateConfig(context):
               },
               {   # Deploy the container image to Cloud Run
                   'name': 'gcr.io/cloud-builders/gcloud',
-                  'dir': 'cds/datashare-toolkit/frontend',
+                  'dir': 'ds/datashare-toolkit/frontend',
                   'args': ['run',
                             'deploy',
                             context.properties['cloudRunDeployName'],

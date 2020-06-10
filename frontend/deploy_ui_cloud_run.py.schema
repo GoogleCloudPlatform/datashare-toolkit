@@ -13,9 +13,9 @@
 # limitations under the License.
 
 info:
-  title: CDS UI Deployment Manager
+  title: Datashare UI Deployment Manager
   author: Google Inc.
-  description: Template code to deploy the CDS UI to Cloud Run
+  description: Template code to deploy the Datashare UI to Cloud Run
 
 required:
 - containerTag
@@ -32,11 +32,12 @@ properties:
   cloudRunDeployName:
     type: string
     description: Cloud run service name that is displayed in the UI.
-    default: cds-frontend-ui
+    default: ds-frontend-ui
 
   containerTag:
     type: string
-    description: CDS UI Docker container tag
+    description: DS UI Docker container tag
+    default: dev
 
   region:
     type: string
@@ -45,6 +46,12 @@ properties:
   timeout:
     type: string
     description: Alloted time for the deployment to be successfull.
+    default: 600s
+
+  datashareGitReleaseTag:
+    type: string
+    description: The Git release version that should be used to install Datashare assets.
+    default: v0.3.1
     
 outputs:
   properties:

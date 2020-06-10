@@ -8,4 +8,5 @@ resources:
     firebaseApiKey: YOUR_FIREBASE_WEB_APIKEY
     containerTag: dev
     region: us-central1
-    timeout: 360s
+    timeout: 600s
+    datashareGitReleaseTag: v0.3.1
