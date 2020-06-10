@@ -173,7 +173,7 @@ async function listAccounts(projectId, datasetId, policyId) {
 async function createOrUpdateAccount(projectId, accountId, data) {
     console.log(`createOrUpdateAccount called with accountId: ${accountId} and data: ${JSON.stringify(data)}`);
     let _accountId = accountId;
-    let impactedPolicies = Array.from(data.policies);
+    let impactedPolicies = data.policies ? Array.from(data.policies) : [];
     const currentAccount = await getAccount(projectId, accountId, data.email, data.emailType);
     console.log(`currentAccount response: ${JSON.stringify(currentAccount)}`);
     if (currentAccount.success) {
@@ -203,7 +203,7 @@ async function createOrUpdateAccount(projectId, accountId, data) {
     let fields = [...cfg.cdsAccountTableFields], values = [...cfg.cdsAccountTableFields];
 
     // reformat policies object for saving
-    let policies = data.policies;
+    let policies = data.policies || [];
     if (policies.length === 0) {
         // If there are no supplied policies, remove policies column field and value from insert statement.
         delete data.policies;
@@ -213,7 +213,11 @@ async function createOrUpdateAccount(projectId, accountId, data) {
             values.splice(index, 1);
         }
     } else {
-        data.policies = policies.map(p => { return { policyId: p }; })
+        // TODO: clean up format before passing from UI
+        // String array is passed in reformat for storing as dictionaries
+        if (policies[0] instanceof String) {
+            data.policies = policies.map(p => { return { policyId: p }; })
+        }
     }
 
     fields = Array.from(fields).join();
@@ -230,7 +234,7 @@ async function createOrUpdateAccount(projectId, accountId, data) {
             accountType: 'consumer'
         }
     };
-    console.log(data);
+    console.log(JSON.stringify(data));
     const [rows] = await _insertData(projectId, fields, values, data);
     if (rows.length === 0) {
         try {
@@ -267,7 +271,7 @@ async function getAccount(projectId, accountId, email, emailType) {
     }
     else if (email && emailType) {
         console.log(`getAccount performing lookup by email and emailType: ${email}:${emailType}`);
-        filter = 'WHERE email = @email AND emailType = @emailType AND isDeleted is true';
+        filter = 'WHERE email = @email AND emailType = @emailType'; // AND isDeleted is true
         params = { email: email, emailType: emailType };
     }
 
@@ -375,8 +379,7 @@ async function register(projectId, token) {
                 const signingKey = key.getPublicKey();
                 try {
                     const result = jwt.verify(token, signingKey, options);
-                    console.log(result);
-                    resolve({ success: true, code: 200 });
+                    resolve({ success: true, code: 200, data: result });
                 } catch (err) {
                     resolve({ success: false, code: 401, errors: [err] });
                 }
@@ -402,35 +405,44 @@ async function approve(projectId, token, reason, email) {
         console.log(`Approve called for token: ${token} for email: ${email}`);
         const procurementUtil = new CommerceProcurementUtil(projectId);
         const registration = await register(projectId, token);
+        console.log(`registration: ${JSON.stringify(registration)}`);
         if (registration.success === true) {
-            const accountId = registration.data.sub;
-            const accountName = procurementUtil.getAccountName(projectId,  accountId);
+            const accountId = registration.data.payload.sub;
+            const accountName = procurementUtil.getAccountName(projectId, accountId);
             const accountRecord = { accountName: accountName };
             console.log(`accountName: ${accountName}`);
 
             // Insert the account records.
+            let accountData;
             let account = await getAccount(projectId, null, email, 'userByEmail');
-            if (account) {
-                if (account.marketplace) {
-                    const found = underscore.findWhere(account.marketplace, accountRecord);
+            if (account.success) {
+                accountData = account.data;
+                if (accountData.marketplace) {
+                    const found = underscore.findWhere(accountData.marketplace, accountRecord);
                     if (!found) {
-                        account.marketplace.append(accountRecord);
+                        accountData.marketplace.push(accountRecord);
                     }
                 } else {
-                    account.marketplace = [ accountRecord ];  
+                    accountData.marketplace = [ accountRecord ];  
                 }
             } else {
                 // Create the account
-                account = { };
+                accountData = { 
+                    email: email,
+                    emailType: 'userByEmail',
+                    createdBy: email,
+                    marketplace: [ accountRecord ]
+                };
             }
 
             // This will create or update the account. At this point no new policies will be associated.
-            await createOrUpdateAccount(projectId, null, account);
+            await createOrUpdateAccount(projectId, null, accountData);
             
             const approval = await procurementUtil.approveAccount(accountName, approvalName, reason);
             return { success: true, code: 200, data: approval };
         }
     } catch (err) {
+        console.error(err);
         return { success: false, code: 500, errors: ['Failed to approve account'] };
     }
 }

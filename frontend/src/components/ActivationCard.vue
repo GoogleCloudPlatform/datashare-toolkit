@@ -26,12 +26,13 @@ export default {
         .auth()
         .signInWithRedirect(provider)
         .then(result => {
-          console.log(result);
+          this.approveAccount();
         });
     } else {
-      console.log(user);
+      // console.log(user);
       // Idea of where we would post back the cookie and accountId.
       // Activation success/failure, etc.
+      this.approveAccount();
     }
   },
   methods: {
@@ -43,13 +44,35 @@ export default {
           .pop()
           .split(';')
           .shift();
+    },
+    approveAccount() {
+      console.log('Approve account');
+      this.loading = true;
+      this.$store
+        .dispatch('submitProcurementApproval', {
+          projectId: this.$store.state.settings.projectId,
+          email: this.user.email,
+          token: this.jwtToken
+        })
+        .then(response => {
+          if (response.success) {
+            this.activated = true;
+          } else {
+            this.activated = false;
+          }
+          this.loading = false;
+        });
     }
   },
   computed: {
     userSummary() {
       return `<b>Display Name</b>: ${this.user.displayName}<br/>
       <b>Email</b>: ${this.user.email}<br/>
-      <b>Token</b>: ${this.getCookie('gmt') || this.$route.query.gmt}`;
+      <b>Token</b>: ${this.jwtToken}<br/>
+      <b>Activation Status: ${this.activated || false}</b>`;
+    },
+    jwtToken() {
+      return this.getCookie('gmt') || this.$route.query.gmt;
     }
   },
   mounted() {

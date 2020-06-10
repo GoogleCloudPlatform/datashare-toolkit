@@ -243,10 +243,14 @@ export default {
       .get(this._apiBaseUrl() + '/procurements')
       .then(response => response);
   },
-  setProcurementApprovalState(payload) {
-    console.log(`Performing setProcurementApprovalState`);
+  submitProcurementApproval(payload) {
+    console.log(
+      `Performing submitProcurementApproval with payload: ${JSON.stringify(
+        payload
+      )}`
+    );
     return axios
-      .post(this._apiBaseUrl() + '/procurements/approve', payload)
+      .post(this._apiBaseUrl() + '/accounts:approve', payload)
       .then(response => response);
   },
   initSchema(payload) {

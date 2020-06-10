@@ -278,8 +278,8 @@ const store = new Vuex.Store({
       });
     },
     // eslint-disable-next-line no-unused-vars
-    setProcurementApprovalState({ commit }, payload) {
-      return client.setProcurementApprovalState().catch(error => {
+    submitProcurementApproval({ commit }, payload) {
+      return client.submitProcurementApproval(payload).catch(error => {
         notify(error);
       });
     },

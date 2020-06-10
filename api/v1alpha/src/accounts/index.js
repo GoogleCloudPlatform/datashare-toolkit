@@ -607,6 +607,19 @@ accounts.get('/projects/:projectId/datasets/:datasetId/accounts', async (req, re
     });
 });
 
+function extractHostname(url) {
+    var hostname;
+    if (url.indexOf("//") > -1) {
+        hostname = url.split('/')[2];
+    }
+    else {
+        hostname = url.split('/')[0];
+    }
+    hostname = hostname.split(':')[0];
+    hostname = hostname.split('?')[0];
+    return hostname;
+}
+
 // Temporary for development
 accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
     const projectId = req.params.projectId;
@@ -620,7 +633,8 @@ accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
         res.clearCookie(gcpMarketplaceTokenCookieName);
         res.redirect(cfg.uiBaseUrl + '/activationError');
     } else {
-        res.cookie(gcpMarketplaceTokenCookieName, token, { secure: true, expires: 0, domain: 'localhost' });
+        const host = extractHostname(req.headers.host);
+        res.cookie(gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
         res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
     }
 });
@@ -639,22 +653,23 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
                 res.clearCookie(gcpMarketplaceTokenCookieName);
                 res.redirect(cfg.uiBaseUrl + '/activationError');
             } else {
-                res.cookie(gcpMarketplaceTokenCookieName, token, { secure: true, expires: 0 });
+                const host = extractHostname(req.headers.host);
+                res.cookie(gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
                 res.redirect(cfg.uiBaseUrl + '/activation');
             }
             break;
         }
         case "approve": {
-            const token = req.cookies[gcpMarketplaceTokenCookieName];
+            // const token = req.cookies[gcpMarketplaceTokenCookieName];
+            const token = req.body.token;
             const email = req.body.email;
             const reason = req.body.reason;
             console.log(`Approve called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
 
             const data = await dataManager.approve(projectId, token, reason, email);
-            console.log(`Data: t${JSON.stringify(data)}`);
+            console.log(`Data: ${JSON.stringify(data)}`);
 
             // TODO: Perform redirects
-
             var code;
             if (data && data.success === false) {
                 code = (data.code === undefined) ? 500 : data.code;
