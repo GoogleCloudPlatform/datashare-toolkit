@@ -9,6 +9,11 @@ const routerOptions = [
     component: 'Home'
   },
   {
+    path: '/restricted',
+    name: 'restricted',
+    component: 'Restricted'
+  },
+  {
     path: '/config',
     name: 'config',
     component: 'Config',

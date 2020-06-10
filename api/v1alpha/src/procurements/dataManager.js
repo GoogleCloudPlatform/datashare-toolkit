@@ -38,7 +38,7 @@ function getTableFqdn(projectId, datasetId, tableId) {
 async function listProcurements(projectId) {
     const procurementUtil = new CommerceProcurementUtil(projectId);
     const result = await procurementUtil.listEntitlements('state=ENTITLEMENT_ACTIVATION_REQUESTED');
-    console.log(result);
+    // console.log(result);
     return { success: true, data: result.entitlements };
 
     /*
@@ -47,9 +47,9 @@ async function listProcurements(projectId) {
         CROSS JOIN UNNEST(a.marketplace) as m
         where m.accountName in ('a', 'b', 'c');
     */
+   
     // Get list of procurements and then get accounts that have matching procurement account names.
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsProcurementViewId);
-    const fields = Array.from(cfg.cdsProcurementViewFields).join();
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
     const options = {
         query: `SELECT ${fields} FROM \`${table}\``
     }
