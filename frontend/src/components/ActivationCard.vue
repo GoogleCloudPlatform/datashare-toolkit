@@ -49,7 +49,7 @@ export default {
     approveAccount() {
       this.loading = true;
       this.$store
-        .dispatch('submitProcurementApproval', {
+        .dispatch('submitProcurementAccountApproval', {
           projectId: this.$store.state.settings.projectId,
           email: this.user.email,
           token: this.jwtToken

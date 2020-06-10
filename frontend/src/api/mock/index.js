@@ -95,7 +95,7 @@ export default {
   getProcurementRequests() {
     return get(procurementRequests, 2000); // wait 2s before returning config
   },
-  submitProcurementApproval() {
-    console.log(`Mock submitProcurementApproval: ${projectId}`);
+  submitProcurementAccountApproval() {
+    console.log(`Mock submitProcurementAccountApproval: ${projectId}`);
   }
 };

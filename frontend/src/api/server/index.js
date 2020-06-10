@@ -243,7 +243,12 @@ export default {
       .get(this._apiBaseUrl() + '/procurements')
       .then(response => response);
   },
-  submitProcurementApproval(payload) {
+  submitProcurementAccountApproval(payload) {
+    return axios
+      .post(this._apiBaseUrl() + '/accounts:approve', payload)
+      .then(response => response);
+  },
+  submitProcurementEntitlementApproval(payload) {
     return axios
       .post(this._apiBaseUrl() + '/accounts:approve', payload)
       .then(response => response);

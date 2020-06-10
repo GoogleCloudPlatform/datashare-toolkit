@@ -35,9 +35,9 @@ firebase.auth().useDeviceLanguage();
 firebase.auth().onAuthStateChanged(user => {
   store.dispatch('fetchUser', user);
   if (user) {
-    console.log('User is signed in');
+    console.debug('User is signed in');
   } else {
-    console.log('No user is signed in');
+    console.debug('No user is signed in');
   }
 
   new Vue({

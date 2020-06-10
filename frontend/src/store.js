@@ -278,10 +278,18 @@ const store = new Vuex.Store({
       });
     },
     // eslint-disable-next-line no-unused-vars
-    submitProcurementApproval({ commit }, payload) {
-      return client.submitProcurementApproval(payload).catch(error => {
+    submitProcurementAccountApproval({ commit }, payload) {
+      return client.submitProcurementAccountApproval(payload).catch(error => {
         notify(error);
       });
+    },
+    // eslint-disable-next-line no-unused-vars
+    submitProcurementEntitlementApproval({ commit }, payload) {
+      return client
+        .submitProcurementEntitlementApproval(payload)
+        .catch(error => {
+          notify(error);
+        });
     },
     // eslint-disable-next-line no-unused-vars
     saveIngestion({ commit }, payload) {
