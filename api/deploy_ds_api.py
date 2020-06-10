@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Creates service account, custom role and builds CDS API image and deploys to Cloud Run."""
+"""Creates service account, custom role and builds DS API image and deploys to Cloud Run."""
 
 import json
 
@@ -19,11 +19,11 @@ import json
 def GenerateConfig(context):
   """Generate YAML resource configuration."""
   
-  #volumes = [{'name': 'cds-code', 'path': '/cds'}]
+  #volumes = [{'name': 'ds-code', 'path': '/ds'}]
   cmd = "https://github.com/GoogleCloudPlatform/datashare-toolkit.git"
 
   resources = [{
-      'name': 'cds-api-build',
+      'name': 'ds-api-build',
       'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
       'metadata': {
           'runtimePolicy': ['UPDATE_ALWAYS']
@@ -37,13 +37,14 @@ def GenerateConfig(context):
               },
               { # Clone the Datashare repository
               'name': 'gcr.io/cloud-builders/git',
-              'dir': 'cds', # changes the working directory to /workspace/cds/
+              'dir': 'ds', # changes the working directory to /workspace/ds/
               'args': ['clone', cmd]
               },
               { # Create the custom role
+              'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
               'entrypoint': '/bin/bash',
               'args': ['-c', 'gcloud iam roles create ' + context.properties['customRoleName'] + ' --project=$PROJECT_ID --file=config/cds-api-mgr-role-definition.yaml || exit 0'],
-              'dir': 'cds/datashare-toolkit/api' # changes the working directory to /workspace/cds/datashare-toolkit/api
+              'dir': 'ds/datashare-toolkit/api' # changes the working directory to /workspace/ds/datashare-toolkit/api
               },
               { # Assign the service account to the custom role
               'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
@@ -51,9 +52,9 @@ def GenerateConfig(context):
                 '--member=serviceAccount:' + context.properties['serviceAccountName'] + '@$PROJECT_ID.iam.gserviceaccount.com', 
                 '--role=projects/$PROJECT_ID/roles/' + context.properties['customRoleName']]
               },
-              {   # Submit the build configuration to Cloud Build to be the CDS API container image
+              {   # Submit the build configuration to Cloud Build to be the Datashare API container image
                   'name': 'gcr.io/cloud-builders/gcloud',
-                  'dir': 'cds/datashare-toolkit',
+                  'dir': 'ds/datashare-toolkit',
                   'args': ['builds',
                             'submit',
                             '.', # SOURCE current working directory
@@ -63,7 +64,7 @@ def GenerateConfig(context):
               },
               {   # Deploy the container image to Cloud Run
                   'name': 'gcr.io/cloud-builders/gcloud',
-                  'dir': 'cds/datashare-toolkit',
+                  'dir': 'ds/datashare-toolkit',
                   'args': ['run',
                             'deploy',
                             context.properties['cloudRunDeployName'],

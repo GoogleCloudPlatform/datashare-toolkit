@@ -13,9 +13,9 @@
 # limitations under the License.
 
 info:
-  title: CDS API Deployment Manager
+  title: DS API Deployment Manager
   author: Google Inc.
-  description: Template code to deploy the CDS API to Cloud Run
+  description: Template code to deploy the DS API to Cloud Run
 
 required:
 - serviceAccountName
@@ -39,7 +39,7 @@ properties:
 
   containerTag:
     type: string
-    description: CDS API Docker container tag
+    description: DS API Docker container tag
 
   region:
     type: string

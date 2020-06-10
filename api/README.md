@@ -147,7 +147,7 @@ The Deployment Manager script will create a Cloud Build package that performs th
 * create a custom role
 * assign the service account to the custom role
 * create a container image in Container Registry
-* deploy the CDS API to Cloud Run
+* deploy the Datashare API to Cloud Run
 
 **NOTE: If you delete the Deployment Manager template, it will NOT delete any of the resources that it creates (SA, custom role, container, Cloud Run deployment)**
 
@@ -173,10 +173,10 @@ The Deployment Manager script will create a Cloud Build package that performs th
 ### Deploy to Cloud Run
 By default it deploys to us-central1 region. Execute the following command from the `datashare-toolkit/api` directory. 
 ```
-gcloud deployment-manager deployments create cds-api --config deploy_cds_api.yaml
+gcloud deployment-manager deployments create ds-api --config deploy_ds_api.yaml
 ```
 
-You can update the region in the `deploy_cds_api.yaml` file. 
+You can update the region in the `deploy_ds_api.yaml` file. 
 ```
 properties:
     region: us-central1
