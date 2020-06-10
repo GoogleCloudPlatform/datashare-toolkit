@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tcpreplay-env-config
+data:
+  #ADDRESS: "dmc-publisher-service" # tcpreplay-edit cannot lookup hostnames
+  ADDRESS: "239.0.0.1/32"
+  PORT: "50000"
+  IF_NAME: "eth0"

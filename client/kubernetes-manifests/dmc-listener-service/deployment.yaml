@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dmc-listener-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dmc-listener-service
+  template:
+    metadata:
+      labels:
+        app: dmc-listener-service
+        version: v1
+    spec:
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: dmc-service-creds
+      containers:
+        - name: dmc-service
+          image: dmc
+          args: ["multicast", "listen", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-r", "$(READ_BUFFER_BYTES)", "-v=$(VERBOSE)"]
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 50001
+          volumeMounts:
+          - name: google-cloud-key
+            mountPath: /var/secrets/google
+          env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /var/secrets/google/key.json
+          - name: ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                name: dmc-listener-env-config
+                key: ADDRESS
+          - name: IF_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: dmc-listener-env-config
+                key: IF_NAME
+          - name: READ_BUFFER_BYTES
+            valueFrom:
+              configMapKeyRef:
+                name: dmc-listener-env-config
+                key: READ_BUFFER_BYTES
+          - name: VERBOSE
+            valueFrom:
+              configMapKeyRef:
+                name: dmc-listener-env-config
+                key: VERBOSE

@@ -1,0 +1,40 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dmc-producer-job
+spec:
+  template:
+    metadata:
+      labels:
+        app: dmc-producer-job
+        version: v1
+    spec:
+      restartPolicy: Never
+      #ttlSecondsAfterFinished: 60
+      containers:
+        - name: dmc-producer
+          image: gcr.io/chrispage-dev/dmc:dev
+          args: ["multicast", "broadcast", "-a", "$(ADDRESS)", "-i", "$(IF_NAME)", "-v=$(VERBOSE)", "-m", "$(MESSAGE)"]
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                name: dmc-producer-env-config
+                key: ADDRESS
+          - name: IF_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: dmc-producer-env-config
+                key: IF_NAME
+          - name: VERBOSE
+            valueFrom:
+              configMapKeyRef:
+                name: dmc-producer-env-config
+                key: VERBOSE
+          - name: MESSAGE
+            valueFrom:
+              configMapKeyRef:
+                name: dmc-producer-env-config
+                key: MESSAGE
