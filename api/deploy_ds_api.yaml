@@ -1,0 +1,14 @@
+imports:
+- path: deploy_ds_api.py
+
+resources:
+- name: build
+  type: deploy_ds_api.py
+  properties:
+    serviceAccountName: ds-api-mgr
+    serviceAccountDesc: DS API Manager
+    customRoleName: custom.ds.api.mgr
+    cloudRunDeployName: ds-api
+    containerTag: dev
+    region: us-central1
+    timeout: 600s
