@@ -30,8 +30,11 @@
           ></v-text-field>
         </v-toolbar>
       </template>
-      <template v-slot:item.createdAt="{ item }">
-        {{ toLocalTime(item.createdAt) }} </template
+      <template v-slot:item.createTime="{ item }">
+        {{ toLocalTime(item.createTime) }}
+      </template>
+      <template v-slot:item.updateTime="{ item }">
+        {{ toLocalTime(item.updateTime) }} </template
       ><template v-slot:item.action="{ item }">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
@@ -45,6 +48,19 @@
             </v-icon>
           </template>
           <span>Reject</span>
+        </v-tooltip>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              v-on="on"
+              class="mr-2"
+              color="amber"
+              @click="commentItem(item)"
+            >
+              {{ icons.comment }}
+            </v-icon>
+          </template>
+          <span>Comment</span>
         </v-tooltip>
         <v-tooltip top>
           <template v-slot:activator="{ on }">
@@ -89,22 +105,16 @@
               >
                 <v-radio label="Reject" value="reject" color="red"></v-radio>
                 <v-radio
+                  label="Comment"
+                  value="comment"
+                  color="amber"
+                ></v-radio>
+                <v-radio
                   label="Approve"
                   value="approve"
                   color="green"
                 ></v-radio>
               </v-radio-group>
-              <ValidationProvider
-                v-if="approvalDialogData.approvalStatus === 'approve'"
-                v-slot="{ errors }"
-                name="Accounts"
-              >
-                <v-text-field
-                  v-model="approvalDialogData.accounts"
-                  :error-messages="errors"
-                  label="Accounts"
-                ></v-text-field>
-              </ValidationProvider>
               <ValidationProvider
                 v-slot="{ errors }"
                 name="Comment"
@@ -160,7 +170,7 @@ extend('max', {
   message: '{_field_} may not be greater than {length} characters'
 });
 
-import { mdiCancel, mdiCheck } from '@mdi/js';
+import { mdiCancel, mdiCheck, mdiCommentOutline } from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 
 export default {
@@ -180,17 +190,20 @@ export default {
     selectedItem: null,
     icons: {
       cancel: mdiCancel,
-      check: mdiCheck
+      check: mdiCheck,
+      comment: mdiCommentOutline
     },
     search: '',
     itemsPerPageOptions: [20, 50, 100, 200],
     itemsPerPage: 50,
     headers: [
-      { text: 'Solution Id', value: 'solutionId' },
-      { text: 'Plan Id', value: 'planId' },
-      { text: 'Entitlement Name', value: 'entitlementName' },
-      { text: 'Requestor Account Id', value: 'accountId' },
-      { text: 'Requested At', value: 'createdAt' },
+      { text: 'Product', value: 'product' },
+      { text: 'Plan', value: 'plan' },
+      { text: 'Entitlement Name', value: 'name' },
+      { text: 'Requestor Email', value: 'email' },
+      { text: 'Message to User', value: 'messageToUser' },
+      { text: 'Created At', value: 'createTime' },
+      { text: 'Modified At', value: 'updateTime' },
       { text: '', value: 'action', sortable: false }
     ]
   }),
@@ -199,9 +212,9 @@ export default {
   },
   computed: {
     selectedItemSummary() {
-      return `<b>Solution Id</b>: ${this.selectedItem.solutionId}<br/>
-      <b>Requestor Account Id</b>: ${this.selectedItem.accountId}<br/>
-      <b>Requested At</b>: ${this.toLocalTime(this.selectedItem.createdAt)}`;
+      return `<b>Product</b>: ${this.selectedItem.product}<br/>
+      <b>Account</b>: ${this.selectedItem.account}<br/>
+      <b>Requested At</b>: ${this.toLocalTime(this.selectedItem.createTime)}`;
     }
   },
   methods: {
@@ -271,18 +284,21 @@ export default {
           this.loading = false;
         });
     },
-    toLocalTime(epoch) {
-      let d = new Date(0);
-      d.setUTCMilliseconds(epoch);
+    toLocalTime(str) {
+      let d = new Date(str);
       return d.toLocaleString();
-    },
-    approveItem(item) {
-      console.log(`Approve called with item: ${JSON.stringify(item)}`);
-      this.presentApprovalDialog(item, 'approve');
     },
     rejectItem(item) {
       console.log(`Reject called with item: ${JSON.stringify(item)}`);
       this.presentApprovalDialog(item, 'reject');
+    },
+    commentItem(item) {
+      console.log(`Comment called with item: ${JSON.stringify(item)}`);
+      this.presentApprovalDialog(item, 'comment');
+    },
+    approveItem(item) {
+      console.log(`Approve called with item: ${JSON.stringify(item)}`);
+      this.presentApprovalDialog(item, 'approve');
     }
   }
 };

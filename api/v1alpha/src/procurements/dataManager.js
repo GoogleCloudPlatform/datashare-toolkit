@@ -36,6 +36,12 @@ function getTableFqdn(projectId, datasetId, tableId) {
  * Get a list of Procurements
  */
 async function listProcurements(projectId) {
+    const procurementUtil = new CommerceProcurementUtil(projectId);
+    const result = await procurementUtil.listEntitlements('state=ENTITLEMENT_ACTIVATION_REQUESTED');
+    console.log(result);
+    return { success: true, data: result.entitlements };
+
+    // Get list of procurements and then get accounts that have matching procurement account names.
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsProcurementViewId);
     const fields = Array.from(cfg.cdsProcurementViewFields).join();
     const options = {
