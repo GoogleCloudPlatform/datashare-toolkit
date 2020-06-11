@@ -113,13 +113,13 @@
                 :mandatory="false"
               >
                 <v-radio
-                  v-if="item.state !== 'ENTITLEMENT_CANCELLED'"
+                  v-if="selectedItem.state !== 'ENTITLEMENT_CANCELLED'"
                   label="Reject"
                   value="reject"
                   color="red"
                 ></v-radio>
                 <v-radio
-                  v-if="item.state !== 'ENTITLEMENT_CANCELLED'"
+                  v-if="selectedItem.state !== 'ENTITLEMENT_CANCELLED'"
                   label="Comment"
                   value="comment"
                   color="amber"
@@ -127,7 +127,7 @@
                 <v-radio
                   v-if="
                     selectedItem.activated === true &&
-                      item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'
+                      selectedItem.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'
                   "
                   label="Approve"
                   value="approve"
