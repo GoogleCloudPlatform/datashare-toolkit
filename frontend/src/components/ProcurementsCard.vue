@@ -189,7 +189,7 @@ extend('max', {
   message: '{_field_} may not be greater than {length} characters'
 });
 
-import { mdiCancel, mdiCheck, mdiCommentOutline, mdiReplay } from '@mdi/js';
+import { mdiCancel, mdiCheck, mdiCommentOutline } from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 
 export default {
@@ -210,8 +210,7 @@ export default {
     icons: {
       cancel: mdiCancel,
       check: mdiCheck,
-      comment: mdiCommentOutline,
-      replay: mdiReplay
+      comment: mdiCommentOutline
     },
     search: '',
     itemsPerPageOptions: [20, 50, 100, 200],
