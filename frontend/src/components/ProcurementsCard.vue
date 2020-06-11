@@ -31,7 +31,7 @@
         </v-toolbar>
       </template>
       <template v-slot:item.email="{ item }">
-        {{ item.email || item.accountName }}
+        {{ item.email || item.account }}
       </template>
       <template v-slot:item.createTime="{ item }">
         {{ toLocalTime(item.createTime) }}
@@ -39,7 +39,7 @@
       <template v-slot:item.updateTime="{ item }">
         {{ toLocalTime(item.updateTime) }} </template
       ><template v-slot:item.action="{ item }">
-        <v-tooltip top>
+        <v-tooltip top v-if="item.state !== 'ENTITLEMENT_CANCELLED'">
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
@@ -52,7 +52,7 @@
           </template>
           <span>Reject</span>
         </v-tooltip>
-        <v-tooltip top>
+        <v-tooltip top v-if="item.state !== 'ENTITLEMENT_CANCELLED'">
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
@@ -65,7 +65,13 @@
           </template>
           <span>Comment</span>
         </v-tooltip>
-        <v-tooltip top v-if="item.activated === true">
+        <v-tooltip
+          top
+          v-if="
+            item.activated === true &&
+              item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'
+          "
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
@@ -106,14 +112,23 @@
                 v-model="approvalDialogData.approvalStatus"
                 :mandatory="false"
               >
-                <v-radio label="Reject" value="reject" color="red"></v-radio>
                 <v-radio
+                  v-if="item.state !== 'ENTITLEMENT_CANCELLED'"
+                  label="Reject"
+                  value="reject"
+                  color="red"
+                ></v-radio>
+                <v-radio
+                  v-if="item.state !== 'ENTITLEMENT_CANCELLED'"
                   label="Comment"
                   value="comment"
                   color="amber"
                 ></v-radio>
                 <v-radio
-                  v-if="selectedItem.activated === true"
+                  v-if="
+                    selectedItem.activated === true &&
+                      item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'
+                  "
                   label="Approve"
                   value="approve"
                   color="green"
@@ -174,7 +189,7 @@ extend('max', {
   message: '{_field_} may not be greater than {length} characters'
 });
 
-import { mdiCancel, mdiCheck, mdiCommentOutline } from '@mdi/js';
+import { mdiCancel, mdiCheck, mdiCommentOutline, mdiReplay } from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 
 export default {
@@ -195,7 +210,8 @@ export default {
     icons: {
       cancel: mdiCancel,
       check: mdiCheck,
-      comment: mdiCommentOutline
+      comment: mdiCommentOutline,
+      replay: mdiReplay
     },
     search: '',
     itemsPerPageOptions: [20, 50, 100, 200],
@@ -203,9 +219,11 @@ export default {
     headers: [
       { text: 'Product', value: 'product' },
       { text: 'Plan', value: 'plan' },
+      { text: 'Entitlement Name', value: 'name' },
       { text: 'Email', value: 'email' },
       { text: 'Activated', value: 'activated' },
       { text: 'Status Message', value: 'messageToUser' },
+      { text: 'State', value: 'state' },
       { text: 'Created At', value: 'createTime' },
       { text: 'Modified At', value: 'updateTime' },
       { text: '', value: 'action', sortable: false }
@@ -217,8 +235,10 @@ export default {
   computed: {
     selectedItemSummary() {
       return `<b>Product</b>: ${this.selectedItem.product}<br/>
-      <b>Account</b>: ${this.selectedItem.account}<br/>
-      <b>Requested At</b>: ${this.toLocalTime(this.selectedItem.createTime)}`;
+      <b>Plan</b>: ${this.selectedItem.plan}<br/>
+      <b>Account</b>: ${this.selectedItem.email ||
+        this.selectedItem.account}<br/>
+      <b>Created At</b>: ${this.toLocalTime(this.selectedItem.createTime)}`;
     }
   },
   methods: {
@@ -241,16 +261,17 @@ export default {
       this.resetApprovalDialogData();
     },
     submitApproval() {
-      console.log('Submit approval clicked');
       this.$refs.observer
         .validate()
         .then(result => {
           if (result) {
             console.log('Validation passed, saving.');
             this.$store
-              .dispatch('setProcurementApprovalState', {
+              .dispatch('submitProcurementEntitlementApproval', {
                 projectId: this.$store.state.settings.projectId,
-                entitlementName: this.selectedItem.entitlementName
+                name: this.selectedItem.name,
+                status: this.approvalDialogData.approvalStatus,
+                reason: this.approvalDialogData.comment
               })
               .then(result => {
                 this.loading = false;
@@ -265,7 +286,7 @@ export default {
                 }
               })
               .catch(error => {
-                console.error(`Error creating dataset: ${error}`);
+                console.error(`Error submitting approval change: ${error}`);
               });
           }
         })

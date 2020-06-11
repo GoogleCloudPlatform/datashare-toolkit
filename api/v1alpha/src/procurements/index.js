@@ -123,10 +123,10 @@ procurements.get('/projects/:projectId/procurements', async (req, res) => {
 
 procurements.post('/projects/:projectId/procurements/approve', async (req, res) => {
     const projectId = req.params.projectId;
-    const entitlementName = req.body.entitlementName;
-    const approve = req.body.approve;
+    const name = req.body.name;
+    const status = req.body.status;
     const reason = req.body.reason;
-    const data = await dataManager.approveEntitlement(projectId, entitlementName, approve, reason);
+    const data = await dataManager.approveEntitlement(projectId, name, status, reason);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined) ? 500 : data.code;

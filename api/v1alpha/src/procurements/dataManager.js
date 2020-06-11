@@ -18,7 +18,6 @@
 
 const { BigQueryUtil, CommerceProcurementUtil } = require('cds-shared');
 let bigqueryUtil = new BigQueryUtil();
-let commerceProcurementUtil = new CommerceProcurementUtil('cds-demo-2');
 const cfg = require('../lib/config');
 const underscore = require("underscore");
 
@@ -39,9 +38,11 @@ function getTableFqdn(projectId, datasetId, tableId) {
 async function listProcurements(projectId) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
+        // OR state=ENTITLEMENT_PENDING_CANCELLATION OR state=ENTITLEMENT_CANCELLED
         const result = await procurementUtil.listEntitlements('state=ENTITLEMENT_ACTIVATION_REQUESTED');
-        const accountNames = underscore.uniq(result.entitlements.map(e => e.account));
-        let entitlements = result.entitlements;
+        let entitlements = result.entitlements || [];
+
+        const accountNames = underscore.uniq(entitlements.map(e => e.account));        
 
         // Set activated flag to false
         entitlements.forEach(e => {
@@ -74,6 +75,7 @@ WHERE m.accountName IN UNNEST(@accountNames)`;
 
         return { success: true, data: entitlements };
     } catch (err) {
+        console.error(err);
         return { success: false, errors: ['Failed to retrieve pending entitlement list', err] };
     }
 }
@@ -81,22 +83,26 @@ WHERE m.accountName IN UNNEST(@accountNames)`;
 /**
  * @param  {} projectId The projectId for the provider
  * @param  {} name Name of the entitlement resource
- * @param  {boolean} Indicates an approval (true) or a rejection (false)
+ * @param  {} status The approval status, should be one of ['approve', 'reject', 'comment']
  * @param  {} reason Only provided for a rejection
  */
-async function approveEntitlement(projectId, name, approve, reason) {
+async function approveEntitlement(projectId, name, status, reason) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
-        if (approve === true) {
+        if (status === 'approve') {
             // At this point, we could automatically permission the calling email address for access to the policy.
             // However, given that it could potentially fail, we'll not do this just yet.
             const result = await procurementUtil.approveEntitlement(name);
             return { success: true, data: result };
-        } else {
+        } else if (status === 'reject') {
             const result = await procurementUtil.rejectEntitlement(name, reason);
+            return { success: true, data: result };
+        } else if (status === 'comment') {
+            const result = await procurementUtil.updateEntitlementMessage(name, reason);
             return { success: true, data: result };
         }
     } catch (err) {
+        console.error(err);
         return { success: false, errors: ['Failed to approve entitlement', err] };
     }
 }

@@ -250,7 +250,7 @@ export default {
   },
   submitProcurementEntitlementApproval(payload) {
     return axios
-      .post(this._apiBaseUrl() + '/accounts:approve', payload)
+      .post(this._apiBaseUrl() + '/procurements/approve', payload)
       .then(response => response);
   },
   initSchema(payload) {
