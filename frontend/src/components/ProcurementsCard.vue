@@ -264,7 +264,6 @@ export default {
         .validate()
         .then(result => {
           if (result) {
-            console.log('Validation passed, saving.');
             this.$store
               .dispatch('submitProcurementEntitlementApproval', {
                 projectId: this.$store.state.settings.projectId,
