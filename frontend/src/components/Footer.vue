@@ -10,9 +10,6 @@
 import { mapGetters } from 'vuex';
 
 export default {
-  data: () => ({
-    links: ['Home', 'About Us', 'Team', 'Services', 'Blog', 'Contact Us']
-  }),
   computed: {
     ...mapGetters({
       settings: 'settings'

@@ -51,6 +51,10 @@
       </v-tooltip>
       <v-toolbar-title>{{ toolbar.title }}</v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-avatar :tile="true" height="25" width="25">
+        <img :src="require('@/assets/datashare-alpha-24px.svg')" alt="logo" />
+      </v-avatar>
+      <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
           <v-btn
