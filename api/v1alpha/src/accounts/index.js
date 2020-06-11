@@ -224,7 +224,8 @@ accounts.post('/projects/:projectId/accounts', async (req, res) => {
         emailType: req.body.emailType,
         accountType: req.body.accountType,
         createdBy: req.header('x-gcp-account'),
-        policies: req.body.policies
+        policies: req.body.policies,
+        marketplace: req.body.marketplace
     };
     const data = await dataManager.createOrUpdateAccount(projectId, null, values);
     var code;
@@ -385,7 +386,8 @@ accounts.put('/projects/:projectId/accounts/:accountId', async (req, res) => {
         emailType: req.body.emailType,
         accountType: req.body.accountType,
         createdBy: req.header('x-gcp-account'),
-        policies: req.body.policies
+        policies: req.body.policies,
+        marketplace: req.body.marketplace
     };
     const data = await dataManager.createOrUpdateAccount(projectId, accountId, values);
     var code;

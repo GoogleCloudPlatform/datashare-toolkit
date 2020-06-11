@@ -417,6 +417,9 @@ async function approve(projectId, token, reason, email) {
             let account = await getAccount(projectId, null, email, 'userByEmail');
             if (account.success) {
                 accountData = account.data;
+                if (accountData.policies) {
+                    accountData.policies = accountData.policies.map(e => e.policyId);
+                }
                 if (accountData.marketplace) {
                     const found = underscore.findWhere(accountData.marketplace, accountRecord);
                     if (!found) {

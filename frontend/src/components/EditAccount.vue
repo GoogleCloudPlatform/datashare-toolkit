@@ -148,7 +148,8 @@ export default {
       accountId: null,
       emailType: null,
       email: null,
-      policies: []
+      policies: [],
+      marketplace: []
     },
     emailTypes: ['userByEmail', 'groupByEmail'],
     showError: false
@@ -160,6 +161,7 @@ export default {
       this.user.emailType = this.userData.emailType;
       this.user.email = this.userData.email;
       this.user.policies = this.userData.policies;
+      this.user.marketplace = this.userData.marketplace;
       this.initialSelectedPolicies = this.userData.policies;
       this.loadAccount();
     }
@@ -211,7 +213,8 @@ export default {
                 accountId: this.user.accountId,
                 email: this.user.email,
                 emailType: this.user.emailType,
-                policies: this.user.policies
+                policies: this.user.policies,
+                marketplace: this.user.marketplace
               };
             }
 
@@ -263,6 +266,7 @@ export default {
               policies = account.policies.map(p => p.policyId);
             }
             this.user.policies = policies;
+            this.user.marketplace = account.marketplace;
             this.initialSelectedPolicies = policies;
           }
           this.loading = false;

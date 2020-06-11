@@ -20,6 +20,7 @@ const { BigQueryUtil, CommerceProcurementUtil } = require('cds-shared');
 let bigqueryUtil = new BigQueryUtil();
 const cfg = require('../lib/config');
 const underscore = require("underscore");
+const accountManager = require('../accounts/dataManager');
 
 /**
  * @param  {string} projectId
@@ -57,6 +58,7 @@ async function listProcurements(projectId) {
         name,
         description
     FROM \`${table}\`
+    WHERE marketplace IS NOT NULL
 )
 SELECT *
 FROM policyData
@@ -71,7 +73,7 @@ WHERE marketplaceId IN UNNEST(@products)`;
                 entitlements.forEach(e => {
                     const policy = underscore.findWhere(policyRows, { marketplaceId: e.product + '$||$' + e.plan });
                     if (policy) {
-                        e.policy = { name: policy.name, description: policy.description };
+                        e.policy = { policyId: policy.policyId, name: policy.name, description: policy.description };
                     }
                 });
             }
@@ -84,7 +86,7 @@ WHERE marketplaceId IN UNNEST(@products)`;
 
         if (accountNames && accountNames.length > 0) {
             const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
-            const query = `SELECT m.accountName, a.email
+            const query = `SELECT a.accountId, m.accountName, a.email
 FROM \`${table}\` a
 CROSS JOIN UNNEST(a.marketplace) as m
 WHERE m.accountName IN UNNEST(@accountNames)`;
@@ -97,10 +99,14 @@ WHERE m.accountName IN UNNEST(@accountNames)`;
 
             if (accountRows && accountRows.length > 0) {
                 entitlements.forEach(e => {
-                    const email = underscore.where(accountRows, { accountName: e.account }).map(e => e.email).join(', ');
-                    if (email) {
-                        e.email = email;
-                        e.activated = true;
+                    const account = underscore.findWhere(accountRows, { accountName: e.account });
+                    if (account) {
+                        e.email = account.email;
+                        e.accountId = account.accountId;
+                        if (e.policy) {
+                            // Only set activated if a policy is found.
+                            e.activated = true;
+                        }
                     }
                 });
             }
@@ -118,18 +124,25 @@ WHERE m.accountName IN UNNEST(@accountNames)`;
  * @param  {} name Name of the entitlement resource
  * @param  {} status The approval status, should be one of ['approve', 'reject', 'comment']
  * @param  {} reason Only provided for a rejection
+ * @param  {} accountId The datashare accountId
+ * @param  {} policyId The datashare policyId
  */
-async function approveEntitlement(projectId, name, status, reason) {
+async function approveEntitlement(projectId, name, status, reason, accountId, policyId) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
         if (status === 'approve') {
-            // At this point, we could automatically permission the calling email address for access to the policy.
-            // However, given that it could potentially fail, we'll not do this just yet.
             const result = await procurementUtil.approveEntitlement(name);
-
-            // Update account to add the policy access, at this point we know that the billing user already has an account
-            // Get it, and add the policy
-
+            const account = await accountManager.getAccount(projectId, accountId);
+            console.log(account);
+            const policyRecord = { policyId: policyId };
+            let accountData = account.data;
+            let policies = accountData.policies || [];
+            const found = underscore.findWhere(policies, policyRecord);
+            if (!found) {
+                policies.push(policyRecord);
+                console.log(`Updating account: ${JSON.stringify(accountData, null, 3)}`);
+                await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
+            }
             return { success: true, data: result };
         } else if (status === 'reject') {
             const result = await procurementUtil.rejectEntitlement(name, reason);

@@ -216,6 +216,7 @@ export default {
     itemsPerPageOptions: [20, 50, 100, 200],
     itemsPerPage: 50,
     headers: [
+      { text: 'Policy', value: 'policy.name' },
       { text: 'Product', value: 'product' },
       { text: 'Plan', value: 'plan' },
       { text: 'Entitlement Name', value: 'name' },
@@ -269,7 +270,9 @@ export default {
                 projectId: this.$store.state.settings.projectId,
                 name: this.selectedItem.name,
                 status: this.approvalDialogData.approvalStatus,
-                reason: this.approvalDialogData.comment
+                reason: this.approvalDialogData.comment,
+                accountId: this.selectedItem.accountId,
+                policyId: this.selectedItem.policy.policyId
               })
               .then(result => {
                 this.loading = false;
