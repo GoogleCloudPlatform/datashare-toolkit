@@ -42,7 +42,40 @@ async function listProcurements(projectId) {
         const result = await procurementUtil.listEntitlements('state=ENTITLEMENT_ACTIVATION_REQUESTED');
         let entitlements = result.entitlements || [];
 
-        const accountNames = underscore.uniq(entitlements.map(e => e.account));        
+        const accountNames = underscore.uniq(entitlements.map(e => e.account));
+
+        // Query for the policy data and join that on for policy name.
+        const products = entitlements.map(e => e.product + '$||$' + e.plan);
+
+        if (products && products.length > 0) {
+            const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+            const query = `WITH policyData AS (
+    SELECT
+        policyId,
+        marketplace,
+        CONCAT(marketplace.solutionId, '$||$', marketplace.planId) as marketplaceId,
+        name,
+        description
+    FROM \`${table}\`
+)
+SELECT *
+FROM policyData
+WHERE marketplaceId IN UNNEST(@products)`;
+
+            const options = {
+                query: query,
+                params: { products: products },
+            }
+            const [policyRows] = await bigqueryUtil.executeQuery(options);
+            if (policyRows && policyRows.length > 0) {
+                entitlements.forEach(e => {
+                    const policy = underscore.findWhere(policyRows, { marketplaceId: e.product + '$||$' + e.plan });
+                    if (policy) {
+                        e.policy = { name: policy.name, description: policy.description };
+                    }
+                });
+            }
+        }
 
         // Set activated flag to false
         entitlements.forEach(e => {
@@ -93,6 +126,10 @@ async function approveEntitlement(projectId, name, status, reason) {
             // At this point, we could automatically permission the calling email address for access to the policy.
             // However, given that it could potentially fail, we'll not do this just yet.
             const result = await procurementUtil.approveEntitlement(name);
+
+            // Update account to add the policy access, at this point we know that the billing user already has an account
+            // Get it, and add the policy
+
             return { success: true, data: result };
         } else if (status === 'reject') {
             const result = await procurementUtil.rejectEntitlement(name, reason);
