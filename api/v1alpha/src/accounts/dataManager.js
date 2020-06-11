@@ -282,11 +282,11 @@ async function getAccount(projectId, accountId, email, emailType) {
     let filter = 'WHERE accountId = @accountId AND isDeleted is false';
     let params = {};
     if (accountId) {
-        console.log(`getAccount performing lookup by accountId: ${accountId}`);
+        // console.log(`getAccount performing lookup by accountId: ${accountId}`);
         params.accountId = accountId;
     }
     else if (email && emailType) {
-        console.log(`getAccount performing lookup by email and emailType: ${email}:${emailType}`);
+        // console.log(`getAccount performing lookup by email and emailType: ${email}:${emailType}`);
         filter = 'WHERE email = @email AND emailType = @emailType'; // AND isDeleted is true
         params = { email: email, emailType: emailType };
     }
