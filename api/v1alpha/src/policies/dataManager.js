@@ -75,6 +75,35 @@ async function _deleteData(projectId, fields, values, data) {
 }
 
 /**
+ * @param  {} projectId
+ * @param  {} email
+ */
+async function listUserPolicies(projectId, email) {
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+    let fields = new Set(cfg.cdsPolicyViewFields);
+    fields.delete('isDeleted');
+    fields = Array.from(fields).map(i => 'cp.' + i).join();
+    const accountTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+    let sqlQuery = `WITH currentAccount AS (
+            SELECT policies.policyId
+            FROM \`${accountTable}\` ca
+            CROSS JOIN UNNEST(policies) policies
+            WHERE lower(email) = @email AND
+                (ca.isDeleted IS false OR ca.isDeleted IS null)
+          )
+        SELECT name, description, datasets, rowAccessTags, marketplace
+        FROM \`${table}\` cp
+        JOIN currentAccount ca ON ca.policyId = cp.policyId
+        WHERE (cp.isDeleted IS false OR cp.isDeleted IS null)`;
+    let options = {
+        query: sqlQuery,
+        params: { email: email.toLowerCase() }
+    };
+    const [rows] = await bigqueryUtil.executeQuery(options);
+    return { success: true, data: rows };
+}
+
+/**
  * @param  {string} projectId
  * @param  {string} datasetId
  * @param  {string} accountId
@@ -150,7 +179,7 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
             _policyId = currentPolicy.data.policyId;
         }
     }
-    
+
     if (!_policyId) {
         _policyId = uuidv4();
     }
@@ -266,7 +295,7 @@ async function deletePolicy(projectId, policyId, data) {
         return { success: false, code: 500, errors: ["STALE"] };
     }
 
-    let fields =[...cfg.cdsPolicyTableFields];
+    let fields = [...cfg.cdsPolicyTableFields];
     let values = ['@rowId', 'policyId', 'name', 'description', 'datasets', 'rowAccessTags', '@createdBy', 'current_timestamp()', 'true'];
     fields = Array.from(fields).join();
     values = Array.from(values).join();
@@ -287,5 +316,6 @@ module.exports = {
     listPolicies,
     createOrUpdatePolicy,
     deletePolicy,
-    getPolicy
+    getPolicy,
+    listUserPolicies
 };
