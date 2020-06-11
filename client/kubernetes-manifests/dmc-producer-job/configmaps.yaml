@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dmc-producer-env-config
+data:
+  ## PROJECT_ID and TOPIC_NAME are only required for publisher
+  #PROJECT_ID: "chrispage-dev"
+  #TOPIC_NAME: "ds-multicast-demo-broadcast"
+  ## If producer is running outside publisher/listener GKE node, then the service name is required
+  ADDRESS: "dmc-publisher-service:50000"
+  ## If you want to broadcast to a multicast group in 1 GK# node, then use the multicast group
+  #ADDRESS: "239.0.0.1:50000"
+  IF_NAME: "eth0"
+  VERBOSE: "true"
+  MESSAGE: "I am a sample message"

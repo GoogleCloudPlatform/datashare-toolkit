@@ -1,0 +1,51 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tcpreplay-job
+spec:
+  template:
+    metadata:
+      labels:
+        app: tcpreplay-job
+    spec:
+      restartPolicy: Never
+      #ttlSecondsAfterFinished: 60
+      containers:
+        - name: tcpreplay-job
+          image: williamofockham/tcpreplay:4.3.0
+          #tcpreplay-edit -i eth0 -D 233.215.21.4/32:239.0.0.1/32 -r 10378:9999 -C -t ${PWD}/temp/data_feeds_20180127_20180127_IEXTP1_DEEP1.0.pcap
+          args: ["tcpreplay-edit", "-i", "$(IF_NAME)", "-D", "233.215.21.4/32:$(ADDRESS)", "-r", "10378:$(PORT)", "-m", "1460", "--mtu-trunc", "-C", "-t", "/pcap/data.pcap"]
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - name: pcapdir
+            mountPath: /pcap
+          env:
+          - name: ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                name: tcpreplay-env-config
+                key: ADDRESS
+          - name: PORT
+            valueFrom:
+              configMapKeyRef:
+                name: tcpreplay-env-config
+                key: PORT
+          - name: IF_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: tcpreplay-env-config
+                key: IF_NAME
+      initContainers:
+      - name: install
+        image: busybox
+        command: ["sh","-c"]
+        args: ["wget 'https://www.googleapis.com/download/storage/v1/b/iex/o/data%2Ffeeds%2F20180127%2F20180127_IEXTP1_DEEP1.0.pcap.gz?generation=1517101215560431&alt=media' -O /pcap/data.pcap.gz && gunzip /pcap/data.pcap.gz"]
+        volumeMounts:
+        - name: pcapdir
+          mountPath: "/pcap"
+      dnsPolicy: Default
+      volumes:
+      - name: pcapdir
+        emptyDir: {}
+

@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dmc-publisher-env-config
+data:
+  PROJECT_ID: "chrispage-dev"
+  TOPIC_NAME: "ds-multicast-demo-broadcast"
+  ADDRESS: "239.0.0.1:50000"
+  IF_NAME: "eth0"
+  READ_BUFFER_BYTES: "5242880" # 5MB
+  VERBOSE: "true"

@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dmc-listener-service-lb
+  labels:
+    app: dmc-listener-service
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: UDP
+      port: 50001
+      name: multicast
+      targetPort: 50001
+  selector:
+    app: dmc-listener-service
+    version: v1
