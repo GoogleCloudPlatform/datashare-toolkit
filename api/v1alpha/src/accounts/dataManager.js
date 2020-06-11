@@ -173,6 +173,14 @@ async function listAccounts(projectId, datasetId, policyId) {
 async function createOrUpdateAccount(projectId, accountId, data) {
     console.log(`createOrUpdateAccount called with accountId: ${accountId} and data: ${JSON.stringify(data)}`);
     let _accountId = accountId;
+
+    // If provided policies is not a string array, re-format it to string array
+    // TODO: clean up format before passing from UI
+    let policies = data.policies || [];
+    if (policies && typeof policies[0] !== 'string') {
+        data.policies = policies.map(p => { return p.policyId });
+    }
+
     let impactedPolicies = data.policies ? Array.from(data.policies) : [];
     const currentAccount = await getAccount(projectId, accountId, data.email, data.emailType);
     console.log(`currentAccount response: ${JSON.stringify(currentAccount)}`);
@@ -203,7 +211,6 @@ async function createOrUpdateAccount(projectId, accountId, data) {
     let fields = [...cfg.cdsAccountTableFields], values = [...cfg.cdsAccountTableFields];
 
     // reformat policies object for saving
-    let policies = data.policies || [];
     if (policies.length === 0) {
         // If there are no supplied policies, remove policies column field and value from insert statement.
         delete data.policies;
@@ -213,10 +220,19 @@ async function createOrUpdateAccount(projectId, accountId, data) {
             values.splice(index, 1);
         }
     } else {
-        // TODO: clean up format before passing from UI
         // String array is passed in reformat for storing as dictionaries
-        if (policies[0] instanceof String) {
-            data.policies = policies.map(p => { return { policyId: p }; })
+        // Reformat for storing into BQ
+        data.policies = policies.map(p => { return { policyId: p }; });
+    }
+
+    let marketplace = data.marketplace || [];
+    if (marketplace.length === 0) {
+        // If there are no supplied marketplace, remove marketplace column field and value from insert statement.
+        delete data.marketplace;
+        const index = fields.indexOf('marketplace');
+        if (index > -1) {
+            fields.splice(index, 1);
+            values.splice(index, 1);
         }
     }
 
