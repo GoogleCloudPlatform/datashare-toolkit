@@ -71,6 +71,14 @@
         v-on:cancel="editCompleted(false)"
       />
     </v-dialog>
+    <Dialog
+      v-if="showError"
+      v-model="showError"
+      :title="errorDialogTitle"
+      :text="errorDialogText"
+      :cancelButtonEnabled="false"
+      v-on:confirmed="showError = false"
+    />
   </v-card>
 </template>
 
@@ -107,7 +115,7 @@ export default {
     };
   },
   created() {
-    this.loadPolicies();
+    this.loadProducts();
   },
   computed: {
     deleteDialogTitle() {
@@ -127,15 +135,18 @@ export default {
       this.selectedItem = null;
       this.showCreatePolicy = false;
       if (refresh) {
-        this.loadPolicies();
+        this.loadProducts();
       }
     },
-    loadPolicies() {
+    loadProducts() {
       this.loading = true;
       this.$store.dispatch('getUserProducts').then(response => {
         if (response.success) {
           this.policies = response.data;
         } else {
+          this.showError = true;
+          this.errorDialogTitle = 'Error retrieving products';
+          this.errorDialogText = response.errors.join(', ');
           this.policies = [];
         }
         this.loading = false;
