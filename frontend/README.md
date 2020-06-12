@@ -11,6 +11,7 @@ This documentation provides details for how to develop, build, and deploy new ve
     * [Enable Authentication](#authentication)
     * [Install Firebase CLI](#firebase_cli)
   * [Deploy Cloud Run](#deploy_cloud_run)
+  * [Deploy Cloud Run with Deployment Manager](#deploy_cloud_run_deployment_manager)
   * [Deploy Firebase](#deploy_firebase)
 
 
@@ -152,8 +153,8 @@ Build with Cloud Build and TAG:
 Deploy with Cloud Run:
 _Note_ - There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--set-env-vars) provides details for how they are set.
 
-    gcloud run deploy cds-frontend-ui \
-      --image gcr.io/${PROJECT_ID}/cds-frontend-ui:${TAG} \
+    gcloud run deploy ds-frontend-ui \
+      --image gcr.io/${PROJECT_ID}/ds-frontend-ui:${TAG} \
       --region=us-central1 \
       --allow-unauthenticated \
       --platform managed \
@@ -161,8 +162,34 @@ _Note_ - There are a few environment variables that need to be set before the ap
 
 Open the app URL in your browser. You can return the FQDN via:
 
-    gcloud run services describe cds-frontend-ui --platform managed --format="value(status.url)"
+    gcloud run services describe ds-frontend-ui --platform managed --format="value(status.url)"
 
+### <a name="deploy_cloud_run_deployment_manager">Deploy Cloud Run with Deployment Manager</a>
+Use Deployment Manager to deploy the Datashare UI with Cloud Run.
+_Cloud Run and Cloud Build APIs will need to be enabled in your GCP project._
+
+Deployment Manager will use Cloud Build to:
+* build the Docker container and save it to Google Container Registry
+* deploy the container to Cloud Run
+
+```
+gcloud deployment-manager deployments create ds-ui --config deploy_ui_cloud_run.yaml
+```
+
+**Note: If you delete the Deployment Manager template, the resources that it creates will NOT be deleted (container, Cloud Run deployment). You must delete these manually.**
+### <a name="deploy_cloud_run_deployment_manager_config">Configuration</a>
+
+Configure the deployment by updating the properties listed in `deploy_ui_cloud_run.yaml`.
+
+You must include your Firebase API Key before you deploy the Datashare UI.  
+
+```
+  properties:
+    firebaseApiKey: YOUR_FIREBASE_WEBAPI_KEY
+    containerTag: dev
+    region: us-central1
+    timeout: 600s
+```
 
 ### <a name="deploy_firebase">Deploy Firebase</a>
 Navigate to the frontend directory and modify the .firebaserc file with the Firebase projectId and save changes.
