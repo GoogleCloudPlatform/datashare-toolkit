@@ -35,6 +35,9 @@ const checkIfAuthenticated = (req, res, next) => {
     // Ignore the docs path
     if (req.path.startsWith('/docs/')) {
         return next();
+    } else if (req.path.match(/\/projects\/.+\/accounts:register/g)) {
+        // Allow unauthenticated calls to the accounts:register endpoint
+        return next();
     }
     getAuthToken(req, res, async () => {
         try {
