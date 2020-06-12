@@ -140,6 +140,7 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
             const found = underscore.findWhere(policies, policyRecord);
             if (!found) {
                 policies.push(policyRecord);
+                accountData.policies = accountData.policies.map(e => e.policyId);
                 console.log(`Updating account: ${JSON.stringify(accountData, null, 3)}`);
                 await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
             }
