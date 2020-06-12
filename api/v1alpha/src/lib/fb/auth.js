@@ -37,6 +37,7 @@ const checkIfAuthenticated = (req, res, next) => {
         return next();
     } else if (req.path.match(/\/projects\/.+\/accounts:register/g)) {
         // Allow unauthenticated calls to the accounts:register endpoint
+        console.log(`accounts:register called with headers: ${JSON.stringify(req.headers)} and body: ${JSON.stringify(req.body)}`);
         return next();
     }
     getAuthToken(req, res, async () => {
