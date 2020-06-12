@@ -1,0 +1,154 @@
+imports:
+  - name: common.py
+    path: common/common.py
+  - name: default.py
+    path: common/default.py
+  - name: password.py
+    path: common/password.py
+  - name: path_utils.jinja
+    path: common/path_utils.jinja
+  - name: vm_instance.py
+    path: common/vm_instance.py
+
+info:
+  version: '1.0'
+  title: Datashare Template
+
+required:
+  - zone
+  - machineType
+  - network
+  - bootDiskType
+  - bootDiskSizeGb
+  - input_adminEmail
+
+properties:
+  zone:
+    type: string
+    x-googleProperty:
+      type: GCE_ZONE
+  image:
+    type: string
+    enum:
+      - '0'
+      - '1'
+    default: '0'
+  machineType:
+    type: string
+    default: f1-micro
+    x-googleProperty:
+      type: GCE_MACHINE_TYPE
+      zoneProperty: zone
+      gceMachineType:
+        minCpu: 1
+        minRamGb: 0.6000000238418579
+  acceleratorType:
+    type: string
+    default: nvidia-tesla-p100
+    x-googleProperty:
+      type: GCE_GPU_TYPE
+      gceGpuType:
+        machineTypeProperty: machineType
+        gpuType:
+          - nvidia-tesla-k80
+          - nvidia-tesla-p100
+  acceleratorCount:
+    type: integer
+    default: 0
+    x-googleProperty:
+      type: GCE_GPU_COUNT
+      gceGpuCount:
+        machineTypeProperty: machineType
+  network:
+    type: array
+    default: [default]
+    minItems: 1
+    maxItems: 1
+    x-googleProperty:
+      type: GCE_NETWORK
+      gceNetwork:
+        allowSharedVpcs: True
+        machineTypeProperty: machineType
+  subnetwork:
+    type: array
+    minItems: 1
+    maxItems: 1
+    x-googleProperty:
+      type: GCE_SUBNETWORK
+      zoneProperty: zone
+      gceSubnetwork:
+        networkProperty: network
+  externalIP:
+    type: array
+    default: [EPHEMERAL]
+    minItems: 1
+    maxItems: 1
+    x-googleProperty:
+      type: GCE_EXTERNAL_IP
+      gceExternalIp:
+        networkProperty: network
+        notConfigurable: False
+        allowStaticIps: True
+  ipForward:
+    type: string
+    enum:
+      - 'On'
+      - 'Off'
+    default: 'Off'
+  bootDiskType:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  bootDiskSizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: bootDiskType
+  enableTcp80:
+    type: boolean
+    default: False
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: network
+  tcp80SourceRanges:
+    type: string
+    x-googleProperty:
+      type: GCE_FIREWALL_RANGE
+      gceFirewallRange:
+        firewallProperty: enableTcp80
+  input_adminEmail:
+    type: string
+    x-googleProperty:
+      type: EMAIL_ADDRESS
+  input_additionalEmail:
+    type: string
+    x-googleProperty:
+      type: EMAIL_ADDRESS
+  input_booleanField1:
+    type: boolean
+    default: False
+
+outputs:
+  deployment:
+    type: string
+  password0:
+    type: string
+  project:
+    type: string
+  vmId:
+    type: string
+  vmExternalIP:
+    type: string
+  vmInternalIP:
+    type: string
+  vmName:
+    type: string
+  vmSelfLink:
+    type: string

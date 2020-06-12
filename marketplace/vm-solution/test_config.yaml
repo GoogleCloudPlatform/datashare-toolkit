@@ -1,0 +1,9 @@
+imports:
+- path: cds-vm.jinja
+
+resources:
+- name: cds-vm
+  type: cds-vm.jinja
+  properties:
+    input_adminEmail: default-user@example.com
+    zone: us-central1-f

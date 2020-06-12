@@ -1,0 +1,159 @@
+description:
+  author:
+    title: GCP Financial Services Team
+    descriptionHtml: "Financial Services team provides Google Cloud Platform solutions for the financial services industry.  \n"
+    shortDescription: Google Cloud Platform Financial Services team provides solutions for the financial services industry.
+    url: https://www.google.com
+  descriptionHtml: Financial Services Cloud Datashare solution allows you to quickly ingest large volumes of data and share it with your customers.
+  logo: '@media/cds-vm_store.png'
+  tagline: Ingest, entitle, share large volumes of data.
+  title: Cloud Datashare
+  url: https://www.google.com
+  version: '1.0'
+  eulaUrl: https://www.google.com
+  softwareGroups:
+  - type: SOFTWARE_GROUP_OS
+    software:
+    - title: Ubuntu
+      version: 16.04 LTS
+  - software:
+    - title: Apache
+      version: 2.4.23
+  documentations:
+  - title: Getting Started
+    url: https://www.google.com
+    description: Get started docs for this example solution
+    destinations:
+    - DESTINATION_POST_DEPLOY
+  - title: Some more docs
+    url: https://www.google.com
+    description: Additional docs for this solution
+    destinations:
+    - DESTINATION_POST_DEPLOY
+    - DESTINATION_CONFIGURATION
+  support:
+  - title: Support
+    descriptionHtml: We provide limited support on this product.
+    url: https://www.google.com
+
+input:
+  properties:
+    - name: image
+      title: Image version
+      enumLabels:
+        '0': 'debian'
+    - name: zone
+      title: Zone
+      subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
+    - name: machineType
+      title: Machine type
+    - name: acceleratorType
+      title: GPUs
+    - name: bootDiskType
+      title: cds-boot-disk type
+      section: BOOT_DISK
+    - name: bootDiskSizeGb
+      title: cds-boot-disk size in GB
+      section: BOOT_DISK
+    - name: network
+      title: Network name
+      section: NETWORKING
+    - name: subnetwork
+      title: Subnetwork name
+      section: NETWORKING
+    - name: externalIP
+      title: External IP
+      tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+      section: NETWORKING
+    - name: enableTcp80
+      title: Allow HTTP traffic from Internet
+      section: NETWORKING
+    - name: tcp80SourceRanges
+      title: Source IP ranges for HTTP traffic
+      tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+      placeholder: '0.0.0.0/0, 192.169.0.2/24'
+      section: NETWORKING
+    - name: ipForward
+      title: IP forwarding
+      tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
+      section: NETWORKING
+      level: 1
+    - name: input_adminEmail
+      title: Enter your e-mail here
+      subtext: admin email of your GCP project
+      tooltip: Tooltipe for this input field
+      validation: Please enter a valid email address
+      placeholder: user@example.com
+    - name: input_additionalEmail
+      title: Additional email address
+      validation: Please enter a valid email address
+      placeholder: user@example.com
+    - name: input_booleanField1
+      title: Boolean checkbox used to
+  sections:
+    - name: BOOT_DISK
+      title: Boot Disk
+      tooltip: Each instance requires a disk to boot from.
+    - name: NETWORKING
+      title: Networking
+
+runtime:
+  deployingMessage: Deployment can take several minutes to complete.
+  applicationTable:
+    rows:
+      - label: Admin user
+        value: solutionuser
+      - label: Admin password (Temporary)
+        value: '{{ outputs().password0 }}'
+      - label: Instance
+        value: '<a href="{{ consoleUrl(outputs().vmSelfLink) }}">{{ outputs().vmName }}</a>'
+      - label: Instance zone
+        value: '{{ properties().zone }}'
+      - label: Instance machine type
+        value: '{{ properties().machineType }}'
+      - label: Property 1
+        value: Value for property 1
+      - label: Property 2
+        value: '{{ properties().input_additionalEmail }}'
+  primaryButton:
+    label: SSH
+    type: TYPE_GCE_VM_SSH
+    action: '{{ outputs().vmSelfLink }}'
+  suggestedActions:
+    - heading: No external IP configured
+      description: 'The VM instance has been configured with no external IP or internet access. Connecting to it directly may not be possible. Consider using a <a href="https://cloud.google.com/compute/docs/instances/connecting-advanced#bastion_host">bastion host</a> to access this VM.'
+      showIf: '{{ !outputs().hasExternalIP }}'
+    - heading: Log on now
+      description: 'Start using your application by accessing the following URL: https://www.google.com'
+      snippet: $ some code snippets can go here, to show some examples
+    - heading: Another label
+      description: Another description
+      showIf: '{{ properties().input_booleanField1 }}'
+    - heading: Open HTTP traffic
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from the Internet,
+        create a firewall rule to open HTTP traffic
+        for target tag "{{ outputs().deployment }}-deployment".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-tcp-80"
+        --network {{ outputs().mainNetwork }}
+        --allow tcp:80
+        --target-tags "{{ outputs().deployment }}-deployment"
+      showIf: '{{ !properties().enableTcp80 }}'
+    - heading: Change the temporary password
+      description: For additional security, it is recommended that you change the password.
+    - heading: Assign a static external IP address to your VM instance
+      description: 'An ephemeral external IP address has been assigned to the VM instance. If you require a static external IP address, you may promote the address to static. <a href="https://cloud.google.com/compute/docs/instances-and-network#promote_ephemeral_ip">Learn more</a>'
+      showIf: '{{ outputs().hasExternalIP }}'
+
+annotations:
+  autogenSpecType: 'SINGLE_VM'
+  vmImage0: https://www.googleapis.com/compute/v1/projects/fsi-cds-markeplace-sw-dev/global/images/fsicds-debian-20200527
+  vmImage1: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20200521
+
+metadata_version: v1

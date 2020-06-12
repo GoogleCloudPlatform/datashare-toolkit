@@ -1,0 +1,204 @@
+{% import "path_utils.jinja" as path_utils with context %}
+
+imports:
+- path: cloud_function.py
+
+{% set project = env["project"] %}
+{% set datashareGitReleaseVersion = "v0.3.1" %}
+{% set deployment = env["deployment"] %}
+{% set name = "%s-vm-tmpl" % env["name"] %}
+{% set instanceName = "%s-vm" % deployment %}
+{% set zone = properties["zone"] %}
+{% set machineType = properties["machineType"] %}
+{% set acceleratorType = properties["acceleratorType"] %}
+{% set acceleratorCount = properties["acceleratorCount"] %}
+{% set networks = [] %}
+{% for network in properties["network"] %}
+{% set _ = networks.append(path_utils.networkPath(network)) %}
+{% endfor %}
+{% set subnetworks = properties["subnetwork"] %}
+{% set externalIPs = properties["externalIP"] %}
+{% set bootDiskType = properties["bootDiskType"] %}
+{% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
+{% set hasExternalIP = externalIPs and externalIPs[0] != "NONE" %}
+{# Software status only works if the VM has an external IP. #}
+{% set enableStatusWaiter = hasExternalIP %}
+{% set canIpForward = properties["ipForward"] == "On" %}
+
+{% set imageProjects = ["debian-cloud"] %}
+{% set imageNames = ["debian-9-stretch-v20200521"] %}
+{% set selectedImageIndex = properties["image"]|int %}
+
+resources:
+  - type: storage.v1.bucket
+    name: {{ project }}-cds-bucket
+    properties:
+      name: {{ project }}-cds-bucket
+      project: {{ project }}
+      #predefinedAcl: projectPrivate
+      #projection: full
+      location: US
+      storageClass: STANDARD
+  - type: storage.v1.bucket
+    name: {{ project }}-install-bucket
+    properties:
+      name: {{ project }}-install-bucket
+      project: {{ project }}
+      #predefinedAcl: projectPrivate
+      #projection: full
+      location: US
+      storageClass: STANDARD
+  - name: function
+    type: cloud_function.py
+    properties:
+      # All the files that start with this prefix will be packed in the Cloud Function
+      codeLocation: function/
+      codeBucket: {{ project }}-install-bucket
+      codeBucketObject: datashare-toolkit-cloud-function.zip
+      location: us-east1
+      timeout: 60s
+      runtime: nodejs10
+      availableMemoryMb: 256
+      entryPoint: processEvent
+      #temp: $(ref.{{ name }}.selfLink)
+    #metadata:
+    #  dependsOn:
+    #  - {{ name }} # depends on the VM instance startup script executing first.
+  - name: {{ name }}
+    type: vm_instance.py
+    metadata:
+      dependsOn:
+      - {{ project }}-install-bucket # depneds on the install bucket being created.
+    properties:
+      instanceName: {{ instanceName }}
+      sourceImage: https://www.googleapis.com/compute/v1/projects/{{ imageProjects[selectedImageIndex] }}/global/images/{{ imageNames[selectedImageIndex] }}
+      zone: {{ zone }}
+      machineType: {{ machineType }}
+      networks:
+      {% for network in networks %}
+        - {{ network }}
+      {% endfor %}
+      {% if subnetworks is defined and subnetworks %}
+      subnetworks:
+      {% for subnetwork in subnetworks %}
+        - {{ subnetwork or '' }}
+      {% endfor %}
+      {% endif %}
+      {% if externalIPs is defined and externalIPs %}
+      externalIPs:
+      {% for externalIP in externalIPs %}
+        - {{ externalIP }}
+      {% endfor %}
+      {% endif %}
+      bootDiskType: {{ bootDiskType }}
+      bootDiskSizeGb: {{ bootDiskSizeGb }}
+      
+      canIpForward: {{ canIpForward }}
+      {% if acceleratorCount > 0 %}
+      guestAccelerators:
+        - acceleratorType: {{ acceleratorType }}
+          acceleratorCount: {{ acceleratorCount }}
+      {% endif %}
+      serviceAccounts:
+        - email: default
+          scopes:
+            - 'https://www.googleapis.com/auth/cloud.useraccounts.readonly'
+            - 'https://www.googleapis.com/auth/devstorage.read_only'
+            - 'https://www.googleapis.com/auth/logging.write'
+            - 'https://www.googleapis.com/auth/monitoring.write'
+            - 'https://www.googleapis.com/auth/cloud-platform'
+      metadata:
+        items:
+          - key: my-password-1
+            value: $(ref.generated-password-0.password)
+          - key: startup-script
+            value: |-
+              #!/bin/bash
+              sudo apt-get install git -y
+              sudo apt-get install zip -y
+              echo "installing git"
+              cd /opt
+              git clone https://github.com/GoogleCloudPlatform/datashare-toolkit.git
+              echo "cloning the repo"
+
+              # checkout the current version
+              cd datashare-toolkit
+              git checkout -b v0.1.3 # this should be changed to external metadata
+              cd ..
+              FUNCTION_SHARED="./datashare-toolkit/ingestion/batch/shared"
+              if [ -d "${FUNCTION_SHARED}" ]; then
+                rm -R "${FUNCTION_SHARED}"
+              fi
+
+              echo "Copying shared module into function directory"
+              cp -R datashare-tookit/shared/ "${FUNCTION_SHARED}/"
+
+              # linux
+              echo 'Running on linux, performing package.json replacement for cds-shared module'
+              sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ./datashare-toolkit/ingestion/batch/package.json
+
+              # Zip the Cloud Function package
+              cd /opt/datashare-toolkit/ingestion/batch
+              zip -r datashare-toolkit-cloud-function.zip * .eslintrc.json configurationManager.js index.js package.js package-lock.json shared/
+
+              #PROJECT=`curl http://metadata.google.internal/computeMetadata/v1/project/project-id -H "Metadata-Flavor: Google"`
+              export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
+              # Upload to Google Cloud storage
+              gsutil cp datashare-toolkit-cloud-function.zip gs://$PROJECT_ID-install-bucket/
+
+              cd /opt/datashare-toolkit/ingestion/batch/bin
+              #echo "Enabling cloudresourcemanger.googleapis.com api"
+              gcloud services enable cloudresourcemanager.googleapis.com
+              echo "CDS deployment successful"
+      tags:
+        items:
+          - {{ env["deployment"] }}-deployment
+  - name: generated-password-0
+    type: password.py
+    properties:
+      length: 8
+      includeSymbols: True
+  {% if properties["enableTcp80"] %}
+  - name: {{ env["deployment"] }}-tcp-80
+    type: compute.v1.firewall
+    properties:
+      network: {{ networks[0] }}
+      {% if properties.get("tcp80SourceRanges") %}
+      sourceRanges:
+        {% for source in properties["tcp80SourceRanges"].split(',') %}
+        - '{{ source | trim }}'
+        {% endfor %}
+      {% else %}
+      sourceRanges: ["0.0.0.0/0"]
+      {% endif %}
+      targetTags: ["{{ env["deployment"] }}-deployment"]
+      allowed:
+        - IPProtocol: TCP
+          ports: ["80"]
+  {% endif %}
+
+outputs:
+  - name: deployment
+    value: {{ deployment }}
+  - name: password0
+    value: $(ref.generated-password-0.password)
+  - name: project
+    value: {{ project }}
+  - name: vmId
+    value: $(ref.{{ instanceName }}.id)
+  - name: vmExternalIP
+    {% if hasExternalIP %}
+    value: $(ref.{{ name }}.ip)
+    {% else %}
+    value: NONE
+    {% endif %}
+  - name: vmInternalIP
+    value: $(ref.{{ name }}.internalIP)
+  - name: vmName
+    value: {{ instanceName }}
+  - name: vmSelfLink
+    value: $(ref.{{ instanceName }}.selfLink)
+  - name: hasExternalIP
+    value: {{ hasExternalIP }}
+  - name: mainNetwork
+    value: {{ networks[0] }}

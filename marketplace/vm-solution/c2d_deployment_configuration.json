@@ -1,0 +1,7 @@
+{
+  "defaultDeploymentType": "SINGLE_VM",
+  "imageName": "fsicds-debian-20200527",
+  "projectId": "fsi-cds-markeplace-sw-dev",
+  "templateName": "nonexistent_template",
+  "useSolutionPackage": true
+}
