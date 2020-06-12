@@ -134,7 +134,7 @@ policies.get('/projects/:projectId/policies', async(req, res) => {
 
 policies.get('/projects/:projectId/products', async(req, res) => {
     const projectId = req.params.projectId;
-    const email = req.query.email;
+    const email = req.header('x-gcp-account')
     const data = await dataManager.listUserPolicies(projectId, email);
     var code;
     if (data && data.success === false) {

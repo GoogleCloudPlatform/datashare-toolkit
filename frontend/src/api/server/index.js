@@ -253,6 +253,11 @@ export default {
       .post(this._apiBaseUrl() + '/procurements/approve', payload)
       .then(response => response);
   },
+  getUserProducts() {
+    return axios
+      .get(this._apiBaseUrl() + '/products')
+      .then(response => response);
+  },
   initSchema(payload) {
     return axios
       .post(this._apiBaseUrl() + '/admin:initSchema')

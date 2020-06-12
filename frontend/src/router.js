@@ -110,6 +110,14 @@ const routerOptions = [
     }
   },
   {
+    path: '/myDashboard',
+    name: 'myDashboard',
+    component: 'MyDashboard',
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/spotFulfillment',
     name: 'spotFulfillment',
     component: 'SpotFulfillment',
