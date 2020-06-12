@@ -3,6 +3,7 @@
 imports:
 - path: cloud_function.py
 
+{% set adminEmail = properties["input_adminEmail"] %}
 {% set project = env["project"] %}
 {% set datashareGitReleaseVersion = "v0.3.1" %}
 {% set deployment = env["deployment"] %}
@@ -53,7 +54,7 @@ resources:
     properties:
       # All the files that start with this prefix will be packed in the Cloud Function
       codeLocation: function/
-      codeBucket: {{ project }}-install-bucket
+      codeBucket: fsi-cds-markeplace-sw-dev-datashare-cloud-function
       codeBucketObject: datashare-toolkit-cloud-function.zip
       location: us-east1
       timeout: 60s
@@ -109,47 +110,17 @@ resources:
             - 'https://www.googleapis.com/auth/cloud-platform'
       metadata:
         items:
-          - key: my-password-1
-            value: $(ref.generated-password-0.password)
+          - key: adminEmail
+            value: {{ adminEmail }}
           - key: startup-script
             value: |-
               #!/bin/bash
-              sudo apt-get install git -y
-              sudo apt-get install zip -y
-              echo "installing git"
-              cd /opt
-              git clone https://github.com/GoogleCloudPlatform/datashare-toolkit.git
-              echo "cloning the repo"
-
-              # checkout the current version
-              cd datashare-toolkit
-              git checkout -b v0.1.3 # this should be changed to external metadata
-              cd ..
-              FUNCTION_SHARED="./datashare-toolkit/ingestion/batch/shared"
-              if [ -d "${FUNCTION_SHARED}" ]; then
-                rm -R "${FUNCTION_SHARED}"
-              fi
-
-              echo "Copying shared module into function directory"
-              cp -R datashare-tookit/shared/ "${FUNCTION_SHARED}/"
-
-              # linux
-              echo 'Running on linux, performing package.json replacement for cds-shared module'
-              sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ./datashare-toolkit/ingestion/batch/package.json
-
-              # Zip the Cloud Function package
-              cd /opt/datashare-toolkit/ingestion/batch
-              zip -r datashare-toolkit-cloud-function.zip * .eslintrc.json configurationManager.js index.js package.js package-lock.json shared/
-
-              #PROJECT=`curl http://metadata.google.internal/computeMetadata/v1/project/project-id -H "Metadata-Flavor: Google"`
-              export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
-              # Upload to Google Cloud storage
-              gsutil cp datashare-toolkit-cloud-function.zip gs://$PROJECT_ID-install-bucket/
-
-              cd /opt/datashare-toolkit/ingestion/batch/bin
+              # use curl and metadata url to access adminEmail
+              ADMIN_EMAIL=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/adminEmail -H "Metadata-Flavor: Google"`
+              echo $ADMIN_EMAIL
               #echo "Enabling cloudresourcemanger.googleapis.com api"
               gcloud services enable cloudresourcemanager.googleapis.com
-              echo "CDS deployment successful"
+              echo "DS deployment successful"
       tags:
         items:
           - {{ env["deployment"] }}-deployment
@@ -180,8 +151,6 @@ resources:
 outputs:
   - name: deployment
     value: {{ deployment }}
-  - name: password0
-    value: $(ref.generated-password-0.password)
   - name: project
     value: {{ project }}
   - name: vmId
