@@ -21,7 +21,7 @@ export TAG=dev
 cd v1alpha
 cd ../../
 gcloud builds submit --config api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
-gcloud run deploy ds-api \
+gcloud run deploy cds-api \
   --image gcr.io/${PROJECT_ID}/cds-api:${TAG} \
   --region=us-central1 \
   --allow-unauthenticated \
