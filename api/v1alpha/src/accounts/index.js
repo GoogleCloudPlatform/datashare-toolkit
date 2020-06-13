@@ -662,7 +662,6 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
             break;
         }
         case "approve": {
-            // const token = req.cookies[gcpMarketplaceTokenCookieName];
             const token = req.body.token;
             const email = req.body.email;
             const reason = req.body.reason;
@@ -672,6 +671,25 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
             console.log(`Data: ${JSON.stringify(data)}`);
 
             // TODO: Perform redirects
+            var code;
+            if (data && data.success === false) {
+                code = (data.code === undefined) ? 500 : data.code;
+            } else {
+                code = (data.code === undefined) ? 200 : data.code;
+            }
+            res.status(code).json({
+                code: code,
+                ...data
+            });
+            break;
+        }
+        case "reset": {
+            const accountNames = req.body.accountNames;
+            console.log(`Reset account called for project ${projectId}, accountNames: ${accountNames}, body: ${JSON.stringify(req.body)}`);
+
+            const data = await dataManager.reset(projectId, accountNames);
+            console.log(`Data: ${JSON.stringify(data)}`);
+
             var code;
             if (data && data.success === false) {
                 code = (data.code === undefined) ? 500 : data.code;

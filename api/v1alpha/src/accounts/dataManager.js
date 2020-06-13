@@ -466,11 +466,30 @@ async function approve(projectId, token, reason, email) {
     }
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} accountNames
+ */
+async function reset(projectId, accountNames) {
+    try {
+        console.log(`Reset called for account names: ${accountNames}`);
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        for (const name of accountNames) {
+            await procurementUtil.resetAccount(name);
+        }
+        return { success: true, code: 200 };
+    } catch (err) {
+        console.error(err);
+        return { success: false, code: 500, errors: ['Failed to reset account(s)'] };
+    }
+}
+
 module.exports = {
     listAccounts,
     createOrUpdateAccount,
     deleteAccount,
     getAccount,
     register,
-    approve
+    approve,
+    reset
 };

@@ -69,12 +69,35 @@
         </v-chip-group>
       </template>
       <template v-if="this.showAddAccountButton" v-slot:item.action="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)">
-          edit
-        </v-icon>
-        <v-icon small @click="deleteItem(item)">
-          delete
-        </v-icon>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-icon v-on="on" small class="mr-2" @click="editItem(item)">
+              edit
+            </v-icon>
+          </template>
+          <span>Edit Account</span>
+        </v-tooltip>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-icon v-on="on" small class="mr-2" @click="deleteItem(item)">
+              delete
+            </v-icon>
+          </template>
+          <span>Delete Account</span>
+        </v-tooltip>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              v-on="on"
+              v-if="item.marketplace.length > 0"
+              small
+              @click="resetItem(item)"
+            >
+              {{ icons.reset }}
+            </v-icon>
+          </template>
+          <span>Reset Marketplace Account</span>
+        </v-tooltip>
       </template>
     </v-data-table>
     <v-dialog v-model="showCreateAccount" persistent max-width="700px">
@@ -94,6 +117,16 @@
       v-on:canceled="deleteCompleted"
       confirmButtonColor="red darken-1"
       confirmButtonText="Delete"
+    />
+    <Dialog
+      v-if="showResetDialog"
+      v-model="showResetDialog"
+      :title="resetDialogTitle"
+      :text="resetDialogText"
+      v-on:confirmed="resetAccount(selectedItem)"
+      v-on:canceled="resetCompleted"
+      confirmButtonColor="red darken-1"
+      confirmButtonText="Reset"
     />
     <v-card-text
       style="height: 100px; position: relative"
@@ -119,7 +152,13 @@
 <script>
 import EditAccount from '@/components/EditAccount';
 import Dialog from '@/components/Dialog.vue';
-import { mdiChevronRight, mdiForward, mdiDotsVertical, mdiPlus } from '@mdi/js';
+import {
+  mdiChevronRight,
+  mdiForward,
+  mdiDotsVertical,
+  mdiPlus,
+  mdiReplay
+} from '@mdi/js';
 
 export default {
   components: {
@@ -143,9 +182,11 @@ export default {
         chevronRight: mdiChevronRight,
         forward: mdiForward,
         verticalDots: mdiDotsVertical,
-        plus: mdiPlus
+        plus: mdiPlus,
+        reset: mdiReplay
       },
-      search: ''
+      search: '',
+      showResetDialog: false
     };
   },
   computed: {
@@ -174,10 +215,16 @@ export default {
       return h;
     },
     deleteDialogTitle() {
-      return `Delete accounts?`;
+      return 'Delete accounts?';
     },
     deleteDialogText() {
-      return `Please click 'Delete' to confirm that you want to delete the selected accounts(s).`;
+      return `Please click 'Delete' to confirm that you want to delete the selected account.`;
+    },
+    resetDialogTitle() {
+      return 'Reset marketplace account?';
+    },
+    resetDialogText() {
+      return `Please click 'Reset' to confirm that you want to delete the marketplace account(s) for ${this.selectedItem.email}.`;
     }
   },
   created() {
@@ -258,6 +305,17 @@ export default {
           this.loadAccounts();
           this.loading = false;
         });
+    },
+    resetItem(item) {
+      this.selectedItem = item;
+      this.showResetDialog = true;
+    },
+    resetCompleted() {
+      this.showResetDialog = false;
+      this.selectedItem = null;
+    },
+    resetAccount() {
+      alert('This is not yet implemented');
     },
     toLocalTime(epoch) {
       let d = new Date(epoch);
