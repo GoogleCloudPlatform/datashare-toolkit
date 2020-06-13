@@ -79,12 +79,13 @@ async function _deleteData(projectId, fields, values, data) {
  * @param  {} email
  */
 async function listUserPolicies(projectId, email) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
-    let fields = new Set(cfg.cdsPolicyViewFields);
-    fields.delete('isDeleted');
-    fields = Array.from(fields).map(i => 'cp.' + i).join();
-    const accountTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
-    let sqlQuery = `WITH currentAccount AS (
+    try {
+        const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+        let fields = new Set(cfg.cdsPolicyViewFields);
+        fields.delete('isDeleted');
+        fields = Array.from(fields).map(i => 'cp.' + i).join();
+        const accountTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+        let sqlQuery = `WITH currentAccount AS (
             SELECT policies.policyId
             FROM \`${accountTable}\` ca
             CROSS JOIN UNNEST(policies) policies
@@ -95,12 +96,16 @@ async function listUserPolicies(projectId, email) {
         FROM \`${table}\` cp
         JOIN currentAccount ca ON ca.policyId = cp.policyId
         WHERE (cp.isDeleted IS false OR cp.isDeleted IS null)`;
-    let options = {
-        query: sqlQuery,
-        params: { email: email.toLowerCase() }
-    };
-    const [rows] = await bigqueryUtil.executeQuery(options);
-    return { success: true, data: rows };
+        let options = {
+            query: sqlQuery,
+            params: { email: email.toLowerCase() }
+        };
+        const [rows] = await bigqueryUtil.executeQuery(options);
+        return { success: true, data: rows };
+    } catch (err) {
+        console.error(err);
+        return { success: false, code: 500, errors: ['Unable to retrieve user products'] };
+    }
 }
 
 /**

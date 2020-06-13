@@ -1,5 +1,5 @@
 <template>
-  <v-card class="px-4">
+  <v-card>
     <v-card-title v-if="policy.policyId">
       Edit Policy
     </v-card-title>
@@ -9,7 +9,7 @@
     <v-card-subtitle v-if="policy.policyId">{{
       policy.policyId
     }}</v-card-subtitle>
-    <form>
+    <form class="px-4">
       <ValidationObserver ref="policyFormObserver" v-slot="{}">
         <ValidationProvider
           v-slot="{ errors }"
