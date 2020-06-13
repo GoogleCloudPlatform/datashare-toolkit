@@ -105,7 +105,7 @@ async function syncResources(projectId, type) {
                     const sql = viewClone.viewSql;
                     console.log(`Creating view ${viewClone.datasetId}.${viewClone.name}`);
                     viewClone.projectId = projectId;
-                    if (view.expiration.time) {
+                    if (view.expiration && view.expiration.time) {
                         // This logic should probably be re-factored to a shared place maybe in createView using a type check
                         // See datasets dataManager as the logic should be re-factored out of there from createOrUpdateDatasetView.
                         viewClone.expiration.time = new Date(view.expiration.time);
