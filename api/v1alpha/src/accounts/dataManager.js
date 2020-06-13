@@ -348,6 +348,7 @@ async function deleteAccount(projectId, accountId, data) {
 
 /**
  * @param  {} projectId
+ * @param  {} host
  * @param  {} token
  */
 async function register(projectId, host, token) {
@@ -412,15 +413,16 @@ async function register(projectId, host, token) {
 
 /**
  * @param  {} projectId
+ * @param  {} host
  * @param  {} token
  * @param  {} reason
  * @param  {} email
  */
-async function approve(projectId, token, reason, email) {
+async function approve(projectId, host, token, reason, email) {
     try {
         console.log(`Approve called for token: ${token} for email: ${email}`);
         const procurementUtil = new CommerceProcurementUtil(projectId);
-        const registration = await register(projectId, token);
+        const registration = await register(projectId, host, token);
         console.log(`registration: ${JSON.stringify(registration)}`);
         if (registration.success === true) {
             const accountId = registration.data.payload.sub;

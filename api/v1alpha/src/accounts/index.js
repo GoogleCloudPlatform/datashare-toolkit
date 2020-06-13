@@ -628,7 +628,8 @@ accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
     const token = req.query.token;
     console.log(`Activate called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
 
-    const data = await dataManager.register(projectId, token);
+    const host = extractHostname(req.headers.host);
+    const data = await dataManager.register(projectId, host, token);
     console.log(`Data: ${JSON.stringify(data)}`);
 
     if (data && data.success === false) {
@@ -643,12 +644,12 @@ accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
 
 accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
     const projectId = req.params.projectId;
+    const host = extractHostname(req.headers.host);
     switch (req.params.custom) {
         case "register": {
             const token = req.body['x-gcp-marketplace-token'];
             console.log(`Activate called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
 
-            const host = extractHostname(req.headers.host);
             const data = await dataManager.register(projectId, host, token);
             console.log(`Data: ${JSON.stringify(data)}`);
 
@@ -656,10 +657,11 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
                 res.clearCookie(gcpMarketplaceTokenCookieName);
                 res.redirect(cfg.uiBaseUrl + '/activationError');
             } else {
-                const domain = extractHostname(cfg.uiBaseUrl);
-                console.log(`Writing out cookie with token: ${token} for domain: ${domain}`);
-                res.cookie(gcpMarketplaceTokenCookieName, token, { secure: domain =='localhost' ? false : true, expires: 0, domain: domain });
-                res.redirect(cfg.uiBaseUrl + '/activation');
+                // const domain = extractHostname(cfg.uiBaseUrl);
+                console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
+                res.cookie(gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
+                // res.redirect(cfg.uiBaseUrl + '/activation');
+                res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
             }
             break;
         }
@@ -669,7 +671,7 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
             const reason = req.body.reason;
             console.log(`Approve called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
 
-            const data = await dataManager.approve(projectId, token, reason, email);
+            const data = await dataManager.approve(projectId, host, token, reason, email);
             console.log(`Data: ${JSON.stringify(data)}`);
 
             // TODO: Perform redirects
