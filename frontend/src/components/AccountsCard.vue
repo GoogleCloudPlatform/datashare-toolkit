@@ -315,7 +315,26 @@ export default {
       this.selectedItem = null;
     },
     resetAccount() {
-      alert('This is not yet implemented');
+      this.$store
+        .dispatch('submitProcurementAccountReset', {
+          projectId: this.$store.state.settings.projectId,
+          accountNames: this.selectedItem.marketplace.map(a => a.accountName)
+        })
+        .then(result => {
+          this.loading = false;
+          if (!result.success) {
+            this.showError = true;
+            this.errorDialogTitle = 'Error resetting accounts';
+            this.errorDialogText = result.errors.join(', ');
+          } else {
+            this.showError = false;
+            this.loadAccounts();
+            this.resetCompleted();
+          }
+        })
+        .catch(error => {
+          console.error(`Error submitting approval change: ${error}`);
+        });
     },
     toLocalTime(epoch) {
       let d = new Date(epoch);

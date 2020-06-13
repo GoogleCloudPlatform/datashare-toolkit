@@ -284,6 +284,12 @@ const store = new Vuex.Store({
       });
     },
     // eslint-disable-next-line no-unused-vars
+    submitProcurementAccountReset({ commit }, payload) {
+      return client.submitProcurementAccountReset(payload).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
     submitProcurementEntitlementApproval({ commit }, payload) {
       return client
         .submitProcurementEntitlementApproval(payload)

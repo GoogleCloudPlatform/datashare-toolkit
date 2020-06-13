@@ -645,7 +645,7 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
     const projectId = req.params.projectId;
     switch (req.params.custom) {
         case "register": {
-            const token = req.headers['x-gcp-marketplace-token'];
+            const token = req.body['x-gcp-marketplace-token'];
             console.log(`Activate called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
 
             const data = await dataManager.register(projectId, token);

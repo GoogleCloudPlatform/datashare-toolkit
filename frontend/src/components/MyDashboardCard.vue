@@ -58,7 +58,7 @@
         </v-tooltip>
         <v-tooltip top>
           <template v-slot:activator="{ on }">
-            <v-icon v-on="on" class="mr-2" @click="viewPlan(item)">
+            <v-icon v-on="on" class="mr-2" @click="showDetails(item)">
               {{ icons.search }}
             </v-icon>
           </template>
@@ -81,7 +81,14 @@
         max-width="650"
       >
         <v-card>
-          <v-card-title class="headline">Product Details</v-card-title>
+          <v-card-title class="headline"
+            >Product Details
+            <v-spacer></v-spacer>
+            <v-btn @click="navigateToMarketplace(selectedItem)">
+              <v-icon left>{{ icons.marketplace }}</v-icon>
+              Marketplace
+            </v-btn>
+          </v-card-title>
           <v-card-text v-html="selectedItemSummary"></v-card-text>
           <form class="px-4">
             <v-expansion-panels multiple v-model="panel">

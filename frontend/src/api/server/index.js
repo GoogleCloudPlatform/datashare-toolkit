@@ -248,6 +248,11 @@ export default {
       .post(this._apiBaseUrl() + '/accounts:approve', payload)
       .then(response => response);
   },
+  submitProcurementAccountReset(payload) {
+    return axios
+      .post(this._apiBaseUrl() + '/accounts:reset', payload)
+      .then(response => response);
+  },
   submitProcurementEntitlementApproval(payload) {
     return axios
       .post(this._apiBaseUrl() + '/procurements/approve', payload)
