@@ -16,12 +16,13 @@
 
 'use strict';
 
-const { BigQueryUtil } = require('cds-shared');
+const { BigQueryUtil, CommerceProcurementUtil } = require('cds-shared');
 let bigqueryUtil = new BigQueryUtil();
 const uuidv4 = require('uuid/v4');
 
 const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');
+const accountManager = require('../accounts/dataManager');
 
 /**
  * @param  {string} projectId
@@ -92,7 +93,7 @@ async function listUserPolicies(projectId, email) {
             WHERE lower(email) = @email AND
                 (ca.isDeleted IS false OR ca.isDeleted IS null)
           )
-        SELECT name, description, datasets, rowAccessTags, marketplace
+        SELECT datasets, rowAccessTags, marketplace
         FROM \`${table}\` cp
         JOIN currentAccount ca ON ca.policyId = cp.policyId
         WHERE (cp.isDeleted IS false OR cp.isDeleted IS null)`;
@@ -101,6 +102,40 @@ async function listUserPolicies(projectId, email) {
             params: { email: email.toLowerCase() }
         };
         const [rows] = await bigqueryUtil.executeQuery(options);
+
+        rows.forEach(e => {
+            e.status = 'Active';
+        });
+
+        const account = await accountManager.getAccount(projectId, null, email, 'userByEmail');
+        if (account.success) {
+            const accountData = account.data;
+            const accountNames = accountData.marketplace.map(e => e.accountName);
+            if (accountNames && accountNames.length > 0) {
+                const procurementUtil = new CommerceProcurementUtil(projectId);
+                let accountFilter = '';
+                accountNames.forEach(e => {
+                    if (accountFilter != '') {
+                        accountFilter += ' OR ';
+                    }
+                    const name = e.substring(e.lastIndexOf('/') + 1);
+                    accountFilter += `account=${name}`;
+                });
+
+                const filterString = `state=ENTITLEMENT_ACTIVATION_REQUESTED AND (${accountFilter})`;
+                const result = await procurementUtil.listEntitlements(filterString);
+                if (result) {
+                    let entitlements = result.entitlements || [];
+                    if (entitlements && entitlements.length > 0) {
+                        entitlements.forEach(e => {
+                            const name = e.name.substring(e.name.lastIndexOf('/') + 1);
+                            rows.push({ marketplace: { solutionId: e.product, planId: e.plan, name: name }, status: 'Pending Approval' });
+                        });
+                    }
+                }
+            }
+        }
+
         return { success: true, data: rows };
     } catch (err) {
         console.error(err);

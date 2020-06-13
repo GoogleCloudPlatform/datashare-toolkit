@@ -34,7 +34,12 @@
         {{ toLocalTime(item.createdAt) }}
       </template>
       <template v-slot:item.datasets="{ item }">
-        <v-chip-group multiple column active-class="primary--text">
+        <v-chip-group
+          v-if="item.datasets && item.datasets.length > 0"
+          multiple
+          column
+          active-class="primary--text"
+        >
           <v-chip
             v-for="dataset in item.datasets.slice(0, 4)"
             :key="dataset.datasetId"
@@ -92,7 +97,12 @@
           <v-card-text v-html="selectedItemSummary"></v-card-text>
           <form class="px-4">
             <v-expansion-panels multiple v-model="panel">
-              <v-expansion-panel>
+              <v-expansion-panel
+                v-if="
+                  this.selectedItem.datasets &&
+                    this.selectedItem.datasets.length > 0
+                "
+              >
                 <v-expansion-panel-header
                   >Available Datasets</v-expansion-panel-header
                 >
@@ -136,7 +146,10 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
               <v-expansion-panel
-                v-if="this.selectedItem.rowAccessTags.length > 0"
+                v-if="
+                  this.selectedItem.rowAccessTags &&
+                    this.selectedItem.rowAccessTags.length > 0
+                "
               >
                 <v-expansion-panel-header
                   >Available Row Filters</v-expansion-panel-header
@@ -217,6 +230,7 @@ export default {
         // { text: 'Description', value: 'description' },
         { text: 'Marketplace Solution', value: 'marketplace.solutionId' },
         { text: 'Marketplace Plan', value: 'marketplace.planId' },
+        { text: 'Status', value: 'status' },
         { text: 'Datasets', value: 'datasets', sortable: false },
         { text: '', value: 'action', sortable: false }
       ],
@@ -250,7 +264,14 @@ export default {
   computed: {
     selectedItemSummary() {
       return `<b>Product</b>: ${this.selectedItem.marketplace.solutionId}<br/>
-      <b>Plan</b>: ${this.selectedItem.marketplace.planId}<br/>`;
+      <b>Plan</b>: ${this.selectedItem.marketplace.planId}<br/>
+      <b>Status</b>: ${this.selectedItem.status}
+      ${
+        this.selectedItem.marketplace.name
+          ? '<br/><b>Entitlement Name</b>: ' +
+            this.selectedItem.marketplace.name
+          : ''
+      } `;
     },
     datasetHeaders() {
       let h = [
