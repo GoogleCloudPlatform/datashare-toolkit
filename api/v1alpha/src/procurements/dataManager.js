@@ -133,7 +133,6 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
         if (status === 'approve') {
             const result = await procurementUtil.approveEntitlement(name);
             const account = await accountManager.getAccount(projectId, accountId);
-            console.log(account);
             const policyRecord = { policyId: policyId };
             let accountData = account.data;
             let policies = accountData.policies || [];
