@@ -648,15 +648,18 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
             const token = req.body['x-gcp-marketplace-token'];
             console.log(`Activate called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
 
-            const data = await dataManager.register(projectId, token);
+            const host = extractHostname(req.headers.host);
+            const data = await dataManager.register(projectId, host, token);
             console.log(`Data: ${JSON.stringify(data)}`);
 
             if (data && data.success === false) {
                 res.clearCookie(gcpMarketplaceTokenCookieName);
                 res.redirect(cfg.uiBaseUrl + '/activationError');
             } else {
-                const host = extractHostname(req.headers.host);
-                res.cookie(gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
+                const domain = cfg.uiBaseUrl;
+                // domain =='localhost' ? false : true
+                console.log(`Writing out cookie with token: ${token} for domain: ${domain}`);
+                res.cookie(gcpMarketplaceTokenCookieName, token, { secure: false, expires: 0, domain: domain });
                 res.redirect(cfg.uiBaseUrl + '/activation');
             }
             break;
@@ -671,7 +674,7 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
             console.log(`Data: ${JSON.stringify(data)}`);
 
             // TODO: Perform redirects
-            var code;
+            let code;
             if (data && data.success === false) {
                 code = (data.code === undefined) ? 500 : data.code;
             } else {
@@ -684,13 +687,13 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
             break;
         }
         case "reset": {
-            const accountNames = req.body.accountNames;
-            console.log(`Reset account called for project ${projectId}, accountNames: ${accountNames}, body: ${JSON.stringify(req.body)}`);
+            const accountId = req.body.accountId;
+            console.log(`Reset account called for project ${projectId}, accountId: ${accountId}, body: ${JSON.stringify(req.body)}`);
 
-            const data = await dataManager.reset(projectId, accountNames);
+            const data = await dataManager.reset(projectId, accountId);
             console.log(`Data: ${JSON.stringify(data)}`);
 
-            var code;
+            let code;
             if (data && data.success === false) {
                 code = (data.code === undefined) ? 500 : data.code;
             } else {

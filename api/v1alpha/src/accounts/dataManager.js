@@ -350,7 +350,7 @@ async function deleteAccount(projectId, accountId, data) {
  * @param  {} projectId
  * @param  {} token
  */
-async function register(projectId, token) {
+async function register(projectId, host, token) {
     // https://cloud.google.com/marketplace/docs/partners/integrated-saas/frontend-integration#verify-jwt
     const jwt = require('jsonwebtoken');
 
@@ -368,7 +368,7 @@ async function register(projectId, token) {
         // TODO: Should be passed in dynamically from solution configuration.
         // Host or referrer in the header
         // req.header.host
-        audience: 'storage.cloud.google.com',
+        audience: host,
 
         issuer: cfg.procurementIssuer,
         ignoreExpiration: false,
@@ -442,21 +442,21 @@ async function approve(projectId, token, reason, email) {
                         accountData.marketplace.push(accountRecord);
                     }
                 } else {
-                    accountData.marketplace = [ accountRecord ];  
+                    accountData.marketplace = [accountRecord];
                 }
             } else {
                 // Create the account
-                accountData = { 
+                accountData = {
                     email: email,
                     emailType: 'userByEmail',
                     createdBy: email,
-                    marketplace: [ accountRecord ]
+                    marketplace: [accountRecord]
                 };
             }
 
             // This will create or update the account. At this point no new policies will be associated.
             await createOrUpdateAccount(projectId, null, accountData);
-            
+
             const approval = await procurementUtil.approveAccount(accountName, approvalName, reason);
             return { success: true, code: 200, data: approval };
         }
@@ -468,14 +468,32 @@ async function approve(projectId, token, reason, email) {
 
 /**
  * @param  {} projectId
- * @param  {} accountNames
+ * @param  {} accountId
  */
-async function reset(projectId, accountNames) {
+async function reset(projectId, accountId) {
     try {
-        console.log(`Reset called for account names: ${accountNames}`);
-        const procurementUtil = new CommerceProcurementUtil(projectId);
-        for (const name of accountNames) {
-            await procurementUtil.resetAccount(name);
+        console.log(`Reset called for accountId: ${accountId}`);
+        let accountData;
+        let account = await getAccount(projectId, accountId, 'userByEmail');
+        if (account.success) {
+            accountData = account.data;
+            if (accountData.policies) {
+                // Reformat policies for saving.
+                // TODO: Re-factor so this isn't a mess
+                accountData.policies = accountData.policies.map(e => e.policyId);
+            }
+            if (accountData.marketplace && accountData.marketplace.length > 0) {
+                const accountNames = accountData.marketplace.map(e => e.accountName);
+                // Clear the associated accountNames
+                accountData.marketplace = [];
+                const procurementUtil = new CommerceProcurementUtil(projectId);
+                for (const name of accountNames) {
+                    console.log(`Resetting account for name: ${name}`);
+                    await procurementUtil.resetAccount(name);
+                }
+                // Save the updated account record
+                await createOrUpdateAccount(projectId, null, accountData);
+            }
         }
         return { success: true, code: 200 };
     } catch (err) {

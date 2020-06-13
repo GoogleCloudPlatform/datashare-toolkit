@@ -318,7 +318,7 @@ export default {
       this.$store
         .dispatch('submitProcurementAccountReset', {
           projectId: this.$store.state.settings.projectId,
-          accountNames: this.selectedItem.marketplace.map(a => a.accountName)
+          accountId: this.selectedItem.accountId
         })
         .then(result => {
           this.loading = false;
