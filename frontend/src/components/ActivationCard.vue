@@ -30,9 +30,6 @@ export default {
           this.approveAccount();
         });
     } else {
-      // console.log(user);
-      // Idea of where we would post back the cookie and accountId.
-      // Activation success/failure, etc.
       this.approveAccount();
     }
   },
@@ -57,6 +54,9 @@ export default {
         .then(response => {
           if (response.success) {
             this.activated = true;
+            this.$router.replace({
+              name: 'myDashboard'
+            });
           } else {
             this.activated = false;
           }
