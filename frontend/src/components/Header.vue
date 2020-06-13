@@ -135,7 +135,8 @@ import {
   mdiAccount,
   mdiShieldKey,
   mdiAccountMultipleCheck,
-  mdiShopping
+  mdiShopping,
+  mdiBriefcaseAccount
 } from '@mdi/js';
 
 const firebase = require('firebase');
@@ -265,6 +266,11 @@ export default {
           name: 'procurements',
           title: 'Procurement Requests',
           icon: mdiShopping
+        },
+        {
+          name: 'myDashboard',
+          title: 'My Products',
+          icon: mdiBriefcaseAccount
         },
         {
           section: 'Ingestion',
