@@ -8,6 +8,7 @@ imports:
 {% set adminEmail = properties["input_adminEmail"] %}
 {% set project = env["project"] %}
 {% set datashareGitReleaseVersion = properties["input_datashareGithubReleaseVersion"] %}
+{% set gcpRegion = properties["input_gcpRegion"] %}
 
 {% set deployment = env["deployment"] %}
 {% set name = "%s-vm-tmpl" % env["name"] %}
@@ -39,7 +40,7 @@ resources:
       project: {{ project }}
       #predefinedAcl: projectPrivate
       #projection: full
-      location: US
+      location: US ## TODO paramaterize this value
       storageClass: STANDARD
   - type: storage.v1.bucket
     name: {{ project }}-install-bucket
@@ -48,7 +49,7 @@ resources:
       project: {{ project }}
       #predefinedAcl: projectPrivate
       #projection: full
-      location: US
+      location: US ## TODO paramaterize this value
       storageClass: STANDARD
   - name: function
     type: cloud_function.py
@@ -57,7 +58,7 @@ resources:
       codeLocation: function/
       codeBucket: fsi-cds-markeplace-sw-dev-datashare-cloud-function
       codeBucketObject: datashare-toolkit-cloud-function.zip
-      location: us-east1
+      location: {{ gcpRegion }}
       timeout: 60s
       runtime: nodejs10
       availableMemoryMb: 256
@@ -75,7 +76,7 @@ resources:
       customRoleName: custom.ds.api.mgr
       cloudRunDeployName: ds-api
       containerTag: dev
-      region: us-central1
+      region: {{ gcpRegion }}
       timeout: 600s
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
   ## Deploy Datashare UI
@@ -84,7 +85,7 @@ resources:
     properties:
       firebaseApiKey: YOUR_FIREBASE_WEB_APIKEY
       containerTag: dev
-      region: us-central1
+      region: {{ gcpRegion }}
       timeout: 600s
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
   - name: {{ name }}

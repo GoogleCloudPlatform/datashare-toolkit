@@ -129,14 +129,15 @@ properties:
   input_datashareGithubReleaseVersion:
     type: string
     default: master
-  input_booleanField1:
-    type: boolean
-    default: False
+  input_gcpRegion:
+    type: string
+    default: us-central1
+  #input_booleanField1:
+  #  type: boolean
+  #  default: False
 
 outputs:
   deployment:
-    type: string
-  password0:
     type: string
   project:
     type: string
