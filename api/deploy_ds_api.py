@@ -19,17 +19,12 @@ import json
 def GenerateConfig(context):
   """Generate YAML resource configuration."""
   
-  #volumes = [{'name': 'ds-code', 'path': '/ds'}]
   cmd = "https://github.com/GoogleCloudPlatform/datashare-toolkit.git"
+  gitReleaseVersion = "master"
+  if context.properties['datashareGitReleaseTag'] != None:
+      gitReleaseVersion = context.properties['datashareGitReleaseTag']
 
-  resources = [{
-      'name': 'ds-api-build',
-      'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
-      'metadata': {
-          'runtimePolicy': ['UPDATE_ALWAYS']
-      },
-      'properties': {
-          'steps': [
+  steps = [
               { # Create a service account
               'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
               'entrypoint': '/bin/bash',
@@ -75,7 +70,25 @@ def GenerateConfig(context):
                             '--service-account=' + context.properties['serviceAccountName'] + '@$PROJECT_ID.iam.gserviceaccount.com'
                           ]
               }
-          ],
+          ]
+    
+  gitRelease = { # Checkout the correct release
+                'name': 'gcr.io/cloud-builders/git',
+                'dir': 'ds/datashare-toolkit', # changes the working directory to /workspace/ds/datashare-toolkit
+                'args': ['checkout', gitReleaseVersion]
+              }
+
+  if gitReleaseVersion != "master":
+      steps.insert(2, gitRelease) # insert the git checkout command into after the git clone step
+
+  resources = [{
+      'name': 'ds-api-build',
+      'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
+      'metadata': {
+          'runtimePolicy': ['UPDATE_ALWAYS']
+      },
+      'properties': {
+          'steps': steps,
           'timeout': context.properties['timeout']
       }
   }]

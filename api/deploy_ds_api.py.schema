@@ -48,6 +48,11 @@ properties:
   timeout:
     type: string
     description: Alloted time for the deployment to be successfull.
+
+  datashareGitReleaseTag:
+    type: string
+    description: The Github release version that should be used to install Datashare assets.
+    default: master
     
 outputs:
   properties:
