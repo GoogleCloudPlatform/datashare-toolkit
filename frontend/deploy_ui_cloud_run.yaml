@@ -9,4 +9,4 @@ resources:
     containerTag: dev
     region: us-central1
     timeout: 600s
-    datashareGitReleaseTag: v0.3.1
+    datashareGitReleaseTag: master

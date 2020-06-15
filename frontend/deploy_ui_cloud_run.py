@@ -21,24 +21,15 @@ def GenerateConfig(context):
   
   #volumes = [{'name': 'cds-code', 'path': '/cds'}]
   cmd = "https://github.com/GoogleCloudPlatform/datashare-toolkit.git"
+  gitReleaseVersion = "master"
+  if context.properties['datashareGitReleaseTag'] != None:
+      gitReleaseVersion = context.properties['datashareGitReleaseTag']
 
-  resources = [{
-      'name': 'ds-ui-build',
-      'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
-      'metadata': {
-          'runtimePolicy': ['UPDATE_ALWAYS']
-      },
-      'properties': {
-          'steps': [
+  steps = [
               { # Clone the Datashare repository
                 'name': 'gcr.io/cloud-builders/git',
                 'dir': 'ds', # changes the working directory to /workspace/ds/
                 'args': ['clone', cmd]
-              },
-              { # Checkout the correct release
-                'name': 'gcr.io/cloud-builders/git',
-                'dir': 'ds/datashare-toolkit', # changes the working directory to /workspace/ds/datashare-toolkit
-                'args': ['checkout', context.properties['datashareGitReleaseTag']]
               },
               { # Submit the build configuration to Cloud Build to build the DS UI container image
                   'name': 'gcr.io/cloud-builders/gcloud',
@@ -63,7 +54,25 @@ def GenerateConfig(context):
                             '--set-env-vars=FIREBASE_API_KEY=' + context.properties['firebaseApiKey']
                           ]
               }
-          ],
+          ]
+
+  gitRelease = { # Checkout the correct release
+                'name': 'gcr.io/cloud-builders/git',
+                'dir': 'ds/datashare-toolkit', # changes the working directory to /workspace/ds/datashare-toolkit
+                'args': ['checkout', gitReleaseVersion]
+              }
+
+  if gitReleaseVersion != "master":
+      steps.insert(1, gitRelease)
+
+  resources = [{
+      'name': 'ds-ui-build',
+      'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
+      'metadata': {
+          'runtimePolicy': ['UPDATE_ALWAYS']
+      },
+      'properties': {
+          'steps': steps,
           'timeout': context.properties['timeout']
       }
   }]

@@ -51,7 +51,7 @@ properties:
   datashareGitReleaseTag:
     type: string
     description: The Git release version that should be used to install Datashare assets.
-    default: v0.3.1
+    default: master
     
 outputs:
   properties:
