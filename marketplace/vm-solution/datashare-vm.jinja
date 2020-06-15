@@ -9,6 +9,7 @@ imports:
 {% set project = env["project"] %}
 {% set datashareGitReleaseVersion = properties["input_datashareGithubReleaseVersion"] %}
 {% set gcpRegion = properties["input_gcpRegion"] %}
+{% set storageBucketLocation = properties["input_storageBucketLocation"] %}
 
 {% set deployment = env["deployment"] %}
 {% set name = "%s-vm-tmpl" % env["name"] %}
@@ -40,7 +41,7 @@ resources:
       project: {{ project }}
       #predefinedAcl: projectPrivate
       #projection: full
-      location: US ## TODO paramaterize this value
+      location: {{ storageBucketLocation }}
       storageClass: STANDARD
   - type: storage.v1.bucket
     name: {{ project }}-install-bucket
@@ -49,7 +50,7 @@ resources:
       project: {{ project }}
       #predefinedAcl: projectPrivate
       #projection: full
-      location: US ## TODO paramaterize this value
+      location: {{ storageBucketLocation }}
       storageClass: STANDARD
   - name: function
     type: cloud_function.py

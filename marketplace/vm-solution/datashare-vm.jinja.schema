@@ -132,6 +132,9 @@ properties:
   input_gcpRegion:
     type: string
     default: us-central1
+  input_storageBucketLocation:
+    type: string
+    default: US
   #input_booleanField1:
   #  type: boolean
   #  default: False

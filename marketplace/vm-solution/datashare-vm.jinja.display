@@ -89,9 +89,14 @@ input:
       placeholder: v0.3.1
     - name: input_gcpRegion
       title: Google Cloud Platform Region
-      subtext: <a href="https://cloud.google.com/compute/docs/regions-zones#available">Valid Google Cloud Platform regions</a>.
+      subtext: <a href="https://cloud.google.com/compute/docs/regions-zones#available">Valid Google Cloud Platform regions</a>
       tooltip: Deploys the Cloud Function, Datashare API and UI to this region; default is us-central1.  
       placeholder: us-central1
+    - name: input_storageBucketLocation
+      title: Google Cloud Platform Storage Bucket location
+      subtext: <a href="https://cloud.google.com/storage/docs/locations">Valid Storage Bucket locations</a>
+      tooltip: Create the storage buckets in the specified region; default is US.
+      placeholder: US
     ##- name: input_booleanField1
     ##  title: Boolean checkbox used to
   sections:
@@ -111,10 +116,12 @@ runtime:
         value: '{{ properties().zone }}'
       - label: Instance machine type
         value: '{{ properties().machineType }}'
+      - label: Cloud Function, Datashare UI and API deployment location
+        value: '{{ properties().input_gcpRegion }}'
       - label: Datashare Github Release Version
         value: '{{ properties().input_datashareGithubReleaseVersion }}'
-      - label: Admin User Email
-        value: '{{ properties().input_adminEmail }}'
+      - label: Cloud Storage Bucket Location
+        value: '{{ properties().input_storageBucketLocation }}'
   primaryButton:
     label: SSH
     type: TYPE_GCE_VM_SSH
