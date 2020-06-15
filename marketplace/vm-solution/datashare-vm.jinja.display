@@ -87,8 +87,8 @@ input:
     - name: input_datashareGithubReleaseVersion
       title: Github Datashare Release Version
       placeholder: v0.3.1
-    - name: input_booleanField1
-      title: Boolean checkbox used to
+    #- name: input_booleanField1
+    #  title: Boolean checkbox used to
   sections:
     - name: BOOT_DISK
       title: Boot Disk
@@ -100,20 +100,16 @@ runtime:
   deployingMessage: Deployment can take several minutes to complete.
   applicationTable:
     rows:
-      - label: Admin user
-        value: solutionuser
-      - label: Admin password (Temporary)
-        value: '{{ outputs().password0 }}'
       - label: Instance
         value: '<a href="{{ consoleUrl(outputs().vmSelfLink) }}">{{ outputs().vmName }}</a>'
       - label: Instance zone
         value: '{{ properties().zone }}'
       - label: Instance machine type
         value: '{{ properties().machineType }}'
-      - label: Property 1
-        value: Value for property 1
-      - label: Property 2
-        value: '{{ properties().input_additionalEmail }}'
+      - label: Datashare Github Release Version
+        value: '{{ properties().input_datashareGithubReleaseVersion }}'
+      - label: Admin User Email
+        value: '{{ properties().input_adminEmail }}'
   primaryButton:
     label: SSH
     type: TYPE_GCE_VM_SSH
