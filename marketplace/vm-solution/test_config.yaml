@@ -1,9 +1,9 @@
 imports:
-- path: cds-vm.jinja
+- path: datashare-vm.jinja
 
 resources:
-- name: cds-vm
-  type: cds-vm.jinja
+- name: datashare-vm
+  type: datashare-vm.jinja
   properties:
     input_adminEmail: default-user@example.com
     zone: us-central1-f
