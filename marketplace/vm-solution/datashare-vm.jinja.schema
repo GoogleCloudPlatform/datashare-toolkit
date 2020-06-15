@@ -31,11 +31,10 @@ properties:
     type: string
     enum:
       - '0'
-      - '1'
     default: '0'
   machineType:
     type: string
-    default: f1-micro
+    default: g1-small
     x-googleProperty:
       type: GCE_MACHINE_TYPE
       zoneProperty: zone

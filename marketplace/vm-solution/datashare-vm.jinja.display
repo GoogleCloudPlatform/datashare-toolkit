@@ -1,6 +1,6 @@
 description:
   author:
-    title: GCP Financial Services Team
+    title: Google Cloud Platform Financial Services Team
     descriptionHtml: "Financial Services team provides Google Cloud Platform solutions for the financial services industry.  \n"
     shortDescription: Google Cloud Platform Financial Services team provides solutions for the financial services industry.
     url: https://www.google.com
@@ -152,7 +152,6 @@ runtime:
 
 annotations:
   autogenSpecType: 'SINGLE_VM'
-  vmImage0: https://www.googleapis.com/compute/v1/projects/fsi-cds-markeplace-sw-dev/global/images/fsicds-debian-20200527
-  vmImage1: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20200521
+  vmImage0: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20200521
 
 metadata_version: v1
