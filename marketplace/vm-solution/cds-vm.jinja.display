@@ -33,7 +33,7 @@ description:
     - DESTINATION_CONFIGURATION
   support:
   - title: Support
-    descriptionHtml: We provide limited support on this product.
+    descriptionHtml: We provide limited support on this product.  
     url: https://www.google.com
 
 input:
@@ -47,8 +47,8 @@ input:
       subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
     - name: machineType
       title: Machine type
-    - name: acceleratorType
-      title: GPUs
+    #- name: acceleratorType
+    #  title: GPUs
     - name: bootDiskType
       title: cds-boot-disk type
       section: BOOT_DISK
@@ -84,10 +84,9 @@ input:
       tooltip: Tooltipe for this input field
       validation: Please enter a valid email address
       placeholder: user@example.com
-    - name: input_additionalEmail
-      title: Additional email address
-      validation: Please enter a valid email address
-      placeholder: user@example.com
+    - name: input_datashareGithubReleaseVersion
+      title: Github Datashare Release Version
+      placeholder: v0.3.1
     - name: input_booleanField1
       title: Boolean checkbox used to
   sections:

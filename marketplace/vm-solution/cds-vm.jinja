@@ -2,17 +2,18 @@
 
 imports:
 - path: cloud_function.py
+- path: deploy_ds_api.py
+- path: deploy_ui_cloud_run.py
 
 {% set adminEmail = properties["input_adminEmail"] %}
 {% set project = env["project"] %}
-{% set datashareGitReleaseVersion = "v0.3.1" %}
+{% set datashareGitReleaseVersion = properties["input_datashareGithubReleaseVersion"] %}
+
 {% set deployment = env["deployment"] %}
 {% set name = "%s-vm-tmpl" % env["name"] %}
 {% set instanceName = "%s-vm" % deployment %}
 {% set zone = properties["zone"] %}
 {% set machineType = properties["machineType"] %}
-{% set acceleratorType = properties["acceleratorType"] %}
-{% set acceleratorCount = properties["acceleratorCount"] %}
 {% set networks = [] %}
 {% for network in properties["network"] %}
 {% set _ = networks.append(path_utils.networkPath(network)) %}
@@ -62,9 +63,29 @@ resources:
       availableMemoryMb: 256
       entryPoint: processEvent
       #temp: $(ref.{{ name }}.selfLink)
-    #metadata:
-    #  dependsOn:
-    #  - {{ name }} # depends on the VM instance startup script executing first.
+    ##metadata:
+    ##  dependsOn:
+    ##  - {{ name }} # depends on the VM instance startup script executing first.
+  ## Deploy Datashare API
+  - name: build-api
+    type: deploy_ds_api.py
+    properties:
+      serviceAccountName: ds-api-mgr
+      serviceAccountDesc: DS API Manager
+      customRoleName: custom.ds.api.mgr
+      cloudRunDeployName: ds-api
+      containerTag: dev
+      region: us-central1
+      timeout: 600s
+  ## Deploy Datashare UI
+  - name: build-ui
+    type: deploy_ui_cloud_run.py
+    properties:
+      firebaseApiKey: YOUR_FIREBASE_WEB_APIKEY
+      containerTag: dev
+      region: us-central1
+      timeout: 600s
+      datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
   - name: {{ name }}
     type: vm_instance.py
     metadata:
@@ -95,11 +116,6 @@ resources:
       bootDiskSizeGb: {{ bootDiskSizeGb }}
       
       canIpForward: {{ canIpForward }}
-      {% if acceleratorCount > 0 %}
-      guestAccelerators:
-        - acceleratorType: {{ acceleratorType }}
-          acceleratorCount: {{ acceleratorCount }}
-      {% endif %}
       serviceAccounts:
         - email: default
           scopes:
