@@ -52,6 +52,11 @@ properties:
     type: string
     description: The Git release version that should be used to install Datashare assets.
     default: master
+
+  useRuntimeConfigWaiter:
+    type: boolean
+    description: Deploy all the components (UI, API, Ingestion)
+    default: False
     
 outputs:
   properties:
