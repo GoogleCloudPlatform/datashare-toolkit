@@ -1,0 +1,192 @@
+{% import "path_utils.jinja" as path_utils with context %}
+
+imports:
+- path: cloud_function.py
+- path: deploy_ds_api.py
+- path: deploy_ui_cloud_run.py
+
+{% set adminEmail = properties["input_adminEmail"] %}
+{% set project = env["project"] %}
+{% set datashareGitReleaseVersion = properties["input_datashareGithubReleaseVersion"] %}
+{% set gcpRegion = properties["input_gcpRegion"] %}
+{% set storageBucketLocation = properties["input_storageBucketLocation"] %}
+
+{% set deployment = env["deployment"] %}
+{% set name = "%s-vm-tmpl" % env["name"] %}
+{% set instanceName = "%s-vm" % deployment %}
+{% set zone = properties["zone"] %}
+{% set machineType = properties["machineType"] %}
+{% set networks = [] %}
+{% for network in properties["network"] %}
+{% set _ = networks.append(path_utils.networkPath(network)) %}
+{% endfor %}
+{% set subnetworks = properties["subnetwork"] %}
+{% set externalIPs = properties["externalIP"] %}
+{% set bootDiskType = properties["bootDiskType"] %}
+{% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
+{% set hasExternalIP = externalIPs and externalIPs[0] != "NONE" %}
+{# Software status only works if the VM has an external IP. #}
+{% set enableStatusWaiter = hasExternalIP %}
+{% set canIpForward = properties["ipForward"] == "On" %}
+
+{% set imageProjects = ["debian-cloud"] %}
+{% set imageNames = ["debian-9-stretch-v20200521"] %}
+{% set selectedImageIndex = properties["image"]|int %}
+
+resources:
+  - type: storage.v1.bucket
+    name: {{ project }}-cds-bucket
+    properties:
+      name: {{ project }}-cds-bucket
+      project: {{ project }}
+      #predefinedAcl: projectPrivate
+      #projection: full
+      location: {{ storageBucketLocation }}
+      storageClass: STANDARD
+  - type: storage.v1.bucket
+    name: {{ project }}-install-bucket
+    properties:
+      name: {{ project }}-install-bucket
+      project: {{ project }}
+      #predefinedAcl: projectPrivate
+      #projection: full
+      location: {{ storageBucketLocation }}
+      storageClass: STANDARD
+  - name: function
+    type: cloud_function.py
+    properties:
+      # All the files that start with this prefix will be packed in the Cloud Function
+      codeLocation: function/
+      codeBucket: fsi-cds-markeplace-sw-dev-datashare-cloud-function
+      codeBucketObject: datashare-toolkit-cloud-function.zip
+      location: {{ gcpRegion }}
+      timeout: 60s
+      runtime: nodejs10
+      availableMemoryMb: 256
+      entryPoint: processEvent
+      #temp: $(ref.{{ name }}.selfLink)
+    ##metadata:
+    ##  dependsOn:
+    ##  - {{ name }} # depends on the VM instance startup script executing first.
+  ## Deploy Datashare API
+  - name: build-api
+    type: deploy_ds_api.py
+    properties:
+      serviceAccountName: ds-api-mgr
+      serviceAccountDesc: DS API Manager
+      customRoleName: custom.ds.api.mgr
+      cloudRunDeployName: ds-api
+      containerTag: dev
+      region: {{ gcpRegion }}
+      timeout: 600s
+      datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
+  ## Deploy Datashare UI
+  - name: build-ui
+    type: deploy_ui_cloud_run.py
+    properties:
+      firebaseApiKey: YOUR_FIREBASE_WEB_APIKEY
+      containerTag: dev
+      region: {{ gcpRegion }}
+      timeout: 600s
+      datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
+  - name: {{ name }}
+    type: vm_instance.py
+    metadata:
+      dependsOn:
+      - {{ project }}-install-bucket # depneds on the install bucket being created.
+    properties:
+      instanceName: {{ instanceName }}
+      sourceImage: https://www.googleapis.com/compute/v1/projects/{{ imageProjects[selectedImageIndex] }}/global/images/{{ imageNames[selectedImageIndex] }}
+      zone: {{ zone }}
+      machineType: {{ machineType }}
+      networks:
+      {% for network in networks %}
+        - {{ network }}
+      {% endfor %}
+      {% if subnetworks is defined and subnetworks %}
+      subnetworks:
+      {% for subnetwork in subnetworks %}
+        - {{ subnetwork or '' }}
+      {% endfor %}
+      {% endif %}
+      {% if externalIPs is defined and externalIPs %}
+      externalIPs:
+      {% for externalIP in externalIPs %}
+        - {{ externalIP }}
+      {% endfor %}
+      {% endif %}
+      bootDiskType: {{ bootDiskType }}
+      bootDiskSizeGb: {{ bootDiskSizeGb }}
+      
+      canIpForward: {{ canIpForward }}
+      serviceAccounts:
+        - email: default
+          scopes:
+            - 'https://www.googleapis.com/auth/cloud.useraccounts.readonly'
+            - 'https://www.googleapis.com/auth/devstorage.read_only'
+            - 'https://www.googleapis.com/auth/logging.write'
+            - 'https://www.googleapis.com/auth/monitoring.write'
+            - 'https://www.googleapis.com/auth/cloud-platform'
+      metadata:
+        items:
+          - key: adminEmail
+            value: {{ adminEmail }}
+          - key: startup-script
+            value: |-
+              #!/bin/bash
+              # use curl and metadata url to access adminEmail
+              ADMIN_EMAIL=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/adminEmail -H "Metadata-Flavor: Google"`
+              echo $ADMIN_EMAIL
+              #echo "Enabling cloudresourcemanger.googleapis.com api"
+              gcloud services enable cloudresourcemanager.googleapis.com
+              echo "DS deployment successful"
+      tags:
+        items:
+          - {{ env["deployment"] }}-deployment
+  - name: generated-password-0
+    type: password.py
+    properties:
+      length: 8
+      includeSymbols: True
+  {% if properties["enableTcp80"] %}
+  - name: {{ env["deployment"] }}-tcp-80
+    type: compute.v1.firewall
+    properties:
+      network: {{ networks[0] }}
+      {% if properties.get("tcp80SourceRanges") %}
+      sourceRanges:
+        {% for source in properties["tcp80SourceRanges"].split(',') %}
+        - '{{ source | trim }}'
+        {% endfor %}
+      {% else %}
+      sourceRanges: ["0.0.0.0/0"]
+      {% endif %}
+      targetTags: ["{{ env["deployment"] }}-deployment"]
+      allowed:
+        - IPProtocol: TCP
+          ports: ["80"]
+  {% endif %}
+
+outputs:
+  - name: deployment
+    value: {{ deployment }}
+  - name: project
+    value: {{ project }}
+  - name: vmId
+    value: $(ref.{{ instanceName }}.id)
+  - name: vmExternalIP
+    {% if hasExternalIP %}
+    value: $(ref.{{ name }}.ip)
+    {% else %}
+    value: NONE
+    {% endif %}
+  - name: vmInternalIP
+    value: $(ref.{{ name }}.internalIP)
+  - name: vmName
+    value: {{ instanceName }}
+  - name: vmSelfLink
+    value: $(ref.{{ instanceName }}.selfLink)
+  - name: hasExternalIP
+    value: {{ hasExternalIP }}
+  - name: mainNetwork
+    value: {{ networks[0] }}

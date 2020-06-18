@@ -1,4 +1,4 @@
-# Copyright 2020 Google Inc. All rights reserved.
+# Copyright 2018 Google Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,48 +13,52 @@
 # limitations under the License.
 
 info:
-  title: Datashare UI Deployment Manager
+  title: Cloud Function Example
   author: Google Inc.
-  description: Template code to deploy the Datashare UI to Cloud Run
+  description: Template to deploy a cloud function from code
 
 required:
-- containerTag
-- firebaseApiKey
-- region
-- timeout
-
+- codeLocation
+- codeBucket
+- codeBucketObject
+- runtime
 
 properties:
-  firebaseApiKey:
+  codeLocation:
     type: string
-    description: Firebase API key
+    description: Prefix from the imports that will be packed in the cloud function
 
-  cloudRunDeployName:
+  codeBucket:
     type: string
-    description: Cloud run service name that is displayed in the UI.
-    default: ds-frontend-ui
+    description: Where the function code will be stored
 
-  containerTag:
+  codeBucketObject:
     type: string
-    description: DS UI Docker container tag
-    default: dev
+    description: Where the function code will be stored
 
-  region:
+  location:
     type: string
-    description: Google Cloud region to which this service should be deployed
+    description: Where the function will be deployed
 
   timeout:
     type: string
-    description: Alloted time for the deployment to be successfull.
-    default: 600s
+    description: Timeout for the function to run
 
-  datashareGitReleaseTag:
+  availableMemoryMb:
+    type: integer
+    description: Available memory for the function
+
+  entrypoint:
     type: string
-    description: The Git release version that should be used to install Datashare assets.
-    default: master
-    
+    description: Entrypoint for the function
+
+  runtime:
+    type: string
+    description: Node.js runtime
+
 outputs:
   properties:
     functionName:
       type: string
       description: The name of the function created
+
