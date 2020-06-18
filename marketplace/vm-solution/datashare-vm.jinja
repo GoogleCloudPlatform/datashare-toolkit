@@ -10,6 +10,8 @@ imports:
 {% set datashareGitReleaseVersion = properties["input_datashareGithubReleaseVersion"] %}
 {% set gcpRegion = properties["input_gcpRegion"] %}
 {% set storageBucketLocation = properties["input_storageBucketLocation"] %}
+{% set useRuntimeConfigWaiter = properties["input_useRuntimeConfigWaiter"] %}
+{% set waiterName = env["deployment"] + "-startup-waiter" %}
 
 {% set deployment = env["deployment"] %}
 {% set name = "%s-vm-tmpl" % env["name"] %}
@@ -64,10 +66,10 @@ resources:
       runtime: nodejs10
       availableMemoryMb: 256
       entryPoint: processEvent
+      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
+      waiterName: {{ waiterName }}
       #temp: $(ref.{{ name }}.selfLink)
-    ##metadata:
-    ##  dependsOn:
-    ##  - {{ name }} # depends on the VM instance startup script executing first.
+
   ## Deploy Datashare API
   - name: build-api
     type: deploy_ds_api.py
@@ -80,6 +82,9 @@ resources:
       region: {{ gcpRegion }}
       timeout: 600s
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
+      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
+      waiterName: {{ waiterName }}
+    
   ## Deploy Datashare UI
   - name: build-ui
     type: deploy_ui_cloud_run.py
@@ -89,6 +94,8 @@ resources:
       region: {{ gcpRegion }}
       timeout: 600s
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
+      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
+      waiterName: {{ waiterName }}
   - name: {{ name }}
     type: vm_instance.py
     metadata:
@@ -127,27 +134,53 @@ resources:
             - 'https://www.googleapis.com/auth/logging.write'
             - 'https://www.googleapis.com/auth/monitoring.write'
             - 'https://www.googleapis.com/auth/cloud-platform'
+            - 'https://www.googleapis.com/auth/cloudruntimeconfig'
       metadata:
         items:
           - key: adminEmail
             value: {{ adminEmail }}
+          - key: useRuntimeConfigWaiter
+            value: {{ useRuntimeConfigWaiter }}
           - key: startup-script
             value: |-
               #!/bin/bash
               # use curl and metadata url to access adminEmail
               ADMIN_EMAIL=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/adminEmail -H "Metadata-Flavor: Google"`
               echo $ADMIN_EMAIL
-              #echo "Enabling cloudresourcemanger.googleapis.com api"
-              gcloud services enable cloudresourcemanager.googleapis.com
-              echo "DS deployment successful"
+              USE_RUNTIME_CONFIG_WAITER =`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/useRuntimeConfigWaiter -H "Metadata-Flavor: Google"`
+              echo $USE_RUNTIME_CONFIG_WAITER
+              if [ "$USE_RUNTIME_CONFIG_WAITER" = "True" ]; then
+                echo "Enabling Cloud APIs"
+                gcloud services enable cloudbuild.googleapis.com --quiet
+                gcloud services enable iam.googleapis.com --quiet
+                gcloud services enable run.googleapis.com --quiet
+                gcloud services enable cloudresourcemanager.googleapis.com --quiet
+                echo "Updating apt-get and updating gcloud..." 
+                sudo apt-get -y update && sudo apt-get -y --only-upgrade install google-cloud-sdk-skaffold kubectl google-cloud-sdk-anthos-auth google-cloud-sdk-minikube google-cloud-sdk google-cloud-sdk-app-engine-grpc google-cloud-sdk-kind google-cloud-sdk-pubsub-emulator google-cloud-sdk-app-engine-go google-cloud-sdk-firestore-emulator google-cloud-sdk-cloud-build-local google-cloud-sdk-datastore-emulator google-cloud-sdk-kpt google-cloud-sdk-app-engine-python google-cloud-sdk-spanner-emulator google-cloud-sdk-cbt google-cloud-sdk-bigtable-emulator google-cloud-sdk-app-engine-python-extras google-cloud-sdk-datalab google-cloud-sdk-app-engine-java
+                sudo apt-get -y install google-cloud-sdk
+                echo "Notifiying Waiter that this VM startup script is complete..."
+                gcloud beta runtime-config configs variables set success/my-instance success --config-name $(ref.my-waiter.configName)
+                echo "VM startup-script finished!"
+              fi
+              
       tags:
         items:
           - {{ env["deployment"] }}-deployment
-  - name: generated-password-0
-    type: password.py
+  
+  # Runtime Config Waiter
+  {% if useRuntimeConfigWaiter %}
+  - name: my-waiter
+    type: waiter.jinja
     properties:
-      length: 8
-      includeSymbols: True
+      #instanceName: cds-vm-1
+      instanceName: {{ instanceName }}
+  {% endif %}
+
+  #- name: generated-password-0
+  #  type: password.py
+  #  properties:
+  #    length: 8
+  #    includeSymbols: True
   {% if properties["enableTcp80"] %}
   - name: {{ env["deployment"] }}-tcp-80
     type: compute.v1.firewall

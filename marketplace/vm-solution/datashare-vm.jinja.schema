@@ -135,9 +135,9 @@ properties:
   input_storageBucketLocation:
     type: string
     default: US
-  #input_booleanField1:
-  #  type: boolean
-  #  default: False
+  input_useRuntimeConfigWaiter:
+    type: boolean
+    default: False
 
 outputs:
   deployment:
