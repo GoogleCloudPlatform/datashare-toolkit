@@ -626,7 +626,7 @@ function extractHostname(url) {
 accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
     const projectId = req.params.projectId;
     const token = req.query['x-gcp-marketplace-token'];
-    console.log(`Activate called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
+    console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
     const host = extractHostname(req.headers.host);
     const data = await dataManager.register(projectId, host, token);
@@ -648,7 +648,7 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
     switch (req.params.custom) {
         case "register": {
             const token = req.body['x-gcp-marketplace-token'];
-            console.log(`Activate called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
+            console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
             const data = await dataManager.register(projectId, host, token);
             console.log(`Data: ${JSON.stringify(data)}`);
