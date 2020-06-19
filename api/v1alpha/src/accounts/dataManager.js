@@ -418,9 +418,9 @@ async function register(projectId, host, token) {
  * @param  {} reason
  * @param  {} email
  */
-async function approve(projectId, host, token, reason, email) {
+async function activate(projectId, host, token, reason, email) {
     try {
-        console.log(`Approve called for token: ${token} for email: ${email}`);
+        console.log(`Activate called for token: ${token} for email: ${email}`);
         const procurementUtil = new CommerceProcurementUtil(projectId);
         const registration = await register(projectId, host, token);
         console.log(`registration: ${JSON.stringify(registration)}`);
@@ -510,6 +510,6 @@ module.exports = {
     deleteAccount,
     getAccount,
     register,
-    approve,
+    activate,
     reset
 };

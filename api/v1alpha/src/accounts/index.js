@@ -671,7 +671,7 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
             const reason = req.body.reason;
             console.log(`Approve called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
 
-            const data = await dataManager.approve(projectId, host, token, reason, email);
+            const data = await dataManager.activate(projectId, host, token, reason, email);
             console.log(`Data: ${JSON.stringify(data)}`);
 
             // TODO: Perform redirects
