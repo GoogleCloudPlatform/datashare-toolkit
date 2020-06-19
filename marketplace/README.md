@@ -9,6 +9,7 @@ would like to deploy Datashare to a Kubernetes based environment.
 ## Requirements
 The Cloud Function must zipped, named `datashare-toolkit-cloud-function.zip` and uploaded to a Google Cloud Storage bucket.
 This file should be publicly accessible so all partners that are deploying Datashare can access the Cloud Function code.
+
 ## Shell scripts
 The `marketplace` folder includes several files to help with deployment and testing. 
 

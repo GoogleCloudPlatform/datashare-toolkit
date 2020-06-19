@@ -99,7 +99,7 @@ def GenerateConfig(context):
       }
     }]
   else:
-      resources = [{
+    resources = [{
       'name': 'ds-api-build',
       'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
       'metadata': {

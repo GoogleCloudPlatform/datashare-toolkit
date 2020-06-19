@@ -143,6 +143,7 @@ resources:
             - 'https://www.googleapis.com/auth/monitoring.write'
             - 'https://www.googleapis.com/auth/cloud-platform'
             - 'https://www.googleapis.com/auth/cloudruntimeconfig'
+
       metadata:
         items:
           - key: adminEmail
@@ -253,6 +254,7 @@ resources:
   #  properties:
   #    length: 8
   #    includeSymbols: True
+
   {% if properties["enableTcp80"] %}
   - name: {{ env["deployment"] }}-tcp-80
     type: compute.v1.firewall

@@ -21,10 +21,9 @@ def GenerateConfig(context):
                                        'datashare-toolkit-cloud-function.zip')
   print(source_archive_url)
 
-  useWaiter = context.properties['useRuntimeConfigWaiter']
-    
+  useWaiter = context.properties['useRuntimeConfigWaiter']    
   #cmd = "echo '%s' | base64 -d > /function/function.zip;" % (content.decode('ascii'))
-  # 
+
   cloud_function = {
       'type': 'gcp-types/cloudfunctions-v1:projects.locations.functions',
       'name': function_name,
@@ -53,7 +52,7 @@ def GenerateConfig(context):
               context.properties['availableMemoryMb'],
           'runtime':
               context.properties['runtime']
-      }
+        }
   }
 
   if useWaiter:

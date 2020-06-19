@@ -97,6 +97,7 @@ input:
     - name: input_useRuntimeConfigWaiter
       title: Use Google RuntimeConfig Waiter to setup Datashare prereqs.
       tooltip: Enables the <a href="https://cloud.google.com/deployment-manager/runtime-configurator/create-and-delete-runtimeconfig-resources">RuntimeConfig beta</a> feature that will execute a startup-script in the VM to enable APIs, upload Cloud Function source code and configure Cloud Run.
+
   sections:
     - name: BOOT_DISK
       title: Boot Disk
