@@ -49,7 +49,7 @@ export default {
         .dispatch('submitProcurementAccountApproval', {
           projectId: this.$store.state.settings.projectId,
           email: this.user.email,
-          token: this.jwtToken
+          'x-gcp-marketplace-token': this.jwtToken
         })
         .then(response => {
           if (response.success) {

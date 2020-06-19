@@ -625,8 +625,8 @@ function extractHostname(url) {
 // Temporary for development
 accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
     const projectId = req.params.projectId;
-    const token = req.query.token;
-    console.log(`Activate called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
+    const token = req.query['x-gcp-marketplace-token'];
+    console.log(`Activate called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
     const host = extractHostname(req.headers.host);
     const data = await dataManager.register(projectId, host, token);
@@ -648,7 +648,7 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
     switch (req.params.custom) {
         case "register": {
             const token = req.body['x-gcp-marketplace-token'];
-            console.log(`Activate called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
+            console.log(`Activate called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
             const data = await dataManager.register(projectId, host, token);
             console.log(`Data: ${JSON.stringify(data)}`);
@@ -666,10 +666,10 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
             break;
         }
         case "activate": {
-            const token = req.body.token;
+            const token = req.body['x-gcp-marketplace-token'];
             const email = req.body.email;
             const reason = req.body.reason;
-            console.log(`Approve called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
+            console.log(`Activate called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
 
             const data = await dataManager.activate(projectId, host, token, reason, email);
             console.log(`Data: ${JSON.stringify(data)}`);
