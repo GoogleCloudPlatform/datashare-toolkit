@@ -2,7 +2,7 @@ import store from './../../store';
 import axios from 'axios';
 import mock from './../mock';
 
-const firebase = require('firebase');
+import firebase from 'firebase/app';
 
 // set the default Accept header to application/json
 axios.defaults.headers.common['Accept'] = 'application/json';

@@ -7,7 +7,7 @@
 </template>
 
 <script>
-const firebase = require('firebase');
+import firebase from 'firebase/app';
 
 export default {
   name: 'activation',

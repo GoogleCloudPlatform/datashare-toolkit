@@ -139,7 +139,7 @@ import {
   mdiBriefcaseAccount
 } from '@mdi/js';
 
-const firebase = require('firebase');
+import firebase from 'firebase/app';
 import { mapGetters } from 'vuex';
 
 export default {

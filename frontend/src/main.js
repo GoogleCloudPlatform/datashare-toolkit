@@ -16,7 +16,9 @@ Vue.use(VueForm);
 // Fetch and load the store settings
 store.dispatch('getSettings');
 
-const firebase = require('firebase');
+import firebase from 'firebase/app';
+import 'firebase/auth'; // for authentication
+import 'firebase/analytics'; // for authentication
 
 // Initialize Firebase with a "default" Firebase project
 const firebaseConfig = {

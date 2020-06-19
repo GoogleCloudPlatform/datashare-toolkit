@@ -212,7 +212,7 @@
 import { mdiShopping, mdiCardSearch, mdiDatabaseSearch } from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 
-const firebase = require('firebase');
+import firebase from 'firebase/app';
 
 export default {
   components: {
