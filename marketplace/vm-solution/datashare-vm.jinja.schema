@@ -20,7 +20,7 @@ required:
   - network
   - bootDiskType
   - bootDiskSizeGb
-  - input_adminEmail
+  #- input_adminEmail
 
 properties:
   zone:
@@ -41,23 +41,6 @@ properties:
       gceMachineType:
         minCpu: 1
         minRamGb: 0.6000000238418579
-  #acceleratorType:
-  #  type: string
-  #  default: nvidia-tesla-p100
-  #  x-googleProperty:
-  #    type: GCE_GPU_TYPE
-  #    gceGpuType:
-  #      machineTypeProperty: machineType
-  #      gpuType:
-  #        - nvidia-tesla-k80
-  #        - nvidia-tesla-p100
-  #acceleratorCount:
-  #  type: integer
-  #  default: 0
-  #  x-googleProperty:
-  #    type: GCE_GPU_COUNT
-  #    gceGpuCount:
-  #      machineTypeProperty: machineType
   network:
     type: array
     default: [default]
@@ -122,10 +105,10 @@ properties:
       type: GCE_FIREWALL_RANGE
       gceFirewallRange:
         firewallProperty: enableTcp80
-  input_adminEmail:
-    type: string
-    x-googleProperty:
-      type: EMAIL_ADDRESS
+  #input_adminEmail:
+  #  type: string
+  #  x-googleProperty:
+  #    type: EMAIL_ADDRESS
   input_datashareGithubReleaseVersion:
     type: string
     default: master
