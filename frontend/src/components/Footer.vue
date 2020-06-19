@@ -2,7 +2,7 @@
   <v-footer dark color="#1876D2" app>
     Cloud FSI Solutions &copy; {{ new Date().getFullYear() }}
     <v-spacer></v-spacer>
-    {{ settings.projectId }}:{{ settings.storageBucket }}
+    {{ settings.projectId }}
   </v-footer>
 </template>
 
