@@ -665,7 +665,7 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
             }
             break;
         }
-        case "approve": {
+        case "activate": {
             const token = req.body.token;
             const email = req.body.email;
             const reason = req.body.reason;

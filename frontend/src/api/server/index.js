@@ -245,7 +245,7 @@ export default {
   },
   submitProcurementAccountApproval(payload) {
     return axios
-      .post(this._apiBaseUrl() + '/accounts:approve', payload)
+      .post(this._apiBaseUrl() + '/accounts:activate', payload)
       .then(response => response);
   },
   submitProcurementAccountReset(payload) {
