@@ -105,6 +105,9 @@ def GenerateComputeVM(context, create_disks_separately=True):
   can_ip_fwd = prop.setdefault(CAN_IP_FWD, DEFAULT_IP_FWD)
   disks = prop.setdefault(default.DISKS, list())
   local_ssd = prop.setdefault(default.LOCAL_SSD, 0)
+  project = context.env[default.PROJECT]
+  datashare_install_bucket_name = project + '-install-bucket'
+  datashare_ingestion_bucket_name = project + '-cds-bucket'
 
   if disks:
     if create_disks_separately:
@@ -151,6 +154,11 @@ def GenerateComputeVM(context, create_disks_separately=True):
       0, {
           'name': vm_name,
           'type': default.INSTANCE,
+          'metadata': {
+              'dependsOn': [ 
+                datashare_ingestion_bucket_name
+              ]
+          },
           'properties': {
               'zone': zone,
               'machineType': machine_type,
@@ -161,6 +169,11 @@ def GenerateComputeVM(context, create_disks_separately=True):
               'metadata': metadata,
           }
       })
+
+  if context.properties['useRuntimeConfigWaiter']:
+    configName = context.properties['waiterConfigName']
+    resource[0]['metadata']['dependsOn'].append(configName)
+    resource[0]['metadata']['dependsOn'].append(datashare_install_bucket_name)
 
   # Pass through any additional properties to the VM
   if SERVICE_ACCOUNTS in prop:
