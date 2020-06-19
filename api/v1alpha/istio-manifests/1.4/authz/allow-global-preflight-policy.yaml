@@ -1,0 +1,10 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-global-preflight
+  namespace: datashare
+spec:
+  action: ALLOW
+  rules:
+  - services: ["*"]
+    methods: ["OPTIONS"]

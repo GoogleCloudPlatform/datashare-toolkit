@@ -1,0 +1,19 @@
+apiVersion: authentication.istio.io/v1alpha1
+kind: Policy
+metadata:
+  name: google-jwt
+  namespace: datashare
+spec:
+  origins:
+  - jwt:
+      issuer: https://accounts.google.com
+      jwksUri: https://www.googleapis.com/oauth2/v3/certs
+      triggerRules:
+      - excludedPaths:
+        - exact: /healthz
+        - exact: /metrics
+        - exact: /probe
+        - prefix: /_internal/knative
+      - excludedPaths:
+        - exact: /docs
+  principalBinding: USE_ORIGIN

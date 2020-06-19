@@ -1,0 +1,15 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-firebase-users
+  namespace: datashare
+spec:
+  action: ALLOW
+  rules:
+  - when:
+    - key: request.auth.claims[aud]
+      values:
+      - $PROJECT_ID
+    - key: request.auth.claims[iss]
+      values:
+      - https://securetoken.google.com/$PROJECT_ID

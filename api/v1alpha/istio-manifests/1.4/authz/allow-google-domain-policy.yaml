@@ -1,0 +1,15 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-google-domain
+  namespace: datashare
+spec:
+  action: ALLOW
+  rules:
+  - when:
+    - key: request.auth.claims[iss]
+      values:
+      - https://accounts.google.com
+    - key: request.auth.claims[email]
+      values:
+      - "*@google.com"
