@@ -2,9 +2,17 @@
 apiVersion: authentication.istio.io/v1alpha1
 kind: Policy
 metadata:
+  # global policy per namespace if name is 'default' without targets
+  #name: default
+  #namespace: datashare-apis
   name: google-jwt
-  namespace: datashare
+  namespace: gke-system
 spec:
+  targets:
+  - name: istio-ingress
+    ports:
+    - number: 80
+    - number: 443
   origins:
   - jwt:
       issuer: https://accounts.google.com
@@ -15,6 +23,5 @@ spec:
         - exact: /metrics
         - exact: /probe
         - prefix: /_internal/knative
-      - excludedPaths:
-        - exact: /docs
+        - prefix: /v1alpha/docs
   principalBinding: USE_ORIGIN

@@ -17,6 +17,9 @@
     * [Deploy Cloud Run Managed](#deploy-cloud-run-managed)
   * [Deploy Kubernetes](#deploy-kubernetes)
   * [Deploy App Engine](#deploy-app-engine)
+* [Security](#security)
+  * [Authentication](#authentication)
+  * [Authorization](#authorization)
 * [Development](#development)
 * [Testing](#testing)
 * [Contributing](#contributing)
@@ -353,19 +356,6 @@ You will see status of *Running* for the DS API pod
 
     curl -i -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha
 
-#### Apply Authentication and Authorization policies
-
-1. Authentication
-
-
-    cat authn/* | envsubst | kubectl apply -f -
-
-2. Authorization
-
-
-    cat authz/* | envsubst | kubectl delete -f -
-
-
 ### Deploy Cloud Run Managed
 Deploy with Cloud Run (Managed): \
 **Note**: There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--set-env-vars) provides details for how they are set.
@@ -436,6 +426,47 @@ TBD
 
 ## Delete Deployment
 TODO - should we provide steps or a script to delete all the assets after they have been deployed?
+
+
+## Security
+
+The DS API runs as a trusted application that communicates to GCP services in a data producer's project. A [service account](#service-account) is required with the appropriate GCP service IAM controls enabled following a least privileged model.
+
+Clients of the DS API will include end-users (data producers/admins and data consumers) from the DS UI application and service accounts from [Google Cloud Marketplace](https://cloud.google.com/marketplace) integration and other trusted applications (e.g POS systems)
+
+### Authentication
+
+Authentication is enforced by Istio [JWT Policies](https://archive.istio.io/v1.4/docs/reference/config/security/istio.authentication.v1alpha1/) at the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/). There are separate Policies for each supported Identity Provider: [Google](istio-manifests/1.4/authn/google-jwt-policy.yaml) and [Firebase](istio-manifests/1.4/authn/firebase-jwt-policy.yaml)
+
+1. Apply the authN policies:
+**Note**: `envsubst` will read the **PROJECT_ID** environment variable, substitute it in the template, then `kubectl` to apply the config:
+
+
+    cat istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -
+
+2. Verify the DS API is not accessible now:
+**Note**: Should be *401 Unauthorized*
+
+
+    curl -i -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha
+
+3. Verify the DS API is accessiblle with a valid Bearer ID Token:
+**Note**: Should be *200 OK*
+
+
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha
+
+### Authorization
+
+Authentication is enforced by Istio [JWT Policies](https://archive.istio.io/v1.4/docs/reference/config/security/istio.authentication.v1alpha1/) at the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/). There are separate Policies for each supported Identity Provider: [Google](istio-manifests/1.4/authn/google-jwt-policy.yaml) and [Firebase](istio-manifests/1.4/authn/firebase-jwt-policy.yaml)
+
+Apply the authN policies:
+
+    cat authn/* | envsubst | kubectl apply -f -
+
+
+    cat authz/* | envsubst | kubectl delete -f -
+
 
 ## Development
 
