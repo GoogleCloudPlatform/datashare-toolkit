@@ -234,7 +234,7 @@ Deploy with Cloud Run (Anthos) requires the following GKE [setup](https://cloud.
 1. Define an environment variables and gcloud tool default for the Compute Engine zone that you want to use for this tutorial:
 
 
-    ZONE=us-central1-f
+    ZONE=us-central1-a
     gcloud config set compute/zone $ZONE
 
 You can change the [zone](https://cloud.google.com/compute/docs/regions-zones)
@@ -242,7 +242,7 @@ You can change the [zone](https://cloud.google.com/compute/docs/regions-zones)
 2. Create a GKE cluster with the Cloud Run add-on:
 
 
-    CLUSTER=datashare-api
+    CLUSTER=datashare
 
     gcloud container clusters create $CLUSTER \
         --addons HorizontalPodAutoscaling,HttpLoadBalancing,CloudRun \
@@ -252,6 +252,7 @@ You can change the [zone](https://cloud.google.com/compute/docs/regions-zones)
         --machine-type e2-standard-2
 
 This tutorial requires GKE version 1.15.11-gke.9 and later, 1.16.8-gke.7 and later, or 1.17.4-gke.5 and later.
+The **e2-standard-2** [compute machine type](https://cloud.google.com/compute/docs/machine-types#e2_standard_machine_types) requires the least amount of compute resources to run the service.
 
 #### Installing the Istio sidecar injector webhook
 Istio authorization relies on the [Istio sidecar proxy](https://archive.istio.io/v1.4/docs/ops/deployment/architecture/). You use the [Istio sidecar injector webhook](https://archive.istio.io/v1.4/docs/setup/additional-setup/sidecar-injection/) to add the sidecar proxy to your Cloud Run for Anthos services.
@@ -309,28 +310,27 @@ This command sets the pilot.enabled flag to false to create a manifest file that
 
 #### Deploy the service
 
-1. Create a namespace called *datashare* in the GKE cluster:
+1. Create a namespace called **datashare-apis** in the GKE cluster:
 
 
-    kubectl create namespace datashare
+    kubectl create namespace datashare-apis
 
-2. Label the *datashare* namespace with `istio-injection=enabled` so that the Istio sidecar proxy is injected to all pods in the namespace by default:
-
-
-    kubectl label namespace datashare istio-injection=enabled
+2. Label the **datashare-apis** namespace with `istio-injection=enabled` so that the Istio sidecar proxy is injected to all pods in the namespace by default:
 
 
-3. Deploy ths DS API service to Cloud Run for Anthos in the *datashare* namespace:
+    kubectl label namespace datashare-apis istio-injection=enabled
 
 
-    gcloud run deploy ds-api \
+3. Deploy ths DS API service to Cloud Run for Anthos in the **datashare-apis** namespace:
+
+
+    gcloud run deploy cds-api \
       --cluster $CLUSTER \
       --cluster-location $ZONE \
       --min-instances 1 \
-      --namespace datashare \
-      --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
-      --platform gke \
-      --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+      --namespace datashare-apis \
+      --image gcr.io/${PROJECT_ID}/cds-api:${TAG} \
+      --platform gke
 
 This command creates a [Knative Serving service](https://github.com/knative/serving/blob/master/docs/spec/overview.md) object.
 
@@ -340,15 +340,31 @@ The `--min-instances 1` option prevents timing conflicts between the Istio and K
 You will see status of *Running* for the DS API pod
 
 
-    kubectl get gw,deploy,po,svc -n tutorial
+    kubectl get gw,deploy,po,svc -n datashare-apis
 
 5. Cloud Run for Anthos exposes services on the external IP address of the [Istio ingress gateway](https://archive.istio.io/v1.4/docs/concepts/traffic-management/#gateways). Retrieve the external IP address and store it in an environment variable:
 
 
     GATEWAY_IP=`kubectl -n gke-system get svc istio-ingress -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`; echo $GATEWAY_IP
 
+6. Verify the DS API is running based off the active version url:
+**Note**: The service external fqdn will be `'<service>.<namespace>.<domain>'` and **example.com** is the default knative domain.
 
-#### Confirm your API is running
+
+    curl -i -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha
+
+#### Apply Authentication and Authorization policies
+
+1. Authentication
+
+
+    cat authn/* | envsubst | kubectl apply -f -
+
+2. Authorization
+
+
+    cat authz/* | envsubst | kubectl delete -f -
+
 
 ### Deploy Cloud Run Managed
 Deploy with Cloud Run (Managed): \
