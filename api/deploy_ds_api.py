@@ -81,7 +81,25 @@ def GenerateConfig(context):
   if gitReleaseVersion != "master":
       steps.insert(2, gitRelease) # insert the git checkout command into after the git clone step
 
-  resources = [{
+  resources = None
+  # include the dependsOn property if we are deploying all the components
+  useRuntimeConfigWaiter = context.properties['useRuntimeConfigWaiter']
+  if useRuntimeConfigWaiter:
+    waiterName = context.properties['waiterName']
+    resources = [{
+      'name': 'ds-api-build',
+      'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
+      'metadata': {
+          'runtimePolicy': ['UPDATE_ALWAYS'],
+          'dependsOn': [waiterName]
+      },
+      'properties': {
+          'steps': steps,
+          'timeout': context.properties['timeout']
+      }
+    }]
+  else:
+    resources = [{
       'name': 'ds-api-build',
       'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
       'metadata': {
@@ -91,5 +109,5 @@ def GenerateConfig(context):
           'steps': steps,
           'timeout': context.properties['timeout']
       }
-  }]
+    }]
   return { 'resources': resources }

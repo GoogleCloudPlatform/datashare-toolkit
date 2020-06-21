@@ -44,11 +44,8 @@ input:
         '0': 'debian'
     - name: zone
       title: Zone
-      subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
     - name: machineType
       title: Machine type
-    #- name: acceleratorType
-    #  title: GPUs
     - name: bootDiskType
       title: cds-boot-disk type
       section: BOOT_DISK
@@ -78,12 +75,12 @@ input:
       tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
       section: NETWORKING
       level: 1
-    - name: input_adminEmail
-      title: Enter your e-mail here
-      subtext: admin email of your GCP project
-      tooltip: Tooltipe for this input field
-      validation: Please enter a valid email address
-      placeholder: user@example.com
+    #- name: input_adminEmail
+    #  title: Enter your e-mail here
+    #  subtext: admin email of your GCP project
+    #  tooltip: Tooltipe for this input field
+    #  validation: Please enter a valid email address
+    #  placeholder: user@example.com
     - name: input_datashareGithubReleaseVersion
       title: Github Datashare Release Version
       placeholder: v0.3.1
@@ -97,8 +94,10 @@ input:
       subtext: <a href="https://cloud.google.com/storage/docs/locations">Valid Storage Bucket locations</a>
       tooltip: Create the storage buckets in the specified region; default is US.
       placeholder: US
-    ##- name: input_booleanField1
-    ##  title: Boolean checkbox used to
+    - name: input_useRuntimeConfigWaiter
+      title: Use Google RuntimeConfig Waiter to setup Datashare prereqs.
+      tooltip: Enables the <a href="https://cloud.google.com/deployment-manager/runtime-configurator/create-and-delete-runtimeconfig-resources">RuntimeConfig beta</a> feature that will execute a startup-script in the VM to enable APIs, upload Cloud Function source code and configure Cloud Run.
+
   sections:
     - name: BOOT_DISK
       title: Boot Disk
@@ -160,6 +159,6 @@ runtime:
 
 annotations:
   autogenSpecType: 'SINGLE_VM'
-  vmImage0: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20200521
+  vmImage0: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20200618
 
 metadata_version: v1

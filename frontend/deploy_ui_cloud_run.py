@@ -65,7 +65,24 @@ def GenerateConfig(context):
   if gitReleaseVersion != "master":
       steps.insert(1, gitRelease)
 
-  resources = [{
+  # include the dependsOn property if we are deploying all the components
+  useRuntimeConfigWaiter = context.properties['useRuntimeConfigWaiter']
+  if useRuntimeConfigWaiter:
+    waiterName = context.properties['waiterName']
+    resources = [{
+      'name': 'ds-ui-build',
+      'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
+      'metadata': {
+          'runtimePolicy': ['UPDATE_ALWAYS'],
+          'dependsOn': [waiterName]
+      },
+      'properties': {
+          'steps': steps,
+          'timeout': context.properties['timeout']
+      }
+    }]
+  else:
+    resources = [{
       'name': 'ds-ui-build',
       'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
       'metadata': {
@@ -75,5 +92,6 @@ def GenerateConfig(context):
           'steps': steps,
           'timeout': context.properties['timeout']
       }
-  }]
+    }]
+  
   return { 'resources': resources }

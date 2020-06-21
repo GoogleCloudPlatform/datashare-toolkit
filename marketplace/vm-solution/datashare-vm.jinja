@@ -10,6 +10,9 @@ imports:
 {% set datashareGitReleaseVersion = properties["input_datashareGithubReleaseVersion"] %}
 {% set gcpRegion = properties["input_gcpRegion"] %}
 {% set storageBucketLocation = properties["input_storageBucketLocation"] %}
+{% set useRuntimeConfigWaiter = properties["input_useRuntimeConfigWaiter"] %}
+{% set waiterName = env["deployment"] + "-startup-waiter" %}
+{% set configName = env["deployment"] + "-startup-config" %}
 
 {% set deployment = env["deployment"] %}
 {% set name = "%s-vm-tmpl" % env["name"] %}
@@ -30,7 +33,7 @@ imports:
 {% set canIpForward = properties["ipForward"] == "On" %}
 
 {% set imageProjects = ["debian-cloud"] %}
-{% set imageNames = ["debian-9-stretch-v20200521"] %}
+{% set imageNames = ["debian-9-stretch-v20200618"] %}
 {% set selectedImageIndex = properties["image"]|int %}
 
 resources:
@@ -43,6 +46,8 @@ resources:
       #projection: full
       location: {{ storageBucketLocation }}
       storageClass: STANDARD
+
+  {% if useRuntimeConfigWaiter %}  
   - type: storage.v1.bucket
     name: {{ project }}-install-bucket
     properties:
@@ -52,22 +57,26 @@ resources:
       #projection: full
       location: {{ storageBucketLocation }}
       storageClass: STANDARD
+  {% endif %}
+
+  ## Deploy the Ingestion Cloud Function
   - name: function
     type: cloud_function.py
     properties:
       # All the files that start with this prefix will be packed in the Cloud Function
       codeLocation: function/
-      codeBucket: fsi-cds-markeplace-sw-dev-datashare-cloud-function
+      codeBucket: {{ project }}-install-bucket
+      ## codeBucket: fsi-cds-markeplace-sw-dev-datashare-cloud-function
       codeBucketObject: datashare-toolkit-cloud-function.zip
       location: {{ gcpRegion }}
       timeout: 60s
       runtime: nodejs10
       availableMemoryMb: 256
       entryPoint: processEvent
+      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
+      waiterName: {{ waiterName }}
       #temp: $(ref.{{ name }}.selfLink)
-    ##metadata:
-    ##  dependsOn:
-    ##  - {{ name }} # depends on the VM instance startup script executing first.
+
   ## Deploy Datashare API
   - name: build-api
     type: deploy_ds_api.py
@@ -80,6 +89,9 @@ resources:
       region: {{ gcpRegion }}
       timeout: 600s
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
+      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
+      waiterName: {{ waiterName }}
+    
   ## Deploy Datashare UI
   - name: build-ui
     type: deploy_ui_cloud_run.py
@@ -89,13 +101,16 @@ resources:
       region: {{ gcpRegion }}
       timeout: 600s
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
+      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
+      waiterName: {{ waiterName }}
+  
+  ## Deploy the VM instance
   - name: {{ name }}
     type: vm_instance.py
-    metadata:
-      dependsOn:
-      - {{ project }}-install-bucket # depneds on the install bucket being created.
     properties:
       instanceName: {{ instanceName }}
+      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
+      waiterConfigName: {{ configName }}
       sourceImage: https://www.googleapis.com/compute/v1/projects/{{ imageProjects[selectedImageIndex] }}/global/images/{{ imageNames[selectedImageIndex] }}
       zone: {{ zone }}
       machineType: {{ machineType }}
@@ -127,27 +142,119 @@ resources:
             - 'https://www.googleapis.com/auth/logging.write'
             - 'https://www.googleapis.com/auth/monitoring.write'
             - 'https://www.googleapis.com/auth/cloud-platform'
+            - 'https://www.googleapis.com/auth/cloudruntimeconfig'
+
       metadata:
         items:
           - key: adminEmail
             value: {{ adminEmail }}
+          - key: datashareGitReleaseVersion
+            value: {{ datashareGitReleaseVersion }}
+          {% if useRuntimeConfigWaiter %}  
+          - key: useRuntimeConfigWaiter
+            value: {{ useRuntimeConfigWaiter }}
+          - key: configName
+            value: {{ configName }}
+          {% endif %}
           - key: startup-script
             value: |-
               #!/bin/bash
+
               # use curl and metadata url to access adminEmail
-              ADMIN_EMAIL=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/adminEmail -H "Metadata-Flavor: Google"`
-              echo $ADMIN_EMAIL
-              #echo "Enabling cloudresourcemanger.googleapis.com api"
-              gcloud services enable cloudresourcemanager.googleapis.com
-              echo "DS deployment successful"
+              #ADMIN_EMAIL=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/adminEmail -H "Metadata-Flavor: Google"`
+              #echo $ADMIN_EMAIL
+              CLOUD_FUNCTION_ZIP_FILE_NAME="datashare-toolkit-cloud-function.zip"
+              USE_RUNTIME_CONFIG_WAITER=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/useRuntimeConfigWaiter -H "Metadata-Flavor: Google"`
+              echo $USE_RUNTIME_CONFIG_WAITER
+              if [ "$USE_RUNTIME_CONFIG_WAITER" = "true" ]; then
+                echo "Using Runtime Config Waiter to install Datashare prerequisites..."
+                IS_GIT_INSTALLED=`dpkg-query -W -f='${Status}\n' git`
+                if [ "$IS_GIT_INSTALLED" != "install ok installed" ]; then
+                    echo "Installing git."
+                    sudo apt-get install git -y
+                fi
+                IS_ZIP_INSTALLED=`dpkg-query -W -f='${Status}\n' zip`
+                if [ "$IS_ZIP_INSTALLED" != "install ok installed" ]; then
+                    echo "Installing zip."
+                    sudo apt-get install zip -y
+                fi
+                
+                cd /opt
+                echo "Cloning the Datashare repository..."
+                git clone https://github.com/GoogleCloudPlatform/datashare-toolkit.git
+                
+                # checkout the Datashare release version specified in the Deployment package description
+                cd datashare-toolkit
+                DATASHARE_GIT_RELEASE_VERSION=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/datashareGitReleaseVersion -H "Metadata-Flavor: Google"`
+                echo $DATASHARE_GIT_RELEASE_VERSION
+                if [ "$DATASHARE_GIT_RELEASE_VERSION" != "master" ]; then
+                    echo "Using Datashare release version $DATASHARE_GIT_RELEASE_VERSION"
+                    git checkout -b $DATASHARE_GIT_RELEASE_VERSION # this should be changed to external metadata
+                fi
+                
+                cd ..
+                FUNCTION_SHARED="./datashare-toolkit/ingestion/batch/shared"
+                if [ -d "${FUNCTION_SHARED}" ]; then
+                    rm -R "${FUNCTION_SHARED}"
+                fi
+
+                echo "Copying shared module into function directory..."
+                sudo cp -R datashare-toolkit/shared/ "${FUNCTION_SHARED}/"
+
+                # linux
+                echo 'Running on linux, performing package.json replacement for cds-shared module'
+                sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ./datashare-toolkit/ingestion/batch/package.json
+
+                # Zip the Cloud Function package
+                cd /opt/datashare-toolkit/ingestion/batch
+                zip -r $CLOUD_FUNCTION_ZIP_FILE_NAME * .eslintrc.json configurationManager.js index.js package.js package-lock.json shared/
+
+                #PROJECT=`curl http://metadata.google.internal/computeMetadata/v1/project/project-id -H "Metadata-Flavor: Google"`
+                export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
+
+                # Upload Cloud Function to Google Cloud storage
+                gsutil cp $CLOUD_FUNCTION_ZIP_FILE_NAME gs://$PROJECT_ID-install-bucket/
+                # TODO - we should notify a new Waiter here so that the Cloud Function deployment can start at this point instead of waiting until the end.
+
+                echo "Enabling Cloud APIs"
+                gcloud services enable cloudbuild.googleapis.com --quiet
+                gcloud services enable iam.googleapis.com --quiet
+                gcloud services enable run.googleapis.com --quiet
+                gcloud services enable cloudresourcemanager.googleapis.com --quiet
+                echo "Updating apt-get and updating gcloud..." 
+                sudo apt-get -y update && sudo apt-get -y --only-upgrade install google-cloud-sdk-skaffold kubectl google-cloud-sdk-anthos-auth google-cloud-sdk-minikube google-cloud-sdk google-cloud-sdk-app-engine-grpc google-cloud-sdk-kind google-cloud-sdk-pubsub-emulator google-cloud-sdk-app-engine-go google-cloud-sdk-firestore-emulator google-cloud-sdk-cloud-build-local google-cloud-sdk-datastore-emulator google-cloud-sdk-kpt google-cloud-sdk-app-engine-python google-cloud-sdk-spanner-emulator google-cloud-sdk-cbt google-cloud-sdk-bigtable-emulator google-cloud-sdk-app-engine-python-extras google-cloud-sdk-datalab google-cloud-sdk-app-engine-java
+                sudo apt-get -y install google-cloud-sdk
+                echo "Notifiying Waiter that this VM startup script is complete..."
+                CONFIG_NAME=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/configName -H "Metadata-Flavor: Google"`
+                echo $CONFIG_NAME
+                gcloud beta runtime-config configs variables set success/my-instance success --config-name $CONFIG_NAME
+                echo "VM startup-script finished!"
+              else
+                echo "Will not use Google Cloud Runtime Config Waiter to install prerequisites."
+                echo "You must install the prerequisites before you launch this service. Execute the install-datashare-prerequisites.sh file from Cloud Shell."
+                echo "The file is located in the datashare-toolkit/marketplace folder."
+                echo "VM startup-script finished!"
+              fi
+              
       tags:
         items:
           - {{ env["deployment"] }}-deployment
-  - name: generated-password-0
-    type: password.py
+  
+  # Runtime Config Waiter
+  {% if useRuntimeConfigWaiter %}
+  - name: my-waiter
+    type: waiter.jinja
     properties:
-      length: 8
-      includeSymbols: True
+      #instanceName: cds-vm-1
+      instanceName: {{ instanceName }}
+  {% endif %}
+
+  #- name: generated-password-0
+  #  type: password.py
+  #  properties:
+  #    length: 8
+  #    includeSymbols: True
+
   {% if properties["enableTcp80"] %}
   - name: {{ env["deployment"] }}-tcp-80
     type: compute.v1.firewall
