@@ -2,12 +2,19 @@
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-firebase-users
-  namespace: datashare
+  name: allow-data-consumers
+  namespace: datashare-apis
 spec:
   action: ALLOW
   rules:
-  - when:
+  - to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/v1alpha/projects/$PROJECT_ID/accounts/*"]
+    - operation:
+        methods: ["POST"]
+        paths: ["/v1alpha/projects/$PROJECT_ID/accounts:*"]
+    when:
     - key: request.auth.claims[aud]
       values:
       - $PROJECT_ID

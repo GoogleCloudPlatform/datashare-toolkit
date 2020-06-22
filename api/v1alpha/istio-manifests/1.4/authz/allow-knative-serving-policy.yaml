@@ -3,7 +3,7 @@ apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
   name: allow-knative-serving
-  namespace: datashare
+  namespace: datashare-apis
 spec:
   action: ALLOW
   rules:

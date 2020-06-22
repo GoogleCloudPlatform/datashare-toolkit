@@ -345,6 +345,16 @@ You will see status of *Running* for the DS API pod
 
     kubectl get gw,deploy,po,svc -n datashare-apis
 
+You can also run the `glcoud run services describe` command to see the status:
+
+
+    gcloud run services describe cds-api \
+      --cluster $CLUSTER \
+      --cluster-location $ZONE \
+      --namespace datashare-apis \
+      --platform gke
+
+
 5. Cloud Run for Anthos exposes services on the external IP address of the [Istio ingress gateway](https://archive.istio.io/v1.4/docs/concepts/traffic-management/#gateways). Retrieve the external IP address and store it in an environment variable:
 
 
@@ -432,13 +442,13 @@ TODO - should we provide steps or a script to delete all the assets after they h
 
 The DS API runs as a trusted application that communicates to GCP services in a data producer's project. A [service account](#service-account) is required with the appropriate GCP service IAM controls enabled following a least privileged model.
 
-Clients of the DS API will include end-users (data producers/admins and data consumers) from the DS UI application and service accounts from [Google Cloud Marketplace](https://cloud.google.com/marketplace) integration and other trusted applications (e.g POS systems).
+Clients of the DS API will include end-users (data producers/admins and data consumers) from the DS UI application and service accounts from [Google Cloud Marketplace](https://cloud.google.com/marketplace) integration and/or other trusted applications (e.g POS systems).
 
-All clients and applications will be authenticated by the Identity Providers provided in the configurations [here](istio-manifests/1.4/authn/). The only unauthented requests to the DS API will be for clients that required [CORS](https://www.w3.org/wiki/CORS) preflight fetch or *OPTIONS* requests e.g. [XMLHttpRequest (XHR)](https://www.w3.org/TR/XMLHttpRequest/)
+All clients and applications will be authenticated by the Identity Providers provided in the Istio [JWT Policies](https://archive.istio.io/v1.4/docs/reference/config/security/istio.authentication.v1alpha1/) configurations [here](istio-manifests/1.4/authn/). The only unauthented requests to the DS API will be for clients that required [CORS](https://www.w3.org/wiki/CORS) preflight fetch or *OPTIONS* requests e.g. [XMLHttpRequest (XHR)](https://www.w3.org/TR/XMLHttpRequest/). These requests will still have strict [Authorization](#authorization) rules enforced.
 
 ### Authentication
 
-Authentication is enforced by Istio [JWT Policies](https://archive.istio.io/v1.4/docs/reference/config/security/istio.authentication.v1alpha1/) at the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/). There are two JWT origins for each supported Identity Provider: Google and Firebase [here](istio-manifests/1.4/authn/google-firebase-jwt-policy.tmpl.yaml)
+Authentication is enforced by Istio JWT Policies at the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/). There are three JWT origins for each supported Identity Provider: Google, Firebase, and Marketplace [here](istio-manifests/1.4/authn/default-jwt-policy.tmpl.yaml)
 
 1. Apply the authN policies:
 **Note**: `envsubst` will read the **PROJECT_ID** environment variable, substitute it in the template, then `kubectl` to apply the config:
@@ -446,29 +456,84 @@ Authentication is enforced by Istio [JWT Policies](https://archive.istio.io/v1.4
 
     cat istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -
 
-2. Verify the DS API is not accessible now:
-**Note**: Should be *401 Unauthorized*
+2. Verify the DS API is not accessible:
+**Note**: The HTTP response code should be *401 Unauthorized*
 
 
     curl -i -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha
 
-3. Verify the DS API is accessiblle with a valid Bearer ID Token:
-**Note**: Should be *200 OK*
+3. Verify the DS API is accessible with a valid Bearer ID Token:
+**Note**: The HTTP response code should be *200 OK*
 
 
     curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha
 
+4. Verify the DS API preflight requests are accessible without a valid Bearer ID Token:
+**Note**: The HTTP response code should be *200 OK*
+
+
+     curl -i -X OPTIONS -H "Origin: http://cds-ui.a.run.app" -H "Access-Control-Request-Method: POST" -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha
+
+
+You now have [authentication](#authentication) enabled for all endpoints and methods in the DS API service. Next step is to enforce [authorization](#authorization) for the clients:
+
 ### Authorization
 
-Authentication is enforced by Istio [JWT Policies](https://archive.istio.io/v1.4/docs/reference/config/security/istio.authentication.v1alpha1/) at the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/). There are separate Policies for each supported Identity Provider: [Google](istio-manifests/1.4/authn/google-jwt-policy.yaml) and [Firebase](istio-manifests/1.4/authn/firebase-jwt-policy.yaml)
+Authorization is enabled implicitly via Istio [Authorization Policy](https://archive.istio.io/v1.4/docs/concepts/security/#authorization-policy) and access to the workload or services are **denied by default** when a policy is enabled. The Authorization policies are dividied into separate roles based off the end-user or client defined in [Security](#security) above. \
+**Note**: These can be refined if additional roles are required.
 
-Apply the authN policies:
+#### Data Producers:
+Datashare project administrators or service accounts that require read-write access to all Datashare API services and methods. These users are authenticated via Google.
+* read-write access to all `*`
 
-    cat authn/* | envsubst | kubectl apply -f -
+#### Data Consumers:
+Datashare end-user or data consumers that require read-write access to Account registration endpoints and read-only access to Accounts. These users are authenticated via Firebase (Identity Platform).
+* read-write (POST) access to `accounts:*`
+* read-only (GET) access to `accounts`
+
+#### Marketplace Service Account:
+Google Cloud Marketplace integration Service Account that is required for redirecting end-users to registration and sign-up pages in the UI. This service account authenticates via Google.
+* read-write (POST) access to `accounts:*`
+* read-only (GET) access to `accounts`
+
+#### Preflight Requests:
+Unauthenticated clients (single page applications) and browsers that make CORS preflight requests require *OPTIONS* to all service endpoints:
+* read-only (OPTIONS) access to `*`
+
+Before you apply the AuthZ policies, export the **DATA_PRODUCERS** environment variable as a comma separated list of email addresses: e.g.
+**Note**: You can wildcard an email address domain or explicity add them individually
 
 
-    cat authz/* | envsubst | kubectl delete -f -
+    export DATA_PRODUCERS="*@google.com"
+    export DATA_PRODUCERS="abc@xyz.com,my-trusted-app@my-gcp-project.iam.gserviceaccount.com"
 
+
+1. Apply the authZ policies:
+**Note**: `envsubst` will read the **PROJECT_ID**, **DATA_PRODUCERS**, environment variable, substitute it in the template, then `kubectl` to apply the config:
+
+
+    cat istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
+
+2. Verify the DS API is not accessible:
+**Note**: The HTTP response code should be *401 Unauthorized*
+
+
+    curl -i -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha
+
+3. Verify the DS API is accessible with a valid Bearer ID Token:
+**Note**: The HTTP response code should be *200 OK*
+
+
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha
+
+4. Verify the DS API preflight requests are accessible without a valid Bearer ID Token:
+**Note**: The HTTP response code should be *200 OK*
+
+
+     curl -i -X OPTIONS -H "Origin: http://cds-ui.a.run.app" -H "Access-Control-Request-Method: POST" -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha
+
+
+You now have [authorization](#authorization) enabled for all endpoints and methods in the DS API service.
 
 ## Development
 
