@@ -5,7 +5,7 @@ metadata:
   # global policy per namespace if name is 'default' without targets
   #name: default
   #namespace: datashare-apis
-  name: google-jwt
+  name: google-firebase-jwt
   namespace: gke-system
 spec:
   targets:
@@ -17,6 +17,16 @@ spec:
   - jwt:
       issuer: https://accounts.google.com
       jwksUri: https://www.googleapis.com/oauth2/v3/certs
+      triggerRules:
+      - excludedPaths:
+        - exact: /healthz
+        - exact: /metrics
+        - exact: /probe
+        - prefix: /_internal/knative
+        - prefix: /v1alpha/docs
+  - jwt:
+      issuer: https://securetoken.google.com/$PROJECT_ID
+      jwksUri: https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com
       triggerRules:
       - excludedPaths:
         - exact: /healthz

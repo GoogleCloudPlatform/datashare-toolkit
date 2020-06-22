@@ -432,11 +432,13 @@ TODO - should we provide steps or a script to delete all the assets after they h
 
 The DS API runs as a trusted application that communicates to GCP services in a data producer's project. A [service account](#service-account) is required with the appropriate GCP service IAM controls enabled following a least privileged model.
 
-Clients of the DS API will include end-users (data producers/admins and data consumers) from the DS UI application and service accounts from [Google Cloud Marketplace](https://cloud.google.com/marketplace) integration and other trusted applications (e.g POS systems)
+Clients of the DS API will include end-users (data producers/admins and data consumers) from the DS UI application and service accounts from [Google Cloud Marketplace](https://cloud.google.com/marketplace) integration and other trusted applications (e.g POS systems).
+
+All clients and applications will be authenticated by the Identity Providers provided in the configurations [here](istio-manifests/1.4/authn/). The only unauthented requests to the DS API will be for clients that required [CORS](https://www.w3.org/wiki/CORS) preflight fetch or *OPTIONS* requests e.g. [XMLHttpRequest (XHR)](https://www.w3.org/TR/XMLHttpRequest/)
 
 ### Authentication
 
-Authentication is enforced by Istio [JWT Policies](https://archive.istio.io/v1.4/docs/reference/config/security/istio.authentication.v1alpha1/) at the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/). There are separate Policies for each supported Identity Provider: [Google](istio-manifests/1.4/authn/google-jwt-policy.yaml) and [Firebase](istio-manifests/1.4/authn/firebase-jwt-policy.yaml)
+Authentication is enforced by Istio [JWT Policies](https://archive.istio.io/v1.4/docs/reference/config/security/istio.authentication.v1alpha1/) at the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/). There are two JWT origins for each supported Identity Provider: Google and Firebase [here](istio-manifests/1.4/authn/google-firebase-jwt-policy.tmpl.yaml)
 
 1. Apply the authN policies:
 **Note**: `envsubst` will read the **PROJECT_ID** environment variable, substitute it in the template, then `kubectl` to apply the config:
