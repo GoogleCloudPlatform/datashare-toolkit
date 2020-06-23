@@ -11,5 +11,6 @@ spec:
     - key: request.auth.claims[iss]
       values:
       - https://accounts.google.com
+      - https://securetoken.google.com/$PROJECT_ID
     - key: request.auth.claims[email]
       values: ["$DATA_PRODUCERS"]
