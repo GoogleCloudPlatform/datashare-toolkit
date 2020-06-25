@@ -238,7 +238,7 @@ async function listTables(projectId, datasetId, labelKey) {
         let tables = await bigqueryUtil.getTablesByLabel(projectId, datasetId, labelKey);
         return { success: true, data: tables }
     } catch (err) {
-        return { success: false, errors: ['Failed to retrieve tables'] };
+        return { success: false, errors: ['Failed to retrieve tables', err] };
     }
 }
 
