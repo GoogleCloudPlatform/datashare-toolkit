@@ -529,7 +529,7 @@ export default {
           this.$store.dispatch('savePolicy', data).then(result => {
             this.loading = false;
             if (!result.success) {
-              this.errorDialogTitle = 'Error saving account';
+              this.errorDialogTitle = 'Error saving policy';
               this.errorDialogText = result.errors.join(', ');
               this.showError = true;
             } else {

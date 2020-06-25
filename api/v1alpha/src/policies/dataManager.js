@@ -224,6 +224,14 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
         _policyId = uuidv4();
     }
 
+    if (data.marketplace && data.marketplace.solutionId && data.marketplace.planId) {
+        const isMarketplaceUnique = await isMarketplaceSolutionPlanUnique(projectId, policyId, data.marketplace.solutionId, data.marketplace.planId);
+        if (isMarketplaceUnique === false) {
+            const message = `Marketplace solutionId or planId is already defined. The combination of a solutionId and planId must be unique across all policies.`;
+            return { success: false, code: 500, errors: [message] };
+        }
+    }
+
     const rowId = uuidv4();
     const isDeleted = false;
     const createdAt = new Date().toISOString();
@@ -317,6 +325,36 @@ async function getPolicy(projectId, policyId) {
     } else {
         const message = `Policies do not exist with in table: '${table}'`;
         return { success: false, code: 400, errors: [message] };
+    }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} policyId
+ * @param  {} solutionId
+ * @param  {} planId
+ */
+async function isMarketplaceSolutionPlanUnique(projectId, policyId, solutionId, planId) {
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+    const sqlQuery = `SELECT
+    COUNT(policyId) as count
+FROM \`${table}\`
+WHERE
+    isDeleted IS FALSE
+    AND policyId != @policyId
+    AND marketplace IS NOT NULL and lower(marketplace.solutionId) = lower(@solutionId)
+    AND lower(marketplace.planId) = lower(@planId);`
+
+    let options = {
+        query: sqlQuery,
+        params: { policyId: policyId !== null ? policyId : '', solutionId: solutionId, planId: planId }
+    };
+    const [rows] = await bigqueryUtil.executeQuery(options);
+    console.log(JSON.stringify(rows));
+    if (rows[0].count === 0) {
+        return true;
+    } else {
+        return false;
     }
 }
 
