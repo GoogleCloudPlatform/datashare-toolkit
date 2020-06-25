@@ -1,9 +1,10 @@
-title: "DS API Spot Manager Role"
-description: "Custom DS API role for the Spot services to interface with GCP services"
+title: "CDS API Spot Manager Role"
+description: "Custom CDS API role for the Spot services to interface with GCP services"
 stage: "BETA"
 includedPermissions:
 - bigquery.datasets.create
 - bigquery.datasets.get
+- bigquery.datasets.update
 - bigquery.jobs.create
 - bigquery.tables.create
 - bigquery.tables.delete
