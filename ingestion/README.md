@@ -1,4 +1,4 @@
-[Back to CDS](../../README.md)
+[Back to DS](../../README.md)
 
 # Ingestion Cloud Function for batch data uploads
 
@@ -7,7 +7,7 @@ The dataset and table names were previously inferred from the name of the file p
 
 ## Synopsis
 
-`CDS`'s entry point is through a [Cloud Function](https://cloud.google.com/functions/) that is listening for
+`DS`'s entry point is through a [Cloud Function](https://cloud.google.com/functions/) that is listening for
 the [finalize event](https://cloud.google.com/functions/docs/calling/storage) in a [Cloud Storage](https://cloud.google.com/storage/) bucket. This function can be deployed to
 a bucket of your choice using the deployment script in [bin/deploy.sh](bin/deploy.sh).
 
@@ -35,7 +35,7 @@ A summary of the logic within the function is:
 After cloning the repository, this command will attach the Cloud Function to a storage bucket of your choosing:
 
 ```
-cd bq-datashare-toolkit/ingestion/bin
+cd datashare-toolkit/ingestion/bin
 ./deploy.sh --trigger-bucket=gs://<mybucket>
 ```
 At this point, any files uploaded to that bucket will trigger the
@@ -61,7 +61,7 @@ ones (each no larger than 1-1.5G) to upload and process individually.
 
 ### Schema definition and data transformation
 
-`CDS` supports two stages of data ingestion, both configurable via
+`DS` supports two stages of data ingestion, both configurable via
 files stored in the same Cloud Storage bucket as the data being
 uploaded.
 

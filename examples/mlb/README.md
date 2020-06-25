@@ -1,9 +1,9 @@
-[Back to CDS](../../README.md)
+[Back to DS](../../README.md)
 
 # Example scenario using Major League Baseball game logs
 
 ## Overview
-For this CDS example, we configure and load Major League Baseball [1871-2018 Game Logs](https://www.retrosheet.org/gamelogs/gl1871_2018.zip) which were sourced from [Retrosheet](https://www.retrosheet.org/gamelogs/index.html).
+For this DS example, we configure and load Major League Baseball [1871-2018 Game Logs](https://www.retrosheet.org/gamelogs/gl1871_2018.zip) which were sourced from [Retrosheet](https://www.retrosheet.org/gamelogs/index.html).
 
 ## Quick start
 
@@ -53,7 +53,7 @@ eventTrigger:
 labels:
   deployment-tool: cli-gcloud
 name: projects/thisuser-cloud-sandbox/locations/us-central1/functions/processUpload
-runtime: nodejs8
+runtime: nodejs10
 serviceAccountEmail: thisuser-cloud-sandbox@appspot.gserviceaccount.com
 sourceUploadUrl: https://storage.googleapis.com/gcf-upload-us-central1-081d71f7-3b71-4e31-bbb2-8668bf287101/bbcb0441-0571-4dbc-920a-5772b9c34e85.zip?GoogleAccessId=service-283242825526@gcf-admin-robot.iam.gserviceaccount.com&Expires=1572371537&Signature=dZLp9YyRa2y40pTFuz0%2BEgWR0oUKAC9CYFzFy2rfwyKpobnyo17RivMnXgkFhyw4izwHTdUy%2FSfg4jYXIjM6kt6GCGX%2FuTz2F4Mp0sNifUEZ5WueNGsVdHQ%2BWDuKAkiUd%2FrHfAxNWm3UrU%2BuR0MSZg2%2Baaz9hh5AzFEAGu9ixhm4rc3G5LNDp4kud8QCVz57Dtl5F7ZZSX3RRzVCPAkP7Fq7%2BYZLLsENDrEz4%2B04FDLiuPXddvkU9XpLZAahWlWKZL8T4Y6wJPhKuQHqY8RLR9jU1Vfkbp93%2BcMXcOPtue6eXOmVVKVhRYalXsoLUMTu2qutKgVkbTN8MBczKT9K2g%3D%3D
 status: ACTIVE

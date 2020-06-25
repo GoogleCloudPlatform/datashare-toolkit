@@ -22,6 +22,7 @@ const uuidv4 = require('uuid/v4');
 
 const ConfigValidator = require('./views/configValidator');
 const sqlBuilder = require('./views/sqlBuilder');
+const metaManager = require('../lib/metaManager');
 const cfg = require('../lib/config');
 
 /**
@@ -259,19 +260,23 @@ async function listTableColumns(projectId, datasetId, tableId) {
 /**
  * @param  {} projectId
  * @param  {} datasetId
+ * @param  {} includeAllFields
  */
-async function listDatasetViews(projectId, datasetId) {
+async function listDatasetViews(projectId, datasetId, includeAllFields) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
     let fields = new Set(cfg.cdsAuthorizedViewViewFields);
-    let remove = ['source', 'expiration', 'custom', 'viewSql', 'isDeleted'];
-    remove.forEach(f => fields.delete(f));
+    if (!includeAllFields) {
+        let remove = [];
+        remove.push('source', 'expiration', 'custom', 'viewSql', 'isDeleted');
+        remove.forEach(f => fields.delete(f));
+    }
     fields = Array.from(fields).map(i => 'v.' + i).join();
     let sqlQuery = `SELECT ${fields}
       FROM \`${table}\` v
-      WHERE isDeleted is false`;
+      WHERE isDeleted IS false`;
 
     if (datasetId) {
-        sqlQuery += '\nand datasetId = @datasetId'
+        sqlQuery += '\nAND datasetId = @datasetId'
     }
 
     let options = {
@@ -468,10 +473,14 @@ async function createOrUpdateDatasetView(projectId, datasetId, viewId, view, cre
 
 /**
  * @param  {} view
+ * @param  {} overrideSql
  */
-async function createView(view) {
+async function createView(view, overrideSql) {
+    let viewSql = overrideSql;
     try {
-        const viewSql = await sqlBuilder.generateSql(view);
+        if (!viewSql) {
+            viewSql = await sqlBuilder.generateSql(view);
+        }
         let metadataResult = await bigqueryUtil.getTableMetadata(view.datasetId, view.name);
 
         let viewMetadata = metadataResult.metadata;
@@ -533,17 +542,17 @@ async function createView(view) {
 
         let viewCreated = createViewResult && createViewResult.success;
         console.log("Authorizing view objects for access from other datasets");
-        if (view.hasOwnProperty('source')) {
+        if (view.hasOwnProperty('source') && view.source !== null) {
             let source = view.source;
             if (source.datasetId !== view.datasetId) {
                 // Need to authorize the view from the source tables
                 await bigqueryUtil.shareAuthorizeView(source.datasetId, view.projectId, view.datasetId, view.name, viewCreated);
             }
-            if (source.accessControl && source.accessControl.enabled === true && cfg.cdsDatasetId !== view.datasetId) {
+            if (view.accessControl && view.accessControl.enabled === true && cfg.cdsDatasetId !== view.datasetId) {
                 await bigqueryUtil.shareAuthorizeView(cfg.cdsDatasetId, view.projectId, view.datasetId, view.name, viewCreated);
             }
         }
-        else if(view.hasOwnProperty('custom')) {
+        else if(view.hasOwnProperty('custom') && view.custom !== null) {
             // Custom sql
             let custom = view.custom;
             if (custom.authorizeFromDatasetIds && custom.authorizeFromDatasetIds.length > 0) {
@@ -556,7 +565,7 @@ async function createView(view) {
         return { success: true, data: {} };
     }
     catch (err) {
-        console.error(`Failed to create view: ${JSON.stringify(view)} - ${JSON.stringify(err.message)}`);
+        console.error(`Failed to create view: ${JSON.stringify(view)} - ${JSON.stringify(err)}`);
         return { success: false, code: 500, errors: [err.message] };
     }
 }
@@ -606,5 +615,6 @@ module.exports = {
     getDatasetView,
     validateDatasetView,
     createOrUpdateDatasetView,
-    deleteDatasetView
+    deleteDatasetView,
+    createView
 };

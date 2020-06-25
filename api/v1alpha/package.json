@@ -21,7 +21,7 @@
     "scripts": {
         "dev": "nodemon src/index.js",
         "start": "functions-framework --target=processEvent",
-        "deploy": "gcloud functions deploy cds --memory=2GB --timeout=120s --runtime nodejs8 --trigger-http --entry-point app",
+        "deploy": "gcloud functions deploy cds --memory=2GB --timeout=120s --runtime nodejs10 --trigger-http --entry-point app",
         "lint": "eslint src",
         "test": "mocha 'tests/*_tests.js' --exit"
     },
@@ -35,6 +35,6 @@
     },
     "repository": {
         "type": "git",
-        "url": "git@github.com:GoogleCloudPlatform/cloud-datashare-toolkit.git"
+        "url": "git@github.com:GoogleCloudPlatform/datashare-toolkit.git"
     }
 }

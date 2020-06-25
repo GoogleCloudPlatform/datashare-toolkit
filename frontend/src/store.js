@@ -46,17 +46,7 @@ const store = new Vuex.Store({
     },
     isLoggedIn: state => {
       if (state.user && state.user.loggedIn && state.user.data.email) {
-        const whitelist = [
-          'mservidio@google.com',
-          'chrispage@google.com',
-          'cmbrown@google.com',
-          'sferrazza@google.com',
-          'paulmibus@google.com'
-        ];
-        return (
-          state.user.loggedIn === true &&
-          whitelist.includes(state.user.data.email)
-        );
+        return state.user.loggedIn === true;
       }
       return false;
     }

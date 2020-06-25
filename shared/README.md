@@ -1,4 +1,4 @@
-# Cloud Datashare - Shared Modules
+# Datashare - Shared Modules
 
 * [Overview](#overview)
 * [Testing](#testing)
@@ -14,14 +14,14 @@
 
 # Overview
 
-The [Cloud Datashare (CDS)](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit) Shared Modules directory provides a library of utility classes for the CDS services which include additional functionality or capabilities while avoiding duplicate logic. The majority of CDS services leverage the [Google Cloud Platform (GCP)](https://cloud.google.com/) [NodeJS SDK libraries](https://github.com/googleapis/google-cloud-node).
+The [Datashare (DS)](https://github.com/GoogleCloudPlatform/datashare-toolkit) Shared Modules directory provides a library of utility classes for the DS services which include additional functionality or capabilities while avoiding duplicate logic. The majority of DS services leverage the [Google Cloud Platform (GCP)](https://cloud.google.com/) [NodeJS SDK libraries](https://github.com/googleapis/google-cloud-node).
 
-**Note**: _The CDS Shared Modules are for internal use only and the public CDS interfaces are through the API or CLI._
+**Note**: _The DS Shared Modules are for internal use only and the public DS interfaces are through the API or CLI._
 
 
 ## Testing
 
-These instructions will run through testing the CDS Shared Modules via NodeJS and GCP [Cloud Build (GCB)](https://cloud.google.com/cloud-build) in your GCP project.
+These instructions will run through testing the DS Shared Modules via NodeJS and GCP [Cloud Build (GCB)](https://cloud.google.com/cloud-build) in your GCP project.
 
 
 ### Prerequisites
@@ -35,7 +35,7 @@ cloudkms.googleapis.com
 
 ### Service Account
 
-CDS Shared Modules makes authorized API calls to specific GCP project service(s). Any class or feature that imports the Shared Module classes will require a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](config/cds-fulfillments-mgr-role-definition.yaml).
+DS Shared Modules makes authorized API calls to specific GCP project service(s). Any class or feature that imports the Shared Module classes will require a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](config/cds-fulfillments-mgr-role-definition.yaml).
 
 For testing the Shared Modules, we provide an example using GCB to verfy integration testing is successful. GCB provides a default service account that is owned by GCP but SA permissions are managed by the GCP project owner [here](https://cloud.google.com/cloud-build/docs/securing-builds/set-service-account-permissions). Unfortunately, this service account does not have the appropriate *client_email* in it's credentials which is required when executing storage signUrl methods.
 
@@ -58,7 +58,7 @@ Set the **SERVICE\_ACCOUNT\_DESC** environment variable(s):
 
     export SERVICE_ACCOUNT_DESC="CDS Cloud Build Manager";
 
-Create the custom CDS service-account:
+Create the custom DS service-account:
 
     gcloud iam service-accounts create ${SERVICE_ACCOUNT_NAME} --display-name "${SERVICE_ACCOUNT_DESC}";
 

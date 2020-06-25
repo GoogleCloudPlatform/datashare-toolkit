@@ -1,5 +1,5 @@
-# CDS Frontend UI
-This documentation provides details for how to develop, build, and deploy new versions of the CDS Frontend UI. There are a few different deployment options for you to choose based on developer pererence and/or environment.
+# DS Frontend UI
+This documentation provides details for how to develop, build, and deploy new versions of the DS Frontend UI. There are a few different deployment options for you to choose based on developer pererence and/or environment.
 
 * [Prerequisites](#prereqs)
   * [Setup Backend API](#setup_backend)
@@ -11,17 +11,18 @@ This documentation provides details for how to develop, build, and deploy new ve
     * [Enable Authentication](#authentication)
     * [Install Firebase CLI](#firebase_cli)
   * [Deploy Cloud Run](#deploy_cloud_run)
+  * [Deploy Cloud Run with Deployment Manager](#deploy_cloud_run_deployment_manager)
   * [Deploy Firebase](#deploy_firebase)
 
 
 ## <a name="prereqs">Prerequisites</a>
-These are the prerequisites for the CDS Frontend UI
+These are the prerequisites for the DS Frontend UI
 
 
 ### <a name="setup_backend">Setup Backend API</a>
-CDS API setup is a dependency for the Frontend UI if you do not plan to use mock data or do not have an existing CDS API endpoint URL.
+DS API setup is a dependency for the Frontend UI if you do not plan to use mock data or do not have an existing DS API endpoint URL.
 
-[CDS API Documentation](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/tree/master/api)
+[DS API Documentation](https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/api)
 
 ## <a name="develop">Develop</a>
 You can develop the locally for now. [NodeJS](https://nodejs.org/en/)
@@ -38,7 +39,7 @@ Project setup:
 
     npm install
 
-You can choose to use mock API data or point to a CDS Admin REST API endpoint in the applicaiton settings page. The *VUE_APP_APICLIENT* environment variable will dynamically load between the two options.
+You can choose to use mock API data or point to a DS Admin REST API endpoint in the applicaiton settings page. The *VUE_APP_APICLIENT* environment variable will dynamically load between the two options.
 
 Using API client data that is mocked:
 
@@ -48,23 +49,23 @@ or Using API client data from an endpoint URL:
 
     VUE_APP_APICLIENT=server npm run serve
 
-Point your browser to http://localhost:8080 and update your CDS Frontend `API Base URL` in the UI settings [page](http://localhost:8080/settings)
+Point your browser to http://localhost:8080 and update your DS Frontend `API Base URL` in the UI settings [page](http://localhost:8080/settings)
 
    http://localhost:8080
 
 
 ## <a name="deployment">Deployment</a>
-Once you've deployed the [CDS API](https://github.com/GoogleCloudPlatform/cloud-datashare-toolkit/tree/master/api), you should only then proceed to setup the UI. You can deploy the Frontend content via various methods below based off developer preference and/or environment. These are the examples we provide, though you may use other hosting options:
+Once you've deployed the [DS API](https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/api), you should only then proceed to setup the UI. You can deploy the Frontend content via various methods below based off developer preference and/or environment. These are the examples we provide, though you may use other hosting options:
 
   * [Google Cloud Run](https://cloud.google.com/run/) via [gcloud](https://cloud.google.com/sdk/)
   * [Firebase Hosting](https://firebase.google.com/docs/hosting) via [firebase cli](https://firebase.google.com/docs/cli)
 
-[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the CDS Frontend content and generate a unique URL for consumption.
+[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the DS Frontend content and generate a unique URL for consumption.
 
 There are some Firebase configuration and environment variables that need to be set for all build and deployment options.
 
 ### <a name="deploy_prereqs">Deploy Prerequisites</a>
-The CDS Frontend is currently configured for Firebase authentication. A new Firebase project and Firebase application credentials are required for deployment.
+The DS Frontend is currently configured for Firebase authentication. A new Firebase project and Firebase application credentials are required for deployment.
 
 There are some environment variables that need to be set for all build and deployment options.
 
@@ -152,8 +153,8 @@ Build with Cloud Build and TAG:
 Deploy with Cloud Run:
 _Note_ - There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--set-env-vars) provides details for how they are set.
 
-    gcloud run deploy cds-frontend-ui \
-      --image gcr.io/${PROJECT_ID}/cds-frontend-ui:${TAG} \
+    gcloud run deploy ds-frontend-ui \
+      --image gcr.io/${PROJECT_ID}/ds-frontend-ui:${TAG} \
       --region=us-central1 \
       --allow-unauthenticated \
       --platform managed \
@@ -161,14 +162,40 @@ _Note_ - There are a few environment variables that need to be set before the ap
 
 Open the app URL in your browser. You can return the FQDN via:
 
-    gcloud run services describe cds-frontend-ui --platform managed --format="value(status.url)"
+    gcloud run services describe ds-frontend-ui --platform managed --format="value(status.url)"
 
+### <a name="deploy_cloud_run_deployment_manager">Deploy Cloud Run with Deployment Manager</a>
+Use Deployment Manager to deploy the Datashare UI with Cloud Run.
+_Cloud Run and Cloud Build APIs will need to be enabled in your GCP project._
+
+Deployment Manager will use Cloud Build to:
+* build the Docker container and save it to Google Container Registry
+* deploy the container to Cloud Run
+
+```
+gcloud deployment-manager deployments create ds-ui --config deploy_ui_cloud_run.yaml
+```
+
+**Note: If you delete the Deployment Manager template, the resources that it creates will NOT be deleted (container, Cloud Run deployment). You must delete these manually.**
+### <a name="deploy_cloud_run_deployment_manager_config">Configuration</a>
+
+Configure the deployment by updating the properties listed in `deploy_ui_cloud_run.yaml`.
+
+You must include your Firebase API Key before you deploy the Datashare UI.  
+
+```
+  properties:
+    firebaseApiKey: YOUR_FIREBASE_WEBAPI_KEY
+    containerTag: dev
+    region: us-central1
+    timeout: 600s
+```
 
 ### <a name="deploy_firebase">Deploy Firebase</a>
 Navigate to the frontend directory and modify the .firebaserc file with the Firebase projectId and save changes.
 
 ```
-cd ~/Git/cloud-datashare-toolkit/frontend
+cd ~/Git/datashare-toolkit/frontend
 vi .firebaserc
 
 {
