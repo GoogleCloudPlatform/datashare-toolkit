@@ -1,40 +1,55 @@
 description:
   author:
     title: Google Cloud Platform Financial Services Team
-    descriptionHtml: "Financial Services team provides Google Cloud Platform solutions for the financial services industry.  \n"
+    descriptionHtml: "Google Cloud Platform Financial Services team provides solutions for the financial services industry.\n"
     shortDescription: Google Cloud Platform Financial Services team provides solutions for the financial services industry.
-    url: https://www.google.com
-  descriptionHtml: Financial Services Cloud Datashare solution allows you to quickly ingest large volumes of data and share it with your customers.
-  logo: '@media/cds-vm_store.png'
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
+  descriptionHtml: The Datashare solution allows you to quickly ingest large volumes of data and share it with your customers.
+  logo: '@media/datashare-color-image-150px-v1.png'
   tagline: Ingest, entitle, share large volumes of data.
-  title: Cloud Datashare
-  url: https://www.google.com
+  title: Datashare
+  url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
   version: '1.0'
-  eulaUrl: https://www.google.com
+  eulaUrl: https://raw.githubusercontent.com/GoogleCloudPlatform/datashare-toolkit/ecada698551d3022ed12afbabba5e5eae43dfb03/LICENSE.txt
   softwareGroups:
   - type: SOFTWARE_GROUP_OS
     software:
-    - title: Ubuntu
-      version: 16.04 LTS
+    - title: Debian
+      version: v20200618 LTS
   - software:
-    - title: Apache
-      version: 2.4.23
+    - title: Datashare
+      version: 1.0.0
   documentations:
   - title: Getting Started
-    url: https://www.google.com
-    description: Get started docs for this example solution
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master
+    description: Checkout our Github repository documentation to learn more
     destinations:
     - DESTINATION_POST_DEPLOY
-  - title: Some more docs
-    url: https://www.google.com
-    description: Additional docs for this solution
+  - title: Datashare Ingestion Documentation
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/ingestion
+    description: Learn how to use Datashare batch ingestion
     destinations:
     - DESTINATION_POST_DEPLOY
-    - DESTINATION_CONFIGURATION
+  - title: Datashare UI Documentation
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/frontend
+    description: Learn how to use the Datashare UI
+    destinations:
+    - DESTINATION_POST_DEPLOY
+  - title: Datashare API Documentation
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/api
+    description: Learn how to use the Datashare API
+    destinations:
+    - DESTINATION_POST_DEPLOY
+  - title: Latest Documentation # displayed after user clicks launch button
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master
+    description: Additional documentation for this solution
+    destinations:
+    - DESTINATION_POST_DEPLOY
+    ##- DESTINATION_CONFIGURATION
   support:
   - title: Support
-    descriptionHtml: We provide limited support on this product.  
-    url: https://www.google.com
+    descriptionHtml: We provide limited support on this product.  Please submit a Github issue in our official Github repository.  
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/issues
 
 input:
   properties:
@@ -97,6 +112,7 @@ input:
     - name: input_useRuntimeConfigWaiter
       title: Use Google RuntimeConfig Waiter to setup Datashare prereqs.
       tooltip: Enables the <a href="https://cloud.google.com/deployment-manager/runtime-configurator/create-and-delete-runtimeconfig-resources">RuntimeConfig beta</a> feature that will execute a startup-script in the VM to enable APIs, upload Cloud Function source code and configure Cloud Run.
+      subtext: Enables CloudBuild, IAM, Cloud Run, Cloud Resource Manager APIs, and uploads Datashare Cloud Function to Cloud Storage.
 
   sections:
     - name: BOOT_DISK
@@ -130,32 +146,17 @@ runtime:
       description: 'The VM instance has been configured with no external IP or internet access. Connecting to it directly may not be possible. Consider using a <a href="https://cloud.google.com/compute/docs/instances/connecting-advanced#bastion_host">bastion host</a> to access this VM.'
       showIf: '{{ !outputs().hasExternalIP }}'
     - heading: Log on now
-      description: 'Start using your application by accessing the following URL: https://www.google.com'
-      snippet: $ some code snippets can go here, to show some examples
-    - heading: Another label
-      description: Another description
-      showIf: '{{ properties().input_booleanField1 }}'
-    - heading: Open HTTP traffic
-      description: >-
-        This firewall rule is not enabled.
-        To allow specific network traffic from the Internet,
-        create a firewall rule to open HTTP traffic
-        for target tag "{{ outputs().deployment }}-deployment".
-        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
-        If you are using Google Cloud SDK, type the following command in
-        the terminal:
-      snippet: >-
-        gcloud --project={{ outputs().project }} compute firewall-rules
-        create "{{ outputs().deployment }}-tcp-80"
-        --network {{ outputs().mainNetwork }}
-        --allow tcp:80
-        --target-tags "{{ outputs().deployment }}-deployment"
-      showIf: '{{ !properties().enableTcp80 }}'
-    - heading: Change the temporary password
-      description: For additional security, it is recommended that you change the password.
-    - heading: Assign a static external IP address to your VM instance
-      description: 'An ephemeral external IP address has been assigned to the VM instance. If you require a static external IP address, you may promote the address to static. <a href="https://cloud.google.com/compute/docs/instances-and-network#promote_ephemeral_ip">Learn more</a>'
-      showIf: '{{ outputs().hasExternalIP }}'
+      description: 'Start using the Datashare UI by accessing the URL from the commands below.'
+      snippet: gcloud run services list --platform=managed
+    - heading: Deployed with RuntimeConfig beta
+      description: Datashare was deployed using the Google Cloud Platform RuntimeConfig beta release to install dependencies.
+      showIf: '{{ properties().input_useRuntimeConfigWaiter }}'
+    #- heading: Remove Project Owner role from Compute Engine Service account
+    #  description: Remove the Project Owner role from the compute engine service account in <a href="https://cloud.google.com/shell">Cloud Shell</a>.
+    #  snippet: >-
+    #    $ export PROJECT_NUMBER=`gcloud projects list --filter=$(gcloud config get-value project) --format="value(PROJECT_NUMBER)"`
+    #    $ gcloud projects remove-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="roles/owner"
+    #  showIf: '{{ properties().input_useRuntimeConfigWaiter }}'
 
 annotations:
   autogenSpecType: 'SINGLE_VM'
