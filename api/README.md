@@ -230,9 +230,9 @@ Deploy with Cloud Run (Anthos) requires the following GKE [setup](https://cloud.
 
 * Create a GKE cluster with Cloud Run enabled
 * Install additional Istio components required for Istio authorization
-* TODO - Install additional Letsencrypt components required to auto manage TLS certificates and HTTPS
-* Configure GKE Workload identity for the service
 * Deploy the service
+* Configure GKE Workload identity for the service
+* TODO - Install additional Letsencrypt components required to auto manage TLS certificates and HTTPS
 
 #### Create a GKE Cluster with Cloud Run enabled
 
@@ -313,58 +313,33 @@ This command sets the pilot.enabled flag to false to create a manifest file that
 
     kubectl rollout status deploy istio-sidecar-injector -n gke-system
 
-
-#### Workload Identity
-Assuming the [service account](#service-account) was created above.
-**Note**: We will use the *default* KSA for now until loading multi-tenant KSA can be loaded via Google ADC
-
-    gcloud iam service-accounts add-iam-policy-binding \
-      --role roles/iam.workloadIdentityUser \
-      --member "serviceAccount:$PROJECT_ID.svc.id.goog[datashare-apis/default]" ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
-
-    kubectl annotate serviceaccount -n datashare-apis default iam.gke.io/gcp-service-account=${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
-
-~~1. Create the KSA:~~
-
-
-    kubectl create serviceaccount -n datashare-apis ${SERVICE_ACCOUNT_NAME};
-
-
-~~2. Bind the workloadIdentityUser~~
-
-
-    gcloud iam service-accounts add-iam-policy-binding \
-      --role roles/iam.workloadIdentityUser \
-      --member "serviceAccount:$PROJECT_ID.svc.id.goog[datashare-apis/${SERVICE_ACCOUNT_NAME}]" ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
-
-
-~~3. Annotate KSA to GSA~~
-
-
-    kubectl annotate serviceaccount -n datashare-apis ${SERVICE_ACCOUNT_NAME} iam.gke.io/gcp-service-account=${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
-
-
 #### Deploy the service
 
-1. Create a namespace called **datashare-apis** in the GKE cluster:
+1. Create a **NAMESPACE** environment variable called **datashare-apis**:
 
 
-    kubectl create namespace datashare-apis
+    export NAMESPACE=datashare-apis
 
-2. Label the **datashare-apis** namespace with `istio-injection=enabled` so that the Istio sidecar proxy is injected to all pods in the namespace by default:
-
-
-    kubectl label namespace datashare-apis istio-injection=enabled
+2. Create the **NAMESPACE** in the GKE cluster:
 
 
-3. Deploy ths DS API service to Cloud Run for Anthos in the **datashare-apis** namespace:
+    kubectl create namespace ${NAMESPACE}
+
+
+3. Label the **namespace** with `istio-injection=enabled` so that the Istio sidecar proxy is injected to all pods in the namespace by default:
+
+
+    kubectl label namespace ${NAMESPACE} istio-injection=enabled
+
+
+4. Deploy ths DS API service to Cloud Run for Anthos in the **NAMESPACE**:
 
 
     gcloud run deploy cds-api \
       --cluster $CLUSTER \
       --cluster-location $ZONE \
       --min-instances 1 \
-      --namespace datashare-apis \
+      --namespace ${NAMESPACE} \
       --image gcr.io/${PROJECT_ID}/cds-api:${TAG} \
       --platform gke
 
@@ -372,11 +347,11 @@ This command creates a [Knative Serving service](https://github.com/knative/serv
 
 The `--min-instances 1` option prevents timing conflicts between the Istio and Knative Serving sidecars, when scaling up from zero pods.
 
-4. Check the status of the deployment
+5. Check the status of the deployment
 You will see status of *Running* for the DS API pod
 
 
-    kubectl get gw,deploy,po,svc -n datashare-apis
+    kubectl get gw,deploy,po,svc -n ${NAMESPACE}
 
 You can also run the `glcoud run services describe` command to see the status:
 
@@ -384,7 +359,7 @@ You can also run the `glcoud run services describe` command to see the status:
     gcloud run services describe cds-api \
       --cluster $CLUSTER \
       --cluster-location $ZONE \
-      --namespace datashare-apis \
+      --namespace ${NAMESPACE} \
       --platform gke
 
 
@@ -398,6 +373,56 @@ You can also run the `glcoud run services describe` command to see the status:
 
 
     curl -i -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha
+
+#### Workload Identity
+In the new  GKE cluster, the DS API requires credentials from the [service account](#service-account) created above. Google recommends [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) for applications in GKE to communicate with GCP services. With Workload Identity, you configure a Kubernetes service account (KSA) (KSA) to act as a Google service account (GSA). Any workload running as the KSA automatically authenticates as the GSA when accessing Google Cloud APIs.\
+**Note**: We need to use the *default* KSA for now until multi-tenant KSA is supported in the [Google Auth NodeJS library](https://github.com/googleapis/google-auth-library-nodejs). The *default* KSA already exists in a cluster and namespace so we do not need to create it.
+
+
+1. Set the **NAMESPACE** environment variable (if not already):
+
+
+    export NAMESPACE=datashare-apis
+
+
+2. Set the **KSA_NAME** environment variable:
+
+
+    export KSA_NAME=default
+~~  export KSA_NAME=${SERVICE_ACCOUNT_NAME} ~~
+
+
+~~2. Create the new KSA:~~
+
+
+~~    kubectl create serviceaccount ${KSA_NAME} -n ${NAMESPACE};  ~~
+
+
+3. Bind the `iam.workloadIdentityUser` role for the KSA to GSA:
+
+
+    gcloud iam service-accounts add-iam-policy-binding \
+      --role roles/iam.workloadIdentityUser \
+      --member "serviceAccount:$PROJECT_ID.svc.id.goog[${NAMESPACE}/${KSA_NAME}]" ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+
+
+4. Complete the binding between the KSA and GSA:
+
+
+    kubectl annotate serviceaccount ${KSA_NAME} -n ${NAMESPACE} iam.gke.io/gcp-service-account=${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+
+
+5. You can check the binding via:
+
+
+    kubectl get serviceaccount ${KSA_NAME} -n ${NAMESPACE} -o yaml
+
+
+5. You should now be able to verify the DS API can communicate with GCP services:
+
+
+    curl -i -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha/projects/${PROJECT_ID}/datasets
+
 
 ### Deploy Cloud Run Managed
 Deploy with Cloud Run (Managed): \
