@@ -231,6 +231,8 @@ Deploy with Cloud Run (Anthos) requires the following GKE [setup](https://cloud.
 * Create a GKE cluster with Cloud Run enabled
 * Install additional Istio components required for Istio authorization
 * TODO - Install additional Letsencrypt components required to auto manage TLS certificates and HTTPS
+* Configure GKE Workload identity for the service
+* Deploy the service
 
 #### Create a GKE Cluster with Cloud Run enabled
 
@@ -250,6 +252,7 @@ You can change the [zone](https://cloud.google.com/compute/docs/regions-zones)
     gcloud container clusters create $CLUSTER \
         --addons HorizontalPodAutoscaling,HttpLoadBalancing,CloudRun \
         --cluster-version 1.16 \
+        --workload-pool=$PROJECT_ID.svc.id.goog \
         --enable-ip-alias \
         --enable-stackdriver-kubernetes \
         --machine-type e2-standard-2
@@ -309,6 +312,36 @@ This command sets the pilot.enabled flag to false to create a manifest file that
 
 
     kubectl rollout status deploy istio-sidecar-injector -n gke-system
+
+
+#### Workload Identity
+Assuming the [service account](#service-account) was created above.
+**Note**: We will use the *default* KSA for now until loading multi-tenant KSA can be loaded via Google ADC
+
+    gcloud iam service-accounts add-iam-policy-binding \
+      --role roles/iam.workloadIdentityUser \
+      --member "serviceAccount:$PROJECT_ID.svc.id.goog[datashare-apis/default]" ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+
+    kubectl annotate serviceaccount -n datashare-apis default iam.gke.io/gcp-service-account=${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+
+~~1. Create the KSA:~~
+
+
+    kubectl create serviceaccount -n datashare-apis ${SERVICE_ACCOUNT_NAME};
+
+
+~~2. Bind the workloadIdentityUser~~
+
+
+    gcloud iam service-accounts add-iam-policy-binding \
+      --role roles/iam.workloadIdentityUser \
+      --member "serviceAccount:$PROJECT_ID.svc.id.goog[datashare-apis/${SERVICE_ACCOUNT_NAME}]" ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+
+
+~~3. Annotate KSA to GSA~~
+
+
+    kubectl annotate serviceaccount -n datashare-apis ${SERVICE_ACCOUNT_NAME} iam.gke.io/gcp-service-account=${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
 
 
 #### Deploy the service
