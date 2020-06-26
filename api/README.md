@@ -236,7 +236,7 @@ Deploy with Cloud Run (Anthos) requires the following GKE [setup](https://cloud.
 
 #### Create a GKE Cluster with Cloud Run enabled
 
-1. Define an environment variables and gcloud tool default for the Compute Engine zone that you want to use for this tutorial:
+Define an environment variables and gcloud tool default for the Compute Engine zone that you want to use for this tutorial:
 
 
     ZONE=us-central1-a
@@ -244,7 +244,7 @@ Deploy with Cloud Run (Anthos) requires the following GKE [setup](https://cloud.
 
 You can change the [zone](https://cloud.google.com/compute/docs/regions-zones)
 
-2. Create a GKE cluster with the Cloud Run add-on:
+Create a GKE cluster with the Cloud Run add-on:
 
 
     CLUSTER=datashare
@@ -263,15 +263,13 @@ The **e2-standard-2** [compute machine type](https://cloud.google.com/compute/do
 #### Installing the Istio sidecar injector webhook
 Istio authorization relies on the [Istio sidecar proxy](https://archive.istio.io/v1.4/docs/ops/deployment/architecture/). You use the [Istio sidecar injector webhook](https://archive.istio.io/v1.4/docs/setup/additional-setup/sidecar-injection/) to add the sidecar proxy to your Cloud Run for Anthos services.
 
-1. Add your user as a cluster admin so that you can install extra Istio components:
-
+Add your user as a cluster admin so that you can install extra Istio components:
 
     kubectl create clusterrolebinding cluster-admin-binding \
         --clusterrole cluster-admin \
         --user $(gcloud config get-value core/account)
 
-2. Inspect your GKE cluster to find the version of Istio used by the Cloud Run add-on:
-
+Inspect your GKE cluster to find the version of Istio used by the Cloud Run add-on:
 
     ISTIO_PACKAGE=$(kubectl -n gke-system get deployments istio-pilot \
     -o jsonpath="{.spec.template.spec.containers[0].image}" | \
@@ -279,13 +277,11 @@ Istio authorization relies on the [Istio sidecar proxy](https://archive.istio.io
 
     ISTIO_VERSION=$(echo $ISTIO_PACKAGE | cut -d'-' -f1)
 
-3. Download and extract Istio:
-
+Download and extract Istio:
 
     gsutil -m cp gs://istio-release/releases/$ISTIO_VERSION/istio-$ISTIO_VERSION-linux.tar.gz - | tar zx
 
-4. Use Helm's local template rendering to create a Kubernetes manifest that installs the Istio sidecar injector webhook:
-
+Use Helm's local template rendering to create a Kubernetes manifest that installs the Istio sidecar injector webhook:
 
     helm template \
       --namespace gke-system \
@@ -301,39 +297,31 @@ Istio authorization relies on the [Istio sidecar proxy](https://archive.istio.io
 
 This command sets the pilot.enabled flag to false to create a manifest file that contains only the objects required to add the Istio sidecar injector webhook to your cluster. Applying this manifest file doesn't disable the existing Istio Pilot component.
 
-5. Apply the Istio sidecar injector webhook manifest:
-
+Apply the Istio sidecar injector webhook manifest:
 
     kubectl apply -f istio-$ISTIO_VERSION-sidecar-injector-webhook.yaml
 
 **Note**: When using the Cloud Run add-on for GKE, upgrades to the components installed by the add-on are managed as part of the GKE master upgrade process. These upgrades don't include extra components installed manually, such as the Istio sidecar injector webhook. Repeat the steps in this section to upgrade the Istio sidecar injector webhook when GKE upgrades the version of Cloud Run in your cluster.
 
-6. Wait for the sidecar injector to be ready:
-
+Wait for the sidecar injector to be ready:
 
     kubectl rollout status deploy istio-sidecar-injector -n gke-system
 
 #### Deploy the service
 
-1. Create a **NAMESPACE** environment variable called **datashare-apis**:
-
+ Create a **NAMESPACE** environment variable called **datashare-apis**:
 
     export NAMESPACE=datashare-apis
 
-2. Create the **NAMESPACE** in the GKE cluster:
-
+ Create the **NAMESPACE** in the GKE cluster:
 
     kubectl create namespace ${NAMESPACE}
 
-
-3. Label the **namespace** with `istio-injection=enabled` so that the Istio sidecar proxy is injected to all pods in the namespace by default:
-
+Label the **namespace** with `istio-injection=enabled` so that the Istio sidecar proxy is injected to all pods in the namespace by default:
 
     kubectl label namespace ${NAMESPACE} istio-injection=enabled
 
-
-4. Deploy ths DS API service to Cloud Run for Anthos in the **NAMESPACE**:
-
+Deploy ths DS API service to Cloud Run for Anthos in the **NAMESPACE**:
 
     gcloud run deploy cds-api \
       --cluster $CLUSTER \
@@ -344,17 +332,14 @@ This command sets the pilot.enabled flag to false to create a manifest file that
       --platform gke
 
 This command creates a [Knative Serving service](https://github.com/knative/serving/blob/master/docs/spec/overview.md) object.
-
 The `--min-instances 1` option prevents timing conflicts between the Istio and Knative Serving sidecars, when scaling up from zero pods.
 
-5. Check the status of the deployment
-You will see status of *Running* for the DS API pod
-
+Check the status of the deployment: \
+**Note**: You will see status of *Running* for the DS API pod
 
     kubectl get gw,deploy,po,svc -n ${NAMESPACE}
 
 You can also run the `glcoud run services describe` command to see the status:
-
 
     gcloud run services describe cds-api \
       --cluster $CLUSTER \
@@ -362,15 +347,12 @@ You can also run the `glcoud run services describe` command to see the status:
       --namespace ${NAMESPACE} \
       --platform gke
 
-
-5. Cloud Run for Anthos exposes services on the external IP address of the [Istio ingress gateway](https://archive.istio.io/v1.4/docs/concepts/traffic-management/#gateways). Retrieve the external IP address and store it in an environment variable:
-
+Cloud Run for Anthos exposes services on the external IP address of the [Istio ingress gateway](https://archive.istio.io/v1.4/docs/concepts/traffic-management/#gateways). Retrieve the external IP address and store it in an environment variable:
 
     GATEWAY_IP=`kubectl -n gke-system get svc istio-ingress -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`; echo $GATEWAY_IP
 
-6. Verify the DS API is running based off the active version url:
+Verify the DS API is running based off the active version url: \
 **Note**: The service external fqdn will be `'<service>.<namespace>.<domain>'` and **example.com** is the default knative domain.
-
 
     curl -i -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha
 
@@ -379,47 +361,34 @@ In the new  GKE cluster, the DS API requires credentials from the [service accou
 **Note**: We need to use the *default* KSA for now until multi-tenant KSA is supported in the [Google Auth NodeJS library](https://github.com/googleapis/google-auth-library-nodejs). The *default* KSA already exists in a cluster and namespace so we do not need to create it.
 
 
-1. Set the **NAMESPACE** environment variable (if not already):
-
+Set the **NAMESPACE** environment variable (if not already):
 
     export NAMESPACE=datashare-apis
 
-
-2. Set the **KSA_NAME** environment variable:
-
+Set the **KSA_NAME** environment variable:
 
     export KSA_NAME=default
 ~~  export KSA_NAME=${SERVICE_ACCOUNT_NAME} ~~
 
-
-~~2. Create the new KSA:~~
-
+~~Create the new KSA:~~
 
 ~~    kubectl create serviceaccount ${KSA_NAME} -n ${NAMESPACE};  ~~
 
-
-3. Bind the `iam.workloadIdentityUser` role for the KSA to GSA:
-
+Bind the `iam.workloadIdentityUser` role for the KSA to GSA:
 
     gcloud iam service-accounts add-iam-policy-binding \
       --role roles/iam.workloadIdentityUser \
       --member "serviceAccount:$PROJECT_ID.svc.id.goog[${NAMESPACE}/${KSA_NAME}]" ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
 
-
-4. Complete the binding between the KSA and GSA:
-
+Complete the binding between the KSA and GSA:
 
     kubectl annotate serviceaccount ${KSA_NAME} -n ${NAMESPACE} iam.gke.io/gcp-service-account=${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
 
-
-5. You can check the binding via:
-
+You can check the binding via:
 
     kubectl get serviceaccount ${KSA_NAME} -n ${NAMESPACE} -o yaml
 
-
-5. You should now be able to verify the DS API can communicate with GCP services:
-
+You should now be able to verify the DS API can communicate with GCP services:
 
     curl -i -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha/projects/${PROJECT_ID}/datasets
 
