@@ -320,7 +320,7 @@ async function deleteAccount(projectId, accountId, data) {
     }
 
     let fields = [...cfg.cdsAccountTableFields];
-    let values = ['@rowId', 'accountId', 'email', 'emailType', 'accountType', '@createdBy', 'current_timestamp()', 'policies', 'true'];
+    let values = ['@rowId', 'accountId', 'email', 'emailType', 'accountType', '@createdBy', 'current_timestamp()', 'policies', 'marketplace', 'true'];
     fields = Array.from(fields).join();
     values = Array.from(values).join();
 
