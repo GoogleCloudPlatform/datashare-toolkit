@@ -230,8 +230,8 @@ Deploy with Cloud Run (Anthos) requires the following GKE [setup](https://cloud.
 
 * Create a GKE cluster with Cloud Run enabled
 * Install additional Istio components required for Istio authorization
-* Deploy the service
 * Configure GKE Workload identity for the service
+* Deploy the service
 * TODO - Install additional Letsencrypt components required to auto manage TLS certificates and HTTPS
 
 #### Create a GKE Cluster with Cloud Run enabled
@@ -307,13 +307,50 @@ Wait for the sidecar injector to be ready:
 
     kubectl rollout status deploy istio-sidecar-injector -n gke-system
 
-#### Deploy the service
+#### Workload Identity
+In the new  GKE cluster, the DS API requires credentials from the [service account](#service-account) created above. Google recommends [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) for applications in GKE to communicate with GCP services. With Workload Identity, you configure a Kubernetes service account (KSA) (KSA) to act as a Google service account (GSA). Any workload running as the KSA automatically authenticates as the GSA when accessing Google Cloud APIs.\
+**Note**: We need to use the *default* KSA for now until multi-tenant KSA is supported in the [Google Auth NodeJS library](https://github.com/googleapis/google-auth-library-nodejs). The *default* KSA already exists in a cluster and namespace so we do not need to create it.
 
- Create a **NAMESPACE** environment variable called **datashare-apis**:
+
+Create a **NAMESPACE** environment variable called **datashare-apis**:
 
     export NAMESPACE=datashare-apis
 
- Create the **NAMESPACE** in the GKE cluster:
+Create the **NAMESPACE** in the GKE cluster:
+
+    kubectl create namespace ${NAMESPACE}
+
+Set the **KSA_NAME** environment variable:
+
+    export KSA_NAME=default
+~~  export KSA_NAME=${SERVICE_ACCOUNT_NAME} ~~
+
+~~Create the new KSA:~~
+
+~~    kubectl create serviceaccount ${KSA_NAME} -n ${NAMESPACE};  ~~
+
+Bind the `iam.workloadIdentityUser` role for the KSA to GSA:
+
+    gcloud iam service-accounts add-iam-policy-binding \
+      --role roles/iam.workloadIdentityUser \
+      --member "serviceAccount:$PROJECT_ID.svc.id.goog[${NAMESPACE}/${KSA_NAME}]" ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+
+Complete the binding between the KSA and GSA:
+
+    kubectl annotate serviceaccount ${KSA_NAME} -n ${NAMESPACE} iam.gke.io/gcp-service-account=${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+
+You can check the binding via:
+
+    kubectl get serviceaccount ${KSA_NAME} -n ${NAMESPACE} -o yaml
+
+
+#### Deploy the service
+
+Create a **NAMESPACE** environment variable called **datashare-apis**:
+
+    export NAMESPACE=datashare-apis
+
+Create the **NAMESPACE** in the GKE cluster:
 
     kubectl create namespace ${NAMESPACE}
 
@@ -356,39 +393,7 @@ Verify the DS API is running based off the active version url: \
 
     curl -i -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha
 
-#### Workload Identity
-In the new  GKE cluster, the DS API requires credentials from the [service account](#service-account) created above. Google recommends [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) for applications in GKE to communicate with GCP services. With Workload Identity, you configure a Kubernetes service account (KSA) (KSA) to act as a Google service account (GSA). Any workload running as the KSA automatically authenticates as the GSA when accessing Google Cloud APIs.\
-**Note**: We need to use the *default* KSA for now until multi-tenant KSA is supported in the [Google Auth NodeJS library](https://github.com/googleapis/google-auth-library-nodejs). The *default* KSA already exists in a cluster and namespace so we do not need to create it.
-
-
-Set the **NAMESPACE** environment variable (if not already):
-
-    export NAMESPACE=datashare-apis
-
-Set the **KSA_NAME** environment variable:
-
-    export KSA_NAME=default
-~~  export KSA_NAME=${SERVICE_ACCOUNT_NAME} ~~
-
-~~Create the new KSA:~~
-
-~~    kubectl create serviceaccount ${KSA_NAME} -n ${NAMESPACE};  ~~
-
-Bind the `iam.workloadIdentityUser` role for the KSA to GSA:
-
-    gcloud iam service-accounts add-iam-policy-binding \
-      --role roles/iam.workloadIdentityUser \
-      --member "serviceAccount:$PROJECT_ID.svc.id.goog[${NAMESPACE}/${KSA_NAME}]" ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
-
-Complete the binding between the KSA and GSA:
-
-    kubectl annotate serviceaccount ${KSA_NAME} -n ${NAMESPACE} iam.gke.io/gcp-service-account=${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
-
-You can check the binding via:
-
-    kubectl get serviceaccount ${KSA_NAME} -n ${NAMESPACE} -o yaml
-
-You should now be able to verify the DS API can communicate with GCP services:
+You should also be able to verify the DS API can communicate with GCP services:
 
     curl -i -H "Host: cds-api.datashare-apis.example.com" $GATEWAY_IP/v1alpha/projects/${PROJECT_ID}/datasets
 
