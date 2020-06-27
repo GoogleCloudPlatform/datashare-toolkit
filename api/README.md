@@ -18,6 +18,7 @@
   * [Deploy Kubernetes](#deploy-kubernetes)
   * [Deploy App Engine](#deploy-app-engine)
 * [Security](#security)
+  * [Encryption](#encryption)
   * [Authentication](#authentication)
   * [Authorization](#authorization)
 * [Development](#development)
@@ -526,9 +527,9 @@ Clients of the DS API will include end-users (data producers/admins and data con
 
 All clients and applications will be authenticated by the Identity Providers provided in the Istio [JWT Policies](https://archive.istio.io/v1.4/docs/reference/config/security/istio.authentication.v1alpha1/) configurations [here](istio-manifests/1.4/authn/). The only unauthented requests to the DS API will be for clients that required [CORS](https://www.w3.org/wiki/CORS) preflight fetch or *OPTIONS* requests e.g. [XMLHttpRequest (XHR)](https://www.w3.org/TR/XMLHttpRequest/). These requests will still have strict [Authorization](#authorization) rules enforced.
 
-### TLS
+### Encryption
 
-TLS is enabled by the Clour Run GKE [auto-tls](https://cloud.google.com/run/docs/gke/auto-tls) feature. TLS is enforced for clients by the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/) and certificates are managed by [LetsEncrypt](https://letsencrypt.org/).
+Encryption is enabled by default in Google Cloud for data [at-rest](https://cloud.google.com/security/encryption-at-rest) and in [transit](https://cloud.google.com/security/encryption-in-transit). Encryption from the client to the DS API leverages HTTPS via TLS and asymetric crytographic certificates. TLS is enabled by the Cloud Run GKE [auto-tls](https://cloud.google.com/run/docs/gke/auto-tls) feature and enforced by the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/). TLS certificates are managed and rotated by [LetsEncrypt](https://letsencrypt.org/).
 
 Verify you have completed the prereq steps above for [domain mapping](#domain-mapping) first
 
