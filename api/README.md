@@ -530,7 +530,36 @@ All clients and applications will be authenticated by the Identity Providers pro
 
 TLS is enabled by the Clour Run GKE [auto-tls](https://cloud.google.com/run/docs/gke/auto-tls) feature. TLS is enforced for clients by the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/) and certificates are managed by [LetsEncrypt](https://letsencrypt.org/).
 
-Verify you have completed the steps above for [domain mapping](#domain-mapping) first
+Verify you have completed the prereq steps above for [domain mapping](#domain-mapping) first
+
+Turn on auto TLS certificates and HTTPS by updating the ConfigMap config-domainmapping:
+
+    kubectl patch cm config-domainmapping -n knative-serving -p '{"data":{"autoTLS":"Enabled"}}'
+
+Wait for a few minutes after the command succeeds, then make sure the certificates feature is working:
+
+    kubectl get kcert -n $NAMESPACE
+
+If the certificate is ready, you should see a message similar to this one:
+
+    NAME              READY   REASON
+    example.com       True
+
+It may take from 20 seconds to 2 minutes for the Kcert to become ready. If you experience any issues, see the troubleshooting instructions for this feature
+
+Verify that the DNS record has gone into effect by running the command:
+**Note**: You sould see HTTPS instead
+
+    gcloud beta run domain-mappings describe \
+      --domain $DOMAIN \
+      --cluster $CLUSTER \
+      --cluster-location $ZONE \
+      --namespace $NAMESPACE \
+      --platform gke
+
+You should also be able to verify the DS API can communicate with GCP services via HTTPS:
+
+    curl -i https://${DOMAIN}/v1alpha/projects/${PROJECT_ID}/datasets
 
 
 ### Authentication
