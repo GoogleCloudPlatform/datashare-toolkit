@@ -4,6 +4,7 @@ stage: "BETA"
 includedPermissions:
 - bigquery.datasets.create
 - bigquery.datasets.get
+- bigquery.datasets.update
 - bigquery.jobs.create
 - bigquery.tables.create
 - bigquery.tables.delete

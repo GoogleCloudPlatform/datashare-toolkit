@@ -1,0 +1,65 @@
+# Copyright 2020 Google Inc. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+info:
+  title: Datashare UI Deployment Manager
+  author: Google Inc.
+  description: Template code to deploy the Datashare UI to Cloud Run
+
+required:
+- containerTag
+- firebaseApiKey
+- region
+- timeout
+
+
+properties:
+  firebaseApiKey:
+    type: string
+    description: Firebase API key
+
+  cloudRunDeployName:
+    type: string
+    description: Cloud run service name that is displayed in the UI.
+    default: ds-frontend-ui
+
+  containerTag:
+    type: string
+    description: DS UI Docker container tag
+    default: dev
+
+  region:
+    type: string
+    description: Google Cloud region to which this service should be deployed
+
+  timeout:
+    type: string
+    description: Alloted time for the deployment to be successfull.
+    default: 600s
+
+  datashareGitReleaseTag:
+    type: string
+    description: The Git release version that should be used to install Datashare assets.
+    default: master
+
+  useRuntimeConfigWaiter:
+    type: boolean
+    description: Deploy all the components (UI, API, Ingestion)
+    default: False
+    
+outputs:
+  properties:
+    functionName:
+      type: string
+      description: The name of the function created
