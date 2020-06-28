@@ -16,7 +16,7 @@
     "@google-cloud/functions-framework": "^1.3.2",
     "@google-cloud/pubsub": "^1.1.5",
     "@google-cloud/storage": "^4.1.3",
-    "googleapis": "file:temp_npm_packages/google-api-nodejs-client",
+    "googleapis": "^52.1.0",
     "jsonschema": "^1.2.4",
     "lint": "^0.7.0",
     "minimist": "^1.2.5",

@@ -16,7 +16,8 @@
 
 'use strict';
 const { google } = require('googleapis');
-const Cloudcommerceprocurement = google.cloudcommerceprocurement('v1');
+
+const DISCOVERY_URL = 'https://cloudcommerceprocurement.googleapis.com/$discovery/rest';
 
 // Cloud Commerce Procurement Utility
 class CommerceProcurementUtil {
@@ -26,11 +27,19 @@ class CommerceProcurementUtil {
         if (projectId) {
             options.projectId = projectId;
         }
-        //this.procurementClient = new Cloudcommerceprocuement(options);
-        this.procurementClient = Cloudcommerceprocurement;
+    }
 
-        this.auth = new google.auth.GoogleAuth({
+    async getClient() {
+        const auth = new google.auth.GoogleAuth({
             scopes: 'https://www.googleapis.com/auth/cloud-platform'
+        });
+        google.options({auth: auth});
+        return google.discoverAPI(DISCOVERY_URL, {}, (err, client) => {
+            if (err) {
+                console.log('Error during API discovery', err);
+                return undefined;
+            }
+            return client;
         });
     }
 
@@ -52,10 +61,9 @@ class CommerceProcurementUtil {
      * Grant an approval on Account resource
      */
     async approveAccount(name, approvalName, reason) {
-        const authClient = await this.auth.getClient();
+        const client = await this.getClient();
         try {
-            const res = await this.procurementClient.providers.accounts.approve({
-                auth: authClient,
+            const res = await client.providers.accounts.approve({
                 name: name,
                 approvalName: approvalName,
                 reason: reason
@@ -77,10 +85,9 @@ class CommerceProcurementUtil {
      */
     async getAccount(name) {
         console.log(name);
-        const authClient = await this.auth.getClient();
+        const client = await this.getClient();
         try {
-            const res = await this.procurementClient.providers.accounts.get({
-                auth: authClient,
+            const res = await client.providers.accounts.get({
                 name: name
             });
             if (this.VERBOSE_MODE) {
@@ -99,10 +106,9 @@ class CommerceProcurementUtil {
      * list Accounts for the provider
      */
     async listAccounts() {
-        const authClient = await this.auth.getClient();
+        const client = await this.getClient();
         try {
-            const res = await this.procurementClient.providers.accounts.list({
-                auth: authClient,
+            const res = await client.providers.accounts.list({
                 // The maximum number of entries that are requested. Default size is 200.
                 //pageSize: 'placeholder-value',
                 // The token for fetching the next page.
@@ -126,10 +132,9 @@ class CommerceProcurementUtil {
      * Reset and Account and cancel all associated Entitlements
      */
     async resetAccount(name) {
-        const authClient = await this.auth.getClient();
+        const client = await this.getClient();
         try {
-            const res = await this.procurementClient.providers.accounts.reset({
-                auth: authClient,
+            const res = await client.providers.accounts.reset({
                 name: name
             });
             if (this.VERBOSE_MODE) {
@@ -148,10 +153,9 @@ class CommerceProcurementUtil {
      * Reject an approval on an account
      */
     async rejectAccount(name, approvalName, reason) {
-        const authClient = await this.auth.getClient();
+        const client = await this.getClient();
         try {
-            const res = await this.procurementClient.providers.accounts.reject({
-                auth: authClient,
+            const res = await client.providers.accounts.reject({
                 name: name,
                 requestBody: {
                     approvalName: approvalName,
@@ -174,10 +178,9 @@ class CommerceProcurementUtil {
      * approve Entitlement resource
      */
     async approveEntitlement(name) {
-        const authClient = await this.auth.getClient();
+        const client = await this.getClient();
         try {
-            const res = await this.procurementClient.providers.entitlements.approve({
-                auth: authClient,
+            const res = await client.providers.entitlements.approve({
                 name: name
             });
             if (this.VERBOSE_MODE) {
@@ -196,10 +199,10 @@ class CommerceProcurementUtil {
      * get Entitlement resource
      */
     async getEntitlement(name) {
-        const authClient = await this.auth.getClient();
+        const client = await this.getClient();
+        console.log(client);
         try {
-            const res = await this.procurementClient.providers.entitlements.get({
-                auth: authClient,
+            const res = await client.providers.entitlements.get({
                 name: name
             });
             if (this.VERBOSE_MODE) {
@@ -218,10 +221,9 @@ class CommerceProcurementUtil {
      * list Entitlements for the provider
      */
     async listEntitlements(filter) {
-        const authClient = await this.auth.getClient();
+        const client = await this.getClient();
         try {
-            const res = await this.procurementClient.providers.entitlements.list({
-                auth: authClient,
+            const res = await client.providers.entitlements.list({
                 // The maximum number of entries that are requested. Default size is 200.
                 //pageSize: 'placeholder-value',
                 // The token for fetching the next page.
@@ -244,16 +246,15 @@ class CommerceProcurementUtil {
 
     /**
      * Updates an existing Entitlement with a message that is displayed to the end user.
-     * Provider-supplied message that is displayed to the end user. Currently this is used to communicate 
+     * Provider-supplied message that is displayed to the end user. Currently this is used to communicate
      * progress and ETA for provisioning. This field can be updated only when a user is waiting for an action
-     * from the provider, i.e. entitlement state is EntitlementState.ENTITLEMENT_ACTIVATION_REQUESTED or 
+     * from the provider, i.e. entitlement state is EntitlementState.ENTITLEMENT_ACTIVATION_REQUESTED or
      * EntitlementState.ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL.
      */
     async updateEntitlementMessage(name, message) {
-        const authClient = await this.auth.getClient();
+        const client = await this.getClient();
         try {
-            const res = await this.procurementClient.providers.entitlements.patch({
-                auth: authClient,
+            const res = await client.providers.entitlements.patch({
                 name: name,
                 updateMask: 'messageToUser',
                 requestBody: {
@@ -276,10 +277,9 @@ class CommerceProcurementUtil {
      * reject Entitlement resource
      */
     async rejectEntitlement(name, reason) {
-        const authClient = await this.auth.getClient();
+        const client = await this.getClient();
         try {
-            const res = await this.procurementClient.providers.entitlements.reject({
-                auth: authClient,
+            const res = await client.providers.entitlements.reject({
                 name: name,
                 reason: reason
             });
@@ -299,10 +299,9 @@ class CommerceProcurementUtil {
      * request suspension of an active Entitlement. This is not yet supported.
      */
     async suspendEntitlement(name, reason) {
-        const authClient = await this.auth.getClient();
+        const client = await this.getClient();
         try {
-            const res = await this.procurementClient.providers.entitlements.suspend({
-                auth: authClient,
+            const res = await client.providers.entitlements.suspend({
                 name: name,
                 reason: reason
             });
