@@ -13,8 +13,14 @@
   * [Deploy to Cloud Run](#deploy-to-cloud-run)
 * [Deployment](#deployment)
   * [Deploy Cloud Run](#deploy-cloud-run)
+    * [Deploy Cloud Run Anthos](#deploy-cloud-run-anthos)
+    * [Deploy Cloud Run Managed](#deploy-cloud-run-managed)
   * [Deploy Kubernetes](#deploy-kubernetes)
   * [Deploy App Engine](#deploy-app-engine)
+* [Security](#security)
+  * [Encryption](#encryption)
+  * [Authentication](#authentication)
+  * [Authorization](#authorization)
 * [Development](#development)
 * [Testing](#testing)
 * [Contributing](#contributing)
@@ -111,14 +117,14 @@ Set the **CUSTOM\_ROLE\_NAME** environment variable(s):
 
     export CUSTOM_ROLE_NAME=custom.cds.api.mgr;
 
-*Note* We could use the the following roles, but it's better to follow the principle of least privilege. \
+**Note**: We could use the the following roles, but it's better to follow the principle of least privilege. \
 _The permissions for the custom role are defined in [config/cds-api-mgr-role-definition.yaml](config/cds-api-mgr-role-definition.yaml)_
 
 Create custom DS API role:
 
     gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/cds-api-mgr-role-definition.yaml
 
-*Note* If the custom role already exists, just update the stage:
+**Note**: If the custom role already exists, just update the stage:
 
     gcloud iam roles update ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --stage BETA
 
@@ -140,7 +146,7 @@ Set the **GOOGLE_APPLICATION_CREDENTIALS** environment variable(s):
     export GOOGLE_APPLICATION_CREDENTIALS="${SERVICE_ACCOUNT_NAME}.json"
 
 ## Deploy to Cloud Run with Deployment Manager
-You can deploy the API service via the Deployment Manager.  
+You can deploy the API service via the Deployment Manager.
 The Deployment Manager script will create a Cloud Build package that performs the following actions:
 * clones the datashare-tookit repository
 * create a service account
@@ -155,7 +161,7 @@ The Deployment Manager script will create a Cloud Build package that performs th
 * Enable the following APIs
   * With the following link
     * [Enable the Cloud Build, Deployment Manager, IAM, Cloud Run APIs](https://console.cloud.google.com/flows/enableapi?apiid=cloudbuild.googleapis.com,deploymentmanager.googleapis.com,iam.googleapis.com,run.googleapis.com)
-  * Or enabled them with the following gcloud commands. 
+  * Or enabled them with the following gcloud commands.
     ```
     gcloud services enable cloudbuild.googleapis.com
     gcloud services enable deploymentmanager.googleapis.com
@@ -171,12 +177,12 @@ The Deployment Manager script will create a Cloud Build package that performs th
   * Cloud Run Service Agent
 
 ### Deploy to Cloud Run
-By default it deploys to us-central1 region. Execute the following command from the `datashare-toolkit/api` directory. 
+By default it deploys to us-central1 region. Execute the following command from the `datashare-toolkit/api` directory.
 ```
 gcloud deployment-manager deployments create ds-api --config deploy_ds_api.yaml
 ```
 
-You can update the region in the `deploy_ds_api.yaml` file. 
+You can update the region in the `deploy_ds_api.yaml` file.
 ```
 properties:
     region: us-central1
@@ -189,7 +195,7 @@ You can deploy the API service via various methods below based off developer pre
   * [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/) via [Skaffold](https://github.com/GoogleContainerTools/skaffold)
   * [Google Cloud App Engine](https://cloud.google.com/appengine/) via [Deployment Manager](https://cloud.google.com/deployment-manager/) and gcloud - TODO
 
-[Deploy Cloud Run](#deploy-cloud-run) is the _preferred_ method to quickly host the DS API Service content and generate a unique URL for consumption.
+[Deploy Cloud Run](#deploy-cloud-run) on [Anthos](https://cloud.google.com/run/docs/choosing-a-platform#cloud-run-for-anthos) is the _required_ method to enabled fine-grained authorization with [Istio](http://istio.io/). [Managed](https://cloud.google.com/run/docs/choosing-a-platform#cloud-run-fully-managed)is the _preferred_ method to quickly host the DS API Service content and generate a unique URL for consumption.
 
 There are some environment variables that need to be set for all build and deployment options.
 
@@ -207,17 +213,243 @@ Change directories into the current working API version:
 
 ### Deploy Cloud Run
 
-Deploy with Cloud Run allows stateless HTTP containers on a fully managed environment or GKE cluster. [Cloud Build](https://cloud.google.com/run/docs/quickstarts/build-and-deploy#containerizing) packages the Docker image into your Google Container repository.
+Deploy with Cloud Run allows stateless HTTP containers on a fully [managed](https://cloud.google.com/run/docs/choosing-a-platform#cloud-run-fully-managed) environment or [Anthos](https://cloud.google.com/run/docs/choosing-a-platform#cloud-run-for-anthos) GKE cluster. If you do not have a pre-built image, [Cloud Build](https://cloud.google.com/run/docs/quickstarts/build-and-deploy#containerizing) packages the Docker image into your Google Container repository.
 _Cloud Run and Cloud Build APIs will need to be enabled in your GCP project._
 
 Build with Cloud Build and TAG:
+
 **Note**: Cloud Build needs to run from parent directory for build context and the [shared](../shared) directory
 
     cd ../../
     gcloud builds submit --config api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
-Deploy with Cloud Run Beta:
-_Note_ - There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--set-env-vars) provides details for how they are set.
+[Enable the APIs](https://console.cloud.google.com/flows/enableapi?apiid=cloudapis.googleapis.com,container.googleapis.com,run.googleapis.com) before beginning
+
+### Deploy Cloud Run Anthos
+Deploy with Cloud Run (Anthos) requires the following GKE [setup](https://cloud.google.com/run/docs/gke/setup) configuration items to be completed before deploying.
+**Note**  The default domain is *example.com* and can be changed manually [here](https://cloud.google.com/run/docs/gke/default-domain) if auto managed TLS is not enabled
+
+* Create a GKE cluster with Cloud Run enabled
+* Install additional Istio components required for Istio authorization
+* Configure GKE Workload identity for the service
+* Deploy the service
+* Map custom domain to the service
+
+#### Create a GKE Cluster with Cloud Run enabled
+
+Define an environment variables and gcloud tool default for the Compute Engine zone that you want to use for this tutorial:
+
+    REGION=us-central1
+    ZONE=us-central1-a
+    gcloud config set compute/zone $ZONE
+
+You can change the [zone](https://cloud.google.com/compute/docs/regions-zones)
+
+Create a GKE cluster with the Cloud Run add-on:
+
+    CLUSTER=datashare
+
+    gcloud container clusters create $CLUSTER \
+        --addons HorizontalPodAutoscaling,HttpLoadBalancing,CloudRun \
+        --cluster-version 1.16 \
+        --workload-pool=${PROJECT_ID}.svc.id.goog \
+        --enable-ip-alias \
+        --enable-stackdriver-kubernetes \
+        --machine-type e2-standard-2
+
+This tutorial requires GKE version 1.15.11-gke.9 and later, 1.16.8-gke.7 and later, or 1.17.4-gke.5 and later.
+The **e2-standard-2** [compute machine type](https://cloud.google.com/compute/docs/machine-types#e2_standard_machine_types) requires the least amount of compute resources to run the service.
+
+#### Installing the Istio sidecar injector webhook
+Istio authorization relies on the [Istio sidecar proxy](https://archive.istio.io/v1.4/docs/ops/deployment/architecture/). You use the [Istio sidecar injector webhook](https://archive.istio.io/v1.4/docs/setup/additional-setup/sidecar-injection/) to add the sidecar proxy to your Cloud Run for Anthos services.
+
+Add your user as a cluster admin so that you can install extra Istio components:
+
+    kubectl create clusterrolebinding cluster-admin-binding \
+        --clusterrole cluster-admin \
+        --user $(gcloud config get-value core/account)
+
+Inspect your GKE cluster to find the version of Istio used by the Cloud Run add-on:
+
+    ISTIO_PACKAGE=$(kubectl -n gke-system get deployments istio-pilot \
+    -o jsonpath="{.spec.template.spec.containers[0].image}" | \
+    cut -d':' -f2)
+
+    ISTIO_VERSION=$(echo $ISTIO_PACKAGE | cut -d'-' -f1)
+
+Download and extract Istio:
+
+    gsutil -m cp gs://istio-release/releases/${ISTIO_VERSION}/istio-${ISTIO_VERSION}-linux.tar.gz - | tar zx
+
+Use Helm's local template rendering to create a Kubernetes manifest that installs the Istio sidecar injector webhook:
+
+    helm template \
+      --namespace gke-system \
+      --set global.hub=gcr.io/gke-release/istio \
+      --set global.tag=$ISTIO_PACKAGE \
+      --set pilot.enabled=false \
+      --set security.enabled=true \
+      --set sidecarInjectorWebhook.enabled=true \
+      --set sidecarInjectorWebhook.rewriteAppHTTPProbe=true \
+      --values istio-${ISTIO_VERSION}/install/kubernetes/helm/istio/values-istio-minimal.yaml \
+      istio-${ISTIO_VERSION}/install/kubernetes/helm/istio \
+      > istio-${ISTIO_VERSION}-sidecar-injector-webhook.yaml
+
+This command sets the pilot.enabled flag to false to create a manifest file that contains only the objects required to add the Istio sidecar injector webhook to your cluster. Applying this manifest file doesn't disable the existing Istio Pilot component.
+
+Apply the Istio sidecar injector webhook manifest:
+
+    kubectl apply -f istio-${ISTIO_VERSION}-sidecar-injector-webhook.yaml
+
+**Note**: When using the Cloud Run add-on for GKE, upgrades to the components installed by the add-on are managed as part of the GKE master upgrade process. These upgrades don't include extra components installed manually, such as the Istio sidecar injector webhook. Repeat the steps in this section to upgrade the Istio sidecar injector webhook when GKE upgrades the version of Cloud Run in your cluster.
+
+Wait for the sidecar injector to be ready:
+
+    kubectl rollout status deploy istio-sidecar-injector -n gke-system
+
+#### Workload Identity
+In the new  GKE cluster, the DS API requires credentials from the [service account](#service-account) created above. Google recommends [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) for applications in GKE to communicate with GCP services. With Workload Identity, you configure a Kubernetes service account (KSA) (KSA) to act as a Google service account (GSA). Any workload running as the KSA automatically authenticates as the GSA when accessing Google Cloud APIs.
+
+
+Create a **NAMESPACE** environment variable called **datashare-apis**:
+
+    export NAMESPACE=datashare-apis
+
+Create the **NAMESPACE** in the GKE cluster:
+
+    kubectl create namespace $NAMESPACE
+
+Set the **KSA_NAME** environment variable: \
+**Note**: We are setting this thhe same as **SERVICE_ACCOUNT_NAME** for simplicity, but it can be changed
+
+    export KSA_NAME=$SERVICE_ACCOUNT_NAME
+
+Create the new KSA:
+
+    kubectl create serviceaccount $KSA_NAME -n $NAMESPACE;
+
+Bind the `iam.workloadIdentityUser` role for the KSA to GSA:
+
+    gcloud iam service-accounts add-iam-policy-binding \
+      --role roles/iam.workloadIdentityUser \
+      --member "serviceAccount:${PROJECT_ID}.svc.id.goog[${NAMESPACE}/${KSA_NAME}]" ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+
+Complete the binding between the KSA and GSA:
+
+    kubectl annotate serviceaccount $KSA_NAME -n $NAMESPACE iam.gke.io/gcp-service-account=${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+
+You can check the binding via:
+
+    kubectl get serviceaccount $KSA_NAME -n $NAMESPACE -o yaml
+
+
+#### Deploy the service
+
+Create a **NAMESPACE** environment variable called **datashare-apis**:
+
+    export NAMESPACE=datashare-apis
+
+Create the **NAMESPACE** in the GKE cluster:
+
+    kubectl create namespace $NAMESPACE
+
+Label the **namespace** with `istio-injection=enabled` so that the Istio sidecar proxy is injected to all pods in the namespace by default:
+
+    kubectl label namespace $NAMESPACE istio-injection=enabled
+
+Deploy ths DS API service to Cloud Run for Anthos in the **NAMESPACE**: \
+**Note**: We need to use the *alpha* version of gcloud command thaht supports the KSA's `serviceAccountName` value for the GKE service pod.
+
+    gcloud alpha run deploy cds-api \
+      --cluster $CLUSTER \
+      --cluster-location $ZONE \
+      --min-instances 1 \
+      --namespace $NAMESPACE \
+      --image gcr.io/${PROJECT_ID}/cds-api:${TAG} \
+      --platform gke
+
+This command creates a [Knative Serving service](https://github.com/knative/serving/blob/master/docs/spec/overview.md) object.
+The `--min-instances 1` option prevents timing conflicts between the Istio and Knative Serving sidecars, when scaling up from zero pods.
+
+Check the status of the deployment: \
+**Note**: You will see status of *Running* for the DS API pod
+
+    kubectl get gw,deploy,po,svc -n $NAMESPACE
+
+You can also run the `glcoud run services describe` command to see the status:
+
+    gcloud run services describe cds-api \
+      --cluster $CLUSTER \
+      --cluster-location $ZONE \
+      --namespace $NAMESPACE \
+      --platform gke
+
+Cloud Run for Anthos exposes services on the external IP address of the [Istio ingress gateway](https://archive.istio.io/v1.4/docs/concepts/traffic-management/#gateways). Retrieve the external IP address and store it in an environment variable:
+
+    GATEWAY_IP=`kubectl -n gke-system get svc istio-ingress -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`; echo $GATEWAY_IP
+
+Verify the DS API is running based off the active version url: \
+**Note**: The service external fqdn will be `'<service>.<namespace>.<domain>'` and **example.com** is the default knative domain.
+
+    curl -i -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+
+You should also be able to verify the DS API can communicate with GCP services:
+
+    curl -i -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha/projects/${PROJECT_ID}/datasets
+
+
+#### Domain mapping
+To use a custom domain for a service, you map your service to the custom domain, then update your DNS records. You can map a service to a domain, such as *example.com* or to a subdomain, such as *subdomain.example.com*. You must already own the TLD or sub-domain to use this feature.\
+**Note**: For internal Googlers, you can create custom domains via go/joonix
+
+Create a **DOMAIN** environment variable based off the above:
+
+    export DOMAIN=cds-api.fsi.joonix.net
+
+Verify domain ownership the first time you use that domain in the Google Cloud project:
+
+    gcloud domains list-user-verified
+
+If your ownership of the domain needs to be verified, open the Webmaster Central verification page:
+
+    gcloud domains verify $DOMAIN
+
+Map your service to the custom domain:
+
+    gcloud beta run domain-mappings create --service cds-api \
+      --domain $DOMAIN \
+      --cluster $CLUSTER \
+      --cluster-location $ZONE \
+      --namespace $NAMESPACE \
+      --platform gke
+
+Reserve the IP address attached to the Load Balancer for the Istio ingress gateway service as a static IP: \
+**Note**: Create a **REGION** environment variable based off the appropriate **ZONE** variable above:
+
+    gcloud compute addresses create cds-api-static-ip --addresses $GATEWAY_IP --region $REGION
+
+Add the appropriate A record to the DNS entry in your domain registrar based off the entry of this command:
+**Note**: You can execute `gcloud` commands to add this if the DNS zone is managed in Cloud DNS [here](https://cloud.google.com/dns/docs/records#gcloud)
+
+    gcloud beta run domain-mappings describe \
+      --domain $DOMAIN \
+      --cluster $CLUSTER \
+      --cluster-location $ZONE \
+      --namespace $NAMESPACE \
+      --platform gke
+
+Very the new record propagated to the local DNS resolvers:
+
+    dig +short $DOMAIN
+
+You should also be able to verify the DS API can communicate with GCP services:
+
+    curl -i http://${DOMAIN}/v1alpha/projects/${PROJECT_ID}/datasets
+
+
+### Deploy Cloud Run Managed
+Deploy with Cloud Run (Managed): \
+**Note**: There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--set-env-vars) provides details for how they are set.
 
     gcloud run deploy cds-api \
       --image gcr.io/${PROJECT_ID}/cds-api:${TAG} \
@@ -259,7 +491,7 @@ http://{HOSTNAME}/{API_VERSION}/docs
 These instructions are to build and deploy in a k8s environment via Skaffold.
 
 Create a kubernetes secret with the appropriate service account key file from above:\
-_Note_ Change the file path to the appropriate destination. Secrets management for multiple k8s clusters is outside the scope of this example.
+**Note**: Change the file path to the appropriate destination. Secrets management for multiple k8s clusters is outside the scope of this example.
 
     kubectl create secret generic cds-api-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
 
@@ -286,6 +518,140 @@ TBD
 ## Delete Deployment
 TODO - should we provide steps or a script to delete all the assets after they have been deployed?
 
+
+## Security
+
+The DS API runs as a trusted application that communicates to GCP services in a data producer's project. A [service account](#service-account) is required with the appropriate GCP service IAM controls enabled following a least privileged model. Communication between the client, DS API, and GCP services is encrypted in transit by default via TLS.
+
+Clients of the DS API will include end-users (data producers/admins and data consumers) from the DS UI application and service accounts from [Google Cloud Marketplace](https://cloud.google.com/marketplace) integration and/or other trusted applications (e.g POS systems).
+
+All clients and applications will be authenticated by the Identity Providers provided in the Istio [JWT Policies](https://archive.istio.io/v1.4/docs/reference/config/security/istio.authentication.v1alpha1/) configurations [here](istio-manifests/1.4/authn/). The only unauthented requests to the DS API will be for clients that required [CORS](https://www.w3.org/wiki/CORS) preflight fetch or *OPTIONS* requests e.g. [XMLHttpRequest (XHR)](https://www.w3.org/TR/XMLHttpRequest/). These requests will still have strict [Authorization](#authorization) rules enforced.
+
+### Encryption
+
+Encryption is enabled by default in Google Cloud for data [at-rest](https://cloud.google.com/security/encryption-at-rest) and in [transit](https://cloud.google.com/security/encryption-in-transit). Encryption from the client to the DS API leverages HTTPS via TLS and asymetric crytographic certificates. TLS is enabled by the Cloud Run GKE [auto-tls](https://cloud.google.com/run/docs/gke/auto-tls) feature and enforced by the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/). TLS certificates are managed and rotated by [LetsEncrypt](https://letsencrypt.org/).
+
+Verify you have completed the prereq steps above for [domain mapping](#domain-mapping) first
+
+Turn on auto TLS certificates and HTTPS by updating the ConfigMap config-domainmapping:
+
+    kubectl patch cm config-domainmapping -n knative-serving -p '{"data":{"autoTLS":"Enabled"}}'
+
+Wait for a few minutes after the command succeeds, then make sure the certificates feature is working:
+
+    kubectl get kcert -n $NAMESPACE
+
+If the certificate is ready, you should see a message similar to this one:
+
+    NAME              READY   REASON
+    example.com       True
+
+It may take from 20 seconds to 2 minutes for the Kcert to become ready. If you experience any issues, see the troubleshooting instructions for this feature
+
+Verify that the DNS record has gone into effect by running the command:
+**Note**: You sould see HTTPS instead
+
+    gcloud beta run domain-mappings describe \
+      --domain $DOMAIN \
+      --cluster $CLUSTER \
+      --cluster-location $ZONE \
+      --namespace $NAMESPACE \
+      --platform gke
+
+You should also be able to verify the DS API can communicate with GCP services via HTTPS:
+
+    curl -i https://${DOMAIN}/v1alpha/projects/${PROJECT_ID}/datasets
+
+
+### Authentication
+
+Authentication is enforced by Istio JWT Policies at the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/). There are three JWT origins for each supported Identity Provider: Google, Firebase, and Marketplace [here](istio-manifests/1.4/authn/default-jwt-policy.tmpl.yaml)
+
+1. Apply the authN policies:
+**Note**: `envsubst` will read the **PROJECT_ID** environment variable, substitute it in the template, then `kubectl` to apply the config:
+
+
+    cat istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -
+
+2. Verify the DS API is not accessible:
+**Note**: The HTTP response code should be *401 Unauthorized*
+
+
+    curl -i -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+
+3. Verify the DS API is accessible with a valid Bearer ID Token:
+**Note**: The HTTP response code should be *200 OK*
+
+
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+
+4. Verify the DS API preflight requests are accessible without a valid Bearer ID Token:
+**Note**: The HTTP response code should be *200 OK*
+
+
+     curl -i -X OPTIONS -H "Origin: http://cds-ui.a.run.app" -H "Access-Control-Request-Method: POST" -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+
+
+You now have [authentication](#authentication) enabled for all endpoints and methods in the DS API service. Next step is to enforce [authorization](#authorization) for the clients:
+
+### Authorization
+
+Authorization is enabled implicitly via Istio [Authorization Policy](https://archive.istio.io/v1.4/docs/concepts/security/#authorization-policy) and access to the workload or services are **denied by default** when a policy is enabled. The Authorization policies are dividied into separate roles based off the end-user or client defined in [Security](#security) above. \
+**Note**: These can be refined if additional roles are required.
+
+#### Data Producers:
+Datashare project administrators or service accounts that require read-write access to all Datashare API services and methods. These users are authenticated via Google.
+* read-write access to all `*`
+
+#### Data Consumers:
+Datashare end-user or data consumers that require read-write access to Account registration endpoints and read-only access to Accounts. These users are authenticated via Firebase (Identity Platform).
+* read-write (POST) access to `accounts:*`
+* read-only (GET) access to `accounts`
+
+#### Marketplace Service Account:
+Google Cloud Marketplace integration Service Account that is required for redirecting end-users to registration and sign-up pages in the UI. This service account authenticates via Google.
+* read-write (POST) access to `accounts:*`
+* read-only (GET) access to `accounts`
+
+#### Preflight Requests:
+Unauthenticated clients (single page applications) and browsers that make CORS preflight requests require *OPTIONS* to all service endpoints:
+* read-only (OPTIONS) access to `*`
+
+Before you apply the AuthZ policies, export the **DATA_PRODUCERS** environment variable as a comma separated list of email addresses: e.g.
+**Note**: You can wildcard an email address domain or explicity add them individually
+
+
+    export DATA_PRODUCERS="*@google.com"
+    export DATA_PRODUCERS="abc@xyz.com,my-trusted-app@my-gcp-project.iam.gserviceaccount.com"
+
+
+1. Apply the authZ policies:
+**Note**: `envsubst` will read the **PROJECT_ID**, **DATA_PRODUCERS**, environment variable, substitute it in the template, then `kubectl` to apply the config:
+
+
+    cat istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
+
+2. Verify the DS API is not accessible:
+**Note**: The HTTP response code should be *401 Unauthorized*
+
+
+    curl -i -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+
+3. Verify the DS API is accessible with a valid Bearer ID Token:
+**Note**: The HTTP response code should be *200 OK*
+
+
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+
+4. Verify the DS API preflight requests are accessible without a valid Bearer ID Token:
+**Note**: The HTTP response code should be *200 OK*
+
+
+     curl -i -X OPTIONS -H "Origin: http://cds-ui.a.run.app" -H "Access-Control-Request-Method: POST" -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+
+
+You now have [authorization](#authorization) enabled for all endpoints and methods in the DS API service.
+
 ## Development
 
 Navigate to the API version directory (*v1alpha*, *v1*, etc.).
@@ -299,7 +665,7 @@ Install the Node modules
     npm install
 
 Start the service.\
-_Note_ - There are a few environment variables that need to be set before the application starts (see below). [Nodemon](https://nodemon.io/) is leveraged to read file changes and reload automatically.
+**Note**: There are a few environment variables that need to be set before the application starts (see below). [Nodemon](https://nodemon.io/) is leveraged to read file changes and reload automatically.
 
     export GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS};
 
