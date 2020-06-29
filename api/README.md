@@ -605,14 +605,13 @@ Datashare project administrators or service accounts that require read-write acc
 * read-write access to all `*`
 
 #### Data Consumers:
-Datashare end-user or data consumers that require read-write access to Account registration endpoints and read-only access to Accounts. These users are authenticated via Firebase (Identity Platform).
-* read-write (POST) access to `accounts:*`
-* read-only (GET) access to `accounts`
+Datashare end-user or data consumers that require read-write access to Account activate endpoints and read-only access to Products. These users are authenticated via Firebase (Identity Platform).
+* read-write (GET, POST) access to `accounts:activate`
+* read-only (GET) access to `products`
 
 #### Marketplace Service Account:
 Google Cloud Marketplace integration Service Account that is required for redirecting end-users to registration and sign-up pages in the UI. This service account authenticates via Google.
-* read-write (POST) access to `accounts:*`
-* read-only (GET) access to `accounts`
+* read-write (POST) access to `accounts:register`
 
 #### Preflight Requests:
 Unauthenticated clients (single page applications) and browsers that make CORS preflight requests require *OPTIONS* to all service endpoints:

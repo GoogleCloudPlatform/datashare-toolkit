@@ -19,6 +19,8 @@
 const express = require('express');
 
 const dataManager = require("./dataManager");
+const cfg = require('../lib/config');
+const gcpMarketplaceTokenCookieName = 'gmt';
 
 /************************************************************
   API Endpoints
@@ -133,18 +135,18 @@ var accounts = express.Router();
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.get('/projects/:projectId/accounts', async(req, res) => {
+accounts.get('/projects/:projectId/accounts', async (req, res) => {
     const projectId = req.params.projectId;
     const data = await dataManager.listAccounts(projectId);
     var code;
     if (data && data.success === false) {
-        code = (data.code === undefined ) ? 500 : data.code;
+        code = (data.code === undefined) ? 500 : data.code;
     } else {
-        code = (data.code === undefined ) ? 200 : data.code;
+        code = (data.code === undefined) ? 200 : data.code;
     }
     res.status(code).json({
         code: code,
-        ... data
+        ...data
     });
 });
 
@@ -201,7 +203,7 @@ accounts.get('/projects/:projectId/accounts', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.post('/projects/:projectId/accounts', async(req, res) => {
+accounts.post('/projects/:projectId/accounts', async (req, res) => {
     const projectId = req.params.projectId;
     if (!req.body.email) {
         return res.status(400).json({
@@ -222,18 +224,19 @@ accounts.post('/projects/:projectId/accounts', async(req, res) => {
         emailType: req.body.emailType,
         accountType: req.body.accountType,
         createdBy: req.header('x-gcp-account'),
-        policies: req.body.policies
+        policies: req.body.policies,
+        marketplace: req.body.marketplace
     };
     const data = await dataManager.createOrUpdateAccount(projectId, null, values);
     var code;
     if (data && data.success === false) {
-        code = (data.code === undefined ) ? 500 : data.code;
+        code = (data.code === undefined) ? 500 : data.code;
     } else {
-        code = (data.code === undefined ) ? 201 : data.code;
+        code = (data.code === undefined) ? 201 : data.code;
     }
     res.status(code).json({
         code: code,
-        ... data
+        ...data
     });
 });
 
@@ -285,19 +288,19 @@ accounts.post('/projects/:projectId/accounts', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.get('/projects/:projectId/accounts/:accountId', async(req, res) => {
+accounts.get('/projects/:projectId/accounts/:accountId', async (req, res) => {
     const projectId = req.params.projectId;
     const accountId = req.params.accountId;
     const data = await dataManager.getAccount(projectId, accountId);
     var code;
     if (data && data.success === false) {
-        code = (data.code === undefined ) ? 500 : data.code;
+        code = (data.code === undefined) ? 500 : data.code;
     } else {
-        code = (data.code === undefined ) ? 200 : data.code;
+        code = (data.code === undefined) ? 200 : data.code;
     }
     res.status(code).json({
         code: code,
-        ... data
+        ...data
     });
 });
 
@@ -360,7 +363,7 @@ accounts.get('/projects/:projectId/accounts/:accountId', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.put('/projects/:projectId/accounts/:accountId', async(req, res) => {
+accounts.put('/projects/:projectId/accounts/:accountId', async (req, res) => {
     const projectId = req.params.projectId;
     const accountId = req.params.accountId;
     if (!req.body.email) {
@@ -383,18 +386,19 @@ accounts.put('/projects/:projectId/accounts/:accountId', async(req, res) => {
         emailType: req.body.emailType,
         accountType: req.body.accountType,
         createdBy: req.header('x-gcp-account'),
-        policies: req.body.policies
+        policies: req.body.policies,
+        marketplace: req.body.marketplace
     };
     const data = await dataManager.createOrUpdateAccount(projectId, accountId, values);
     var code;
     if (data && data.success === false) {
-        code = (data.code === undefined ) ? 500 : data.code;
+        code = (data.code === undefined) ? 500 : data.code;
     } else {
-        code = (data.code === undefined ) ? 200 : data.code;
+        code = (data.code === undefined) ? 200 : data.code;
     }
     res.status(code).json({
         code: code,
-        ... data
+        ...data
     });
 });
 
@@ -457,7 +461,7 @@ accounts.put('/projects/:projectId/accounts/:accountId', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.delete('/projects/:projectId/accounts/:accountId', async(req, res) => {
+accounts.delete('/projects/:projectId/accounts/:accountId', async (req, res) => {
     const projectId = req.params.projectId;
     const accountId = req.params.accountId;
     const values = {
@@ -467,13 +471,13 @@ accounts.delete('/projects/:projectId/accounts/:accountId', async(req, res) => {
     const data = await dataManager.deleteAccount(projectId, accountId, values);
     var code;
     if (data && data.success === false) {
-        code = (data.code === undefined ) ? 500 : data.code;
+        code = (data.code === undefined) ? 500 : data.code;
     } else {
-        code = (data.code === undefined ) ? 200 : data.code;
+        code = (data.code === undefined) ? 200 : data.code;
     }
     res.status(code).json({
         code: code,
-        ... data
+        ...data
     });
 });
 
@@ -525,19 +529,19 @@ accounts.delete('/projects/:projectId/accounts/:accountId', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.get('/projects/:projectId/policies/:policyId/accounts', async(req, res) => {
+accounts.get('/projects/:projectId/policies/:policyId/accounts', async (req, res) => {
     const projectId = req.params.projectId;
     const policyId = req.params.policyId;
     const data = await dataManager.listAccounts(projectId, null, policyId);
     var code;
     if (data && data.success === false) {
-        code = (data.code === undefined ) ? 500 : data.code;
+        code = (data.code === undefined) ? 500 : data.code;
     } else {
-        code = (data.code === undefined ) ? 200 : data.code;
+        code = (data.code === undefined) ? 200 : data.code;
     }
     res.status(code).json({
         code: code,
-        ... data
+        ...data
     });
 });
 
@@ -589,20 +593,120 @@ accounts.get('/projects/:projectId/policies/:policyId/accounts', async(req, res)
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.get('/projects/:projectId/datasets/:datasetId/accounts', async(req, res) => {
+accounts.get('/projects/:projectId/datasets/:datasetId/accounts', async (req, res) => {
     const projectId = req.params.projectId;
     const datasetId = req.params.datasetId;
     const data = await dataManager.listAccounts(projectId, datasetId);
     var code;
     if (data && data.success === false) {
-        code = (data.code === undefined ) ? 500 : data.code;
+        code = (data.code === undefined) ? 500 : data.code;
     } else {
-        code = (data.code === undefined ) ? 200 : data.code;
+        code = (data.code === undefined) ? 200 : data.code;
     }
     res.status(code).json({
         code: code,
-        ... data
+        ...data
     });
+});
+
+function extractHostname(url) {
+    var hostname;
+    if (url.indexOf("//") > -1) {
+        hostname = url.split('/')[2];
+    }
+    else {
+        hostname = url.split('/')[0];
+    }
+    hostname = hostname.split(':')[0];
+    hostname = hostname.split('?')[0];
+    return hostname;
+}
+
+// Temporary for development
+accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
+    const projectId = req.params.projectId;
+    const token = req.query['x-gcp-marketplace-token'];
+    console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
+
+    const host = extractHostname(req.headers.host);
+    const data = await dataManager.register(projectId, host, token);
+    console.log(`Data: ${JSON.stringify(data)}`);
+
+    if (data && data.success === false) {
+        res.clearCookie(gcpMarketplaceTokenCookieName);
+        res.redirect(cfg.uiBaseUrl + '/activationError');
+    } else {
+        const host = extractHostname(req.headers.host);
+        res.cookie(gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
+        res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
+    }
+});
+
+accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
+    const projectId = req.params.projectId;
+    const host = extractHostname(req.headers.host);
+    switch (req.params.custom) {
+        case "register": {
+            const token = req.body['x-gcp-marketplace-token'];
+            console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
+
+            const data = await dataManager.register(projectId, host, token);
+            console.log(`Data: ${JSON.stringify(data)}`);
+
+            if (data && data.success === false) {
+                res.clearCookie(gcpMarketplaceTokenCookieName);
+                res.redirect(cfg.uiBaseUrl + '/activationError');
+            } else {
+                // const domain = extractHostname(cfg.uiBaseUrl);
+                console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
+                res.cookie(gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
+                // res.redirect(cfg.uiBaseUrl + '/activation');
+                res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
+            }
+            break;
+        }
+        case "activate": {
+            const token = req.body['x-gcp-marketplace-token'];
+            const email = req.body.email;
+            const reason = req.body.reason;
+            console.log(`Activate called for project ${projectId}, token: ${token}, body: ${JSON.stringify(req.body)}`);
+
+            const data = await dataManager.activate(projectId, host, token, reason, email);
+            console.log(`Data: ${JSON.stringify(data)}`);
+
+            // TODO: Perform redirects
+            let code;
+            if (data && data.success === false) {
+                code = (data.code === undefined) ? 500 : data.code;
+            } else {
+                code = (data.code === undefined) ? 200 : data.code;
+            }
+            res.status(code).json({
+                code: code,
+                ...data
+            });
+            break;
+        }
+        case "reset": {
+            const accountId = req.body.accountId;
+            console.log(`Reset account called for project ${projectId}, accountId: ${accountId}, body: ${JSON.stringify(req.body)}`);
+
+            const data = await dataManager.reset(projectId, accountId);
+            console.log(`Data: ${JSON.stringify(data)}`);
+
+            let code;
+            if (data && data.success === false) {
+                code = (data.code === undefined) ? 500 : data.code;
+            } else {
+                code = (data.code === undefined) ? 200 : data.code;
+            }
+            res.status(code).json({
+                code: code,
+                ...data
+            });
+            break;
+        }
+    }
 });
 
 module.exports = accounts;

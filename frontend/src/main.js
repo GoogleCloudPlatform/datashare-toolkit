@@ -16,7 +16,9 @@ Vue.use(VueForm);
 // Fetch and load the store settings
 store.dispatch('getSettings');
 
-const firebase = require('firebase');
+import firebase from 'firebase/app';
+import 'firebase/auth'; // for authentication
+import 'firebase/analytics'; // for authentication
 
 // Initialize Firebase with a "default" Firebase project
 const firebaseConfig = {
@@ -35,9 +37,9 @@ firebase.auth().useDeviceLanguage();
 firebase.auth().onAuthStateChanged(user => {
   store.dispatch('fetchUser', user);
   if (user) {
-    console.log('User is signed in');
+    console.debug('User is signed in');
   } else {
-    console.log('No user is signed in');
+    console.debug('No user is signed in');
   }
 
   new Vue({

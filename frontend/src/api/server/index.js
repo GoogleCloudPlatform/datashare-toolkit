@@ -2,7 +2,7 @@ import store from './../../store';
 import axios from 'axios';
 import mock from './../mock';
 
-const firebase = require('firebase');
+import firebase from 'firebase/app';
 
 // set the default Accept header to application/json
 axios.defaults.headers.common['Accept'] = 'application/json';
@@ -234,9 +234,33 @@ export default {
       .then(response => response);
   },
   saveIngestion(payload) {
-    console.log(`Performing ingestion update`);
     return axios
       .put(this._apiBaseUrl() + '/ingestion', payload)
+      .then(response => response);
+  },
+  getProcurementRequests() {
+    return axios
+      .get(this._apiBaseUrl() + '/procurements')
+      .then(response => response);
+  },
+  submitProcurementAccountApproval(payload) {
+    return axios
+      .post(this._apiBaseUrl() + '/accounts:activate', payload)
+      .then(response => response);
+  },
+  submitProcurementAccountReset(payload) {
+    return axios
+      .post(this._apiBaseUrl() + '/accounts:reset', payload)
+      .then(response => response);
+  },
+  submitProcurementEntitlementApproval(payload) {
+    return axios
+      .post(this._apiBaseUrl() + '/procurements/approve', payload)
+      .then(response => response);
+  },
+  getUserProducts() {
+    return axios
+      .get(this._apiBaseUrl() + '/products')
       .then(response => response);
   },
   initSchema(payload) {

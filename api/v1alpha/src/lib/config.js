@@ -27,19 +27,19 @@ config.cdsDatasetId = "datashare";
 
 config.cdsAccountTableId = "account";
 config.cdsAccountTableFields = new Set(['rowId', 'accountId', 'email', 'emailType',
-    'accountType', 'createdBy', 'createdAt', 'policies', 'isDeleted']);
+    'accountType', 'createdBy', 'createdAt', 'policies', 'marketplace', 'isDeleted']);
 
 config.cdsAccountViewId = "currentAccount";
 config.cdsAccountViewFields = new Set(['rowId', 'accountId', 'email', 'emailType',
-    'accountType', 'createdBy', 'policies', 'createdAt', 'version', 'isDeleted']);
+    'accountType', 'createdBy', 'policies', 'marketplace', 'createdAt', 'version', 'isDeleted']);
 
 config.cdsPolicyTableId = "policy";
 config.cdsPolicyTableFields = new Set(['rowId', 'policyId', 'name', 'description',
-    'datasets', 'rowAccessTags', 'createdBy', 'createdAt', 'isDeleted']);
+    'datasets', 'rowAccessTags', 'marketplace', 'createdBy', 'createdAt', 'isDeleted']);
 
 config.cdsPolicyViewId = "currentPolicy";
 config.cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description',
-    'datasets', 'rowAccessTags', 'createdBy', 'createdAt', 'version',
+    'datasets', 'rowAccessTags', 'marketplace', 'createdBy', 'createdAt', 'version',
     'isDeleted']);
 
 config.cdsAuthorizedViewTableId = "authorizedView";
@@ -52,5 +52,14 @@ config.cdsAuthorizedViewViewFields = new Set(['rowId', 'authorizedViewId', 'name
     'version', 'isDeleted']);
 
 config.cdsCurrentUserDatasetViewId = "currentUserDataset";
+
+if (process.env.ADMIN_USERS) {
+    config.adminUsers = process.env.ADMIN_USERS.split(',') || [];
+}
+
+config.procurementJwksUri = process.env.PROCUREMENT_JWKS_URI || 'https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com';
+config.procurementIssuer = process.env.PROCUREMENT_ISSUER || 'https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com';
+
+config.uiBaseUrl = process.env.UI_BASE_URL || 'http://localhost:8080';
 
 module.exports = config;

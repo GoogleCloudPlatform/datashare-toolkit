@@ -9,6 +9,11 @@ const routerOptions = [
     component: 'Home'
   },
   {
+    path: '/restricted',
+    name: 'restricted',
+    component: 'Restricted'
+  },
+  {
     path: '/config',
     name: 'config',
     component: 'Config',
@@ -73,14 +78,6 @@ const routerOptions = [
     }
   },
   {
-    path: '/editAccountOld',
-    name: 'editAccountOld',
-    component: 'EditAccountOld',
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
     path: '/policies',
     name: 'policies',
     component: 'Policies',
@@ -92,6 +89,30 @@ const routerOptions = [
     path: '/editPolicy',
     name: 'editPolicy',
     component: 'EditPolicy',
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/procurements',
+    name: 'procurements',
+    component: 'Procurements',
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/activation',
+    name: 'activation',
+    component: 'Activation',
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/myDashboard',
+    name: 'myDashboard',
+    component: 'MyDashboard',
     meta: {
       requiresAuth: true
     }

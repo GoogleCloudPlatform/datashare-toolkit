@@ -5,7 +5,7 @@
       contain
       height="300"
     ></v-img>
-    <Welcome msg="Welcome to the CDS UI" />
+    <Welcome msg="Welcome to the DS UI" />
   </div>
 </template>
 

@@ -1,0 +1,17 @@
+{
+    "success": true,
+    "data": [
+        {
+            "solutionId": "cds-test-1",
+            "requestorAccountId": "benjentargaryen.327201@gmail.com",
+            "createdAt": 1589506656000,
+            "policyName": "baseball game log readers"
+        },
+        {
+            "solutionId": "cds-test-2",
+            "requestorAccountId": "melisandresnow.388027@gmail.com",
+            "createdAt": 1589506656000,
+            "policyName": "tick history readers"
+        }
+    ]
+}

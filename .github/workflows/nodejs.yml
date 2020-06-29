@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node-version: [10.x, 12.x, 13.x]
     steps:
     - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node-version }}
@@ -16,7 +16,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: npm install, lint, and test for shared
       run: |
-        cd shared
+        cd $GITHUB_WORKSPACE/shared
         npm install
         npm run lint
         npm test
@@ -35,7 +35,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: npm install and lint for processUpload
       run: |
-        cd ingestion/batch
+        cd $GITHUB_WORKSPACE/ingestion/batch
         npm install
         npm run lint
         npm test

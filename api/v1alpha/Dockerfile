@@ -32,7 +32,8 @@ RUN mkdir -p /shared
 FROM base as dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
-# install shared dependencies first
+
+# install shared dependencies next
 COPY shared/package*.json /shared/
 RUN cd /shared && npm install && cd -
 
@@ -52,7 +53,7 @@ COPY api/v1alpha/src/ /app/
 # --- Release with Alpine ----
 FROM node:12.6-alpine as release
 WORKDIR /app
-# Install the shared dependencies first
+# Install the shared dependencies next
 COPY --from=dependencies /shared/package.json /shared/
 RUN cd /shared && npm install --only=production && cd -
 COPY --from=build /shared /shared

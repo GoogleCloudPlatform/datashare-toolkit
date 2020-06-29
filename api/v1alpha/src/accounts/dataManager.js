@@ -16,7 +16,7 @@
 
 'use strict';
 
-const { BigQueryUtil } = require('cds-shared');
+const { BigQueryUtil, CommerceProcurementUtil } = require('cds-shared');
 let bigqueryUtil = new BigQueryUtil();
 const uuidv4 = require('uuid/v4');
 
@@ -24,6 +24,19 @@ const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');
 
 const underscore = require("underscore");
+
+const jwksClient = require('jwks-rsa');
+const ms = require('ms');
+const approvalName = 'signup';
+
+const client = jwksClient({
+    cache: true, // Default Value
+    cacheMaxEntries: 5, // Default value
+    cacheMaxAge: ms('10m'), // Default value
+    rateLimit: true,
+    jwksRequestsPerMinute: 10, // Default value
+    jwksUri: cfg.procurementJwksUri
+});
 
 /**
  * @param  {string} projectId
@@ -160,7 +173,15 @@ async function listAccounts(projectId, datasetId, policyId) {
 async function createOrUpdateAccount(projectId, accountId, data) {
     console.log(`createOrUpdateAccount called with accountId: ${accountId} and data: ${JSON.stringify(data)}`);
     let _accountId = accountId;
-    let impactedPolicies = Array.from(data.policies);
+
+    // If provided policies is not a string array, re-format it to string array
+    // TODO: clean up format before passing from UI
+    let policies = data.policies || [];
+    if (policies && typeof policies[0] !== 'string') {
+        data.policies = policies.map(p => { return p.policyId });
+    }
+
+    let impactedPolicies = data.policies ? Array.from(data.policies) : [];
     const currentAccount = await getAccount(projectId, accountId, data.email, data.emailType);
     console.log(`currentAccount response: ${JSON.stringify(currentAccount)}`);
     if (currentAccount.success) {
@@ -190,7 +211,6 @@ async function createOrUpdateAccount(projectId, accountId, data) {
     let fields = [...cfg.cdsAccountTableFields], values = [...cfg.cdsAccountTableFields];
 
     // reformat policies object for saving
-    let policies = data.policies;
     if (policies.length === 0) {
         // If there are no supplied policies, remove policies column field and value from insert statement.
         delete data.policies;
@@ -200,7 +220,20 @@ async function createOrUpdateAccount(projectId, accountId, data) {
             values.splice(index, 1);
         }
     } else {
-        data.policies = policies.map(p => { return { policyId: p }; })
+        // String array is passed in reformat for storing as dictionaries
+        // Reformat for storing into BQ
+        data.policies = policies.map(p => { return { policyId: p }; });
+    }
+
+    let marketplace = data.marketplace || [];
+    if (marketplace.length === 0) {
+        // If there are no supplied marketplace, remove marketplace column field and value from insert statement.
+        delete data.marketplace;
+        const index = fields.indexOf('marketplace');
+        if (index > -1) {
+            fields.splice(index, 1);
+            values.splice(index, 1);
+        }
     }
 
     fields = Array.from(fields).join();
@@ -217,7 +250,7 @@ async function createOrUpdateAccount(projectId, accountId, data) {
             accountType: 'consumer'
         }
     };
-    console.log(data);
+    console.log(JSON.stringify(data));
     const [rows] = await _insertData(projectId, fields, values, data);
     if (rows.length === 0) {
         try {
@@ -249,12 +282,12 @@ async function getAccount(projectId, accountId, email, emailType) {
     let filter = 'WHERE accountId = @accountId AND isDeleted is false';
     let params = {};
     if (accountId) {
-        console.log(`getAccount performing lookup by accountId: ${accountId}`);
+        // console.log(`getAccount performing lookup by accountId: ${accountId}`);
         params.accountId = accountId;
     }
     else if (email && emailType) {
-        console.log(`getAccount performing lookup by email and emailType: ${email}:${emailType}`);
-        filter = 'WHERE email = @email AND emailType = @emailType AND isDeleted is true';
+        // console.log(`getAccount performing lookup by email and emailType: ${email}:${emailType}`);
+        filter = 'WHERE email = @email AND emailType = @emailType'; // AND isDeleted is true
         params = { email: email, emailType: emailType };
     }
 
@@ -287,7 +320,7 @@ async function deleteAccount(projectId, accountId, data) {
     }
 
     let fields = [...cfg.cdsAccountTableFields];
-    let values = ['@rowId', 'accountId', 'email', 'emailType', 'accountType', '@createdBy', 'current_timestamp()', 'policies', 'true'];
+    let values = ['@rowId', 'accountId', 'email', 'emailType', 'accountType', '@createdBy', 'current_timestamp()', 'policies', 'marketplace', 'true'];
     fields = Array.from(fields).join();
     values = Array.from(values).join();
 
@@ -313,9 +346,170 @@ async function deleteAccount(projectId, accountId, data) {
     }
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} host
+ * @param  {} token
+ */
+async function register(projectId, host, token) {
+    // https://cloud.google.com/marketplace/docs/partners/integrated-saas/frontend-integration#verify-jwt
+    const jwt = require('jsonwebtoken');
+
+    /*
+        1. Verify that the JWT signature is using the public key from Google.
+        2. Verify that the JWT has not expired, by checking the exp claim.
+        3. Verify that aud claim is the correct domain for your solution.
+        4. Verify that the iss claim is https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com
+        5. Verify that sub is not empty.
+    */
+
+    const options = {
+        algorithms: ['RS256'],
+
+        // TODO: Should be passed in dynamically from solution configuration.
+        // Host or referrer in the header
+        // req.header.host
+        audience: host,
+
+        issuer: cfg.procurementIssuer,
+        ignoreExpiration: false,
+        complete: true
+    };
+
+    // Get the kid value
+    const decoded = jwt.decode(token, options);
+
+    let kid = '';
+    if (decoded && decoded.header && decoded.header.kid) {
+        // kid indicates the key ID that was used to secure the JWT. Use the key ID to 
+        // look up the key from the JSON object in the iss attribute in the payload.
+        kid = decoded.header.kid;
+        // console.log(`jwt kid: ${kid}`);
+    } else {
+        return { success: false, code: 500, errors: ['Unable to parse JWT token'] };
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    return new Promise((resolve, reject) => {
+        client.getSigningKey(kid, (err, key) => {
+            if (!err) {
+                const signingKey = key.getPublicKey();
+                try {
+                    const result = jwt.verify(token, signingKey, options);
+                    resolve({ success: true, code: 200, data: result });
+                } catch (err) {
+                    resolve({ success: false, code: 401, errors: [err] });
+                }
+            } else {
+                resolve({ success: false, code: 500, errors: [err] });
+            }
+        });
+    });
+
+    // Response write out for 302 redirect if valid JWT, otherwise 302 redirect to invalid request page
+    // Record sub in the db table with the incoming accountId
+    // If we have to pass any data back to the UI, use a session-based cookie
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} host
+ * @param  {} token
+ * @param  {} reason
+ * @param  {} email
+ */
+async function activate(projectId, host, token, reason, email) {
+    try {
+        console.log(`Activate called for token: ${token} for email: ${email}`);
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        const registration = await register(projectId, host, token);
+        console.log(`registration: ${JSON.stringify(registration)}`);
+        if (registration.success === true) {
+            const accountId = registration.data.payload.sub;
+            const accountName = procurementUtil.getAccountName(projectId, accountId);
+            const accountRecord = { accountName: accountName };
+            console.log(`accountName: ${accountName}`);
+
+            // Insert the account records.
+            let accountData;
+            let account = await getAccount(projectId, null, email, 'userByEmail');
+            if (account.success) {
+                accountData = account.data;
+                if (accountData.policies) {
+                    accountData.policies = accountData.policies.map(e => e.policyId);
+                }
+                if (accountData.marketplace) {
+                    const found = underscore.findWhere(accountData.marketplace, accountRecord);
+                    if (!found) {
+                        accountData.marketplace.push(accountRecord);
+                    }
+                } else {
+                    accountData.marketplace = [accountRecord];
+                }
+            } else {
+                // Create the account
+                accountData = {
+                    email: email,
+                    emailType: 'userByEmail',
+                    createdBy: email,
+                    marketplace: [accountRecord]
+                };
+            }
+
+            // This will create or update the account. At this point no new policies will be associated.
+            await createOrUpdateAccount(projectId, null, accountData);
+
+            const approval = await procurementUtil.approveAccount(accountName, approvalName, reason);
+            return { success: true, code: 200, data: approval };
+        }
+    } catch (err) {
+        console.error(err);
+        return { success: false, code: 500, errors: ['Failed to approve account'] };
+    }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} accountId
+ */
+async function reset(projectId, accountId) {
+    try {
+        console.log(`Reset called for accountId: ${accountId}`);
+        let accountData;
+        let account = await getAccount(projectId, accountId, 'userByEmail');
+        if (account.success) {
+            accountData = account.data;
+            if (accountData.policies) {
+                // Reformat policies for saving.
+                // TODO: Re-factor so this isn't a mess
+                accountData.policies = accountData.policies.map(e => e.policyId);
+            }
+            if (accountData.marketplace && accountData.marketplace.length > 0) {
+                const accountNames = accountData.marketplace.map(e => e.accountName);
+                // Clear the associated accountNames
+                accountData.marketplace = [];
+                const procurementUtil = new CommerceProcurementUtil(projectId);
+                for (const name of accountNames) {
+                    console.log(`Resetting account for name: ${name}`);
+                    await procurementUtil.resetAccount(name);
+                }
+                // Save the updated account record
+                await createOrUpdateAccount(projectId, null, accountData);
+            }
+        }
+        return { success: true, code: 200 };
+    } catch (err) {
+        console.error(err);
+        return { success: false, code: 500, errors: ['Failed to reset account(s)'] };
+    }
+}
+
 module.exports = {
     listAccounts,
     createOrUpdateAccount,
     deleteAccount,
-    getAccount
+    getAccount,
+    register,
+    activate,
+    reset
 };

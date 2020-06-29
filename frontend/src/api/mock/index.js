@@ -6,6 +6,7 @@ import entitlements from './data/entitlements';
 import ingestion from './data/ingestion';
 import policy from './data/policy';
 import policies from './data/policies';
+import procurementRequests from './data/marketplaceRequests';
 
 const uuid4 = require('uuid4');
 
@@ -90,5 +91,11 @@ export default {
   },
   createDataset(projectId, datasetId) {
     console.log(`Mock create dataset: ${projectId}:${datasetId}`);
+  },
+  getProcurementRequests() {
+    return get(procurementRequests, 2000); // wait 2s before returning config
+  },
+  submitProcurementAccountApproval() {
+    console.log(`Mock submitProcurementAccountApproval: ${projectId}`);
   }
 };

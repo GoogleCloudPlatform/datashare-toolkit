@@ -148,7 +148,8 @@ export default {
       accountId: null,
       emailType: null,
       email: null,
-      policies: []
+      policies: [],
+      marketplace: []
     },
     emailTypes: ['userByEmail', 'groupByEmail'],
     showError: false
@@ -160,6 +161,7 @@ export default {
       this.user.emailType = this.userData.emailType;
       this.user.email = this.userData.email;
       this.user.policies = this.userData.policies;
+      this.user.marketplace = this.userData.marketplace;
       this.initialSelectedPolicies = this.userData.policies;
       this.loadAccount();
     }
@@ -211,22 +213,16 @@ export default {
                 accountId: this.user.accountId,
                 email: this.user.email,
                 emailType: this.user.emailType,
-                policies: this.user.policies
+                policies: this.user.policies,
+                marketplace: this.user.marketplace
               };
             }
 
             this.$store.dispatch('saveAccount', data).then(result => {
               this.loading = false;
-
-              if (result.error && result.error === 'STALE') {
-                this.errorDialogTitle = 'Account data is stale';
-                this.errorDialogText =
-                  'This account has been updated since you last opened the page, please reload the page to make changes.';
-                this.showError = true;
-              } else if (result.error) {
+              if (!result.success) {
                 this.errorDialogTitle = 'Error saving account';
-                this.errorDialogText =
-                  'Failed to save account. Please reload and try again.';
+                this.errorDialogText = result.errors.join(', ');
                 this.showError = true;
               } else {
                 // Success
@@ -270,6 +266,7 @@ export default {
               policies = account.policies.map(p => p.policyId);
             }
             this.user.policies = policies;
+            this.user.marketplace = account.marketplace;
             this.initialSelectedPolicies = policies;
           }
           this.loading = false;

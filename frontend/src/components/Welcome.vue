@@ -53,14 +53,14 @@ export default {
   data: () => ({
     documentation: [
       {
-        text: 'CDS Frontend UI Doc',
+        text: 'DS Frontend UI Doc',
         href:
           'https://github.com/GoogleCloudPlatform/datashare-toolkit/frontend'
       }
     ],
     importantLinks: [
       {
-        text: 'CDS Home',
+        text: 'DS Home',
         href: 'https://github.com/GoogleCloudPlatform/datashare-toolkit'
       },
       {

@@ -19,11 +19,10 @@
 var compression = require('compression');
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cors = require('cors')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-
-const { checkIfAuthenticated } = require('./lib/fb/auth');
 
 const apiVersion = "v1alpha";
 const PORT = process.env.PORT || 5555;
@@ -88,6 +87,7 @@ app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.raw({type: 'application/octet-stream'}));
+app.use(cookieParser());
 
 // Import the CDS API Spots service router
 const spots = require('./spots/index');
@@ -99,6 +99,8 @@ const policies = require('./policies/index');
 const accounts = require('./accounts/index');
 // Import the CDS API Admin service router
 const admin = require('./admin/index');
+// Import the CDS API Procurement service router
+const procurements = require('./procurements/index');
 
 /************************************************************
   API Endpoints
@@ -110,13 +112,6 @@ var routes = [];
 
 // CORS will be controlled by the API GW layer
 router.all('*', cors());
-
-if (
-    process.env.NODE_ENV === 'production' ||
-    process.env.VUE_APP_APICLIENT == 'server'
-) {
-    router.all('*', checkIfAuthenticated);
-}
 
 /**
  * @swagger
@@ -247,6 +242,7 @@ router.use(datasets);
 router.use(policies);
 router.use(accounts);
 router.use(admin);
+router.use(procurements);
 
 /**
  * @swagger

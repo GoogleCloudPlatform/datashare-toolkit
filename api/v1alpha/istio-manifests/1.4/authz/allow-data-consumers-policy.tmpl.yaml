@@ -10,10 +10,10 @@ spec:
   - to:
     - operation:
         methods: ["GET"]
-        paths: ["/v1alpha/projects/$PROJECT_ID/accounts/*"]
+        paths: ["/v1alpha/projects/$PROJECT_ID/products"]
     - operation:
-        methods: ["POST"]
-        paths: ["/v1alpha/projects/$PROJECT_ID/accounts:*"]
+        methods: ["GET,POST"]
+        paths: ["/v1alpha/projects/$PROJECT_ID/accounts:activate"]
     when:
     - key: request.auth.claims[aud]
       values:

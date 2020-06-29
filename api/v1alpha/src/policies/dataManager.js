@@ -16,12 +16,13 @@
 
 'use strict';
 
-const { BigQueryUtil } = require('cds-shared');
+const { BigQueryUtil, CommerceProcurementUtil } = require('cds-shared');
 let bigqueryUtil = new BigQueryUtil();
 const uuidv4 = require('uuid/v4');
 
 const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');
+const accountManager = require('../accounts/dataManager');
 
 /**
  * @param  {string} projectId
@@ -75,6 +76,74 @@ async function _deleteData(projectId, fields, values, data) {
 }
 
 /**
+ * @param  {} projectId
+ * @param  {} email
+ */
+async function listUserPolicies(projectId, email) {
+    try {
+        const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+        let fields = new Set(cfg.cdsPolicyViewFields);
+        fields.delete('isDeleted');
+        fields = Array.from(fields).map(i => 'cp.' + i).join();
+        const accountTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+        let sqlQuery = `WITH currentAccount AS (
+            SELECT policies.policyId
+            FROM \`${accountTable}\` ca
+            CROSS JOIN UNNEST(policies) policies
+            WHERE lower(email) = @email AND
+                (ca.isDeleted IS false OR ca.isDeleted IS null)
+          )
+        SELECT datasets, rowAccessTags, marketplace
+        FROM \`${table}\` cp
+        JOIN currentAccount ca ON ca.policyId = cp.policyId
+        WHERE (cp.isDeleted IS false OR cp.isDeleted IS null)`;
+        let options = {
+            query: sqlQuery,
+            params: { email: email.toLowerCase() }
+        };
+        const [rows] = await bigqueryUtil.executeQuery(options);
+
+        rows.forEach(e => {
+            e.status = 'Active';
+        });
+
+        const account = await accountManager.getAccount(projectId, null, email, 'userByEmail');
+        if (account.success) {
+            const accountData = account.data;
+            const accountNames = accountData.marketplace.map(e => e.accountName);
+            if (accountNames && accountNames.length > 0) {
+                const procurementUtil = new CommerceProcurementUtil(projectId);
+                let accountFilter = '';
+                accountNames.forEach(e => {
+                    if (accountFilter != '') {
+                        accountFilter += ' OR ';
+                    }
+                    const name = e.substring(e.lastIndexOf('/') + 1);
+                    accountFilter += `account=${name}`;
+                });
+
+                const filterString = `state=ENTITLEMENT_ACTIVATION_REQUESTED AND (${accountFilter})`;
+                const result = await procurementUtil.listEntitlements(filterString);
+                if (result) {
+                    let entitlements = result.entitlements || [];
+                    if (entitlements && entitlements.length > 0) {
+                        entitlements.forEach(e => {
+                            const name = e.name.substring(e.name.lastIndexOf('/') + 1);
+                            rows.push({ marketplace: { solutionId: e.product, planId: e.plan, name: name }, status: 'Pending Approval' });
+                        });
+                    }
+                }
+            }
+        }
+
+        return { success: true, data: rows };
+    } catch (err) {
+        console.error(err);
+        return { success: false, code: 500, errors: ['Unable to retrieve user products'] };
+    }
+}
+
+/**
  * @param  {string} projectId
  * @param  {string} datasetId
  * @param  {string} accountId
@@ -83,7 +152,6 @@ async function _deleteData(projectId, fields, values, data) {
 async function listPolicies(projectId, datasetId, accountId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const fields = Array.from(cfg.cdsPolicyViewFields).join();
-    const limit = 10;
     let sqlQuery = `with accountCounts AS (
         select p.policyId, count(ca.accountId) as count
         from \`${projectId}.datashare.currentAccount\` ca
@@ -91,7 +159,7 @@ async function listPolicies(projectId, datasetId, accountId) {
         where ca.isDeleted is false
         group by p.policyId
       )
-    SELECT rowId, cp.policyId, name, description, createdAt, createdBy, version, ifnull(ac.count, 0) as accountCount
+    SELECT rowId, cp.policyId, name, description, createdAt, createdBy, version, ifnull(ac.count, 0) as accountCount, marketplace
     FROM \`${projectId}.datashare.currentPolicy\` cp
     left join accountCounts ac on ac.policyId = cp.policyId
     where cp.isDeleted is false;`;
@@ -99,7 +167,7 @@ async function listPolicies(projectId, datasetId, accountId) {
         query: sqlQuery
     };
     if (datasetId) {
-        sqlQuery = `SELECT ${fields} FROM \`${table}\`, UNNEST(datasets) AS datasets WHERE datasets.datasetId = @datasetId LIMIT ${limit};`
+        sqlQuery = `SELECT ${fields} FROM \`${table}\`, UNNEST(datasets) AS datasets WHERE datasets.datasetId = @datasetId;`
         options = {
             query: sqlQuery,
             params: { datasetId: datasetId }
@@ -151,9 +219,17 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
             _policyId = currentPolicy.data.policyId;
         }
     }
-    
+
     if (!_policyId) {
         _policyId = uuidv4();
+    }
+
+    if (data.marketplace && data.marketplace.solutionId && data.marketplace.planId) {
+        const isMarketplaceUnique = await isMarketplaceSolutionPlanUnique(projectId, policyId, data.marketplace.solutionId, data.marketplace.planId);
+        if (isMarketplaceUnique === false) {
+            const message = `Marketplace solutionId or planId is already defined. The combination of a solutionId and planId must be unique across all policies.`;
+            return { success: false, code: 500, errors: [message] };
+        }
     }
 
     const rowId = uuidv4();
@@ -188,6 +264,15 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
         }
     } else {
         data.rowAccessTags = rowAccessTags.map(t => { return { tag: t }; })
+    }
+
+    if (!(data.marketplace && data.marketplace.solutionId && data.marketplace.planId)) {
+        delete data.marketplace;
+        const index = fields.indexOf('marketplace');
+        if (index > -1) {
+            fields.splice(index, 1);
+            values.splice(index, 1);
+        }
     }
 
     fields = Array.from(fields).join();
@@ -244,6 +329,36 @@ async function getPolicy(projectId, policyId) {
 }
 
 /**
+ * @param  {} projectId
+ * @param  {} policyId
+ * @param  {} solutionId
+ * @param  {} planId
+ */
+async function isMarketplaceSolutionPlanUnique(projectId, policyId, solutionId, planId) {
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+    const sqlQuery = `SELECT
+    COUNT(policyId) as count
+FROM \`${table}\`
+WHERE
+    isDeleted IS FALSE
+    AND policyId != @policyId
+    AND marketplace IS NOT NULL and lower(marketplace.solutionId) = lower(@solutionId)
+    AND lower(marketplace.planId) = lower(@planId);`
+
+    let options = {
+        query: sqlQuery,
+        params: { policyId: policyId !== null ? policyId : '', solutionId: solutionId, planId: planId }
+    };
+    const [rows] = await bigqueryUtil.executeQuery(options);
+    console.log(JSON.stringify(rows));
+    if (rows[0].count === 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
  * @param  {string} projectId
  * @param  {string} policyId
  * @param  {object} data
@@ -258,8 +373,8 @@ async function deletePolicy(projectId, policyId, data) {
         return { success: false, code: 500, errors: ["STALE"] };
     }
 
-    let fields =[...cfg.cdsPolicyTableFields];
-    let values = ['@rowId', 'policyId', 'name', 'description', 'datasets', 'rowAccessTags', '@createdBy', 'current_timestamp()', 'true'];
+    let fields = [...cfg.cdsPolicyTableFields];
+    let values = ['@rowId', 'policyId', 'name', 'description', 'datasets', 'rowAccessTags', 'marketplace', '@createdBy', 'current_timestamp()', 'true'];
     fields = Array.from(fields).join();
     values = Array.from(values).join();
 
@@ -279,5 +394,6 @@ module.exports = {
     listPolicies,
     createOrUpdatePolicy,
     deletePolicy,
-    getPolicy
+    getPolicy,
+    listUserPolicies
 };

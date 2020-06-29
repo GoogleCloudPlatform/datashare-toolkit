@@ -193,6 +193,23 @@ async function setupDatasharePrerequisites(projectId) {
                     "description": "List of row access tag(s) associations for a policy"
                 },
                 {
+                    "mode": "NULLABLE",
+                    "name": "marketplace",
+                    "type": "RECORD",
+                    "fields": [
+                        {
+                            "mode": "REQUIRED",
+                            "name": "solutionId",
+                            "type": "STRING"
+                        },
+                        {
+                            "mode": "REQUIRED",
+                            "name": "planId",
+                            "type": "STRING"
+                        }
+                    ]
+                },
+                {
                     "mode": "REQUIRED",
                     "name": "createdBy",
                     "type": "STRING",
@@ -284,6 +301,20 @@ async function setupDatasharePrerequisites(projectId) {
                     ],
                     "mode": "REPEATED",
                     "name": "policies",
+                    "type": "RECORD",
+                    "description": "List of policies(s) associations for an account"
+                },
+                {
+                    "fields": [
+                        {
+                            "mode": "REQUIRED",
+                            "name": "accountName",
+                            "type": "STRING",
+                            "description": "The resource name of the account."
+                        }
+                    ],
+                    "mode": "REPEATED",
+                    "name": "marketplace",
                     "type": "RECORD",
                     "description": "List of policies(s) associations for an account"
                 },
