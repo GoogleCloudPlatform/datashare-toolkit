@@ -3,7 +3,7 @@
 
 _This is not an officially supported Google product._
 
-The ```Datashare Toolkit``` is a solution for data publishers to easily manage datasets residing within [BigQuery](https://cloud.google.com/bigquery/). The toolkit includes functionality to ingest and entitle data, relieving consumers from much of the toil involved in onboarding datasets from a variety of providers. Publishers upload data files to a storage bucket and allocate permissioned datasets for their consumers to use with BigQuery [authorized views](https://cloud.google.com/bigquery/docs/authorized-views). 
+The ```Datashare Toolkit``` is a solution for data publishers to easily manage datasets residing within [BigQuery](https://cloud.google.com/bigquery/). The toolkit includes functionality to ingest and entitle data, relieving consumers from much of the toil involved in onboarding datasets from a variety of providers. Publishers upload data files to a storage bucket and allocate permissioned datasets for their consumers to use with BigQuery [authorized views](https://cloud.google.com/bigquery/docs/authorized-views).
 
 While these tools are used for data management and entitlement, they follow a bring-your-own-license (BYOL) for entitling publisher data. Hence, publishers should already have licensing arrangements for those consumers withing to access their data within GCP, and the consumers can furnish the GCP account ID's corresponding to their entitled user principals. These account IDs are required for the creation of the authorized views.
 
@@ -23,7 +23,8 @@ For publisher projects that do not have the Cloud Functions API enabled at the t
 
 ### Consumers
 
-- A GCP account with billing enabled
+- A valid Google Account or Google Group [email address](https://cloud.google.com/iam/docs/overview#google_account) (which includes Gsuite and Gmail email addresses). \
+  **Note**: Consumers can create a Google account with an existing email address [here](https://support.google.com/accounts/answer/27441)
 - Entitlements granted by the publisher to your specific licensed datasets
 
 ## Principles
