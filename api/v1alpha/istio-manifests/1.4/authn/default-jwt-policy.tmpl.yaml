@@ -1,0 +1,42 @@
+---
+apiVersion: authentication.istio.io/v1alpha1
+kind: Policy
+metadata:
+  # global policy per namespace if name is 'default' without targets
+  #name: google-firebase-jwt
+  #namespace: gke-system
+  name: default
+  namespace: datashare-apis
+spec:
+  origins:
+  - jwt:
+      issuer: https://accounts.google.com
+      jwksUri: https://www.googleapis.com/oauth2/v3/certs
+      triggerRules:
+      - excludedPaths:
+        - exact: /healthz
+        - exact: /metrics
+        - exact: /probe
+        - prefix: /_internal/knative
+        - prefix: /v1alpha/docs
+  - jwt:
+      issuer: https://securetoken.google.com/$PROJECT_ID
+      jwksUri: https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com
+      triggerRules:
+      - excludedPaths:
+        - exact: /healthz
+        - exact: /metrics
+        - exact: /probe
+        - prefix: /_internal/knative
+        - prefix: /v1alpha/docs
+  - jwt:
+      issuer: https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com
+      jwksUri: https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com
+      triggerRules:
+      - excludedPaths:
+        - exact: /healthz
+        - exact: /metrics
+        - exact: /probe
+        - prefix: /_internal/knative
+        - prefix: /v1alpha/docs
+  principalBinding: USE_ORIGIN
