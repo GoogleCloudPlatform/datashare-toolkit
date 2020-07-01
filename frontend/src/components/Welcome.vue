@@ -55,7 +55,7 @@ export default {
       {
         text: 'DS Frontend UI Doc',
         href:
-          'https://github.com/GoogleCloudPlatform/datashare-toolkit/frontend'
+          'https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/frontend/README.md'
       }
     ],
     importantLinks: [
