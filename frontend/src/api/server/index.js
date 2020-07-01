@@ -37,7 +37,7 @@ axios.interceptors.response.use(
   error => {
     if (error.response) {
       let path = '/restricted';
-      if (error.response.status === 403) {
+      if (error.response.status === 401 || error.response.status === 403) {
         router.replace(path);
       }
       return validContentTypes.includes(error.response.headers['content-type'])
