@@ -1,7 +1,7 @@
 <template>
   <div id="welcome">
     <v-img
-      :src="require('../assets/cds-architecture.png')"
+      :src="require('../assets/ds-architecture.png')"
       contain
       height="300"
     ></v-img>
