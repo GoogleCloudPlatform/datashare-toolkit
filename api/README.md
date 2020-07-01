@@ -40,11 +40,11 @@ The DS API also enables data producers unique Fulfillments operations on their d
 
 ### Entitlement Services
 
-![alt text](files/images/cds-api-entitlement-architecture.png)
+![alt text](files/images/ds-api-entitlement-architecture.png)
 
 ### Fulfillment Services
 
-![alt text](files/images/cds-api-spot-architecture.png)
+![alt text](files/images/ds-api-spot-architecture.png)
 
 
 ## Configuration
@@ -115,7 +115,7 @@ Create the custom DS API service-account:
 
 Set the **CUSTOM\_ROLE\_NAME** environment variable(s):
 
-    export CUSTOM_ROLE_NAME=custom.cds.api.mgr;
+    export CUSTOM_ROLE_NAME=custom.ds.api.mgr;
 
 **Note**: We could use the the following roles, but it's better to follow the principle of least privilege. \
 _The permissions for the custom role are defined in [config/ds-api-mgr-role-definition.yaml](config/ds-api-mgr-role-definition.yaml)_
@@ -360,12 +360,12 @@ Label the **namespace** with `istio-injection=enabled` so that the Istio sidecar
 Deploy ths DS API service to Cloud Run for Anthos in the **NAMESPACE**: \
 **Note**: We need to use the *alpha* version of gcloud command thaht supports the KSA's `serviceAccountName` value for the GKE service pod.
 
-    gcloud alpha run deploy cds-api \
+    gcloud alpha run deploy ds-api \
       --cluster $CLUSTER \
       --cluster-location $ZONE \
       --min-instances 1 \
       --namespace $NAMESPACE \
-      --image gcr.io/${PROJECT_ID}/cds-api:${TAG} \
+      --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
       --platform gke
 
 This command creates a [Knative Serving service](https://github.com/knative/serving/blob/master/docs/spec/overview.md) object.
@@ -378,7 +378,7 @@ Check the status of the deployment: \
 
 You can also run the `glcoud run services describe` command to see the status:
 
-    gcloud run services describe cds-api \
+    gcloud run services describe ds-api \
       --cluster $CLUSTER \
       --cluster-location $ZONE \
       --namespace $NAMESPACE \
@@ -391,11 +391,11 @@ Cloud Run for Anthos exposes services on the external IP address of the [Istio i
 Verify the DS API is running based off the active version url: \
 **Note**: The service external fqdn will be `'<service>.<namespace>.<domain>'` and **example.com** is the default knative domain.
 
-    curl -i -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+    curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
 
 You should also be able to verify the DS API can communicate with GCP services:
 
-    curl -i -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha/projects/${PROJECT_ID}/datasets
+    curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha/projects/${PROJECT_ID}/datasets
 
 
 #### Domain mapping
@@ -404,7 +404,7 @@ To use a custom domain for a service, you map your service to the custom domain,
 
 Create a **DOMAIN** environment variable based off the above:
 
-    export DOMAIN=cds-api.fsi.joonix.net
+    export DOMAIN=ds-api.fsi.joonix.net
 
 Verify domain ownership the first time you use that domain in the Google Cloud project:
 
@@ -416,7 +416,7 @@ If your ownership of the domain needs to be verified, open the Webmaster Central
 
 Map your service to the custom domain:
 
-    gcloud beta run domain-mappings create --service cds-api \
+    gcloud beta run domain-mappings create --service ds-api \
       --domain $DOMAIN \
       --cluster $CLUSTER \
       --cluster-location $ZONE \
@@ -426,7 +426,7 @@ Map your service to the custom domain:
 Reserve the IP address attached to the Load Balancer for the Istio ingress gateway service as a static IP: \
 **Note**: Create a **REGION** environment variable based off the appropriate **ZONE** variable above:
 
-    gcloud compute addresses create cds-api-static-ip --addresses $GATEWAY_IP --region $REGION
+    gcloud compute addresses create ds-api-static-ip --addresses $GATEWAY_IP --region $REGION
 
 Add the appropriate A record to the DNS entry in your domain registrar based off the entry of this command:
 **Note**: You can execute `gcloud` commands to add this if the DNS zone is managed in Cloud DNS [here](https://cloud.google.com/dns/docs/records#gcloud)
@@ -452,8 +452,8 @@ Deploy with Cloud Run (Managed): \
 **Note**: There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--set-env-vars) provides details for how they are set.\
 The GCP project's Cloud IAM policy, *constraints/iam.allowedPolicyMemberDomains* or *Domain Restricted Sharing* must be disabled to allow unauthenticated requests to reach Cloud Run services with the `--allow-unauthenticated` parameter. This policy is currently the default setting as described [here](https://cloud.google.com/resource-manager/docs/organization-policy/org-policy-constraints).
 
-    gcloud run deploy cds-api \
-      --image gcr.io/${PROJECT_ID}/cds-api:${TAG} \
+    gcloud run deploy ds-api \
+      --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
       --region=us-central1 \
       --allow-unauthenticated \
       --platform managed \
@@ -461,8 +461,8 @@ The GCP project's Cloud IAM policy, *constraints/iam.allowedPolicyMemberDomains*
 
 Spot service environment:
 
-    gcloud run deploy cds-api \
-      --image gcr.io/${PROJECT_ID}/cds-api:${TAG} \
+    gcloud run deploy ds-api \
+      --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
       --region=us-central1 \
       --allow-unauthenticated \
       --platform managed \
@@ -472,7 +472,7 @@ Spot service environment:
 
 Open the app URL in your browser. You can return the FQDN via:
 
-    gcloud run services describe cds-api --platform managed --format="value(status.url)"
+    gcloud run services describe ds-api --platform managed --format="value(status.url)"
 
 #### Confirm your API is running
 
@@ -494,11 +494,11 @@ These instructions are to build and deploy in a k8s environment via Skaffold.
 Create a kubernetes secret with the appropriate service account key file from above:\
 **Note**: Change the file path to the appropriate destination. Secrets management for multiple k8s clusters is outside the scope of this example.
 
-    kubectl create secret generic cds-api-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
+    kubectl create secret generic ds-api-creds --from-file=key.json=${GOOGLE_APPLICATION_CREDENTIALS}
 
 Modify the ConfigMap with the appropriate DS API environment variables:
 
-    vi kubernetes-manifests/cds-api/configmaps.yaml
+    vi kubernetes-manifests/ds-api/configmaps.yaml
 
 Set the default GCR project repository:
 
@@ -578,19 +578,19 @@ Authentication is enforced by Istio JWT Policies at the Istio [Ingress Gateway](
 **Note**: The HTTP response code should be *401 Unauthorized*
 
 
-    curl -i -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+    curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
 
 3. Verify the DS API is accessible with a valid Bearer ID Token:
 **Note**: The HTTP response code should be *200 OK*
 
 
-    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
 
 4. Verify the DS API preflight requests are accessible without a valid Bearer ID Token:
 **Note**: The HTTP response code should be *200 OK*
 
 
-     curl -i -X OPTIONS -H "Origin: http://cds-ui.a.run.app" -H "Access-Control-Request-Method: POST" -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+     curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
 
 
 You now have [authentication](#authentication) enabled for all endpoints and methods in the DS API service. Next step is to enforce [authorization](#authorization) for the clients:
@@ -635,19 +635,19 @@ Before you apply the AuthZ policies, export the **DATA_PRODUCERS** environment v
 **Note**: The HTTP response code should be *401 Unauthorized*
 
 
-    curl -i -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+    curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
 
 3. Verify the DS API is accessible with a valid Bearer ID Token:
 **Note**: The HTTP response code should be *200 OK*
 
 
-    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
 
 4. Verify the DS API preflight requests are accessible without a valid Bearer ID Token:
 **Note**: The HTTP response code should be *200 OK*
 
 
-     curl -i -X OPTIONS -H "Origin: http://cds-ui.a.run.app" -H "Access-Control-Request-Method: POST" -H "Host: cds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+     curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
 
 
 You now have [authorization](#authorization) enabled for all endpoints and methods in the DS API service.
