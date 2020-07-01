@@ -3,7 +3,7 @@
 ##  Date:   2020-04-03
 ##  Developer:  Chris Page
 ##  Email:  chrispage@google.com
-##  Purpose:   This Dockerfile contains the cds-frontend-ui application
+##  Purpose:   This Dockerfile contains the ds-frontend-ui application
 ################################################################################
 
 ## ---- Base Node ----
