@@ -93,7 +93,7 @@ gcloud services enable iam.googleapis.com
 
 ### Service Account
 
-DS API service(s) are a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](./config/cds-api-mgr-role-definition.yaml)
+DS API service(s) are a trusted application that makes authorized API calls to your GCP project service(s). The application requires a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](./config/ds-api-mgr-role-definition.yaml)
 
 #### Setup Service Account
 
@@ -103,7 +103,7 @@ Set your **PROJECT\_ID** if you have not already:
 
 Set the **SERVICE\_ACCOUNT\_NAME** environment variable(s):
 
-    export SERVICE_ACCOUNT_NAME=cds-api-mgr;
+    export SERVICE_ACCOUNT_NAME=ds-api-mgr;
 
 Set the **SERVICE\_ACCOUNT\_DESC** environment variable(s):
 
@@ -118,11 +118,11 @@ Set the **CUSTOM\_ROLE\_NAME** environment variable(s):
     export CUSTOM_ROLE_NAME=custom.cds.api.mgr;
 
 **Note**: We could use the the following roles, but it's better to follow the principle of least privilege. \
-_The permissions for the custom role are defined in [config/cds-api-mgr-role-definition.yaml](config/cds-api-mgr-role-definition.yaml)_
+_The permissions for the custom role are defined in [config/ds-api-mgr-role-definition.yaml](config/ds-api-mgr-role-definition.yaml)_
 
 Create custom DS API role:
 
-    gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/cds-api-mgr-role-definition.yaml
+    gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml
 
 **Note**: If the custom role already exists, just update the stage:
 

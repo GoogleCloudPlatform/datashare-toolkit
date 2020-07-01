@@ -38,7 +38,7 @@ def GenerateConfig(context):
               { # Create the custom role
               'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
               'entrypoint': '/bin/bash',
-              'args': ['-c', 'gcloud iam roles create ' + context.properties['customRoleName'] + ' --project=$PROJECT_ID --file=config/cds-api-mgr-role-definition.yaml || exit 0'],
+              'args': ['-c', 'gcloud iam roles create ' + context.properties['customRoleName'] + ' --project=$PROJECT_ID --file=config/ds-api-mgr-role-definition.yaml || exit 0'],
               'dir': 'ds/datashare-toolkit/api' # changes the working directory to /workspace/ds/datashare-toolkit/api
               },
               { # Assign the service account to the custom role
