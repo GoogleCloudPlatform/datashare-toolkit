@@ -36,9 +36,11 @@ axios.interceptors.response.use(
   // 404 is considered an error
   error => {
     if (error.response) {
-      let path = '/restricted';
-      if (error.response.status === 401 || error.response.status === 403) {
-        router.replace(path);
+      if (error.response.status === 401) {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        firebase.auth().signInWithRedirect(provider);
+      } else if (error.response.status === 403) {
+        router.replace('/restricted');
       }
       return validContentTypes.includes(error.response.headers['content-type'])
         ? error.response.data
