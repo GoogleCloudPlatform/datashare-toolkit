@@ -1,4 +1,4 @@
-# ```Google Cloud Platform Market Place solution```
+# ```Google Cloud Platform Marketplace solution```
 ## Summary
 
 This folder contains the assets required to create the Marketplace VM solution and package the assets into a single zip file.

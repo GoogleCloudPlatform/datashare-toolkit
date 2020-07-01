@@ -63,10 +63,6 @@ The function is triggered off mutations to a specified Cloud Storage Bucket.
 
 Entitlements are configured in a separate workflow, but generally reference tables created during the ingestion stage. Entitlements must be regenerated each time access control lists or authorized views change.
 
-## Roadmap
-
-The [roadmap](roadmap) section details currently planned features of Datashare. We'd love to hear your feedback!
-
 ## Ingestion and transformation
 
 The [ingestion](ingestion) page has details on the toolkit's embedded ingestion and transformation features.
