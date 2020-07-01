@@ -3,6 +3,7 @@ import axios from 'axios';
 import mock from './../mock';
 
 import firebase from 'firebase/app';
+import router from './../../router';
 
 // set the default Accept header to application/json
 axios.defaults.headers.common['Accept'] = 'application/json';
@@ -35,6 +36,10 @@ axios.interceptors.response.use(
   // 404 is considered an error
   error => {
     if (error.response) {
+      let path = '/restricted';
+      if (error.response.status === 403) {
+        router.replace(path);
+      }
       return validContentTypes.includes(error.response.headers['content-type'])
         ? error.response.data
         : Promise.reject('Content-Type: application/json is required');
