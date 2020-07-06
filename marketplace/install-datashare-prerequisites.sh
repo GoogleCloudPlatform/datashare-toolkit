@@ -1,7 +1,13 @@
 #!/bin/bash
 CLOUD_FUNCTION_ZIP_FILE_NAME="datashare-toolkit-cloud-function.zip"
-
 echo "Enabling Cloud APIs..."
+
+gcloud services enable cloudfunctions.googleapis.com --quiet
+if [ $? -eq 0 ]; then
+    echo "Enabled cloudfunctions API successfully."
+else 
+    echo "cloudfunctions API was not enabled."
+fi
 gcloud services enable cloudbuild.googleapis.com --quiet
 if [ $? -eq 0 ]; then
     echo "Enabled cloudbuild API successfully."
