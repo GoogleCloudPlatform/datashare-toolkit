@@ -1,9 +1,9 @@
-[Back to BQDS](../../README.md)
+[Back to DS](../../README.md)
 
 # Example scenario using Major League Baseball game logs
 
 ## Overview
-For this BQDS example, we configure and load Major League Baseball [1871-2018 Game Logs](https://www.retrosheet.org/gamelogs/gl1871_2018.zip) which were sourced from [Retrosheet](https://www.retrosheet.org/gamelogs/index.html).
+For this DS example, we configure and load Major League Baseball [1871-2018 Game Logs](https://www.retrosheet.org/gamelogs/gl1871_2018.zip) which were sourced from [Retrosheet](https://www.retrosheet.org/gamelogs/index.html).
 
 ## Quick start
 
@@ -15,8 +15,8 @@ gsutil mb gs://${BUCKET}
 cd bq-datashare-toolkit/ingestion/function
 npm run deploy -- --trigger-bucket=gs://${BUCKET}
 cd ../../examples/mlb/config/ingestion
-gsutil cp game_logs.schema.json gs://${BUCKET}/bqds/
-gsutil cp game_logs.transform.sql gs://${BUCKET}/bqds/
+gsutil cp game_logs.schema.json gs://${BUCKET}/cds/
+gsutil cp game_logs.transform.sql gs://${BUCKET}/cds/
 cd ../../data
 gsutil cp mlb.game_logs.csv.gz gs://${BUCKET}
 sleep 60 # wait for ingestion
@@ -53,7 +53,7 @@ eventTrigger:
 labels:
   deployment-tool: cli-gcloud
 name: projects/thisuser-cloud-sandbox/locations/us-central1/functions/processUpload
-runtime: nodejs8
+runtime: nodejs10
 serviceAccountEmail: thisuser-cloud-sandbox@appspot.gserviceaccount.com
 sourceUploadUrl: https://storage.googleapis.com/gcf-upload-us-central1-081d71f7-3b71-4e31-bbb2-8668bf287101/bbcb0441-0571-4dbc-920a-5772b9c34e85.zip?GoogleAccessId=service-283242825526@gcf-admin-robot.iam.gserviceaccount.com&Expires=1572371537&Signature=dZLp9YyRa2y40pTFuz0%2BEgWR0oUKAC9CYFzFy2rfwyKpobnyo17RivMnXgkFhyw4izwHTdUy%2FSfg4jYXIjM6kt6GCGX%2FuTz2F4Mp0sNifUEZ5WueNGsVdHQ%2BWDuKAkiUd%2FrHfAxNWm3UrU%2BuR0MSZg2%2Baaz9hh5AzFEAGu9ixhm4rc3G5LNDp4kud8QCVz57Dtl5F7ZZSX3RRzVCPAkP7Fq7%2BYZLLsENDrEz4%2B04FDLiuPXddvkU9XpLZAahWlWKZL8T4Y6wJPhKuQHqY8RLR9jU1Vfkbp93%2BcMXcOPtue6eXOmVVKVhRYalXsoLUMTu2qutKgVkbTN8MBczKT9K2g%3D%3D
 status: ACTIVE
@@ -61,11 +61,11 @@ timeout: 540s
 updateTime: '2019-10-29T17:22:49Z'
 versionId: '21'
 host:bin thisuser$ cd ../../examples/mlb/config/ingestion
-host:ingestion thisuser$ gsutil cp game_logs.schema.json gs://${BUCKET}/bqds/
+host:ingestion thisuser$ gsutil cp game_logs.schema.json gs://${BUCKET}/cds/
 Copying file://game_logs.schema.json [Content-Type=application/json]...
 / [1 files][ 21.4 KiB/ 21.4 KiB]                                                
 Operation completed over 1 objects/21.4 KiB.                                     
-host:ingestion thisuser$ gsutil cp game_logs.transform.sql gs://${BUCKET}/bqds/
+host:ingestion thisuser$ gsutil cp game_logs.transform.sql gs://${BUCKET}/cds/
 Copying file://game_logs.transform.sql [Content-Type=application/x-sql]...
 / [1 files][  158.0 B/  158.0 B]                                                
 Operation completed over 1 objects/158.0 B.                                      
@@ -83,8 +83,8 @@ host:data thisuser$
 host:data thisuser$ # clean up bucket
 host:data thisuser$ gsutil rm -r -f gs://${BUCKET}
 Removing gs://713573366abd762a58fce9752b55b610/mlb.game_logs.csv.gz#1572369785409249...
-Removing gs://713573366abd762a58fce9752b55b610/bqds/game_logs.schema.json#1572369771326950...
-Removing gs://713573366abd762a58fce9752b55b610/bqds/game_logs.transform.sql#1572369772972359...
+Removing gs://713573366abd762a58fce9752b55b610/cds/game_logs.schema.json#1572369771326950...
+Removing gs://713573366abd762a58fce9752b55b610/cds/game_logs.transform.sql#1572369772972359...
 / [3 objects]                                                                   
 Operation completed over 3 objects.                                              
 Removing gs://713573366abd762a58fce9752b55b610/...
@@ -111,17 +111,10 @@ Removing gs://713573366abd762a58fce9752b55b610/...
         CONCAT(v_name, '|', h_name) AS label
         ```
 
-## Entitlements
-- Simple Example - [JSON](./config/entitlements/simple.json) | [YAML](./config/entitlements/simple.yaml)
-    - In the simple example, there are two audiences - New York fans, and Chicago fans. We create two datasets to manage separate permissions for each - ny_fans and chicago_fans. We create two views, both have `accessControl` enabled, and are filtering rows by the team column label. For the `ny_game_logs` view we also configured `publicAccess` which allows a user with view access but no row-level access to view rows where the game_number is 1 - limited to 20 results.
-- Complex Example - [JSON](./config/entitlements.complex.json) | [YAML](./config/entitlements/complex.yaml)
-    - For the complex example, custom queries are configured for each of the three configured views. Additionally, the `authorizeFromDatasetIds` property  was added within `custom` to ensure that the `mlb` dataset is authorized for access by these newly created views.
-
 ## Directories
 The following directories are included in the example:
 - [config](./config) 
     - [ingestion](./config/ingestion) - Contains the ingestion configuration files.
-    - [entitlements](./config/entitlements) - Contains the entitlement engine configuration files.
 - [data](./data) - Contains a raw, compressed data archive and license file used for the example.
 
 ## License

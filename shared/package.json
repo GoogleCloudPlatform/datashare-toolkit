@@ -1,33 +1,35 @@
 {
-  "name": "bqds-shared",
+  "name": "cds-shared",
   "version": "1.0.0",
-  "description": "BQDS shared library",
+  "description": "CDS shared library",
   "license": "Apache-2.0",
   "repository": {},
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
     "test": "nyc mocha --timeout 60000",
-    "cloudtest": "nyc mocha --timeout 60000 --projectId='bqds-ci' --runCloudTests"
+    "cloudtest": "nyc mocha --timeout 60000 --projectId=${PROJECT_ID} --runCloudTests",
+    "coverage": "nyc report --reporter=html"
   },
   "dependencies": {
     "@google-cloud/bigquery": "^4.4.0",
     "@google-cloud/functions-framework": "^1.3.2",
     "@google-cloud/pubsub": "^1.1.5",
     "@google-cloud/storage": "^4.1.3",
+    "googleapis": "^52.1.0",
     "jsonschema": "^1.2.4",
-    "yaml": "^1.7.2",
-    "uuid": "^3.3.3",
-    "minimist": "^1.2.0",
     "lint": "^0.7.0",
-    "underscore": "^1.9.1"
+    "minimist": "^1.2.5",
+    "underscore": "^1.9.1",
+    "uuid": "^3.3.3",
+    "yaml": "^1.7.2"
   },
   "devDependencies": {
-    "eslint": "^5.12.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "mocha": "^6.2.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "eslint": "^5.16.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "mocha": "^6.2.2",
     "nyc": "^14.1.1"
   }
 }

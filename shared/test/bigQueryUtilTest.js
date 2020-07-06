@@ -42,42 +42,47 @@ describe('BigQueryUtil', () => {
         context('validateQuery with arguments', () => {
             it("query should be valid", async () => {
                 const query = "select 1 union all select 2";
-                return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.true;
+                const v = await bigqueryUtil.validateQuery(query);
+                return expect(v.success).to.equal(true);
             });
         });
 
         context('validateQuery with arguments', () => {
             it("query should be invalid", async () => {
                 const query = "Xselect 1";
-                return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.false;
+                const v = await bigqueryUtil.validateQuery(query);
+                return expect(v.success).to.equal(false);
             });
         });
 
         context('validateQuery with arguments', () => {
             it("query should be valid with limit", async () => {
                 const query = "select 1 union all select 2 limit 10";
-                return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.true;
+                const v = await bigqueryUtil.validateQuery(query);
+                return expect(v.success).to.equal(true);
             });
         });
 
         context('validateQuery with arguments', () => {
             it("query should be invalid with limit", async () => {
                 const query = "Xselect 1 limit 10";
-                return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.false;
+                const v = await bigqueryUtil.validateQuery(query);
+                return expect(v.success).to.equal(false);
             });
         });
 
         context('validateQuery with arguments', () => {
             it("query should be invalid with limit", async () => {
                 const query = "Xselect 1 limit 10";
-                return expect(bigqueryUtil.validateQuery(query)).to.eventually.be.false;
+                const v = await bigqueryUtil.validateQuery(query);
+                return expect(v.success).to.equal(false);
             });
         });
 
         const uuid = uuidv4().replace(/-/g, "_");
         const viewName = `v_${uuid}`;
 
-        const labelName = "bqds_configuration_name";
+        const labelName = "cds_configuration_name";
         const labelValue = "unit_tests";
         let labels = {};
         labels[labelName] = labelValue;
@@ -248,11 +253,13 @@ describe('BigQueryUtil', () => {
                     }).then(() => {
                         const rows = [{ column1: "value 1", column2: "value 2" }, { column1: "value 3", column2: "value 4" }];
                         return bigqueryUtil.insertRows(uuid, uuid, rows);
-                    }).then(() => {
+                    }).then((result) => {
                         const options = { query: `select * from \`${argv.projectId}.${uuid}.${uuid}\`` };
+                        console.log(`Executing query: ${JSON.stringify(options)}`);
                         return bigqueryUtil.executeQuerySync(options);
                     }).then((result) => {
                         const [rows] = result;
+                        console.log(`Rows is ${JSON.stringify(rows)}`);
                         expect(rows.length).is.equal(2);
                     }).then(() => {
                         return bigqueryUtil.deleteTable(uuid, viewName);

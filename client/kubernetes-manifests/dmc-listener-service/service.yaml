@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dmc-listener-service
+  labels:
+    app: dmc-listener-service
+spec:
+  type: ClusterIP
+  ports:
+    - protocol: UDP
+      port: 50001
+      name: multicast
+  selector:
+    app: dmc-listener-service
+    version: v1

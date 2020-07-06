@@ -1,0 +1,7 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: environment-config
+data:
+  SPOT_SERVICE_CONFIG_BUCKET_NAME: chrispage-dev-cds-test

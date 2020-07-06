@@ -1,0 +1,18 @@
+{
+  "name": "pubsock",
+  "version": "0.0.1",
+  "description": "Streams WebSocket data to Pub/Sub",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GoogleCloudPlatform/datashare-toolkit"
+  },
+  "dependencies": {
+    "ws": "~3.3.1",
+    "@google-cloud/pubsub": "^0.28.1"
+  },
+  "bin": {
+    "pubsock": "index.js"
+  },
+  "main": "index.js"
+}

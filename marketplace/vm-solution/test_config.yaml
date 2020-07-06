@@ -1,0 +1,9 @@
+imports:
+- path: datashare-vm.jinja
+
+resources:
+- name: datashare-vm
+  type: datashare-vm.jinja
+  properties:
+    input_adminEmail: default-user@example.com
+    zone: us-central1-f

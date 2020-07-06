@@ -1,4 +1,4 @@
-[Back to BQDS](./README.md)
+[Back to DS](./README.md)
 
 # How to Contribute
 

@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cds-api
+spec:
+  replicas: 1
+  selector:
+   matchLabels:
+     app: cds-api
+  template:
+    metadata:
+      labels:
+        app: cds-api
+        version: v1
+    spec:
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: cds-api-creds
+      containers:
+        - name: cds-api
+          image: cds-api
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5555
+          volumeMounts:
+          - name: google-cloud-key
+            mountPath: /var/secrets/google
+          env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /var/secrets/google/key.json
+          - name: SPOT_SERVICE_CONFIG_BUCKET_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: environment-config
+                key: SPOT_SERVICE_CONFIG_BUCKET_NAME

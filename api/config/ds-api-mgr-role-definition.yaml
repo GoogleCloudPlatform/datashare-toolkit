@@ -1,0 +1,21 @@
+title: "DS API Spot Manager Role"
+description: "Custom DS API role for the Spot services to interface with GCP services"
+stage: "BETA"
+includedPermissions:
+- bigquery.datasets.create
+- bigquery.datasets.get
+- bigquery.datasets.update
+- bigquery.jobs.create
+- bigquery.tables.create
+- bigquery.tables.delete
+- bigquery.tables.export
+- bigquery.tables.get
+- bigquery.tables.getData
+- bigquery.tables.list
+- bigquery.tables.update
+- bigquery.tables.updateData
+- iam.serviceAccounts.signBlob
+- storage.buckets.list
+- storage.objects.get
+- storage.objects.list
+- storage.objects.create

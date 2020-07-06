@@ -1,16 +1,13 @@
-# ```BigQuery Datashare Toolkit```
+# ```Datashare Toolkit```
 ## _DIY commercial datasets on Google Cloud Platform_
 
 _This is not an officially supported Google product._
 
-## **Breaking Changes in v0.2.0.**
-**_There are breaking changes introduced in v0.2.0 related to the storage bucket directory structure used by the ingestion function. For further information see [ingestion](/ingestion/README.md)._**
+The ```Datashare Toolkit``` is a solution for data publishers to easily manage datasets residing within [BigQuery](https://cloud.google.com/bigquery/). The toolkit includes functionality to ingest and entitle data, relieving consumers from much of the toil involved in onboarding datasets from a variety of providers. Publishers upload data files to a storage bucket and allocate permissioned datasets for their consumers to use with BigQuery [authorized views](https://cloud.google.com/bigquery/docs/authorized-views).
 
-The ```BigQuery Datashare Toolkit (BQDS)``` is a solution for data publishers to easily manage datasets residing within [BigQuery](https://cloud.google.com/bigquery/). The toolkit includes functionality to ingest and entitle data, relieving consumers from much of the toil involved in onboarding datasets from a variety of providers. Publishers upload data files to a storage bucket and allocate permissioned datasets using BigQuery [authorized views](https://cloud.google.com/bigquery/docs/authorized-views). This results in less friction for both publishers and consumers.
+While these tools are used for data management and entitlement, they follow a bring-your-own-license (BYOL) for entitling publisher data. Hence, publishers should already have licensing arrangements for those consumers withing to access their data within GCP, and the consumers can furnish the GCP account ID's corresponding to their entitled user principals. These account IDs are required for the creation of the authorized views.
 
-While ```BQDS``` is used for data management and entitlement, it does *not* manage any commercial aspects of delivery. Hence, it is assumed that publishers already have licensing arrangements and that consumers have furnished you the GCP account ID's corresponding to their entitled users. These are required for the creation of the authorized views within BigQuery.
-
-```BQDS``` is open-source. Some supporting infrastructure, such as [storage buckets](https://cloud.google.com/storage/), serverless functions, and BigQuery datasets, must be maintained within GCP by publishers in order to use BQDS. As a consumer, when your GCP account is added to the publisher entitlements, you can view published data as if it were your own, ready to integrate into your analytics workflow, machine learning model, or runtime application. Publishers are responsible for managing the limited BQDS support infrastructure for their datasets. While consumers are billed for BigQuery compute and networking, publishers incur costs only on the storage of their data in BigQuery and Cloud Storage.
+The toolkit is open-source. Some supporting infrastructure, such as [storage buckets](https://cloud.google.com/storage/), serverless functions, and BigQuery datasets, must be maintained within GCP by publishers as a prerequisite. As a consumer, when the GCP accounts are added to the publisher entitlements, the published can be queried directly within BigQuery, ready to integrate into your analytics workflow, machine learning model, or runtime application. Publishers are responsible for managing the limited support infrastructure necessary. While consumers are billed for BigQuery compute and networking, publishers incur costs only on the storage of their data in BigQuery and Cloud Storage.
 
 For publisher projects that do not have the Cloud Functions API enabled at the time of running [deploy.sh](ingestion/bin/deploy.sh), the API will be enabled on the project's behalf.
 
@@ -26,27 +23,27 @@ For publisher projects that do not have the Cloud Functions API enabled at the t
 
 ### Consumers
 
-- A GCP account with billing enabled
-- Entitlements granted to the specific datasets to which you are licensed
-
+- A valid Google Account or Google Group [email address](https://cloud.google.com/iam/docs/overview#google_account) (which includes Gsuite and Gmail email addresses). \
+  **Note**: Consumers can create a Google account with an existing email address [here](https://support.google.com/accounts/answer/27441)
+- Entitlements granted by the publisher to your specific licensed datasets
 
 ## Principles
 
-```BQDS``` aims to embody certain key principles. Among these are:
+Datashare aims to embody certain key principles. Among these are:
 
 - _Promote efficient storage of common datasets_
 
 A common (anti-)pattern with permissioned datasets, especially those delivered in bulk, is that when a data publisher releases a dataset, consumers replicate the physical dataset to their infrastructure, maintaining their own copy of the data and incurring their own storage and processing costs, which are above and beyond the cost of licensing access to the data.
 
-```BQDS``` uses BigQuery's underlying support for maintaining sufficient copies of the data as needed to still ensure high-availability. Most commercial data distribution models today scale storage linearly for each consumer. With ```BQDS```, consumers use the GCP tooling with which they are already familiar and access permissioned datasets seamlessly - reducing unnecessary dataset storage.
+Datashare uses BigQuery's underlying infrastructure for maintaining sufficient copies of the data as needed to still ensure high-availability. Most commercial data distribution models today scale storage linearly for each consumer. With Datashare, consumers use the GCP tooling with which they are already familiar and access permissioned datasets seamlessly - reducing unnecessary dataset storage overall.
 
 - _Reduce ingestion friction for publishers and consumers_
 
-In many of today's typical scenarios, for each published dataset, a consumer must also ingest and normalize the data into their own specific environment. This adds additional toil to the data onboarding workflow and extends the duration that conumers must wait before the data can be usable. ```BQDS``` aims to limit this friction to as few steps as possible, relying on convention and automation to execute an end-to-end data pipeline.
+In many of today's typical scenarios, for each published dataset, a consumer must also ingest and normalize the data into their own specific environment. This adds additional toil to the data onboarding workflow and extends the duration that conumers must wait before the data can be usable. Datashare aims to limit this friction to as few steps as possible, relying on convention and automation to execute an end-to-end data pipeline.
 
 - _Make it easy for data publishers to grant permissioned access for existing GCP consumers of their datasets_
 
-Commercial data publishing models rely on entitlements to grant access permission to licensed consuners. For large data publishers, their electronic entitlements solution may be entirely bespoke. BQDS provides a simple solution for controlling access to data by using GCP's native access control mechanism combined with BigQuery authorized views and Publisher-defined groupings.
+Commercial data publishing models rely on entitlements to grant access permission to licensed consuners. For large data publishers, their electronic entitlements solution may be entirely bespoke. DS provides a simple solution for controlling access to data by using GCP's native access control mechanism combined with BigQuery authorized views and Publisher-defined groupings.
 
 - _Favor instrumenting the solution's configuration via convention_
 
@@ -54,7 +51,7 @@ Derive configuration options from runtime context where possible, and aspire to 
 
 ## Architecture
 
-![BQDS Architecture](architecture.png "BQDS Architecture")
+![Architecture](architecture.png "Architecture")
 
 ## Publishing data to GCP clients using these tools
 
@@ -64,23 +61,17 @@ Ingestion is performed by a [Google Cloud Function](https://cloud.google.com/fun
 
 The function is triggered off mutations to a specified Cloud Storage Bucket.
 
-[Entitlements](entitlements) are configured in a separate workflow, but generally reference tables created during the ingestion stage. Entitlements must be regenerated each time access control lists or authorized views change.
+Entitlements are configured in a separate workflow, but generally reference tables created during the ingestion stage. Entitlements must be regenerated each time access control lists or authorized views change.
 
 ## Ingestion and transformation
 
-The [ingestion](ingestion) page has details on `BQDS`'s embedded ingestion and transformation features.
-
-## Entitlements and view management
-The [entitlementEngine](entitlements) sections go into more detail on using `BQDS`'s  entitlement capabilities.
-
-## Examples
-The [examples](examples) directory has several configurations highlighting various `BQDS` usage models.
+The [ingestion](ingestion) page has details on the toolkit's embedded ingestion and transformation features.
 
 ## Disclaimers
 
-This is not an officially supported Google product.
+_This is not an officially supported Google product._
 
-`BQDS` is under active development. Interfaces and functionality may change at any time.
+Datashare is under active development. Interfaces and functionality may change at any time.
 
 ## License
 

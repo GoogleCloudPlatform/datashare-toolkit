@@ -1,0 +1,7 @@
+{
+  "defaultDeploymentType": "SINGLE_VM",
+  "imageName": "debian-9-stretch-v20200521",
+  "projectId": "fsi-cds-markeplace-sw-dev",
+  "templateName": "nonexistent_template",
+  "useSolutionPackage": true
+}

@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cds-api-lb
+  labels:
+    app: cds-api
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 5555
+      name: http
+      targetPort: 5555
+  selector:
+    app: cds-api
+    version: v1

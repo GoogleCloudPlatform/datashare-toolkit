@@ -32,7 +32,7 @@ describe('StorageUtil', () => {
     if (argv.runCloudTests) {
 
         const uuid = uuidv4();
-        const projectName = argv.projectId;
+        const projectId = argv.projectId;
 
         context('createBucket with arguments', () => {
             it("should return true", async () => {
@@ -67,7 +67,7 @@ describe('StorageUtil', () => {
 
             const jsonString = JSON.stringify({ foo: 'bar' });
             const buf = Buffer.from(jsonString);
-            const options = { gzip: true, private: true };
+            const options = { gzip: true };
 
             context('checkIfBucketExists with arguments', () => {
                 it("should return true", async () => {
@@ -111,7 +111,7 @@ describe('StorageUtil', () => {
 
             const jsonString = JSON.stringify({ foo: 'bar' });
             const buf = Buffer.from(jsonString);
-            const options = { gzip: true, private: true };
+            const options = { gzip: true };
 
             context('checkIfFileExists with arguments', () => {
                 it("should return true", async () => {

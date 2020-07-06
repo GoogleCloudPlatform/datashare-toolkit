@@ -1,0 +1,22 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-knative-serving
+  namespace: datashare-apis
+spec:
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        namespaces:
+        - knative-serving
+    to:
+    - operation:
+        methods:
+        - GET
+        paths:
+        - /healthz
+        - /metrics
+        - /probe
+        - /_internal/knative/*

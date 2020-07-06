@@ -1,0 +1,30 @@
+{
+  "name": "processUpload",
+  "version": "0.0.1",
+  "description": "CDS processUpload ingestion function",
+  "license": "Apache-2.0",
+  "repository": {},
+  "dependencies": {
+    "@google-cloud/functions-framework": "^1.3.2",
+    "lint": "^0.7.0",
+    "cds-shared": "file:../../shared",
+    "underscore": "^1.9.1"
+  },
+  "scripts": {
+    "start": "functions-framework --target=processHttpEvent",
+    "deploy": "../bin/deploy.sh",
+    "lint": "eslint .",
+    "test": "nyc mocha --timeout 60000",
+    "cloudtest": "nyc mocha --timeout 60000 --projectId=${PROJECT_ID} --runCloudTests",
+    "coverage": "nyc report --reporter=html"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^5.12.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "minimist": "^1.2.5",
+    "mocha": "^6.2.2",
+    "nyc": "^14.1.1"
+  }
+}

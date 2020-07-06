@@ -1,0 +1,18 @@
+{
+    "uuid": "861a060e-f489-44f7-a569-d8ab79d7550a",
+    "policyId": "b0d87162-4fd4-4bd7-a12c-505a9cd8d85c",
+    "name": "MLB Game Log Reader Policy",
+    "description": "MLB game log readers",
+    "datasets": [
+      {
+        "datasetId": "ds_1"
+      },
+      {
+        "datasetId": "ds_2"
+      }
+    ],
+    "rowAccessTags": [],
+    "modifiedTime": 1580087041912,
+    "modifiedBy": "cloud.datashare.test.1@gmail.com",
+    "version": 3
+  }

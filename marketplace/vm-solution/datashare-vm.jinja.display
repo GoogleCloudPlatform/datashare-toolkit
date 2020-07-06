@@ -1,0 +1,165 @@
+description:
+  author:
+    title: Google Cloud Platform Financial Services Team
+    descriptionHtml: "Google Cloud Platform Financial Services team provides solutions for the financial services industry.\n"
+    shortDescription: Google Cloud Platform Financial Services team provides solutions for the financial services industry.
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
+  descriptionHtml: The Datashare solution allows you to quickly ingest large volumes of data and share it with your customers.
+  logo: '@media/datashare-color-image-150px-v1.png'
+  tagline: Ingest, entitle, share large volumes of data.
+  title: Datashare
+  url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
+  version: '1.0'
+  eulaUrl: https://raw.githubusercontent.com/GoogleCloudPlatform/datashare-toolkit/ecada698551d3022ed12afbabba5e5eae43dfb03/LICENSE.txt
+  softwareGroups:
+  - type: SOFTWARE_GROUP_OS
+    software:
+    - title: Debian
+      version: v20200618 LTS
+  - software:
+    - title: Datashare
+      version: 1.0.0
+  documentations:
+  - title: Getting Started
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master
+    description: Checkout our Github repository documentation to learn more
+    destinations:
+    - DESTINATION_POST_DEPLOY
+  - title: Datashare Ingestion Documentation
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/ingestion
+    description: Learn how to use Datashare batch ingestion
+    destinations:
+    - DESTINATION_POST_DEPLOY
+  - title: Datashare UI Documentation
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/frontend
+    description: Learn how to use the Datashare UI
+    destinations:
+    - DESTINATION_POST_DEPLOY
+  - title: Datashare API Documentation
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/api
+    description: Learn how to use the Datashare API
+    destinations:
+    - DESTINATION_POST_DEPLOY
+  - title: Latest Documentation # displayed after user clicks launch button
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master
+    description: Additional documentation for this solution
+    destinations:
+    - DESTINATION_POST_DEPLOY
+    ##- DESTINATION_CONFIGURATION
+  support:
+  - title: Support
+    descriptionHtml: We provide limited support on this product.  Please submit a Github issue in our official Github repository.  
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/issues
+
+input:
+  properties:
+    - name: image
+      title: Image version
+      enumLabels:
+        '0': 'debian'
+    - name: zone
+      title: Zone
+    - name: machineType
+      title: Machine type
+    - name: bootDiskType
+      title: cds-boot-disk type
+      section: BOOT_DISK
+    - name: bootDiskSizeGb
+      title: cds-boot-disk size in GB
+      section: BOOT_DISK
+    - name: network
+      title: Network name
+      section: NETWORKING
+    - name: subnetwork
+      title: Subnetwork name
+      section: NETWORKING
+    - name: externalIP
+      title: External IP
+      tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+      section: NETWORKING
+    - name: enableTcp80
+      title: Allow HTTP traffic from Internet
+      section: NETWORKING
+    - name: tcp80SourceRanges
+      title: Source IP ranges for HTTP traffic
+      tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+      placeholder: '0.0.0.0/0, 192.169.0.2/24'
+      section: NETWORKING
+    - name: ipForward
+      title: IP forwarding
+      tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
+      section: NETWORKING
+      level: 1
+    #- name: input_adminEmail
+    #  title: Enter your e-mail here
+    #  subtext: admin email of your GCP project
+    #  tooltip: Tooltipe for this input field
+    #  validation: Please enter a valid email address
+    #  placeholder: user@example.com
+    - name: input_datashareGithubReleaseVersion
+      title: Github Datashare Release Version
+      placeholder: v0.3.1
+    - name: input_gcpRegion
+      title: Google Cloud Platform Region
+      subtext: <a href="https://cloud.google.com/compute/docs/regions-zones#available">Valid Google Cloud Platform regions</a>
+      tooltip: Deploys the Cloud Function, Datashare API and UI to this region; default is us-central1.  
+      placeholder: us-central1
+    - name: input_storageBucketLocation
+      title: Google Cloud Platform Storage Bucket location
+      subtext: <a href="https://cloud.google.com/storage/docs/locations">Valid Storage Bucket locations</a>
+      tooltip: Create the storage buckets in the specified region; default is US.
+      placeholder: US
+    - name: input_useRuntimeConfigWaiter
+      title: Use Google RuntimeConfig Waiter to setup Datashare prereqs.
+      tooltip: Enables the <a href="https://cloud.google.com/deployment-manager/runtime-configurator/create-and-delete-runtimeconfig-resources">RuntimeConfig beta</a> feature that will execute a startup-script in the VM to enable APIs, upload Cloud Function source code and configure Cloud Run.
+      subtext: Enables CloudBuild, IAM, Cloud Run, Cloud Resource Manager APIs, and uploads Datashare Cloud Function to Cloud Storage.
+
+  sections:
+    - name: BOOT_DISK
+      title: Boot Disk
+      tooltip: Each instance requires a disk to boot from.
+    - name: NETWORKING
+      title: Networking
+
+runtime:
+  deployingMessage: Deployment can take several minutes to complete.
+  applicationTable:
+    rows:
+      - label: Instance
+        value: '<a href="{{ consoleUrl(outputs().vmSelfLink) }}">{{ outputs().vmName }}</a>'
+      - label: Instance zone
+        value: '{{ properties().zone }}'
+      - label: Instance machine type
+        value: '{{ properties().machineType }}'
+      - label: Cloud Function, Datashare UI and API deployment location
+        value: '{{ properties().input_gcpRegion }}'
+      - label: Datashare Github Release Version
+        value: '{{ properties().input_datashareGithubReleaseVersion }}'
+      - label: Cloud Storage Bucket Location
+        value: '{{ properties().input_storageBucketLocation }}'
+  primaryButton:
+    label: SSH
+    type: TYPE_GCE_VM_SSH
+    action: '{{ outputs().vmSelfLink }}'
+  suggestedActions:
+    - heading: No external IP configured
+      description: 'The VM instance has been configured with no external IP or internet access. Connecting to it directly may not be possible. Consider using a <a href="https://cloud.google.com/compute/docs/instances/connecting-advanced#bastion_host">bastion host</a> to access this VM.'
+      showIf: '{{ !outputs().hasExternalIP }}'
+    - heading: Log on now
+      description: 'Start using the Datashare UI by accessing the URL from the commands below.'
+      snippet: gcloud run services list --platform=managed
+    - heading: Deployed with RuntimeConfig beta
+      description: Datashare was deployed using the Google Cloud Platform RuntimeConfig beta release to install dependencies.
+      showIf: '{{ properties().input_useRuntimeConfigWaiter }}'
+    #- heading: Remove Project Owner role from Compute Engine Service account
+    #  description: Remove the Project Owner role from the compute engine service account in <a href="https://cloud.google.com/shell">Cloud Shell</a>.
+    #  snippet: >-
+    #    $ export PROJECT_NUMBER=`gcloud projects list --filter=$(gcloud config get-value project) --format="value(PROJECT_NUMBER)"`
+    #    $ gcloud projects remove-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="roles/owner"
+    #  showIf: '{{ properties().input_useRuntimeConfigWaiter }}'
+
+annotations:
+  autogenSpecType: 'SINGLE_VM'
+  vmImage0: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20200618
+
+metadata_version: v1

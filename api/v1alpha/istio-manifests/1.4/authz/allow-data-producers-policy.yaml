@@ -1,0 +1,16 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-data-producers
+  namespace: datashare-apis
+spec:
+  action: ALLOW
+  rules:
+  - when:
+    - key: request.auth.claims[iss]
+      values:
+      - https://accounts.google.com
+      - https://securetoken.google.com/$PROJECT_ID
+    - key: request.auth.claims[email]
+      values: ["$DATA_PRODUCERS"]

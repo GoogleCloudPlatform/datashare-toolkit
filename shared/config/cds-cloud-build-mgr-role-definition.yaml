@@ -1,0 +1,31 @@
+title: "CDS Cloud Build Manager Role"
+description: "Custom CDS Cloud Build role for the Cloud Build service to interface with GCP services"
+stage: "BETA"
+includedPermissions:
+- bigquery.datasets.create
+- bigquery.jobs.create
+- bigquery.tables.create
+- bigquery.tables.delete
+- bigquery.tables.export
+- bigquery.tables.get
+- bigquery.tables.getData
+- bigquery.tables.update
+- bigquery.tables.updateData
+- iam.serviceAccounts.signBlob
+- pubsub.topics.create
+- pubsub.topics.delete
+- pubsub.topics.attachSubscription
+- pubsub.topics.publish
+- pubsub.subscriptions.create
+- pubsub.subscriptions.delete
+- pubsub.subscriptions.get
+- pubsub.subscriptions.consume
+- storage.buckets.create
+- storage.buckets.get
+- storage.buckets.list
+- storage.buckets.delete
+- storage.objects.get
+- storage.objects.list
+- storage.objects.create
+- storage.objects.update
+- storage.objects.delete
