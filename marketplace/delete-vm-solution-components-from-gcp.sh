@@ -6,7 +6,7 @@
 PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 DS_UI="ds-frontend-ui"
 DS_API="ds-api"
-DM_DEPLOYMENT_NAME="cds-vm-1"
+DM_DEPLOYMENT_NAME="datashare-vm-1"
 GCS_INSTALL_BUCKET="gs://$PROJECT_ID-install-bucket"
 CLOUD_RUN_REGION="us-central1"
 CLOUD_RUN_PLATFORM="managed"
