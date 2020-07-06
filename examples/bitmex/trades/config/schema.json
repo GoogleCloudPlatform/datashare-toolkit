@@ -1,0 +1,16 @@
+{
+    "metadata": {
+        "fields": [
+            {"name": "timestamp", "type": "string"},
+            {"name": "symbol", "type": "string"},
+            {"name": "side", "type": "string"},
+            {"name": "size", "type": "int64"},
+            {"name": "price", "type": "float"},
+            {"name": "tickDirection", "type": "string"},
+            {"name": "matchID", "type": "string"},
+            {"name": "grossValue", "type": "float"},
+            {"name": "homeNotional", "type": "float"},
+            {"name": "foreignNotional", "type": "float"}
+        ]
+    }
+}

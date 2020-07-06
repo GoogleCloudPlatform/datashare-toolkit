@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "fields": [
+            {"name": "timestamp", "type": "string"},
+            {"name": "symbol", "type": "string"},
+            {"name": "bidSize", "type": "int64"},
+            {"name": "bidPrice", "type": "float"},
+            {"name": "askPrice", "type": "float"},
+            {"name": "askSize", "type": "int64"}
+        ]
+    }
+}
