@@ -97,7 +97,7 @@
               <v-data-table
                 dense
                 :headers="tableHeaders"
-                :items="policy.datasets"
+                :items="formattedTables"
                 item-key="datasetId"
                 :search="datasetSearch"
                 :loading="loading"
@@ -135,7 +135,7 @@
                   </v-toolbar>
                 </template>
                 <template v-slot:item.action="{ item }">
-                  <v-icon small @click="deleteDataset(item)">
+                  <v-icon small @click="deleteTable(item)">
                     delete
                   </v-icon>
                 </template>
@@ -543,6 +543,15 @@ export default {
       ];
       return h;
     },
+    formattedTables() {
+      let result = [];
+      this.policy.datasets.forEach(d => {
+        d.tables.forEach(t => {
+          result.push({ datasetId: d.datasetId, tableId: t.tableId });
+        });
+      });
+      return result;
+    },
     tagHeaders() {
       let h = [
         { text: 'Tag', value: 'tag' },
@@ -567,10 +576,13 @@ export default {
           d.push(item);
         }
       });
-      return d;
+      return d.sort(function(a, b) {
+        return a.datasetId
+          .toLowerCase()
+          .localeCompare(b.datasetId.toLowerCase());
+      });
     },
     nonSelectedTables() {
-      console.log(`nonSelectedTables is: ${JSON.stringify(this.tables)}`);
       let t = [];
       this.referenceData.tables.forEach(item => {
         const found = this.policy.datasets.find(
@@ -580,7 +592,9 @@ export default {
           t.push(item);
         }
       });
-      return t;
+      return t.sort(function(a, b) {
+        return a.tableId.toLowerCase().localeCompare(b.tableId.toLowerCase());
+      });
     },
     policyDatasets() {
       let d = [];
@@ -692,7 +706,6 @@ export default {
         });
     },
     sourceDatasetChanged() {
-      console.log('sourceDatasetChanged called');
       this.newTableId = null;
       return this.loadTables(this.newDatasetId);
     },
@@ -778,6 +791,55 @@ export default {
       const index = this.policy.datasets.indexOf(item);
       if (index > -1) {
         this.policy.datasets.splice(index, 1);
+      }
+    },
+    addTable() {
+      this.$refs.tableFormObserver.validate().then(result => {
+        if (result) {
+          let ds = this.policy.datasets.find(
+            e => e.datasetId === this.newDatasetId
+          );
+          console.log(JSON.stringify(ds));
+          if (!ds) {
+            console.log('No dataset found');
+            ds = { datasetId: this.newDatasetId, tables: [] };
+            this.policy.datasets.push(ds);
+          } else {
+            console.log('Dataset found');
+            if (!ds.tables) {
+              console.log('creating table array');
+              ds.tables = [];
+            }
+          }
+
+          let t = ds.tables.find(e => e.tableId === this.newTableId);
+          if (!t) {
+            console.log('Adding table');
+            ds.tables.push({ tableId: this.newTableId });
+          } else {
+            console.log('Table already exists');
+          }
+
+          this.showAddTable = false;
+          this.newDatasetId = null;
+          this.newTableId = null;
+
+          console.log(`new policy: ${JSON.stringify(this.policy)}`);
+        }
+      });
+    },
+    deleteTable(item) {
+      let datasetId = item.datasetId;
+      let tableId = item.tableId;
+      console.log(`Delete table called for ${datasetId} and ${tableId}`);
+      const dsIndex = this.policy.datasets.find(e => e.datasetId === datasetId);
+      if (dsIndex > -1) {
+        let tbIndex = this.policy.datasets[dsIndex].tables.find(
+          e => e.tableId === tableId
+        );
+        if (tbIndex > -1) {
+          this.policy.datasets[dsIndex].tables.splice(tbIndex, 1);
+        }
       }
     },
     cancelTable() {
