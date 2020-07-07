@@ -326,7 +326,7 @@
                 rules="required"
               >
                 <v-select
-                  :items="nonSelectedDatasets"
+                  :items="datasetsForTables"
                   item-text="datasetId"
                   item-value="datasetId"
                   v-model="newDatasetId"
@@ -582,16 +582,28 @@ export default {
           .localeCompare(b.datasetId.toLowerCase());
       });
     },
-    nonSelectedTables() {
-      let t = [];
-      this.referenceData.tables.forEach(item => {
-        const found = this.policy.datasets.find(
-          element => element.datasetId === item.datasetId
-        );
-        if (!found) {
-          t.push(item);
-        }
+    datasetsForTables() {
+      let d = this.referenceData.datasets;
+      return d.sort(function(a, b) {
+        return a.datasetId
+          .toLowerCase()
+          .localeCompare(b.datasetId.toLowerCase());
       });
+    },
+    nonSelectedTables() {
+      let datasetId = this.newDatasetId;
+      const ds = this.policy.datasets.find(e => e.datasetId === datasetId);
+      let t = [];
+      if (!ds) {
+        t = this.referenceData.tables;
+      } else {
+        this.referenceData.tables.forEach(item => {
+          const found = ds.tables.find(e => e.tableId === item.tableId);
+          if (!found) {
+            t.push(item);
+          }
+        });
+      }
       return t.sort(function(a, b) {
         return a.tableId.toLowerCase().localeCompare(b.tableId.toLowerCase());
       });
@@ -831,17 +843,13 @@ export default {
     deleteTable(item) {
       let datasetId = item.datasetId;
       let tableId = item.tableId;
-      console.log(`Delete table called for ${datasetId} and ${tableId}`);
       const ds = this.policy.datasets.find(e => e.datasetId === datasetId);
       const dsIndex = this.policy.datasets.indexOf(ds);
       if (ds) {
-        console.log('dataset found');
         let tb = ds.tables.find(e => e.tableId === tableId);
         let tbIndex = ds.tables.indexOf(tb);
         if (tb) {
-          console.log('table found');
           ds.tables.splice(tbIndex, 1);
-
           // Remove the dataset if no tables exist anymore
           if (ds.tables.length === 0) {
             this.policy.datasets.splice(dsIndex, 1);
