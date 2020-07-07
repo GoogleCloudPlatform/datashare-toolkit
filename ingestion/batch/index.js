@@ -136,9 +136,9 @@ async function transform(config) {
 
     let transformQuery = "*";
     if (transformExists === true) {
-        transformQuery = await storageUtil.fetchFileContent(config.bucket, config.bucketPath.transform);
-        if (!transformQuery || transformQuery.trim() === '') {
-            throw new Error(`Transform file provided at ${config.bucketPath.transform} is empty.`);
+        let transformContent = await storageUtil.fetchFileContent(config.bucket, config.bucketPath.transform);
+        if (transformContent && transformContent.trim() !== '') {
+            transformQuery = transformContent;
         }
     }
 
