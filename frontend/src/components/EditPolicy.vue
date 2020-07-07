@@ -832,13 +832,20 @@ export default {
       let datasetId = item.datasetId;
       let tableId = item.tableId;
       console.log(`Delete table called for ${datasetId} and ${tableId}`);
-      const dsIndex = this.policy.datasets.find(e => e.datasetId === datasetId);
-      if (dsIndex > -1) {
-        let tbIndex = this.policy.datasets[dsIndex].tables.find(
-          e => e.tableId === tableId
-        );
-        if (tbIndex > -1) {
-          this.policy.datasets[dsIndex].tables.splice(tbIndex, 1);
+      const ds = this.policy.datasets.find(e => e.datasetId === datasetId);
+      const dsIndex = this.policy.datasets.indexOf(ds);
+      if (ds) {
+        console.log('dataset found');
+        let tb = ds.tables.find(e => e.tableId === tableId);
+        let tbIndex = ds.tables.indexOf(tb);
+        if (tb) {
+          console.log('table found');
+          ds.tables.splice(tbIndex, 1);
+
+          // Remove the dataset if no tables exist anymore
+          if (ds.tables.length === 0) {
+            this.policy.datasets.splice(dsIndex, 1);
+          }
         }
       }
     },
