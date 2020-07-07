@@ -12,20 +12,30 @@ solution automatically.
 
 ##  Update Compute Engine service account from Google Cloud Console
 1. Login to Google Cloud Console and select `IAM` from the menu.
+
 ![IAM Menu Item](images/IAM.png "IAM Menu Item")
+
 2. Select the `edit` button next to the Compute Engine Service account (`project-number-compute@developer.gserviceaccount.com`).
+
 ![IAM Edit button](images/iam-compute-sa.png "IAM Edit button")
-3. Click `Add another role`
+
+3. Click `Add another role`.
+
 ![Add another role](images/iam-add-another-role.png "Add another role")
+
 4. Search for `Security Admin` and select it.
+
 ![search role](images/iam-search-security-admin.png "search role")
+
 5. Click the `Save` button. 
+
 ![save button](images/iam-save-button.png "save button")
 
 Now you can click the `Launch` button on the Marketplace and deploy the Datashare solution within your GCP project. 
 
 ## Update Compute Engine service account from Cloud Shell
 1. Open `Cloud Shell` from your Google Cloud console (top right corner).
+
 ![cloud shell](images/cloud-shell.png "cloud shell")
 
 

@@ -40,6 +40,7 @@ The following service account are modified with additional roles as shown below.
 To remove the elevated Service Account permissions follow the steps outline below. 
 
 1. From your Google Cloud Console, active Google Cloud Shell (top right corner).
+
 ![cloud shell](images/cloud-shell.png "cloud shell")
 
 2. Switch to the correct directory.
