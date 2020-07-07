@@ -513,7 +513,8 @@ export default {
     referenceData: {
       datasets: [],
       tables: []
-    }
+    },
+    loading: false
   }),
   created() {
     this.loadDatasets();
@@ -673,6 +674,7 @@ export default {
             data = {
               name: this.policy.name,
               description: this.policy.description,
+              isTableBased: this.policy.isTableBased,
               datasets: this.policy.datasets.map(d => d.datasetId),
               rowAccessTags: this.policy.rowAccessTags.map(t => t.tag)
             };
@@ -683,6 +685,7 @@ export default {
               policyId: this.policy.policyId,
               name: this.policy.name,
               description: this.policy.description,
+              isTableBased: this.policy.isTableBased,
               datasets: this.policy.datasets.map(d => d.datasetId),
               rowAccessTags: this.policy.rowAccessTags.map(t => t.tag)
             };
@@ -898,9 +901,9 @@ export default {
       }
     },
     accessTypeChanged() {
-      console.log(
+      /*console.log(
         `Permission type changed, isTableBased is ${this.policy.isTableBased}`
-      );
+      );*/
     }
   }
 };

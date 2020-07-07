@@ -235,6 +235,7 @@ policies.post('/projects/:projectId/policies', async(req, res) => {
     const values = {
         name: req.body.name,
         description: req.body.description,
+        isTableBased: req.body.isTableBased,
         createdBy: req.header('x-gcp-account'),
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags,
