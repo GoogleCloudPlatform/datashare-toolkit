@@ -165,6 +165,12 @@ async function setupDatasharePrerequisites(projectId) {
                     "description": "Description for the policy"
                 },
                 {
+                    "mode": "NULLABLE",
+                    "name": "isTableBased",
+                    "type": "BOOLEAN",
+                    "description": "The flag to indicate if the policy is table-based otherwisre dataset-based"
+                },
+                {
                     "fields": [
                         {
                             "mode": "REQUIRED",
