@@ -176,7 +176,20 @@ async function setupDatasharePrerequisites(projectId) {
                             "mode": "REQUIRED",
                             "name": "datasetId",
                             "type": "STRING",
-                            "description": "Dataset identifier of dataset"
+                            "description": "Dataset identifier of dataset that policy will grant access to"
+                        },
+                        {
+                          "name": "tables",
+                          "type": "RECORD",
+                          "mode": "REPEATED",
+                          "fields": [
+                            {
+                              "name": "tableId",
+                              "type": "STRING",
+                              "mode": "REQUIRED",
+                              "description": "Table identifier of table that policy will grant access to"
+                            }
+                          ]
                         }
                     ],
                     "mode": "REPEATED",
