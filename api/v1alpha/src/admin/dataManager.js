@@ -243,7 +243,7 @@ async function setupDatasharePrerequisites(projectId) {
     if (await bigqueryUtil.viewExists(cfg.cdsDatasetId, cfg.cdsPolicyViewId) === false) {
         console.log("Creating latest policies view");
         const policyTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyTableId);
-        const viewSql = `WITH ranked AS (\n  select\n    p.*,\n    DENSE_RANK() OVER (PARTITION BY policyId ORDER BY createdAt) as rank\n  from \`${policyTable}\` p\n),\nrowIdentifiers AS (\n  SELECT r.rowId\n  from RANKED r\n  where r.rank = (select max(r2.rank) from RANKED r2 where r2.policyId = r.policyId)\n)\nSELECT\n * EXCEPT(rank, createdAt, isDeleted),\n UNIX_MILLIS(createdAt) as createdAt,\n rank as version,\n ifnull(isDeleted, false) as isDeleted\nFROM ranked t\nWHERE EXISTS (SELECT 1 from rowIdentifiers r WHERE t.rowId = r.rowId)`;
+        const viewSql = `WITH ranked AS (\n  select\n    p.*,\n    DENSE_RANK() OVER (PARTITION BY policyId ORDER BY createdAt) as rank\n  from \`${policyTable}\` p\n),\nrowIdentifiers AS (\n  SELECT r.rowId\n  from RANKED r\n  where r.rank = (select max(r2.rank) from RANKED r2 where r2.policyId = r.policyId)\n)\nSELECT\n * EXCEPT(rank, createdAt, isTableBased, isDeleted),\n UNIX_MILLIS(createdAt) as createdAt,\n rank as version,\n ifnull(isTableBased, false) as isTableBased\n ifnull(isDeleted, false) as isDeleted\nFROM ranked t\nWHERE EXISTS (SELECT 1 from rowIdentifiers r WHERE t.rowId = r.rowId)`;
         await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsPolicyViewId, viewSql);
     } else {
         console.log('Policies view already exists');
