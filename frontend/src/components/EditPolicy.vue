@@ -551,9 +551,11 @@ export default {
       let result = [];
       if (this.policy.datasets && this.policy.datasets.length > 0) {
         this.policy.datasets.forEach(d => {
-          d.tables.forEach(t => {
-            result.push({ datasetId: d.datasetId, tableId: t.tableId });
-          });
+          if (d.tables && d.tables.length > 0) {
+            d.tables.forEach(t => {
+              result.push({ datasetId: d.datasetId, tableId: t.tableId });
+            });
+          }
         });
       }
       return result;
@@ -600,9 +602,12 @@ export default {
       let datasetId = this.newDatasetId;
       const ds = this.policy.datasets.find(e => e.datasetId === datasetId);
       let t = [];
-      if (!ds) {
+      if (!ds || !ds.tables) {
         t = this.referenceData.tables;
-      } else {
+      } else if (
+        this.referenceData.tables &&
+        this.referenceData.tables.length > 0
+      ) {
         this.referenceData.tables.forEach(item => {
           const found = ds.tables.find(e => e.tableId === item.tableId);
           if (!found) {
