@@ -98,8 +98,8 @@
                 dense
                 :headers="tableHeaders"
                 :items="formattedTables"
-                item-key="datasetId"
-                :search="datasetSearch"
+                :item-key="datasetId + '.' + tableId"
+                :search="tableSearch"
                 :loading="loading"
               >
                 <template v-slot:loading>
@@ -118,7 +118,7 @@
                     <v-text-field
                       class="mb-4"
                       width="40px"
-                      v-model="datasetSearch"
+                      v-model="tableSearch"
                       append-icon="search"
                       label="Search"
                       single-line
@@ -503,6 +503,7 @@ export default {
       marketplace: { solutionId: null, planId: null }
     },
     datasetSearch: '',
+    tableSearch: '',
     accountSearch: '',
     rowAccessSearch: '',
     componentKey: 0,
