@@ -35,8 +35,12 @@
             required
           ></v-textarea>
         </ValidationProvider>
+        <v-radio-group v-model="isTableBased" row @change="accessTypeChanged">
+          <v-radio label="Dataset-based" :value="false"></v-radio>
+          <v-radio label="Table-based" :value="true"></v-radio>
+        </v-radio-group>
         <v-expansion-panels multiple v-model="panel">
-          <v-expansion-panel>
+          <v-expansion-panel v-if="!isTableBased">
             <v-expansion-panel-header>Dataset Access</v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-data-table
@@ -76,6 +80,57 @@
                       class="mb-2"
                       @click.stop="showAddDatasetDialog"
                       >Add Dataset</v-btn
+                    >
+                  </v-toolbar>
+                </template>
+                <template v-slot:item.action="{ item }">
+                  <v-icon small @click="deleteDataset(item)">
+                    delete
+                  </v-icon>
+                </template>
+              </v-data-table>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel v-else>
+            <v-expansion-panel-header>Table Access</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-data-table
+                dense
+                :headers="tableHeaders"
+                :items="policy.datasets"
+                item-key="datasetId"
+                :search="datasetSearch"
+                :loading="loading"
+              >
+                <template v-slot:loading>
+                  <v-row justify="center" align="center">
+                    <div class="text-center ma-12">
+                      <v-progress-circular
+                        v-if="loading"
+                        indeterminate
+                        color="primary"
+                      ></v-progress-circular>
+                    </div>
+                  </v-row>
+                </template>
+                <template v-slot:top>
+                  <v-toolbar flat color="white">
+                    <v-text-field
+                      class="mb-4"
+                      width="40px"
+                      v-model="datasetSearch"
+                      append-icon="search"
+                      label="Search"
+                      single-line
+                      hide-details
+                    ></v-text-field>
+                    <v-divider class="mx-4" inset vertical></v-divider>
+                    <v-btn
+                      color="primary"
+                      dark
+                      class="mb-2"
+                      @click.stop="showAddTableDialog"
+                      >Add Table</v-btn
                     >
                   </v-toolbar>
                 </template>
@@ -256,6 +311,60 @@
         </v-card>
       </v-dialog>
       <v-dialog
+        v-show="showAddTable"
+        v-model="showAddTable"
+        persistent
+        max-width="390"
+      >
+        <v-card>
+          <v-card-title class="headline">Add Table</v-card-title>
+          <ValidationObserver ref="tableFormObserver" v-slot="{}">
+            <v-form class="px-4">
+              <ValidationProvider
+                v-slot="{ errors }"
+                name="Dataset Id"
+                rules="required"
+              >
+                <v-select
+                  :items="nonSelectedDatasets"
+                  item-text="datasetId"
+                  item-value="datasetId"
+                  v-model="newDatasetId"
+                  :error-messages="errors"
+                  label="Dataset Id"
+                  required
+                  @change="sourceDatasetChanged"
+                ></v-select>
+              </ValidationProvider>
+              <ValidationProvider
+                v-slot="{ errors }"
+                name="Table Id"
+                rules="required"
+              >
+                <v-select
+                  :items="nonSelectedTables"
+                  item-text="tableId"
+                  item-value="tableId"
+                  v-model="newTableId"
+                  :error-messages="errors"
+                  label="Table Id"
+                  required
+                ></v-select>
+              </ValidationProvider>
+            </v-form>
+          </ValidationObserver>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click.stop="cancelTable"
+              >Cancel</v-btn
+            >
+            <v-btn color="green darken-1" text @click.stop="addTable"
+              >Add</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog
         ref="addRowTagForm"
         v-show="showAddRowTag"
         v-model="showAddRowTag"
@@ -370,15 +479,17 @@ export default {
     policyData: Object
   },
   data: () => ({
+    isTableBased: false,
     editMode: false,
     showAddDataset: false,
+    showAddTable: false,
     showAddRowTag: false,
     newDatasetId: null,
+    newTableId: null,
     newRowTag: null,
     showError: false,
     panel: [0],
     id: null,
-    datasets: [],
     accounts: [],
     policy: {
       rowId: null,
@@ -394,7 +505,11 @@ export default {
     datasetSearch: '',
     accountSearch: '',
     rowAccessSearch: '',
-    componentKey: 0
+    componentKey: 0,
+    referenceData: {
+      datasets: [],
+      tables: []
+    }
   }),
   created() {
     this.loadDatasets();
@@ -420,6 +535,14 @@ export default {
       ];
       return h;
     },
+    tableHeaders() {
+      let h = [
+        { text: 'Dataset Id', value: 'datasetId' },
+        { text: 'Table Id', value: 'tableId' },
+        { text: '', value: 'action', sortable: false }
+      ];
+      return h;
+    },
     tagHeaders() {
       let h = [
         { text: 'Tag', value: 'tag' },
@@ -436,7 +559,7 @@ export default {
     },
     nonSelectedDatasets() {
       let d = [];
-      this.datasets.forEach(item => {
+      this.referenceData.datasets.forEach(item => {
         const found = this.policy.datasets.find(
           element => element.datasetId === item.datasetId
         );
@@ -445,6 +568,19 @@ export default {
         }
       });
       return d;
+    },
+    nonSelectedTables() {
+      console.log(`nonSelectedTables is: ${JSON.stringify(this.tables)}`);
+      let t = [];
+      this.referenceData.tables.forEach(item => {
+        const found = this.policy.datasets.find(
+          element => element.datasetId === item.datasetId
+        );
+        if (!found) {
+          t.push(item);
+        }
+      });
+      return t;
     },
     policyDatasets() {
       let d = [];
@@ -548,9 +684,29 @@ export default {
         })
         .then(response => {
           if (response.success) {
-            this.datasets = response.data;
+            this.referenceData.datasets = response.data;
           } else {
-            this.datasets = [];
+            this.referenceData.datasets = [];
+          }
+          this.loading = false;
+        });
+    },
+    sourceDatasetChanged() {
+      console.log('sourceDatasetChanged called');
+      this.newTableId = null;
+      return this.loadTables(this.newDatasetId);
+    },
+    loadTables(datasetId) {
+      this.loading = true;
+      return this.$store
+        .dispatch('getTables', {
+          datasetId: datasetId
+        })
+        .then(response => {
+          if (response.success) {
+            this.referenceData.tables = response.data;
+          } else {
+            this.referenceData.tables = [];
           }
           this.loading = false;
         });
@@ -601,6 +757,10 @@ export default {
       this.componentKey += 1;
       this.showAddDataset = true;
     },
+    showAddTableDialog() {
+      this.componentKey += 1;
+      this.showAddTable = true;
+    },
     addDataset() {
       this.$refs.datasetFormObserver.validate().then(result => {
         if (result) {
@@ -619,6 +779,10 @@ export default {
       if (index > -1) {
         this.policy.datasets.splice(index, 1);
       }
+    },
+    cancelTable() {
+      this.showAddTable = false;
+      this.newTableId = null;
     },
     showAddRowTagDialog() {
       this.componentKey += 1;
@@ -655,6 +819,11 @@ export default {
       if (index > -1) {
         this.policy.rowAccessTags.splice(index, 1);
       }
+    },
+    accessTypeChanged() {
+      console.log(
+        `Permission type changed, isTableBased is ${this.isTableBased}`
+      );
     }
   }
 };
