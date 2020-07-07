@@ -35,12 +35,16 @@
             required
           ></v-textarea>
         </ValidationProvider>
-        <v-radio-group v-model="isTableBased" row @change="accessTypeChanged">
+        <v-radio-group
+          v-model="policy.isTableBased"
+          row
+          @change="accessTypeChanged"
+        >
           <v-radio label="Dataset-based" :value="false"></v-radio>
           <v-radio label="Table-based" :value="true"></v-radio>
         </v-radio-group>
         <v-expansion-panels multiple v-model="panel">
-          <v-expansion-panel v-if="!isTableBased">
+          <v-expansion-panel v-if="!policy.isTableBased">
             <v-expansion-panel-header>Dataset Access</v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-data-table
@@ -98,7 +102,6 @@
                 dense
                 :headers="tableHeaders"
                 :items="formattedTables"
-                :item-key="datasetId + '.' + tableId"
                 :search="tableSearch"
                 :loading="loading"
               >
@@ -479,7 +482,6 @@ export default {
     policyData: Object
   },
   data: () => ({
-    isTableBased: false,
     editMode: false,
     showAddDataset: false,
     showAddTable: false,
@@ -496,6 +498,7 @@ export default {
       policyId: null,
       name: null,
       description: null,
+      isTableBased: false,
       datasets: [],
       rowAccessTags: [],
       initialDatasets: [],
@@ -546,11 +549,13 @@ export default {
     },
     formattedTables() {
       let result = [];
-      this.policy.datasets.forEach(d => {
-        d.tables.forEach(t => {
-          result.push({ datasetId: d.datasetId, tableId: t.tableId });
+      if (this.policy.datasets && this.policy.datasets.length > 0) {
+        this.policy.datasets.forEach(d => {
+          d.tables.forEach(t => {
+            result.push({ datasetId: d.datasetId, tableId: t.tableId });
+          });
         });
-      });
+      }
       return result;
     },
     tagHeaders() {
@@ -812,32 +817,21 @@ export default {
           let ds = this.policy.datasets.find(
             e => e.datasetId === this.newDatasetId
           );
-          console.log(JSON.stringify(ds));
           if (!ds) {
-            console.log('No dataset found');
             ds = { datasetId: this.newDatasetId, tables: [] };
             this.policy.datasets.push(ds);
           } else {
-            console.log('Dataset found');
             if (!ds.tables) {
-              console.log('creating table array');
               ds.tables = [];
             }
           }
-
           let t = ds.tables.find(e => e.tableId === this.newTableId);
           if (!t) {
-            console.log('Adding table');
             ds.tables.push({ tableId: this.newTableId });
-          } else {
-            console.log('Table already exists');
           }
-
           this.showAddTable = false;
           this.newDatasetId = null;
           this.newTableId = null;
-
-          console.log(`new policy: ${JSON.stringify(this.policy)}`);
         }
       });
     },
@@ -900,7 +894,7 @@ export default {
     },
     accessTypeChanged() {
       console.log(
-        `Permission type changed, isTableBased is ${this.isTableBased}`
+        `Permission type changed, isTableBased is ${this.policy.isTableBased}`
       );
     }
   }
