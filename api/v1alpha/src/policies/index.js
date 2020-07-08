@@ -413,6 +413,7 @@ policies.put('/projects/:projectId/policies/:policyId', async(req, res) => {
         rowId: req.body.rowId,
         name: req.body.name,
         description: req.body.description,
+        isTableBased: req.body.isTableBased,
         createdBy: req.header('x-gcp-account'),
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags,

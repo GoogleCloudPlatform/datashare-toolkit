@@ -666,7 +666,7 @@ export default {
           } else {
             console.log('Row tag update required');
           }
-
+          
           this.loading = true;
           let data = {};
           if (!this.policyData) {
@@ -675,7 +675,7 @@ export default {
               name: this.policy.name,
               description: this.policy.description,
               isTableBased: this.policy.isTableBased,
-              datasets: this.policy.datasets.map(d => d.datasetId),
+              datasets: this.policy.datasets,
               rowAccessTags: this.policy.rowAccessTags.map(t => t.tag)
             };
           } else {
@@ -686,7 +686,7 @@ export default {
               name: this.policy.name,
               description: this.policy.description,
               isTableBased: this.policy.isTableBased,
-              datasets: this.policy.datasets.map(d => d.datasetId),
+              datasets: this.policy.datasets,
               rowAccessTags: this.policy.rowAccessTags.map(t => t.tag)
             };
           }
@@ -763,6 +763,7 @@ export default {
             this.policy.policyId = p.policyId;
             this.policy.name = p.name;
             this.policy.description = p.description;
+            this.policy.isTableBased = p.isTableBased || false;
             this.policy.datasets = p.datasets;
             this.policy.rowAccessTags = p.rowAccessTags;
             this.policy.initialDatasets = p.datasets;
@@ -803,7 +804,9 @@ export default {
     addDataset() {
       this.$refs.datasetFormObserver.validate().then(result => {
         if (result) {
-          this.policy.datasets.push({ datasetId: this.newDatasetId });
+          this.policy.datasets.push({
+            datasetId: this.newDatasetId
+          });
           this.showAddDataset = false;
           this.newDatasetId = null;
         }
