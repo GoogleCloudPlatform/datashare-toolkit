@@ -3,7 +3,9 @@
 
 _This is not an officially supported Google product._
 
-<img src="card.png" alt="Datashare" height="150"/>
+<p align="center">
+  <img src="card.png" alt="Datashare" height="150"/>
+</p>
 
 The ```Datashare Toolkit``` is a solution for data publishers to easily manage datasets residing within [BigQuery](https://cloud.google.com/bigquery/). The toolkit includes functionality to ingest and entitle data, relieving consumers from much of the toil involved in onboarding datasets from a variety of providers. Publishers upload data files to a storage bucket and allocate permissioned datasets for their consumers to use with BigQuery [authorized views](https://cloud.google.com/bigquery/docs/authorized-views).
 
