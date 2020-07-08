@@ -111,16 +111,16 @@ var router = express.Router();
 // methods that require multiple routes
 var routes = [];
 
+// CORS will be controlled by the API GW layer
+router.all('*', cors());
+
 if (
     (process.env.NODE_ENV === 'production' ||
         process.env.VUE_APP_APICLIENT == 'server') &&
-        process.env.SIMPLE_AUTHENTICATION === 'true'
+    process.env.SIMPLE_AUTHENTICATION === 'true'
 ) {
     router.all('*', checkIfAuthenticated);
 }
-
-// CORS will be controlled by the API GW layer
-router.all('*', cors());
 
 /**
  * @swagger
