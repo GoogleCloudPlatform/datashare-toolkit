@@ -272,7 +272,7 @@ describe('BigQueryUtil', () => {
                     }).then((result) => {
                         const [rows] = result;
                         console.log(`Rows is ${JSON.stringify(rows)}`);
-                        expect(rows.length).is.equal(2);
+                        expect(rows.length).is.equal(4);
                     }).then(() => {
                         return bigqueryUtil.deleteTable(uuid, viewName);
                     }).catch((reason) => {
