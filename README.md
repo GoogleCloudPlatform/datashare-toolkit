@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="card.png" alt="Datashare" height="150"/>
+  <img src="card.png" alt="Datashare" height="175"/>
 </p>
 
 ## _DIY commercial datasets on Google Cloud Platform_
