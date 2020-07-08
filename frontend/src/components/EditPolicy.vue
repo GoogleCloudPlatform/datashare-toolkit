@@ -36,6 +36,7 @@
           ></v-textarea>
         </ValidationProvider>
         <v-radio-group
+          v-if="false"
           v-model="policy.isTableBased"
           row
           @change="accessTypeChanged"
@@ -666,7 +667,7 @@ export default {
           } else {
             console.log('Row tag update required');
           }
-          
+
           this.loading = true;
           let data = {};
           if (!this.policyData) {
