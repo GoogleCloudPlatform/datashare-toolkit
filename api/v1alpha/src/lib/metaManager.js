@@ -103,9 +103,11 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
  * @param  {} projectId
  * @param  {} policyIds
  * @param  {} datasetIds
- * TODO - This won't work for deletes currently because it uses ids. The deleted records aren't returned in views currently.
  */
 async function performMetadataUpdate(projectId, policyIds, datasetIds) {
+    // Remove the datasetIds parameter, and get this ourselves based on the last version of the policyId.
+    // For each policyId get the prior record and update using that.
+    
     console.log(`performMetadataUpdate called for policyIds: ${JSON.stringify(policyIds)} and datasetIds: ${JSON.stringify(datasetIds)}`);
     let filter = "";
     if (policyIds && policyIds.length > 0 && datasetIds && datasetIds.length > 0) {

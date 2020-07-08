@@ -34,11 +34,11 @@ config.cdsAccountViewFields = new Set(['rowId', 'accountId', 'email', 'emailType
     'accountType', 'createdBy', 'policies', 'marketplace', 'createdAt', 'version', 'isDeleted']);
 
 config.cdsPolicyTableId = "policy";
-config.cdsPolicyTableFields = new Set(['rowId', 'policyId', 'name', 'description',
+config.cdsPolicyTableFields = new Set(['rowId', 'policyId', 'name', 'description', 'isTableBased',
     'datasets', 'rowAccessTags', 'marketplace', 'createdBy', 'createdAt', 'isDeleted']);
 
 config.cdsPolicyViewId = "currentPolicy";
-config.cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description',
+config.cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description', 'isTableBased',
     'datasets', 'rowAccessTags', 'marketplace', 'createdBy', 'createdAt', 'version',
     'isDeleted']);
 
