@@ -217,6 +217,17 @@ describe('BigQueryUtil', () => {
                 });
             });
 
+            context('insertRows into table', () => {
+                it("should insert rows", async () => {
+                    const rows = [{ column1: "value 1", column2: "value 2" }, { column1: "value 3", column2: "value 4" }];
+                    await bigqueryUtil.insertRows(uuid, uuid, rows).then((result) => {
+                        expect(result).is.true;
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
+                });
+            });
+            
             context('ingestion integration test', () => {
                 it("create dataset, table, and load data", async () => {
                     await bigqueryUtil.datasetExists(uuid).then((result) => {
@@ -254,6 +265,7 @@ describe('BigQueryUtil', () => {
                         const rows = [{ column1: "value 1", column2: "value 2" }, { column1: "value 3", column2: "value 4" }];
                         return bigqueryUtil.insertRows(uuid, uuid, rows);
                     }).then((result) => {
+                        expect(result).is.true;
                         const options = { query: `select * from \`${argv.projectId}.${uuid}.${uuid}\`` };
                         console.log(`Executing query: ${JSON.stringify(options)}`);
                         return bigqueryUtil.executeQuerySync(options);
