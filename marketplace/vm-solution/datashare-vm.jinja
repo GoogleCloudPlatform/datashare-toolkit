@@ -212,14 +212,6 @@ resources:
                 #PROJECT=`curl http://metadata.google.internal/computeMetadata/v1/project/project-id -H "Metadata-Flavor: Google"`
                 export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 
-                # Upload Cloud Function to Google Cloud storage
-                gsutil cp $CLOUD_FUNCTION_ZIP_FILE_NAME gs://$PROJECT_ID-install-bucket/
-                # TODO - we should notify a new Waiter here so that the Cloud Function deployment can start at this point instead of waiting until the end.
-
-                # Update permission on Deployment Manager service account (cloudservices.gserviceaccount.com)
-                export PROJECT_NUMBER=`gcloud projects list --filter=$(gcloud config get-value project) --format="value(PROJECT_NUMBER)"`
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudservices.gserviceaccount.com" --role="roles/storage.admin"
-
                 # Enable APIs
                 echo "Enabling Cloud APIs"
                 gcloud services enable cloudbuild.googleapis.com --quiet
@@ -227,6 +219,30 @@ resources:
                 gcloud services enable iam.googleapis.com --quiet
                 gcloud services enable run.googleapis.com --quiet
                 gcloud services enable cloudresourcemanager.googleapis.com --quiet
+
+                # Upload Cloud Function to Google Cloud storage
+                gsutil cp $CLOUD_FUNCTION_ZIP_FILE_NAME gs://$PROJECT_ID-install-bucket/
+                # TODO - we should notify a new Waiter here so that the Cloud Function deployment can start at this point instead of waiting until the end.
+
+                # Update permission on Deployment Manager service account (cloudservices.gserviceaccount.com)
+                export PROJECT_NUMBER=`gcloud projects list --filter=$(gcloud config get-value project) --format="value(PROJECT_NUMBER)"`
+                echo "Adding IAM policy to Deployment Manager service account..."
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudservices.gserviceaccount.com" --role="roles/storage.admin"
+                
+                # Update permissions on Cloud Build service account (@cloudbuild.gserviceaccount.com)
+                echo "Adding IAM policy to Cloud Build service account..."
+                echo "Adding iam.admin role to Cloud Build service account"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.serviceAccountAdmin" 
+                echo "Adding cloudrun.admin role to Cloud Build service account"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.admin"
+                echo "Adding iam.roleadmin role to Cloud Build service account"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.roleAdmin"
+                echo "Adding iam.securityadmin role to Cloud Build service account"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.securityAdmin"
+                echo "Adding run.serviceagent role to Cloud Build service account"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.serviceAgent"
+                
+                
                 echo "Updating apt-get and updating gcloud..." 
                 sudo apt-get -y update && sudo apt-get -y --only-upgrade install google-cloud-sdk-skaffold kubectl google-cloud-sdk-anthos-auth google-cloud-sdk-minikube google-cloud-sdk google-cloud-sdk-app-engine-grpc google-cloud-sdk-kind google-cloud-sdk-pubsub-emulator google-cloud-sdk-app-engine-go google-cloud-sdk-firestore-emulator google-cloud-sdk-cloud-build-local google-cloud-sdk-datastore-emulator google-cloud-sdk-kpt google-cloud-sdk-app-engine-python google-cloud-sdk-spanner-emulator google-cloud-sdk-cbt google-cloud-sdk-bigtable-emulator google-cloud-sdk-app-engine-python-extras google-cloud-sdk-datalab google-cloud-sdk-app-engine-java
                 sudo apt-get -y install google-cloud-sdk
