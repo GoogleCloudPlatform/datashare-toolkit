@@ -20,6 +20,11 @@ description:
     - title: Datashare
       version: 1.0.0
   documentations:
+  - title: Prerequisities
+    url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/marketplace/PREREQUISITES.md
+    description: You must fulfill the prerequisites before you launch this solution. 
+    destinations:
+    - DESTINATION_CONFIGURATION
   - title: Getting Started
     url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master
     description: Checkout our Github repository documentation to learn more
@@ -148,6 +153,12 @@ runtime:
     - heading: Log on now
       description: 'Start using the Datashare UI by accessing the URL from the commands below.'
       snippet: gcloud run services list --platform=managed
+    - heading: Setup Firebase
+      description: Setup <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/frontend#new-firebase-setup">Firebase</a>
+    - heading: Remove roles from Service Accounts
+      description: <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/marketplace/README.md#remove-elevated-service-account-permissions">Remove elevated permissions from Cloud Build and Deployment Manager</a>
+    - heading: Do you want to delete the Datashare solution?
+      description: The best way to delete the Datashare solution is by following this <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/marketplace#delete-vm-solution-components-from-gcpsh">documentation.</a>
     - heading: Deployed with RuntimeConfig beta
       description: Datashare was deployed using the Google Cloud Platform RuntimeConfig beta release to install dependencies.
       showIf: '{{ properties().input_useRuntimeConfigWaiter }}'
