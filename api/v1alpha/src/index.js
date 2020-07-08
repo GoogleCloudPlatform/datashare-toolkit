@@ -23,6 +23,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const { checkIfAuthenticated } = require('./lib/fb/auth');
 
 const apiVersion = "v1alpha";
 const PORT = process.env.PORT || 5555;
@@ -109,6 +110,14 @@ const procurements = require('./procurements/index');
 var router = express.Router();
 // methods that require multiple routes
 var routes = [];
+
+if (
+    (process.env.NODE_ENV === 'production' ||
+        process.env.VUE_APP_APICLIENT == 'server') &&
+        process.env.SIMPLE_AUTHENTICATION === 'true'
+) {
+    router.all('*', checkIfAuthenticated);
+}
 
 // CORS will be controlled by the API GW layer
 router.all('*', cors());
