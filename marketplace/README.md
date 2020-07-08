@@ -10,6 +10,54 @@ would like to deploy Datashare to a Kubernetes based environment.
 The Cloud Function must zipped, named `datashare-toolkit-cloud-function.zip` and uploaded to a Google Cloud Storage bucket.
 This file should be publicly accessible so all partners that are deploying Datashare can access the Cloud Function code.
 
+## Google APIs enabled
+The following APIs are enabled during the Marketplace solution launch.
+* Cloud Run - `run.googleapis.com`
+* Cloud Build - `cloudbuild.googleapis.com`
+* Deployment Manager - `cloudresourcemanager.googleapis.com`
+* Cloud Functions - `cloudfunctions.googleapis.com`
+* IAM - `iam.googleapis.com`
+
+## New roles added to Service Accounts
+The following service account are modified with additional roles as shown below. 
+* Compute Engine Service Account (`project-number-compute@developer.gserviceaccount.com`)
+  * Security IAM Role [`iam.securityAdmin`](https://cloud.google.com/iam/docs/understanding-roles#iam-roles)
+  * Added by the user as a prerequisite.
+* Cloud Build Service Account  (`project-number@cloudbuild.gserviceaccount.com`)
+  * The Cloud Build service account deploys the builds the container images and deploys the Datashare UI and API to Cloud Run.
+  * Roles added to this service account:
+    * iam.serviceAccountAdmin
+    * run.admin
+    * iam.roleAdmin
+    * iam.securityAdmin
+    * run.serviceAgent
+* Deployment Manager service account (`project-number@cloudservices.gserviceaccount.com`)
+  * This service account needs access to the Google Cloud Storage bucket, which contains the Cloud Function source code to install the Cloud Function during the deployment.
+  * Role added to this service account:
+    * storage.admin
+
+## Remove Elevated Service Account permissions
+To remove the elevated Service Account permissions follow the steps outline below. 
+
+1. From your Google Cloud Console, active Google Cloud Shell (top right corner).
+
+![cloud shell](images/cloud-shell.png "cloud shell")
+
+2. Switch to the correct directory.
+```
+cd datashare-toolkit/marketplace
+```
+
+3. Remove Compute Engine elevated permission.
+```
+./update-compute-service-account-with-securityadmin-role.sh remove
+```
+
+4. Remove Cloud Build and Deployment Manager elevated permissions
+```
+./remove-elevated-permissions-from-cloudbuild-deploymentmgr.sh
+```
+
 ## Shell scripts
 The `marketplace` folder includes several files to help with deployment and testing. 
 
@@ -30,6 +78,11 @@ Use this script to delete all Datashare components from your GCP project, with t
 is that the Deployment Manager will only delete resources that it manages.  At this time it does not support Cloud Run deployments; therefore, 
 the Datashare API and UI will not be deleted when you delete the Deployment Manager configuration file. 
 
+Execute the following commands from Google Cloud Shell.
+```
+cd datashare-toolkit/marketplace
+./delete-vm-solution-components-from-gcp.sh
+```
 ### install-datashare-prerequisites.sh
 Enables Google Cloud APIs that are required to run the Datashare toolkit in you GCP project. It also creates a 
 storage bucket named * [PROJECT]-install-bucket and uploads the Datashare Cloud Function source code to that bucket.
@@ -38,6 +91,19 @@ When the Cloud Function is deployed it uses the source code located in this stor
 ### reset-gcp-project-for-testing.sh
 This is a helper script that allows the developer/maintainer of the package to disable the GCP APIs
 and remove the [RuntimeConfig beta](https://cloud.google.com/deployment-manager/runtime-configurator/create-and-delete-runtimeconfig-resources) resources if they were used.  
+
+### update-compute-service-account-with-securityadmin-role.sh
+This script will either `add` or `remove` the `IAM Security Admin` role to the Compute Engine service account. 
+
+#### Add the IAM security role
+```
+./update-compute-service-account-with-securityadmin-role.sh add
+```
+
+#### Remove the IAM security role
+```
+./update-compute-service-account-with-securityadmin-role.sh remove
+```
 
 ## Create the VM Solution Package
 Execute the following command to create the VM solution package, which will zip the `vm-solution` folder and copy the Deployment Manager scripts from the 
