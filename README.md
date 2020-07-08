@@ -2,7 +2,6 @@
   <img src="card.png" alt="Datashare" height="150"/>
 </p>
 
-# ```Datashare Toolkit```
 ## _DIY commercial datasets on Google Cloud Platform_
 
 _This is not an officially supported Google product._
