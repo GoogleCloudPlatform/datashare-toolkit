@@ -174,7 +174,7 @@ async function deleteDataset(projectId, datasetId, createdBy) {
         await bigqueryUtil.executeQuery(viewOptions);
 
         // Updated related policies to remove the deleted dataset
-        const policyStatement = `INSERT INTO \`datashare.policy\` (rowId, policyId, name, description, datasets, rowAccessTags, createdBy, createdAt, isDeleted)
+        const policyStatement = `INSERT INTO \`datashare.policy\` (rowId, policyId, name, description, isTableBased, datasets, rowAccessTags, createdBy, createdAt, isDeleted)
     WITH datasetRows as (
       SELECT rowId
       FROM \`datashare.currentPolicy\` cp
@@ -203,6 +203,7 @@ async function deleteDataset(projectId, datasetId, createdBy) {
       policyId,
       name,
       description,
+      isTableBased,
       pd.datasets,
       rowAccessTags,
       @createdBy,

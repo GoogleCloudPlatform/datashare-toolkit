@@ -99,6 +99,30 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
     return isDirty;
 }
 
+async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
+    // If fullRefresh is specified, iterate over all managed datasets, removing all access and updating
+    /*
+    const labelKey = cfg.cdsManagedLabelKey;
+    const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
+    const datasetIds = datasets.map(d => d.datasetId);
+    */
+    
+    /*
+        policyIds should include policies for which where added from/to an account and policies that were created/modified/deleted
+        There are two main scenarios:
+            1) When a policy is created/modified/deleted, in which case a record is added to the policy table for each. For policy modifications, we must look at the previous record to find previous datasets/tables.
+            2) When an account is modified and a policy is added or removed.
+    */
+
+    // Using the policyIds, get the list of impacted Datasets and Tables
+
+    // Aggregate the access required for Datasets and Tables
+
+    // Iterate over Datasets, removing all READER access, and update permissions as required
+
+    // Iterate over Tables, removing all READER access, and update permssions as required
+}
+
 /**
  * @param  {} projectId
  * @param  {} policyIds
