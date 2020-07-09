@@ -41,7 +41,6 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
         throw err;
     }
 
-    console.log(`Removing access for all accounts with role of READER in dataset: ${datasetId}`);
     // 2. Check for and remove any non-existing authorized views
     // Remove stale view access
     let i = metadata.access.length;
@@ -65,9 +64,12 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
                 const accessId = a[accessType];
                 if (accessTypes.includes(accessType)) {
                     // If we find the record, remove it
-                    console.log(`Deleting user: ${accessType}:${accessId} from datasetId: ${datasetId}`);
-                    metadata.access.splice(i, 1);
-                    isDirty = true;
+                    const shouldHaveAccess = underscore.findWhere(accounts, { email: accessId, emailType: accessType });
+                    if (!shouldHaveAccess) {
+                        console.log(`Deleting user: ${accessType}:${accessId} from datasetId: ${datasetId}`);
+                        metadata.access.splice(i, 1);
+                        isDirty = true;
+                    }
                 }
             }
         }
@@ -82,9 +84,13 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
             let a = { role: 'READER', };
             a["role"] = 'READER';
             a[account.emailType] = account.email;
-            metadata.access.push(a);
-            isDirty = true;
-            console.log(`Adding access record to datasetId: ${datasetId}: ${JSON.stringify(account)}`);
+            const accessRecordExists = underscore.findWhere(metadata.access, a);
+            console.log(metadata.access);
+            if (!accessRecordExists) {
+                metadata.access.push(a);
+                isDirty = true;
+                console.log(`Adding access record to datasetId: ${datasetId}: ${JSON.stringify(account)}`);
+            }
         }
     });
 
@@ -97,6 +103,8 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
             console.error(`Failed to set metadata for dataset '${datasetId}' with error '${err}' and payload: ${JSON.stringify(metadata)}`);
             throw err;
         }
+    } else {
+        console.info(`Metadata is already up to date for dataset: '${datasetId}'`);
     }
 
     console.log(`End metadata update for dataset: ${datasetId}`);
