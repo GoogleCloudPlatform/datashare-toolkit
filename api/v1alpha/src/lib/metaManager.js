@@ -19,6 +19,7 @@
 const { BigQueryUtil } = require('cds-shared');
 const underscore = require("underscore");
 let bigqueryUtil = new BigQueryUtil();
+const cfg = require('./config');
 
 /**
  * @param  {} projectId
@@ -26,6 +27,7 @@ let bigqueryUtil = new BigQueryUtil();
  * @param  {} accounts
  */
 async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
+    console.log(`Begin metadata update for dataset: ${datasetId}`);
     let isDirty = false;
     let accessTypes = ["userByEmail", "groupByEmail"];
 
@@ -39,6 +41,7 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
         throw err;
     }
 
+    console.log(`Removing access for all accounts with role of READER in dataset: ${datasetId}`);
     // 2. Check for and remove any non-existing authorized views
     // Remove stale view access
     let i = metadata.access.length;
@@ -96,17 +99,19 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
         }
     }
 
+    console.log(`End metadata update for dataset: ${datasetId}`);
     return isDirty;
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} policyIds
+ * @param  {} fullRefresh
+ */
 async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
-    /*if (fullRefresh) {
-        const labelKey = cfg.cdsManagedLabelKey;
-        const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);    
-        const datasetIds = datasets.map(d => d.datasetId);
-    }*/
+    const labelKey = cfg.cdsManagedLabelKey;
     let options = {};
-    if (policyIds && policyIds.length > 0) {
+    if (!fullRefresh && policyIds && policyIds.length > 0) {
         options = {
             query: `CALL \`${projectId}.datashare.permissionsDiff\`(@policyIds)`,
             params: { policyIds: policyIds }
@@ -122,14 +127,43 @@ async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
 
     if (fullRefresh === true) {
         // Update all managed datasets and tables
+        const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
+        for (const dataset of datasets) {
+            const datasetId = dataset.datasetId;
+            console.log(`Iterating over dataset: ${datasetId}`);
+
+            let dsPolicyRecord = underscore.findWhere(rows, { datasetId: datasetId, isTableBased: false });
+            console.log(dsPolicyRecord);
+            let accounts = [];
+            if (dsPolicyRecord) {
+                accounts = dsPolicyRecord.accounts;
+            }
+            await performDatasetMetadataUpdate(projectId, datasetId, accounts);
+
+            const tables = await bigqueryUtil.getTablesByLabel(projectId, datasetId, labelKey);
+            for (const table of tables) {
+                const tableId = table.tableId;
+                console.log(`Iterating over table: ${datasetId}.${tableId}`);
+            }
+        }
     } else {
-        // Differential update, iterate over result based on the policyId filter
-        // let list = underscore.where
+        // Differential update, iterate over result based on the policyId filter only.
+        // No need to apply an additional filter.
+        for (const row of rows) {
+            const datasetId = row.datasetId;
+            const tableId = row.tableId;
+            if (row.isTableBased === true) {
+                console.log(`Iterating over table: ${datasetId}.${tableId}`);
+                // Call new table based update function
+            } else {
+                console.log(`Iterating over dataset: ${datasetId}`);
+                await performDatasetMetadataUpdate(projectId, datasetId, row.accounts);
+            }
+        }
     }
 
     // If fullRefresh is specified, iterate over all managed datasets, removing all access and updating
 
-    
     /*
         policyIds should include policies for which where added from/to an account and policies that were created/modified/deleted
         There are two main scenarios:
@@ -152,7 +186,8 @@ async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
  * @param  {} datasetIds
  */
 async function performMetadataUpdate(projectId, policyIds, datasetIds) {
-    await performPolicyUpdates(projectId, null, true);
+    await performPolicyUpdates(projectId, policyIds, false);
+    return;
 
     console.log(`performMetadataUpdate called for policyIds: ${JSON.stringify(policyIds)} and datasetIds: ${JSON.stringify(datasetIds)}`);
     let filter = "";
@@ -242,5 +277,6 @@ async function performMetadataUpdate(projectId, policyIds, datasetIds) {
 }
 
 module.exports = {
-    performMetadataUpdate
+    performMetadataUpdate,
+    performPolicyUpdates
 };

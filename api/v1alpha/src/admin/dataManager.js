@@ -73,7 +73,8 @@ async function syncResources(projectId, type) {
             const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
             const datasetIds = datasets.map(d => d.datasetId);
             console.log(`Performing policy sync for datasets: ${JSON.stringify(datasetIds)})`);
-            await metaManager.performMetadataUpdate(projectId, null, datasetIds);
+            // await metaManager.performMetadataUpdate(projectId, null, datasetIds);
+            await metaManager.performPolicyUpdates(projectId, null, true);
         }
         if (views) {
             // Get list of configured views
