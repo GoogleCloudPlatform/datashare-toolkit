@@ -48,7 +48,7 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
         let a = metadata.access[i];
         if (a.view && a.view.projectId && a.view.datasetId && a.view.tableId) {
             const _viewExists = await bigqueryUtil.viewExists(a.view.datasetId, a.view.tableId);
-            // If view no longer exists, remove it.
+            // If view no longer exists, remove it
             if (_viewExists === false) {
                 console.log(`Removing authorized view as it does not exist: ${a.view.datasetId}.${a.view.tableId}`);
                 metadata.access.splice(i, 1);
@@ -56,14 +56,12 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
             }
         }
         else if (a.role === 'READER') {
-            // 3. Remove all 'READER' userByEmail and groupByEmail accounts
-            // Get keys for the current access object.
+            // 3. Remove all 'READER' userByEmail and groupByEmail accounts that should not have access
             const aKeys = Object.keys(a);
             if (aKeys.length === 2) {
                 const accessType = aKeys[1];
                 const accessId = a[accessType];
                 if (accessTypes.includes(accessType)) {
-                    // If we find the record, remove it
                     const shouldHaveAccess = underscore.findWhere(accounts, { email: accessId, emailType: accessType });
                     if (!shouldHaveAccess) {
                         console.log(`Deleting user: ${accessType}:${accessId} from datasetId: ${datasetId}`);
@@ -79,7 +77,6 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
     accounts.forEach(account => {
         // If a dataset contains no accounts, the query will return an array with
         // a single item at zero index with attributes having all null values.
-        // TODO: Clean this up.
         if (account.email && account.emailType) {
             let a = { role: 'READER', };
             a["role"] = 'READER';
@@ -109,6 +106,17 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
 
     console.log(`End metadata update for dataset: ${datasetId}`);
     return isDirty;
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} datasetId
+ * @param  {} tableId
+ * @param  {} accounts
+ */
+async function performTableMetadataUpdate(projectId, datasetId, tableId, accounts) {
+    // TODO
+    return true;
 }
 
 /**
@@ -152,6 +160,7 @@ async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
             for (const table of tables) {
                 const tableId = table.tableId;
                 console.log(`Iterating over table: ${datasetId}.${tableId}`);
+                // Invoke to-be-created function performTableMetadataUpdate
             }
         }
     } else {
