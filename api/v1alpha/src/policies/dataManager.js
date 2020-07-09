@@ -198,7 +198,6 @@ async function listPolicies(projectId, datasetId, accountId) {
 async function createOrUpdatePolicy(projectId, policyId, data) {
     console.log(`createOrUpdateAccount called with policyId: ${policyId} and data: ${JSON.stringify(data)}`);
     let _policyId = policyId;
-    let previousDatasetIds = [];
     if (policyId) {
         const currentPolicy = await getPolicy(projectId, policyId);
         console.log(`currentPolicy response: ${JSON.stringify(currentPolicy)}`);
@@ -207,7 +206,6 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
                 // If user is updating an existing record, compare the rowId to ensure they're making updates from the latest record.
                 return { success: false, code: 500, errors: ["STALE"] };
             }
-            previousDatasetIds = currentPolicy.data.datasets.map(p => p.datasetId);
             _policyId = currentPolicy.data.policyId;
         }
     }
@@ -281,7 +279,7 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
     const result = await _insertData(projectId, fields, values, data);
     if (result) {
         try {
-            await metaManager.performMetadataUpdate(projectId, [_policyId], previousDatasetIds);
+            await metaManager.performMetadataUpdate(projectId, [_policyId]);
         } catch (err) {
             return { success: false, code: 500, errors: [err.message] };
         }
