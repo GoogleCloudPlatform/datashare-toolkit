@@ -100,12 +100,35 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
 }
 
 async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
+    /*if (fullRefresh) {
+        const labelKey = cfg.cdsManagedLabelKey;
+        const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);    
+        const datasetIds = datasets.map(d => d.datasetId);
+    }*/
+    let options = {};
+    if (policyIds && policyIds.length > 0) {
+        options = {
+            query: `CALL \`${projectId}.datashare.permissionsDiff\`(@policyIds)`,
+            params: { policyIds: policyIds }
+        };
+    } else {
+        options = {
+            query: `CALL \`${projectId}.datashare.permissionsDiff\`(null)`
+        };
+    }
+
+    const [rows] = await bigqueryUtil.executeQuery(options);
+    console.log(`Permission Diff Result: ${JSON.stringify(rows, null, 3)}`);
+
+    if (fullRefresh === true) {
+        // Update all managed datasets and tables
+    } else {
+        // Differential update, iterate over result based on the policyId filter
+        // let list = underscore.where
+    }
+
     // If fullRefresh is specified, iterate over all managed datasets, removing all access and updating
-    /*
-    const labelKey = cfg.cdsManagedLabelKey;
-    const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
-    const datasetIds = datasets.map(d => d.datasetId);
-    */
+
     
     /*
         policyIds should include policies for which where added from/to an account and policies that were created/modified/deleted
@@ -129,9 +152,8 @@ async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
  * @param  {} datasetIds
  */
 async function performMetadataUpdate(projectId, policyIds, datasetIds) {
-    // Remove the datasetIds parameter, and get this ourselves based on the last version of the policyId.
-    // For each policyId get the prior record and update using that.
-    
+    await performPolicyUpdates(projectId, null, true);
+
     console.log(`performMetadataUpdate called for policyIds: ${JSON.stringify(policyIds)} and datasetIds: ${JSON.stringify(datasetIds)}`);
     let filter = "";
     if (policyIds && policyIds.length > 0 && datasetIds && datasetIds.length > 0) {
