@@ -302,6 +302,15 @@ class BigQueryUtil {
             throw err;
         }
     }
+    /**
+     * @param  {} projectId
+     * @param  {} datasetId
+     * @param  {} tableId
+     * https://cloud.google.com/resource-manager/reference/rest/v1/projects/setIamPolicy
+     */
+    async setTableIamPolicy(projectId, datasetId, tableId) {
+
+    }
 
     /**
      * @param  {string} datasetId
