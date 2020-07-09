@@ -17,6 +17,10 @@
 'use strict';
 const { BigQuery } = require('@google-cloud/bigquery');
 const { Storage } = require('@google-cloud/storage');
+
+const { google } = require('googleapis');
+const DISCOVERY_URL = 'https://bigquery.googleapis.com/discovery/v1/apis/bigquery/v2/rest';
+
 const storage = new Storage();
 const underscore = require("underscore");
 
@@ -258,6 +262,44 @@ class BigQueryUtil {
         }
 
         return { metadata, exists, datasetExists, tableExists, error, errorMessage };
+    }
+
+    async getClient() {
+        const auth = new google.auth.GoogleAuth({
+            scopes: 'https://www.googleapis.com/auth/cloud-platform'
+        });
+        google.options({auth: auth});
+        return google.discoverAPI(DISCOVERY_URL, {}, (err, client) => {
+            if (err) {
+                console.log('Error during API discovery', err);
+                return undefined;
+            }
+            return client;
+        });
+    }
+
+    /**
+     * @param  {} datasetId
+     * @param  {} tableId
+     * https://cloud.google.com/resource-manager/reference/rest/v1/projects/getIamPolicy
+     */
+    async getTableIamPolicy(datasetId, tableId) {
+        const client = await this.getClient();
+        console.log('authorized');
+        try {
+            const res = await client.tables.getIamPolicy({
+                resource: `projects/${this.projectId}/datasets/${datasetId}/tables/${tableId}`
+            });
+            if (this.VERBOSE_MODE) {
+                console.log(res.data);
+            }
+            return res.data;
+        } catch (err) {
+            if (this.VERBOSE_MODE) {
+                console.warn(err);
+            }
+            throw err;
+        }
     }
 
     /**

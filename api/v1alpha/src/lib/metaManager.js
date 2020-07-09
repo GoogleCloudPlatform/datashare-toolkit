@@ -115,7 +115,10 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
  * @param  {} accounts
  */
 async function performTableMetadataUpdate(projectId, datasetId, tableId, accounts) {
-    // TODO
+    console.log(`Begin metadata update for table: ${datasetId}.${tableId}`);
+    console.log(`End metadata update for table: ${datasetId}.${tableId}`);
+    await bigqueryUtil.getTableIamPolicy(datasetId, tableId);
+    // Not implemented.
     return true;
 }
 
@@ -160,7 +163,7 @@ async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
             for (const table of tables) {
                 const tableId = table.tableId;
                 console.log(`Iterating over table: ${datasetId}.${tableId}`);
-                // Invoke to-be-created function performTableMetadataUpdate
+                await performTableMetadataUpdate(projectId, datasetId, tableId, table.accounts);
             }
         }
     } else {
@@ -171,7 +174,7 @@ async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
             const tableId = row.tableId;
             if (row.isTableBased === true) {
                 console.log(`Iterating over table: ${datasetId}.${tableId}`);
-                // Call new table based update function
+                await performTableMetadataUpdate(projectId, datasetId, tableId, row.accounts);
             } else {
                 console.log(`Iterating over dataset: ${datasetId}`);
                 await performDatasetMetadataUpdate(projectId, datasetId, row.accounts);
