@@ -279,19 +279,20 @@ class BigQueryUtil {
     }
 
     /**
+     * @param  {} projectId
      * @param  {} datasetId
      * @param  {} tableId
      * https://cloud.google.com/resource-manager/reference/rest/v1/projects/getIamPolicy
      */
-    async getTableIamPolicy(datasetId, tableId) {
+    async getTableIamPolicy(projectId, datasetId, tableId) {
         const client = await this.getClient();
         console.log('authorized');
         try {
             const res = await client.tables.getIamPolicy({
-                resource: `projects/${this.projectId}/datasets/${datasetId}/tables/${tableId}`
+                resource: `projects/${projectId}/datasets/${datasetId}/tables/${tableId}`
             });
             if (this.VERBOSE_MODE) {
-                console.log(res.data);
+                console.log(JSON.stringify(res.data));
             }
             return res.data;
         } catch (err) {

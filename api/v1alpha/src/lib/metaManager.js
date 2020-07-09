@@ -117,7 +117,7 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
 async function performTableMetadataUpdate(projectId, datasetId, tableId, accounts) {
     console.log(`Begin metadata update for table: ${datasetId}.${tableId}`);
     console.log(`End metadata update for table: ${datasetId}.${tableId}`);
-    await bigqueryUtil.getTableIamPolicy(datasetId, tableId);
+    await bigqueryUtil.getTableIamPolicy(projectId, datasetId, tableId);
     // Not implemented.
     return true;
 }
