@@ -279,7 +279,7 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
     const result = await _insertData(projectId, fields, values, data);
     if (result) {
         try {
-            await metaManager.performMetadataUpdate(projectId, [_policyId]);
+            await metaManager.performPolicyUpdates(projectId, [_policyId]);
         } catch (err) {
             return { success: false, code: 500, errors: [err.message] };
         }
@@ -371,7 +371,7 @@ async function deletePolicy(projectId, policyId, data) {
     await _deleteData(projectId, fields, values, params);
 
     try {
-        await metaManager.performMetadataUpdate(projectId, [policyId]);
+        await metaManager.performPolicyUpdates(projectId, [policyId]);
     } catch (err) {
         return { success: false, code: 500, errors: [err.message] };
     }
