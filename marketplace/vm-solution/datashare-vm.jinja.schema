@@ -120,7 +120,7 @@ properties:
     default: US
   input_useRuntimeConfigWaiter:
     type: boolean
-    default: False
+    default: True
 
 outputs:
   deployment:

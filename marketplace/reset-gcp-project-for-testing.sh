@@ -1,11 +1,18 @@
 #!/bin/bash
 
-RUNTIME_CONFIG="cds-vm-1-startup-config"
+RUNTIME_CONFIG="datashare-vm-1-startup-config"
 VARIABLE_NAME="/success/my-instance"
 
 # Remove storage.admin role from deployment manager service account (PROJECT_NUMBER@cloudservices.gserviceaccount.com)
 PROJECT_NUMBER=`gcloud projects list --filter=$(gcloud config get-value project) --format="value(PROJECT_NUMBER)"`
 gcloud projects remove-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudservices.gserviceaccount.com" --role="roles/storage.admin"
+
+# Remove IAM admin role from Cloud Build service account (@cloudbuild.gserviceaccount.com)
+gcloud projects remove-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.serviceAccountAdmin"
+gcloud projects remove-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.admin"
+gcloud projects remove-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.serviceAgent"
+gcloud projects remove-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.roleAdmin"
+gcloud projects remove-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.securityAdmin"
 
 # disable all the APIs
 echo "Disabling GCP APIs that were enabled during the VM solution deployment..."

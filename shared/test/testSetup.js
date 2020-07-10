@@ -27,6 +27,8 @@ console.log(`Command arguments: ${JSON.stringify(argv)}`);
 if (argv.runCloudTests && !argv.projectId) {
     console.log("projectId must be provided when runCloudTests is enabled");
     process.exit(1);
+} else if (argv.runCloudTests && argv.projectId) {
+    console.log(`Running cloud tests in project: ${argv.projectId}`);
 }
 
 // Needs to be set to mimic environmental variable set by cloud function invocation and used within ingestion.
