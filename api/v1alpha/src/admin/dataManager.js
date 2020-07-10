@@ -569,7 +569,8 @@ async function setupDatasharePrerequisites(projectId) {
         console.log('Current user dataset view already exists');
     }
 
-    // Create or update procedure permissionsDiff.
+    // TODO: Create or update procedure permissionsDiff.
+    // const permissionsProc = 
 }
 
 module.exports = {
