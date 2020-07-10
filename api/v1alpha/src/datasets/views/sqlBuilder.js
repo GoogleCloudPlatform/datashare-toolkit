@@ -141,13 +141,17 @@ async function generateAccessControlSubquery(view) {
         if (useNesting === true) {
             query += `SELECT 1 FROM UNNEST(split(s.${accessControlLabelColumn}, "${accessControlLabelColumnDelimiter}")) AS flattenedLabel\n`;
             query += `JOIN \`${view.projectId}.${cfg.cdsDatasetId}.${cfg.cdsCurrentUserDatasetViewId}\` e ON LOWER(flattenedLabel) = LOWER(e.tag)\n`;
-            query += `WHERE LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}'\n`;
+            query += `WHERE\n\t(e.isTableBased IS false AND LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}') OR\n`;
+            query += `\t(e.isTableBased IS true AND LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}' AND LOWER(e.tableId) = '${view.name.toLowerCase()}')\n`;
         }
         else {
             query += `SELECT 1 FROM \`${view.projectId}.${cfg.cdsDatasetId}.${cfg.cdsCurrentUserDatasetViewId}\` e\n`;
-            query += `WHERE LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}' AND LOWER(e.tag) = LOWER(s.${accessControlLabelColumn})\n`;
+            query += `WHERE (\n\t(e.isTableBased IS false AND LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}') OR\n`;
+            query += `\t(e.isTableBased IS true AND LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}' AND LOWER(e.tableId) = '${view.name.toLowerCase()}')\n)`;
+            query += `\nAND LOWER(e.tag) = LOWER(s.${accessControlLabelColumn})`;
         }
 
+        console.log(sql);
         sql += await prependLines(query, "\t", 1);
         sql += "\n)";
         return sql;
