@@ -19,4 +19,12 @@ gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PRO
 echo "Removing run.serviceagent role from Cloud Build service account"
 gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.serviceAgent"
                 
+# Remove permissions from Cloud Build when GKE is used for Datashare API; It's ok if these commands fail.
+echo "Removing clusterAdmin role from Cloud Build service account"
+gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.clusterAdmin"
+echo "Removing container.viewer role from Cloud Build service account"
+gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.viewer"
+echo "Removing container.admin role from Cloud Build service account"
+gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.admin"
+
 #gcloud projects add-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="$ROLE"
