@@ -21,6 +21,10 @@ def GenerateConfig(context):
   
   cmd = "https://github.com/GoogleCloudPlatform/datashare-toolkit.git"
   gitReleaseVersion = "master"
+  namespace = "datashare-apis"
+  cluster_name = "datashare"
+  cluster_location = context.properties['gkeZone']
+
   if context.properties['datashareGitReleaseTag'] != None:
       gitReleaseVersion = context.properties['datashareGitReleaseTag']
 
@@ -60,18 +64,35 @@ def GenerateConfig(context):
               {   # Deploy the container image to Cloud Run
                   'name': 'gcr.io/cloud-builders/gcloud',
                   'dir': 'ds/datashare-toolkit',
-                  'args': ['run',
-                            'deploy',
-                            context.properties['cloudRunDeployName'],
-                            '--image=gcr.io/$PROJECT_ID/' + context.properties['cloudRunDeployName'] + ':' + context.properties['containerTag'], 
-                            '--region='+ context.properties['region'],
-                            '--allow-unauthenticated',
-                            '--platform=managed',
-                            '--service-account=' + context.properties['serviceAccountName'] + '@$PROJECT_ID.iam.gserviceaccount.com'
-                          ]
+                  'entrypoint': 'gcloud'
               }
           ]
-    
+  # select the correct deploy command based on whether deployToGke is True or False
+  if context.properties['deployToGke'] == False:
+    steps[5]['args'] = [ 'run',
+                    'deploy',
+                    context.properties['cloudRunDeployName'],
+                    '--image=gcr.io/$PROJECT_ID/' + context.properties['cloudRunDeployName'] + ':' + context.properties['containerTag'], 
+                    '--region='+ context.properties['region'],
+                    '--allow-unauthenticated',
+                    '--platform=managed',
+                    '--service-account=' + context.properties['serviceAccountName'] + '@$PROJECT_ID.iam.gserviceaccount.com'
+                    ]
+  else:
+    steps[5]['args'] = ['alpha',
+                    'run',
+                    'deploy',
+                    context.properties['cloudRunDeployName'],
+                    '--cluster=' + cluster_name,
+                    '--cluster-location=' + cluster_location,
+                    '--namespace=' + namespace,
+                    '--min-instances=1',
+                    '--image=gcr.io/$PROJECT_ID/' + context.properties['cloudRunDeployName'] + ':' + context.properties['containerTag'], 
+                    '--platform=gke',
+                    '--service-account=' + context.properties['serviceAccountName']
+                    ]
+
+
   gitRelease = { # Checkout the correct release
                 'name': 'gcr.io/cloud-builders/git',
                 'dir': 'ds/datashare-toolkit', # changes the working directory to /workspace/ds/datashare-toolkit
@@ -79,7 +100,7 @@ def GenerateConfig(context):
               }
 
   if gitReleaseVersion != "master":
-      steps.insert(2, gitRelease) # insert the git checkout command into after the git clone step
+    steps.insert(2, gitRelease) # insert the git checkout command into after the git clone step
 
   resources = None
   # include the dependsOn property if we are deploying all the components
