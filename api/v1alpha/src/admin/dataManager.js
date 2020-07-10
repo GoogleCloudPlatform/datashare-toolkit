@@ -213,10 +213,10 @@ async function setupDatasharePrerequisites(projectId) {
         console.log('Authorized view view already exists');
     }
 
-    if (await bigqueryUtil.viewExists(cfg.cdsDatasetId, cfg.cdsCurrentUserDatasetViewId) === false) {
-        console.log("Creating latest currentUserDataset view");
-        const sql = sqlReplacements(projectId, require('./bq/views/currentUserDataset.sql'));
-        await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsCurrentUserDatasetViewId, sql);
+    if (await bigqueryUtil.viewExists(cfg.cdsDatasetId, cfg.cdsCurrentUserPermissionViewId) === false) {
+        console.log("Creating latest currentUserPermission view");
+        const sql = sqlReplacements(projectId, require('./bq/views/currentUserPermission.sql'));
+        await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsCurrentUserPermissionViewId, sql);
     } else {
         console.log('Current user dataset view already exists');
     }

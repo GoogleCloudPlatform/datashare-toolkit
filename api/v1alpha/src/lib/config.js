@@ -51,7 +51,7 @@ config.cdsAuthorizedViewViewFields = new Set(['rowId', 'authorizedViewId', 'name
     'datasetId', 'source', 'custom', 'accessControl', 'expiration', 'createdBy', 'createdAt', 'viewSql', 
     'version', 'isDeleted']);
 
-config.cdsCurrentUserDatasetViewId = "currentUserDataset";
+config.cdsCurrentUserPermissionViewId = "currentUserPermission";
 
 config.permissionsDiffProcedureId = "permissionsDiff";
 
