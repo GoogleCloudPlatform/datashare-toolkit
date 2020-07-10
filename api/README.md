@@ -285,7 +285,7 @@ Use Helm's local template rendering to create a Kubernetes manifest that install
 
     helm template \
       --namespace gke-system \
-      --set global.hub=gcr.io/gke-release/istio \
+      --set global.hub=gcr.io/gke-release/asm \
       --set global.tag=$ISTIO_PACKAGE \
       --set pilot.enabled=false \
       --set security.enabled=true \
@@ -366,7 +366,8 @@ Deploy ths DS API service to Cloud Run for Anthos in the **NAMESPACE**: \
       --min-instances 1 \
       --namespace $NAMESPACE \
       --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
-      --platform gke
+      --platform gke \
+      --service-account ${SERVICE_ACCOUNT_NAME}
 
 This command creates a [Knative Serving service](https://github.com/knative/serving/blob/master/docs/spec/overview.md) object.
 The `--min-instances 1` option prevents timing conflicts between the Istio and Knative Serving sidecars, when scaling up from zero pods.
@@ -400,11 +401,11 @@ You should also be able to verify the DS API can communicate with GCP services:
 
 #### Domain mapping
 To use a custom domain for a service, you map your service to the custom domain, then update your DNS records. You can map a service to a domain, such as *example.com* or to a subdomain, such as *subdomain.example.com*. You must already own the TLD or sub-domain to use this feature.\
-**Note**: For internal Googlers, you can create custom domains via go/joonix
+**Note**: For internal Googlers, you can create custom domains via go/create-test-org
 
-Create a **DOMAIN** environment variable based off the above:
+Create a **FQDN** environment variable based off the subdomain above:
 
-    export DOMAIN=ds-api.fsi.joonix.net
+    export FQDN=ds-api.fsi.joonix.net
 
 Verify domain ownership the first time you use that domain in the Google Cloud project:
 
@@ -412,12 +413,12 @@ Verify domain ownership the first time you use that domain in the Google Cloud p
 
 If your ownership of the domain needs to be verified, open the Webmaster Central verification page:
 
-    gcloud domains verify $DOMAIN
+    gcloud domains verify $FQDN
 
-Map your service to the custom domain:
+Map your service to the custom FQDN:
 
     gcloud beta run domain-mappings create --service ds-api \
-      --domain $DOMAIN \
+      --domain $FQDN \
       --cluster $CLUSTER \
       --cluster-location $ZONE \
       --namespace $NAMESPACE \
@@ -429,22 +430,36 @@ Reserve the IP address attached to the Load Balancer for the Istio ingress gatew
     gcloud compute addresses create ds-api-static-ip --addresses $GATEWAY_IP --region $REGION
 
 Add the appropriate A record to the DNS entry in your domain registrar based off the entry of this command:
-**Note**: You can execute `gcloud` commands to add this if the DNS zone is managed in Cloud DNS [here](https://cloud.google.com/dns/docs/records#gcloud)
+**Note**: These `gcloud` commands will only work if the DNS zone is managed in Cloud DNS [here](https://cloud.google.com/dns/docs/records#gcloud)
 
-    gcloud beta run domain-mappings describe \
-      --domain $DOMAIN \
-      --cluster $CLUSTER \
-      --cluster-location $ZONE \
-      --namespace $NAMESPACE \
-      --platform gke
+Export **DNS_ZONE_NAME** environment variable
+
+    export DNS_ZONE_NAME=fsi-joonix-net
+
+Create a new DNS record transaction:
+
+    gcloud dns record-sets transaction start --zone=$DNS_ZONE_NAME
+
+Add the *A* record to the FQDN in the transaction:
+
+    gcloud dns record-sets transaction add $GATEWAY_IP \
+      --name=$FQDN \
+      --ttl="30" \
+      --type="A" \
+      --zone=$DNS_ZONE_NAME
+
+Execute the DNS record transaction:
+**Note**: It may take a minute or two for the DNS resolvers to propogate the new DNS record
+
+    gcloud dns record-sets transaction execute --zone=$DNS_ZONE_NAME
 
 Very the new record propagated to the local DNS resolvers:
 
-    dig +short $DOMAIN
+    dig +short $FQDN
 
 You should also be able to verify the DS API can communicate with GCP services:
 
-    curl -i http://${DOMAIN}/v1alpha/projects/${PROJECT_ID}/datasets
+    curl -i http://${FQDN}/v1alpha/projects/${PROJECT_ID}/datasets
 
 
 ### Deploy Cloud Run Managed
@@ -553,7 +568,7 @@ Verify that the DNS record has gone into effect by running the command:
 **Note**: You sould see HTTPS instead
 
     gcloud beta run domain-mappings describe \
-      --domain $DOMAIN \
+      --domain $FQDN \
       --cluster $CLUSTER \
       --cluster-location $ZONE \
       --namespace $NAMESPACE \
@@ -561,7 +576,7 @@ Verify that the DNS record has gone into effect by running the command:
 
 You should also be able to verify the DS API can communicate with GCP services via HTTPS:
 
-    curl -i https://${DOMAIN}/v1alpha/projects/${PROJECT_ID}/datasets
+    curl -i https://${FQDN}/v1alpha/projects/${PROJECT_ID}/datasets
 
 
 ### Authentication
