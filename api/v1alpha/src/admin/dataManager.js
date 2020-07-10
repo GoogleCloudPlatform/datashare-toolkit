@@ -568,6 +568,8 @@ async function setupDatasharePrerequisites(projectId) {
     } else {
         console.log('Current user dataset view already exists');
     }
+
+    // Create or update procedure permissionsDiff.
 }
 
 module.exports = {
