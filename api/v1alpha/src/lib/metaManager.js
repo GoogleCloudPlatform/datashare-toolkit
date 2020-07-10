@@ -82,7 +82,6 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
             a["role"] = 'READER';
             a[account.emailType] = account.email;
             const accessRecordExists = underscore.findWhere(metadata.access, a);
-            console.log(metadata.access);
             if (!accessRecordExists) {
                 metadata.access.push(a);
                 isDirty = true;
@@ -200,10 +199,7 @@ async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
         const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
         for (const dataset of datasets) {
             const datasetId = dataset.datasetId;
-            console.log(`Iterating over dataset: ${datasetId}`);
-
             let dsPolicyRecord = underscore.findWhere(rows, { datasetId: datasetId, isTableBased: false });
-            console.log(dsPolicyRecord);
             let accounts = [];
             if (dsPolicyRecord) {
                 accounts = dsPolicyRecord.accounts;
@@ -214,12 +210,10 @@ async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
             for (const table of tables) {
                 const tableId = table.tableId;
                 let tbPolicyRecord = underscore.findWhere(rows, { datasetId: datasetId, tableId: tableId, isTableBased: true });
-                console.log(tbPolicyRecord);
                 let tbAccounts = [];
                 if (tbPolicyRecord) {
                     tbAccounts = tbPolicyRecord.accounts;
                 }
-                console.log(`Iterating over table: ${datasetId}.${tableId}: ${JSON.stringify(tbPolicyRecord, null, 3)}`);
                 await performTableMetadataUpdate(projectId, datasetId, tableId, tbAccounts);
             }
         }
