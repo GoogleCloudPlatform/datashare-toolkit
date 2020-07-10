@@ -429,7 +429,7 @@ Reserve the IP address attached to the Load Balancer for the Istio ingress gatew
 
     gcloud compute addresses create ds-api-static-ip --addresses $GATEWAY_IP --region $REGION
 
-Add the appropriate A record to the DNS entry in your domain registrar based off the entry of this command:
+Add the appropriate A record to the DNS entry in your domain registrar based off the entry of this command: \
 **Note**: These `gcloud` commands will only work if the DNS zone is managed in Cloud DNS [here](https://cloud.google.com/dns/docs/records#gcloud)
 
 Export **DNS_ZONE_NAME** environment variable
@@ -448,7 +448,7 @@ Add the *A* record to the FQDN in the transaction:
       --type="A" \
       --zone=$DNS_ZONE_NAME
 
-Execute the DNS record transaction:
+Execute the DNS record transaction: \
 **Note**: It may take a minute or two for the DNS resolvers to propogate the new DNS record
 
     gcloud dns record-sets transaction execute --zone=$DNS_ZONE_NAME
@@ -564,7 +564,7 @@ If the certificate is ready, you should see a message similar to this one:
 
 It may take from 20 seconds to 2 minutes for the Kcert to become ready. If you experience any issues, see the troubleshooting instructions for this feature
 
-Verify that the DNS record has gone into effect by running the command:
+Verify that the DNS record has gone into effect by running the command: \
 **Note**: You sould see HTTPS instead
 
     gcloud beta run domain-mappings describe \
