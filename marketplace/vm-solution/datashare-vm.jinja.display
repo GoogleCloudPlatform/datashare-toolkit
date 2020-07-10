@@ -118,7 +118,16 @@ input:
       title: Use Google RuntimeConfig Waiter to setup Datashare prereqs.
       tooltip: Enables the <a href="https://cloud.google.com/deployment-manager/runtime-configurator/create-and-delete-runtimeconfig-resources">RuntimeConfig beta</a> feature that will execute a startup-script in the VM to enable APIs, upload Cloud Function source code and configure Cloud Run.
       subtext: Enables CloudBuild, IAM, Cloud Run, Cloud Resource Manager APIs, and uploads Datashare Cloud Function to Cloud Storage.
-
+    - name: input_deployApiToGke
+      title: Deploy the Datashare API to Cloud Run/GKE
+      tooltip: This creates a<a href="https://cloud.google.com/run/docs/gke/setup">GKE cluster and installs Cloud Run</a> and deploys the Datashare API to this Cloud Run instance.
+      subtext: Creates a GKE cluster, installs Cloud Run and deploys Datashare API to this cluster.
+    - name: input_gkeZone
+      title: GKE zone.
+      tooltip: This will create the GKE cluster in the specified zone; default zone is us-central1-a
+      subtext: Create the GKE cluster in the specified zone;
+      placeholder: us-central1-a
+    
   sections:
     - name: BOOT_DISK
       title: Boot Disk
@@ -152,11 +161,32 @@ runtime:
       showIf: '{{ !outputs().hasExternalIP }}'
     - heading: Log on now
       description: 'Start using the Datashare UI by accessing the URL from the commands below.'
-      snippet: gcloud run services list --platform=managed
+      snippet: >-
+        gcloud run services list --platform=managed
     - heading: Setup Firebase
-      description: Setup <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/frontend#new-firebase-setup">Firebase</a>
+      description: You must configure Firebase. <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/frontend#new-firebase-setup">Follow these instructions.</a>
     - heading: Remove roles from Service Accounts
       description: <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/marketplace/README.md#remove-elevated-service-account-permissions">Remove elevated permissions from Cloud Build and Deployment Manager</a>
+    - heading: Datashare API Deployed to Cloud Run managed by GKE
+      description: Confirm Datashare deployment, pod and service is running on GKE. Execute the following commands from Cloud Shell.
+      showIf: '{{ properties().input_deployApiToGke }}'
+      snippet: >-
+        gcloud container clusters get-credentials datashare --zone {{ properties().input_gkeZone }}
+        kubectl get gw,deploy,po,svc -n datashare-apis
+    - heading: Datashare API Service in GKE
+      description: Display the Datashare UI domain name. Execute the following commands from Cloud Shell.
+      showIf: '{{ properties().input_deployApiToGke }}'
+      snippet: >-
+        gcloud container clusters get-credentials datashare --zone {{ properties().input_gkeZone }}
+        gcloud run services describe ds-api --cluster datashare --cluster-location {{ properties().input_gkeZone }}   --namespace datashare-apis   --platform gke
+    - heading: Send Curl request to Datashare API
+      description: Execute the following commands from Cloud Shell.
+      showIf: '{{ properties().input_deployApiToGke }}'
+      snippet: >-
+        gcloud container clusters get-credentials datashare --zone {{ properties().input_gkeZone }}
+        GATEWAY_IP=`kubectl -n gke-system get svc istio-ingress -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`; echo $GATEWAY_IP
+        curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha       
+        curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha/projects/gcp-financial-services-dev/datasets
     - heading: Do you want to delete the Datashare solution?
       description: The best way to delete the Datashare solution is by following this <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/marketplace#delete-vm-solution-components-from-gcpsh">documentation.</a>
     - heading: Deployed with RuntimeConfig beta
