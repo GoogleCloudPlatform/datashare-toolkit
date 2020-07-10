@@ -119,11 +119,12 @@ async function performTableMetadataUpdate(projectId, datasetId, tableId, account
     console.log(`Begin metadata update for table: ${datasetId}.${tableId}`);
     let isDirty = false;
     const tablePolicy = await bigqueryUtil.getTableIamPolicy(projectId, datasetId, tableId);
-
     let readBinding = {};
-    if (tablePolicy && tablePolicy.bindings) {
+    let bindingExists = false;
+    if (tablePolicy.bindings) {
         readBinding = underscore.findWhere(tablePolicy.bindings, { role: viewerRole });
         if (readBinding) {
+            bindingExists = true;
             let i = readBinding.members.length;
             while (i--) {
                 let member = readBinding.members[i];
@@ -141,13 +142,20 @@ async function performTableMetadataUpdate(projectId, datasetId, tableId, account
                 }
             }
         }
+    } else {
+        tablePolicy.bindings = [];
+    }
+
+    if (!bindingExists) {
+        readBinding.role = viewerRole;
+        readBinding.members = [];
+        tablePolicy.bindings.push(readBinding);
     }
 
     accounts.forEach(account => {
         if (account.email && account.emailType) {
             const identifier = (account.emailType === 'userByEmail' ? 'user' : 'group') + ':' + account.email;
             const accessRecordExists = readBinding.members.includes(identifier);
-            console.log(readBinding.members);
             if (!accessRecordExists) {
                 readBinding.members.push(identifier);
                 isDirty = true;
