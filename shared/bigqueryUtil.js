@@ -268,7 +268,7 @@ class BigQueryUtil {
         const auth = new google.auth.GoogleAuth({
             scopes: 'https://www.googleapis.com/auth/cloud-platform'
         });
-        google.options({auth: auth});
+        google.options({ auth: auth });
         return google.discoverAPI(DISCOVERY_URL, {}, (err, client) => {
             if (err) {
                 console.log('Error during API discovery', err);
@@ -286,7 +286,6 @@ class BigQueryUtil {
      */
     async getTableIamPolicy(projectId, datasetId, tableId) {
         const client = await this.getClient();
-        console.log('authorized');
         try {
             const res = await client.tables.getIamPolicy({
                 resource: `projects/${projectId}/datasets/${datasetId}/tables/${tableId}`
@@ -302,14 +301,35 @@ class BigQueryUtil {
             throw err;
         }
     }
+
     /**
      * @param  {} projectId
      * @param  {} datasetId
      * @param  {} tableId
+     * @param  {} policy
+     * @param  {} updateMask
      * https://cloud.google.com/resource-manager/reference/rest/v1/projects/setIamPolicy
      */
-    async setTableIamPolicy(projectId, datasetId, tableId) {
-
+    async setTableIamPolicy(projectId, datasetId, tableId, policy, updateMask) {
+        const client = await this.getClient();
+        try {
+            const res = await client.tables.setIamPolicy({
+                resource: `projects/${projectId}/datasets/${datasetId}/tables/${tableId}`,
+                requestBody: {
+                    "policy": policy,
+                    "updateMask": updateMask // 'bindings'
+                }
+            });
+            if (this.VERBOSE_MODE) {
+                console.log(JSON.stringify(res.data));
+            }
+            return res.data;
+        } catch (err) {
+            if (this.VERBOSE_MODE) {
+                console.warn(err);
+            }
+            throw err;
+        }
     }
 
     /**
