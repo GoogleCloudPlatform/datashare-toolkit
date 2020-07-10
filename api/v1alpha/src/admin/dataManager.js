@@ -74,7 +74,6 @@ async function syncResources(projectId, type) {
 
         const labelKey = cfg.cdsManagedLabelKey;
         if (permissions) {
-            console.log('Syncing permissions');
             await metaManager.performPolicyUpdates(projectId, null, true);
         }
         if (views) {
