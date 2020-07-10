@@ -1,0 +1,186 @@
+{
+    "description": "Datashare Authorized View Table",
+    "schema": [
+        {
+            "description": "Unique row identifier",
+            "mode": "REQUIRED",
+            "name": "rowId",
+            "type": "STRING"
+        },
+        {
+            "description": "Unique authorized view identifier",
+            "mode": "REQUIRED",
+            "name": "authorizedViewId",
+            "type": "STRING"
+        },
+        {
+            "description": "Display name for authorized view",
+            "mode": "REQUIRED",
+            "name": "name",
+            "type": "STRING"
+        },
+        {
+            "mode": "REQUIRED",
+            "name": "description",
+            "type": "STRING",
+            "description": "Description for the authorized view"
+        },
+        {
+            "mode": "REQUIRED",
+            "name": "datasetId",
+            "type": "STRING",
+            "description": "The datasetId where the authorized view will be created"
+        },
+        {
+            "description": "Source data",
+            "fields": [
+                {
+                    "description": "Source datasetId",
+                    "mode": "REQUIRED",
+                    "name": "datasetId",
+                    "type": "STRING"
+                },
+                {
+                    "description": "Source tableId",
+                    "mode": "REQUIRED",
+                    "name": "tableId",
+                    "type": "STRING"
+                },
+                {
+                    "description": "Public access data",
+                    "fields": [
+                        {
+                            "description": "Flag indicating if public access is to be used",
+                            "mode": "REQUIRED",
+                            "name": "enabled",
+                            "type": "BOOLEAN"
+                        },
+                        {
+                            "description": "Public access query filter",
+                            "mode": "NULLABLE",
+                            "name": "queryFilter",
+                            "type": "STRING"
+                        },
+                        {
+                            "description": "Public access row limit",
+                            "mode": "NULLABLE",
+                            "name": "limit",
+                            "type": "INTEGER"
+                        }
+                    ],
+                    "mode": "NULLABLE",
+                    "name": "publicAccess",
+                    "type": "RECORD"
+                },
+                {
+                    "description": "The columns that should be made visible",
+                    "mode": "REPEATED",
+                    "name": "visibleColumns",
+                    "type": "STRING"
+                },
+                {
+                    "description": "The query filter",
+                    "name": "queryFilter",
+                    "type": "STRING"
+                }
+            ],
+            "mode": "NULLABLE",
+            "name": "source",
+            "type": "RECORD"
+        },
+        {
+            "description": "The custom data",
+            "fields": [
+                {
+                    "description": "Optionally used to provide a custom query",
+                    "mode": "REQUIRED",
+                    "name": "query",
+                    "type": "STRING"
+                },
+                {
+                    "description": "The datasets that need to authorize access to the new view.",
+                    "mode": "REPEATED",
+                    "name": "authorizeFromDatasetIds",
+                    "type": "STRING"
+                }
+            ],
+            "mode": "NULLABLE",
+            "name": "custom",
+            "type": "RECORD"
+        },
+        {
+            "description": "Access control data",
+            "fields": [
+                {
+                    "description": "Flag indicating if row-level access control is enabled",
+                    "mode": "REQUIRED",
+                    "name": "enabled",
+                    "type": "BOOLEAN"
+                },
+                {
+                    "description": "The column in the source table to be used for filtering access at a row-level",
+                    "mode": "REQUIRED",
+                    "name": "labelColumn",
+                    "type": "STRING"
+                },
+                {
+                    "description": "The column delimiter to use to split the source value",
+                    "mode": "NULLABLE",
+                    "name": "labelColumnDelimiter",
+                    "type": "STRING"
+                }
+            ],
+            "name": "accessControl",
+            "type": "RECORD"
+        },
+        {
+            "description": "The view expiration data",
+            "fields": [
+                {
+                    "description": "Flag indicating if view expiration is enabled",
+                    "mode": "REQUIRED",
+                    "name": "enabled",
+                    "type": "BOOLEAN"
+                },
+                {
+                    "description": "Flag indicating if the view should be deleted upon expiration, otherwise return zero result",
+                    "mode": "REQUIRED",
+                    "name": "delete",
+                    "type": "BOOLEAN"
+                },
+                {
+                    "description": "The time for the expiration",
+                    "mode": "REQUIRED",
+                    "name": "time",
+                    "type": "TIMESTAMP"
+                }
+            ],
+            "mode": "NULLABLE",
+            "name": "expiration",
+            "type": "RECORD"
+        },
+        {
+            "description": "The timestamp the authorized view row entry was created at",
+            "mode": "REQUIRED",
+            "name": "createdAt",
+            "type": "TIMESTAMP"
+        },
+        {
+            "description": "The email address the account row entry was created by",
+            "mode": "REQUIRED",
+            "name": "createdBy",
+            "type": "STRING"
+        },
+        {
+            "description": "The generated view sql",
+            "mode": "REQUIRED",
+            "name": "viewSql",
+            "type": "STRING"
+        },
+        {
+            "description": "The flag to indicate the account was deleted",
+            "name": "isDeleted",
+            "type": "BOOLEAN"
+        }
+    ]
+}
