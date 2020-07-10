@@ -34,11 +34,11 @@ config.cdsAccountViewFields = new Set(['rowId', 'accountId', 'email', 'emailType
     'accountType', 'createdBy', 'policies', 'marketplace', 'createdAt', 'version', 'isDeleted']);
 
 config.cdsPolicyTableId = "policy";
-config.cdsPolicyTableFields = new Set(['rowId', 'policyId', 'name', 'description',
+config.cdsPolicyTableFields = new Set(['rowId', 'policyId', 'name', 'description', 'isTableBased',
     'datasets', 'rowAccessTags', 'marketplace', 'createdBy', 'createdAt', 'isDeleted']);
 
 config.cdsPolicyViewId = "currentPolicy";
-config.cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description',
+config.cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description', 'isTableBased',
     'datasets', 'rowAccessTags', 'marketplace', 'createdBy', 'createdAt', 'version',
     'isDeleted']);
 
@@ -51,7 +51,9 @@ config.cdsAuthorizedViewViewFields = new Set(['rowId', 'authorizedViewId', 'name
     'datasetId', 'source', 'custom', 'accessControl', 'expiration', 'createdBy', 'createdAt', 'viewSql', 
     'version', 'isDeleted']);
 
-config.cdsCurrentUserDatasetViewId = "currentUserDataset";
+config.cdsCurrentUserPermissionViewId = "currentUserPermission";
+
+config.permissionsDiffProcedureId = "permissionsDiff";
 
 if (process.env.ADMIN_USERS) {
     config.adminUsers = process.env.ADMIN_USERS.split(',') || [];

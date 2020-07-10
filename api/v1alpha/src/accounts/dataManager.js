@@ -254,7 +254,7 @@ async function createOrUpdateAccount(projectId, accountId, data) {
     const [rows] = await _insertData(projectId, fields, values, data);
     if (rows.length === 0) {
         try {
-            await metaManager.performMetadataUpdate(projectId, impactedPolicies);
+            await metaManager.performPolicyUpdates(projectId, impactedPolicies, false);
         } catch (err) {
             return { success: false, code: 500, errors: [err.message] };
         }
@@ -335,7 +335,7 @@ async function deleteAccount(projectId, accountId, data) {
     console.log(`Policy id's requiring refresh result ${JSON.stringify(policyIds)}`);
     if (policyIds.length > 0) {
         try {
-            await metaManager.performMetadataUpdate(projectId, policyIds);
+            await metaManager.performPolicyUpdates(projectId, policyIds, false);
         } catch (err) {
             return { success: false, code: 500, errors: [err.message] };
         }

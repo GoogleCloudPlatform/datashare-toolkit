@@ -42,15 +42,7 @@ function getTableFqdn(projectId, datasetId, tableId) {
  * Insert policy data
  */
 async function _insertData(projectId, fields, values, data) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyTableId);
-    const sqlQuery = `INSERT INTO \`${table}\` (${fields}) VALUES (${values})`;
-    console.log(sqlQuery);
-    const options = {
-        query: sqlQuery,
-        params: data
-    };
-    const bigqueryUtil = new BigQueryUtil(projectId);
-    return await bigqueryUtil.executeQuery(options);
+    return await bigqueryUtil.insertRows(cfg.cdsDatasetId, cfg.cdsPolicyTableId, data);
 }
 
 /**
@@ -206,7 +198,6 @@ async function listPolicies(projectId, datasetId, accountId) {
 async function createOrUpdatePolicy(projectId, policyId, data) {
     console.log(`createOrUpdateAccount called with policyId: ${policyId} and data: ${JSON.stringify(data)}`);
     let _policyId = policyId;
-    let previousDatasetIds = [];
     if (policyId) {
         const currentPolicy = await getPolicy(projectId, policyId);
         console.log(`currentPolicy response: ${JSON.stringify(currentPolicy)}`);
@@ -215,7 +206,6 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
                 // If user is updating an existing record, compare the rowId to ensure they're making updates from the latest record.
                 return { success: false, code: 500, errors: ["STALE"] };
             }
-            previousDatasetIds = currentPolicy.data.datasets.map(p => p.datasetId);
             _policyId = currentPolicy.data.policyId;
         }
     }
@@ -248,8 +238,6 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
             fields.splice(index, 1);
             values.splice(index, 1);
         }
-    } else {
-        data.datasets = datasets.map(d => { return { datasetId: d }; })
     }
 
     // reformat datasets object for saving
@@ -288,10 +276,10 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
         }
     };
     console.log(data);
-    const [rows] = await _insertData(projectId, fields, values, data);
-    if (rows.length === 0) {
+    const result = await _insertData(projectId, fields, values, data);
+    if (result) {
         try {
-            await metaManager.performMetadataUpdate(projectId, [_policyId], previousDatasetIds);
+            await metaManager.performPolicyUpdates(projectId, [_policyId]);
         } catch (err) {
             return { success: false, code: 500, errors: [err.message] };
         }
@@ -374,7 +362,7 @@ async function deletePolicy(projectId, policyId, data) {
     }
 
     let fields = [...cfg.cdsPolicyTableFields];
-    let values = ['@rowId', 'policyId', 'name', 'description', 'datasets', 'rowAccessTags', 'marketplace', '@createdBy', 'current_timestamp()', 'true'];
+    let values = ['@rowId', 'policyId', 'name', 'description', 'isTableBased', 'datasets', 'rowAccessTags', 'marketplace', '@createdBy', 'current_timestamp()', 'true'];
     fields = Array.from(fields).join();
     values = Array.from(values).join();
 
@@ -383,7 +371,7 @@ async function deletePolicy(projectId, policyId, data) {
     await _deleteData(projectId, fields, values, params);
 
     try {
-        await metaManager.performMetadataUpdate(projectId, [policyId]);
+        await metaManager.performPolicyUpdates(projectId, [policyId]);
     } catch (err) {
         return { success: false, code: 500, errors: [err.message] };
     }

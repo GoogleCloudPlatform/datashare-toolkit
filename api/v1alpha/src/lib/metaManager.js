@@ -19,6 +19,7 @@
 const { BigQueryUtil } = require('cds-shared');
 const underscore = require("underscore");
 let bigqueryUtil = new BigQueryUtil();
+const cfg = require('./config');
 
 /**
  * @param  {} projectId
@@ -26,8 +27,9 @@ let bigqueryUtil = new BigQueryUtil();
  * @param  {} accounts
  */
 async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
+    console.log(`Begin metadata update for dataset: ${datasetId}`);
     let isDirty = false;
-    let accessTypes = ["userByEmail", "groupByEmail"];
+    const accessTypes = ["userByEmail", "groupByEmail"];
 
     // 0. Check for existance of the datasetId and handle appropriately
 
@@ -46,7 +48,7 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
         let a = metadata.access[i];
         if (a.view && a.view.projectId && a.view.datasetId && a.view.tableId) {
             const _viewExists = await bigqueryUtil.viewExists(a.view.datasetId, a.view.tableId);
-            // If view no longer exists, remove it.
+            // If view no longer exists, remove it
             if (_viewExists === false) {
                 console.log(`Removing authorized view as it does not exist: ${a.view.datasetId}.${a.view.tableId}`);
                 metadata.access.splice(i, 1);
@@ -54,17 +56,18 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
             }
         }
         else if (a.role === 'READER') {
-            // 3. Remove all 'READER' userByEmail and groupByEmail accounts
-            // Get keys for the current access object.
+            // 3. Remove all 'READER' userByEmail and groupByEmail accounts that should not have access
             const aKeys = Object.keys(a);
             if (aKeys.length === 2) {
                 const accessType = aKeys[1];
                 const accessId = a[accessType];
                 if (accessTypes.includes(accessType)) {
-                    // If we find the record, remove it
-                    console.log(`Deleting user: ${accessType}:${accessId} from datasetId: ${datasetId}`);
-                    metadata.access.splice(i, 1);
-                    isDirty = true;
+                    const shouldHaveAccess = underscore.findWhere(accounts, { email: accessId, emailType: accessType });
+                    if (!shouldHaveAccess) {
+                        console.log(`Deleting user: ${accessType}:${accessId} from datasetId: ${datasetId}`);
+                        metadata.access.splice(i, 1);
+                        isDirty = true;
+                    }
                 }
             }
         }
@@ -74,14 +77,16 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
     accounts.forEach(account => {
         // If a dataset contains no accounts, the query will return an array with
         // a single item at zero index with attributes having all null values.
-        // TODO: Clean this up.
         if (account.email && account.emailType) {
             let a = { role: 'READER', };
             a["role"] = 'READER';
             a[account.emailType] = account.email;
-            metadata.access.push(a);
-            isDirty = true;
-            console.log(`Adding access record to datasetId: ${datasetId}: ${JSON.stringify(account)}`);
+            const accessRecordExists = underscore.findWhere(metadata.access, a);
+            if (!accessRecordExists) {
+                metadata.access.push(a);
+                isDirty = true;
+                console.log(`Adding access record to datasetId: ${datasetId}: ${JSON.stringify(account)}`);
+            }
         }
     });
 
@@ -94,105 +99,149 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
             console.error(`Failed to set metadata for dataset '${datasetId}' with error '${err}' and payload: ${JSON.stringify(metadata)}`);
             throw err;
         }
+    } else {
+        console.info(`Metadata is already up to date for dataset: '${datasetId}'`);
     }
 
+    console.log(`End metadata update for dataset: ${datasetId}`);
+    return isDirty;
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} datasetId
+ * @param  {} tableId
+ * @param  {} accounts
+ */
+async function performTableMetadataUpdate(projectId, datasetId, tableId, accounts) {
+    const accessTypes = ["user", "group"];
+    const viewerRole = 'roles/bigquery.dataViewer';
+    console.log(`Begin metadata update for table: ${datasetId}.${tableId}`);
+    let isDirty = false;
+    const tablePolicy = await bigqueryUtil.getTableIamPolicy(projectId, datasetId, tableId);
+    let readBinding = {};
+    let bindingExists = false;
+    if (tablePolicy.bindings) {
+        readBinding = underscore.findWhere(tablePolicy.bindings, { role: viewerRole });
+        if (readBinding) {
+            bindingExists = true;
+            let i = readBinding.members.length;
+            while (i--) {
+                let member = readBinding.members[i];
+                let arr = member.split(':');
+                let type = arr[0];
+                let email = arr[1];
+                if (accessTypes.includes(type)) {
+                    const emailType = type === 'user' ? 'userByEmail' : 'groupByEmail';
+                    const shouldHaveAccess = underscore.findWhere(accounts, { email: email, emailType: emailType });
+                    if (!shouldHaveAccess) {
+                        console.log(`Deleting user: ${type}:${email} from table: ${datasetId}.${tableId}`);
+                        readBinding.members.splice(i, 1);
+                        isDirty = true;
+                    }
+                }
+            }
+        }
+    } else {
+        tablePolicy.bindings = [];
+    }
+
+    if (!bindingExists) {
+        readBinding.role = viewerRole;
+        readBinding.members = [];
+        tablePolicy.bindings.push(readBinding);
+    }
+
+    accounts.forEach(account => {
+        if (account.email && account.emailType) {
+            const identifier = (account.emailType === 'userByEmail' ? 'user' : 'group') + ':' + account.email;
+            const accessRecordExists = readBinding.members.includes(identifier);
+            if (!accessRecordExists) {
+                readBinding.members.push(identifier);
+                isDirty = true;
+                console.log(`Adding access record to tableId: ${datasetId}.${tableId}: ${JSON.stringify(account)}`);
+            }
+        }
+    });
+
+    if (isDirty === true) {
+        try {
+            await bigqueryUtil.setTableIamPolicy(projectId, datasetId, tableId, tablePolicy, 'bindings');
+            console.info(`Policy set successfully for table '${datasetId}'`);
+        } catch (err) {
+            console.error(`Failed to set policy for table '${datasetId}.${tableId}' with error '${err}' and payload: ${JSON.stringify(tablePolicy)}`);
+            throw err;
+        }
+    } else {
+        console.info(`Metadata is already up to date for table: '${datasetId}.${tableId}'`);
+    }
+
+    console.log(`End metadata update for table: ${datasetId}.${tableId}`);
     return isDirty;
 }
 
 /**
  * @param  {} projectId
  * @param  {} policyIds
- * @param  {} datasetIds
- * TODO - This won't work for deletes currently because it uses ids. The deleted records aren't returned in views currently.
+ * @param  {} fullRefresh
  */
-async function performMetadataUpdate(projectId, policyIds, datasetIds) {
-    console.log(`performMetadataUpdate called for policyIds: ${JSON.stringify(policyIds)} and datasetIds: ${JSON.stringify(datasetIds)}`);
-    let filter = "";
-    if (policyIds && policyIds.length > 0 && datasetIds && datasetIds.length > 0) {
-        filter = "(cp.policyId IN UNNEST(@policy_ids) or (cp.isDeleted is false and d.datasetId IN UNNEST(@dataset_ids)))";
-    }
-    if (policyIds && policyIds.length > 0) {
-        filter = "(cp.policyId IN UNNEST(@policy_ids))";
-    }
-    else if (datasetIds && datasetIds.length > 0) {
-        filter = "(cp.isDeleted is false and d.datasetId IN UNNEST(@dataset_ids))";
-    }
-    else {
-        return;
-    }
-
-    const sqlQuery = `with policies as (
-        select distinct
-          cp.policyId,
-          d.datasetId
-        from \`${projectId}.datashare.currentPolicy\` cp
-        cross join unnest(cp.datasets) d
-        where ${filter}
-      ),
-      userPolicies as (
-        select
-          ca.email,
-          ca.emailType,
-          p.policyId
-        from \`${projectId}.datashare.currentAccount\` ca
-        cross join unnest(ca.policies) as p
-        where ca.isDeleted is false
-      ),
-      list as (
-        select distinct
-          p.datasetId,
-          up.email,
-          up.emailType
-        from policies p
-        left join userPolicies up on p.policyId = up.policyId
-      )
-      select
-        ud.datasetId,
-        ARRAY_AGG(struct<email string, emailType string>(ud.email, ud.emailType)) as accounts
-      from list ud
-      group by ud.datasetId`;
-
-    let options = {
-        query: sqlQuery,
-        params: {}
-    };
-
-    if (policyIds && policyIds.length > 0) {
-        options.params.policy_ids = policyIds;
-    }
-    if (datasetIds && datasetIds.length > 0) {
-        options.params.dataset_ids = datasetIds;
+async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
+    const labelKey = cfg.cdsManagedLabelKey;
+    let options = {};
+    if (!fullRefresh && policyIds && policyIds.length > 0) {
+        options = {
+            query: `CALL \`${projectId}.datashare.permissionsDiff\`(@policyIds)`,
+            params: { policyIds: policyIds }
+        };
+    } else {
+        options = {
+            query: `CALL \`${projectId}.datashare.permissionsDiff\`(null)`
+        };
     }
 
     const [rows] = await bigqueryUtil.executeQuery(options);
-    console.log(`User access to update: ${JSON.stringify(rows, null, 3)}`);
+    console.log(`Permission Diff Result: ${JSON.stringify(rows, null, 3)}`);
 
-    let updatedDatasets = [];
-
-    if (policyIds) {
-        for (const row of rows) {
-            updatedDatasets.push(row.datasetId);
-            await performDatasetMetadataUpdate(projectId, row.datasetId, row.accounts);
-        }
-    }
-
-    if (datasetIds) {
-        for (const datasetId of datasetIds) {
-            // Skip if the dataset was already updated
-            if (updatedDatasets && updatedDatasets.includes(datasetId)) {
-                continue;
-            }
-            updatedDatasets.push(datasetId);
+    if (fullRefresh === true) {
+        // Update all managed datasets and tables
+        const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
+        for (const dataset of datasets) {
+            const datasetId = dataset.datasetId;
+            let dsPolicyRecord = underscore.findWhere(rows, { datasetId: datasetId, isTableBased: false });
             let accounts = [];
-            const found = underscore.findWhere(rows, { datasetId: datasetId });
-            if (found) {
-                accounts = found.accounts;
+            if (dsPolicyRecord) {
+                accounts = dsPolicyRecord.accounts;
             }
             await performDatasetMetadataUpdate(projectId, datasetId, accounts);
+
+            const tables = await bigqueryUtil.getTablesByLabel(projectId, datasetId, labelKey);
+            for (const table of tables) {
+                const tableId = table.tableId;
+                let tbPolicyRecord = underscore.findWhere(rows, { datasetId: datasetId, tableId: tableId, isTableBased: true });
+                let tbAccounts = [];
+                if (tbPolicyRecord) {
+                    tbAccounts = tbPolicyRecord.accounts;
+                }
+                await performTableMetadataUpdate(projectId, datasetId, tableId, tbAccounts);
+            }
+        }
+    } else {
+        // Differential update, iterate over result based on the policyId filter only.
+        // No need to apply an additional filter.
+        for (const row of rows) {
+            const datasetId = row.datasetId;
+            const tableId = row.tableId;
+            if (row.isTableBased === true) {
+                console.log(`Iterating over table: ${datasetId}.${tableId}`);
+                await performTableMetadataUpdate(projectId, datasetId, tableId, row.accounts);
+            } else {
+                console.log(`Iterating over dataset: ${datasetId}`);
+                await performDatasetMetadataUpdate(projectId, datasetId, row.accounts);
+            }
         }
     }
 }
 
 module.exports = {
-    performMetadataUpdate
+    performPolicyUpdates
 };
