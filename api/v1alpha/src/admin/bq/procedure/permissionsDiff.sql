@@ -1,11 +1,11 @@
-CREATE OR REPLACE PROCEDURE `${projectId}.datashare.permissionsDiff`(policyFilter ARRAY<STRING>)
+CREATE OR REPLACE PROCEDURE `${permissionsDiffProcedure}`(policyFilter ARRAY<STRING>)
 BEGIN
 WITH ranked AS (
   -- Rank all of the policies by date descending. The latest record will be 1.
   SELECT
     p.*,
     DENSE_RANK() OVER (PARTITION BY policyId ORDER BY createdAt desc) AS rank
-  FROM `${projectId}.datashare.policy` p
+  FROM `${policyTable}` p
 ),
 rowIdentifiers AS (
   -- Take only the last 2 modified records and set defaults/current record flags.
@@ -23,7 +23,7 @@ userPolicies AS (
     ca.email,
     ca.emailType,
     p.policyId
-  FROM `datashare.currentAccount` ca
+  FROM `${accountView}` ca
   CROSS JOIN unnest(ca.policies) AS p
   WHERE ca.isDeleted is false
 ),

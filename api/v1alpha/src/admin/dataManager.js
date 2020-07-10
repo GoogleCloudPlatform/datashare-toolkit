@@ -145,6 +145,9 @@ function sqlReplacements(projectId, text) {
     const accountView = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
     sql = sql.replace(/\$\{accountView\}/g, accountView);
 
+    const permissionsDiffProcedure = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.permissionsDiffProcedureId);
+    sql = sql.replace(/\$\{permissionsDiffProcedure\}/g, permissionsDiffProcedure);
+
     return sql;
 }
 
