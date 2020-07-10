@@ -1,0 +1,81 @@
+{
+    "description": "Datashare Account Table",
+    "schema": [
+        {
+            "mode": "REQUIRED",
+            "name": "rowId",
+            "type": "STRING",
+            "description": "Unique row identifier"
+        },
+        {
+            "mode": "REQUIRED",
+            "name": "accountId",
+            "type": "STRING",
+            "description": "Unique account identifier"
+        },
+        {
+            "mode": "REQUIRED",
+            "name": "email",
+            "type": "STRING",
+            "description": "Email address for the account"
+        },
+        {
+            "mode": "REQUIRED",
+            "name": "emailType",
+            "type": "STRING",
+            "description": "Email address type for the account"
+        },
+        {
+            "mode": "REQUIRED",
+            "name": "accountType",
+            "type": "STRING",
+            "description": "Email address type for the account"
+        },
+        {
+            "mode": "REQUIRED",
+            "name": "createdBy",
+            "type": "STRING",
+            "description": "The email address the consumer row entry was created by"
+        },
+        {
+            "mode": "REQUIRED",
+            "name": "createdAt",
+            "type": "TIMESTAMP",
+            "description": "The timestamp the consumer row entry was created at"
+        },
+        {
+            "fields": [
+                {
+                    "mode": "REQUIRED",
+                    "name": "policyId",
+                    "type": "STRING",
+                    "description": "Policy identifier of policy"
+                }
+            ],
+            "mode": "REPEATED",
+            "name": "policies",
+            "type": "RECORD",
+            "description": "List of policies(s) associations for an account"
+        },
+        {
+            "fields": [
+                {
+                    "mode": "REQUIRED",
+                    "name": "accountName",
+                    "type": "STRING",
+                    "description": "The resource name of the account."
+                }
+            ],
+            "mode": "REPEATED",
+            "name": "marketplace",
+            "type": "RECORD",
+            "description": "List of policies(s) associations for an account"
+        },
+        {
+            "mode": "NULLABLE",
+            "name": "isDeleted",
+            "type": "BOOLEAN",
+            "description": "The flag to indicate the account was deleted"
+        }
+    ]
+}
