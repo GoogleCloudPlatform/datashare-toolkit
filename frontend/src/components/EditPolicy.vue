@@ -36,7 +36,6 @@
           ></v-textarea>
         </ValidationProvider>
         <v-radio-group
-          v-if="false"
           v-model="policy.isTableBased"
           row
           @change="accessTypeChanged"

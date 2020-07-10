@@ -51,7 +51,9 @@ config.cdsAuthorizedViewViewFields = new Set(['rowId', 'authorizedViewId', 'name
     'datasetId', 'source', 'custom', 'accessControl', 'expiration', 'createdBy', 'createdAt', 'viewSql', 
     'version', 'isDeleted']);
 
-config.cdsCurrentUserDatasetViewId = "currentUserDataset";
+config.cdsCurrentUserPermissionViewId = "currentUserPermission";
+
+config.permissionsDiffProcedureId = "permissionsDiff";
 
 if (process.env.ADMIN_USERS) {
     config.adminUsers = process.env.ADMIN_USERS.split(',') || [];
