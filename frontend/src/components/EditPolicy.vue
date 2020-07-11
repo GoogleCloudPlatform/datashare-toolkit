@@ -720,7 +720,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getDatasets', {
-          labelKey: 'cds_managed'
+          labelKey: 'datashare_managed'
         })
         .then(response => {
           if (response.success) {
