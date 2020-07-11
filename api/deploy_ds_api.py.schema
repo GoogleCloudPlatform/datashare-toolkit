@@ -59,6 +59,16 @@ properties:
     description: Deploy all the components (UI, API, Ingestion)
     default: False
 
+  deployToGke:
+    type: boolean
+    description: Deploy the API to Cloud Run GKE
+    default: False
+
+  gkeZone:
+    type: string
+    description: The GKE zone to which API shoudl be deployed.
+    default: us-central1-a  
+
 outputs:
   properties:
     functionName:

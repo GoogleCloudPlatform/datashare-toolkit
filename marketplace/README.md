@@ -31,6 +31,10 @@ The following service account are modified with additional roles as shown below.
     * iam.roleAdmin
     * iam.securityAdmin
     * run.serviceAgent
+  * Roles added to this service account when Datashare API is installed in Cloud Run managed with GKE
+    * container.clusterAdmin
+    * container.viewer
+    * container.admin
 * Deployment Manager service account (`project-number@cloudservices.gserviceaccount.com`)
   * This service account needs access to the Google Cloud Storage bucket, which contains the Cloud Function source code to install the Cloud Function during the deployment.
   * Role added to this service account:
