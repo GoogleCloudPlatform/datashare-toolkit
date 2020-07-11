@@ -1,20 +1,20 @@
-with policies as (
-  select distinct
+WITH policies AS (
+  SELECT DISTINCT
     cp.policyId,
-    cp.name as policyName,
-    ifnull(cp.isTableBased, false) as isTableBased,
+    cp.name AS policyName,
+    IFNULL(cp.isTableBased, false) AS isTableBased,
     d.datasetId,
     t.tableId,
     r.tag
-  from `${policyView}` cp
-  cross join unnest(cp.datasets) d
-  left join unnest(d.tables) t on cp.isTableBased is true
-  cross join unnest(cp.rowAccessTags) r
-  where cp.isDeleted is false
+  FROM `${policyView}` cp
+  CROSS JOIN UNNEST(cp.datasets) d
+  LEFT JOIN UNNEST(d.tables) t ON cp.isTableBased IS true
+  CROSS JOIN UNNEST(cp.rowAccessTags) r
+  WHERE cp.isDeleted IS false
 ),
-userPolicies as (
-  select
-    ca.rowId as accountRowId,
+userPolicies AS (
+  SELECT
+    ca.rowId AS accountRowId,
     ca.accountId,
     ca.email,
     ca.emailType,
@@ -22,12 +22,12 @@ userPolicies as (
     cp.datasetId,
     cp.tableId,
     cp.tag
-  from `${accountView}` ca
-  cross join unnest(ca.policies) as p
-  join policies cp on p.policyId = cp.policyId
-  where ca.isDeleted is false
+  FROM `${accountView}` ca
+  CROSS JOIN UNNEST(ca.policies) AS p
+  JOIN policies cp ON p.policyId = cp.policyId
+  WHERE ca.isDeleted IS false
 )
-select distinct
+SELECT DISTINCT
   up.accountRowId,
   up.accountId,
   up.email,
@@ -36,5 +36,5 @@ select distinct
   up.datasetId,
   up.tableId,
   up.tag
-from userPolicies up
+FROM userPolicies up
 WHERE up.email = SESSION_USER() AND up.emailType = 'userByEmail'

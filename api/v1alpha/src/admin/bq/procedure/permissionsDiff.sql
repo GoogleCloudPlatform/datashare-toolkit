@@ -4,7 +4,7 @@ WITH ranked AS (
   -- Rank all of the policies by date descending. The latest record will be 1.
   SELECT
     p.*,
-    DENSE_RANK() OVER (PARTITION BY policyId ORDER BY createdAt desc) AS rank
+    DENSE_RANK() OVER (PARTITION BY policyId ORDER BY createdAt DESC) AS rank
   FROM `${policyTable}` p
 ),
 rowIdentifiers AS (
@@ -12,10 +12,10 @@ rowIdentifiers AS (
   SELECT
     * EXCEPT(isTableBased, isDeleted),
     CASE WHEN r.rank = 1 THEN true ELSE false END AS isCurrent,
-   ifnull(isTableBased, false) AS isTableBased,
-   ifnull(isDeleted, false) AS isDeleted
+   IFNULL(isTableBased, false) AS isTableBased,
+   IFNULL(isDeleted, false) AS isDeleted
   FROM RANKED r
-  WHERE r.rank in (1,2)
+  WHERE r.rank IN (1,2)
 ),
 userPolicies AS (
   -- Get account/policy associations
@@ -25,7 +25,7 @@ userPolicies AS (
     p.policyId
   FROM `${accountView}` ca
   CROSS JOIN unnest(ca.policies) AS p
-  WHERE ca.isDeleted is false
+  WHERE ca.isDeleted IS false
 ),
 policyData AS (
   -- Join up all policy data with entitled accounts.
@@ -38,7 +38,7 @@ policyData AS (
     r.isDeleted,
     p.email,
     p.emailType,
-    CASE WHEN t.tableId IS NOT NULL THEN concat(d.datasetId, '.', t.tableId) ELSE d.datasetId END AS identifier
+    CASE WHEN t.tableId IS NOT NULL THEN CONCAT(d.datasetId, '.', t.tableId) ELSE d.datasetId END AS identifier
   FROM rowIdentifiers r
   LEFT JOIN UNNEST(r.datasets) d
   LEFT JOIN UNNEST(d.tables) t
@@ -59,7 +59,7 @@ SELECT
   u.datasetId,
   u.tableId,
   CASE WHEN u.tableId IS NOT NULL THEN true ELSE false END AS isTableBased,
-  ARRAY_AGG(struct<email string, emailType string>(p.email, p.emailType)) AS accounts
+  ARRAY_AGG(STRUCT<email STRING, emailType STRING>(p.email, p.emailType)) AS accounts
 FROM uniqueIdentifiers u
 LEFT JOIN policyData p ON u.identifier = p.identifier AND p.isCurrent IS true AND p.isDeleted IS false
 GROUP BY u.datasetId, u.tableId, p.isTableBased, p.isCurrent, p.isDeleted;
