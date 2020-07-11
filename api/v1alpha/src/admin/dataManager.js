@@ -159,7 +159,7 @@ async function setupDatasharePrerequisites(projectId) {
 
     if (await bigqueryUtil.datasetExists(cfg.cdsDatasetId) === false) {
         console.log('Creating datashare dataset');
-        const options = { description: 'CDS Datashare Master Dataset' };
+        const options = { description: 'Datashare Master Dataset' };
         await bigqueryUtil.createDataset(cfg.cdsDatasetId, options);
     } else {
         console.log('Datashare dataset already exists');
