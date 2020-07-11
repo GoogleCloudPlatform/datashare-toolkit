@@ -1,7 +1,7 @@
 {
   "name": "cds-shared",
   "version": "1.0.0",
-  "description": "CDS shared library",
+  "description": "Datashare shared library",
   "license": "Apache-2.0",
   "repository": {},
   "main": "index.js",

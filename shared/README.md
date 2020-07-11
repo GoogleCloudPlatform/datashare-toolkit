@@ -35,7 +35,7 @@ cloudkms.googleapis.com
 
 ### Service Account
 
-DS Shared Modules makes authorized API calls to specific GCP project service(s). Any class or feature that imports the Shared Module classes will require a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](config/cds-fulfillments-mgr-role-definition.yaml).
+DS Shared Modules makes authorized API calls to specific GCP project service(s). Any class or feature that imports the Shared Module classes will require a [GCP service account](https://cloud.google.com/iam/docs/service-accounts) with the appropriate permissions enabled. These permissions have been aggregated into a custom role that is associated to a service account. The custom role and associated permissions are defined in [here](config/ds-cloud-build-mgr-role-definition.yaml).
 
 For testing the Shared Modules, we provide an example using GCB to verfy integration testing is successful. GCB provides a default service account that is owned by GCP but SA permissions are managed by the GCP project owner [here](https://cloud.google.com/cloud-build/docs/securing-builds/set-service-account-permissions). Unfortunately, this service account does not have the appropriate *client_email* in it's credentials which is required when executing storage signUrl methods.
 
@@ -52,11 +52,11 @@ Set your **PROJECT\_ID** if you have not already:
 
 Set the **SERVICE\_ACCOUNT\_NAME** environment variable(s):
 
-    export SERVICE_ACCOUNT_NAME=cds-cloud-build-mgr;
+    export SERVICE_ACCOUNT_NAME=ds-cloud-build-mgr;
 
 Set the **SERVICE\_ACCOUNT\_DESC** environment variable(s):
 
-    export SERVICE_ACCOUNT_DESC="CDS Cloud Build Manager";
+    export SERVICE_ACCOUNT_DESC="Datashare Cloud Build Manager";
 
 Create the custom DS service-account:
 
@@ -64,13 +64,13 @@ Create the custom DS service-account:
 
 Set the **CUSTOM\_ROLE\_NAME** environment variable(s):
 
-    export CUSTOM_ROLE_NAME=custom.cds.cloud.build.mgr;
+    export CUSTOM_ROLE_NAME=custom.ds.cloud.build.mgr;
 
-_The permissions for the custom role are defined in [config/cds-cloud-build-mgr-role-definition.yaml](config/cds-cloud-build-mgr-role-definition.yaml)_
+_The permissions for the custom role are defined in [config/ds-cloud-build-mgr-role-definition.yaml](config/ds-cloud-build-mgr-role-definition.yaml)_
 
 Create custom role:
 
-    gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/cds-cloud-build-mgr-role-definition.yaml
+    gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/ds-cloud-build-mgr-role-definition.yaml
 
 **Note**: _If the custom role already exists, just update the stage:_
 
@@ -102,7 +102,7 @@ GCB requires a [Key Management Service](https://cloud.google.com/kms) to decrypt
 
 Set your **KEYRING_NAME** if you have not already:
 
-    export KEYRING_NAME=cds-cloud-build-ring;
+    export KEYRING_NAME=ds-cloud-build-ring;
 
 Create the Key Ring:
 
@@ -110,7 +110,7 @@ Create the Key Ring:
 
 Set your **KEY_NAME** if you have not already:
 
-    export KEY_NAME=cds-cloud-build;
+    export KEY_NAME=ds-cloud-build;
 
 Create the Crypto Key:
 
