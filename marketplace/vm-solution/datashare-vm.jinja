@@ -4,6 +4,7 @@ imports:
 - path: cloud_function.py
 - path: deploy_ds_api.py
 - path: deploy_ui_cloud_run.py
+- path: cluster.py
 
 {% set adminEmail = properties["input_adminEmail"] %}
 {% set project = env["project"] %}
@@ -11,6 +12,9 @@ imports:
 {% set gcpRegion = properties["input_gcpRegion"] %}
 {% set storageBucketLocation = properties["input_storageBucketLocation"] %}
 {% set useRuntimeConfigWaiter = properties["input_useRuntimeConfigWaiter"] %}
+{% set deployApiToGke = properties["input_deployApiToGke"] %}
+{% set gkeZone = properties["input_gkeZone"] %}
+{% set gkeClusterName = "datashare" %}
 {% set waiterName = env["deployment"] + "-startup-waiter" %}
 {% set configName = env["deployment"] + "-startup-config" %}
 
@@ -47,6 +51,11 @@ resources:
       location: {{ storageBucketLocation }}
       storageClass: STANDARD
 
+  - name: datashare-cluster-manager
+    type: cluster.py
+    properties:
+      zone: us-central1-a
+      
   {% if useRuntimeConfigWaiter %}  
   - type: storage.v1.bucket
     name: {{ project }}-install-bucket
@@ -91,6 +100,8 @@ resources:
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
       waiterName: {{ waiterName }}
+      deployToGke: {{ deployApiToGke }}
+      gkeZone: {{ gkeZone }}
     
   ## Deploy Datashare UI
   - name: build-ui
@@ -150,6 +161,14 @@ resources:
             value: {{ adminEmail }}
           - key: datashareGitReleaseVersion
             value: {{ datashareGitReleaseVersion }}
+          {% if deployApiToGke %}   
+          - key: gkeZone
+            value: {{ gkeZone }}
+          - key: deployApiToGke
+            value: {{ deployApiToGke }}
+          - key: gkeClusterName
+            value: {{ gkeClusterName }}
+          {% endif %}  
           {% if useRuntimeConfigWaiter %}  
           - key: useRuntimeConfigWaiter
             value: {{ useRuntimeConfigWaiter }}
@@ -166,6 +185,8 @@ resources:
               CLOUD_FUNCTION_ZIP_FILE_NAME="datashare-toolkit-cloud-function.zip"
               USE_RUNTIME_CONFIG_WAITER=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/useRuntimeConfigWaiter -H "Metadata-Flavor: Google"`
               echo $USE_RUNTIME_CONFIG_WAITER
+              VM_STARTUP_SCRIPT=true
+
               if [ "$USE_RUNTIME_CONFIG_WAITER" = "true" ]; then
                 echo "Using Runtime Config Waiter to install Datashare prerequisites..."
                 IS_GIT_INSTALLED=`dpkg-query -W -f='${Status}\n' git`
@@ -178,7 +199,12 @@ resources:
                     echo "Installing zip."
                     sudo apt-get install zip -y
                 fi
-                
+                IS_KUBECTL_INSTALLED=`dpkg-query -W -f='${Status}\n' kubectl`
+                if [ "$IS_KUBECTL_INSTALLED" != "install ok installed" ]; then
+                    echo "Installing kubectl."
+                    sudo apt-get install kubectl -y
+                fi
+
                 cd /opt
                 echo "Cloning the Datashare repository..."
                 git clone https://github.com/GoogleCloudPlatform/datashare-toolkit.git
@@ -219,6 +245,8 @@ resources:
                 gcloud services enable iam.googleapis.com --quiet
                 gcloud services enable run.googleapis.com --quiet
                 gcloud services enable cloudresourcemanager.googleapis.com --quiet
+                # Enabling APIs for GKE cluster
+                gcloud services enable container.googleapis.com containerregistry.googleapis.com --quiet
 
                 # Upload Cloud Function to Google Cloud storage
                 gsutil cp $CLOUD_FUNCTION_ZIP_FILE_NAME gs://$PROJECT_ID-install-bucket/
@@ -249,8 +277,96 @@ resources:
                 echo "Notifiying Waiter that this VM startup script is complete..."
                 CONFIG_NAME=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/configName -H "Metadata-Flavor: Google"`
                 echo $CONFIG_NAME
+
+                # Setup GKE cluster
+                DEPLOY_API_TO_GKE=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/deployApiToGke -H "Metadata-Flavor: Google"`
+                if [ "$DEPLOY_API_TO_GKE" = "true" ]; then
+                    echo "Adding container.clusterAdmin role to Cloud Build service account"
+                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.clusterAdmin"
+                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.viewer"
+                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.admin"
+                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="roles/container.admin"
+
+                    # This is executing from the VM's startup script
+                    if [ "$VM_STARTUP_SCRIPT" = true ]; then
+                        export KUBECONFIG="/opt/.kube/config"
+                    else
+                    # This is executing from Cloud Shell
+                        export KUBECONFIG="~/.kube/config"
+                    fi
+                    GKE_ZONE=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/gkeZone -H "Metadata-Flavor: Google"`
+                    GKE_CLUSTER_NAME=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/gkeClusterName -H "Metadata-Flavor: Google"`
+                    
+                    echo "Getting the cluster credentials"
+                    gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
+                    echo "Setting up GKE cluster for Cloud Run."
+                    echo "Creating the cluster role binding."
+                    kubectl create clusterrolebinding cluster-admin-binding \
+                        --clusterrole cluster-admin \
+                        --user ${PROJECT_NUMBER}-compute@developer.gserviceaccount.com
+                
+                    ISTIO_PACKAGE=$(kubectl -n gke-system get deployments istio-pilot \
+                        -o jsonpath="{.spec.template.spec.containers[0].image}" | \
+                        cut -d':' -f2)
+                    echo "Istio Package is " + $ISTIO_PACKAGE
+                    ISTIO_VERSION=$(echo $ISTIO_PACKAGE | cut -d'-' -f1)
+                    echo "Istio version is " + $ISTIO_VERSION
+
+                    echo "Fetching Istio release."
+                    gsutil -m cp gs://istio-release/releases/${ISTIO_VERSION}/istio-${ISTIO_VERSION}-linux.tar.gz - | tar zx
+                    
+                    if ! helm &> /dev/null 
+                    then
+                        echo "Installing Helm"
+                        curl https://helm.baltorepo.com/organization/signing.asc | sudo apt-key add -
+                        sudo apt-get install apt-transport-https --yes
+                        echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+                        sudo apt-get update
+                        sudo apt-get install helm
+                        echo "Helm installed."
+                    fi
+
+                    echo "Building the Helm template"
+                    /usr/sbin/helm template \
+                        --namespace gke-system \
+                        --set global.hub=gcr.io/gke-release/asm \
+                        --set global.tag=$ISTIO_PACKAGE \
+                        --set pilot.enabled=false \
+                        --set security.enabled=true \
+                        --set sidecarInjectorWebhook.enabled=true \
+                        --set sidecarInjectorWebhook.rewriteAppHTTPProbe=true \
+                        --values istio-${ISTIO_VERSION}/install/kubernetes/helm/istio/values-istio-minimal.yaml \
+                        istio-${ISTIO_VERSION}/install/kubernetes/helm/istio \
+                        > istio-${ISTIO_VERSION}-sidecar-injector-webhook.yaml
+                    
+                    echo "Installing Istio into the cluster."
+                    kubectl apply -f istio-${ISTIO_VERSION}-sidecar-injector-webhook.yaml
+                    echo "Checking the rollout status."
+                    kubectl rollout status deploy istio-sidecar-injector -n gke-system
+
+                    export NAMESPACE=datashare-apis
+                    kubectl create namespace $NAMESPACE
+                    export SERVICE_ACCOUNT_NAME=ds-api-mgr
+                    export KSA_NAME=$SERVICE_ACCOUNT_NAME
+                    echo "Creating Kubernets service account."
+                    kubectl create serviceaccount $KSA_NAME -n $NAMESPACE;
+
+                    echo "Binding the GCP service account to the K8S service account"
+                    gcloud iam service-accounts add-iam-policy-binding \
+                        --role roles/iam.workloadIdentityUser \
+                        --member "serviceAccount:${PROJECT_ID}.svc.id.goog[${NAMESPACE}/${KSA_NAME}]" ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+
+                    echo "Annotating the service account."
+                    kubectl annotate serviceaccount $KSA_NAME -n $NAMESPACE iam.gke.io/gcp-service-account=${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+                    echo "Labeling the namespace."
+                    kubectl label namespace $NAMESPACE istio-injection=enabled
+                    echo "GKE setup complete."
+                fi
+
+                # Notify Listener
                 gcloud beta runtime-config configs variables set success/my-instance success --config-name $CONFIG_NAME
                 echo "VM startup-script finished!"
+
               else
                 echo "Will not use Google Cloud Runtime Config Waiter to install prerequisites."
                 echo "You must install the prerequisites before you launch this service. Execute the install-datashare-prerequisites.sh file from Cloud Shell."

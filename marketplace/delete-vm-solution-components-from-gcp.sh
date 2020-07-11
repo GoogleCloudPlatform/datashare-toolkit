@@ -11,6 +11,10 @@ GCS_INSTALL_BUCKET="gs://$PROJECT_ID-install-bucket"
 CLOUD_RUN_REGION="us-central1"
 CLOUD_RUN_PLATFORM="managed"
 
+if [ ! -z "$1" ]; then
+    DM_DEPLOYMENT_NAME="$1"
+fi
+
 # Force delete the GCS install bucket first, since the deployment manager can't delete a bucket unless it is empty.
 gsutil rm -r $GCS_INSTALL_BUCKET
 if [ $? -eq 0 ]; then
