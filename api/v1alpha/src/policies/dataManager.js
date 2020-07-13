@@ -338,7 +338,6 @@ WHERE
         params: { policyId: policyId !== null ? policyId : '', solutionId: solutionId, planId: planId }
     };
     const [rows] = await bigqueryUtil.executeQuery(options);
-    console.log(JSON.stringify(rows));
     if (rows[0].count === 0) {
         return true;
     } else {

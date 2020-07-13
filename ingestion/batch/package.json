@@ -1,7 +1,7 @@
 {
   "name": "processUpload",
   "version": "0.0.1",
-  "description": "CDS processUpload ingestion function",
+  "description": "Datashare processUpload ingestion function",
   "license": "Apache-2.0",
   "repository": {},
   "dependencies": {

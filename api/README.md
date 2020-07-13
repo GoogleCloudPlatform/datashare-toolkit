@@ -227,12 +227,13 @@ Build with Cloud Build and TAG:
 
 ### Deploy Cloud Run Anthos
 Deploy with Cloud Run (Anthos) requires the following GKE [setup](https://cloud.google.com/run/docs/gke/setup) configuration items to be completed before deploying.
-**Note**  The default domain is *example.com* and can be changed manually [here](https://cloud.google.com/run/docs/gke/default-domain) if auto managed TLS is not enabled
+**Note**  The default Knative serving domain is *example.com* and will be changed via [here](https://cloud.google.com/run/docs/gke/default-domain) before HTTPS and autoTLS is enabled via the [Encryption](#encryption) section
 
 * Create a GKE cluster with Cloud Run enabled
 * Install additional Istio components required for Istio authorization
 * Configure GKE Workload identity for the service
 * Deploy the service
+* Change the default Knative serving domain
 * Map custom domain to the service
 
 #### Create a GKE Cluster with Cloud Run enabled
@@ -285,7 +286,7 @@ Use Helm's local template rendering to create a Kubernetes manifest that install
 
     helm template \
       --namespace gke-system \
-      --set global.hub=gcr.io/gke-release/istio \
+      --set global.hub=gcr.io/gke-release/asm \
       --set global.tag=$ISTIO_PACKAGE \
       --set pilot.enabled=false \
       --set security.enabled=true \
@@ -366,7 +367,8 @@ Deploy ths DS API service to Cloud Run for Anthos in the **NAMESPACE**: \
       --min-instances 1 \
       --namespace $NAMESPACE \
       --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
-      --platform gke
+      --platform gke \
+      --service-account ${SERVICE_ACCOUNT_NAME}
 
 This command creates a [Knative Serving service](https://github.com/knative/serving/blob/master/docs/spec/overview.md) object.
 The `--min-instances 1` option prevents timing conflicts between the Istio and Knative Serving sidecars, when scaling up from zero pods.
@@ -398,13 +400,40 @@ You should also be able to verify the DS API can communicate with GCP services:
     curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha/projects/${PROJECT_ID}/datasets
 
 
+#### Change the default Knative serving domain
+Change the default Knative serving domain from **example.com** to test out the service from a public wildcard DNS site [here](https://cloud.google.com/run/docs/gke/default-domain#choose_an_alternative_for_wildcard_dns)
+**Note**: This configuration should be removed in production
+
+Create a **GATEWAY_IP_DOMAIN** environment variable based off the **GATEWAY_IP** above and [xip.io](xip.io) wildcard DNS:
+
+    export GATEWAY_IP_DOMAIN="$GATEWAY_IP.xip.io"; echo $GATEWAY_IP_DOMAIN
+
+Apply the knative serving config patch:
+
+    kubectl patch configmap config-domain --namespace knative-serving --patch \
+      '{"data": {"example.com": null, "'"$GATEWAY_IP_DOMAIN"'": ""}}'
+
+Create a **XIP_FQDN** for the full service FQDN with the **GATEWAY_IP_DOMAIN**:
+**Note**: The service external fqdn will be `'<service>.<namespace>.<domain>'` and **xip.io** is the custom knative domain.
+
+    export XIP_FQDN="ds-api.${NAMESPACE}.${GATEWAY_IP_DOMAIN}"; echo $XIP_FQDN
+
+Verify the DS API is running based off the active version url:
+
+    curl -i http://${XIP_FQDN}/v1alpha
+
+You should also be able to verify the DS API can communicate with GCP services:
+
+    curl -i http://${XIP_FQDN}/v1alpha/projects/${PROJECT_ID}/datasets
+
+
 #### Domain mapping
-To use a custom domain for a service, you map your service to the custom domain, then update your DNS records. You can map a service to a domain, such as *example.com* or to a subdomain, such as *subdomain.example.com*. You must already own the TLD or sub-domain to use this feature.\
-**Note**: For internal Googlers, you can create custom domains via go/joonix
+To use a custom domain for a service, you map your service to the custom domain, then update your DNS records. You can map a service to a domain, such as *abc.com* or to a subdomain, such as *subdomain.abc.com*. You must already own the TLD or sub-domain to use this feature.\
+**Note**: For internal Googlers, you can create custom domains via go/create-test-org
 
-Create a **DOMAIN** environment variable based off the above:
+Create a **FQDN** environment variable based off the subdomain above:
 
-    export DOMAIN=ds-api.fsi.joonix.net
+    export FQDN=ds-api.fsi.joonix.net
 
 Verify domain ownership the first time you use that domain in the Google Cloud project:
 
@@ -412,12 +441,12 @@ Verify domain ownership the first time you use that domain in the Google Cloud p
 
 If your ownership of the domain needs to be verified, open the Webmaster Central verification page:
 
-    gcloud domains verify $DOMAIN
+    gcloud domains verify $FQDN
 
-Map your service to the custom domain:
+Map your service to the custom FQDN:
 
     gcloud beta run domain-mappings create --service ds-api \
-      --domain $DOMAIN \
+      --domain $FQDN \
       --cluster $CLUSTER \
       --cluster-location $ZONE \
       --namespace $NAMESPACE \
@@ -428,23 +457,37 @@ Reserve the IP address attached to the Load Balancer for the Istio ingress gatew
 
     gcloud compute addresses create ds-api-static-ip --addresses $GATEWAY_IP --region $REGION
 
-Add the appropriate A record to the DNS entry in your domain registrar based off the entry of this command:
-**Note**: You can execute `gcloud` commands to add this if the DNS zone is managed in Cloud DNS [here](https://cloud.google.com/dns/docs/records#gcloud)
+Add the appropriate A record to the DNS entry in your domain registrar based off the entry of this command: \
+**Note**: These `gcloud` commands will only work if the DNS zone is managed in Cloud DNS [here](https://cloud.google.com/dns/docs/records#gcloud)
 
-    gcloud beta run domain-mappings describe \
-      --domain $DOMAIN \
-      --cluster $CLUSTER \
-      --cluster-location $ZONE \
-      --namespace $NAMESPACE \
-      --platform gke
+Export **DNS_ZONE_NAME** environment variable
+
+    export DNS_ZONE_NAME=fsi-joonix-net
+
+Create a new DNS record transaction:
+
+    gcloud dns record-sets transaction start --zone=$DNS_ZONE_NAME
+
+Add the *A* record to the FQDN in the transaction:
+
+    gcloud dns record-sets transaction add $GATEWAY_IP \
+      --name=$FQDN \
+      --ttl="30" \
+      --type="A" \
+      --zone=$DNS_ZONE_NAME
+
+Execute the DNS record transaction: \
+**Note**: It may take a minute or two for the DNS resolvers to propogate the new DNS record
+
+    gcloud dns record-sets transaction execute --zone=$DNS_ZONE_NAME
 
 Very the new record propagated to the local DNS resolvers:
 
-    dig +short $DOMAIN
+    dig +short $FQDN
 
 You should also be able to verify the DS API can communicate with GCP services:
 
-    curl -i http://${DOMAIN}/v1alpha/projects/${PROJECT_ID}/datasets
+    curl -i http://${FQDN}/v1alpha/projects/${PROJECT_ID}/datasets
 
 
 ### Deploy Cloud Run Managed
@@ -549,11 +592,11 @@ If the certificate is ready, you should see a message similar to this one:
 
 It may take from 20 seconds to 2 minutes for the Kcert to become ready. If you experience any issues, see the troubleshooting instructions for this feature
 
-Verify that the DNS record has gone into effect by running the command:
+Verify that the DNS record has gone into effect by running the command: \
 **Note**: You sould see HTTPS instead
 
     gcloud beta run domain-mappings describe \
-      --domain $DOMAIN \
+      --domain $FQDN \
       --cluster $CLUSTER \
       --cluster-location $ZONE \
       --namespace $NAMESPACE \
@@ -561,7 +604,7 @@ Verify that the DNS record has gone into effect by running the command:
 
 You should also be able to verify the DS API can communicate with GCP services via HTTPS:
 
-    curl -i https://${DOMAIN}/v1alpha/projects/${PROJECT_ID}/datasets
+    curl -i https://${FQDN}/v1alpha/projects/${PROJECT_ID}/datasets
 
 
 ### Authentication
@@ -578,19 +621,19 @@ Authentication is enforced by Istio JWT Policies at the Istio [Ingress Gateway](
 **Note**: The HTTP response code should be *401 Unauthorized*
 
 
-    curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+    curl -i https://${FQDN}/v1alpha
 
 3. Verify the DS API is accessible with a valid Bearer ID Token:
 **Note**: The HTTP response code should be *200 OK*
 
 
-    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://${FQDN}/v1alpha
 
 4. Verify the DS API preflight requests are accessible without a valid Bearer ID Token:
 **Note**: The HTTP response code should be *200 OK*
 
 
-     curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+     curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" https://${FQDN}/v1alpha
 
 
 You now have [authentication](#authentication) enabled for all endpoints and methods in the DS API service. Next step is to enforce [authorization](#authorization) for the clients:
@@ -635,19 +678,19 @@ Before you apply the AuthZ policies, export the **DATA_PRODUCERS** environment v
 **Note**: The HTTP response code should be *401 Unauthorized*
 
 
-    curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+    curl -i https://${FQDN}/v1alpha
 
 3. Verify the DS API is accessible with a valid Bearer ID Token:
 **Note**: The HTTP response code should be *200 OK*
 
 
-    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://${FQDN}/v1alpha
 
 4. Verify the DS API preflight requests are accessible without a valid Bearer ID Token:
 **Note**: The HTTP response code should be *200 OK*
 
 
-     curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+     curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" https://${FQDN}/v1alpha
 
 
 You now have [authorization](#authorization) enabled for all endpoints and methods in the DS API service.

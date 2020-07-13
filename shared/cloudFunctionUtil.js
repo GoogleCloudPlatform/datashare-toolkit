@@ -24,7 +24,7 @@ class CloudFunctionUtil {
     /**
      * @param  {} event
      * @param  {} context
-     * Generates the CDS batch Id.
+     * Generates the Datashare batch Id.
      */
     generateBatchId(eventId, bucketName, fileName) {
         return [

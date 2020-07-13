@@ -121,7 +121,12 @@ properties:
   input_useRuntimeConfigWaiter:
     type: boolean
     default: True
-
+  input_deployApiToGke:
+    type: boolean
+    default: True
+  input_gkeZone:
+    type: string
+    default: us-central1-a
 outputs:
   deployment:
     type: string

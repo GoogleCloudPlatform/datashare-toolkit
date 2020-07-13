@@ -19,9 +19,9 @@
 var config = {};
 
 config.verboseMode = false;
-config.productName = 'CDS';
+config.productName = 'Datashare';
 config.productVersion = '0.0.1';
-config.cdsManagedLabelKey = 'cds_managed';
+config.cdsManagedLabelKey = 'datashare_managed';
 
 config.cdsDatasetId = "datashare";
 
