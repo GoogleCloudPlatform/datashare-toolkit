@@ -136,7 +136,10 @@ async function transform(config) {
 
     let transformQuery = "*";
     if (transformExists === true) {
-        transformQuery = await storageUtil.fetchFileContent(config.bucket, config.bucketPath.transform);
+        let transformContent = await storageUtil.fetchFileContent(config.bucket, config.bucketPath.transform);
+        if (transformContent && transformContent.trim() !== '') {
+            transformQuery = transformContent;
+        }
     }
 
     const query = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.datasetId}.${config.stagingTable}\``;
