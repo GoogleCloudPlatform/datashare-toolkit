@@ -162,7 +162,7 @@ export default {
         .dispatch('getTables', {
           projectId: this.$store.state.settings.projectId,
           datasetId: this.$route.query.datasetId,
-          labelKey: 'cds_managed'
+          labelKey: 'datashare_managed'
         })
         .then(tables => {
           this.views = tables;

@@ -24,7 +24,7 @@ const storageUtil = new StorageUtil();
 const stagingTableExpiryDays = 2;
 const processPrefix = "cds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
-const labelName = "cds_managed";
+const labelName = "datashare_managed";
 const queryResultTimeoutMs = 540000;
 let batchId;
 const archiveEnabled = process.env.ARCHIVE_FILES ? (process.env.ARCHIVE_FILES.toLowerCase() === "true") : false;

@@ -1,6 +1,6 @@
 {
     "name": "cds-api",
-    "description": "CDS API service",
+    "description": "Datashare API service",
     "version": "0.0.1",
     "license": "Apache-2.0",
     "dependencies": {

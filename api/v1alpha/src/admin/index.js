@@ -56,7 +56,7 @@ var admin = express.Router();
  *
  * /projects/{projectId}/admin:initSchema:
  *   post:
- *     summary: Initialize the CDS schema creation
+ *     summary: Initialize the Datashare schema creation
  *     description: Returns the schema creation response
  *     tags:
  *       - admin
@@ -101,7 +101,7 @@ var admin = express.Router();
  *
  * /projects/{projectId}/admin:syncResources:
  *   post:
- *     summary: Syncronize the CDS resources and metadata
+ *     summary: Syncronize the Datashare resources and metadata
  *     description: Returns the syncronize resources response
  *     tags:
  *       - admin
