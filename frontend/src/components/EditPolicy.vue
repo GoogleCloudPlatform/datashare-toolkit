@@ -718,18 +718,14 @@ export default {
     },
     loadDatasets() {
       this.loading = true;
-      this.$store
-        .dispatch('getDatasets', {
-          labelKey: 'datashare_managed'
-        })
-        .then(response => {
-          if (response.success) {
-            this.referenceData.datasets = response.data;
-          } else {
-            this.referenceData.datasets = [];
-          }
-          this.loading = false;
-        });
+      this.$store.dispatch('getDatasets', {}).then(response => {
+        if (response.success) {
+          this.referenceData.datasets = response.data;
+        } else {
+          this.referenceData.datasets = [];
+        }
+        this.loading = false;
+      });
     },
     sourceDatasetChanged() {
       this.newTableId = null;
