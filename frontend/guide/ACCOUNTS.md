@@ -34,5 +34,5 @@ Ensure caution when deleting any account. If you have GCP Marketplace integratio
 1. Click the trash image on the rightmost side.
 2. Click 'DELETE' to confirm the deletion.
 
-## <a name="resetting_an_account">Resetting an Account (Marketplace)</a>
+## <a name="resetting_an_account">Resetting an Account (Marketplace Integration only)</a>
 Resetting an Account cancels all Entitlements that an account is provisioned to through the GCP Marketplace. You may only perform a reset on an account if a user has registered and activated their account via the GCP Marketplace on a Datashare related solution purchase. For more information see the Cloud Commerce Procurement API documentation for [Method: providers.accounts.reset](https://cloud.google.com/marketplace/docs/partners/commerce-procurement-api/reference/rest/v1/providers.accounts/reset).
