@@ -19,4 +19,18 @@ This documentation provides details for using the Datashare user interface. If y
     * [Admin](#admin)
     * [Settings](#settings)
 
-<img src="assets/nav_menu.png" alt="nav menu" height="200"/>
+## <a name="batch">Batch</a>
+### <a name="datasets">Datasets</a>
+### <a name="authorized_views">Authorized Views</a>
+
+## <a name="entitlements">Entitlements</a>
+### <a name="accounts">Accounts</a>
+### <a name="policies">Policies</a>
+
+## <a name="marketplace">Marketplace</a>
+### <a name="procurement_requests">Procurement Requests</a>
+### <a name="my_products">My Products</a>
+
+## <a name="application">Application</a>
+### <a name="admin">Admin</a>
+### <a name="settings">Settings</a>
