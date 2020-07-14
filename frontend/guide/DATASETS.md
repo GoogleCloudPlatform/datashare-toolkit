@@ -23,7 +23,7 @@ To view the Dataset within BigQuery, click the button in the fourth column.
 <img src="./assets/view_in_bigquery.png" alt="View in BigQuery" height="100"/>
 
 ## <a name="viewing_accounts_with_access">Viewing Accounts with Access</a>
-To view accounts that have been provided access to a given dataset, click the button with the ellipsis image in the rightmost column and click 'Accounts'. Note that the accounts screen does not yet have 'Table-based' policy support. This enhancement is tracked in [#195](https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/195)
+To view accounts that have been provided access to a given dataset, click the button with the ellipsis image in the rightmost column and click 'Accounts'. Note that the accounts screen does not yet have 'Table-based' policy support. This enhancement is tracked in [#195](https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/195).
 
 ## <a name="creating_a_dataset">Creating a Dataset</a>
 1. Click the 'CREATE DATASET' button on the top right.
