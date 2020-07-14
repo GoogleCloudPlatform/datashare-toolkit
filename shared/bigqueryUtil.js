@@ -733,7 +733,7 @@ class BigQueryUtil {
                         }
                     }
                 });
-                list.push({ datasetId: dataset.id, description: metadata.description, modifiedAt: metadata.lastModifiedTime, accounts: accounts });
+                list.push({ datasetId: dataset.id, description: metadata.description, modifiedAt: metadata.lastModifiedTime, accounts: accounts, labels: labels });
             }
         }
         return list;
