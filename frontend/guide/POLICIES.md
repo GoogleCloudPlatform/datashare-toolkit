@@ -12,7 +12,11 @@
 </p>
 
 ## <a name="viewing_policies">Viewing Policies</a>
+
 ## <a name="creating_a_policy">Creating a Policy</a>
+
 ## <a name="editing_a_policy">Editing a Policy</a>
+
 ## <a name="deleting_a_policy">Deleting a Policy</a>
+
 ## <a name="integrating_with_marketplace">Integrating with Marketplace</a>
