@@ -95,7 +95,6 @@ WHERE
             query: sqlQuery,
             params: { email: email.toLowerCase() }
         };
-        console.log(sqlQuery);
         const [rows] = await bigqueryUtil.executeQuery(options);
 
         rows.forEach(e => {
