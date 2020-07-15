@@ -51,7 +51,7 @@ My Products provides a listing of Marketplace Solution and Marketplace Plans tha
 ## <a name="application">Application</a>
 Provides administrative and settings configuration screens.
 
-### <a name="admin">Admin</a>
+### <a name="admin">Admin</a> [Guide](./ADMIN.md)
 The admin screen is used for initializing the Datashare data schema in BigQuery. Additionally, it provides functionlity to sync permissions and views in case they fall out of sync.
 
 ### <a name="settings">Settings</a> [Guide](./SETTINGS.md)
