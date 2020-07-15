@@ -6,6 +6,12 @@
 * [Editing a Policy](#editing_a_policy)
 * [Deleting a Policy](#deleting_a_policy)
 * [Integrating with Marketplace](#integrating_with_marketplace)
+    * [Becoming a Marketplace vendor](#becoming_a_marketplace_vendor)
+    * [Creating your first solution](#creating_your_first_solution)
+    * [Marketplace Concepts](#marketplace_concepts)
+        * [Plans & Features](#plans_and_features)
+            * [Service Features](#service_features)
+            * [Service Plans](#service_plans)
 
 <p align="center">
   <img src="./assets/policies_list_ui.png" alt="Policies List UI" height="450"/>
@@ -38,8 +44,11 @@ Ensure caution when deleting any policy. If you have GCP Marketplace integration
 2. Click 'DELETE' to confirm the deletion.
 
 ## <a name="integrating_with_marketplace">Integrating with Marketplace</a>
+
+### <a name="becoming_a_marketplace_vendor">Becoming a Marketplace vendor</a>
 In order to integrate Datashare with the GCP Marketplace, you must first sign up to become a [Google Cloud Marketplace vendor](https://cloud.google.com/marketplace/docs/partners). Once you have been approved as a partner you may then list your data solutions within Marketplace.
 
+### <a name="creating_your_first_solution">Creating your first solution</a>
 In order to create a data solution in GCP Marketplace and sell it, follow the instructions below:
 
 1. Go to [Partner Portal](https://console.cloud.google.com/partner/solutions).
@@ -59,7 +68,7 @@ In order to create a data solution in GCP Marketplace and sell it, follow the in
 8. Go to the Datashare 'Policies' UI. In the examples below we defined three service plans. To support three service plans defined in the GCP Marketplace Solution, we will need to [create](#creating_a_policy) three separate Datashare policies.
 9. Within each policy, scroll down to the 'Marketplace' section and enter in the 'Solution Id' and the 'Plan Id' (Service Level) that you defined in the services and plans section of partner portal. The 'Solution Id' was generated when you created a solution name in step 3. If you're unsure of what it is, load the [solutions](https://console.cloud.google.com/partner/solutions) page to check.
 
-### Marketplace Concepts
+### <a name="marketplace_concepts">Marketplace Concepts</a>
 #### <a name="plans_and_features">Plans & Features</a>
 Marketplace has the concept of plans and features. Plans are the sellable item which include one or more features.
 
