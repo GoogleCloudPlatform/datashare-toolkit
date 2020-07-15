@@ -238,4 +238,4 @@ Hosting URL: https://cds-demo-3.web.app
 
 ```
 
-Navigate to the Hosting URL and on the top right click the right most button to sign-in using Google authentication. Lastly, to initialize the 'Datashare' dataset within BigQuery, navigate to the Admin page and click the "Initialize Schema" button.
+Navigate to the Hosting URL and on the top right click the right most button to sign-in using Google authentication. Next,Lastly, to initialize the 'Datashare' dataset within BigQuery, navigate to the Admin page and click the "Initialize Schema" button.

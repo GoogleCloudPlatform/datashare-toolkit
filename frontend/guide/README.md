@@ -54,5 +54,5 @@ Provides administrative and settings configuration screens.
 ### <a name="admin">Admin</a>
 The admin screen is used for initializing the Datashare data schema in BigQuery. Additionally, it provides functionlity to sync permissions and views in case they fall out of sync.
 
-### <a name="settings">Settings</a>
+### <a name="settings">Settings</a> [Guide](./SETTINGS.md)
 The settings page is used to configure application settings. For further information see [Datashare UI](../README.md).
