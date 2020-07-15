@@ -27,8 +27,11 @@ To view the authorized view within BigQuery, click the button in the sixth colum
 4. Choose if you want to configure the view using 'Source-based' or 'Custom'.
     * Source-based: provides a wizard like setup requiring little to no writing of SQL.
     * Custom: provides ability to write SQL directly.
+5. If using Source-based you will also have the option to configure [public access](#public_access).
+6. You can also define [row level access](#row_level_access) or [expiration](#expiration) as required.
 
-### Row Level Access
+
+### <a name="row_level_access">Row Level Access</a>
 Row level access configuration works in conjunction with policies. Row level access tags that accounts are entitled to are configured within [policies](./POLICIES.md/#creating_a_policy), and in this section is where you can define a single column to use for performing the row level filtering. The column may also contain a delimited list of values to use. In this example we're using a column named 'label' and there are multiple values in the column delimited by a pipe '|'.
 
 <img src="./assets/view_row_level_access.png" alt="View Row Level Access" width="400"/>
@@ -38,7 +41,7 @@ If you use a Source-based configuration for an authorized view, you will also ha
 
 <img src="./assets/view_public_access.png" alt="View Public Access" width="400"/>
 
-### Expiration
+### <a name="expiration">Expiration</a>
 In the event where you want a consumer to have limited access to an authorized view, you may define an expiration date and time. You may also choose to delete the view upon expiry, if you do not want to delete the view upon expiry, then the view will continue to exist, though the consumer will have zero rows returned, or the [public access](#public_access) data returned (if configured).
 
 <img src="./assets/view_expiration.png" alt="View Expiration" width="400"/>
