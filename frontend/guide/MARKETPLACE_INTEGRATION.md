@@ -5,8 +5,8 @@
 * [Creating your first solution](#creating_your_first_solution)
 * [Marketplace Concepts](#marketplace_concepts)
     * [Plans & Features](#plans_and_features)
-    * [Service Features](#service_features)
-    * [Service Plans](#service_plans)
+        * [Service Features](#service_features)
+        * [Service Plans](#service_plans)
 
 ## <a name="becoming_a_marketplace_vendor">Becoming a Marketplace vendor</a>
 In order to integrate Datashare with the GCP Marketplace, you must first sign up to become a [Google Cloud Marketplace vendor](https://cloud.google.com/marketplace/docs/partners). Once you have been approved as a partner you may then list your data solutions within Marketplace.
