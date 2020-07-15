@@ -1,5 +1,5 @@
-# DS Frontend UI
-This documentation provides details for how to develop, build, and deploy new versions of the DS Frontend UI. There are a few different deployment options for you to choose based on developer pererence and/or environment.
+# Datashare UI
+This documentation provides details for how to develop, build, and deploy new versions of the Datashare UI. There are a few different deployment options for you to choose based on developer pererence and/or environment.
 
 * [Prerequisites](#prereqs)
   * [Setup Backend API](#setup_backend)
@@ -16,7 +16,7 @@ This documentation provides details for how to develop, build, and deploy new ve
 
 
 ## <a name="prereqs">Prerequisites</a>
-These are the prerequisites for the DS Frontend UI
+These are the prerequisites for the Datashare UI.
 
 
 ### <a name="setup_backend">Setup Backend API</a>

@@ -4,7 +4,7 @@
   <img src="../../card.png" alt="Datashare" height="175"/>
 </p>
 
-This documentation provides details for using the Datashare user interface. If you have no yet deployed or configured the frontend interface, please see [DS Frontend UI](../README.md) for information on how to do so. The documentation is structured based on the navigation of the interface. On this page, we'll provide a breakdown of the <a href="./assets/nav_menu.png" target="_blank">navigation menu structure</a> to provide insight into what each page provides.
+This documentation provides details for using the Datashare user interface. If you have no yet deployed or configured the frontend interface, please see [Datashare UI](../README.md) for information on how to do so. The documentation is structured based on the navigation of the interface. On this page, we'll provide a breakdown of the <a href="./assets/nav_menu.png" target="_blank">navigation menu structure</a> to provide insight into what each page provides.
 
 * [Batch](#batch)
     * [Datasets](#datasets)
@@ -55,4 +55,4 @@ Provides administrative and settings configuration screens.
 The admin screen is used for initializing the Datashare data schema in BigQuery. Additionally, it provides functionlity to sync permissions and views in case they fall out of sync.
 
 ### <a name="settings">Settings</a>
-The settings page is used to configure application settings. For further information see [DS Frontend UI](../README.md).
+The settings page is used to configure application settings. For further information see [Datashare UI](../README.md).
