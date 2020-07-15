@@ -24,7 +24,7 @@ The accounts UI shows a listing of all of the Accounts managed by Datashare. Wit
 \* Note that a user can only be added where the email address and domain is associated with an active Google Account or Google Apps account. If you add any other type of account, it will cause the Datashare permissions to fail.
 
 ## <a name="editing_an_account">Editing an Account</a>
-1. Click the pencil icon in the rightmost column. The email type and email cannot be modified after creation. The only  attribute within an account that can be modified after creation are the associated policies.
+1. Click the pencil icon in the rightmost column. The email type and email cannot be modified after creation. The only attribute within an account that can be modified after creation are the associated policies.
 2. Modify policies.
 3. Click 'SAVE'.
 
