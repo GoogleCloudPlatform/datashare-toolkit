@@ -42,7 +42,7 @@ Policies are used to manage data access. A policy consists of a list of datasets
 ## <a name="marketplace">Marketplace</a> [Guide](./POLICIES.md/#integrating_with_marketplace)
 Datashare may be integrated with GCP Marketplace in order to sell access to data using [subscription-based pricing](https://cloud.google.com/marketplace/docs/partners/integrated-saas/select-pricing#subscription-pricing). Datashare provides a UI with all of the basic functionality to integrate with GCP Marketplace and the [Cloud Commerce Partner Procurement API](https://cloud.google.com/marketplace/docs/partners/commerce-procurement-api/reference/rest) to expedite your integration.
 
-### <a name="procurement_requests">Procurement Requests</a>
+### <a name="procurement_requests">Procurement Requests</a> [Guide](./PROCUREMENT_REQUESTS.md)
 Procurement Requests provides a listing of pending entitlement approval requests through the procurement [list](https://cloud.google.com/marketplace/docs/partners/commerce-procurement-api/reference/rest/v1/providers.entitlements/list) api. A pending request can be approved, rejected, or modified with a status comment.
 
 ### <a name="my_products">My Products</a>
