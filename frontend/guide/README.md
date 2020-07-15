@@ -33,13 +33,13 @@ Datashare provides functionality that allows a non-technical user to define an a
 ## <a name="entitlements">Entitlements</a>
 The entitlements section is used to manage and grant access to data - which may be a BigQuery dataset, table, or view.
 
-### <a name="accounts">Accounts</a>
+### <a name="accounts">Accounts</a> [Guide](./ACCOUNTS.md)
 Accounts displays a listing of all of the users or groups that are configured for Datashare. Accounts must be associated with policies in order to grant access to data. Note that a user can only be added where the email address and domain is associated with an active Google Account or Google Apps account. If you add any other type of account, it will cause the Datashare permissions to fail.
 
-### <a name="policies">Policies</a>
+### <a name="policies">Policies</a> [Guide](./POLICIES.md)
 Policies are used to manage data access. A policy consists of a list of datasets or tables, row level access tags (if applicable), and Marketplace integration configuration.
 
-## <a name="marketplace">Marketplace</a>
+## <a name="marketplace">Marketplace</a> [Guide](./POLICIES.md/#integrating_with_marketplace)
 Datashare may be integrated with GCP Marketplace in order to sell access to data using [subscription-based pricing](https://cloud.google.com/marketplace/docs/partners/integrated-saas/select-pricing#subscription-pricing). Datashare provides a UI with all of the basic functionality to integrate with GCP Marketplace and the [Cloud Commerce Partner Procurement API](https://cloud.google.com/marketplace/docs/partners/commerce-procurement-api/reference/rest) to expedite your integration.
 
 ### <a name="procurement_requests">Procurement Requests</a>
