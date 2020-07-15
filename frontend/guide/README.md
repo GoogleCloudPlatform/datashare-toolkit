@@ -45,7 +45,7 @@ Datashare may be integrated with GCP Marketplace in order to sell access to data
 ### <a name="procurement_requests">Procurement Requests</a> [Guide](./PROCUREMENT_REQUESTS.md)
 Procurement Requests provides a listing of pending entitlement approval requests through the procurement [list](https://cloud.google.com/marketplace/docs/partners/commerce-procurement-api/reference/rest/v1/providers.entitlements/list) api. A pending request can be approved, rejected, or modified with a status comment.
 
-### <a name="my_products">My Products</a>
+### <a name="my_products">My Products</a> [Guide](./MY_PRODUCTS.md)
 My Products provides a listing of Marketplace Solution and Marketplace Plans that the current user is entitled access to.
 
 ## <a name="application">Application</a>
