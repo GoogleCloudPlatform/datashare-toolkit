@@ -109,6 +109,7 @@ def GenerateComputeVM(context, create_disks_separately=True):
   disks = prop.setdefault(default.DISKS, list())
   local_ssd = prop.setdefault(default.LOCAL_SSD, 0)
   project = context.env[default.PROJECT]
+  deployApiToGke = context.properties['deployApiToGke']
   datashare_install_bucket_name = project + '-install-bucket'
   datashare_ingestion_bucket_name = project + '-cds-bucket'
   k8s_cluster_name = 'datashare-cluster-resource'
@@ -160,8 +161,7 @@ def GenerateComputeVM(context, create_disks_separately=True):
           'type': default.INSTANCE,
           'metadata': {
               'dependsOn': [ 
-                datashare_ingestion_bucket_name,
-                k8s_cluster_name
+                datashare_ingestion_bucket_name
               ]
           },
           'properties': {
@@ -174,6 +174,8 @@ def GenerateComputeVM(context, create_disks_separately=True):
               'metadata': metadata,
           }
       })
+  if deployApiToGke: 
+      resource[0]['metadata']['dependsOn'].append(k8s_cluster_name)
 
   if context.properties['useRuntimeConfigWaiter']:
     configName = context.properties['waiterConfigName']
