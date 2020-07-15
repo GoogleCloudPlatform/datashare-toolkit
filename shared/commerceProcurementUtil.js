@@ -109,11 +109,6 @@ class CommerceProcurementUtil {
         const client = await this.getClient();
         try {
             const res = await client.providers.accounts.list({
-                // The maximum number of entries that are requested. Default size is 200.
-                //pageSize: 'placeholder-value',
-                // The token for fetching the next page.
-                //pageToken: 'placeholder-value',
-                // The parent resource name.
                 parent: this.getProviderName(this.projectId)
             });
             if (this.VERBOSE_MODE) {
