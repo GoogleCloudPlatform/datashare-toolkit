@@ -1,7 +1,7 @@
 [Datashare User Guide](./README.md)
 
 # Admin
-* [Initializing Schema](#initializing_schema)
+* [Initialize Schema](#initialize_schema)
 * [Sync BigQuery Permissions](#sync_bq_permissions)
 * [Sync BigQuery Views](#sync_bq_views)
 * [Sync All](#sync_all)
@@ -10,7 +10,7 @@
   <img src="./assets/admin_ui.png" alt="Admin UI" height="450"/>
 </p>
 
-## <a name="initializing_schema">Initializing Schema</a>
+## <a name="initialize_schema">Initializing Schema</a>
 The initialize schema button will create the required BigQuery objects that store the metadata required by Datashare to operate.
 
 ## <a name="sync_bq_permissions">Sync BigQuery Permissions</a>
