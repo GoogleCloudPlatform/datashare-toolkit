@@ -30,6 +30,9 @@ To view the authorized view within BigQuery, click the button in the sixth colum
 5. If using Source-based you will also have the option to configure [public access](#public_access).
 6. You can also define [row level access](#row_level_access) or [expiration](#expiration) as required.
 
+Once you've configured everything that you want, you can click the 'VALIDATE' button on the bottom right in order to validate and ensure all of the selected and entered options are valid. Additionally, you can click 'SAMPLE DATA' to view a table of sample data that is generated at runtime.
+
+7. Click 'SAVE' to create the view.
 
 ### <a name="row_level_access">Row Level Access</a>
 Row level access configuration works in conjunction with policies. Row level access tags that accounts are entitled to are configured within [policies](./POLICIES.md/#creating_a_policy), and in this section is where you can define a single column to use for performing the row level filtering. The column may also contain a delimited list of values to use. In this example we're using a column named 'label' and there are multiple values in the column delimited by a pipe '|'.
