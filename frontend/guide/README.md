@@ -39,7 +39,7 @@ Accounts displays a listing of all of the users or groups that are configured fo
 ### <a name="policies">Policies</a> [Guide](./POLICIES.md)
 Policies are used to manage data access. A policy consists of a list of datasets or tables, row level access tags (if applicable), and Marketplace integration configuration.
 
-## <a name="marketplace">Marketplace</a> [Guide](./POLICIES.md/#integrating_with_marketplace)
+## <a name="marketplace">Marketplace</a> [Guide](./MARKETPLACE_INTEGRATION.md)
 Datashare may be integrated with GCP Marketplace in order to sell access to data using [subscription-based pricing](https://cloud.google.com/marketplace/docs/partners/integrated-saas/select-pricing#subscription-pricing). Datashare provides a UI with all of the basic functionality to integrate with GCP Marketplace and the [Cloud Commerce Partner Procurement API](https://cloud.google.com/marketplace/docs/partners/commerce-procurement-api/reference/rest) to expedite your integration.
 
 ### <a name="procurement_requests">Procurement Requests</a> [Guide](./PROCUREMENT_REQUESTS.md)
