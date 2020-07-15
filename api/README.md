@@ -1,4 +1,4 @@
-# DS API
+# Datashare API
 
 * [Overview](#overview)
   * [Architecture](#architecture)
