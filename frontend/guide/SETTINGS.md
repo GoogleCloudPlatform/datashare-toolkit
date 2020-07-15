@@ -1,4 +1,4 @@
-[User](./README.md)
+[Datashare User Guide](./README.md)
 
 # Settings
 
