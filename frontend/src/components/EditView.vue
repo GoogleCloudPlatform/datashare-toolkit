@@ -53,7 +53,7 @@
         >
           <v-select
             v-model="view.datasetId"
-            :items="referenceData.datasets"
+            :items="referenceData.managedDatasets"
             item-text="datasetId"
             item-value="datasetId"
             :error-messages="errors"
@@ -567,6 +567,7 @@ export default {
     includeAllColumns: true,
     referenceData: {
       datasets: [],
+      managedDatasets: [],
       tables: [],
       availableColumns: []
     },
@@ -985,14 +986,20 @@ export default {
     },
     loadDatasets() {
       this.loading = true;
-      return this.$store.dispatch('getDatasets', {}).then(response => {
-        if (response.success) {
-          this.referenceData.datasets = response.data;
-        } else {
-          this.referenceData.datasets = [];
-        }
-        this.loading = false;
-      });
+      return this.$store
+        .dispatch('getDatasets', { includeAll: true })
+        .then(response => {
+          if (response.success) {
+            this.referenceData.datasets = response.data;
+            this.referenceData.managedDatasets = response.data.filter(e => {
+              return e.labels && e.labels['datashare_managed'] === 'true';
+            });
+          } else {
+            this.referenceData.datasets = [];
+            this.referenceData.managedDatasets = [];
+          }
+          this.loading = false;
+        });
     },
     sourceDatasetChanged() {
       this.view.source.tableId = null;

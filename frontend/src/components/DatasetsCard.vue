@@ -367,8 +367,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getDatasets', {
-          projectId: this.$store.state.settings.projectId,
-          labelKey: 'datashare_managed'
+          projectId: this.$store.state.settings.projectId
         })
         .then(response => {
           if (response.success) {

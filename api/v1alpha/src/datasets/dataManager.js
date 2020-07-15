@@ -58,11 +58,15 @@ async function _deleteData(projectId, fields, values, data) {
 }
 
 /**
- * @param  {string} projectId
- * Get a list of Datasets based off labelKey string
+ * @param  {} projectId
+ * @param  {} includeAll If true, returns all datasets in the project.
+ * Get a list of Datasets.
  */
-async function listDatasets(projectId) {
-    const labelKey = cfg.cdsManagedLabelKey;
+async function listDatasets(projectId, includeAll) {
+    let labelKey = null;
+    if (!includeAll) {
+        labelKey = cfg.cdsManagedLabelKey;
+    }
     const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };

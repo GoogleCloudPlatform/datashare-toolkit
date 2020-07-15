@@ -2,14 +2,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cds-frontend-ui
+  name: ds-frontend-ui-lb
   labels:
-    app: cds-frontend-ui
+    app: ds-frontend-ui
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - port: 8080
       name: http
+      targetPort: 8080
   selector:
-    app: cds-frontend-ui
+    app: ds-frontend-ui
     version: v1

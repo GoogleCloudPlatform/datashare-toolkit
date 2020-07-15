@@ -85,7 +85,8 @@ var datasets = express.Router();
  */
 datasets.get('/projects/:projectId/datasets', async(req, res) => {
     const projectId = req.params.projectId;
-    const data = await dataManager.listDatasets(projectId);
+    const includeAll = req.query.includeAll === 'true';
+    const data = await dataManager.listDatasets(projectId, includeAll);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;

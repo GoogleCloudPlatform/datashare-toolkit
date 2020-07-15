@@ -71,9 +71,17 @@ export default {
   resetSettings() {
     return mock.resetSettings();
   },
-  getDatasets(labelKey) {
+  getDatasets(includeAll) {
+    let queryAll = false;
+    if (includeAll && includeAll === true) {
+      queryAll = true;
+    }
     return axios
-      .get(this._apiBaseUrl() + '/datasets')
+      .get(this._apiBaseUrl() + '/datasets', {
+        params: {
+          includeAll: queryAll
+        }
+      })
       .then(response => response);
   },
   createDataset(projectId, datasetId, description) {

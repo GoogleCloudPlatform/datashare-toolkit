@@ -79,16 +79,18 @@ async function listUserPolicies(projectId, email) {
         fields = Array.from(fields).map(i => 'cp.' + i).join();
         const accountTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
         let sqlQuery = `WITH currentAccount AS (
-            SELECT policies.policyId
-            FROM \`${accountTable}\` ca
-            CROSS JOIN UNNEST(policies) policies
-            WHERE lower(email) = @email AND
-                (ca.isDeleted IS false OR ca.isDeleted IS null)
-          )
-        SELECT datasets, rowAccessTags, marketplace
-        FROM \`${table}\` cp
-        JOIN currentAccount ca ON ca.policyId = cp.policyId
-        WHERE (cp.isDeleted IS false OR cp.isDeleted IS null)`;
+    SELECT policies.policyId
+    FROM \`${accountTable}\` ca
+    CROSS JOIN UNNEST(policies) policies
+    WHERE lower(email) = @email AND
+        (ca.isDeleted IS false OR ca.isDeleted IS NULL)
+)
+SELECT datasets, rowAccessTags, marketplace
+FROM \`${table}\` cp
+JOIN currentAccount ca ON ca.policyId = cp.policyId
+WHERE
+    (cp.marketplace IS NOT NULL AND cp.marketplace.solutionId IS NOT NULL AND cp.marketplace.planId IS NOT NULL)
+    AND (cp.isDeleted IS false OR cp.isDeleted IS NULL)`;
         let options = {
             query: sqlQuery,
             params: { email: email.toLowerCase() }
@@ -384,3 +386,4 @@ module.exports = {
     getPolicy,
     listUserPolicies
 };
+ 
