@@ -33,7 +33,7 @@ class CommerceProcurementUtil {
         const auth = new google.auth.GoogleAuth({
             scopes: 'https://www.googleapis.com/auth/cloud-platform'
         });
-        google.options({auth: auth});
+        google.options({ auth: auth });
         return google.discoverAPI(DISCOVERY_URL, {}, (err, client) => {
             if (err) {
                 console.log('Error during API discovery', err);
