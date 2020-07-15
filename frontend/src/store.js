@@ -114,7 +114,7 @@ const store = new Vuex.Store({
     },
     // eslint-disable-next-line no-unused-vars
     getDatasets({ commit }, payload) {
-      return client.getDatasets().catch(error => {
+      return client.getDatasets(payload.includeAll).catch(error => {
         notify(error);
       });
     },

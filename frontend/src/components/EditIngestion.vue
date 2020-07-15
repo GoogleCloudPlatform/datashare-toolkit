@@ -203,8 +203,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getDatasets', {
-          projectId: this.$store.state.settings.projectId,
-          labelKey: 'cds_ingestion_managed'
+          projectId: this.$store.state.settings.projectId
         })
         .then(datasets => {
           this.datasets = datasets;

@@ -24,7 +24,7 @@ const storageUtil = new StorageUtil();
 const stagingTableExpiryDays = 2;
 const processPrefix = "cds";
 const batchIdColumnName = `${processPrefix}_batch_id`;
-const labelName = "cds_managed";
+const labelName = "datashare_managed";
 const queryResultTimeoutMs = 540000;
 let batchId;
 const archiveEnabled = process.env.ARCHIVE_FILES ? (process.env.ARCHIVE_FILES.toLowerCase() === "true") : false;
@@ -136,7 +136,10 @@ async function transform(config) {
 
     let transformQuery = "*";
     if (transformExists === true) {
-        transformQuery = await storageUtil.fetchFileContent(config.bucket, config.bucketPath.transform);
+        let transformContent = await storageUtil.fetchFileContent(config.bucket, config.bucketPath.transform);
+        if (transformContent && transformContent.trim() !== '') {
+            transformQuery = transformContent;
+        }
     }
 
     const query = `SELECT ${transformQuery}, '${batchId}' AS ${batchIdColumnName} FROM \`${config.datasetId}.${config.stagingTable}\``;

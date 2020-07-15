@@ -34,8 +34,8 @@ const options = {
     definition: {
         openapi: '3.0.0', // Specification (optional, defaults to swagger: '2.0')
         info: {
-            description: 'This is the CDS API service that provides data producers the ability to expose subsets of their datasets programatically.',
-            title: 'CDS API Service', // Title (required)
+            description: 'This is the Datashare API service that provides data producers the ability to expose subsets of their datasets programatically.',
+            title: 'Datashare API Service', // Title (required)
             version: '0.0.1', // Version (required)
             contact: {
                 email: 'no-reply@google.com'
@@ -90,17 +90,17 @@ app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.raw({type: 'application/octet-stream'}));
 app.use(cookieParser());
 
-// Import the CDS API Spots service router
+// Import the Datashare API Spots service router
 const spots = require('./spots/index');
-// Import the CDS API Datasets service router
+// Import the Datashare API Datasets service router
 const datasets = require('./datasets/index');
-// Import the CDS API Policies service router
+// Import the Datashare API Policies service router
 const policies = require('./policies/index');
-// Import the CDS API Accounts service router
+// Import the Datashare API Accounts service router
 const accounts = require('./accounts/index');
-// Import the CDS API Admin service router
+// Import the Datashare API Admin service router
 const admin = require('./admin/index');
-// Import the CDS API Procurement service router
+// Import the Datashare API Procurement service router
 const procurements = require('./procurements/index');
 
 /************************************************************
@@ -127,21 +127,21 @@ if (
  *
  * tags:
  *   - name: welcome
- *     description: The welcome message for the CDS API
+ *     description: The welcome message for the Datashare API
  *   - name: datasets
- *     description: The CDS API Dataset Services
+ *     description: The Datashare API Dataset Services
  *   - name: policies
- *     description: The CDS API Policy Services
+ *     description: The Datashare API Policy Services
  *   - name: accounts
- *     description: The CDS API Account Services
+ *     description: The Datashare API Account Services
  *   - name: spots
- *     description: The CDS API Spot Services
+ *     description: The Datashare API Spot Services
  *   - name: admin
- *     description: The CDS API Admin Services
+ *     description: The Datashare API Admin Services
  *   - name: docs
- *     description: The OpenAPI specification documents for the CDS API services
+ *     description: The OpenAPI specification documents for the Datashare API services
  *   - name: default
- *     description: The default routes for the CDS API
+ *     description: The default routes for the Datashare API
  *
  * definitions:
  *   Error:
@@ -194,7 +194,7 @@ router.get('/', function(req, res) {
     res.status(200).json({
         success: true,
         code: 200,
-        message: 'Welcome to the CDS API (' + apiVersion + ')! Docs available via /docs'
+        message: 'Welcome to the Datashare API (' + apiVersion + ')! Docs available via /docs'
     });
 });
 
@@ -203,8 +203,8 @@ router.get('/', function(req, res) {
  *
  * /docs:
  *   get:
- *     summary: Swagger UI for CDS API OpenAPI Specification
- *     description: Returns the Swagger UI with the OpenAPI specification for the CDS API services
+ *     summary: Swagger UI for Datashare API OpenAPI Specification
+ *     description: Returns the Swagger UI with the OpenAPI specification for the Datashare API services
  *     tags:
  *       - docs
  *     responses:
@@ -223,8 +223,8 @@ router.get(['/docs', '/api-docs'], swaggerUi.setup(openapiSpec, swaggerOptions))
  *
  * /docs/openapi_spec:
  *   get:
- *     summary: CDS API OpenAPI Specification
- *     description: Returns the OpenAPI specification for the CDS API services
+ *     summary: Datashare API OpenAPI Specification
+ *     description: Returns the OpenAPI specification for the Datashare API services
  *     tags:
  *       - docs
  *     responses:
