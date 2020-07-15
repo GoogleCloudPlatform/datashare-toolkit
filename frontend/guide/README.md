@@ -25,7 +25,7 @@ The batch section contains page links for managing batch data. Currently the Dat
 ### <a name="datasets">Datasets</a> [Guide](./DATASETS.md)
 Datasets displays a listing of all of the BigQuery datasets that are managed by Datashare. It provides functionality to create a new dataset, edit or delete an existing one. You can also view the accounts that have access to a given dataset and the list of managed authorized views within each dataset.
 
-### <a name="authorized_views">Authorized Views</a>
+### <a name="authorized_views">Authorized Views</a> [Guide](./AUTHORIZED_VIEWS.md)
 Authorized views displays a listing of BigQuery authorized views that are managed by Datashare. Note that any authorized view created or managed by Datashare should only be modified through Datashare. You should not manually edit any managed object outside of Datashare.
 
 Datashare provides functionality that allows a non-technical user to define an authorized view through a UI form. It also allows you to view sample data through the UI.
