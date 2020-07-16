@@ -15,7 +15,7 @@ description:
   - type: SOFTWARE_GROUP_OS
     software:
     - title: Debian
-      version: v20200618 LTS
+      version: v20200714 LTS
   - software:
     - title: Datashare
       version: 0.5.0
@@ -260,6 +260,6 @@ runtime:
 
 annotations:
   autogenSpecType: 'SINGLE_VM'
-  vmImage0: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20200618
+  vmImage0: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20200714
 
 metadata_version: v1
