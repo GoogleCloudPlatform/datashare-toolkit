@@ -33,7 +33,7 @@ class CommerceProcurementUtil {
         const auth = new google.auth.GoogleAuth({
             scopes: 'https://www.googleapis.com/auth/cloud-platform'
         });
-        google.options({auth: auth});
+        google.options({ auth: auth });
         return google.discoverAPI(DISCOVERY_URL, {}, (err, client) => {
             if (err) {
                 console.log('Error during API discovery', err);
@@ -109,11 +109,6 @@ class CommerceProcurementUtil {
         const client = await this.getClient();
         try {
             const res = await client.providers.accounts.list({
-                // The maximum number of entries that are requested. Default size is 200.
-                //pageSize: 'placeholder-value',
-                // The token for fetching the next page.
-                //pageToken: 'placeholder-value',
-                // The parent resource name.
                 parent: this.getProviderName(this.projectId)
             });
             if (this.VERBOSE_MODE) {
@@ -224,11 +219,6 @@ class CommerceProcurementUtil {
         const client = await this.getClient();
         try {
             const res = await client.providers.entitlements.list({
-                // The maximum number of entries that are requested. Default size is 200.
-                //pageSize: 'placeholder-value',
-                // The token for fetching the next page.
-                //pageToken: 'placeholder-value',
-                // The parent resource name.
                 parent: this.getProviderName(this.projectId),
                 filter: filter
             });
