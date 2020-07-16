@@ -23,7 +23,7 @@ The policies UI shows a listing of all of the Policies managed by Datashare. A p
 5. Enter the list of Row Access Tags. Row access tags are simple string filters that are used by tables/views associated with the policy in order to filter rows for users*.
 6. Click 'SAVE'. Details on the 'Marketplace' section will be covered in the [Integrating with Marketplace](./MARKETPLACE_INTEGRATION.md) section.
 
-\* Row Access Tags currently only work for users, they do not work with groups.
+\* Row Access Tags currently only work for users, they do not work with groups. An enhancement request is tracked in [#212](https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/212).
 
 ## <a name="editing_a_policy">Editing a Policy</a>
 1. Click on the pencil icon in the rightmost column.
