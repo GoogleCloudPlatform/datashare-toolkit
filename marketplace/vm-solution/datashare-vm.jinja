@@ -51,11 +51,14 @@ resources:
       location: {{ storageBucketLocation }}
       storageClass: STANDARD
 
+
+  {% if deployApiToGke %}  
   - name: datashare-cluster-manager
     type: cluster.py
     properties:
       zone: us-central1-a
-      
+  {% endif %}
+
   {% if useRuntimeConfigWaiter %}  
   - type: storage.v1.bucket
     name: {{ project }}-install-bucket
@@ -100,8 +103,10 @@ resources:
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
       waiterName: {{ waiterName }}
+      {% if deployApiToGke %}  
       deployToGke: {{ deployApiToGke }}
       gkeZone: {{ gkeZone }}
+      {% endif %}
     
   ## Deploy Datashare UI
   - name: build-ui
@@ -122,6 +127,7 @@ resources:
       instanceName: {{ instanceName }}
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
       waiterConfigName: {{ configName }}
+      deployApiToGke: {{ deployApiToGke }}
       sourceImage: https://www.googleapis.com/compute/v1/projects/{{ imageProjects[selectedImageIndex] }}/global/images/{{ imageNames[selectedImageIndex] }}
       zone: {{ zone }}
       machineType: {{ machineType }}

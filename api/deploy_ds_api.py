@@ -68,7 +68,7 @@ def GenerateConfig(context):
               }
           ]
   # select the correct deploy command based on whether deployToGke is True or False
-  if context.properties['deployToGke'] == False:
+  if context.properties['deployToGke'] == False or context.properties['deployToGke'] == "false":
     steps[5]['args'] = [ 'run',
                     'deploy',
                     context.properties['cloudRunDeployName'],
