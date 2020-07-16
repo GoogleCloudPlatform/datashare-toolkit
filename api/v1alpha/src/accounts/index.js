@@ -82,8 +82,8 @@ var accounts = express.Router();
  *     type: string
  *     description: Account Email Type enum
  *     enum:
- *       - userByEmail
- *       - groupByEmail
+ *       - user
+ *       - group
  *
  *   AccountType:
  *     type: string

@@ -151,7 +151,7 @@ export default {
       policies: [],
       marketplace: []
     },
-    emailTypes: ['userByEmail', 'groupByEmail'],
+    emailTypes: ['user', 'group'],
     showError: false
   }),
   created() {

@@ -22,6 +22,32 @@ let bigqueryUtil = new BigQueryUtil();
 const cfg = require('./config');
 
 /**
+ * @param  {} bqDatasetAccessType
+ */
+function getDatashareDatasetAccessType(bqDatasetAccessType) {
+    if (bqDatasetAccessType === 'userByEmail') {
+        return 'user';
+    } else if (bqDatasetAccessType === 'groupByEmail') {
+        return 'group';
+    } else {
+        throw new Error(`Unsupported access type '${bqDatasetAccessType}'`);
+    }
+}
+
+/**
+ * @param  {} datashareDatasetAccessType
+ */
+function getBqDatasetAccessType(datashareDatasetAccessType) {
+    if (datashareDatasetAccessType === 'user') {
+        return 'userByEmail';
+    } else if (datashareDatasetAccessType === 'group') {
+        return 'groupByEmail';
+    } else {
+        throw new Error(`Unsupported access type '${datashareDatasetAccessType}'`);
+    }
+}
+
+/**
  * @param  {} projectId
  * @param  {} dataset
  * @param  {} accounts
@@ -31,9 +57,7 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
     let isDirty = false;
     const accessTypes = ["userByEmail", "groupByEmail"];
 
-    // 0. Check for existance of the datasetId and handle appropriately
-
-    // 1. Get metadata
+    // Get metadata
     let metadata;
     try {
         metadata = await bigqueryUtil.getDatasetMetadata(datasetId);
@@ -41,8 +65,7 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
         throw err;
     }
 
-    // 2. Check for and remove any non-existing authorized views
-    // Remove stale view access
+    // Check for and remove any non-existing authorized views
     let i = metadata.access.length;
     while (i--) {
         let a = metadata.access[i];
@@ -56,13 +79,14 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
             }
         }
         else if (a.role === 'READER') {
-            // 3. Remove all 'READER' userByEmail and groupByEmail accounts that should not have access
+            // Remove all 'READER' userByEmail and groupByEmail accounts that should not have access
             const aKeys = Object.keys(a);
             if (aKeys.length === 2) {
                 const accessType = aKeys[1];
                 const accessId = a[accessType];
                 if (accessTypes.includes(accessType)) {
-                    const shouldHaveAccess = underscore.findWhere(accounts, { email: accessId, emailType: accessType });
+                    const dsAccessType = getDatashareDatasetAccessType(accessType);
+                    const shouldHaveAccess = underscore.findWhere(accounts, { email: accessId, emailType: dsAccessType });
                     if (!shouldHaveAccess) {
                         console.log(`Deleting user: ${accessType}:${accessId} from datasetId: ${datasetId}`);
                         metadata.access.splice(i, 1);
@@ -73,14 +97,15 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
         }
     }
 
-    // 4. Add accounts
+    // Add new or missing accounts
     accounts.forEach(account => {
         // If a dataset contains no accounts, the query will return an array with
         // a single item at zero index with attributes having all null values.
         if (account.email && account.emailType) {
+            const bqAccessType = getBqDatasetAccessType(account.emailType);
             let a = { role: 'READER', };
             a["role"] = 'READER';
-            a[account.emailType] = account.email;
+            a[bqAccessType] = account.email;
             const accessRecordExists = underscore.findWhere(metadata.access, a);
             if (!accessRecordExists) {
                 metadata.access.push(a);
@@ -90,7 +115,7 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
         }
     });
 
-    // 5. Save metadata if changed
+    // Save metadata if changed
     if (isDirty === true) {
         try {
             await bigqueryUtil.setDatasetMetadata(datasetId, metadata);
@@ -132,8 +157,7 @@ async function performTableMetadataUpdate(projectId, datasetId, tableId, account
                 let type = arr[0];
                 let email = arr[1];
                 if (accessTypes.includes(type)) {
-                    const emailType = type === 'user' ? 'userByEmail' : 'groupByEmail';
-                    const shouldHaveAccess = underscore.findWhere(accounts, { email: email, emailType: emailType });
+                    const shouldHaveAccess = underscore.findWhere(accounts, { email: email, emailType: type });
                     if (!shouldHaveAccess) {
                         console.log(`Deleting user: ${type}:${email} from table: ${datasetId}.${tableId}`);
                         readBinding.members.splice(i, 1);
@@ -154,7 +178,7 @@ async function performTableMetadataUpdate(projectId, datasetId, tableId, account
 
     accounts.forEach(account => {
         if (account.email && account.emailType) {
-            const identifier = (account.emailType === 'userByEmail' ? 'user' : 'group') + ':' + account.email;
+            const identifier = `${account.emailType}:${account.email}`;
             const accessRecordExists = readBinding.members.includes(identifier);
             if (!accessRecordExists) {
                 readBinding.members.push(identifier);
