@@ -28,7 +28,7 @@ In order to create a data solution in GCP Marketplace and sell it, follow the in
     * Add your [service features](#service_features). Service features can be included in multiple plans.
     * Configure your [service plans](#service_plans). Service plans can encompass multiple features.
 7. (TODO: This is incomplete) Complete the billing on-boarding spreadsheet here - TBD. The billing setup process will take up to two weeks to complete. Reach out to the GCP Marketing Partner team for more information.
-8. Go to the Datashare 'Policies' UI. In the examples below we defined three service plans. To support three service plans defined in the GCP Marketplace Solution, we will need to [create](#creating_a_policy) three separate Datashare policies.
+8. Go to the Datashare 'Policies' UI. In the examples below we defined three service plans. To support three service plans defined in the GCP Marketplace Solution, we will need to [create](./POLICIES.md/#creating_a_policy) three separate Datashare policies.
 9. Within each policy, scroll down to the 'Marketplace' section and enter in the 'Solution Id' and the 'Plan Id' (Service Level) that you defined in the services and plans section of partner portal. The 'Solution Id' was generated when you created a solution name in step 3. If you're unsure of what it is, load the [solutions](https://console.cloud.google.com/partner/solutions) page to check.
 
 ## <a name="marketplace_concepts">Marketplace Concepts</a>
