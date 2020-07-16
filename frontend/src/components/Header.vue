@@ -61,7 +61,7 @@
             icon
             dark
             v-on="on"
-            href="https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/frontend/guide/README.md"
+            href="https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/frontend/user-guide/README.md"
             target="_blank"
           >
             <v-icon>{{ icons.helpCircle }}</v-icon>
