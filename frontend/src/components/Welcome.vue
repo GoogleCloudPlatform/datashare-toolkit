@@ -53,9 +53,9 @@ export default {
   data: () => ({
     documentation: [
       {
-        text: 'Datashare Frontend UI Doc',
+        text: 'Datashare User Guide',
         href:
-          'https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/frontend/README.md'
+          'https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/frontend/user-guide/README.md'
       }
     ],
     importantLinks: [
