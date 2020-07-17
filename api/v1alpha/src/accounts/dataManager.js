@@ -116,6 +116,7 @@ async function listAccounts(projectId, datasetId, policyId) {
             select distinct
               cp.policyId,
               cp.name,
+              cp.isTableBased,
               d.datasetId
             FROM \`${policyTable}\` cp
             cross join unnest(cp.datasets) d
@@ -129,7 +130,7 @@ async function listAccounts(projectId, datasetId, policyId) {
             FROM \`${table}\` ca
             cross join unnest(ca.policies) as p
             join policies cp on p.policyId = cp.policyId
-            where ca.isDeleted is false
+            where ca.isDeleted IS false and cp.isTableBased IS false
           )
           select
             up.rowId,
