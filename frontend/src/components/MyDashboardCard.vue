@@ -30,6 +30,14 @@
           ></v-text-field>
         </v-toolbar>
       </template>
+      <template v-for="h in headers" v-slot:[`header.${h.value}`]="{ header }">
+        <v-tooltip bottom v-bind:key="h.value">
+          <template v-slot:activator="{ on }">
+            <span v-on="on">{{ h.text }}</span>
+          </template>
+          <span v-if="header.tooltip">{{ header.tooltip }}</span>
+        </v-tooltip>
+      </template>
       <template v-slot:item.createdAt="{ item }">
         {{ toLocalTime(item.createdAt) }}
       </template>
@@ -226,11 +234,32 @@ export default {
       showDialog: false,
       selectedItem: null,
       headers: [
-        { text: 'Marketplace Solution', value: 'marketplace.solutionId' },
-        { text: 'Marketplace Plan', value: 'marketplace.planId' },
-        { text: 'Marketplace Provider Message', value: 'marketplace.message' },
-        { text: 'Status', value: 'status' },
-        { text: 'Datasets', value: 'datasets', sortable: false },
+        {
+          text: 'Marketplace Solution',
+          value: 'marketplace.solutionId',
+          tooltip: 'The GCP Marketplace Solution Id'
+        },
+        {
+          text: 'Marketplace Plan',
+          value: 'marketplace.planId',
+          tooltip: 'The GCP Marketplace Plan Id that was subscribed to'
+        },
+        {
+          text: 'Marketplace Provider Message',
+          value: 'marketplace.message',
+          tooltip: 'Provider-supplied message'
+        },
+        {
+          text: 'Status',
+          value: 'status',
+          tooltip: 'The state of the product request'
+        },
+        {
+          text: 'Datasets',
+          value: 'datasets',
+          sortable: false,
+          tooltip: 'The datasets that the product and plan entitles access to'
+        },
         { text: '', value: 'action', sortable: false }
       ],
       icons: {
