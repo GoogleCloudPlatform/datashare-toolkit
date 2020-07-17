@@ -34,6 +34,14 @@
           >
         </v-toolbar>
       </template>
+      <template v-for="h in headers" v-slot:[`header.${h.value}`]="{ header }">
+        <v-tooltip bottom v-bind:key="h.value">
+          <template v-slot:activator="{ on }">
+            <span v-on="on">{{ h.text }}</span>
+          </template>
+          <span v-if="header.tooltip">{{ header.tooltip }}</span>
+        </v-tooltip>
+      </template>
       <template v-slot:item.createdAt="{ item }">
         {{ toLocalTime(item.createdAt) }}
       </template>
@@ -45,12 +53,27 @@
         </v-chip-group>
       </template>
       <template v-slot:item.action="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)">
-          edit
-        </v-icon>
-        <v-icon small @click="presentDeleteDialog(item)">
-          delete
-        </v-icon>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-icon small v-on="on" class="mr-2" @click="editItem(item)">
+              edit
+            </v-icon>
+          </template>
+          <span>Edit</span>
+        </v-tooltip>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              small
+              v-on="on"
+              class="mr-2"
+              @click="presentDeleteDialog(item)"
+            >
+              delete
+            </v-icon>
+          </template>
+          <span>Delete</span>
+        </v-tooltip>
       </template>
     </v-data-table>
     <Dialog
@@ -108,14 +131,37 @@ export default {
       showCreatePolicy: false,
       selectedItem: null,
       headers: [
-        { text: 'Name', value: 'name' },
-        { text: 'Description', value: 'description' },
-        { text: 'Account Usage', value: 'accountCount' },
-        { text: 'Marketplace Solution', value: 'marketplace.solutionId' },
-        { text: 'Marketplace Plan', value: 'marketplace.planId' },
-        { text: 'Modified At', value: 'createdAt' },
-        { text: 'Modified By', value: 'createdBy' },
-        // { text: 'Version', value: 'version' },
+        { text: 'Name', value: 'name', tooltip: 'Name of the policy' },
+        {
+          text: 'Description',
+          value: 'description',
+          tooltip: 'Description of the policy'
+        },
+        {
+          text: 'Account Usage',
+          value: 'accountCount',
+          tooltip: 'The # of accounts using this policy'
+        },
+        {
+          text: 'Marketplace Solution',
+          value: 'marketplace.solutionId',
+          tooltip: 'The associated GCP Marketplace Solution Id'
+        },
+        {
+          text: 'Marketplace Plan',
+          value: 'marketplace.planId',
+          tooltip: 'The associated GCP Marketplace Plan Id'
+        },
+        {
+          text: 'Modified At',
+          value: 'createdAt',
+          tooltip: 'The last modified time for the policy'
+        },
+        {
+          text: 'Modified By',
+          value: 'createdBy',
+          tooltip: 'The last user that modified the policy'
+        },
         { text: '', value: 'action', sortable: false }
       ],
       icons: {

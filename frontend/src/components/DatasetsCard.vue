@@ -34,12 +34,25 @@
           >
         </v-toolbar>
       </template>
+      <template v-for="h in headers" v-slot:[`header.${h.value}`]="{ header }">
+        <v-tooltip bottom v-bind:key="h.value">
+          <template v-slot:activator="{ on }">
+            <span v-on="on">{{ h.text }}</span>
+          </template>
+          <span v-if="header.tooltip">{{ header.tooltip }}</span>
+        </v-tooltip>
+      </template>
       <template v-slot:item.modifiedAt="{ item }">
         {{ toLocalTime(item.modifiedAt) }} </template
       ><template v-slot:item.viewAction="{ item }">
-        <v-icon class="mr-2" @click="navigateToDataset(item)">
-          {{ icons.databaseSearch }}
-        </v-icon>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-icon v-on="on" class="mr-2" @click="navigateToDataset(item)">
+              {{ icons.databaseSearch }}
+            </v-icon>
+          </template>
+          <span>View in BigQuery</span>
+        </v-tooltip>
       </template>
       <template v-slot:item.action="{ item }">
         <v-menu bottom offset-y>
@@ -249,10 +262,27 @@ export default {
     itemsPerPageOptions: [20, 50, 100, 200],
     itemsPerPage: 50,
     headers: [
-      { text: 'Dataset Id', value: 'datasetId' },
-      { text: 'Description', value: 'description' },
-      { text: 'Modified At', value: 'modifiedAt' },
-      { text: '', value: 'viewAction', sortable: false },
+      {
+        text: 'Dataset Id',
+        value: 'datasetId',
+        tooltip: 'The BigQuery datasetId'
+      },
+      {
+        text: 'Description',
+        value: 'description',
+        tooltip: 'Description of the dataset'
+      },
+      {
+        text: 'Modified At',
+        value: 'modifiedAt',
+        tooltip: 'The last modified time for the dataset'
+      },
+      {
+        text: 'View in BigQuery',
+        value: 'viewAction',
+        sortable: false,
+        tooltip: 'View dataset in the BigQuery console'
+      },
       { text: '', value: 'action', sortable: false }
     ]
   }),

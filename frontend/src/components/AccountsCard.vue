@@ -46,6 +46,14 @@
           >
         </v-toolbar>
       </template>
+      <template v-for="h in headers" v-slot:[`header.${h.value}`]="{ header }">
+        <v-tooltip bottom v-bind:key="h.value">
+          <template v-slot:activator="{ on }">
+            <span v-on="on">{{ h.text }}</span>
+          </template>
+          <span v-if="header.tooltip">{{ header.tooltip }}</span>
+        </v-tooltip>
+      </template>
       <template v-slot:item.createdAt="{ item }">
         {{ toLocalTime(item.createdAt) }}
       </template>
@@ -75,7 +83,7 @@
               edit
             </v-icon>
           </template>
-          <span>Edit Account</span>
+          <span>Edit</span>
         </v-tooltip>
         <v-tooltip top>
           <template v-slot:activator="{ on }">
@@ -83,7 +91,7 @@
               delete
             </v-icon>
           </template>
-          <span>Delete Account</span>
+          <span>Delete</span>
         </v-tooltip>
         <v-tooltip top>
           <template v-slot:activator="{ on }">
@@ -198,16 +206,36 @@ export default {
     },
     headers() {
       let h = [
-        { text: 'Email', value: 'email' },
-        { text: 'Email Type', value: 'emailType' },
-        { text: 'Policies', value: 'policies' }
+        { text: 'Email', value: 'email', tooltip: 'The account email address' },
+        {
+          text: 'Email Type',
+          value: 'emailType',
+          tooltip: 'The email type of the account'
+        },
+        {
+          text: 'Policies',
+          value: 'policies',
+          tooltip: 'The policies that the account is entitled to'
+        },
+        {
+          text: 'Policy Search String',
+          value: 'policySearchString',
+          align: ' d-none'
+        }
       ];
 
       if (!this.selectedDataset) {
         h.push(
-          { text: 'Modified At', value: 'createdAt' },
-          { text: 'Modified By', value: 'createdBy' },
-          // { text: 'Version', value: 'version' },
+          {
+            text: 'Modified At',
+            value: 'createdAt',
+            tooltip: 'The last modified time for the account'
+          },
+          {
+            text: 'Modified By',
+            value: 'createdBy',
+            tooltip: 'The last user that modified the account'
+          },
           { text: '', value: 'action', sortable: false }
         );
       }
@@ -236,17 +264,6 @@ export default {
     this.loadAccounts();
   },
   methods: {
-    // eslint-disable-next-line no-unused-vars
-    customFilter(items, search, filter) {
-      search = search.toString().toLowerCase();
-      // console.log(`Items: ${items}`)
-      // return items.includes(search);
-      return items.filter(
-        i =>
-          Object.keys(i).some(j => filter(i[j], search)) ||
-          i.policies.map(p => p.name).filter(name => name.includes(search))
-      );
-    },
     addAccount() {
       this.componentKey += 1;
       this.selectedItem = null;
@@ -287,7 +304,17 @@ export default {
         })
         .then(response => {
           if (response.success) {
-            this.entitlements = response.data;
+            let data = response.data;
+            data.forEach(function(element) {
+              if (element.policies && element.policies.length > 0) {
+                element.policySearchString = element.policies
+                  .map(e => e.name)
+                  .join('');
+              } else {
+                element.policySearchString = null;
+              }
+            });
+            this.entitlements = data;
           } else {
             this.entitlements = [];
           }
