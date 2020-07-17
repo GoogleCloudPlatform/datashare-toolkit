@@ -35,21 +35,49 @@
           >
         </v-toolbar>
       </template>
+      <template v-for="h in headers" v-slot:[`header.${h.value}`]="{ header }">
+        <v-tooltip bottom v-bind:key="h.value">
+          <template v-slot:activator="{ on }">
+            <span v-on="on">{{ h.text }}</span>
+          </template>
+          <span v-if="header.tooltip">{{ header.tooltip }}</span>
+        </v-tooltip>
+      </template>
       <template v-slot:item.createdAt="{ item }">
         {{ toLocalTime(item.createdAt) }}
       </template>
       <template v-slot:item.viewAction="{ item }">
-        <v-icon class="mr-2" @click="navigateToTable(item)">
-          {{ icons.tableHeadersEye }}
-        </v-icon>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-icon v-on="on" class="mr-2" @click="navigateToTable(item)">
+              {{ icons.tableHeadersEye }}
+            </v-icon>
+          </template>
+          <span>View in BigQuery</span>
+        </v-tooltip>
       </template>
       <template v-slot:item.action="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)">
-          edit
-        </v-icon>
-        <v-icon small @click="presentDeleteDialog(item)">
-          delete
-        </v-icon>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-icon small v-on="on" class="mr-2" @click="editItem(item)">
+              edit
+            </v-icon>
+          </template>
+          <span>Edit</span>
+        </v-tooltip>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              small
+              v-on="on"
+              class="mr-2"
+              @click="presentDeleteDialog(item)"
+            >
+              delete
+            </v-icon>
+          </template>
+          <span>Delete</span>
+        </v-tooltip>
       </template>
     </v-data-table>
     <v-data-iterator
@@ -234,13 +262,33 @@ export default {
     },
     headers() {
       let h = [
-        { text: 'Name', value: 'name' },
-        { text: 'Description', value: 'description' },
-        { text: 'Dataset Id', value: 'datasetId' },
-        { text: 'Modified At', value: 'createdAt' },
-        { text: 'Modified By', value: 'createdBy' },
-        // { text: 'Version', value: 'version' },
-        { text: '', value: 'viewAction', sortable: false },
+        { text: 'Name', value: 'name', tooltip: 'Name of the view' },
+        {
+          text: 'Description',
+          value: 'description',
+          tooltip: 'Description of the view'
+        },
+        {
+          text: 'Dataset Id',
+          value: 'datasetId',
+          tooltip: 'The BigQuery datasetId where the view resides'
+        },
+        {
+          text: 'Modified At',
+          value: 'createdAt',
+          tooltip: 'The last modified time for the dataset'
+        },
+        {
+          text: 'Modified By',
+          value: 'createdBy',
+          tooltip: 'The last user that modified the view'
+        },
+        {
+          text: 'View in BigQuery',
+          value: 'viewAction',
+          sortable: false,
+          tooltip: 'View in the BigQuery console'
+        },
         { text: '', value: 'action', sortable: false }
       ];
 
