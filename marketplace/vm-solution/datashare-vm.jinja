@@ -36,8 +36,8 @@ imports:
 {% set enableStatusWaiter = hasExternalIP %}
 {% set canIpForward = properties["ipForward"] == "On" %}
 
-{% set imageProjects = ["debian-cloud"] %}
-{% set imageNames = ["debian-9-stretch-v20200618"] %}
+{% set imageProjects = [project] %}
+{% set imageNames = ["gcp-financial-services-debian-datashare-20200716"] %}
 {% set selectedImageIndex = properties["image"]|int %}
 
 resources:
