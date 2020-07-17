@@ -363,7 +363,6 @@ export default {
   methods: {
     showDetails(item) {
       this.selectedItem = item;
-      console.log(this.selectedItem);
       this.showProductDetail = true;
     },
     closeDetailDialog(refresh) {
