@@ -85,7 +85,7 @@ async function listUserPolicies(projectId, email) {
     WHERE lower(email) = @email AND
         (ca.isDeleted IS false OR ca.isDeleted IS NULL)
 )
-SELECT datasets, rowAccessTags, marketplace
+SELECT datasets, rowAccessTags, marketplace, isTableBased
 FROM \`${table}\` cp
 JOIN currentAccount ca ON ca.policyId = cp.policyId
 WHERE

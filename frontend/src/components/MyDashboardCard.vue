@@ -100,7 +100,8 @@
               <v-expansion-panel
                 v-if="
                   this.selectedItem.datasets &&
-                    this.selectedItem.datasets.length > 0
+                    this.selectedItem.datasets.length > 0 &&
+                    this.selectedItem.isTableBased === false
                 "
               >
                 <v-expansion-panel-header
@@ -140,6 +141,49 @@
                         @click="navigateToDataset(item.datasetId)"
                       >
                         {{ icons.databaseSearch }}
+                      </v-icon>
+                    </template>
+                  </v-data-table>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+              <v-expansion-panel v-if="this.selectedItem.isTableBased === true">
+                <v-expansion-panel-header
+                  >Available Tables</v-expansion-panel-header
+                >
+                <v-expansion-panel-content>
+                  <v-data-table
+                    :headers="tableHeaders"
+                    :items="this.availableTables"
+                    :search="tableSearch"
+                    :loading="loading"
+                  >
+                    <template v-slot:loading>
+                      <v-row justify="center" align="center">
+                        <div class="text-center ma-12">
+                          <v-progress-circular
+                            v-if="loading"
+                            indeterminate
+                            color="primary"
+                          ></v-progress-circular>
+                        </div>
+                      </v-row>
+                    </template>
+                    <template v-slot:top>
+                      <v-text-field
+                        class="mb-4"
+                        v-model="tableSearch"
+                        append-icon="search"
+                        label="Search"
+                        single-line
+                        hide-details
+                      ></v-text-field>
+                    </template>
+                    <template v-slot:item.action="{ item }">
+                      <v-icon
+                        class="mr-2"
+                        @click="navigateToTable(item.datasetId, item.tableId)"
+                      >
+                        {{ icons.tableHeadersEye }}
                       </v-icon>
                     </template>
                   </v-data-table>
@@ -209,7 +253,12 @@
 </template>
 
 <script>
-import { mdiShopping, mdiCardSearch, mdiDatabaseSearch } from '@mdi/js';
+import {
+  mdiShopping,
+  mdiCardSearch,
+  mdiDatabaseSearch,
+  mdiTableHeadersEye
+} from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 
 import firebase from 'firebase/app';
@@ -230,18 +279,20 @@ export default {
         { text: 'Marketplace Plan', value: 'marketplace.planId' },
         { text: 'Marketplace Provider Message', value: 'marketplace.message' },
         { text: 'Status', value: 'status' },
-        { text: 'Datasets', value: 'datasets', sortable: false },
+        // { text: 'Datasets', value: 'datasets', sortable: false },
         { text: '', value: 'action', sortable: false }
       ],
       icons: {
         search: mdiCardSearch,
         marketplace: mdiShopping,
-        databaseSearch: mdiDatabaseSearch
+        databaseSearch: mdiDatabaseSearch,
+        tableHeadersEye: mdiTableHeadersEye
       },
       showError: false,
       showProductDetail: false,
       panel: [0],
       datasetSearch: '',
+      tableSearch: '',
       rowAccessSearch: ''
     };
   },
@@ -279,14 +330,40 @@ export default {
       ];
       return h;
     },
+    tableHeaders() {
+      let h = [
+        { text: 'Dataset Id', value: 'datasetId' },
+        { text: 'Table Id', value: 'tableId' },
+        { text: '', value: 'action', sortable: false }
+      ];
+      return h;
+    },
     rowAccessHeaders() {
       let h = [{ text: 'Tag', value: 'tag' }];
       return h;
+    },
+    availableTables() {
+      let list = [];
+      if (
+        this.selectedItem.isTableBased === true &&
+        this.selectedItem.datasets &&
+        this.selectedItem.datasets.length > 0
+      ) {
+        this.selectedItem.datasets.forEach(d => {
+          if (d.tables && d.tables.length > 0) {
+            d.tables.forEach(t => {
+              list.push({ datasetId: d.datasetId, tableId: t.tableId });
+            });
+          }
+        });
+      }
+      return list;
     }
   },
   methods: {
     showDetails(item) {
       this.selectedItem = item;
+      console.log(this.selectedItem);
       this.showProductDetail = true;
     },
     closeDetailDialog(refresh) {
@@ -320,6 +397,10 @@ export default {
     },
     navigateToDataset(item) {
       const url = `https://console.cloud.google.com/bigquery?project=${this.$store.state.settings.projectId}&p=${this.$store.state.settings.projectId}&d=${item}`;
+      window.open(url, '_blank');
+    },
+    navigateToTable(datasetId, tableId) {
+      const url = `https://console.cloud.google.com/bigquery?project=${this.$store.state.settings.projectId}&p=${this.$store.state.settings.projectId}&d=${datasetId}&t=${tableId}&page=table`;
       window.open(url, '_blank');
     }
   }
