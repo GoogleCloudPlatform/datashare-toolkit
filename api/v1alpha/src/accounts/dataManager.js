@@ -286,7 +286,6 @@ async function getAccount(projectId, accountId, email, emailType) {
         params.accountId = accountId;
     }
     else if (email && emailType) {
-        // console.log(`getAccount performing lookup by email and emailType: ${email}:${emailType}`);
         filter = 'WHERE email = @email AND emailType = @emailType'; // AND isDeleted is true
         params = { email: email, emailType: emailType };
     }
@@ -432,7 +431,7 @@ async function activate(projectId, host, token, reason, email) {
 
             // Insert the account records.
             let accountData;
-            let account = await getAccount(projectId, null, email, 'userByEmail');
+            let account = await getAccount(projectId, null, email, 'user');
             if (account.success) {
                 accountData = account.data;
                 if (accountData.policies) {
@@ -450,7 +449,7 @@ async function activate(projectId, host, token, reason, email) {
                 // Create the account
                 accountData = {
                     email: email,
-                    emailType: 'userByEmail',
+                    emailType: 'user',
                     createdBy: email,
                     marketplace: [accountRecord]
                 };
@@ -476,7 +475,7 @@ async function reset(projectId, accountId) {
     try {
         console.log(`Reset called for accountId: ${accountId}`);
         let accountData;
-        let account = await getAccount(projectId, accountId, 'userByEmail');
+        let account = await getAccount(projectId, accountId, 'user');
         if (account.success) {
             accountData = account.data;
             if (accountData.policies) {

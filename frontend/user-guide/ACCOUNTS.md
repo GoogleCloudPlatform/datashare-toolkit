@@ -16,7 +16,7 @@ The accounts UI shows a listing of all of the Accounts managed by Datashare. Wit
 
 ## <a name="creating_an_account">Creating an Account</a>
 1. Click the 'ADD ACCOUNT' button on the top right.
-2. Select the account type, 'userByEmail' for a user, 'groupByEmail' for a group.
+2. Select the account type - user or group.
 3. Enter a valid\* Google Account or Google Apps account.
 4. Check any policies that you want the account to have access to.
 5. Click 'SAVE'.

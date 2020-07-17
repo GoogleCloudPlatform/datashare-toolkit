@@ -101,7 +101,7 @@ WHERE
             e.status = 'Active';
         });
 
-        const account = await accountManager.getAccount(projectId, null, email, 'userByEmail');
+        const account = await accountManager.getAccount(projectId, null, email, 'user');
         if (account.success) {
             const accountData = account.data;
             const accountNames = accountData.marketplace.map(e => e.accountName);

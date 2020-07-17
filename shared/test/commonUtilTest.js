@@ -44,10 +44,10 @@ it("should return true for valid yaml string", () => {
     groups:
     - name: newyork_users
       access:
-      - userByEmail: benjentargaryen.327201@gmail.com
+      - user: benjentargaryen.327201@gmail.com
     - name: chicago_users
       access:
-      - userByEmail: melisandresnow.388027@gmail.com`)).is.true;
+      - user: melisandresnow.388027@gmail.com`)).is.true;
 });
 
 it("should return false for invalid yaml string", () => {
@@ -60,10 +60,10 @@ it("should return false for invalid yaml string", () => {
     groups:
     - name: newyork_users
       access:
-      - userByEmail: benjentargaryen.327201@gmail.com
+      - user: benjentargaryen.327201@gmail.com
     - name: chicago_users
       access:
-      - userByEmail: melisandresnow.388027@gmail.com`)).is.false;
+      - user: melisandresnow.388027@gmail.com`)).is.false;
 });
 
 it("should parse yaml string", () => {
@@ -76,10 +76,10 @@ it("should parse yaml string", () => {
   groups:
   - name: newyork_users
     access:
-    - userByEmail: benjentargaryen.327201@gmail.com
+    - user: benjentargaryen.327201@gmail.com
   - name: chicago_users
     access:
-    - userByEmail: melisandresnow.388027@gmail.com`)).to.not.throw;
+    - user: melisandresnow.388027@gmail.com`)).to.not.throw;
 });
 
 it("should fail to parse yaml string", () => {
@@ -93,10 +93,10 @@ it("should fail to parse yaml string", () => {
     groups:
     - name: newyork_users
       access:
-      - userByEmail: benjentargaryen.327201@gmail.com
+      - user: benjentargaryen.327201@gmail.com
     - name: chicago_users
       access:
-      - userByEmail: melisandresnow.388027@gmail.com`);
+      - user: melisandresnow.388027@gmail.com`);
     }).to.throw(/Implicit map keys need to be on a single line/);
 });
 

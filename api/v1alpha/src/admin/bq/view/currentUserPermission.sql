@@ -37,4 +37,4 @@ SELECT DISTINCT
   up.tableId,
   up.tag
 FROM userPolicies up
-WHERE up.email = SESSION_USER() AND up.emailType = 'userByEmail'
+WHERE up.email = SESSION_USER() AND up.emailType = 'user'
