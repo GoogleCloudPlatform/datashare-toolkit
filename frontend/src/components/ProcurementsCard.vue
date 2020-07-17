@@ -30,6 +30,14 @@
           ></v-text-field>
         </v-toolbar>
       </template>
+      <template v-for="h in headers" v-slot:[`header.${h.value}`]="{ header }">
+        <v-tooltip bottom v-bind:key="h.value">
+          <template v-slot:activator="{ on }">
+            <span v-on="on">{{ h.text }}</span>
+          </template>
+          <span v-if="header.tooltip">{{ header.tooltip }}</span>
+        </v-tooltip>
+      </template>
       <template v-slot:item.email="{ item }">
         {{ item.email || item.account }}
       </template>
@@ -216,16 +224,53 @@ export default {
     itemsPerPageOptions: [20, 50, 100, 200],
     itemsPerPage: 50,
     headers: [
-      { text: 'Policy', value: 'policy.name' },
-      { text: 'Product', value: 'product' },
-      { text: 'Plan', value: 'plan' },
-      { text: 'Entitlement Name', value: 'name' },
-      { text: 'Email', value: 'email' },
-      { text: 'User Activated', value: 'activated' },
-      { text: 'Message to User', value: 'messageToUser' },
-      { text: 'State', value: 'state' },
-      { text: 'Created At', value: 'createTime' },
-      { text: 'Modified At', value: 'updateTime' },
+      {
+        text: 'Policy',
+        value: 'policy.name',
+        tooltip: 'The policy name associated to the procurement request'
+      },
+      {
+        text: 'Product',
+        value: 'product',
+        tooltip: 'The GCP Marketplace Solution Id'
+      },
+      {
+        text: 'Plan',
+        value: 'plan',
+        tooltip: 'The GCP Marketplace Plan Id that was subscribed to'
+      },
+      {
+        text: 'Entitlement Name',
+        value: 'name',
+        tooltip: 'The Cloud Commerce Procurement entitlement resource name'
+      },
+      {
+        text: 'Email',
+        value: 'email',
+        tooltip: 'The email address of the subscriber'
+      },
+      {
+        text: 'User Activated',
+        value: 'activated',
+        tooltip:
+          'Indicates it he subscriber has performed the registration and activation steps'
+      },
+      {
+        text: 'Message to User',
+        value: 'messageToUser',
+        tooltip: 'Provider-supplied message that is displayed to the subscriber'
+      },
+      { text: 'State', value: 'state', tooltip: 'The state of the request' },
+      {
+        text: 'Created At',
+        value: 'createTime',
+        tooltip: 'The created time for the request'
+      },
+      {
+        text: 'Modified At',
+        value: 'updateTime',
+        tooltip: 'The last modified time for the request'
+      },
       { text: '', value: 'action', sortable: false }
     ]
   }),
