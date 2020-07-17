@@ -123,7 +123,7 @@ WHERE
                     if (entitlements && entitlements.length > 0) {
                         entitlements.forEach(e => {
                             const name = e.name.substring(e.name.lastIndexOf('/') + 1);
-                            rows.push({ marketplace: { solutionId: e.product, planId: e.plan, name: name }, status: 'Pending Approval' });
+                            rows.push({ marketplace: { solutionId: e.product, planId: e.plan, name: name, message: e.messageToUser }, status: 'Pending Approval' });
                         });
                     }
                 }

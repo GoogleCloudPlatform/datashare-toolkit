@@ -226,10 +226,9 @@ export default {
       showDialog: false,
       selectedItem: null,
       headers: [
-        // { text: 'Name', value: 'name' },
-        // { text: 'Description', value: 'description' },
         { text: 'Marketplace Solution', value: 'marketplace.solutionId' },
         { text: 'Marketplace Plan', value: 'marketplace.planId' },
+        { text: 'Marketplace Provider Message', value: 'marketplace.message' },
         { text: 'Status', value: 'status' },
         { text: 'Datasets', value: 'datasets', sortable: false },
         { text: '', value: 'action', sortable: false }
