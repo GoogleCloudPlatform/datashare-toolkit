@@ -61,7 +61,7 @@ input:
     - name: image
       title: Image version
       enumLabels:
-        '0': 'debian'
+        '0': 'gcp-financial-services-debian-datashare-20200716'
     - name: zone
       title: Zone
     - name: machineType
@@ -260,6 +260,6 @@ runtime:
 
 annotations:
   autogenSpecType: 'SINGLE_VM'
-  vmImage0: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20200714
+  vmImage0: https://www.googleapis.com/compute/v1/projects/gcp-financial-services-public/global/images/gcp-financial-services-debian-datashare-20200716
 
 metadata_version: v1
