@@ -20,7 +20,6 @@ required:
   - network
   - bootDiskType
   - bootDiskSizeGb
-  #- input_adminEmail
 
 properties:
   zone:
@@ -105,10 +104,9 @@ properties:
       type: GCE_FIREWALL_RANGE
       gceFirewallRange:
         firewallProperty: enableTcp80
-  #input_adminEmail:
-  #  type: string
-  #  x-googleProperty:
-  #    type: EMAIL_ADDRESS
+  input_adminEmail:
+    type: string
+    default: user@example.com
   input_datashareGithubReleaseVersion:
     type: string
     default: master

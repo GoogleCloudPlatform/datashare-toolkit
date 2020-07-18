@@ -1,5 +1,16 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.5.1 Release Notes
+* Build - 7/18/2020
+
+### Datashare
+* Datashare release version is 0.5.0.
+
+### Updates
+* Marketplace VM solution requires the input_adminEmail to be included in the schema even if it is not used. 
+  Added this field to the schema to resolve the Marketplace submission error. 
+
+
 ## 0.5 Release Notes
 * Build - 7/16/2020
 

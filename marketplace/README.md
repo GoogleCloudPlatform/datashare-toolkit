@@ -6,6 +6,9 @@ This folder contains the assets required to create the Marketplace VM solution a
 Currently, it only contains the `vm-solution` folder, which contains all the VM solution assets. Eventually we will create a Kubernetes solution folder for customers that 
 would like to deploy Datashare to a Kubernetes based environment.  
 
+## Releases
+View the [releases](releases/RELEASE_NOTES_VM_SOLUTION.md) page for details. 
+
 ## Requirements
 The Cloud Function must zipped, named `datashare-toolkit-cloud-function.zip` and uploaded to a Google Cloud Storage bucket.
 This file should be publicly accessible so all partners that are deploying Datashare can access the Cloud Function code.
