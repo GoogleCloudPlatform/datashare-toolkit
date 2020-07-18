@@ -9,7 +9,7 @@ description:
   tagline: Ingest, entitle, share large volumes of data.
   title: Datashare
   url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
-  version: '0.5.0'
+  version: '0.5.1'
   eulaUrl: https://raw.githubusercontent.com/GoogleCloudPlatform/datashare-toolkit/ecada698551d3022ed12afbabba5e5eae43dfb03/LICENSE.txt
   softwareGroups:
   - type: SOFTWARE_GROUP_OS
@@ -95,12 +95,6 @@ input:
       tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
       section: NETWORKING
       level: 1
-    #- name: input_adminEmail
-    #  title: Enter your e-mail here
-    #  subtext: admin email of your GCP project
-    #  tooltip: Tooltipe for this input field
-    #  validation: Please enter a valid email address
-    #  placeholder: user@example.com
     - name: input_datashareGithubReleaseVersion
       title: Github Datashare Release Version
       placeholder: v0.3.1

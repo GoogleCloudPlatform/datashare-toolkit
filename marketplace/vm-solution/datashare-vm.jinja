@@ -6,7 +6,6 @@ imports:
 - path: deploy_ui_cloud_run.py
 - path: cluster.py
 
-{% set adminEmail = properties["input_adminEmail"] %}
 {% set project = env["project"] %}
 {% set datashareGitReleaseVersion = properties["input_datashareGithubReleaseVersion"] %}
 {% set gcpRegion = properties["input_gcpRegion"] %}
@@ -163,8 +162,6 @@ resources:
 
       metadata:
         items:
-          - key: adminEmail
-            value: {{ adminEmail }}
           - key: datashareGitReleaseVersion
             value: {{ datashareGitReleaseVersion }}
           {% if deployApiToGke %}   
@@ -185,9 +182,6 @@ resources:
             value: |-
               #!/bin/bash
 
-              # use curl and metadata url to access adminEmail
-              #ADMIN_EMAIL=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/adminEmail -H "Metadata-Flavor: Google"`
-              #echo $ADMIN_EMAIL
               CLOUD_FUNCTION_ZIP_FILE_NAME="datashare-toolkit-cloud-function.zip"
               USE_RUNTIME_CONFIG_WAITER=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/useRuntimeConfigWaiter -H "Metadata-Flavor: Google"`
               echo $USE_RUNTIME_CONFIG_WAITER
