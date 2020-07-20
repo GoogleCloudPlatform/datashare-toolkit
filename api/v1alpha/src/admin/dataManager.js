@@ -228,8 +228,83 @@ async function setupDatasharePrerequisites(projectId) {
     });
 }
 
+async function initializePubSubListiner(timeout = 60) {
+    console.log(`Initializing PubSub listener`);
+    const topicName = `projects/cloudcommerceproc-prod/topics/cds-demo-2`;
+    const subscriptionName = `projects/cds-demo-2/subscriptions/procurement-cds-demo-2`;
+    const { PubSub } = require('@google-cloud/pubsub');
+    const pubSubClient = new PubSub();
+
+    const [subscriptions] = await pubSubClient.getSubscriptions();
+    const existing = underscore.findWhere(subscriptions.flatMap(e => e.metadata), { name: subscriptionName, topic: topicName });
+
+    if (existing) {
+        console.log(`Subscription '${subscriptionName}' already exists`)
+    } else {
+        await pubSubClient.topic(topicName).createSubscription(subscriptionName);
+        console.log(`Subscription '${subscriptionName}' created.`);
+    }
+
+    // Subscribe
+    function listenForMessages() {
+        // References an existing subscription
+        const subscription = pubSubClient.subscription(subscriptionName);
+
+        // Create an event handler to handle messages
+        let messageCount = 0;
+        const messageHandler = message => {
+            // Have to perform sync to avoid any syncing issues with permissions
+            console.log(`Received message ${message.id}:`);
+            console.log(`\tData: ${message.data}`);
+            console.log(`\tAttributes: ${message.attributes}`);
+            messageCount += 1;
+
+            // "Ack" (acknowledge receipt of) the message
+            message.ack();
+
+            /*
+              Handle Subscribe:
+              Received message 1380641252171122:
+              Data: {
+                  "eventId": "CREATE_ENTITLEMENT-1a701d66-f131-4bb5-96ea-b8834aece3be",
+                  "eventType": "ENTITLEMENT_CREATION_REQUESTED",
+                  "entitlement": {
+                      "id": "79041050-c3be-4777-b4ba-91b869f6e8da",
+                      "updateTime": "2020-07-20T20:29:56.854Z"
+                  }
+                  }
+  
+              Handle Cancel:
+              We don't have a way to associate other users to the purchase currently
+              Received message 1380632154523826:
+              Data: {
+                  "eventId": "CANCEL_ENTITLEMENT-ccd0ca16-5397-4cfd-94f7-50d15260ef45",
+                  "eventType": "ENTITLEMENT_CANCELLED",
+                  "entitlement": {
+                      "id": "d3c52313-c65f-43b7-987a-f089130cabad",
+                      "updateTime": "2020-07-20T20:28:27.515Z"
+                  }
+                  }
+            */
+        };
+
+        // Listen for new messages until timeout is hit
+        subscription.on('message', messageHandler);
+
+        /*
+        setTimeout(() => {
+          subscription.removeListener('message', messageHandler);
+          console.log(`${messageCount} message(s) received.`);
+        }, timeout * 1000);
+        */
+    }
+
+    listenForMessages();
+}
+
 module.exports = {
     initializeSchema,
-    syncResources
+    syncResources,
+    initializePubSubListiner
 };
 
