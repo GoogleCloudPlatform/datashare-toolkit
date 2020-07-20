@@ -252,8 +252,10 @@ export default {
       return d.toLocaleString();
     },
     navigateToMarketplace(item) {
-      const url = `https://console.cloud.google.com/marketplace/details/${this.$store.state.settings.projectId}/${item.marketplace.solutionId}`;
-      window.open(url, '_blank');
+      UrlHelper.navigateToMarketplace(
+        this.$store.state.settings.projectId,
+        item.marketplace.solutionId
+      );
     }
   }
 };
