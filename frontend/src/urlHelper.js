@@ -13,7 +13,7 @@ function navigateToTable(datasetId, tableId) {
   window.open(url, '_blank');
 }
 
-module.exports = {
+export default {
   navigateToMarketplace,
   navigateToDataset,
   navigateToTable
