@@ -74,6 +74,26 @@
           </template>
           <span>Delete</span>
         </v-tooltip>
+        <v-tooltip
+          top
+          v-if="
+            item.marketplace &&
+              item.marketplace.solutionId &&
+              item.marketplace.planId
+          "
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon
+              small
+              v-on="on"
+              class="mr-2"
+              @click="navigateToMarketplace(item)"
+            >
+              {{ icons.marketplace }}
+            </v-icon>
+          </template>
+          <span>Marketplace Page</span>
+        </v-tooltip>
       </template>
     </v-data-table>
     <Dialog
@@ -114,7 +134,7 @@
 <script>
 import Dialog from '@/components/Dialog.vue';
 import EditPolicy from '@/components/EditPolicy';
-import { mdiPlus } from '@mdi/js';
+import { mdiPlus, mdiShopping } from '@mdi/js';
 
 export default {
   components: {
@@ -165,6 +185,7 @@ export default {
         { text: '', value: 'action', sortable: false }
       ],
       icons: {
+        marketplace: mdiShopping,
         plus: mdiPlus
       }
     };
@@ -229,6 +250,10 @@ export default {
     toLocalTime(epoch) {
       let d = new Date(epoch);
       return d.toLocaleString();
+    },
+    navigateToMarketplace(item) {
+      const url = `https://console.cloud.google.com/marketplace/details/${this.$store.state.settings.projectId}/${item.marketplace.solutionId}`;
+      window.open(url, '_blank');
     }
   }
 };
