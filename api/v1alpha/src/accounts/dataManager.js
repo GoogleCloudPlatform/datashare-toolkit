@@ -519,6 +519,7 @@ async function autoApproveEntitlement(projectId, entitlementId) {
     const product = entitlement.product;
     const plan = entitlement.plan;
     console.log(`Auto approve product: ${product} and plan: ${plan}`);
+    await procurementUtil.approveEntitlement(entitlementName);
 }
 
 module.exports = {
