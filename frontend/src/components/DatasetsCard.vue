@@ -194,7 +194,7 @@
 
 <script>
 import Vue from 'vue';
-
+import UrlHelper from '../urlHelper';
 import { required, max } from 'vee-validate/dist/rules';
 import {
   extend,
@@ -414,8 +414,10 @@ export default {
       return d.toLocaleString();
     },
     navigateToDataset(item) {
-      const url = `https://console.cloud.google.com/bigquery?project=${this.$store.state.settings.projectId}&p=${this.$store.state.settings.projectId}&d=${item.datasetId}`;
-      window.open(url, '_blank');
+      UrlHelper.navigateToDataset(
+        this.$store.state.settings.projectId,
+        item.datasetId
+      );
     }
   }
 };

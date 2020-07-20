@@ -268,7 +268,7 @@ import {
   mdiTableHeadersEye
 } from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
-
+import UrlHelper from '../urlHelper';
 import firebase from 'firebase/app';
 
 export default {
@@ -414,16 +414,23 @@ export default {
       return d.toLocaleString();
     },
     navigateToMarketplace(item) {
-      const url = `https://console.cloud.google.com/marketplace/details/${this.$store.state.settings.projectId}/${item.marketplace.solutionId}`;
-      window.open(url, '_blank');
+      UrlHelper.navigateToMarketplace(
+        this.$store.state.settings.projectId,
+        item.marketplace.solutionId
+      );
     },
-    navigateToDataset(item) {
-      const url = `https://console.cloud.google.com/bigquery?project=${this.$store.state.settings.projectId}&p=${this.$store.state.settings.projectId}&d=${item}`;
-      window.open(url, '_blank');
+    navigateToDataset(datasetId) {
+      UrlHelper.navigateToDataset(
+        this.$store.state.settings.projectId,
+        datasetId
+      );
     },
     navigateToTable(datasetId, tableId) {
-      const url = `https://console.cloud.google.com/bigquery?project=${this.$store.state.settings.projectId}&p=${this.$store.state.settings.projectId}&d=${datasetId}&t=${tableId}&page=table`;
-      window.open(url, '_blank');
+      UrlHelper.navigateToTable(
+        this.$store.state.settings.projectId,
+        datasetId,
+        tableId
+      );
     }
   }
 };
