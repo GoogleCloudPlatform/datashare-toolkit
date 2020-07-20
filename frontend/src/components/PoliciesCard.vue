@@ -134,6 +134,7 @@
 <script>
 import Dialog from '@/components/Dialog.vue';
 import EditPolicy from '@/components/EditPolicy';
+import UrlHelper from '../urlHelper';
 import { mdiPlus, mdiShopping } from '@mdi/js';
 
 export default {
