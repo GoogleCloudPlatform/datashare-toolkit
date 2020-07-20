@@ -456,6 +456,9 @@ async function activate(projectId, host, token, reason, email) {
                 };
             }
 
+            // If this is an auto/approving entitlement, upon user activation, check the entitlements pending approval and
+            // their associated policies. If any, auto-approve and add them to the account policy.
+
             // This will create or update the account. At this point no new policies will be associated.
             await createOrUpdateAccount(projectId, null, accountData);
 
