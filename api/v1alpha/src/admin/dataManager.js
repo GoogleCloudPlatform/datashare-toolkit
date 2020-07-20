@@ -21,6 +21,7 @@ const underscore = require("underscore");
 const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');
 const datasetManager = require('../datasets/dataManager');
+const accountManager = require('../accounts/dataManager');
 const fs = require('fs');
 
 require.extensions['.sql'] = function (module, filename) {
@@ -246,13 +247,13 @@ async function initializePubSubListiner(timeout = 60) {
     }
 
     // Subscribe
-    function listenForMessages(projectId) {
+    async function listenForMessages(projectId) {
         // References an existing subscription
         const subscription = pubSubClient.subscription(subscriptionName);
 
         // Create an event handler to handle messages
         let messageCount = 0;
-        const messageHandler = message => {
+        const messageHandler = async message => {
             // Have to perform sync to avoid any syncing issues with permissions
             console.log(`Received message ${message.id}:`);
             console.log(`\tData: ${message.data}`);
@@ -265,10 +266,10 @@ async function initializePubSubListiner(timeout = 60) {
             if (message.data) {
                 const data = message.data;
                 const eventType = data.eventType;
-                const entitlement = data.entitlement;
-                const entitlementId = entitlement.id;
-
-                const entitlementName = 
+                if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
+                    const entitlement = data.entitlement;
+                    await accountManager.autoApproveEntitlement(projectId, entitlement.id)
+                }
             }
 
             /*

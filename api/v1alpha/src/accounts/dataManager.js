@@ -507,6 +507,20 @@ async function reset(projectId, accountId) {
     }
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} entitlementId
+ */
+async function autoApproveEntitlement(projectId, entitlementId) {
+    const procurementUtil = new CommerceProcurementUtil(projectId);
+    const entitlementName = procurementUtil.getEntitlementName(projectId, entitlementId);
+    const entitlement = await procurementUtil.getEntitlement(entitlementName);
+    console.log(entitlement);
+    const product = entitlement.product;
+    const plan = entitlement.plan;
+    console.log(`Auto approve product: ${product} and plan: ${plan}`);
+}
+
 module.exports = {
     listAccounts,
     createOrUpdateAccount,
@@ -514,5 +528,6 @@ module.exports = {
     getAccount,
     register,
     activate,
-    reset
+    reset,
+    autoApproveEntitlement
 };
