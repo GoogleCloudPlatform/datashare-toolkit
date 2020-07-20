@@ -58,6 +58,15 @@ class CommerceProcurementUtil {
     }
 
     /**
+     * @param  {} projectId
+     * @param  {} entitlementId
+     * Returns the entitlement resource name
+     */
+    getEntitlementName(projectId, entitlementId) {
+        return `providers/${projectId}/entitlements/${entitlementId}`;
+    }
+
+    /**
      * Grant an approval on Account resource
      */
     async approveAccount(name, approvalName, reason) {

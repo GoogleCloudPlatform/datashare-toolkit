@@ -246,7 +246,7 @@ async function initializePubSubListiner(timeout = 60) {
     }
 
     // Subscribe
-    function listenForMessages() {
+    function listenForMessages(projectId) {
         // References an existing subscription
         const subscription = pubSubClient.subscription(subscriptionName);
 
@@ -261,6 +261,15 @@ async function initializePubSubListiner(timeout = 60) {
 
             // "Ack" (acknowledge receipt of) the message
             message.ack();
+
+            if (message.data) {
+                const data = message.data;
+                const eventType = data.eventType;
+                const entitlement = data.entitlement;
+                const entitlementId = entitlement.id;
+
+                const entitlementName = 
+            }
 
             /*
               Handle Subscribe:
@@ -287,16 +296,8 @@ async function initializePubSubListiner(timeout = 60) {
                   }
             */
         };
-
-        // Listen for new messages until timeout is hit
+        
         subscription.on('message', messageHandler);
-
-        /*
-        setTimeout(() => {
-          subscription.removeListener('message', messageHandler);
-          console.log(`${messageCount} message(s) received.`);
-        }, timeout * 1000);
-        */
     }
 
     listenForMessages();
