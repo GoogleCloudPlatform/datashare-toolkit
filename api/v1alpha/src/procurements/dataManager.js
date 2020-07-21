@@ -175,12 +175,9 @@ async function autoApproveEntitlement(projectId, entitlementId) {
     const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
     console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
     if (policyData && policyData.success === true && policyData.data.marketplace) {
-        const policy = policyData.data.marketplace;
-        const enableAutoApprove = policy.enableAutoApprove;
+        const policy = policyData.data;
+        const enableAutoApprove = policy.marketplace.enableAutoApprove;
         if (enableAutoApprove === true) {
-            console.log(`Auto approve product: ${product} and plan: ${plan}`);
-            await procurementUtil.approveEntitlement(entitlementName);
-
             // We need to associate the user to this entitlement, so user must register and activate.
             if (accountName) {
                 // Approve the account (if it's activated in Datashare already)
@@ -189,10 +186,18 @@ async function autoApproveEntitlement(projectId, entitlementId) {
                 // which are associated to policies that allow enableAutoApprove
                 // If so, upon activating the account, associate the policy and approve the entitlement
                 const accountData = await accountManager.findMarketplaceAccount(projectId, accountName);
+                console.log(`Account data: ${JSON.stringify(accountData, null, 3)}`);
                 if (accountData && accountData.success) {
+                    console.log(`Account found will approve the entitlement`);
                     const account = accountData.data;
+                    await approveEntitlement(projectId, accountName, 'approve', null, account.accountId, policy.policyId);
+                } else {
+                    console.log(`Account not found, entitle will not be auto-approved`);
                 }
             }
+
+            console.log(`Auto approve product: ${product} and plan: ${plan}`);
+            await procurementUtil.approveEntitlement(entitlementName);
         } else {
             console.log(`Auto approve is not enabled`);
         }
