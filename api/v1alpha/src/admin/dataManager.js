@@ -244,7 +244,7 @@ async function initializePubSubListiner() {
     } else {
         console.log('gcpMetadata is unavailable, will not start PubSub listener');
         projectId = 'cds-demo-2';
-        // return;            
+        // return;
     }
 
     const topicName = `projects/cloudcommerceproc-prod/topics/${projectId}`;
