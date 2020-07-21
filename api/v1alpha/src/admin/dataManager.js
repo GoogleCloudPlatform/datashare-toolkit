@@ -231,8 +231,23 @@ async function setupDatasharePrerequisites(projectId) {
 
 async function initializePubSubListiner(timeout = 60) {
     console.log(`Initializing PubSub listener`);
-    const topicName = `projects/cloudcommerceproc-prod/topics/cds-demo-2`;
-    const subscriptionName = `projects/cds-demo-2/subscriptions/procurement-cds-demo-2`;
+
+    let projectId = '';
+    // https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata
+    const gcpMetadata = require('gcp-metadata');
+    const isAvailable = await gcpMetadata.isAvailable();
+    if (isAvailable === true) {
+        console.log('gcpMetadata is available, getting projectId');
+        projectId = await gcpMetadata.project('project-id');
+        console.log(projectId); // ...Project ID of the running instance
+    } else {
+        console.log('gcpMetadata is unavailable, will not start PubSub listener');
+        projectId = 'cds-demo-2';
+        // return;            
+    }
+
+    const topicName = `projects/cloudcommerceproc-prod/topics/${projectId}`;
+    const subscriptionName = `projects/${projectId}/subscriptions/procurement-${projectId}`;
     const { PubSub } = require('@google-cloud/pubsub');
     const pubSubClient = new PubSub();
 
@@ -248,22 +263,6 @@ async function initializePubSubListiner(timeout = 60) {
 
     // Subscribe
     async function listenForMessages() {
-        let projectId = '';
-        // https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata
-        const gcpMetadata = require('gcp-metadata');
-        const isAvailable = await gcpMetadata.isAvailable();
-        if (isAvailable === true) {
-            console.log('gcpMetadata is available, getting projectId');
-            projectId = await gcpMetadata.project('project-id');
-            console.log(projectId); // ...Project ID of the running instance
-        } else {
-            console.log('gcpMetadata is unavailable, will not start PubSub listener');
-            projectId = 'cds-demo-2';
-            // return;            
-        }
-
-        console.log(`Starting with project id: ${projectId}`);
-
         const messageHandler = async message => {
             console.log(`Received message ${message.id}:`);
             console.log(`\tData: ${message.data}`);
@@ -283,7 +282,8 @@ async function initializePubSubListiner(timeout = 60) {
             }
         };
 
-        subscription.on('message', messageHandler);
+        const sub = pubSubClient.subscription(subscriptionName);
+        sub.on('message', messageHandler);
     }
 
     listenForMessages();
