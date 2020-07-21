@@ -55,7 +55,7 @@ async function listProcurements(projectId) {
     SELECT
         policyId,
         marketplace,
-        CONCAT(marketplace.solutionId, '$||$', marketplace.planId) as marketplaceId,
+        CONCAT(marketplace.solutionId, '$||$', marketplace.planId) AS marketplaceId,
         name,
         description
     FROM \`${table}\`
@@ -89,7 +89,7 @@ WHERE marketplaceId IN UNNEST(@products)`;
             const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
             const query = `SELECT a.accountId, m.accountName, a.email
 FROM \`${table}\` a
-CROSS JOIN UNNEST(a.marketplace) as m
+CROSS JOIN UNNEST(a.marketplace) AS m
 WHERE m.accountName IN UNNEST(@accountNames)`;
 
             const options = {
@@ -170,7 +170,7 @@ async function autoApproveEntitlement(projectId, entitlementId) {
     console.log(`Entitlement: ${JSON.stringify(entitlement, null, 3)}`);
     const product = entitlement.product;
     const plan = entitlement.plan;
-    const account = entitlement.account;
+    const accountName = entitlement.account;
 
     const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
     console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
@@ -182,12 +182,16 @@ async function autoApproveEntitlement(projectId, entitlementId) {
             await procurementUtil.approveEntitlement(entitlementName);
 
             // We need to associate the user to this entitlement, so user must register and activate.
-            if (account) {
+            if (accountName) {
                 // Approve the account (if it's activated in Datashare already)
                 // Otherwise, do not approve - return, and only approve upon the account dataManager activation
                 // When activating an account, check if there are any pending entitlement activations
                 // which are associated to policies that allow enableAutoApprove
                 // If so, upon activating the account, associate the policy and approve the entitlement
+                const accountData = await accountManager.findMarketplaceAccount(projectId, accountName);
+                if (accountData && accountData.success) {
+                    const account = accountData.data;
+                }
             }
         } else {
             console.log(`Auto approve is not enabled`);

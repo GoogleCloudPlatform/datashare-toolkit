@@ -286,12 +286,12 @@ async function getAccount(projectId, accountId, email, emailType) {
         // console.log(`getAccount performing lookup by accountId: ${accountId}`);
         params.accountId = accountId;
     }
-    else if (email && emailType) {
+    else if (email && emailType) {å
         filter = 'WHERE email = @email AND emailType = @emailType'; // AND isDeleted is true
         params = { email: email, emailType: emailType };
     }
 
-    const sqlQuery = `SELECT ${fields} FROM \`${table}\` ${filter} LIMIT ${limit};`
+    const sqlQuery = `SELECT ${fields} FROM \`${table}\` ${filter};`
     const options = {
         query: sqlQuery,
         params: params
@@ -300,7 +300,33 @@ async function getAccount(projectId, accountId, email, emailType) {
     if (rows.length === 1) {
         return { success: true, data: rows[0] };
     } else {
-        const message = `Accounts do not exist with in table: '${table}'`;
+        const message = `Accounts do not exist within table: '${table}'`;
+        return { success: false, code: 400, errors: [message] };
+    }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} accountName
+ */
+async function findMarketplaceAccount(projectId, accountName) {
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+    const fields = Array.from(cfg.cdsAccountViewFields).join();
+    const limit = 1;
+
+    const sqlQuery = `SELECT ${fields}
+FROM \`${table}\` c
+CROSS JOIN UNNEST(c.marketplace) m
+WHERE m.accountName = @accountName`;
+    const options = {
+        query: sqlQuery,
+        params: { accountName: accountName }
+    };
+    const [rows] = await bigqueryUtil.executeQuery(options);
+    if (rows.length === 1) {
+        return { success: true, data: rows[0] };
+    } else {
+        const message = `Accounts does not exist within table: '${table}'`;
         return { success: false, code: 400, errors: [message] };
     }
 }
@@ -514,5 +540,6 @@ module.exports = {
     getAccount,
     register,
     activate,
-    reset
+    reset,
+    findMarketplaceAccount
 };
