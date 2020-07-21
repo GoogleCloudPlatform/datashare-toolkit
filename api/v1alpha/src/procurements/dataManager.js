@@ -139,7 +139,7 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
             const found = underscore.findWhere(policies, policyRecord);
             if (!found) {
                 policies.push(policyRecord);
-                // TODO: Get fid of this conversion
+                // TODO: Get rid of this conversion
                 accountData.policies = accountData.policies.map(e => e.policyId);
                 console.log(`Updating account: ${JSON.stringify(accountData, null, 3)}`);
                 await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
@@ -158,7 +158,27 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
     }
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} entitlementId
+ */
+async function autoApproveEntitlement(projectId, entitlementId) {
+    const procurementUtil = new CommerceProcurementUtil(projectId);
+    const entitlementName = procurementUtil.getEntitlementName(projectId, entitlementId);
+    const entitlement = await procurementUtil.getEntitlement(entitlementName);
+    console.log(entitlement);
+    const product = entitlement.product;
+    const plan = entitlement.plan;
+
+    // Look up policy by product and plan
+
+    // Get the policy check if auto-approved is enabled and approve if so.
+    console.log(`Auto approve product: ${product} and plan: ${plan}`);
+    await procurementUtil.approveEntitlement(entitlementName);
+}
+
 module.exports = {
     listProcurements,
-    approveEntitlement
+    approveEntitlement,
+    autoApproveEntitlement
 };

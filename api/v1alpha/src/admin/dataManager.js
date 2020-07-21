@@ -21,7 +21,7 @@ const underscore = require("underscore");
 const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');
 const datasetManager = require('../datasets/dataManager');
-const accountManager = require('../accounts/dataManager');
+const procurementManager = require('../procurements/dataManager');
 const fs = require('fs');
 
 require.extensions['.sql'] = function (module, filename) {
@@ -229,10 +229,11 @@ async function setupDatasharePrerequisites(projectId) {
     });
 }
 
-async function initializePubSubListiner(timeout = 60) {
+async function initializePubSubListiner() {
     console.log(`Initializing PubSub listener`);
 
     let projectId = '';
+    // https://github.com/googleapis/gcp-metadata
     // https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata
     const gcpMetadata = require('gcp-metadata');
     const isAvailable = await gcpMetadata.isAvailable();
@@ -277,7 +278,7 @@ async function initializePubSubListiner(timeout = 60) {
                 if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
                     const entitlement = data.entitlement;
                     // Perform sync to avoid multiple running at a time
-                    await accountManager.autoApproveEntitlement(projectId, entitlement.id)
+                    await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
                 }
             }
         };
