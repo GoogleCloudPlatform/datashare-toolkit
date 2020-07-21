@@ -190,13 +190,10 @@ async function autoApproveEntitlement(projectId, entitlementId) {
                 if (accountData && accountData.success) {
                     console.log(`Account found will approve the entitlement`);
                     const account = accountData.data;
-                    await approveEntitlement(projectId, accountName, 'approve', null, account.accountId, policy.policyId);
+                    await approveEntitlement(projectId, entitlementName, 'approve', null, account.accountId, policy.policyId);
                 } else {
                     console.log(`Account not found, entitle will not be auto-approved`);
                 }
-
-                console.log(`Auto approve product: ${product} and plan: ${plan}`);
-                await procurementUtil.approveEntitlement(entitlementName);
             }
         } else {
             console.log(`Auto approve is not enabled`);

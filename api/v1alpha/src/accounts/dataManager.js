@@ -456,6 +456,10 @@ async function activate(projectId, host, token, reason, email) {
             const accountRecord = { accountName: accountName };
             console.log(`accountName: ${accountName}`);
 
+            // Search entitlements to see if there is any pending entitlement for the accountName
+            // If so, check if auto approve is enabled for the associated policy,
+            // If so, add to the policies list and approve the entitlement.
+
             // Insert the account records.
             let accountData;
             let account = await getAccount(projectId, null, email, 'user');
