@@ -237,9 +237,9 @@ async function initializePubSubListiner(timeout = 60) {
     const pubSubClient = new PubSub();
 
     const [subscriptions] = await pubSubClient.getSubscriptions();
-    const existing = underscore.findWhere(subscriptions.flatMap(e => e.metadata), { name: subscriptionName, topic: topicName });
+    const subscription = underscore.findWhere(subscriptions.flatMap(e => e.metadata), { name: subscriptionName, topic: topicName });
 
-    if (existing) {
+    if (subscription) {
         console.log(`Subscription '${subscriptionName}' already exists`)
     } else {
         await pubSubClient.topic(topicName).createSubscription(subscriptionName);
@@ -247,18 +247,27 @@ async function initializePubSubListiner(timeout = 60) {
     }
 
     // Subscribe
-    async function listenForMessages(projectId) {
-        // References an existing subscription
-        const subscription = pubSubClient.subscription(subscriptionName);
+    async function listenForMessages() {
+        let projectId = '';
+        // https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata
+        const gcpMetadata = require('gcp-metadata');
+        const isAvailable = await gcpMetadata.isAvailable();
+        if (isAvailable === true) {
+            console.log('gcpMetadata is available, getting projectId');
+            projectId = await gcpMetadata.project('project-id');
+            console.log(projectId); // ...Project ID of the running instance
+        } else {
+            console.log('gcpMetadata is unavailable, will not start PubSub listener');
+            projectId = 'cds-demo-2';
+            // return;            
+        }
 
-        // Create an event handler to handle messages
-        let messageCount = 0;
+        console.log(`Starting with project id: ${projectId}`);
+
         const messageHandler = async message => {
-            // Have to perform sync to avoid any syncing issues with permissions
             console.log(`Received message ${message.id}:`);
             console.log(`\tData: ${message.data}`);
             console.log(`\tAttributes: ${message.attributes}`);
-            messageCount += 1;
 
             // "Ack" (acknowledge receipt of) the message
             message.ack();
@@ -268,36 +277,12 @@ async function initializePubSubListiner(timeout = 60) {
                 const eventType = data.eventType;
                 if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
                     const entitlement = data.entitlement;
+                    // Perform sync to avoid multiple running at a time
                     await accountManager.autoApproveEntitlement(projectId, entitlement.id)
                 }
             }
-
-            /*
-              Handle Subscribe:
-              Received message 1380641252171122:
-              Data: {
-                  "eventId": "CREATE_ENTITLEMENT-1a701d66-f131-4bb5-96ea-b8834aece3be",
-                  "eventType": "ENTITLEMENT_CREATION_REQUESTED",
-                  "entitlement": {
-                      "id": "79041050-c3be-4777-b4ba-91b869f6e8da",
-                      "updateTime": "2020-07-20T20:29:56.854Z"
-                  }
-                  }
-  
-              Handle Cancel:
-              We don't have a way to associate other users to the purchase currently
-              Received message 1380632154523826:
-              Data: {
-                  "eventId": "CANCEL_ENTITLEMENT-ccd0ca16-5397-4cfd-94f7-50d15260ef45",
-                  "eventType": "ENTITLEMENT_CANCELLED",
-                  "entitlement": {
-                      "id": "d3c52313-c65f-43b7-987a-f089130cabad",
-                      "updateTime": "2020-07-20T20:28:27.515Z"
-                  }
-                  }
-            */
         };
-        
+
         subscription.on('message', messageHandler);
     }
 
