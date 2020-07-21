@@ -225,6 +225,19 @@
                 label="Enable Purchase Auto Approve"
                 v-model="policy.marketplace.enableAutoApprove"
               ></v-switch>
+              <v-btn
+                @click="navigateToMarketplace(policy)"
+                :disabled="
+                  !(
+                    policy.marketplace &&
+                    policy.marketplace.solutionId &&
+                    policy.marketplace.planId
+                  )
+                "
+              >
+                <v-icon left>{{ icons.marketplace }}</v-icon>
+                Marketplace
+              </v-btn>
             </v-expansion-panel-content>
           </v-expansion-panel>
           <v-expansion-panel v-if="editMode">
@@ -422,6 +435,7 @@
 
 <script>
 import Vue from 'vue';
+import UrlHelper from '../urlHelper';
 
 import { required, max } from 'vee-validate/dist/rules';
 import {
@@ -469,6 +483,7 @@ function isPopulated(value) {
 }
 
 import Dialog from '@/components/Dialog.vue';
+import { mdiShopping } from '@mdi/js';
 
 Array.prototype.diff = function(a, key) {
   return this.filter(function(i) {
@@ -519,7 +534,10 @@ export default {
       datasets: [],
       tables: []
     },
-    loading: false
+    loading: false,
+    icons: {
+      marketplace: mdiShopping
+    }
   }),
   created() {
     this.loadDatasets();
@@ -914,6 +932,12 @@ export default {
       /*console.log(
         `Permission type changed, isTableBased is ${this.policy.isTableBased}`
       );*/
+    },
+    navigateToMarketplace(item) {
+      UrlHelper.navigateToMarketplace(
+        this.$store.state.settings.projectId,
+        item.marketplace.solutionId
+      );
     }
   }
 };
