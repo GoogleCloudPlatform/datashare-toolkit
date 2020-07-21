@@ -167,23 +167,22 @@ async function autoApproveEntitlement(projectId, entitlementId) {
     const procurementUtil = new CommerceProcurementUtil(projectId);
     const entitlementName = procurementUtil.getEntitlementName(projectId, entitlementId);
     const entitlement = await procurementUtil.getEntitlement(entitlementName);
-    console.log(entitlement);
     const product = entitlement.product;
     const plan = entitlement.plan;
 
-    const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
-    console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
-    if (policy && policy.marketplace) {
-        // Look up policy by product and plan
-        const enableAutoApprove = policy.marketplace.enableAutoApprove;
+    const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
+    console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
+    if (policyData && policyData.success === true && policyData.data.marketplace) {
+        const policy = policyData.data.marketplace;
+        const enableAutoApprove = policy.enableAutoApprove;
         if (enableAutoApprove === true) {
-            // Get the policy check if auto-approved is enabled and approve if so.
             console.log(`Auto approve product: ${product} and plan: ${plan}`);
             await procurementUtil.approveEntitlement(entitlementName);
+
+            // We need to associate the user to this entitlement, so user must register and activate.
         } else {
             console.log(`Auto approve is not enabled`);
         }
-        // Separately the account will be 1. registered, 2. activated (approved)
     }
 }
 

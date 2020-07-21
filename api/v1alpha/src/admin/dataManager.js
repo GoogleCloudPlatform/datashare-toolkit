@@ -273,14 +273,12 @@ async function initializePubSubListiner() {
             message.ack();
 
             if (message.data) {
-                // Convert to object
                 const data = JSON.parse(message.data);
                 console.log(`Event type is: ${data.eventType}`);
                 const eventType = data.eventType;
                 if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
                     console.log(`Running auto approve for eventType: ${eventType}`);
                     const entitlement = data.entitlement;
-                    // Perform sync to avoid multiple running at a time
                     await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
                 } else {
                     console.debug(`Event type not implemented: ${eventType}`);
