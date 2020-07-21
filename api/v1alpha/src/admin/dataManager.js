@@ -267,18 +267,23 @@ async function initializePubSubListiner() {
         const messageHandler = async message => {
             console.log(`Received message ${message.id}:`);
             console.log(`\tData: ${message.data}`);
-            console.log(`\tAttributes: ${message.attributes}`);
+            console.log(`\tAttributes: ${JSON.stringify(message.attributes)}`);
 
             // "Ack" (acknowledge receipt of) the message
             message.ack();
 
             if (message.data) {
-                const data = message.data;
+                // Convert to object
+                const data = JSON.parse(message.data);
+                console.log(`Event type is: ${data.eventType}`);
                 const eventType = data.eventType;
                 if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
+                    console.log(`Running auto approve for eventType: ${eventType}`);
                     const entitlement = data.entitlement;
                     // Perform sync to avoid multiple running at a time
                     await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
+                } else {
+                    console.debug(`Event type not implemented: ${eventType}`);
                 }
             }
         };

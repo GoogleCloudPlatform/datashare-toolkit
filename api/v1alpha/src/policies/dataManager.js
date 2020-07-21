@@ -285,9 +285,6 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
         } catch (err) {
             return { success: false, code: 500, errors: [err.message] };
         }
-        // Retrieving the record after insert makes another round-trip and is not
-        // efficient. For now, just return the original data.
-        // return await getPolicy(projectId, accountId);
         return { success: true, data: data };
     } else {
         const message = `Policy did not create with data values: '${data}'`;
@@ -304,7 +301,7 @@ async function getPolicy(projectId, policyId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const fields = Array.from(cfg.cdsPolicyViewFields).join();
     const limit = 1;
-    const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE policyId = @policyId AND isDeleted is false LIMIT ${limit};`
+    const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE policyId = @policyId AND isDeleted IS false LIMIT ${limit};`
     const options = {
         query: sqlQuery,
         params: { policyId: policyId }
@@ -314,6 +311,33 @@ async function getPolicy(projectId, policyId) {
         return { success: true, data: rows[0] };
     } else {
         const message = `Policies do not exist with in table: '${table}'`;
+        return { success: false, code: 400, errors: [message] };
+    }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} solutionId
+ * @param  {} planId
+ */
+async function findMarketplacePolicy(projectId, solutionId, planId) {
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+    const fields = Array.from(cfg.cdsPolicyViewFields).join();
+    const limit = 1;
+    const sqlQuery = `SELECT ${fields}
+FROM \`${table}\`
+WHERE
+    marketplace IS NOT NULL AND marketplace.solutionId = @solutionId AND marketplace.planId = @planId
+    AND isDeleted IS false LIMIT ${limit};`
+    const options = {
+        query: sqlQuery,
+        params: { solutionId: solutionId, planId: planId }
+    };
+    const [rows] = await bigqueryUtil.executeQuery(options);
+    if (rows.length === 1) {
+        return { success: true, data: rows[0] };
+    } else {
+        const message = `Policy not found with in table: '${table}'`;
         return { success: false, code: 400, errors: [message] };
     }
 }
@@ -384,6 +408,7 @@ module.exports = {
     createOrUpdatePolicy,
     deletePolicy,
     getPolicy,
-    listUserPolicies
+    listUserPolicies,
+    findMarketplacePolicy
 };
  

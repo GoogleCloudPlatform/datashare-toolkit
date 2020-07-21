@@ -21,6 +21,7 @@ let bigqueryUtil = new BigQueryUtil();
 const cfg = require('../lib/config');
 const underscore = require("underscore");
 const accountManager = require('../accounts/dataManager');
+const policyManager = require('../policies/dataManager');
 
 /**
  * @param  {string} projectId
@@ -170,15 +171,20 @@ async function autoApproveEntitlement(projectId, entitlementId) {
     const product = entitlement.product;
     const plan = entitlement.plan;
 
-    // Look up policy by product and plan
-    const enableAutoApprove = false;
-    if (enableAutoApprove === true) {
-        // Get the policy check if auto-approved is enabled and approve if so.
-        console.log(`Auto approve product: ${product} and plan: ${plan}`);
-        await procurementUtil.approveEntitlement(entitlementName);
+    const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
+    console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
+    if (policy && policy.marketplace) {
+        // Look up policy by product and plan
+        const enableAutoApprove = policy.marketplace.enableAutoApprove;
+        if (enableAutoApprove === true) {
+            // Get the policy check if auto-approved is enabled and approve if so.
+            console.log(`Auto approve product: ${product} and plan: ${plan}`);
+            await procurementUtil.approveEntitlement(entitlementName);
+        } else {
+            console.log(`Auto approve is not enabled`);
+        }
+        // Separately the account will be 1. registered, 2. activated (approved)
     }
-
-    // Separately the account will be 1. registered, 2. activated (approved)
 }
 
 module.exports = {
