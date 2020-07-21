@@ -171,10 +171,14 @@ async function autoApproveEntitlement(projectId, entitlementId) {
     const plan = entitlement.plan;
 
     // Look up policy by product and plan
+    const enableAutoApprove = false;
+    if (enableAutoApprove === true) {
+        // Get the policy check if auto-approved is enabled and approve if so.
+        console.log(`Auto approve product: ${product} and plan: ${plan}`);
+        await procurementUtil.approveEntitlement(entitlementName);
+    }
 
-    // Get the policy check if auto-approved is enabled and approve if so.
-    console.log(`Auto approve product: ${product} and plan: ${plan}`);
-    await procurementUtil.approveEntitlement(entitlementName);
+    // Separately the account will be 1. registered, 2. activated (approved)
 }
 
 module.exports = {
