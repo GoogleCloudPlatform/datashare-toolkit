@@ -22,7 +22,6 @@ const uuidv4 = require('uuid/v4');
 
 const ConfigValidator = require('./views/configValidator');
 const sqlBuilder = require('./views/sqlBuilder');
-const metaManager = require('../lib/metaManager');
 const cfg = require('../lib/config');
 
 /**
