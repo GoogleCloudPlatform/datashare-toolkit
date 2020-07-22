@@ -471,17 +471,17 @@ async function activate(projectId, host, token, reason, email) {
                     if (entitlements && entitlements.length > 0) {
                         const policyManager = require('../policies/dataManager');
                         for (const entitlement of entitlements) {
-                            const entitlementResourceName = entitlement.name;
+                            const entitlementName = entitlement.name;
                             const product = entitlement.product;
                             const plan = entitlement.plan;
-                            console.log(`${entitlementResourceName} is pending activation for product: ${product} and plan: ${plan}`);
+                            console.log(`${entitlementName} is pending activation for product: ${product} and plan: ${plan}`);
                             const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
                             console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
                             if (policyData && policyData.success === true && policyData.data.marketplace) {
                                 const policy = policyData.data;
                                 const enableAutoApprove = policy.marketplace.enableAutoApprove;
                                 if (enableAutoApprove === true) {
-                                    await procurementUtil.approveEntitlement(entitlementResourceName);
+                                    await procurementUtil.approveEntitlement(entitlementName);
                                     console.log(`Appending policyId to new list: ${policy.policyId}`);
                                     newPolicies.push(policy.policyId);
                                 }
