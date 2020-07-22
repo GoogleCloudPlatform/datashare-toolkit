@@ -457,36 +457,40 @@ async function activate(projectId, host, token, reason, email) {
 
             // Must approve the account first, before approving the entitlement.
             const approval = await procurementUtil.approveAccount(accountName, approvalName, reason);
-
             let newPolicies = [];
-            // Search entitlements to see if there is any pending entitlement for the accountName
-            // If so, check if auto approve is enabled for the associated policy,
-            // if true, add policies list and approve the entitlement.
-            let accountFilter = `account=${accountId}`;
-            const filterString = `state=ENTITLEMENT_ACTIVATION_REQUESTED AND (${accountFilter})`;
-            const result = await procurementUtil.listEntitlements(filterString);
-            if (result) {
-                let entitlements = result.entitlements || [];
-                if (entitlements && entitlements.length > 0) {
-                    const policyManager = require('../policies/dataManager');
-                    for (const entitlement of entitlements) {
-                        const entitlementResourceName = entitlement.name;
-                        const product = entitlement.product;
-                        const plan = entitlement.plan;
-                        console.log(`${entitlementResourceName} is pending activation for product: ${product} and plan: ${plan}`);
-                        const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
-                        console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
-                        if (policyData && policyData.success === true && policyData.data.marketplace) {
-                            const policy = policyData.data;
-                            const enableAutoApprove = policy.marketplace.enableAutoApprove;
-                            if (enableAutoApprove === true) {
-                                await procurementUtil.approveEntitlement(entitlementResourceName);
-                                console.log(`Appending policyId to new list: ${policy.policyId}`);
-                                newPolicies.push(policy.policyId);
+
+            try {
+                // Search entitlements to see if there is any pending entitlement for the accountName
+                // If so, check if auto approve is enabled for the associated policy,
+                // if true, add policies list and approve the entitlement.
+                let accountFilter = `account=${accountId}`;
+                const filterString = `state=ENTITLEMENT_ACTIVATION_REQUESTED AND (${accountFilter})`;
+                const result = await procurementUtil.listEntitlements(filterString);
+                if (result) {
+                    let entitlements = result.entitlements || [];
+                    if (entitlements && entitlements.length > 0) {
+                        const policyManager = require('../policies/dataManager');
+                        for (const entitlement of entitlements) {
+                            const entitlementResourceName = entitlement.name;
+                            const product = entitlement.product;
+                            const plan = entitlement.plan;
+                            console.log(`${entitlementResourceName} is pending activation for product: ${product} and plan: ${plan}`);
+                            const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
+                            console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
+                            if (policyData && policyData.success === true && policyData.data.marketplace) {
+                                const policy = policyData.data;
+                                const enableAutoApprove = policy.marketplace.enableAutoApprove;
+                                if (enableAutoApprove === true) {
+                                    await procurementUtil.approveEntitlement(entitlementResourceName);
+                                    console.log(`Appending policyId to new list: ${policy.policyId}`);
+                                    newPolicies.push(policy.policyId);
+                                }
                             }
                         }
                     }
                 }
+            } catch (err) {
+                console.error(`Failed to auto approve entitlement(s) for user: ${err}`);
             }
 
             // Insert the account records
