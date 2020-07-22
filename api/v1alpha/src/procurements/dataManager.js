@@ -192,7 +192,7 @@ async function autoApproveEntitlement(projectId, entitlementId) {
                     const account = accountData.data;
                     await approveEntitlement(projectId, entitlementName, 'approve', null, account.accountId, policy.policyId);
                 } else {
-                    console.log(`Account not found, entitle will not be auto-approved`);
+                    console.log(`Account not found, entitlement will not be auto-approved`);
                 }
             }
         } else {

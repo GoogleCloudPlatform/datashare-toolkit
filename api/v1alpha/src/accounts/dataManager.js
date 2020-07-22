@@ -279,14 +279,13 @@ async function createOrUpdateAccount(projectId, accountId, data) {
 async function getAccount(projectId, accountId, email, emailType) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
     const fields = Array.from(cfg.cdsAccountViewFields).join();
-    const limit = 1;
     let filter = 'WHERE accountId = @accountId AND isDeleted is false';
     let params = {};
     if (accountId) {
         // console.log(`getAccount performing lookup by accountId: ${accountId}`);
         params.accountId = accountId;
     }
-    else if (email && emailType) {å
+    else if (email && emailType) {
         filter = 'WHERE email = @email AND emailType = @emailType'; // AND isDeleted is true
         params = { email: email, emailType: emailType };
     }
@@ -312,7 +311,6 @@ async function getAccount(projectId, accountId, email, emailType) {
 async function findMarketplaceAccount(projectId, accountName) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
     const fields = Array.from(cfg.cdsAccountViewFields).join();
-    const limit = 1;
 
     const sqlQuery = `SELECT ${fields}
 FROM \`${table}\` c
@@ -451,16 +449,48 @@ async function activate(projectId, host, token, reason, email) {
         const registration = await register(projectId, host, token);
         console.log(`registration: ${JSON.stringify(registration)}`);
         if (registration.success === true) {
+            console.log('Registration success');
             const accountId = registration.data.payload.sub;
             const accountName = procurementUtil.getAccountName(projectId, accountId);
             const accountRecord = { accountName: accountName };
             console.log(`accountName: ${accountName}`);
 
+            // Must approve the account first, before approving the entitlement.
+            const approval = await procurementUtil.approveAccount(accountName, approvalName, reason);
+
+            let newPolicies = [];
             // Search entitlements to see if there is any pending entitlement for the accountName
             // If so, check if auto approve is enabled for the associated policy,
-            // If so, add to the policies list and approve the entitlement.
+            // if true, add policies list and approve the entitlement.
+            let accountFilter = `account=${accountId}`;
+            const filterString = `state=ENTITLEMENT_ACTIVATION_REQUESTED AND (${accountFilter})`;
+            const result = await procurementUtil.listEntitlements(filterString);
+            if (result) {
+                let entitlements = result.entitlements || [];
+                if (entitlements && entitlements.length > 0) {
+                    const policyManager = require('../policies/dataManager');
+                    for (const entitlement of entitlements) {
+                        const entitlementResourceName = entitlement.name;
+                        const product = entitlement.product;
+                        const plan = entitlement.plan;
+                        console.log(`${entitlementResourceName} is pending activation for product: ${product} and plan: ${plan}`);
+                        const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
+                        console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
+                        if (policyData && policyData.success === true && policyData.data.marketplace) {
+                            const policy = policyData.data;
+                            const enableAutoApprove = policy.marketplace.enableAutoApprove;
+                            if (enableAutoApprove === true) {
+                                await procurementUtil.approveEntitlement(entitlementResourceName);
 
-            // Insert the account records.
+                                console.log(`Appending policyId to new list: ${policy.policyId}`);
+                                newPolicies.push(policy.policyId);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Insert the account records
             let accountData;
             let account = await getAccount(projectId, null, email, 'user');
             if (account.success) {
@@ -486,13 +516,28 @@ async function activate(projectId, host, token, reason, email) {
                 };
             }
 
-            // If this is an auto/approving entitlement, upon user activation, check the entitlements pending approval and
-            // their associated policies. If any, auto-approve and add them to the account policy.
+            if (newPolicies.length > 0) {
+                // Initialize policies array if necessary
+                if (!accountData.policies) {
+                    console.log(`Initializing policies array`);
+                    accountData.policies = [];
+                }
+
+                newPolicies.forEach(p => {
+                    const found = accountData.policies.includes(p);
+                    if (!found) {
+                        accountData.policies.push(p);
+                        console.log(`Added policy: ${p}`);
+                    } else {
+                        console.log(`Policy already in array: ${p}`);
+                    }
+                });
+            }
 
             // This will create or update the account. At this point no new policies will be associated.
             await createOrUpdateAccount(projectId, null, accountData);
 
-            const approval = await procurementUtil.approveAccount(accountName, approvalName, reason);
+            // const approval = await procurementUtil.approveAccount(accountName, approvalName, reason);
             return { success: true, code: 200, data: approval };
         }
     } catch (err) {
