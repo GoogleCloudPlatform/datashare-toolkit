@@ -279,7 +279,7 @@ async function createOrUpdateAccount(projectId, accountId, data) {
 async function getAccount(projectId, accountId, email, emailType) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
     const fields = Array.from(cfg.cdsAccountViewFields).join();
-    let limit = 2;
+    const limit = 2;
     let filter = 'WHERE accountId = @accountId AND isDeleted is false';
     let params = {};
     if (accountId) {
@@ -312,7 +312,7 @@ async function getAccount(projectId, accountId, email, emailType) {
 async function findMarketplaceAccount(projectId, accountName) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
     const fields = Array.from(cfg.cdsAccountViewFields).join();
-    let limit = 2;
+    const limit = 2;
 
     const sqlQuery = `SELECT ${fields}
 FROM \`${table}\` c
