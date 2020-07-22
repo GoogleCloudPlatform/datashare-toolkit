@@ -22,7 +22,6 @@ const uuidv4 = require('uuid/v4');
 
 const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');
-const accountManager = require('../accounts/dataManager');
 
 /**
  * @param  {string} projectId
@@ -101,6 +100,7 @@ WHERE
             e.status = 'Active';
         });
 
+        const accountManager = require('../accounts/dataManager');
         const account = await accountManager.getAccount(projectId, null, email, 'user');
         if (account.success) {
             const accountData = account.data;
