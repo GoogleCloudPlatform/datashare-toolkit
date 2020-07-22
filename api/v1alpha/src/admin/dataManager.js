@@ -303,14 +303,14 @@ async function initializePubSubListener() {
                 maxMessages: 1,
             }
         };
-        let subscription = await pubSubUtil.getSubscription(subscriptionName, subscriberOptions);
+        let subscription = pubSubUtil.getSubscription(subscriptionName, subscriberOptions);
         subscription.on('message', messageHandler);
         subscription.on('error', errorHandler);
     }
 
     // If a new subscription was created, delay to give it time to finish creating
     // Even though the create returns a subscription object, you can't attached to .on immediately
-    let delay = exists === true ? 0 : 60000;
+    let delay = exists === true ? 0 : 20000;
     setTimeout(listenForMessages, delay);
 }
 

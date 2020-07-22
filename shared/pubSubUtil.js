@@ -106,7 +106,7 @@ class PubSubUtil {
      * @param  {} subscriptionName
      * @param  {} subscriberOptions
      */
-    async getSubscription(subscriptionName, subscriberOptions) {
+    getSubscription(subscriptionName, subscriberOptions) {
         return this.pubsub.subscription(subscriptionName, subscriberOptions);
     }
 
