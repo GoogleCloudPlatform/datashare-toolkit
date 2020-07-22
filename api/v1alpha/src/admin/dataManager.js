@@ -270,7 +270,7 @@ async function initializePubSubListener() {
 
     // Subscribe
     async function listenForMessages() {
-        console.log('Creating message handler');
+        console.log(`Creating message handler for subscription: ${subscriptionName}`);
         const messageHandler = async message => {
             console.log(`Received message ${message.id}:`);
             console.log(`\tData: ${message.data}`);
