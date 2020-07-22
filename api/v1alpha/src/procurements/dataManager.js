@@ -165,7 +165,11 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
  */
 async function autoApproveEntitlement(projectId, entitlementId) {
     const procurementUtil = new CommerceProcurementUtil(projectId);
+
+    // Get the fully qualified entitlement resource name
     const entitlementName = procurementUtil.getEntitlementName(projectId, entitlementId);
+
+    // Get the entitlement object from the procurement api
     const entitlement = await procurementUtil.getEntitlement(entitlementName);
     console.log(`Entitlement: ${JSON.stringify(entitlement, null, 3)}`);
     const product = entitlement.product;
@@ -178,6 +182,7 @@ async function autoApproveEntitlement(projectId, entitlementId) {
         const policy = policyData.data;
         const enableAutoApprove = policy.marketplace.enableAutoApprove;
         if (enableAutoApprove === true) {
+            console.log(`Auto approve is enabled for policy ${policy.policyId}, will check if the user account is already activated`);
             // We need to associate the user to this entitlement, so user must register and activate.
             if (accountName) {
                 // Approve the account (if it's activated in Datashare already)
@@ -188,15 +193,20 @@ async function autoApproveEntitlement(projectId, entitlementId) {
                 const accountData = await accountManager.findMarketplaceAccount(projectId, accountName);
                 console.log(`Account data: ${JSON.stringify(accountData, null, 3)}`);
                 if (accountData && accountData.success) {
-                    console.log(`Account found will approve the entitlement`);
+                    console.log(`Account is already activated, will now proceed to approve the entitlement`);
                     const account = accountData.data;
+                    
+                    // We should not auto approve the entitlement if the account was not activated
+                    // as if the account wasn't activated yet, we do not know the email address for the associated user
+                    // As a side note, an entitlement cannot be approved unless the associated account is already activated
+                    // the account should always be approved first, followed by the entitlement
                     await approveEntitlement(projectId, entitlementName, 'approve', null, account.accountId, policy.policyId);
                 } else {
-                    console.log(`Account not found, entitlement will not be auto-approved`);
+                    console.log(`Account was not found, entitlement will not be auto-approved`);
                 }
             }
         } else {
-            console.log(`Auto approve is not enabled`);
+            console.log(`Auto approve is not enabled for policy: ${policy.policyId}`);
         }
     }
 }
