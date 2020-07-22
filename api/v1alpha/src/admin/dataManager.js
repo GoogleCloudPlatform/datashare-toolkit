@@ -243,8 +243,14 @@ async function initializePubSubListiner() {
         console.log(projectId); // ...Project ID of the running instance
     } else {
         console.log('gcpMetadata is unavailable, will not start PubSub listener');
-        projectId = 'cds-demo-2';
-        // return;
+
+        if (process.env.NODE_ENV === 'production' || process.env.VUE_APP_APICLIENT == 'server') {
+            console.log('Could not identify project, will not start up subscription');
+            return;
+        } else {
+            console.log('Running locally will default to demo project');
+            projectId = 'cds-demo-2';
+        }
     }
 
     const topicName = `projects/cloudcommerceproc-prod/topics/${projectId}`;
