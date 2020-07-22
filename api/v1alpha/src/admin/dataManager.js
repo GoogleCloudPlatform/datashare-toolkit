@@ -310,7 +310,7 @@ async function initializePubSubListiner() {
 
     // If a new subscription was created, delay to give it time to finish creating
     // Even though the create returns a subscription object, you can't attached to .on immediately
-    let delay = 0; // exists === true ? 0 : 20000;
+    let delay = exists === true ? 0 : 60000;
     setTimeout(listenForMessages, delay);
 }
 
