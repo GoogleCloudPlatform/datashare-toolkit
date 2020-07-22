@@ -481,7 +481,6 @@ async function activate(projectId, host, token, reason, email) {
                             const enableAutoApprove = policy.marketplace.enableAutoApprove;
                             if (enableAutoApprove === true) {
                                 await procurementUtil.approveEntitlement(entitlementResourceName);
-
                                 console.log(`Appending policyId to new list: ${policy.policyId}`);
                                 newPolicies.push(policy.policyId);
                             }
