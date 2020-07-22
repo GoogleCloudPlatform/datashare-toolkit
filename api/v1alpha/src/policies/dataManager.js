@@ -300,8 +300,7 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
 async function getPolicy(projectId, policyId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const fields = Array.from(cfg.cdsPolicyViewFields).join();
-    const limit = 1;
-    const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE policyId = @policyId AND isDeleted IS false LIMIT ${limit};`
+    const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE policyId = @policyId AND isDeleted IS false;`
     const options = {
         query: sqlQuery,
         params: { policyId: policyId }
@@ -410,4 +409,3 @@ module.exports = {
     listUserPolicies,
     findMarketplacePolicy
 };
- 
