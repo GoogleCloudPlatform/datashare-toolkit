@@ -29,7 +29,7 @@
             "mode": "NULLABLE",
             "name": "isTableBased",
             "type": "BOOLEAN",
-            "description": "The flag to indicate if the policy is table-based otherwisre dataset-based"
+            "description": "The flag to indicate if the policy is table-based otherwise dataset-based"
         },
         {
             "fields": [
@@ -87,6 +87,12 @@
                     "mode": "REQUIRED",
                     "name": "planId",
                     "type": "STRING"
+                },
+                {
+                    "mode": "REQUIRED",
+                    "name": "enableAutoApprove",
+                    "type": "BOOLEAN",
+                    "description": "The flag indicates if the purchase through Marketplace should be auto-approved and entitled for the subscriber."
                 }
             ]
         },

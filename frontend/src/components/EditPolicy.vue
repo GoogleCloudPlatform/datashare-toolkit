@@ -220,6 +220,11 @@
                   label="Plan Id"
                 ></v-text-field>
               </ValidationProvider>
+              <v-switch
+                v-if="false"
+                label="Enable Purchase Auto Approve"
+                v-model="policy.marketplace.enableAutoApprove"
+              ></v-switch>
               <v-btn
                 @click="navigateToMarketplace(policy)"
                 :disabled="
@@ -518,7 +523,7 @@ export default {
       rowAccessTags: [],
       initialDatasets: [],
       initialRowAccessTags: [],
-      marketplace: { solutionId: null, planId: null }
+      marketplace: { solutionId: null, planId: null, enableAutoApprove: false }
     },
     datasetSearch: '',
     tableSearch: '',
@@ -716,7 +721,9 @@ export default {
           ) {
             data.marketplace = {
               solutionId: this.policy.marketplace.solutionId,
-              planId: this.policy.marketplace.planId
+              planId: this.policy.marketplace.planId,
+              enableAutoApprove:
+                this.policy.marketplace.enableAutoApprove || false
             };
           }
 
@@ -786,7 +793,11 @@ export default {
             if (p.marketplace) {
               this.policy.marketplace = p.marketplace;
             } else {
-              this.policy.marketplace = { solutionId: '', planId: '' };
+              this.policy.marketplace = {
+                solutionId: '',
+                planId: '',
+                enableAutoApprove: false
+              };
             }
           }
           this.loading = false;
