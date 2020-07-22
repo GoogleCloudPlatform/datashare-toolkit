@@ -221,7 +221,6 @@
                 ></v-text-field>
               </ValidationProvider>
               <v-switch
-                v-if="false"
                 label="Enable Purchase Auto Approve"
                 v-model="policy.marketplace.enableAutoApprove"
               ></v-switch>
