@@ -323,12 +323,11 @@ async function getPolicy(projectId, policyId) {
 async function findMarketplacePolicy(projectId, solutionId, planId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const fields = Array.from(cfg.cdsPolicyViewFields).join();
-    const limit = 1;
     const sqlQuery = `SELECT ${fields}
 FROM \`${table}\`
 WHERE
     marketplace IS NOT NULL AND marketplace.solutionId = @solutionId AND marketplace.planId = @planId
-    AND isDeleted IS false LIMIT ${limit};`
+    AND isDeleted IS false;`
     const options = {
         query: sqlQuery,
         params: { solutionId: solutionId, planId: planId }
