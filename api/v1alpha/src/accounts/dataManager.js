@@ -545,7 +545,6 @@ async function activate(projectId, host, token, reason, email) {
             // This will create or update the account. At this point no new policies will be associated.
             await createOrUpdateAccount(projectId, null, accountData);
 
-            // const approval = await procurementUtil.approveAccount(accountName, approvalName, reason);
             return { success: true, code: 200, data: approval };
         }
     } catch (err) {
