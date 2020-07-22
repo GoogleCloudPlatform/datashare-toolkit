@@ -63,11 +63,11 @@ class PubSubUtil {
      * create subscription by name and return true
      */
     async createSubscription(topicName, subscriptionName) {
-        await this.pubsub.topic(topicName).createSubscription(subscriptionName);
+        const sub = await this.pubsub.topic(topicName).createSubscription(subscriptionName);
         if (this.VERBOSE_MODE) {
             console.log(`Subscription '${subscriptionName}' created for '${topicName}'.`);
         }
-        return true;
+        return sub[0];
     }
 
     /**
@@ -88,6 +88,7 @@ class PubSubUtil {
      * @param  {string} subscriptionProjectId
      * @param  {string} subscriptionName
      * check if the subscription exists by name and return true if exists
+     * this function will only work if you have the necessary permissions on the topic
      */
     async checkIfSubscriptionExists(topicName, subscriptionProjectId, subscriptionName) {
         const topic = this.pubsub.topic(topicName);
@@ -99,6 +100,13 @@ class PubSubUtil {
             console.log(`Checking if subscription exists: '${topicName}': ${formattedSubscription}`);
         }
         return exists;
+    }
+
+    /**
+     * @param  {} subscriptionName
+     */
+    async getSubscription(subscriptionName) {
+        return this.pubsub.subscription(subscriptionName);
     }
 
     /**

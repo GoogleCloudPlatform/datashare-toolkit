@@ -16,7 +16,7 @@
 
 'use strict';
 
-const { BigQueryUtil } = require('cds-shared');
+const { BigQueryUtil, PubSubUtil } = require('cds-shared');
 const underscore = require("underscore");
 const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');
@@ -258,21 +258,20 @@ async function initializePubSubListiner() {
 
     const topicName = `projects/cloudcommerceproc-prod/topics/${projectId}`;
     const subscriptionName = `projects/${projectId}/subscriptions/procurement-${projectId}`;
-    const { PubSub } = require('@google-cloud/pubsub');
-    const pubSubClient = new PubSub();
-
-    const [subscriptions] = await pubSubClient.getSubscriptions();
-    const subscription = underscore.findWhere(subscriptions.flatMap(e => e.metadata), { name: subscriptionName, topic: topicName });
-
-    if (subscription) {
+    const pubSubUtil = new PubSubUtil(projectId);
+    const exists = await pubSubUtil.checkIfSubscriptionExists(topicName, projectId, `procurement-${projectId}`);
+    let subscription;
+    if (exists === true) {
+        subscription = await pubSubUtil.getSubscription(subscriptionName);
         console.log(`Subscription '${subscriptionName}' already exists`)
     } else {
-        await pubSubClient.topic(topicName).createSubscription(subscriptionName);
+        subscription = await pubSubUtil.createSubscription(topicName, subscriptionName);
         console.log(`Subscription '${subscriptionName}' created.`);
     }
 
     // Subscribe
     async function listenForMessages() {
+        console.log('Creating message handler');
         const messageHandler = async message => {
             console.log(`Received message ${message.id}:`);
             console.log(`\tData: ${message.data}`);
@@ -295,11 +294,13 @@ async function initializePubSubListiner() {
             }
         };
 
-        const sub = pubSubClient.subscription(subscriptionName);
-        sub.on('message', messageHandler);
+        subscription.on('message', messageHandler);
     }
 
-    listenForMessages();
+    // If a new subscription was created, delay to give it time to finish creating
+    // Even though the create returns a subscription object, you can't attached to .on immediately
+    let delay = exists === true ? 0 : 10000;
+    setTimeout(listenForMessages, delay);
 }
 
 module.exports = {
