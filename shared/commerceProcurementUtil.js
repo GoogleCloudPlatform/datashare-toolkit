@@ -93,7 +93,6 @@ class CommerceProcurementUtil {
      * get Account resource
      */
     async getAccount(name) {
-        console.log(name);
         const client = await this.getClient();
         try {
             const res = await client.providers.accounts.get({
@@ -204,7 +203,6 @@ class CommerceProcurementUtil {
      */
     async getEntitlement(name) {
         const client = await this.getClient();
-        console.log(client);
         try {
             const res = await client.providers.entitlements.get({
                 name: name
