@@ -279,6 +279,7 @@ async function createOrUpdateAccount(projectId, accountId, data) {
 async function getAccount(projectId, accountId, email, emailType) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
     const fields = Array.from(cfg.cdsAccountViewFields).join();
+    let limit = 2;
     let filter = 'WHERE accountId = @accountId AND isDeleted is false';
     let params = {};
     if (accountId) {
@@ -290,7 +291,7 @@ async function getAccount(projectId, accountId, email, emailType) {
         params = { email: email, emailType: emailType };
     }
 
-    const sqlQuery = `SELECT ${fields} FROM \`${table}\` ${filter};`
+    const sqlQuery = `SELECT ${fields} FROM \`${table}\` ${filter} LIMIT ${limit};`
     const options = {
         query: sqlQuery,
         params: params
@@ -311,11 +312,13 @@ async function getAccount(projectId, accountId, email, emailType) {
 async function findMarketplaceAccount(projectId, accountName) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
     const fields = Array.from(cfg.cdsAccountViewFields).join();
+    let limit = 2;
 
     const sqlQuery = `SELECT ${fields}
 FROM \`${table}\` c
 CROSS JOIN UNNEST(c.marketplace) m
-WHERE m.accountName = @accountName`;
+WHERE m.accountName = @accountName
+LIMIT ${limit}`;
     const options = {
         query: sqlQuery,
         params: { accountName: accountName }

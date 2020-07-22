@@ -300,7 +300,8 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
 async function getPolicy(projectId, policyId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const fields = Array.from(cfg.cdsPolicyViewFields).join();
-    const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE policyId = @policyId AND isDeleted IS false;`
+    let limit = 2;
+    const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE policyId = @policyId AND isDeleted IS false LIMIT ${limit};`
     const options = {
         query: sqlQuery,
         params: { policyId: policyId }
@@ -322,11 +323,13 @@ async function getPolicy(projectId, policyId) {
 async function findMarketplacePolicy(projectId, solutionId, planId) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const fields = Array.from(cfg.cdsPolicyViewFields).join();
+    let limit = 2;
     const sqlQuery = `SELECT ${fields}
 FROM \`${table}\`
 WHERE
     marketplace IS NOT NULL AND marketplace.solutionId = @solutionId AND marketplace.planId = @planId
-    AND isDeleted IS false;`
+    AND isDeleted IS false
+LIMIT ${limit};`
     const options = {
         query: sqlQuery,
         params: { solutionId: solutionId, planId: planId }
