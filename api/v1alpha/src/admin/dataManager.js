@@ -16,11 +16,12 @@
 
 'use strict';
 
-const { BigQueryUtil } = require('cds-shared');
+const { BigQueryUtil, PubSubUtil } = require('cds-shared');
 const underscore = require("underscore");
 const cfg = require('../lib/config');
 const metaManager = require('../lib/metaManager');
 const datasetManager = require('../datasets/dataManager');
+const procurementManager = require('../procurements/dataManager');
 const fs = require('fs');
 
 require.extensions['.sql'] = function (module, filename) {
@@ -228,8 +229,94 @@ async function setupDatasharePrerequisites(projectId) {
     });
 }
 
+/**
+ * Initializes PubSub listener for entitlement auto approvals
+ */
+async function initializePubSubListener() {
+    console.log(`Initializing PubSub listener`);
+
+    let projectId = '';
+    // https://github.com/googleapis/gcp-metadata
+    // https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata
+    const gcpMetadata = require('gcp-metadata');
+    const isAvailable = await gcpMetadata.isAvailable();
+    if (isAvailable === true) {
+        console.log('gcpMetadata is available, getting projectId');
+        projectId = await gcpMetadata.project('project-id');
+        console.log(projectId); // ...Project ID of the running instance
+    } else {
+        console.log('gcpMetadata is unavailable, will not start PubSub listener');
+
+        if (process.env.NODE_ENV === 'production' || process.env.VUE_APP_APICLIENT == 'server') {
+            console.log('Could not identify project, will not start up subscription');
+            return;
+        } else {
+            console.log('Running locally will default to demo project');
+            projectId = 'cds-demo-2';
+        }
+    }
+
+    const topicName = `projects/cloudcommerceproc-prod/topics/${projectId}`;
+    const subscriptionName = `projects/${projectId}/subscriptions/procurement-${projectId}`;
+    const pubSubUtil = new PubSubUtil(projectId);
+    const exists = await pubSubUtil.checkIfSubscriptionExists(topicName, projectId, `procurement-${projectId}`);
+
+    if (exists === true) {
+        console.log(`Subscription '${subscriptionName}' already exists`)
+    } else {
+        await pubSubUtil.createSubscription(topicName, subscriptionName);
+        console.log(`Subscription '${subscriptionName}' created.`);
+    }
+
+    // Subscribe
+    async function listenForMessages() {
+        console.log(`Creating message handler for subscription: ${subscriptionName}`);
+        const messageHandler = async message => {
+            console.log(`Received message ${message.id}:`);
+            console.log(`\tData: ${message.data}`);
+            console.log(`\tAttributes: ${JSON.stringify(message.attributes)}`);
+
+            // "Ack" (acknowledge receipt of) the message
+            message.ack();
+
+            if (message.data) {
+                const data = JSON.parse(message.data);
+                console.log(`Event type is: ${data.eventType}`);
+                const eventType = data.eventType;
+                if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
+                    console.log(`Running auto approve for eventType: ${eventType}`);
+                    const entitlement = data.entitlement;
+                    await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
+                } else {
+                    console.debug(`Event type not implemented: ${eventType}`);
+                }
+            }
+        };
+
+        // Create an event handler to handle errors
+        const errorHandler = function (error) {
+            console.error(`ERROR: ${error}`);
+        };
+
+        const subscriberOptions = {
+            flowControl: {
+                maxMessages: 1,
+            }
+        };
+        let subscription = pubSubUtil.getSubscription(subscriptionName, subscriberOptions);
+        subscription.on('message', messageHandler);
+        subscription.on('error', errorHandler);
+    }
+
+    // If a new subscription was created, delay to give it time to finish creating
+    // Even though the create returns a subscription object, you can't attached to .on immediately
+    let delay = exists === true ? 0 : 60000;
+    setTimeout(listenForMessages, delay);
+}
+
 module.exports = {
     initializeSchema,
-    syncResources
+    syncResources,
+    initializePubSubListener
 };
 

@@ -58,6 +58,15 @@ class CommerceProcurementUtil {
     }
 
     /**
+     * @param  {} projectId
+     * @param  {} entitlementId
+     * Returns the entitlement resource name
+     */
+    getEntitlementName(projectId, entitlementId) {
+        return `providers/${projectId}/entitlements/${entitlementId}`;
+    }
+
+    /**
      * Grant an approval on Account resource
      */
     async approveAccount(name, approvalName, reason) {
@@ -84,7 +93,6 @@ class CommerceProcurementUtil {
      * get Account resource
      */
     async getAccount(name) {
-        console.log(name);
         const client = await this.getClient();
         try {
             const res = await client.providers.accounts.get({
@@ -195,7 +203,6 @@ class CommerceProcurementUtil {
      */
     async getEntitlement(name) {
         const client = await this.getClient();
-        console.log(client);
         try {
             const res = await client.providers.entitlements.get({
                 name: name

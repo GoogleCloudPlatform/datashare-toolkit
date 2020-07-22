@@ -21,7 +21,8 @@
         "axios": "^0.19.2",
         "jsonwebtoken": "^8.5.1",
         "jwks-rsa": "^1.8.0",
-        "ms": "^2.1.2"
+        "ms": "^2.1.2",
+        "gcp-metadata": "^4.1.4"
     },
     "scripts": {
         "dev": "nodemon src/index.js",

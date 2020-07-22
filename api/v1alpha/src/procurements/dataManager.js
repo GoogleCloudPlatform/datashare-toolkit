@@ -21,6 +21,7 @@ let bigqueryUtil = new BigQueryUtil();
 const cfg = require('../lib/config');
 const underscore = require("underscore");
 const accountManager = require('../accounts/dataManager');
+const policyManager = require('../policies/dataManager');
 
 /**
  * @param  {string} projectId
@@ -54,7 +55,7 @@ async function listProcurements(projectId) {
     SELECT
         policyId,
         marketplace,
-        CONCAT(marketplace.solutionId, '$||$', marketplace.planId) as marketplaceId,
+        CONCAT(marketplace.solutionId, '$||$', marketplace.planId) AS marketplaceId,
         name,
         description
     FROM \`${table}\`
@@ -88,7 +89,7 @@ WHERE marketplaceId IN UNNEST(@products)`;
             const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
             const query = `SELECT a.accountId, m.accountName, a.email
 FROM \`${table}\` a
-CROSS JOIN UNNEST(a.marketplace) as m
+CROSS JOIN UNNEST(a.marketplace) AS m
 WHERE m.accountName IN UNNEST(@accountNames)`;
 
             const options = {
@@ -139,7 +140,7 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
             const found = underscore.findWhere(policies, policyRecord);
             if (!found) {
                 policies.push(policyRecord);
-                // TODO: Get fid of this conversion
+                // TODO: Get rid of this conversion
                 accountData.policies = accountData.policies.map(e => e.policyId);
                 console.log(`Updating account: ${JSON.stringify(accountData, null, 3)}`);
                 await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
@@ -158,7 +159,60 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
     }
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} entitlementId
+ */
+async function autoApproveEntitlement(projectId, entitlementId) {
+    const procurementUtil = new CommerceProcurementUtil(projectId);
+
+    // Get the fully qualified entitlement resource name
+    const entitlementName = procurementUtil.getEntitlementName(projectId, entitlementId);
+
+    // Get the entitlement object from the procurement api
+    const entitlement = await procurementUtil.getEntitlement(entitlementName);
+    console.log(`Entitlement: ${JSON.stringify(entitlement, null, 3)}`);
+    const product = entitlement.product;
+    const plan = entitlement.plan;
+    const accountName = entitlement.account;
+
+    const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
+    console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
+    if (policyData && policyData.success === true && policyData.data.marketplace) {
+        const policy = policyData.data;
+        const enableAutoApprove = policy.marketplace.enableAutoApprove;
+        if (enableAutoApprove === true) {
+            console.log(`Auto approve is enabled for policy ${policy.policyId}, will check if the user account is already activated`);
+            // We need to associate the user to this entitlement, so user must register and activate.
+            if (accountName) {
+                // Approve the account (if it's activated in Datashare already)
+                // Otherwise, do not approve - return, and only approve upon the account dataManager activation
+                // When activating an account, check if there are any pending entitlement activations
+                // which are associated to policies that allow enableAutoApprove
+                // If so, upon activating the account, associate the policy and approve the entitlement
+                const accountData = await accountManager.findMarketplaceAccount(projectId, accountName);
+                console.log(`Account data: ${JSON.stringify(accountData, null, 3)}`);
+                if (accountData && accountData.success) {
+                    console.log(`Account is already activated, will now proceed to approve the entitlement`);
+                    const account = accountData.data;
+                    
+                    // We should not auto approve the entitlement if the account was not activated
+                    // as if the account wasn't activated yet, we do not know the email address for the associated user
+                    // As a side note, an entitlement cannot be approved unless the associated account is already activated
+                    // the account should always be approved first, followed by the entitlement
+                    await approveEntitlement(projectId, entitlementName, 'approve', null, account.accountId, policy.policyId);
+                } else {
+                    console.log(`Account was not found, entitlement will not be auto-approved`);
+                }
+            }
+        } else {
+            console.log(`Auto approve is not enabled for policy: ${policy.policyId}`);
+        }
+    }
+}
+
 module.exports = {
     listProcurements,
-    approveEntitlement
+    approveEntitlement,
+    autoApproveEntitlement
 };

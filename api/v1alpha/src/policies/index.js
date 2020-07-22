@@ -63,6 +63,9 @@ var policies = express.Router();
  *         description: Policy row access tags
  *         items:
  *           $ref: '#/definitions/RowAccessTag'
+ *       marketplace:
+ *         $ref: '#/definitions/Marketplace'
+ *         description: Associated Marketplace solution information
  *     required:
  *       - name
  *
@@ -70,9 +73,23 @@ var policies = express.Router();
  *     type: object
  *     description: Policy Row Access Tag object
  *     properties:
- *       name:
+ *       tag:
  *         type: string
  *         description: Row Access Tag
+ * 
+ *   Marketplace:
+ *     type: object
+ *     description: Marketplace object
+ *     properties:
+ *       solutionId:
+ *         type: string
+ *         description: The marketplace solutionId, also known as the product
+ *       planId:
+ *         type: string
+ *         description: The marketplace planId, also known as the plan
+ *       enableAutoApprove:
+ *         type: boolean
+ *         description: Indicates if the purchasing account should automatically be added to the policy
  */
 
 /**

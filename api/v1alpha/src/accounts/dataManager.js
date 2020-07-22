@@ -279,7 +279,7 @@ async function createOrUpdateAccount(projectId, accountId, data) {
 async function getAccount(projectId, accountId, email, emailType) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
     const fields = Array.from(cfg.cdsAccountViewFields).join();
-    const limit = 1;
+    const limit = 2;
     let filter = 'WHERE accountId = @accountId AND isDeleted is false';
     let params = {};
     if (accountId) {
@@ -300,7 +300,34 @@ async function getAccount(projectId, accountId, email, emailType) {
     if (rows.length === 1) {
         return { success: true, data: rows[0] };
     } else {
-        const message = `Accounts do not exist with in table: '${table}'`;
+        const message = `Accounts do not exist within table: '${table}'`;
+        return { success: false, code: 400, errors: [message] };
+    }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} accountName
+ */
+async function findMarketplaceAccount(projectId, accountName) {
+    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+    const fields = Array.from(cfg.cdsAccountViewFields).join();
+    const limit = 2;
+
+    const sqlQuery = `SELECT ${fields}
+FROM \`${table}\` c
+CROSS JOIN UNNEST(c.marketplace) m
+WHERE m.accountName = @accountName
+LIMIT ${limit}`;
+    const options = {
+        query: sqlQuery,
+        params: { accountName: accountName }
+    };
+    const [rows] = await bigqueryUtil.executeQuery(options);
+    if (rows.length === 1) {
+        return { success: true, data: rows[0] };
+    } else {
+        const message = `Accounts does not exist within table: '${table}'`;
         return { success: false, code: 400, errors: [message] };
     }
 }
@@ -425,12 +452,56 @@ async function activate(projectId, host, token, reason, email) {
         const registration = await register(projectId, host, token);
         console.log(`registration: ${JSON.stringify(registration)}`);
         if (registration.success === true) {
+            console.log('Registration success');
             const accountId = registration.data.payload.sub;
             const accountName = procurementUtil.getAccountName(projectId, accountId);
             const accountRecord = { accountName: accountName };
             console.log(`accountName: ${accountName}`);
 
-            // Insert the account records.
+            // Must approve the account first, before approving the entitlement.
+            const approval = await procurementUtil.approveAccount(accountName, approvalName, reason);
+            let newPolicies = [];
+
+            try {
+                // Create filter for the list entitlements request, filtering on the current user procurement account id
+                // where the entitlement is in pending state = 'ENTITLEMENT_ACTIVATION_REQUESTED'
+                let accountFilter = `account=${accountId}`;
+                const filterString = `state=ENTITLEMENT_ACTIVATION_REQUESTED AND (${accountFilter})`;
+                const result = await procurementUtil.listEntitlements(filterString);
+                if (result) {
+                    let entitlements = result.entitlements || [];
+                    if (entitlements && entitlements.length > 0) {
+                        const policyManager = require('../policies/dataManager');
+                        for (const entitlement of entitlements) {
+                            const entitlementName = entitlement.name;
+                            const product = entitlement.product;
+                            const plan = entitlement.plan;
+                            console.log(`${entitlementName} is pending activation for product: ${product} and plan: ${plan}`);
+
+                            // Check the policy table to see if there is a policy object matching the marketplace product and plan
+                            const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
+                            console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
+                            if (policyData && policyData.success === true && policyData.data.marketplace) {
+                                const policy = policyData.data;
+                                const enableAutoApprove = policy.marketplace.enableAutoApprove;
+
+                                // If enableAutoApprove is set to true, approve the entitlement via the procurement api
+                                if (enableAutoApprove === true) {
+                                    await procurementUtil.approveEntitlement(entitlementName);
+
+                                    // Append the policyId to the new list of policies to add to the Datashare user account
+                                    console.log(`Appending policyId to new list: ${policy.policyId}`);
+                                    newPolicies.push(policy.policyId);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error(`Failed to auto approve entitlement(s) for user: ${err}`);
+            }
+
+            // Insert the account records
             let accountData;
             let account = await getAccount(projectId, null, email, 'user');
             if (account.success) {
@@ -456,10 +527,27 @@ async function activate(projectId, host, token, reason, email) {
                 };
             }
 
+            if (newPolicies.length > 0) {
+                // Initialize policies array if necessary
+                if (!accountData.policies) {
+                    console.log(`Initializing policies array`);
+                    accountData.policies = [];
+                }
+
+                newPolicies.forEach(p => {
+                    const found = accountData.policies.includes(p);
+                    if (!found) {
+                        accountData.policies.push(p);
+                        console.log(`Added policy: ${p}`);
+                    } else {
+                        console.log(`Policy already in array: ${p}`);
+                    }
+                });
+            }
+
             // This will create or update the account. At this point no new policies will be associated.
             await createOrUpdateAccount(projectId, null, accountData);
 
-            const approval = await procurementUtil.approveAccount(accountName, approvalName, reason);
             return { success: true, code: 200, data: approval };
         }
     } catch (err) {
@@ -511,5 +599,6 @@ module.exports = {
     getAccount,
     register,
     activate,
-    reset
+    reset,
+    findMarketplaceAccount
 };
