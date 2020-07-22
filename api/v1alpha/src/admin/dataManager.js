@@ -260,12 +260,11 @@ async function initializePubSubListiner() {
     const subscriptionName = `projects/${projectId}/subscriptions/procurement-${projectId}`;
     const pubSubUtil = new PubSubUtil(projectId);
     const exists = await pubSubUtil.checkIfSubscriptionExists(topicName, projectId, `procurement-${projectId}`);
-    let subscription;
+
     if (exists === true) {
-        subscription = await pubSubUtil.getSubscription(subscriptionName);
         console.log(`Subscription '${subscriptionName}' already exists`)
     } else {
-        subscription = await pubSubUtil.createSubscription(topicName, subscriptionName);
+        await pubSubUtil.createSubscription(topicName, subscriptionName);
         console.log(`Subscription '${subscriptionName}' created.`);
     }
 
@@ -294,12 +293,24 @@ async function initializePubSubListiner() {
             }
         };
 
+        // Create an event handler to handle errors
+        const errorHandler = function (error) {
+            console.error(`ERROR: ${error}`);
+        };
+
+        const subscriberOptions = {
+            flowControl: {
+                maxMessages: 1,
+            }
+        };
+        let subscription = await pubSubUtil.getSubscription(subscriptionName, subscriberOptions);
         subscription.on('message', messageHandler);
+        subscription.on('error', errorHandler);
     }
 
     // If a new subscription was created, delay to give it time to finish creating
     // Even though the create returns a subscription object, you can't attached to .on immediately
-    let delay = exists === true ? 0 : 10000;
+    let delay = 0; // exists === true ? 0 : 20000;
     setTimeout(listenForMessages, delay);
 }
 
