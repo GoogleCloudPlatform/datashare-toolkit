@@ -232,7 +232,7 @@ async function setupDatasharePrerequisites(projectId) {
 /**
  * Initializes PubSub listener for entitlement auto approvals
  */
-async function initializePubSubListiner() {
+async function initializePubSubListener() {
     console.log(`Initializing PubSub listener`);
 
     let projectId = '';
@@ -317,6 +317,6 @@ async function initializePubSubListiner() {
 module.exports = {
     initializeSchema,
     syncResources,
-    initializePubSubListiner
+    initializePubSubListener
 };
 
