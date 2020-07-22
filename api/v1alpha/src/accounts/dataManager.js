@@ -460,9 +460,8 @@ async function activate(projectId, host, token, reason, email) {
             let newPolicies = [];
 
             try {
-                // Search entitlements to see if there is any pending entitlement for the accountName
-                // If so, check if auto approve is enabled for the associated policy,
-                // if true, add policies list and approve the entitlement.
+                // Create filter for the list entitlements request, filtering on the current user procurement account id
+                // where the entitlement is in pending state = 'ENTITLEMENT_ACTIVATION_REQUESTED'
                 let accountFilter = `account=${accountId}`;
                 const filterString = `state=ENTITLEMENT_ACTIVATION_REQUESTED AND (${accountFilter})`;
                 const result = await procurementUtil.listEntitlements(filterString);
@@ -475,13 +474,19 @@ async function activate(projectId, host, token, reason, email) {
                             const product = entitlement.product;
                             const plan = entitlement.plan;
                             console.log(`${entitlementName} is pending activation for product: ${product} and plan: ${plan}`);
+
+                            // Check the policy table to see if there is a policy object matching the marketplace product and plan
                             const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
                             console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
                             if (policyData && policyData.success === true && policyData.data.marketplace) {
                                 const policy = policyData.data;
                                 const enableAutoApprove = policy.marketplace.enableAutoApprove;
+
+                                // If enableAutoApprove is set to true, approve the entitlement via the procurement api
                                 if (enableAutoApprove === true) {
                                     await procurementUtil.approveEntitlement(entitlementName);
+
+                                    // Append the policyId to the new list of policies to add to the Datashare user account
                                     console.log(`Appending policyId to new list: ${policy.policyId}`);
                                     newPolicies.push(policy.policyId);
                                 }

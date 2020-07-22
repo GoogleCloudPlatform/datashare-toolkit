@@ -229,6 +229,9 @@ async function setupDatasharePrerequisites(projectId) {
     });
 }
 
+/**
+ * Initializes PubSub listener for entitlement auto approvals
+ */
 async function initializePubSubListiner() {
     console.log(`Initializing PubSub listener`);
 
