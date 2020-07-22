@@ -305,6 +305,6 @@ app.listen(PORT, () => {
 });
 
 const adminMgr = require('./admin/dataManager');
-adminMgr.initializePubSubListiner();
+adminMgr.initializePubSubListener();
 
 module.exports = app;
