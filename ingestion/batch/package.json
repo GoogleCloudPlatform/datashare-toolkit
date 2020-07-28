@@ -12,7 +12,7 @@
   },
   "scripts": {
     "start": "functions-framework --target=processHttpEvent",
-    "deploy": "../bin/deploy.sh",
+    "deploy": "./bin/deploy.sh",
     "lint": "eslint .",
     "test": "nyc mocha --timeout 60000",
     "cloudtest": "nyc mocha --timeout 60000 --projectId=${PROJECT_ID} --runCloudTests",
