@@ -8,7 +8,7 @@ data. While the source data in this example contains many columns,
 the data is being reduced to share only three columns: the observation
 timestamp, the measurement's coordinates as a `GEOGRAPHY` type (manufactured by calling the
 [ST_GeogPoint](https://cloud.google.com/bigquery/docs/reference/standard-sql/geography_functions#st_geogpoint)
-function) column, and the mean temperature that comprises the observation. Datashare will also add a `cds_batch_id` column automatically, to associate groups of rows in the table with their specific ingestion cycle.
+function) column, and the mean temperature that comprises the observation. Datashare will also add a `datashare_batch_id` column automatically, to associate groups of rows in the table with their specific ingestion cycle.
 
 ## Quick start
 
