@@ -18,5 +18,5 @@
 
 var config = {};
 config.pathPrefix = 'datashare';
-config.unitTestsBucketName = `${config.pathPrefix}-unit-tests`;
+config.unitTestBucketName = `${config.pathPrefix}-unit-tests`;
 module.exports = config;
