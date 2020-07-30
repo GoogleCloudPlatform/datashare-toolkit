@@ -22,8 +22,8 @@ const bigqueryUtil = new BigQueryUtil();
 const cloudFunctionUtil = new CloudFunctionUtil();
 const storageUtil = new StorageUtil();
 const stagingTableExpiryDays = 2;
-const processPrefix = "datashare";
-const batchIdColumnName = `${processPrefix}_batch_id`;
+const cfg = require('./config');
+const batchIdColumnName = `${cfg.pathPrefix}_batch_id`;
 const labelName = "datashare_managed";
 const queryResultTimeoutMs = 540000;
 let batchId;
@@ -212,7 +212,7 @@ async function createTransformJob(config, query) {
             ? "WRITE_TRUNCATE"
             : "WRITE_APPEND",
         query: query,
-        jobPrefix: `${processPrefix}_`,
+        jobPrefix: `${cfg.pathPrefix}_`,
         timePartitioning: {
             type: 'DAY'
         }
