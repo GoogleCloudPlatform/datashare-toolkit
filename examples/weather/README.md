@@ -26,12 +26,12 @@ npm run deploy -- --trigger-bucket=gs://${BUCKET}
 cd ../../examples/weather/config/ingestion
 
 # deploy configuration files for source data
-gsutil cp schema.json gs://${BUCKET}/cds/weather/observation/config/schema.json
-gsutil cp transform.sql gs://${BUCKET}/cds/weather/observation/config/transform.sql
+gsutil cp schema.json gs://${BUCKET}/datashare/weather/observation/config/schema.json
+gsutil cp transform.sql gs://${BUCKET}/datashare/weather/observation/config/transform.sql
 cd ../../data
 
 # copy source data to bucket
-gsutil cp weather.observation.csv.gz gs://${BUCKET}/cds/weather/observation/data/weather.observation.csv.gz
+gsutil cp weather.observation.csv.gz gs://${BUCKET}/datashare/weather/observation/data/weather.observation.csv.gz
 sleep 60 # wait for ingestion
 
 # check the number of records ingested
@@ -82,8 +82,8 @@ Copying file://weather.observation.csv.gz [Content-Type=text/csv]...
 Operation completed over 1 objects/353.9 KiB.                                    
 [{"entry_count":"100"}]
 Removing gs://8579a775c4e8a114b13b94fdd07677c0/weather.observation.csv.gz#1572590184078408...
-Removing gs://8579a775c4e8a114b13b94fdd07677c0/cds/observation.schema.json#1572590178619078...
-Removing gs://8579a775c4e8a114b13b94fdd07677c0/cds/observation.transform.sql#1572590181630862...
+Removing gs://8579a775c4e8a114b13b94fdd07677c0/datashare/observation.schema.json#1572590178619078...
+Removing gs://8579a775c4e8a114b13b94fdd07677c0/datashare/observation.transform.sql#1572590181630862...
 / [3 objects]                                                                   
 Operation completed over 3 objects.                                              
 Removing gs://8579a775c4e8a114b13b94fdd07677c0/...
