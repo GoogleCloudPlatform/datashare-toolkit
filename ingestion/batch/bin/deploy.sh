@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 #
-# Copyright 2019 Google LLC
+# Copyright 2019-2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,14 @@ if [ "$#" -ne 1 ]; then
     echo "Usage: $0 [ --trigger-bucket ]" >&2
     exit 1
 fi
+
+function finish {
+    popd
+}
+trap finish EXIT
+
+DIR=`dirname "$BASH_SOURCE"`
+pushd $DIR
 
 BUCKET_NAME=""
 
@@ -103,16 +111,19 @@ if [ -z "$FUNCTION_REGION" ]; then
     exit 7
 else
     echo "Function region: ${FUNCTION_REGION}"
-    FUNCTION_SHARED="../../batch/shared"
+    FUNCTION_SHARED="../shared"
     if [ -d "${FUNCTION_SHARED}" ]; then
         rm -R "${FUNCTION_SHARED}"
     fi
+    ## mkdir "${FUNCTION_SHARED}"
+    echo "Function shared path: ${FUNCTION_SHARED}"
+
     # Symlinks do not work, have to physical copy the directory
     echo "Copying shared module into function directory"
-    cp -R ../../../shared "${FUNCTION_SHARED}/"
+    cp -R "../../../shared/" "${FUNCTION_SHARED}/"
 
     echo "Creating backup of package.json"
-    cp ../../batch/package.json ../../batch/package.json.bak
+    cp ../package.json ../package.json.bak
     UNAME=$(uname | awk '{print tolower($0)}')
     if [ "$UNAME" == "darwin" ]; then
         # macOS
@@ -127,9 +138,10 @@ else
     gcloud functions deploy ${FUNCTION_NAME:-processUpload} --region=${FUNCTION_REGION} --memory=256MB --source=../../batch --runtime=nodejs10 --entry-point=processEvent --timeout=540s --trigger-bucket="${BUCKET_NAME}" --quiet --set-env-vars=VERBOSE_MODE=true,ARCHIVE_FILES=false
 
     echo "Restoring original package.json"
-    mv -f ../../batch/package.json.bak ../../batch/package.json
+    mv -f ../package.json.bak ../package.json
 
     echo "Removing shared directory from function directory"
     rm -R "${FUNCTION_SHARED}"
+
     exit 0
 fi
