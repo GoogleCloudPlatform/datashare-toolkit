@@ -1,40 +1,40 @@
-[Back to DS](../../README.md)
+[Back to Datashare](../../README.md)
 
-# Example scenario using weather observation data
+# Example scenario using sample weather observation data
 
 ## Overview
-For this DS example, we configure and load weather observation
-data. While the raw data used in this scenario contains many columns,
-we are going to restrict the transformed data to only three columns: a
+For this Datashare example, you configure and load sample weather observation 
+data. While the source data in this example contains many columns,
+the data is being reduced to share only three columns: the observation
 timestamp, the measurement's coordinates as a `GEOGRAPHY` type (manufactured by calling the
 [ST_GeogPoint](https://cloud.google.com/bigquery/docs/reference/standard-sql/geography_functions#st_geogpoint)
-function), and the mean temperature that comprises the observation. The
-destination table will also contain the `cds_batch_id` column, that
-is added automatically by `DS`, so that you may
-associate the table data with its specific ingestion cycle.
+function) column, and the mean temperature that comprises the observation. Datashare will also add a `datashare_batch_id` column automatically, to associate groups of rows in the table with their specific ingestion cycle.
 
 ## Quick start
+
+*NOTE*: _The examples below assume you are in the Datashare root directory and logged into the current project with sufficient credentials to create storage buckets and BigQuery objects._
+
 
 ```
 # create new bucket
 BUCKET=$(head -1 /dev/random | md5)
 gsutil mb gs://${BUCKET}
-cd bq-datashare-toolkit/ingestion/function
+cd ingestion/batch
 
 # deploy ingestion function to bucket
 npm run deploy -- --trigger-bucket=gs://${BUCKET}
 cd ../../examples/weather/config/ingestion
 
 # deploy configuration files for source data
-gsutil cp observation.schema.json gs://${BUCKET}/cds/
-gsutil cp observation.transform.sql gs://${BUCKET}/cds/
+gsutil cp schema.json gs://${BUCKET}/datashare/weather/observation/config/schema.json
+gsutil cp transform.sql gs://${BUCKET}/datashare/weather/observation/config/transform.sql
 cd ../../data
 
 # copy source data to bucket
-gsutil cp weather.observation.csv.gz gs://${BUCKET}
+gsutil cp weather.observation.csv.gz gs://${BUCKET}/datashare/weather/observation/data/weather.observation.csv.gz
 sleep 60 # wait for ingestion
 
-# check number of records ingested
+# check the number of records ingested
 echo "SELECT COUNT(*) AS entry_count FROM weather.observation" | bq --quiet --format=json --headless query
 
 # remove bucket
@@ -82,8 +82,8 @@ Copying file://weather.observation.csv.gz [Content-Type=text/csv]...
 Operation completed over 1 objects/353.9 KiB.                                    
 [{"entry_count":"100"}]
 Removing gs://8579a775c4e8a114b13b94fdd07677c0/weather.observation.csv.gz#1572590184078408...
-Removing gs://8579a775c4e8a114b13b94fdd07677c0/cds/observation.schema.json#1572590178619078...
-Removing gs://8579a775c4e8a114b13b94fdd07677c0/cds/observation.transform.sql#1572590181630862...
+Removing gs://8579a775c4e8a114b13b94fdd07677c0/datashare/observation.schema.json#1572590178619078...
+Removing gs://8579a775c4e8a114b13b94fdd07677c0/datashare/observation.transform.sql#1572590181630862...
 / [3 objects]                                                                   
 Operation completed over 3 objects.                                              
 Removing gs://8579a775c4e8a114b13b94fdd07677c0/...
@@ -91,25 +91,24 @@ Removing gs://8579a775c4e8a114b13b94fdd07677c0/...
 
 ## Ingestion
 
-The source data file is relatively wide, but let's imagine that the goal for
-the destination dataset is to distill the source data down to only three
+The source data file is relatively wide, but imagine that the goal for
+the destination dataset is to reduce the source data down to only three
 columns:
 
-* A timestamp column for the observation
-* A geographic column to hold the coordinates of where the observation
-  was made
+* A column for the observation timestamp
+* A geographic column to hold the observation's geographical coordinates
 * The actual measurement observed (`mean_temperature`, in this case)
 
 The `schema.json` file will map to the
-[entire representation](config/ingestion/observation.schema.json) of
+[entire representation](config/ingestion/schema.json) of
 the source file being ingested.
 
 The `transform.sql` configuration file will do the work of transforming
-the source columns to the ultimate destination data format. This
+the source columns to the destination data format. This
 formatting is inferred by the types returned by the SQL fragment
-you specify in [observation.transform.sql](config/ingestion/observation.transform.sql).
+you specify in [transform.sql](config/ingestion/transform.sql).
 
-The `transform.sql` is:
+The `transform.sql` contents are:
 
 ```
   DATE AS `timestamp`,
@@ -118,13 +117,11 @@ The `transform.sql` is:
   HLY_TEMP_NORMAL AS `mean_temperature`
 ```
 
-(`DS` adds the `SELECT` and `FROM` clauses dynamically at runtime,
-so they are always omitted from the contents of `transform.sql`.)
+(Datashare adds the `SELECT` and `FROM` clauses at runtime)
 
 Since the date is already provided in a format BigQuery
 will recognize as a `TIMESTAMP`, we can simply select the column and name
-it (via SQL's `AS`) according
-to the desired destination column name.
+it (via SQL's `AS`) according to the desired destination column name.
 
 The source data stores the measurement coordinates data as two separate
 columns for longitude and latitude. Since BigQuery natively supports a
@@ -133,5 +130,5 @@ value, we'll collapse those independent values into the single column
 using the [ST_GeogPoint](https://cloud.google.com/bigquery/docs/reference/standard-sql/geography_functions#st_geogpoint) BigQuery function inline.
 
 Finally, the observation payload is also copied without
-transformation, aside from naming the column `mean_temperature`.
+transformation, aside from renaming the column `mean_temperature`.
 

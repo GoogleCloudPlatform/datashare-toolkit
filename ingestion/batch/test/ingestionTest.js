@@ -23,6 +23,7 @@ const storageUtil = new StorageUtil();
 const bigqueryUtil = new BigQueryUtil(argv.projectId);
 const fs = require('fs');
 const path = require('path');
+const cfg = require('../config');
 
 const assert = require('assert');
 const chai = require('chai'), expect = chai.expect, should = chai.should();
@@ -32,7 +33,7 @@ chai.use(chaiAsPromised);
 process.env.ARCHIVE_FILES = "true";
 const ingestion = require("../index");
 const uuid = uuidv4().replace(/-/gi, '');
-const bucketName = "cds-unit-tests";
+const bucketName = cfg.unitTestBucketName;
 
 it("getExceptionString empty dictionary", () => {
     const e = {};
@@ -58,10 +59,10 @@ if (argv.runCloudTests) {
         const datasetName = `${uuid}`;
         const tableName = "observation";
 
-        let schemaBucketFile = `cds/${datasetName}/${tableName}/config/schema.json`;
-        let sqlBucketFile = `cds/${datasetName}/${tableName}/config/transform.sql`;
-        let dataBucketFile = `cds/${datasetName}/${tableName}/data/weather.observation.csv`;
-        let dataArchiveBucketFile = `cds/${datasetName}/${tableName}/data/archive/weather.observation.csv`;
+        let schemaBucketFile = `${cfg.pathPrefix}/${datasetName}/${tableName}/config/schema.json`;
+        let sqlBucketFile = `${cfg.pathPrefix}/${datasetName}/${tableName}/config/transform.sql`;
+        let dataBucketFile = `${cfg.pathPrefix}/${datasetName}/${tableName}/data/weather.observation.csv`;
+        let dataArchiveBucketFile = `${cfg.pathPrefix}/${datasetName}/${tableName}/data/archive/weather.observation.csv`;
 
         let schemaFileCreated = false;
         let sqlFileCreated = false;

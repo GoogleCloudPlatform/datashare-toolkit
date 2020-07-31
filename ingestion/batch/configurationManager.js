@@ -22,6 +22,7 @@ const commonUtil = CommonUtil;
 const acceptable = ['csv', 'gz', 'txt', 'avro', 'json'];
 const path = require("path");
 const underscore = require("underscore");
+const cfg = require('./config');
 
 /**
  * @param  {} options
@@ -55,22 +56,22 @@ async function validateOptions(options, validateStorage) {
             console.log(`Path parts: ${pathParts}`);
 
             if (pathParts.length !== 4) {
-                errors.push(`Path must contain 4 components for data files. Provided: '${pathParts}'. Path must start with 'cds' and the data file must be in a directory named 'data'.`);
+                errors.push(`Path must contain 4 components for data files. Provided: '${pathParts}'. Path must start with '${cfg.pathPrefix}' and the data file must be in a directory named 'data'.`);
             }
             else {
-                // Path parts should contain n. IE: /cds/dataset/table/data, /cds/dataset/table/config
+                // Path parts should contain n. IE: /${cfg.pathPrefix}/dataset/table/data, /${cfg.pathPrefix}/dataset/table/config
                 const first = underscore.first(pathParts);
                 const last = underscore.last(pathParts);
-                if (first !== "cds") {
-                    errors.push(`First level directory must be named 'cds', current is '${first}'`);
+                if (first !== cfg.pathPrefix) {
+                    errors.push(`First level directory must be named '${cfg.pathPrefix}', current is '${first}'`);
                 }
                 if (last !== "data") {
                     errors.push(`Last level directory must be named 'data', current is '${last}'`);
                 }
             }
 
-            if (!pathCheck(pathParts, 0, "cds")) {
-                errors.push("The first path component must be 'cds' only");
+            if (!pathCheck(pathParts, 0, cfg.pathPrefix)) {
+                errors.push(`The first path component must be '${cfg.pathPrefix}' only`);
             }
             if (!pathCheck(pathParts, 3, "data")) {
                 errors.push("The fourth path component must be 'data' only");
@@ -171,9 +172,9 @@ function parseDerivedFileAttributes(options) {
     const schemaFileBucketPath = path.join(bucketPath, "..", "config", `schema.json`);
     const transformFileBucketPath = path.join(bucketPath, "..", "config", `transform.sql`);
     const archivePath = path.join(bucketPath, "archive", `${basename}`);
-    const isDataFile = (pathParts.length === 4 && pathParts[0].toLowerCase() === "cds" && pathParts[3].toLowerCase() === "data");
-    const isConfigFile = (pathParts.length === 4 && pathParts[0].toLowerCase() === "cds" && pathParts[3].toLowerCase() === "config");
-    const isArchived = (pathParts.length === 5 && pathParts[0].toLowerCase() === "cds" && pathParts[3].toLowerCase() === "data" && pathParts[4].toLowerCase() === "archive");
+    const isDataFile = (pathParts.length === 4 && pathParts[0].toLowerCase() === cfg.pathPrefix && pathParts[3].toLowerCase() === "data");
+    const isConfigFile = (pathParts.length === 4 && pathParts[0].toLowerCase() === cfg.pathPrefix && pathParts[3].toLowerCase() === "config");
+    const isArchived = (pathParts.length === 5 && pathParts[0].toLowerCase() === cfg.pathPrefix && pathParts[3].toLowerCase() === "data" && pathParts[4].toLowerCase() === "archive");
 
     let isDirectoryPath = false;
     if (options.fileName.endsWith("/")) {
