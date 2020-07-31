@@ -9,16 +9,16 @@
         * [Service Plans](#service_plans)
 
 ## <a name="becoming_a_marketplace_vendor">Becoming a Marketplace vendor</a>
-In order to integrate Datashare with the GCP Marketplace, you must first sign up to become a [Google Cloud Marketplace vendor](https://cloud.google.com/marketplace/docs/partners). Once you have been approved as a partner you may then list your data solutions within Marketplace.
+In order to integrate Datashare with Google Cloud Marketplace, you must first sign up to become a [Google Cloud Marketplace vendor](https://cloud.google.com/marketplace/docs/partners). Once you have been approved as a partner you may then list your data solutions within Marketplace.
 
 ## <a name="creating_your_first_solution">Creating your first solution</a>
-In order to create a data solution in GCP Marketplace and sell it, follow the instructions below:
+In order to create a data solution in Google Cloud Marketplace and sell it, follow the instructions below:
 
 1. Go to [Partner Portal](https://console.cloud.google.com/partner/solutions).
-2. On the top navigation menu, cick '+ ADD SOLUTION'.
+2. Click "Solutions" on the left hand tab, and then click '+ ADD SOLUTION'.
 3. Enter a solution name, select solution type of 'Managed service' and pricing type 'Billed by Google'.
 4. Go to edit for 'SOLUTION METADATA' and fill in the required information and click 'Save'.
-    * If you do not yet want to make your solution public in the GCP Marketplace, ensure the 'Hide solution from end users' checkbox is checked.
+    * If you do not yet want to make your solution public in Google Cloud Marketplace, ensure the 'Hide solution from end users' checkbox is checked.
 5. Go to edit for 'SOLUTION DETAILS' and fill in the required information and click 'Save'.
 6. Go to edit for 'PLANS & FEATURES'. For more information on this section see [Plans & Features](#plans_and_features).
     * For the Signup URL, use the following: ```https://[YOUR_DATASHARE_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/accounts:register```
@@ -28,7 +28,7 @@ In order to create a data solution in GCP Marketplace and sell it, follow the in
     * Add your [service features](#service_features). Service features can be included in multiple plans.
     * Configure your [service plans](#service_plans). Service plans can encompass multiple features.
 7. (TODO: This is incomplete) Complete the billing on-boarding spreadsheet here - TBD. The billing setup process will take up to two weeks to complete. Reach out to the GCP Marketing Partner team for more information.
-8. Go to the Datashare 'Policies' UI. In the examples below we defined three service plans. To support three service plans defined in the GCP Marketplace Solution, we will need to [create](./POLICIES.md/#creating_a_policy) three separate Datashare policies.
+8. Go to the Datashare 'Policies' UI. In the examples below we defined three service plans. To support three service plans defined in the Google Cloud Marketplace Solution, we will need to [create](./POLICIES.md/#creating_a_policy) three separate Datashare policies.
 9. Within each policy, scroll down to the 'Marketplace' section and enter in the 'Solution Id' and the 'Plan Id' (Service Level) that you defined in the services and plans section of partner portal. The 'Solution Id' was generated when you created a solution name in step 3. If you're unsure of what it is, load the [solutions](https://console.cloud.google.com/partner/solutions) page to check.
 
 ## <a name="marketplace_concepts">Marketplace Concepts</a>
@@ -61,4 +61,4 @@ Once you've finished configuring plans, you can review the matrix that was gener
 
 <img src="./assets/features_and_pricing.png" alt="Marketplace Features and Pricing" height="150"/>
 
-This is similiar to the view that your potential customers will see when they're shopping the GCP Marketplace and are viewing your solution.
+This is similar to the view that your potential customers will see when they're shopping Google Cloud Marketplace and are viewing your solution.
