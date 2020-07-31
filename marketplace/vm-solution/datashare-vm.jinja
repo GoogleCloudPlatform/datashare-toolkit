@@ -127,7 +127,7 @@ resources:
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
       waiterConfigName: {{ configName }}
       deployApiToGke: {{ deployApiToGke }}
-      sourceImage: https://www.googleapis.com/compute/v1/projects/{{ imageProjects[selectedImageIndex] }}/global/images/{{ imageNames[selectedImageIndex] }}
+      sourceImage: https://www.googleapis.com/compute/v1/projects/gcp-financial-services-public/global/images/{{ imageNames[selectedImageIndex] }}
       zone: {{ zone }}
       machineType: {{ machineType }}
       networks:
