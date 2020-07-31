@@ -19,13 +19,25 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
+DIR=`dirname "$BASH_SOURCE"`
+pushd $DIR
+
+FUNCTION_SHARED="../shared"
+
 function finish {
+    if [ -d "${FUNCTION_SHARED}" ]; then
+        echo "Removing shared directory from function directory"
+        rm -R "${FUNCTION_SHARED}"
+    fi
+
+    if [ -f ../package.json.bak ]; then
+        echo "Restoring original package.json"
+        mv -f ../package.json.bak ../package.json
+    fi
+
     popd
 }
 trap finish EXIT
-
-DIR=`dirname "$BASH_SOURCE"`
-pushd $DIR
 
 BUCKET_NAME=""
 
@@ -111,12 +123,9 @@ if [ -z "$FUNCTION_REGION" ]; then
     exit 7
 else
     echo "Function region: ${FUNCTION_REGION}"
-    FUNCTION_SHARED="../shared"
     if [ -d "${FUNCTION_SHARED}" ]; then
         rm -R "${FUNCTION_SHARED}"
     fi
-    ## mkdir "${FUNCTION_SHARED}"
-    echo "Function shared path: ${FUNCTION_SHARED}"
 
     # Symlinks do not work, have to physical copy the directory
     echo "Copying shared module into function directory"
