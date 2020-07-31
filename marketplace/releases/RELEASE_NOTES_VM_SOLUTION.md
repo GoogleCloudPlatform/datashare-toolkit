@@ -1,5 +1,18 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.5.2 Release Notes
+* Build - 7/31/2020
+
+### Datashare
+* Datashare release version is 0.4.1
+
+### Updates
+* Changed the Datashare Github release version to v0.4.1 .
+
+### Bug Fixes
+* When a user attempted to install Datashare via the Marketplace, it attempted to use the Datashare VM image from the user's project, 
+but this image in included in the gcp-financial-services-public project. Modified the URL to point to the gcp-financial-services-public project.
+
 ## 0.5.1 Release Notes
 * Build - 7/18/2020
 

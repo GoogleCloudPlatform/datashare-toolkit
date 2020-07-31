@@ -1,7 +1,7 @@
 {
   "defaultDeploymentType": "SINGLE_VM",
-  "imageName": "debian-9-stretch-v20200521",
-  "projectId": "fsi-cds-markeplace-sw-dev",
+  "imageName": "gcp-financial-services-debian-datashare-20200716",
+  "projectId": "gcp-financial-services-public",
   "templateName": "nonexistent_template",
   "useSolutionPackage": true
 }
