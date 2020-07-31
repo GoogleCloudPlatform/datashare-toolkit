@@ -7,7 +7,8 @@
 * Datashare release version is 0.4.1
 
 ### Updates
-* Changed the Datashare Github release version to v0.4.1 .
+* Changed the Datashare Github release version to v0.4.1.
+* Increased the waiter timeout to 900 seconds from 600 seconds.
 
 ### Bug Fixes
 * When a user attempted to install Datashare via the Marketplace, it attempted to use the Datashare VM image from the user's project, 
