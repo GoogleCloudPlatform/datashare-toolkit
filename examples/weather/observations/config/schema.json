@@ -29,8 +29,8 @@
 				"mode": "NULLABLE"
 			},
 			{
-				"type": "TIMESTAMP",
-				"name": "STRING",
+				"type": "STRING",
+				"name": "DATE",
 				"mode": "NULLABLE"
 			},
 			{
