@@ -109,7 +109,7 @@ properties:
     default: user@example.com
   input_datashareGithubReleaseVersion:
     type: string
-    default: master
+    default: v0.4.1
   input_gcpRegion:
     type: string
     default: us-central1
