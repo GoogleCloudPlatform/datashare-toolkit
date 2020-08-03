@@ -211,7 +211,7 @@ async function createTransformJob(config, query) {
         const isAvailable = await gcpMetadata.isAvailable();
         if (isAvailable === true) {
             projectId = await gcpMetadata.project('project-id');
-            console.log(projectId); // ...Project ID of the running instance 
+            console.log(`Project Id is: ${projectId}`); // ...Project ID of the running instance 
         } else {
             console.log('gcpMetadata is unavailable, unable to determine projectId');
             throw new Error('Unable to determine GCP Project Id');
