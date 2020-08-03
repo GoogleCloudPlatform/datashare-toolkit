@@ -201,9 +201,28 @@ async function stageFile(config) {
  */
 async function createTransformJob(config, query) {
     console.log(`Configuration for runTransform: ${JSON.stringify(config)}`);
+
+    // process.env.GCP_PROJECT is currently used by unit tests
+    // This var is not supported in cloud function node.js 10 + environments
+    // https://cloud.google.com/functions/docs/env-var#nodejs_10_and_subsequent_runtimes
+    let projectId = null;
+    if (!process.env.GCP_PROJECT) {
+        const gcpMetadata = require('gcp-metadata');
+        const isAvailable = await gcpMetadata.isAvailable();
+        if (isAvailable === true) {
+            projectId = await gcpMetadata.project('project-id');
+            console.log(`Project Id is: ${projectId}`); // ...Project ID of the running instance 
+        } else {
+            console.log('gcpMetadata is unavailable, unable to determine projectId');
+            throw new Error('Unable to determine GCP Project Id');
+        }
+    } else {
+        projectId = process.env.GCP_PROJECT;
+    }
+
     let options = {
         destinationTable: {
-            projectId: process.env.GCP_PROJECT,
+            projectId: projectId,
             datasetId: config.datasetId,
             tableId: config.destinationTableId
         },

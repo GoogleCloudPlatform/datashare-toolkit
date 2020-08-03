@@ -29,7 +29,7 @@
 				"mode": "NULLABLE"
 			},
 			{
-				"type": "TIMESTAMP",
+				"type": "STRING",
 				"name": "DATE",
 				"mode": "NULLABLE"
 			},
