@@ -23,7 +23,7 @@ cd ingestion/batch
 
 # deploy ingestion function to bucket
 npm run deploy -- --trigger-bucket=gs://${BUCKET}
-cd ../../examples/weather/observations/config
+cd ../../examples/weather/observation/config
 
 # deploy configuration files for source data
 gsutil cp schema.json gs://${BUCKET}/datashare/weather/observation/config/schema.json
@@ -31,7 +31,7 @@ gsutil cp transform.sql gs://${BUCKET}/datashare/weather/observation/config/tran
 cd ../data
 
 # copy source data to bucket
-gsutil cp weather.observation.csv.gz gs://${BUCKET}/datashare/weather/observation/data/weather.observation.csv.gz
+gsutil cp weather.observation.csv.gz gs://${BUCKET}/datashare/weather/observation/data/weather.observation.csv
 sleep 60 # wait for ingestion
 
 # check the number of records ingested
