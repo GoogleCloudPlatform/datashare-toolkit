@@ -142,6 +142,7 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
                 policies.push(policyRecord);
                 // TODO: Get rid of this conversion
                 accountData.policies = accountData.policies.map(e => e.policyId);
+                accountData.createdBy = accountData.email;
                 console.log(`Updating account: ${JSON.stringify(accountData, null, 3)}`);
                 await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
             }
