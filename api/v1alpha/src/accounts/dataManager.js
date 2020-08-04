@@ -517,6 +517,7 @@ async function activate(projectId, host, token, reason, email) {
                 } else {
                     accountData.marketplace = [accountRecord];
                 }
+                accountData.createdBy = email;
             } else {
                 // Create the account
                 accountData = {
