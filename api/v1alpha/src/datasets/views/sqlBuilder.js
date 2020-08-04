@@ -139,8 +139,8 @@ async function generateAccessControlSubquery(view) {
         let query = "";
         let useNesting = accessControlLabelColumnDelimiter && accessControlLabelColumnDelimiter.length > 0;
         if (useNesting === true) {
-            query += `SELECT 1 FROM UNNEST(split(s.${accessControlLabelColumn}, "${accessControlLabelColumnDelimiter}")) AS flattenedLabel\n`;
-            query += `JOIN \`${view.projectId}.${cfg.cdsDatasetId}.${cfg.cdsCurrentUserPermissionViewId}\` e ON LOWER(flattenedLabel) = LOWER(e.tag)\n`;
+            query += `SELECT 1 FROM UNNEST(SPLIT(CAST(s.${accessControlLabelColumn} AS STRING), "${accessControlLabelColumnDelimiter}")) AS flattenedLabel\n`;
+            query += `JOIN \`${view.projectId}.${cfg.cdsDatasetId}.${cfg.cdsCurrentUserPermissionViewId}\` e ON LOWER(CAST(flattenedLabel AS STRING)) = LOWER(e.tag)\n`;
             query += `WHERE\n\t(e.isTableBased IS false AND LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}') OR\n`;
             query += `\t(e.isTableBased IS true AND LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}' AND LOWER(e.tableId) = '${view.name.toLowerCase()}')\n`;
         }
@@ -148,7 +148,7 @@ async function generateAccessControlSubquery(view) {
             query += `SELECT 1 FROM \`${view.projectId}.${cfg.cdsDatasetId}.${cfg.cdsCurrentUserPermissionViewId}\` e\n`;
             query += `WHERE (\n\t(e.isTableBased IS false AND LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}') OR\n`;
             query += `\t(e.isTableBased IS true AND LOWER(e.datasetId) = '${view.datasetId.toLowerCase()}' AND LOWER(e.tableId) = '${view.name.toLowerCase()}')\n)`;
-            query += `\nAND LOWER(e.tag) = LOWER(s.${accessControlLabelColumn})`;
+            query += `\nAND LOWER(e.tag) = LOWER(CAST(s.${accessControlLabelColumn} AS STRING))`;
         }
 
         sql += await prependLines(query, "\t", 1);

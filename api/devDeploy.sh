@@ -22,7 +22,7 @@ cd v1alpha
 cd ../../
 gcloud builds submit --config api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 gcloud run deploy cds-api \
-  --image gcr.io/${PROJECT_ID}/cds-api:${TAG} \
+  --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
   --region=us-central1 \
   --allow-unauthenticated \
   --platform managed \
