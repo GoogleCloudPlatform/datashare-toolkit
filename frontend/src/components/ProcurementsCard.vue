@@ -41,6 +41,10 @@
             persistent-hint
             @change="entitlementStateChanged"
           ></v-select>
+          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-btn color="primary" dark @click.stop="loadProcurementRequests()"
+            ><v-icon>{{ icons.refresh }}</v-icon></v-btn
+          >
         </v-toolbar>
       </template>
       <template v-for="h in headers" v-slot:[`header.${h.value}`]="{ header }">
@@ -210,7 +214,7 @@ extend('max', {
   message: '{_field_} may not be greater than {length} characters'
 });
 
-import { mdiCancel, mdiCheck, mdiCommentOutline } from '@mdi/js';
+import { mdiCancel, mdiCheck, mdiCommentOutline, mdiRefresh } from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 
 export default {
@@ -231,7 +235,8 @@ export default {
     icons: {
       cancel: mdiCancel,
       check: mdiCheck,
-      comment: mdiCommentOutline
+      comment: mdiCommentOutline,
+      refresh: mdiRefresh
     },
     search: '',
     itemsPerPageOptions: [20, 50, 100, 200],

@@ -257,7 +257,6 @@ export default {
     let params = {};
     if (payload.stateFilter) {
       params.stateFilter = payload.stateFilter;
-      console.log(params.stateFilter);
     }
     return axios
       .get(this._apiBaseUrl() + '/procurements', {
