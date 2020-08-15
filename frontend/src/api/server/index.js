@@ -253,9 +253,16 @@ export default {
       .put(this._apiBaseUrl() + '/ingestion', payload)
       .then(response => response);
   },
-  getProcurementRequests() {
+  getProcurementRequests(payload) {
+    let params = {};
+    if (payload.stateFilter) {
+      params.stateFilter = payload.stateFilter;
+      console.log(params.stateFilter);
+    }
     return axios
-      .get(this._apiBaseUrl() + '/procurements')
+      .get(this._apiBaseUrl() + '/procurements', {
+        params: params
+      })
       .then(response => response);
   },
   submitProcurementAccountApproval(payload) {
