@@ -108,7 +108,11 @@ var procurements = express.Router();
  */
 procurements.get('/projects/:projectId/procurements', async (req, res) => {
     const projectId = req.params.projectId;
-    const data = await dataManager.listProcurements(projectId);
+    let stateFilter = null;
+    if (req.query.stateFilter) {
+        stateFilter = req.query.stateFilter.split(',');
+    }
+    const data = await dataManager.listProcurements(projectId, stateFilter);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined) ? 500 : data.code;

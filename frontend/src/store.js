@@ -273,7 +273,7 @@ const store = new Vuex.Store({
     },
     // eslint-disable-next-line no-unused-vars
     getProcurementRequests({ commit }, payload) {
-      return client.getProcurementRequests().catch(error => {
+      return client.getProcurementRequests(payload).catch(error => {
         notify(error);
       });
     },
