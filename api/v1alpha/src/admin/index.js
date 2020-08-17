@@ -188,4 +188,13 @@ admin.post('/projects/:projectId/admin::custom', async(req, res) => {
     };
 });
 
+admin.get('/projects/:projectId/admin/uiConfiguration', async(req, res) => {
+    let data = process.env.UI_CONFIGURATION
+    var code = 200;
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
 module.exports = admin;
