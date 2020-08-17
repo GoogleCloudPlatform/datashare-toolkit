@@ -358,11 +358,13 @@ export default {
     this.$store.dispatch('getUiConfiguration').then(response => {
       if (response) {
         let data = response.data;
-        this.moreInformationText = data.myProducts.moreInformationText;
-        this.moreInformationButtonText =
-          data.myProducts.moreInformationButtonText;
-        this.moreInformationButtonUrl =
-          data.myProducts.moreInformationButtonUrl;
+        if (data.myProducts) {
+          this.moreInformationText = data.myProducts.moreInformationText;
+          this.moreInformationButtonText =
+            data.myProducts.moreInformationButtonText;
+          this.moreInformationButtonUrl =
+            data.myProducts.moreInformationButtonUrl;
+        }
       }
     });
   },
