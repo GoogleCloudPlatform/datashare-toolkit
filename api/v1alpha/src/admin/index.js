@@ -197,7 +197,7 @@ admin.get('/projects/:projectId/admin/uiConfiguration', async (req, res) => {
         success: config ? true : false,
         data: config
     };
-    var code = data.success === true ? 200 : 204;
+    var code = 200;
     res.status(code).json({
         code: code,
         ...data
