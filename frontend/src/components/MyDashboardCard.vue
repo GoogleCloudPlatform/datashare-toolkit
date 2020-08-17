@@ -2,7 +2,7 @@
   <v-card class="px-4">
     <v-card-title>My Products</v-card-title>
     <v-banner v-if="moreInformationText" single-line>
-      <v-icon slot="icon" size="30">
+      <v-icon slot="icon" size="25">
         {{ icons.information }}
       </v-icon>
       {{ moreInformationText }}
