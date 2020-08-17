@@ -357,12 +357,13 @@ export default {
   },
   mounted() {
     this.$store.dispatch('getUiConfiguration').then(response => {
-      if (response.success) {
+      if (response) {
         let data = response.data;
         this.moreInformationText = data.myProducts.moreInformationText;
         this.moreInformationButtonText =
           data.myProducts.moreInformationButtonText;
-        this.moreInformationButtonUrl = data.myProducts.moreInformationButtonUrl;
+        this.moreInformationButtonUrl =
+          data.myProducts.moreInformationButtonUrl;
       }
     });
   },
