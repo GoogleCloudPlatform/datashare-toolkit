@@ -334,10 +334,9 @@ export default {
       datasetSearch: '',
       tableSearch: '',
       rowAccessSearch: '',
-      moreInformationText:
-        'To add more accounts please contact us at blah blah blah',
-      moreInformationButtonText: 'More Information',
-      moreInformationButtonUrl: 'https://www.google.com'
+      moreInformationText: '',
+      moreInformationButtonText: '',
+      moreInformationButtonUrl: ''
     };
   },
   created() {
