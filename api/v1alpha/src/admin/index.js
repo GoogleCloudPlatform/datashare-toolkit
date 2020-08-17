@@ -185,18 +185,19 @@ admin.post('/projects/:projectId/admin::custom', async(req, res) => {
                 code: code,
                 ... data
             });
-    };
+    }
 });
 
 admin.get('/projects/:projectId/admin/uiConfiguration', async(req, res) => {
-    console.log('get config called');
     let config = process.env.UI_CONFIGURATION;
+    if (config) {
+        config = JSON.parse(config);
+    }
     let data = { 
-        ... config,
-        success: config ? true : false
+        success: config ? true : false,
+        data: config
     };
-    console.log(data);
-    var code = config ? 200 : 204;
+    var code = data.success === true ? 200 : 204;
     res.status(code).json({
         code: code,
         ... data

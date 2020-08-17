@@ -356,7 +356,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch('getUiConfiguration').then(response => {
-      if (response) {
+      if (response && response.data) {
         let data = response.data;
         if (data.myProducts) {
           this.moreInformationText = data.myProducts.moreInformationText;
