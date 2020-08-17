@@ -1,6 +1,21 @@
 <template>
   <v-card class="px-4">
     <v-card-title>My Products</v-card-title>
+    <v-banner v-if="moreInformationText" single-line>
+      <v-icon slot="icon" size="25">
+        {{ icons.information }}
+      </v-icon>
+      {{ moreInformationText }}
+      <template v-slot:actions>
+        <v-btn
+          v-if="moreInformationButtonUrl"
+          @click="navigateToMoreInformation()"
+          text
+          color="blue darken-1"
+          >{{ moreInformationButtonText }}</v-btn
+        >
+      </template>
+    </v-banner>
     <v-data-table
       :headers="headers"
       :items="policies"
@@ -265,7 +280,8 @@ import {
   mdiShopping,
   mdiCardSearch,
   mdiDatabaseSearch,
-  mdiTableHeadersEye
+  mdiTableHeadersEye,
+  mdiInformation
 } from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 import UrlHelper from '../urlHelper';
@@ -306,6 +322,7 @@ export default {
         { text: '', value: 'action', sortable: false }
       ],
       icons: {
+        information: mdiInformation,
         search: mdiCardSearch,
         marketplace: mdiShopping,
         databaseSearch: mdiDatabaseSearch,
@@ -316,7 +333,10 @@ export default {
       panel: [0],
       datasetSearch: '',
       tableSearch: '',
-      rowAccessSearch: ''
+      rowAccessSearch: '',
+      moreInformationText: '',
+      moreInformationButtonText: '',
+      moreInformationButtonUrl: ''
     };
   },
   created() {
@@ -333,6 +353,20 @@ export default {
     } else {
       this.loadProducts();
     }
+  },
+  mounted() {
+    this.$store.dispatch('getUiConfiguration').then(response => {
+      if (response && response.data) {
+        let data = response.data;
+        if (data.myProducts) {
+          this.moreInformationText = data.myProducts.moreInformationText;
+          this.moreInformationButtonText =
+            data.myProducts.moreInformationButtonText;
+          this.moreInformationButtonUrl =
+            data.myProducts.moreInformationButtonUrl;
+        }
+      }
+    });
   },
   computed: {
     selectedItemSummary() {
@@ -431,6 +465,9 @@ export default {
         datasetId,
         tableId
       );
+    },
+    navigateToMoreInformation() {
+      window.open(this.moreInformationButtonUrl, '_blank');
     }
   }
 };

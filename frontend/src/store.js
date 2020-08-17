@@ -304,6 +304,12 @@ const store = new Vuex.Store({
       });
     },
     // eslint-disable-next-line no-unused-vars
+    getUiConfiguration({ commit }, payload) {
+      return client.getUiConfiguration().catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
     saveIngestion({ commit }, payload) {
       return client.saveIngestion(payload).catch(error => {
         notify(error);
