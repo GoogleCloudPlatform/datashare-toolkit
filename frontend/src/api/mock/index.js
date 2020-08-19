@@ -78,7 +78,8 @@ export default {
     );
   },
   getSettings() {
-    return get(settings, 100); // wait 100ms before returning
+    // 0 second wait as this call is used by the prod call currently
+    return get(settings, 0);
   },
   updateSettings(payload) {
     return update(payload, 100); // wait 100ms before returning
