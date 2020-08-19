@@ -273,7 +273,7 @@ const store = new Vuex.Store({
     },
     // eslint-disable-next-line no-unused-vars
     getProcurementRequests({ commit }, payload) {
-      return client.getProcurementRequests().catch(error => {
+      return client.getProcurementRequests(payload).catch(error => {
         notify(error);
       });
     },
@@ -300,6 +300,12 @@ const store = new Vuex.Store({
     // eslint-disable-next-line no-unused-vars
     getUserProducts({ commit }, payload) {
       return client.getUserProducts().catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getUiConfiguration({ commit }, payload) {
+      return client.getUiConfiguration().catch(error => {
         notify(error);
       });
     },

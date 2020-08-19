@@ -148,7 +148,7 @@ var admin = express.Router();
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-admin.post('/projects/:projectId/admin::custom', async(req, res) => {
+admin.post('/projects/:projectId/admin::custom', async (req, res) => {
     var data;
     const projectId = req.params.projectId;
 
@@ -157,13 +157,13 @@ admin.post('/projects/:projectId/admin::custom', async(req, res) => {
             data = await dataManager.initializeSchema(projectId);
             var code;
             if (data && data.success === false) {
-                code = (data.code === undefined ) ? 500 : data.code;
+                code = (data.code === undefined) ? 500 : data.code;
             } else {
-                code = (data.code === undefined ) ? 200 : data.code;
+                code = (data.code === undefined) ? 200 : data.code;
             }
             return res.status(code).json({
                 code: code,
-                ... data
+                ...data
             });
         case "syncResources":
             const syncType = req.body.type;
@@ -177,15 +177,31 @@ admin.post('/projects/:projectId/admin::custom', async(req, res) => {
             data = await dataManager.syncResources(projectId, syncType);
             var code;
             if (data && data.success === false) {
-                code = (data.code === undefined ) ? 500 : data.code;
+                code = (data.code === undefined) ? 500 : data.code;
             } else {
-                code = (data.code === undefined ) ? 200 : data.code;
+                code = (data.code === undefined) ? 200 : data.code;
             }
             return res.status(code).json({
                 code: code,
-                ... data
+                ...data
             });
+    }
+});
+
+admin.get('/projects/:projectId/admin/uiConfiguration', async (req, res) => {
+    let config = process.env.UI_CONFIGURATION;
+    if (config) {
+        config = JSON.parse(config);
+    }
+    let data = {
+        success: config ? true : false,
+        data: config
     };
+    var code = 200;
+    res.status(code).json({
+        code: code,
+        ...data
+    });
 });
 
 module.exports = admin;

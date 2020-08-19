@@ -35,13 +35,21 @@ function getTableFqdn(projectId, datasetId, tableId) {
 
 /**
  * @param  {string} projectId
+ * @param  {} stateFilter
  * Get a list of Procurements
  */
-async function listProcurements(projectId) {
+async function listProcurements(projectId, stateFilter) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
-        // OR state=ENTITLEMENT_PENDING_CANCELLATION OR state=ENTITLEMENT_CANCELLED
-        const result = await procurementUtil.listEntitlements('state=ENTITLEMENT_ACTIVATION_REQUESTED');
+
+        let filter = 'state=';
+        if (stateFilter && stateFilter.length > 0) {
+            filter += stateFilter.join(' OR state=')
+        } else {
+            filter += 'ENTITLEMENT_ACTIVATION_REQUESTED';
+        }
+
+        const result = await procurementUtil.listEntitlements(filter);
         let entitlements = result.entitlements || [];
 
         const accountNames = underscore.uniq(entitlements.map(e => e.account));
@@ -142,6 +150,7 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
                 policies.push(policyRecord);
                 // TODO: Get rid of this conversion
                 accountData.policies = accountData.policies.map(e => e.policyId);
+                accountData.createdBy = accountData.email;
                 console.log(`Updating account: ${JSON.stringify(accountData, null, 3)}`);
                 await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
             }

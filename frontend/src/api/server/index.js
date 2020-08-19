@@ -253,9 +253,15 @@ export default {
       .put(this._apiBaseUrl() + '/ingestion', payload)
       .then(response => response);
   },
-  getProcurementRequests() {
+  getProcurementRequests(payload) {
+    let params = {};
+    if (payload.stateFilter) {
+      params.stateFilter = payload.stateFilter;
+    }
     return axios
-      .get(this._apiBaseUrl() + '/procurements')
+      .get(this._apiBaseUrl() + '/procurements', {
+        params: params
+      })
       .then(response => response);
   },
   submitProcurementAccountApproval(payload) {
@@ -276,6 +282,11 @@ export default {
   getUserProducts() {
     return axios
       .get(this._apiBaseUrl() + '/products')
+      .then(response => response);
+  },
+  getUiConfiguration() {
+    return axios
+      .get(this._apiBaseUrl() + '/admin/uiConfiguration')
       .then(response => response);
   },
   initSchema(payload) {
