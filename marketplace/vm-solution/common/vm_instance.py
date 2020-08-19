@@ -113,6 +113,7 @@ def GenerateComputeVM(context, create_disks_separately=True):
   datashare_install_bucket_name = project + '-install-bucket'
   datashare_ingestion_bucket_name = project + '-cds-bucket'
   k8s_cluster_name = 'datashare-cluster-resource'
+  # gce_service_account = context.properties['gceServiceAccount']
 
   if disks:
     if create_disks_separately:
@@ -152,6 +153,7 @@ def GenerateComputeVM(context, create_disks_separately=True):
   if remove_scopes and SERVICE_ACCOUNTS in prop:
     prop.pop(SERVICE_ACCOUNTS)
   else:  # Make sure there is a default service account
+    prop.setdefault(SERVICE_ACCOUNTS, copy.deepcopy(DEFAULT_SERVICE_ACCOUNT))
     prop.setdefault(SERVICE_ACCOUNTS, copy.deepcopy(DEFAULT_SERVICE_ACCOUNT))
 
   resource = []

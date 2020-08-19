@@ -1,18 +1,34 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
-## 0.5.2 Release Notes
-* Build - 7/31/2020
+## 0.5.3 Release Notes
+* Build - 8/19/2020
 
 ### Datashare
-* Datashare release version is 0.4.1
+* Datashare release version is 0.4.2
+* Kubernetes cluster version is 1.16.11-gke.5
 
 ### Updates
-* Changed the Datashare Github release version to v0.4.1.
+* Added a new mandatory field to the deployment configuration page where the user must enter a new service account and provide it with the appropriate permissions.
+* The VM startup script executes all commands with this new service account.
+* Updated the Cloud Run on GKE version to 1.16.11-gke.5
+
+### Bug Fixes
+* None
+
+## 0.5.2 Release Notes
+* Build - 8/3/2020
+
+### Datashare
+* Datashare release version is 0.4.2
+
+### Updates
+* Changed the Datashare Github release version to v0.4.2.
 * Increased the waiter timeout to 900 seconds from 600 seconds.
 
 ### Bug Fixes
 * When a user attempted to install Datashare via the Marketplace, it attempted to use the Datashare VM image from the user's project, 
 but this image in included in the gcp-financial-services-public project. Modified the URL to point to the gcp-financial-services-public project.
+* Changed Datashare API deployment name to `ds-api`.  
 
 ## 0.5.1 Release Notes
 * Build - 7/18/2020

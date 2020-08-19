@@ -8,6 +8,7 @@ imports:
 
 {% set project = env["project"] %}
 {% set datashareGitReleaseVersion = properties["input_datashareGithubReleaseVersion"] %}
+{% set gceServiceAccount = properties["input_gceServiceAccount"] %}
 {% set gcpRegion = properties["input_gcpRegion"] %}
 {% set storageBucketLocation = properties["input_storageBucketLocation"] %}
 {% set useRuntimeConfigWaiter = properties["input_useRuntimeConfigWaiter"] %}
@@ -55,7 +56,7 @@ resources:
   - name: datashare-cluster-manager
     type: cluster.py
     properties:
-      zone: us-central1-a
+      zone: {{ gkeZone }}
   {% endif %}
 
   {% if useRuntimeConfigWaiter %}  
@@ -130,6 +131,7 @@ resources:
       sourceImage: https://www.googleapis.com/compute/v1/projects/gcp-financial-services-public/global/images/{{ imageNames[selectedImageIndex] }}
       zone: {{ zone }}
       machineType: {{ machineType }}
+      gceServiceAccount: {{ gceServiceAccount }}
       networks:
       {% for network in networks %}
         - {{ network }}
@@ -151,19 +153,29 @@ resources:
       
       canIpForward: {{ canIpForward }}
       serviceAccounts:
-        - email: default
-          scopes:
+        - email: {{ gceServiceAccount }}
+          scopes: 
             - 'https://www.googleapis.com/auth/cloud.useraccounts.readonly'
             - 'https://www.googleapis.com/auth/devstorage.read_only'
             - 'https://www.googleapis.com/auth/logging.write'
             - 'https://www.googleapis.com/auth/monitoring.write'
             - 'https://www.googleapis.com/auth/cloud-platform'
             - 'https://www.googleapis.com/auth/cloudruntimeconfig'
+        #- email: default
+        #  scopes:
+        #    - 'https://www.googleapis.com/auth/cloud.useraccounts.readonly'
+        #    - 'https://www.googleapis.com/auth/devstorage.read_only'
+        #    - 'https://www.googleapis.com/auth/logging.write'
+        #    - 'https://www.googleapis.com/auth/monitoring.write'
+        #    - 'https://www.googleapis.com/auth/cloud-platform'
+        #    - 'https://www.googleapis.com/auth/cloudruntimeconfig'
 
       metadata:
         items:
           - key: datashareGitReleaseVersion
             value: {{ datashareGitReleaseVersion }}
+          - key: gceServiceAccount
+            value: {{ gceServiceAccount }}
           {% if deployApiToGke %}   
           - key: gkeZone
             value: {{ gkeZone }}
@@ -271,21 +283,23 @@ resources:
                 gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.serviceAgent"
                 
                 
-                echo "Updating apt-get and updating gcloud..." 
+                #echo "Updating apt-get and updating gcloud..." 
                 sudo apt-get -y update && sudo apt-get -y --only-upgrade install google-cloud-sdk-skaffold kubectl google-cloud-sdk-anthos-auth google-cloud-sdk-minikube google-cloud-sdk google-cloud-sdk-app-engine-grpc google-cloud-sdk-kind google-cloud-sdk-pubsub-emulator google-cloud-sdk-app-engine-go google-cloud-sdk-firestore-emulator google-cloud-sdk-cloud-build-local google-cloud-sdk-datastore-emulator google-cloud-sdk-kpt google-cloud-sdk-app-engine-python google-cloud-sdk-spanner-emulator google-cloud-sdk-cbt google-cloud-sdk-bigtable-emulator google-cloud-sdk-app-engine-python-extras google-cloud-sdk-datalab google-cloud-sdk-app-engine-java
-                sudo apt-get -y install google-cloud-sdk
-                echo "Notifiying Waiter that this VM startup script is complete..."
+                # sudo apt-get -y install google-cloud-sdk
+                
                 CONFIG_NAME=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/configName -H "Metadata-Flavor: Google"`
                 echo $CONFIG_NAME
 
                 # Setup GKE cluster
                 DEPLOY_API_TO_GKE=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/deployApiToGke -H "Metadata-Flavor: Google"`
+                GCE_SERVICE_ACCOUNT=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/gceServiceAccount -H "Metadata-Flavor: Google"`
                 if [ "$DEPLOY_API_TO_GKE" = "true" ]; then
                     echo "Adding container.clusterAdmin role to Cloud Build service account"
                     gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.clusterAdmin"
                     gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.viewer"
                     gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.admin"
-                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="roles/container.admin"
+                    #gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="roles/container.admin"
+                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$GCE_SERVICE_ACCOUNT" --role="roles/container.admin"
 
                     # This is executing from the VM's startup script
                     if [ "$VM_STARTUP_SCRIPT" = true ]; then
@@ -301,9 +315,12 @@ resources:
                     gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
                     echo "Setting up GKE cluster for Cloud Run."
                     echo "Creating the cluster role binding."
+                    #kubectl create clusterrolebinding cluster-admin-binding \
+                    #    --clusterrole cluster-admin \
+                    #    --user ${PROJECT_NUMBER}-compute@developer.gserviceaccount.com
                     kubectl create clusterrolebinding cluster-admin-binding \
                         --clusterrole cluster-admin \
-                        --user ${PROJECT_NUMBER}-compute@developer.gserviceaccount.com
+                        --user ${GCE_SERVICE_ACCOUNT}
                 
                     ISTIO_PACKAGE=$(kubectl -n gke-system get deployments istio-pilot \
                         -o jsonpath="{.spec.template.spec.containers[0].image}" | \
@@ -364,6 +381,7 @@ resources:
                 fi
 
                 # Notify Listener
+                echo "Notifiying Waiter that this VM startup script is complete..."
                 gcloud beta runtime-config configs variables set success/my-instance success --config-name $CONFIG_NAME
                 echo "VM startup-script finished!"
 

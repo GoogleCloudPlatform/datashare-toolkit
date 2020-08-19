@@ -20,6 +20,7 @@ required:
   - network
   - bootDiskType
   - bootDiskSizeGb
+  - input_gceServiceAccount
 
 properties:
   zone:
@@ -107,9 +108,12 @@ properties:
   input_adminEmail:
     type: string
     default: user@example.com
+  input_gceServiceAccount:
+    type: string
+    default: PROJECT@PROJECT_NAME.iam.gserviceaccount.com
   input_datashareGithubReleaseVersion:
     type: string
-    default: v0.4.1
+    default: v0.4.2
   input_gcpRegion:
     type: string
     default: us-central1

@@ -1,12 +1,13 @@
 # ```Google Cloud Platform Marketplace solution prerequisites```
 ## Summary
 
-In order for the Marketplace solution to launch successfully, you must include the 
-`Security Admin IAM role`] on your Google 
-Compute Engine service account so that it can update IAM roles on the Cloud Build service account
+In order for the Marketplace solution to launch successfully, you must create a new
+service account and assign the [Security Admin IAM role](https://cloud.google.com/iam/docs/understanding-roles#iam-roles)
+and the [Project Editor role](https://cloud.google.com/iam/docs/understanding-roles#primitive_role_definitions)
+so that it can update IAM roles on the Cloud Build service account
 to build and deploy the Datashare UI and API to Cloud Run.
 
-This role is required on your Compute Engine service account because it needs to modify other service
+The Security Admin role is required because it needs to modify other service
 accounts with the appropriate permissions so that the Deployment Manager can deploy the full
 solution automatically. 
 
@@ -15,25 +16,31 @@ solution automatically.
 
 ![IAM Menu Item](images/IAM.png "IAM Menu Item")
 
-2. Select the `edit` button next to the Compute Engine Service account (`project-number-compute@developer.gserviceaccount.com`).
+2. Select `Service Accounts` on the left side of the screen
 
-![IAM Edit button](images/iam-compute-sa.png "IAM Edit button")
+![Service Accounts](images/iam-select-service-account.png)
 
-3. Click `Add another role`.
+3. Click `Create Service Account`.
 
-![Add another role](images/iam-add-another-role.png "Add another role")
+![Create SA](images/iam-create-sa.png)
 
-4. Search for `Security Admin` and select it.
+4. Enter the following and then click the `Create` button. 
+* `Service account name` as `datashare-deployment-manager`
+* `Service account description` as `Datashare deployment manager`
 
-![search role](images/iam-search-security-admin.png "search role")
+5. Select the `Editor` and the `Security Admin` roles.
 
-5. Click the `Save` button. 
+![Assign roles](images/iam-assign-roles-to-sa.png)
 
-![save button](images/iam-save-button.png "save button")
+6. Next add two `Service account users roles` to this service account.  These two members need to be able to execute commands on behalf of this service account. Then click the `Done` button. 
+* `PROJECT_ID-compute@developer.gserviceaccount.com`
+* `PROJECT_ID@cloudservices.gserviceaccount.com`
+
+![Assign members](images/iam-assign-members-to-sa.png)
 
 Now you can click the `Launch` button on the Marketplace and deploy the Datashare solution within your GCP project. 
 
-## Update Compute Engine service account from Cloud Shell
+## Create the new Service Account from Cloud Shell
 1. Open `Cloud Shell` from your Google Cloud console (top right corner).
 
 ![cloud shell](images/cloud-shell.png "cloud shell")
@@ -44,9 +51,57 @@ These commands will clone the repository to your Cloud Shell instance, change in
 shell script to add the Security IAM Admin role to your Compute Engine service account.
 
 ```
-git clone https://github.com/GoogleCloudPlatform/datashare-toolkit.git
-cd datashare-toolkit/marketplace
-./update-compute-service-account-with-securityadmin-role.sh add
+gcloud config set project YOUR_PROJECT
+
+SA="datashare-deployment-mgr"
+```
+
+Create the Service Account
+```
+gcloud iam service-accounts create $SA \
+--display-name $SA \
+--description "Datashare deployment manager"
+```
+
+Add a project level policy binding for the project editor role and the security admin role. 
+```
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@gcp-financial-services-public.iam.gserviceaccount.com \
+--role=roles/editor
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@gcp-financial-services-public.iam.gserviceaccount.com \
+--role=roles/iam.securityAdmin
+```
+
+Assign the Compute instance service account access to the new service account.
+```
+gcloud iam service-accounts add-iam-policy-binding $SA@gcp-financial-services-public.iam.gserviceaccount.com \
+--role=roles/iam.serviceAccountUser\
+--member=serviceAcount:PROJECT_ID-compute@developer.gserviceaccount.com
+```
+
+Assign the Cloud Services service access to the new service account as well. 
+```
+gcloud iam service-accounts add-iam-policy-binding $SA@gcp-financial-services-public.iam.gserviceaccount.com \
+--role=roles/iam.serviceAccountUser \
+--member=serviceAccount:PROJECT@cloudservices.gserviceaccount.com 
 ```
 
 Now you can click the `Launch` button on the Marketplace and deploy the Datashare solution within your GCP project. 
+
+### Delete the Service Account
+Delete the Service Account with the following command. 
+```
+gcloud iam service-accounts delete $SA@gcp-financial-services-public.iam.gserviceaccount.com
+```
+
+```
+gcloud projects remove-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@gcp-financial-services-public.iam.gserviceaccount.com \
+--role=roles/iam.securityAdmin
+
+gcloud projects remove-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@gcp-financial-services-public.iam.gserviceaccount.com \
+--role=roles/editor
+```
