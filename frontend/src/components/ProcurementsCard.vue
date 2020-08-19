@@ -64,7 +64,7 @@
       <template v-slot:item.updateTime="{ item }">
         {{ toLocalTime(item.updateTime) }} </template
       ><template v-slot:item.action="{ item }">
-        <v-tooltip top v-if="item.state !== 'ENTITLEMENT_CANCELLED'">
+        <v-tooltip top v-if="item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'">
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
@@ -77,7 +77,7 @@
           </template>
           <span>Reject</span>
         </v-tooltip>
-        <v-tooltip top v-if="item.state !== 'ENTITLEMENT_CANCELLED'">
+        <v-tooltip top v-if="item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'">
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
