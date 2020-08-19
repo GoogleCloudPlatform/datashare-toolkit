@@ -11,7 +11,7 @@ The Security Admin role is required because it needs to modify other service
 accounts with the appropriate permissions so that the Deployment Manager can deploy the full
 solution automatically. 
 
-##  Update Compute Engine service account from Google Cloud Console
+##  Update service account from Google Cloud Console
 1. Login to Google Cloud Console and select `IAM` from the menu.
 
 ![IAM Menu Item](images/IAM.png "IAM Menu Item")
