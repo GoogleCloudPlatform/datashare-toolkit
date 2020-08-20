@@ -43,6 +43,43 @@ The following service account are modified with additional roles as shown below.
   * Role added to this service account:
     * storage.admin
 
+## Deploy Datashare from command line
+This section outlines how to deploy Datashare from the command line. 
+
+1. Make sure to complete the [prerequistes](https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/marketplace/PREREQUISITES.md).
+
+2. Clone this repository and then cd into the folder below. 
+```
+cd datashare-toolkit/marketplace/releases
+```
+
+3. Unzip the `datashare-marketplace-vm-solution-v0.5.3` file and cd into the unzipped folder. 
+```
+unzip datashare-marketplace-vm-solution-v0.5.3.zip
+
+cd vm-solution
+```
+
+4. Execute the following commands. 
+
+```
+gcloud config set project YOUR_PROJECT
+
+gcloud deployment-manager deployments create datashare \
+--template datashare-vm.jinja \
+--properties deployApiToGke:True,\
+gkeZone:us-central1-a,\
+zone:us-central1-a,\
+machineType:e2-small,\
+input_gceServiceAccount:datashare-deployment-manager@gcp-financial-services-public.iam.gserviceaccount.com,\
+sourceImage:gcp-financial-services-debian-datashare-20200716,\
+input_adminEmail:default-user@example.com,\
+useRuntimeConfigWaiter:True,\
+bootDiskType:pd-standard
+```
+
+After a few minutes you will see the Deployment Manager job executing in the Google Cloud console.  
+
 ## Remove Elevated Service Account permissions
 To remove the elevated Service Account permissions follow the steps outline below. 
 
