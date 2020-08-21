@@ -9,6 +9,16 @@ imports:
     path: common/path_utils.jinja
   - name: vm_instance.py
     path: common/vm_instance.py
+  - name: cluster.py
+    path: cluster.py
+  - name: cloud_function.py
+    path: cloud_function.py
+  - name: deploy_ds_api.py
+    path: deploy_ds_api.py
+  - name: deploy_ui_cloud_run.py
+    path: deploy_ui_cloud_run.py
+  - name: waiter.jinja
+    path: waiter.jinja
 
 info:
   version: '1.0'
@@ -20,6 +30,7 @@ required:
   - network
   - bootDiskType
   - bootDiskSizeGb
+  - input_gceServiceAccount
 
 properties:
   zone:
@@ -107,9 +118,12 @@ properties:
   input_adminEmail:
     type: string
     default: user@example.com
+  input_gceServiceAccount:
+    type: string
+    default: PROJECT@PROJECT_NAME.iam.gserviceaccount.com
   input_datashareGithubReleaseVersion:
     type: string
-    default: v0.4.1
+    default: v0.4.2
   input_gcpRegion:
     type: string
     default: us-central1
