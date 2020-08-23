@@ -123,5 +123,5 @@ func (c *Client) SetupCloseHandler() {
 
 // Return the Client Counter totals
 func (c *Client) LogCounter() {
-	log.Infof("%+v\n", c.Counter)
+	log.Infof("Counter: %+v\n", c.Counter)
 }
