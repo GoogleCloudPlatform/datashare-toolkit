@@ -213,11 +213,11 @@ Build the image with the `skaffold run -t <TAG>` command:
 
 
 ## Development
-Verify you have [golang](https://golang.org/) >= 1.13 installed on your machine.
+Verify you have [golang](https://golang.org/) >= 1.14 installed on your machine.
 
-Open a terminal into the [cmd/dmc/](./cmd/dmc/) directory and pull the dependencies:
+Open a terminal and download the dependencies:
 
-    go get -d -v
+    go mod download
 
 Run the main.go command:
 
