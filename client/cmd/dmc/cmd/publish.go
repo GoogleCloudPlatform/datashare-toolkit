@@ -69,6 +69,7 @@ var multicastPublishCmd = &cobra.Command{
 			log.Fatalf("Publish: %s", err.Error())
 		}
 
+		mltcstClient.LogCounter()
 		log.Infof("Completed.")
 	},
 }

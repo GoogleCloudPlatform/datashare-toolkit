@@ -56,6 +56,7 @@ var multicastBroadcastCmd = &cobra.Command{
 			log.Fatalf("Broadcast: %s", err.Error())
 		}
 
+		mltcstClient.LogCounter()
 		log.Infof("Completed.")
 	},
 }

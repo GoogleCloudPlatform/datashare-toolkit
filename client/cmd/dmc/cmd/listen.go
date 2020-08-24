@@ -63,6 +63,7 @@ var multicastListenCmd = &cobra.Command{
 			log.Fatalf("Listen: %s", err.Error())
 		}
 
+		mltcstClient.LogCounter()
 		log.Infof("Completed.")
 	},
 }

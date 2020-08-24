@@ -16,7 +16,7 @@
 
 ## ---- Base Node ----
 
-FROM golang:1.13-alpine3.11 AS base
+FROM golang:1.14-alpine3.11 AS base
 
 # Set the file maintainer (your name - the file's author)
 MAINTAINER Chris Page <chrispage@google.com>
@@ -27,15 +27,12 @@ WORKDIR /go/src/github.com/GoogleCloudPlatform/datashare-toolkit/client
 # Install Git, Go dependencies, and build the app
 RUN apk --no-cache add git
 
-#RUN cd cmd/dmc && go get -d -v
-# Install outside build command for an additional image layer
-RUN go get -v \
-  cloud.google.com/go/pubsub \
-  github.com/sirupsen/logrus \
-  github.com/spf13/cobra \
-  github.com/spf13/viper \
-  github.com/mitchellh/go-homedir
+# Install dependancies outside build command for an additional image layer
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
 
+# Copy the source
 COPY pkg                pkg
 COPY internal           internal
 COPY cmd                cmd
