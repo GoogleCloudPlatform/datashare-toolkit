@@ -18,15 +18,17 @@
 const underscore = require('underscore');
 
 class Config {
-  constructor(environment) {
+  constructor() {
     // Choose environment option
-    this.baseConfig = require('./config.json');
+    let environment = process.env.DATASHARE_ENVIRONMENT;
+
+    this.baseConfig = require('./config/config.json');
     if (!this.baseConfig) {
       this.baseConfig = {};
     }
 
     if (environment) {
-      this.envConfig = require(`./config.${environment}.json`);
+      this.envConfig = require(`./config/config.${environment}.json`);
       if (!this.envConfig) {
         this.envConfig = {};
       }

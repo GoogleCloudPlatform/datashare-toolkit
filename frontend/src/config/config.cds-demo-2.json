@@ -1,0 +1,9 @@
+{
+  "VUE_APP_API_BASE_URL": "https://cds-api-jaa4rm3j3a-uc.a.run.app/v1alpha",
+  "VUE_APP_FIREBASE_API_KEY": "AIzaSyAIg7AUkAoZ3f_Ney3DBojzfCnfjIHAaXU",
+  "VUE_APP_FIREBASE_AUTH_DOMAIN": "cds-demo-2.firebaseapp.com",
+  "VUE_APP_FIREBASE_PROJECT_ID": "cds-demo-2",
+  "VUE_APP_FIREBASE_STORAGE_BUCKET": "cds-demo-2.appspot.com",
+  "VUE_APP_FIREBASE_APP_ID": "1:863461568634:web:f9f4a9a103338eabff4bc3",
+  "MEASUREMENT_ID": "G-G0HJN10N0C"
+}
