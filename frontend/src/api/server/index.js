@@ -5,6 +5,8 @@ import mock from './../mock';
 import firebase from 'firebase/app';
 import router from './../../router';
 
+import config from './../../config';
+
 // set the default Accept header to application/json
 axios.defaults.headers.common['Accept'] = 'application/json';
 
@@ -54,9 +56,9 @@ axios.interceptors.response.use(
 export default {
   _apiBaseUrl() {
     return (
-      store.getters.settings.apiBaseUrl +
+      config.VUE_APP_API_BASE_URL +
       '/projects/' +
-      store.getters.settings.projectId
+      config.VUE_APP_FIREBASE_PROJECT_ID
     );
   },
   // default to the mock which is just a static config load
