@@ -21,14 +21,16 @@ import config from './config';
 
 // Fetch and load the store settings
 store.dispatch('getSettings').then(() => {
+  console.log(config.firebaseProjectId);
+
   // Initialize Firebase with a "default" Firebase project
   const firebaseConfig = {
-    apiKey: config.VUE_APP_FIREBASE_API_KEY,
-    authDomain: config.VUE_APP_FIREBASE_AUTH_DOMAIN,
-    projectId: config.VUE_APP_FIREBASE_PROJECT_ID,
-    storageBucket: config.VUE_APP_FIREBASE_STORAGE_BUCKET,
-    appId: config.VUE_APP_FIREBASE_APP_ID,
-    measurementId: config.VUE_APP_FIREBASE_APP_ID
+    apiKey: config.firebaseApiKey,
+    authDomain: config.firebaseAuthDomain,
+    projectId: config.firebaseProjectId,
+    storageBucket: config.firebaseStorageBucket,
+    appId: config.firebaseAppId,
+    measurementId: config.firebaseMeasurementId
   };
 
   const defaultProject = firebase.initializeApp(firebaseConfig);

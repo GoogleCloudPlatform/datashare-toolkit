@@ -55,11 +55,7 @@ axios.interceptors.response.use(
 
 export default {
   _apiBaseUrl() {
-    return (
-      config.VUE_APP_API_BASE_URL +
-      '/projects/' +
-      config.VUE_APP_FIREBASE_PROJECT_ID
-    );
+    return config.apiBaseUrl + '/projects/' + config.firebaseProjectId;
   },
   // default to the mock which is just a static config load
   getSettings() {

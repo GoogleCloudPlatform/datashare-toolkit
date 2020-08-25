@@ -2,7 +2,7 @@
   <v-app id="app">
     <Header></Header>
     <Notification></Notification>
-    <v-content>
+    <v-main>
       <v-container fluid fill-height>
         <!--align-center-->
         <v-layout justify-center>
@@ -11,7 +11,7 @@
           </v-flex>
         </v-layout>
       </v-container>
-    </v-content>
+    </v-main>
     <Footer></Footer>
   </v-app>
 </template>

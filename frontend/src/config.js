@@ -15,18 +15,61 @@
  */
 
 'use strict';
+const underscore = require('underscore');
 
-// Choose environment option
-var config = require('./config.json');
-if (!config) {
-  config = {};
+class Config {
+  constructor(environment) {
+    // Choose environment option
+    this.baseConfig = require('./config.json');
+    if (!this.baseConfig) {
+      this.baseConfig = {};
+    }
+
+    if (environment) {
+      this.envConfig = require(`./config.${environment}.json`);
+      if (!this.envConfig) {
+        this.envConfig = {};
+      }
+    }
+
+    this.config = underscore.defaults(this.envConfig, this.baseConfig);
+  }
+
+  getConfigValue(key, throws = true) {
+    let val = this.config[key];
+    if (throws && !val) {
+      throw new Error(`Configuration missing for key: ${key}`);
+    }
+    return val;
+  }
+
+  get apiBaseUrl() {
+    return this.getConfigValue('VUE_APP_API_BASE_URL');
+  }
+
+  get firebaseApiKey() {
+    return this.getConfigValue('VUE_APP_FIREBASE_API_KEY');
+  }
+
+  get firebaseAuthDomain() {
+    return this.getConfigValue('VUE_APP_FIREBASE_AUTH_DOMAIN');
+  }
+
+  get firebaseProjectId() {
+    return this.getConfigValue('VUE_APP_FIREBASE_PROJECT_ID');
+  }
+
+  get firebaseStorageBucket() {
+    return this.getConfigValue('VUE_APP_FIREBASE_STORAGE_BUCKET');
+  }
+
+  get firebaseAppId() {
+    return this.getConfigValue('VUE_APP_FIREBASE_APP_ID');
+  }
+
+  get firebaseMeasurementId() {
+    return this.getConfigValue('MEASUREMENT_ID');
+  }
 }
 
-// Override with environment variables
-Object.keys(config).forEach(element => {
-  if (process.env[element]) {
-    config[element] = process.env[element];
-  }
-});
-
-module.exports = config;
+module.exports = new Config();
