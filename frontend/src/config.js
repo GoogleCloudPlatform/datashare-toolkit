@@ -70,7 +70,7 @@ class Config {
   }
 
   get firebaseMeasurementId() {
-    return this.getConfigValue('VUE_APP_MEASUREMENT_ID');
+    return this.getConfigValue('VUE_APP_FIREBASE_MEASUREMENT_ID');
   }
 }
 
