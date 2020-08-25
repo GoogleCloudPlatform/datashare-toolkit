@@ -21,8 +21,6 @@ import config from './config';
 
 // Fetch and load the store settings
 store.dispatch('getSettings').then(() => {
-  console.log(config.firebaseProjectId);
-
   // Initialize Firebase with a "default" Firebase project
   const firebaseConfig = {
     apiKey: config.firebaseApiKey,
