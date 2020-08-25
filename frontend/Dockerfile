@@ -38,5 +38,8 @@ FROM nginx:1.17-alpine as release
 COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
+
+COPY ./docker/entrypoint.sh /entrypoint.sh
 EXPOSE 8080
+ENTRYPOINT ["sh", "/entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
