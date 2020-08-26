@@ -22,13 +22,13 @@ class Config {
     // Choose environment option
     let environment = process.env.DATASHARE_ENVIRONMENT;
 
-    this.baseConfig = require('./config/config.json');
+    this.baseConfig = require('./../config/config.json');
     if (!this.baseConfig) {
       this.baseConfig = {};
     }
 
     if (environment) {
-      this.envConfig = require(`./config/config.${environment}.json`);
+      this.envConfig = require(`./../config/config.${environment}.json`);
       if (!this.envConfig) {
         this.envConfig = {};
       }
