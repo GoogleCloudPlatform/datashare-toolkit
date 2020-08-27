@@ -27,13 +27,13 @@ class Config {
 
   isValid() {
     try {
-      this.apiBaseUrl();
-      this.firebaseApiKey();
-      this.firebaseAuthDomain();
-      this.firebaseProjectId();
-      this.firebaseStorageBucket();
-      this.firebaseAppId();
-      this.firebaseMeasurementId();
+      this.apiBaseUrl;
+      this.firebaseApiKey;
+      this.firebaseAuthDomain;
+      this.firebaseProjectId;
+      this.firebaseStorageBucket;
+      this.firebaseAppId;
+      this.firebaseMeasurementId;
       return true;
     } catch {
       return false;

@@ -7,6 +7,7 @@
         <!--align-center-->
         <v-layout justify-center>
           <v-flex text-xs-center>
+            <SetupBanner></SetupBanner>
             <router-view />
           </v-flex>
         </v-layout>
@@ -19,6 +20,7 @@
 <script>
 import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
+import SetupBanner from '@/components/SetupBanner.vue';
 import Notification from '@/components/Notification.vue';
 
 export default {
@@ -26,7 +28,8 @@ export default {
   components: {
     Footer,
     Header,
-    Notification
+    Notification,
+    SetupBanner
   },
   props: {
     source: String
