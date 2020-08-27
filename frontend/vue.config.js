@@ -24,9 +24,5 @@ module.exports = {
         path.resolve(__dirname, 'src/api/server/index.js')
       );
     }
-
-    config.module
-      .rule('js' /* or css */)
-      .exclude.add(path.resolve(__dirname, 'src/config/config.json'));
   }
 };

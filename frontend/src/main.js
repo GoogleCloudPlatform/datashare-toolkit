@@ -19,35 +19,42 @@ import 'firebase/analytics'; // for authentication
 
 import config from './config';
 
+console.log(process.env.BASE_URL);
 // Fetch and load the store settings
-store.dispatch('getSettings').then(() => {
-  // Initialize Firebase with a "default" Firebase project
-  const firebaseConfig = {
-    apiKey: config.firebaseApiKey,
-    authDomain: config.firebaseAuthDomain,
-    projectId: config.firebaseProjectId,
-    storageBucket: config.firebaseStorageBucket,
-    appId: config.firebaseAppId,
-    measurementId: config.firebaseMeasurementId
-  };
+fetch(process.env.BASE_URL + 'config/config.json').then(response => {
+  response.json().then(json => {
+    console.log(json);
+    config.initialize(json);
+    console.log(config);
 
-  const defaultProject = firebase.initializeApp(firebaseConfig);
-  firebase.analytics();
+    // Initialize Firebase with a "default" Firebase project
+    const firebaseConfig = {
+      apiKey: config.firebaseApiKey,
+      authDomain: config.firebaseAuthDomain,
+      projectId: config.firebaseProjectId,
+      storageBucket: config.firebaseStorageBucket,
+      appId: config.firebaseAppId,
+      measurementId: config.firebaseMeasurementId
+    };
 
-  firebase.auth().useDeviceLanguage();
-  firebase.auth().onAuthStateChanged(user => {
-    store.dispatch('fetchUser', user);
-    if (user) {
-      console.debug('User is signed in');
-    } else {
-      console.debug('No user is signed in');
-    }
+    const defaultProject = firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
 
-    new Vue({
-      vuetify,
-      router,
-      store,
-      render: h => h(App)
-    }).$mount('#app');
+    firebase.auth().useDeviceLanguage();
+    firebase.auth().onAuthStateChanged(user => {
+      store.dispatch('fetchUser', user);
+      if (user) {
+        console.debug('User is signed in');
+      } else {
+        console.debug('No user is signed in');
+      }
+
+      new Vue({
+        vuetify,
+        router,
+        store,
+        render: h => h(App)
+      }).$mount('#app');
+    });
   });
 });
