@@ -26,7 +26,12 @@ class Config {
   }
 
   getConfigValue(key, throws = true) {
-    let val = this.config[key];
+    let val;
+    if (process.env.NODE_ENV === 'production') {
+      val = this.config[key];
+    } else {
+      val = process.env[key] || this.config[key];
+    }
     if (throws && !val) {
       throw new Error(`Configuration missing for key: ${key}`);
     }

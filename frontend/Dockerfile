@@ -35,6 +35,7 @@ RUN npm run build
 
 # --- Release with Alpine ----
 FROM nginx:1.17-alpine as release
+RUN apk update && apk add --no-cache jq moreutils
 COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
