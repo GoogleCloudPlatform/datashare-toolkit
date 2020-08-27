@@ -7,18 +7,20 @@ echo
 
 UNAME=$(uname | awk '{print tolower($0)}')
 IFS=$'\n'
-for name in $(printenv); do
-    if echo "${name}" | egrep ^VUE_APP_.+; then
+for var in $(printenv); do
+    if echo "${var}" | egrep ^VUE_APP_.+; then
         if [ "$UNAME" == "darwin" ]; then
             # macOS
             # echo 'Running on macOS'
-            value="$(echo $name | cut -d '=' -f 2-)"; echo "Replace value: $value"
-            sed -i '' -E "s/\"($name)\":.+/\"\1\": \"$value\",/g" "$CONFIG_PATH"
+            value="$(echo $var | cut -d '=' -f 2-)"; echo "Replace value: $value"
+            sed -i '' -E "s/\"($var)\":.+/\"\1\": \"$value\",/g" "$CONFIG_PATH"
         else
             # linux
             # echo 'Running on linux'
-            value="$(echo $name | cut -d '=' -f 2-)"; echo "Replace value: $value"
-            sed -i -E "s/\"($name)\":.+/\"\1\": \"$value\",/g" "$CONFIG_PATH"
+            key="$(echo $var | cut -d '=' -f 1)"; echo "Replace key: $key"
+            value="$(echo $var | cut -d '=' -f 2-)"; echo "Replace value: $value"
+            echo "Replacing key $key with value $value"
+            sed -i -E "s/\"($key)\":.+/\"\1\": \"$value\",/g" "$CONFIG_PATH"
         fi
     fi
 done
