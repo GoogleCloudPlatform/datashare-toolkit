@@ -30,7 +30,6 @@ WORKDIR /app
 
 # Bundle app source
 COPY src src/
-COPY config/config.json config/config.json
 COPY *.js ./
 RUN npm run build
 
@@ -41,7 +40,8 @@ COPY config/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 
 RUN mkdir -p /usr/share/nginx/html/config
-COPY ./config/config.json /usr/share/nginx/html/config/config.json
+COPY public/config/config.json /usr/share/nginx/html/config/config.json
+
 COPY ./docker/entrypoint.sh /entrypoint.sh
 EXPOSE 8080
 ENTRYPOINT ["sh", "/entrypoint.sh"]
