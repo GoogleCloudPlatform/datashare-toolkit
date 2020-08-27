@@ -188,20 +188,4 @@ admin.post('/projects/:projectId/admin::custom', async (req, res) => {
     }
 });
 
-admin.get('/projects/:projectId/admin/uiConfiguration', async (req, res) => {
-    let config = process.env.UI_CONFIGURATION;
-    if (config) {
-        config = JSON.parse(config);
-    }
-    let data = {
-        success: config ? true : false,
-        data: config
-    };
-    var code = 200;
-    res.status(code).json({
-        code: code,
-        ...data
-    });
-});
-
 module.exports = admin;

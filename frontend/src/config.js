@@ -25,6 +25,21 @@ class Config {
     }
   }
 
+  isValid() {
+    try {
+      this.apiBaseUrl();
+      this.firebaseApiKey();
+      this.firebaseAuthDomain();
+      this.firebaseProjectId();
+      this.firebaseStorageBucket();
+      this.firebaseAppId();
+      this.firebaseMeasurementId();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   getConfigValue(key, throws = true) {
     let val;
     if (process.env.NODE_ENV === 'development') {
@@ -64,6 +79,27 @@ class Config {
 
   get firebaseMeasurementId() {
     return this.getConfigValue('VUE_APP_FIREBASE_MEASUREMENT_ID');
+  }
+
+  get myProductsMoreInformationText() {
+    return this.getConfigValue(
+      'VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT',
+      false
+    );
+  }
+
+  get myProductsMoreInformationButtonText() {
+    return this.getConfigValue(
+      'VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT',
+      false
+    );
+  }
+
+  get myProductsMoreInformationButtonUrl() {
+    return this.getConfigValue(
+      'VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL',
+      false
+    );
   }
 }
 
