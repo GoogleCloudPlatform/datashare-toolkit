@@ -13,12 +13,12 @@ for name in $(printenv); do
             # macOS
             # echo 'Running on macOS'
             value="$(echo $name | cut -d '=' -f 2-)"; echo "Replace value: $value"
-            sed -i '' -E "s/\"($name)\":.+/\"\1\": \"$value\",/g" "${CONFIG_PATH}"
+            sed -i '' -E "s/\"($name)\":.+/\"\1\": \"$value\",/g" "$CONFIG_PATH"
         else
             # linux
             # echo 'Running on linux'
             value="$(echo $name | cut -d '=' -f 2-)"; echo "Replace value: $value"
-            sed -i -E "s/\"($name)\":.+/\"\1\": \"$value\",/g" "${CONFIG_PATH}"
+            sed -i -E "s/\"($name)\":.+/\"\1\": \"$value\",/g" "$CONFIG_PATH"
         fi
     fi
 done
