@@ -25,6 +25,9 @@ for var in $(printenv); do
     fi
 done
 
+# Remove trailing comma from last field in the object
+sed ':begin;$!N;s/,\n}/\n}/g;tbegin;P;D' "$CONFIG_PATH"
+
 echo
 cat $CONFIG_PATH
 echo "Setting variables completed"
