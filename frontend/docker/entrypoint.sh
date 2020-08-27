@@ -26,7 +26,7 @@ for var in $(printenv); do
 done
 
 # Remove trailing comma from last field in the object
-sed ':begin;$!N;s/,\n}/\n}/g;tbegin;P;D' "$CONFIG_PATH"
+sed -i -E ':begin;$!N;s/,\n}/\n}/g;tbegin;P;D' "$CONFIG_PATH"
 
 echo
 cat $CONFIG_PATH
