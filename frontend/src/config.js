@@ -18,42 +18,11 @@
 const underscore = require('underscore');
 
 class Config {
-  constructor(config) {
-    // Choose environment option
-    let environment = process.env.DATASHARE_ENVIRONMENT;
-
-    this.baseConfig = config; // require('./../config/config.json');
-    if (!this.baseConfig) {
-      this.baseConfig = {};
-    }
-
-    if (environment) {
-      this.envConfig = require(`./../config/config.${environment}.json`);
-      if (!this.envConfig) {
-        this.envConfig = {};
-      }
-    }
-
-    this.config = underscore.defaults(this.envConfig, this.baseConfig);
-  }
-
   initialize(config) {
-    // Choose environment option
-    let environment = process.env.DATASHARE_ENVIRONMENT;
-
-    this.baseConfig = config; // require('./../config/config.json');
-    if (!this.baseConfig) {
-      this.baseConfig = {};
+    this.config = config;
+    if (!this.config) {
+      this.config = {};
     }
-
-    if (environment) {
-      this.envConfig = require(`./../config/config.${environment}.json`);
-      if (!this.envConfig) {
-        this.envConfig = {};
-      }
-    }
-
-    this.config = underscore.defaults(this.envConfig, this.baseConfig);
   }
 
   getConfigValue(key, throws = true) {
