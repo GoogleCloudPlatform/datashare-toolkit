@@ -19,7 +19,6 @@ import 'firebase/analytics'; // for authentication
 
 import config from './config';
 
-console.log(process.env.BASE_URL);
 // Fetch and load the store settings
 fetch(process.env.BASE_URL + 'config/config.json').then(response => {
   response.json().then(json => {

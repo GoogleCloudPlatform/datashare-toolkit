@@ -57,18 +57,6 @@ export default {
   _apiBaseUrl() {
     return config.apiBaseUrl + '/projects/' + config.firebaseProjectId;
   },
-  // default to the mock which is just a static config load
-  getSettings() {
-    return mock.getSettings();
-  },
-  // default to the mock which is just a static config load
-  updateSettings(payload) {
-    return mock.updateSettings(payload);
-  },
-  // default to the mock which is just a static config load
-  resetSettings() {
-    return mock.resetSettings();
-  },
   getDatasets(includeAll) {
     let queryAll = false;
     if (includeAll && includeAll === true) {
