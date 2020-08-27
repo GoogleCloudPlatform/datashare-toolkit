@@ -77,16 +77,6 @@ export default {
       )}, removed: ${JSON.stringify(payload.removed)}`
     );
   },
-  getSettings() {
-    // 0 second wait as this call is used by the prod call currently
-    return get(settings, 0);
-  },
-  updateSettings(payload) {
-    return update(payload, 100); // wait 100ms before returning
-  },
-  resetSettings() {
-    return get(settings, 100); // wait 100ms before returning
-  },
   deleteDataset(projectId, datasetId) {
     console.log(`Mock delete dataset: ${projectId}:${datasetId}`);
   },

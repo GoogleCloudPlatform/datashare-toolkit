@@ -78,40 +78,6 @@ const store = new Vuex.Store({
         commit('setUser', null);
       }
     },
-    getSettings({ commit }) {
-      if (!this._vm.$session.exists()) {
-        this._vm.$session.start();
-      }
-      if (!this._vm.$session.get('settings')) {
-        return client
-          .getSettings()
-          .then(settings => commit('setSettings', settings))
-          .catch(error => {
-            notify(error);
-          });
-      }
-      return commit('setSettings', this._vm.$session.get('settings'));
-    },
-    updateSettings({ commit }, payload) {
-      return client
-        .updateSettings(payload)
-        .then(settings => commit('setSettings', settings))
-        .catch(error => {
-          notify(error);
-        });
-    },
-    resetSettings({ commit }) {
-      if (!this._vm.$session.exists()) {
-        this._vm.$session.start();
-      }
-      this._vm.$session.clear();
-      return client
-        .getSettings()
-        .then(settings => commit('setSettings', settings))
-        .catch(error => {
-          notify(error);
-        });
-    },
     // eslint-disable-next-line no-unused-vars
     getDatasets({ commit }, payload) {
       return client.getDatasets(payload.includeAll).catch(error => {
