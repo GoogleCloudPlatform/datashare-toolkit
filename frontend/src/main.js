@@ -23,9 +23,7 @@ console.log(process.env.BASE_URL);
 // Fetch and load the store settings
 fetch(process.env.BASE_URL + 'config/config.json').then(response => {
   response.json().then(json => {
-    console.log(json);
     config.initialize(json);
-    console.log(config);
 
     // Initialize Firebase with a "default" Firebase project
     const firebaseConfig = {
