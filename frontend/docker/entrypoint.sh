@@ -16,11 +16,11 @@ for var in $(printenv); do
         if [ "$UNAME" == "darwin" ]; then
             # macOS
             # echo 'Running on macOS'
-            sed -i '' -E "s/\"($var)\":.+/\"\1\": \"$value\",/g" "$CONFIG_PATH"
+            sed -i '' -E "s~\"($key)\":.+~\"\1\": \"$value\",~g" "$CONFIG_PATH"
         else
             # linux
             # echo 'Running on linux'
-            sed -i -E "s/\"($key)\":.+/\"\1\": \"$value\",/g" "$CONFIG_PATH"
+            sed -i -E "s~\"($key)\":.+~\"\1\": \"$value\",~g" "$CONFIG_PATH"
         fi
     fi
 done
