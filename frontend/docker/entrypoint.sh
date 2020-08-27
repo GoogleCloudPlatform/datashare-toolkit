@@ -11,7 +11,7 @@ for var in $(printenv); do
         key="$(echo $var | cut -d '=' -f 1)"
         value="$(echo $var | cut -d '=' -f 2-)"
         echo "Replacing key $key with value $value"
-        jq ".$key = "\"$value\"""  config.json | sponge config.json
+        jq ".$key = "\"$value\"""  "$CONFIG_PATH" | sponge "$CONFIG_PATH"
     fi
 done
 
