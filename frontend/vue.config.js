@@ -28,7 +28,8 @@ module.exports = {
     config.module
       .rule('js' /* or css */)
       .exclude.add(path.resolve(__dirname, 'src/config/config.json'));
-  },
+  }
+  /*,
   configureWebpack: {
     module: {
       rules: [
@@ -45,5 +46,5 @@ module.exports = {
         }
       ]
     }
-  }
+  }*/
 };
