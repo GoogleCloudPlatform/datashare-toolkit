@@ -29,22 +29,4 @@ module.exports = {
       .rule('js' /* or css */)
       .exclude.add(path.resolve(__dirname, 'src/config/config.json'));
   }
-  /*,
-  configureWebpack: {
-    module: {
-      rules: [
-        {
-          test: /config.*config\.js$/,
-          use: [
-            {
-              loader: 'file-loader',
-              options: {
-                name: 'config.js'
-              }
-            }
-          ]
-        }
-      ]
-    }
-  }*/
 };
