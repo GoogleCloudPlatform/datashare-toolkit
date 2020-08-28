@@ -13,6 +13,12 @@ Vue.config.productionTip = false;
 // Enable vue-form
 Vue.use(VueForm);
 
+import { LoaderPlugin } from 'vue-google-login';
+Vue.use(LoaderPlugin, {
+  client_id:
+    '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com'
+});
+
 import firebase from 'firebase/app';
 import 'firebase/auth'; // for authentication
 import 'firebase/analytics'; // for authentication
@@ -39,7 +45,8 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
 
     firebase.auth().useDeviceLanguage();
     firebase.auth().onAuthStateChanged(user => {
-      store.dispatch('fetchUser', user);
+      // Here is where the user info is currently saved.
+      // store.dispatch('fetchUser', user);
       if (user) {
         console.debug('User is signed in');
       } else {

@@ -89,16 +89,27 @@
 -->
       <v-tooltip bottom v-if="!user.loggedIn">
         <template v-slot:activator="{ on }">
-          <v-btn icon @click.prevent="signIn" dark v-on="on">
-            <v-icon title="login">{{ icons.login }}</v-icon>
+          <v-btn icon dark v-on="on">
+            <GoogleLogin
+              :params="params"
+              :onSuccess="onSuccess"
+              :onFailure="onFailure"
+              ><v-icon title="login">{{ icons.login }}</v-icon></GoogleLogin
+            >
           </v-btn>
         </template>
         <span>Login</span>
       </v-tooltip>
       <v-tooltip bottom v-if="user.loggedIn">
         <template v-slot:activator="{ on }">
-          <v-btn icon @click.prevent="signOut" dark v-on="on">
-            <v-icon title="login">{{ icons.logout }}</v-icon>
+          <v-btn icon dark v-on="on">
+            <GoogleLogin
+              :params="params"
+              :logoutButton="true"
+              :onSuccess="onSuccess"
+              :onFailure="onFailure"
+              ><v-icon title="logout">{{ icons.logout }}</v-icon></GoogleLogin
+            >
           </v-btn>
         </template>
         <span>Logout</span>
@@ -141,9 +152,13 @@ import {
 
 import firebase from 'firebase/app';
 import { mapGetters } from 'vuex';
+import GoogleLogin from 'vue-google-login';
 
 export default {
   name: 'app-header',
+  components: {
+    GoogleLogin
+  },
   data: () => ({
     drawer: false,
     mini: true,
@@ -165,6 +180,11 @@ export default {
     },
     toolbar: {
       title: 'Datashare'
+    },
+    // client_id is the only required property but you can add several more params, full list down bellow on the Auth api section
+    params: {
+      client_id:
+        '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com'
     }
   }),
   mounted() {
@@ -196,19 +216,28 @@ export default {
       });
   },
   methods: {
-    signIn() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      firebase.auth().signInWithRedirect(provider);
-    },
-    signOut() {
-      firebase
-        .auth()
-        .signOut()
-        .then(() => {
-          this.$router.replace({
-            name: 'home'
-          });
+    onSuccess(googleUser) {
+      if (googleUser) {
+        console.log(`User signed in: ${googleUser}`);
+        const profile = googleUser.getBasicProfile();
+        const user = {
+          displayName: profile.getName(),
+          email: profile.getEmail(),
+          photoURL: profile.getImageUrl()
+        };
+        console.log(user);
+        this.$store.dispatch('fetchUser', user);
+      } else {
+        console.log(`User signed out: ${googleUser}`);
+        this.$store.dispatch('fetchUser', null);
+        this.$router.replace({
+          name: 'home'
         });
+      }
+    },
+    onFailure(googleUser) {
+      console.log('failure');
+      console.log(googleUser);
     },
     canAccessRoute(navItem) {
       let routes = this.$router.options.routes;

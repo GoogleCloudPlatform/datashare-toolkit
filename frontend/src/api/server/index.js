@@ -2,6 +2,13 @@ import store from './../../store';
 import axios from 'axios';
 import mock from './../mock';
 
+import Vue from 'vue';
+import { LoaderPlugin } from 'vue-google-login';
+Vue.use(LoaderPlugin, {
+  client_id:
+    '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com'
+});
+
 import firebase from 'firebase/app';
 import router from './../../router';
 
@@ -22,10 +29,21 @@ axios.interceptors.request.use(async function(config) {
     if (account) {
       config.headers['x-gcp-account'] = account;
     }
-    const token = await firebase.auth().currentUser.getIdToken();
-    config.headers.Authorization = `Bearer ${token}`;
+    console.log('here');
+    Vue.GoogleAuth.then(auth2 => {
+      console.log('test');
+      const user = auth2.currentUser.get();
+      console.log(`Current user is ${JSON.stringify(user)}`);
+    })
+      .getAuthResponse(true)
+      .then(result => {
+        console.log(authResponse);
+        config.headers.Authorization = `Bearer ${token}`;
+        return config;
+      });
+  } else {
+    return config;
   }
-  return config;
 });
 
 // reject anything that is not application/json
