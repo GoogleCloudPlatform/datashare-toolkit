@@ -11,7 +11,7 @@
 FROM node:12.6-alpine as base
 
 # Set the file maintainer (your name - the file's author)
-MAINTAINER Chris Page <chrispage@google.com>
+LABEL maintainer="Chris Page <chrispage@google.com>, Mark Servidio <mservidio@google.com>"
 
 # Set the application directory
 RUN mkdir -p /app
@@ -40,9 +40,6 @@ RUN apk update && apk add --no-cache jq moreutils
 COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
-
-RUN mkdir -p /usr/share/nginx/html/config
-COPY public/config/config.json /usr/share/nginx/html/config/config.json
 
 COPY ./docker/entrypoint.sh /entrypoint.sh
 EXPOSE 8080
