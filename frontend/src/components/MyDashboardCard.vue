@@ -286,6 +286,7 @@ import {
 import Dialog from '@/components/Dialog.vue';
 import UrlHelper from '../urlHelper';
 import firebase from 'firebase/app';
+import config from './../config';
 
 export default {
   components: {
@@ -355,18 +356,9 @@ export default {
     }
   },
   mounted() {
-    this.$store.dispatch('getUiConfiguration').then(response => {
-      if (response && response.data) {
-        let data = response.data;
-        if (data.myProducts) {
-          this.moreInformationText = data.myProducts.moreInformationText;
-          this.moreInformationButtonText =
-            data.myProducts.moreInformationButtonText;
-          this.moreInformationButtonUrl =
-            data.myProducts.moreInformationButtonUrl;
-        }
-      }
-    });
+    this.moreInformationText = config.myProductsMoreInformationText;
+    this.moreInformationButtonText = config.myProductsMoreInformationButtonText;
+    this.moreInformationButtonUrl = config.myProductsMoreInformationButtonUrl;
   },
   computed: {
     selectedItemSummary() {

@@ -5,6 +5,8 @@ import mock from './../mock';
 import firebase from 'firebase/app';
 import router from './../../router';
 
+import config from './../../config';
+
 // set the default Accept header to application/json
 axios.defaults.headers.common['Accept'] = 'application/json';
 
@@ -53,23 +55,7 @@ axios.interceptors.response.use(
 
 export default {
   _apiBaseUrl() {
-    return (
-      store.getters.settings.apiBaseUrl +
-      '/projects/' +
-      store.getters.settings.projectId
-    );
-  },
-  // default to the mock which is just a static config load
-  getSettings() {
-    return mock.getSettings();
-  },
-  // default to the mock which is just a static config load
-  updateSettings(payload) {
-    return mock.updateSettings(payload);
-  },
-  // default to the mock which is just a static config load
-  resetSettings() {
-    return mock.resetSettings();
+    return config.apiBaseUrl + '/projects/' + config.firebaseProjectId;
   },
   getDatasets(includeAll) {
     let queryAll = false;

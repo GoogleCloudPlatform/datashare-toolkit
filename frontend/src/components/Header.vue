@@ -298,12 +298,6 @@ export default {
           name: 'admin',
           title: 'Admin',
           icon: mdiShieldKey
-        },
-        {
-          subheader: 'Settings',
-          name: 'settings',
-          title: 'Settings',
-          icon: mdiCog
         }
       ];
       // https://router.vuejs.org/api/#to
