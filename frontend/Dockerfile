@@ -31,6 +31,7 @@ WORKDIR /app
 # Bundle app source
 COPY src src/
 COPY *.js ./
+COPY public public/
 RUN npm run build
 
 # --- Release with Alpine ----
