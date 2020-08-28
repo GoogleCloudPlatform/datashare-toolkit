@@ -158,8 +158,7 @@ The GCP project's Cloud IAM policy, *constraints/iam.allowedPolicyMemberDomains*
       --image gcr.io/${PROJECT_ID}/ds-frontend-ui:${TAG} \
       --region=us-central1 \
       --allow-unauthenticated \
-      --platform managed \
-      --set-env-vars=FIREBASE_API_KEY=${FIREBASE_API_KEY}
+      --platform managed
 
 Open the app URL in your browser. You can return the FQDN via:
 
@@ -186,7 +185,6 @@ You must include your Firebase API Key before you deploy the Datashare UI.
 
 ```
   properties:
-    firebaseApiKey: YOUR_FIREBASE_WEBAPI_KEY
     containerTag: dev
     region: us-central1
     timeout: 600s
