@@ -225,14 +225,16 @@ export default {
           email: profile.getEmail(),
           photoURL: profile.getImageUrl()
         };
-        console.log(user);
         this.$store.dispatch('fetchUser', user);
       } else {
         console.log(`User signed out: ${googleUser}`);
         this.$store.dispatch('fetchUser', null);
-        this.$router.replace({
-          name: 'home'
-        });
+        const name = 'home';
+        if (this.$route.name !== name) {
+          this.$router.replace({
+            name: 'home'
+          });
+        }
       }
     },
     onFailure(googleUser) {

@@ -30,6 +30,19 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
   response.json().then(json => {
     config.initialize(json);
 
+    Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get()) {
+        const googleUser = auth2.currentUser.get();
+        const profile = googleUser.getBasicProfile();
+        const user = {
+          displayName: profile.getName(),
+          email: profile.getEmail(),
+          photoURL: profile.getImageUrl()
+        };
+        store.dispatch('fetchUser', user);
+      }
+    });
+
     // Initialize Firebase with a "default" Firebase project
     const firebaseConfig = {
       apiKey: config.firebaseApiKey,
