@@ -9,7 +9,7 @@ Vue.use(LoaderPlugin, {
     '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com'
 });
 
-import firebase, { analytics } from 'firebase/app';
+import firebase from 'firebase/app';
 import router from './../../router';
 
 import config from './../../config';
