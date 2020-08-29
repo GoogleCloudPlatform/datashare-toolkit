@@ -153,6 +153,12 @@ import {
 import { mapGetters } from 'vuex';
 import GoogleLogin from 'vue-google-login';
 
+import Vue from 'vue';
+Vue.use(GoogleLogin, {
+  client_id:
+    '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com'
+});
+
 export default {
   name: 'app-header',
   components: {
@@ -186,6 +192,21 @@ export default {
         '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com'
     }
   }),
+  mounted() {
+    Vue.GoogleAuth.then(auth2 => {
+      // If user isn't logged in, show sign in window
+      if (auth2.isSignedIn.get() === false) {
+        auth2
+          .signIn()
+          .then(result => {
+            this.onSuccess(result);
+          })
+          .catch(err => {
+            this.onFailure(err);
+          });
+      }
+    });
+  },
   methods: {
     onSuccess(googleUser) {
       if (googleUser) {
@@ -206,9 +227,8 @@ export default {
         }
       }
     },
-    onFailure(googleUser) {
-      console.log('failure');
-      console.log(googleUser);
+    onFailure(error) {
+      console.log(error);
     },
     canAccessRoute(navItem) {
       let routes = this.$router.options.routes;
