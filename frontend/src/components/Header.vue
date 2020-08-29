@@ -150,7 +150,6 @@ import {
   mdiBriefcaseAccount
 } from '@mdi/js';
 
-import firebase from 'firebase/app';
 import { mapGetters } from 'vuex';
 import GoogleLogin from 'vue-google-login';
 
@@ -187,38 +186,9 @@ export default {
         '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com'
     }
   }),
-  mounted() {
-    firebase
-      .auth()
-      .getRedirectResult()
-      .then(function(result) {
-        if (result.credential) {
-          // This gives you a Google Access Token. You can use it to access the Google API.
-          // var token = result.credential.accessToken;
-          // console.log(`Token: ${token}`);
-          // this.$router.replace({ name: 'Welcome' });
-        }
-        // The signed-in user info.
-        // var user = result.user;
-        // console.log(`Result: ${JSON.stringify(user, null, 3)}`);
-      })
-      .catch(function(error) {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // The email of the user's account used.
-        var email = error.email;
-        // The firebase.auth.AuthCredential type that was used.
-        var credential = error.credential;
-
-        this.error = error.message;
-        console.log(`${errorCode} ${errorMessage} ${email} ${credential}`);
-      });
-  },
   methods: {
     onSuccess(googleUser) {
       if (googleUser) {
-        console.log(`User signed in: ${googleUser}`);
         const profile = googleUser.getBasicProfile();
         const user = {
           displayName: profile.getName(),
@@ -227,7 +197,6 @@ export default {
         };
         this.$store.dispatch('fetchUser', user);
       } else {
-        console.log(`User signed out: ${googleUser}`);
         this.$store.dispatch('fetchUser', null);
         const name = 'home';
         if (this.$route.name !== name) {

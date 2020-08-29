@@ -1,6 +1,5 @@
 import store from './../../store';
 import axios from 'axios';
-import mock from './../mock';
 
 import Vue from 'vue';
 import { LoaderPlugin } from 'vue-google-login';
@@ -9,7 +8,7 @@ Vue.use(LoaderPlugin, {
     '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com'
 });
 
-import firebase from 'firebase/app';
+// import firebase from 'firebase/app';
 import router from './../../router';
 
 import config from './../../config';
@@ -51,8 +50,8 @@ axios.interceptors.response.use(
   error => {
     if (error.response) {
       if (error.response.status === 401) {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithRedirect(provider);
+        // const provider = new firebase.auth.GoogleAuthProvider();
+        // firebase.auth().signInWithRedirect(provider);
       } else if (error.response.status === 403) {
         router.replace('/restricted');
       }
