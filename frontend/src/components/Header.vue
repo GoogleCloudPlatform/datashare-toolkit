@@ -152,6 +152,7 @@ import {
 
 import { mapGetters } from 'vuex';
 import GoogleLogin from 'vue-google-login';
+import clickMixin from '../mixins/clickMixin';
 
 import Vue from 'vue';
 Vue.use(GoogleLogin, {
@@ -161,6 +162,7 @@ Vue.use(GoogleLogin, {
 
 export default {
   name: 'app-header',
+  mixins: [clickMixin],
   components: {
     GoogleLogin
   },
@@ -192,7 +194,13 @@ export default {
         '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com'
     }
   }),
+  created() {
+    this.$on('authCompleted', value => {
+      console.log(`authCompleted called with value: ${value}`);
+    });
+  },
   mounted() {
+    this.clicked('test');
     Vue.GoogleAuth.then(auth2 => {
       // If user isn't logged in, show sign in window
       if (auth2.isSignedIn.get() === false) {
