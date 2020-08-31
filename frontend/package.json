@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "deploy": "npm run build && firebase deploy --only hosting"
+    "deploy": "./deploy.sh"
   },
   "dependencies": {
     "@mdi/font": "^5.5.55",
