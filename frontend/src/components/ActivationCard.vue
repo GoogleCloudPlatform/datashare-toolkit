@@ -8,7 +8,6 @@
 
 <script>
 import authMixin from '../mixins/authMixin';
-import firebase from 'firebase/app';
 
 export default {
   name: 'activation',

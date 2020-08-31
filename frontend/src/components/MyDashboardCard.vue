@@ -285,7 +285,6 @@ import {
 } from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 import UrlHelper from '../urlHelper';
-import firebase from 'firebase/app';
 import authMixin from '../mixins/authMixin';
 import config from './../config';
 
@@ -344,9 +343,7 @@ export default {
   },
   mounted() {
     this.performLogin().then(result => {
-      console.log(`result ${result}`);
       if (result) {
-        console.log('Login completed loading products');
         this.loadProducts();
       }
     });

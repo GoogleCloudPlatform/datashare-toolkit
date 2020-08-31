@@ -59,7 +59,7 @@ axios.interceptors.response.use(
 
 export default {
   _apiBaseUrl() {
-    return config.apiBaseUrl + '/projects/' + config.firebaseProjectId;
+    return config.apiBaseUrl + '/projects/' + config.projectId;
   },
   getDatasets(includeAll) {
     let queryAll = false;

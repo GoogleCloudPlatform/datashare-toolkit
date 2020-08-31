@@ -19,7 +19,6 @@ export default {
       });
     },
     onAuthSuccess(googleUser) {
-      console.log(`On Success: ${JSON.stringify(googleUser)}`);
       if (googleUser) {
         const profile = googleUser.getBasicProfile();
         const user = {
@@ -38,7 +37,6 @@ export default {
       }
     },
     onAuthFailure(error) {
-      console.log(`On Failure: ${JSON.stringify(error)}`);
       return this.$store.dispatch('fetchUser', null).then(() => {
         this.redirectHome();
         return false;
@@ -50,8 +48,6 @@ export default {
         this.$router.replace({
           name: 'home'
         });
-      } else {
-        console.log('Will not redirect');
       }
     }
   }
