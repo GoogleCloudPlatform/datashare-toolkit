@@ -92,8 +92,8 @@
           <v-btn icon dark v-on="on">
             <GoogleLogin
               :params="params"
-              :onSuccess="onSuccess"
-              :onFailure="onFailure"
+              :onSuccess="onAuthSuccess"
+              :onFailure="onAuthFailure"
               ><v-icon title="login">{{ icons.login }}</v-icon></GoogleLogin
             >
           </v-btn>
@@ -106,8 +106,8 @@
             <GoogleLogin
               :params="params"
               :logoutButton="true"
-              :onSuccess="onSuccess"
-              :onFailure="onFailure"
+              :onSuccess="onAuthSuccess"
+              :onFailure="onAuthFailure"
               ><v-icon title="logout">{{ icons.logout }}</v-icon></GoogleLogin
             >
           </v-btn>
@@ -151,18 +151,13 @@ import {
 } from '@mdi/js';
 
 import { mapGetters } from 'vuex';
+import config from '../config';
 import GoogleLogin from 'vue-google-login';
-import clickMixin from '../mixins/clickMixin';
-
-import Vue from 'vue';
-Vue.use(GoogleLogin, {
-  client_id:
-    '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com'
-});
+import authMixin from '../mixins/authMixin';
 
 export default {
   name: 'app-header',
-  mixins: [clickMixin],
+  mixins: [authMixin],
   components: {
     GoogleLogin
   },
@@ -188,10 +183,8 @@ export default {
     toolbar: {
       title: 'Datashare'
     },
-    // client_id is the only required property but you can add several more params, full list down bellow on the Auth api section
     params: {
-      client_id:
-        '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com'
+      client_id: config.googleAppClientId
     }
   }),
   created() {
@@ -199,45 +192,7 @@ export default {
       console.log(`authCompleted called with value: ${value}`);
     });
   },
-  mounted() {
-    this.clicked('test');
-    Vue.GoogleAuth.then(auth2 => {
-      // If user isn't logged in, show sign in window
-      if (auth2.isSignedIn.get() === false) {
-        auth2
-          .signIn()
-          .then(result => {
-            this.onSuccess(result);
-          })
-          .catch(err => {
-            this.onFailure(err);
-          });
-      }
-    });
-  },
   methods: {
-    onSuccess(googleUser) {
-      if (googleUser) {
-        const profile = googleUser.getBasicProfile();
-        const user = {
-          displayName: profile.getName(),
-          email: profile.getEmail(),
-          photoURL: profile.getImageUrl()
-        };
-        this.$store.dispatch('fetchUser', user);
-      } else {
-        this.$store.dispatch('fetchUser', null);
-        const name = 'home';
-        if (this.$route.name !== name) {
-          this.$router.replace({
-            name: 'home'
-          });
-        }
-      }
-    },
-    onFailure(error) {
-      console.log(error);
-    },
     canAccessRoute(navItem) {
       let routes = this.$router.options.routes;
       let route = routes.filter(item => {

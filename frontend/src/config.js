@@ -28,6 +28,7 @@ class Config {
   isValid() {
     try {
       this.apiBaseUrl;
+      this.googleAppClientId;
       this.firebaseApiKey;
       this.firebaseAuthDomain;
       this.firebaseProjectId;
@@ -55,6 +56,10 @@ class Config {
 
   get apiBaseUrl() {
     return this.getConfigValue('VUE_APP_API_BASE_URL');
+  }
+
+  get googleAppClientId() {
+    return this.getConfigValue('VUE_APP_GOOGLE_APP_CLIENT_ID');
   }
 
   get firebaseApiKey() {

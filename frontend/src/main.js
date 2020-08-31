@@ -14,17 +14,16 @@ Vue.config.productionTip = false;
 Vue.use(VueForm);
 
 import { LoaderPlugin } from 'vue-google-login';
-Vue.use(LoaderPlugin, {
-  client_id:
-    '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com'
-});
-
 import config from './config';
 
 // Fetch and load the store settings
 fetch(process.env.BASE_URL + 'config/config.json').then(response => {
   response.json().then(json => {
     config.initialize(json);
+
+    Vue.use(LoaderPlugin, {
+      client_id: config.googleAppClientId
+    });
 
     Vue.GoogleAuth.then(auth2 => {
       if (auth2.isSignedIn.get()) {

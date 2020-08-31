@@ -1,16 +1,10 @@
 import store from './../../store';
 import axios from 'axios';
 
-import Vue from 'vue';
-import { LoaderPlugin } from 'vue-google-login';
-Vue.use(LoaderPlugin, {
-  client_id:
-    '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com'
-});
-
-// import firebase from 'firebase/app';
 import router from './../../router';
 
+import Vue from 'vue';
+import authMixin from './../../mixins/authMixin';
 import config from './../../config';
 
 // set the default Accept header to application/json
@@ -50,8 +44,7 @@ axios.interceptors.response.use(
   error => {
     if (error.response) {
       if (error.response.status === 401) {
-        // const provider = new firebase.auth.GoogleAuthProvider();
-        // firebase.auth().signInWithRedirect(provider);
+        router.replace('/');
       } else if (error.response.status === 403) {
         router.replace('/restricted');
       }

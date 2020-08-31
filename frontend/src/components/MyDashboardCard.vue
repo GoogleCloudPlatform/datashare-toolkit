@@ -286,9 +286,11 @@ import {
 import Dialog from '@/components/Dialog.vue';
 import UrlHelper from '../urlHelper';
 import firebase from 'firebase/app';
+import authMixin from '../mixins/authMixin';
 import config from './../config';
 
 export default {
+  mixins: [authMixin],
   components: {
     Dialog
   },
@@ -340,22 +342,15 @@ export default {
       moreInformationButtonUrl: ''
     };
   },
-  created() {
-    const user = firebase.auth().currentUser;
-    this.user = user;
-    if (!user) {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      firebase
-        .auth()
-        .signInWithRedirect(provider)
-        .then(result => {
-          this.loadProducts();
-        });
-    } else {
-      this.loadProducts();
-    }
-  },
   mounted() {
+    this.performLogin().then(result => {
+      console.log(`result ${result}`);
+      if (result) {
+        console.log('Login completed loading products');
+        this.loadProducts();
+      }
+    });
+
     this.moreInformationText = config.myProductsMoreInformationText;
     this.moreInformationButtonText = config.myProductsMoreInformationButtonText;
     this.moreInformationButtonUrl = config.myProductsMoreInformationButtonUrl;
