@@ -37,6 +37,7 @@ export default {
       }
     },
     onAuthFailure(error) {
+      console.error(error);
       return this.$store.dispatch('fetchUser', null).then(() => {
         this.redirectHome();
         return false;
