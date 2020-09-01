@@ -53,8 +53,10 @@ export default {
   computed: {
     userSummary() {
       // <b>Token</b>: ${this.jwtToken}<br/>
-      return `<b>Display Name</b>: ${this.user.displayName}<br/>
-      <b>Email</b>: ${this.user.email}<br/>
+      return `<b>Display Name</b>: ${
+        this.user ? this.user.displayName : ''
+      }<br/>
+      <b>Email</b>: ${this.user ? this.user.email : ''}<br/>
       <b>Activation Status: ${this.activated}</b>`;
     },
     jwtToken() {
