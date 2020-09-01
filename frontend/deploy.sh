@@ -14,7 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export TAG=dev;
+if [[ -z "${TAG:=}" ]]; then
+    echo 'Defaulting TAG to "dev"';
+    export TAG=dev;
+fi
+
 export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
 
 gcloud builds submit --config cloudbuild.yaml --substitutions=TAG_NAME=${TAG}

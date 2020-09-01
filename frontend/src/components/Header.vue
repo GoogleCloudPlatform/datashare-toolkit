@@ -183,15 +183,8 @@ export default {
     toolbar: {
       title: 'Datashare'
     },
-    params: {
-      client_id: config.googleAppClientId
-    }
+    params: {}
   }),
-  created() {
-    this.$on('authCompleted', value => {
-      console.log(`authCompleted called with value: ${value}`);
-    });
-  },
   methods: {
     canAccessRoute(navItem) {
       let routes = this.$router.options.routes;

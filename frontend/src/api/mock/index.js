@@ -1,4 +1,3 @@
-import settings from './data/settings';
 import datasets from './data/datasets';
 import views from './data/views';
 import view from './data/view';
