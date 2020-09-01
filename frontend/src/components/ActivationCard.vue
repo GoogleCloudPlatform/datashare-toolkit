@@ -66,6 +66,10 @@ export default {
   mounted() {
     this.performLogin().then(result => {
       if (result) {
+        this.user = {
+          email: this.$store.state.user.data.email,
+          displayName: this.$store.state.user.data.displayName
+        };
         this.approveAccount();
       }
     });
