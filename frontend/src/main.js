@@ -22,7 +22,8 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
     config.initialize(json);
 
     Vue.use(LoaderPlugin, {
-      client_id: config.googleAppClientId
+      client_id: config.googleAppClientId,
+      ux_mode: 'redirect'
     });
 
     Vue.GoogleAuth.then(auth2 => {
