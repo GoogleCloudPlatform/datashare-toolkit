@@ -23,4 +23,6 @@ spec:
       - $PROJECT_ID
     - key: request.auth.claims[iss]
       values:
+      - accounts.google.com
+      - https://accounts.google.com
       - https://securetoken.google.com/$PROJECT_ID
