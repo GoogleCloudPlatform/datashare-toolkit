@@ -1,30 +1,52 @@
 #!/bin/bash
+#
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
+# This script removes the elevated permissions from the service accounts that were updated during the deployment. 
+# You will see errors if the member and role are not found in your GCP project. These errors are ok.
 PROJECT=$(gcloud config get-value project)
-PROJECT_NUMBER=`gcloud projects list --filter=$PROJECT --format="value(PROJECT_NUMBER)"`
+PROJECT_NUMBER=`gcloud projects describe $PROJECT --format="value(projectNumber)"`
+
+# Declare the roles arrays
+DEPLOYMENT_MGR_ROLES=( "roles/storage.admin" )
+CLOUDBUILD_ROLES=( "roles/iam.serviceAccountAdmin" "roles/run.admin" "roles/iam.roleAdmin" "roles/iam.securityAdmin" "roles/run.serviceAgent" )
+CLOUDBUILD_GKE_ROLES=( "roles/container.clusterAdmin" "roles/container.viewer" "roles/container.admin" )
+
+update_gcp_role()
+{
+    SERVICE_ACCOUNT=$1
+    ROLES=( $2 )
+    #echo "${ROLES[@]}"
+    for i in "${ROLES[@]}"
+    do
+        : 
+        echo "Removing $i role from $SERVICE_ACCOUNT."
+        if gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$SERVICE_ACCOUNT" --role=$i --format=disable; then 
+            echo "Removed successfully."
+        fi
+    done
+}
 
 # Remove permission from Deployment Manager
-echo "Removing storage.admin role from Deployment Manager Service Account"
-gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER@cloudservices.gserviceaccount.com" --role="roles/storage.admin"
+echo "Removing Deployment Manager."
+update_gcp_role $PROJECT_NUMBER@cloudservices.gserviceaccount.com "${DEPLOYMENT_MGR_ROLES[*]}"
 
 # Remove permissions from Cloud Build
-echo "Removing serviceAccountAdmin role from Cloud Build service account"
-gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.serviceAccountAdmin"
-echo "Removing cloudrun.admin role from Cloud Build service account"
-gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.admin"
-echo "Removing iam.roleadmin role from Cloud Build service account"
-gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.roleAdmin"
-echo "Removing iam.securityadmin role from Cloud Build service account"
-gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.securityAdmin"
-echo "Removing run.serviceagent role from Cloud Build service account"
-gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.serviceAgent"
+echo -e "\nRemoving Cloud Build roles."
+update_gcp_role $PROJECT_NUMBER@cloudbuild.gserviceaccount.com "${CLOUDBUILD_ROLES[*]}"
                 
 # Remove permissions from Cloud Build when GKE is used for Datashare API; It's ok if these commands fail.
-echo "Removing clusterAdmin role from Cloud Build service account"
-gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.clusterAdmin"
-echo "Removing container.viewer role from Cloud Build service account"
-gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.viewer"
-echo "Removing container.admin role from Cloud Build service account"
-gcloud projects remove-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.admin"
-
-#gcloud projects add-iam-policy-binding $PROJECT --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="$ROLE"
+echo -e "\nRemoving additional Cloud Build roles for the GKE deployment."
+update_gcp_role $PROJECT_NUMBER@cloudbuild.gserviceaccount.com "${CLOUDBUILD_GKE_ROLES[*]}"
