@@ -35,15 +35,18 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
           email: profile.getEmail(),
           photoURL: profile.getImageUrl()
         };
-        store.dispatch('fetchUser', user);
+        return user;
       }
+      return null;
+    }).then(user => {
+      store.dispatch('fetchUser', user).then(() => {
+        new Vue({
+          vuetify,
+          router,
+          store,
+          render: h => h(App)
+        }).$mount('#app');
+      });
     });
-
-    new Vue({
-      vuetify,
-      router,
-      store,
-      render: h => h(App)
-    }).$mount('#app');
   });
 });
