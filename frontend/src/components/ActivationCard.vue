@@ -52,7 +52,6 @@ export default {
   },
   computed: {
     userSummary() {
-      // <b>Token</b>: ${this.jwtToken}<br/>
       return `<b>Display Name</b>: ${
         this.user ? this.user.displayName : ''
       }<br/>
