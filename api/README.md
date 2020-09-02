@@ -431,9 +431,9 @@ You should also be able to verify the DS API can communicate with GCP services:
 To use a custom domain for a service, you map your service to the custom domain, then update your DNS records. You can map a service to a domain, such as *abc.com* or to a subdomain, such as *subdomain.abc.com*. You must already own the TLD or sub-domain to use this feature.\
 **Note**: For internal Googlers, you can create custom domains via go/create-test-org
 
-Create a **FQDN** environment variable based off the subdomain above:
+Create a **DOMAIN** environment variable based off the custom subdomain:
 
-    export FQDN=ds-api.fsi.joonix.net
+    export DOMAIN=fsi.joonix.net
 
 Verify domain ownership the first time you use that domain in the Google Cloud project:
 
@@ -441,7 +441,11 @@ Verify domain ownership the first time you use that domain in the Google Cloud p
 
 If your ownership of the domain needs to be verified, open the Webmaster Central verification page:
 
-    gcloud domains verify $FQDN
+    gcloud domains verify $DOMAIN
+
+Create a **FQDN** environment variable based off service name and subdomain above:
+
+    export FQDN=ds-api.$DOMAIN
 
 Map your service to the custom FQDN:
 
@@ -611,27 +615,23 @@ You should also be able to verify the DS API can communicate with GCP services v
 
 Authentication is enforced by Istio JWT Policies at the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/). There are three JWT origins for each supported Identity Provider: Google, Firebase, and Marketplace [here](istio-manifests/1.4/authn/default-jwt-policy.tmpl.yaml)
 
-1. Apply the authN policies:
+Apply the authN policies: \
 **Note**: `envsubst` will read the **PROJECT_ID** environment variable, substitute it in the template, then `kubectl` to apply the config:
-
 
     cat istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -
 
-2. Verify the DS API is not accessible:
+Verify the DS API is not accessible: \
 **Note**: The HTTP response code should be *401 Unauthorized*
-
 
     curl -i https://${FQDN}/v1alpha
 
-3. Verify the DS API is accessible with a valid Bearer ID Token:
+Verify the DS API is accessible with a valid Bearer ID Token: \
 **Note**: The HTTP response code should be *200 OK*
-
 
     curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://${FQDN}/v1alpha
 
-4. Verify the DS API preflight requests are accessible without a valid Bearer ID Token:
+Verify the DS API preflight requests are accessible without a valid Bearer ID Token: \
 **Note**: The HTTP response code should be *200 OK*
-
 
      curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" https://${FQDN}/v1alpha
 
@@ -668,27 +668,23 @@ Before you apply the AuthZ policies, export the **DATA_PRODUCERS** environment v
     export DATA_PRODUCERS="abc@xyz.com,my-trusted-app@my-gcp-project.iam.gserviceaccount.com"
 
 
-1. Apply the authZ policies:
+Apply the authZ policies: \
 **Note**: `envsubst` will read the **PROJECT_ID**, **DATA_PRODUCERS**, environment variable, substitute it in the template, then `kubectl` to apply the config:
-
 
     cat istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
 
-2. Verify the DS API is not accessible:
+ Verify the DS API is not accessible: \
 **Note**: The HTTP response code should be *401 Unauthorized*
-
 
     curl -i https://${FQDN}/v1alpha
 
-3. Verify the DS API is accessible with a valid Bearer ID Token:
+Verify the DS API is accessible with a valid Bearer ID Token: \
 **Note**: The HTTP response code should be *200 OK*
-
 
     curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://${FQDN}/v1alpha
 
-4. Verify the DS API preflight requests are accessible without a valid Bearer ID Token:
+Verify the DS API preflight requests are accessible without a valid Bearer ID Token: \
 **Note**: The HTTP response code should be *200 OK*
-
 
      curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" https://${FQDN}/v1alpha
 
