@@ -20,7 +20,7 @@ spec:
     when:
     - key: request.auth.claims[aud]
       values:
-      - $PROJECT_ID
+      - $OAUTH_CLIENT_ID
     - key: request.auth.claims[iss]
       values:
       - accounts.google.com
