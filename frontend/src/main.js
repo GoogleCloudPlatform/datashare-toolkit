@@ -13,10 +13,7 @@ Vue.config.productionTip = false;
 // Enable vue-form
 Vue.use(VueForm);
 
-import firebase from 'firebase/app';
-import 'firebase/auth'; // for authentication
-import 'firebase/analytics'; // for authentication
-
+import { LoaderPlugin } from 'vue-google-login';
 import config from './config';
 
 // Fetch and load the store settings
@@ -24,34 +21,32 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
   response.json().then(json => {
     config.initialize(json);
 
-    // Initialize Firebase with a "default" Firebase project
-    const firebaseConfig = {
-      apiKey: config.firebaseApiKey,
-      authDomain: config.firebaseAuthDomain,
-      projectId: config.firebaseProjectId,
-      storageBucket: config.firebaseStorageBucket,
-      appId: config.firebaseAppId,
-      measurementId: config.firebaseMeasurementId
-    };
+    Vue.use(LoaderPlugin, {
+      client_id: config.googleAppClientId,
+      ux_mode: 'redirect'
+    });
 
-    const defaultProject = firebase.initializeApp(firebaseConfig);
-    firebase.analytics();
-
-    firebase.auth().useDeviceLanguage();
-    firebase.auth().onAuthStateChanged(user => {
-      store.dispatch('fetchUser', user);
-      if (user) {
-        console.debug('User is signed in');
-      } else {
-        console.debug('No user is signed in');
+    Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get()) {
+        const googleUser = auth2.currentUser.get();
+        const profile = googleUser.getBasicProfile();
+        const user = {
+          displayName: profile.getName(),
+          email: profile.getEmail(),
+          photoURL: profile.getImageUrl()
+        };
+        return user;
       }
-
-      new Vue({
-        vuetify,
-        router,
-        store,
-        render: h => h(App)
-      }).$mount('#app');
+      return null;
+    }).then(user => {
+      store.dispatch('fetchUser', user).then(() => {
+        new Vue({
+          vuetify,
+          router,
+          store,
+          render: h => h(App)
+        }).$mount('#app');
+      });
     });
   });
 });

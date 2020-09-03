@@ -304,7 +304,11 @@ app.listen(PORT, () => {
     console.log("Listening on port " + PORT + ". Press Ctrl+C to quit.");
 });
 
-const adminMgr = require('./admin/dataManager');
-adminMgr.initializePubSubListener();
+try {
+    const adminMgr = require('./admin/dataManager');
+    adminMgr.initializePubSubListener();
+} catch (err) {
+    console.error(err);
+}
 
 module.exports = app;

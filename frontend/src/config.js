@@ -28,12 +28,8 @@ class Config {
   isValid() {
     try {
       this.apiBaseUrl;
-      this.firebaseApiKey;
-      this.firebaseAuthDomain;
-      this.firebaseProjectId;
-      this.firebaseStorageBucket;
-      this.firebaseAppId;
-      this.firebaseMeasurementId;
+      this.projectId;
+      this.googleAppClientId;
       return true;
     } catch {
       return false;
@@ -57,28 +53,12 @@ class Config {
     return this.getConfigValue('VUE_APP_API_BASE_URL');
   }
 
-  get firebaseApiKey() {
-    return this.getConfigValue('VUE_APP_FIREBASE_API_KEY');
+  get projectId() {
+    return this.getConfigValue('VUE_APP_PROJECT_ID');
   }
 
-  get firebaseAuthDomain() {
-    return this.getConfigValue('VUE_APP_FIREBASE_AUTH_DOMAIN');
-  }
-
-  get firebaseProjectId() {
-    return this.getConfigValue('VUE_APP_FIREBASE_PROJECT_ID');
-  }
-
-  get firebaseStorageBucket() {
-    return this.getConfigValue('VUE_APP_FIREBASE_STORAGE_BUCKET');
-  }
-
-  get firebaseAppId() {
-    return this.getConfigValue('VUE_APP_FIREBASE_APP_ID');
-  }
-
-  get firebaseMeasurementId() {
-    return this.getConfigValue('VUE_APP_FIREBASE_MEASUREMENT_ID');
+  get googleAppClientId() {
+    return this.getConfigValue('VUE_APP_GOOGLE_APP_CLIENT_ID');
   }
 
   get myProductsMoreInformationText() {
