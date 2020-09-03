@@ -66,7 +66,8 @@ async function listDatasets(projectId, includeAll) {
     if (!includeAll) {
         labelKey = cfg.cdsManagedLabelKey;
     }
-    const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey).catch(err => {
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const datasets = await bigqueryUtil.getDatasetsByLabel(labelKey).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -115,6 +116,7 @@ async function createDataset(projectId, datasetId, description) {
  * @param  {} description
  */
 async function updateDataset(projectId, datasetId, description) {
+    const bigqueryUtil = new BigQueryUtil(projectId);
     try {
         const metadata = await bigqueryUtil.getDatasetMetadata(datasetId);
         metadata.description = description;
@@ -134,6 +136,7 @@ async function updateDataset(projectId, datasetId, description) {
  */
 async function getDataset(projectId, datasetId) {
     const labelKey = cfg.cdsManagedLabelKey;
+    const bigqueryUtil = new BigQueryUtil(projectId);
     const dataset = await bigqueryUtil.getDatasetMetadata(datasetId).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
@@ -159,6 +162,7 @@ async function getDataset(projectId, datasetId) {
  * @param  {} createdBy
  */
 async function deleteDataset(projectId, datasetId, createdBy) {
+    const bigqueryUtil = new BigQueryUtil(projectId);
     const result = await bigqueryUtil.deleteDataset(datasetId, false);
     if (result) {
         // Update and delete related views
@@ -238,6 +242,7 @@ async function deleteDataset(projectId, datasetId, createdBy) {
  * @param  {} labelKey
  */
 async function listTables(projectId, datasetId, labelKey) {
+    const bigqueryUtil = new BigQueryUtil(projectId);
     try {
         let tables = await bigqueryUtil.getTablesByLabel(projectId, datasetId, labelKey);
         return { success: true, data: tables }
@@ -252,6 +257,7 @@ async function listTables(projectId, datasetId, labelKey) {
  * @param  {} tableId
  */
 async function listTableColumns(projectId, datasetId, tableId) {
+    const bigqueryUtil = new BigQueryUtil(projectId);
     try {
         let availableColumns = await bigqueryUtil.tableColumns(datasetId, tableId);
         return { success: true, data: availableColumns }
@@ -290,6 +296,7 @@ async function listDatasetViews(projectId, datasetId, includeAllFields) {
         options.params = { datasetId: datasetId };
     }
 
+    const bigqueryUtil = new BigQueryUtil(projectId);
     const [rows] = await bigqueryUtil.executeQuery(options);
     return { success: true, data: rows }
 }
@@ -312,6 +319,7 @@ async function getDatasetView(projectId, datasetId, viewId) {
         query: sqlQuery,
         params: { authorizedViewId: viewId }
     };
+    const bigqueryUtil = new BigQueryUtil(projectId);
     const [rows] = await bigqueryUtil.executeQuery(options);
     if (rows.length === 1) {
         const result = rows[0];
@@ -357,6 +365,7 @@ async function validateDatasetView(projectId, datasetId, view, includeSampleData
             }
             const sql = await sqlBuilder.generateSql(deepClone, false);
             console.log(sql);
+            const bigqueryUtil = new BigQueryUtil(projectId);
             const validateQueryResponse = await bigqueryUtil.validateQuery(sql, 20, includeSampleData);
             if (validateQueryResponse.rows.length > 0) {
                 response.data.rows = validateQueryResponse.rows;
@@ -470,6 +479,7 @@ async function createOrUpdateDatasetView(projectId, datasetId, viewId, view, cre
 
     console.log(data);
 
+    const bigqueryUtil = new BigQueryUtil(projectId);
     await bigqueryUtil.insertRows(cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId, data);
     return await createView(view);
 }
@@ -484,6 +494,7 @@ async function createView(view, overrideSql) {
         if (!viewSql) {
             viewSql = await sqlBuilder.generateSql(view);
         }
+        const bigqueryUtil = new BigQueryUtil(projectId);
         let metadataResult = await bigqueryUtil.getTableMetadata(view.datasetId, view.name);
 
         let viewMetadata = metadataResult.metadata;
@@ -597,6 +608,7 @@ async function deleteDatasetView(projectId, datasetId, viewId, data) {
     let params = { rowId: rowId, createdBy: data.createdBy, incomingRowId: data.rowId };
     try {
         await _deleteData(projectId, fields, values, params);
+        const bigqueryUtil = new BigQueryUtil(projectId);
         await bigqueryUtil.deleteTable(currentView.data.datasetId, currentView.data.name, false);
         return { success: true, data: {} };
     } catch (err) {

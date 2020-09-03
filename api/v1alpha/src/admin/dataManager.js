@@ -82,7 +82,7 @@ async function syncResources(projectId, type) {
             const viewResult = await datasetManager.listDatasetViews(projectId, null, true);
             if (viewResult.success) {
                 const viewList = viewResult.data;
-                const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
+                const datasets = await bigqueryUtil.getDatasetsByLabel(labelKey);
 
                 for (const dataset of datasets) {
                     const tables = await bigqueryUtil.getTablesByLabel(projectId, dataset.datasetId, labelKey);

@@ -41,6 +41,7 @@ function getTableFqdn(projectId, datasetId, tableId) {
  * Insert policy data
  */
 async function _insertData(projectId, fields, values, data) {
+    const bigqueryUtil = new BigQueryUtil(projectId);
     return await bigqueryUtil.insertRows(cfg.cdsDatasetId, cfg.cdsPolicyTableId, data);
 }
 
@@ -94,6 +95,7 @@ WHERE
             query: sqlQuery,
             params: { email: email.toLowerCase() }
         };
+        const bigqueryUtil = new BigQueryUtil(projectId);
         const [rows] = await bigqueryUtil.executeQuery(options);
 
         rows.forEach(e => {
@@ -187,8 +189,14 @@ async function listPolicies(projectId, datasetId, accountId) {
             params: { accountId: accountId }
         };
     }
-    const [rows] = await bigqueryUtil.executeQuery(options);
-    return { success: true, data: rows };
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    try {
+        const [rows] = await bigqueryUtil.executeQuery(options);
+        return { success: true, data: rows };
+    } catch (err) {
+        const message = `Policies do not exist within table: '${table}'`;
+        return { success: false, code: 400, errors: [message] };
+    }
 }
 
 /**
@@ -306,12 +314,17 @@ async function getPolicy(projectId, policyId) {
         query: sqlQuery,
         params: { policyId: policyId }
     };
-    const [rows] = await bigqueryUtil.executeQuery(options);
-    if (rows.length === 1) {
-        return { success: true, data: rows[0] };
-    } else {
-        const message = `Policies do not exist with in table: '${table}'`;
-        return { success: false, code: 400, errors: [message] };
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    try {
+        const [rows] = await bigqueryUtil.executeQuery(options);
+        if (rows.length === 1) {
+            return { success: true, data: rows[0] };
+        } else {
+            const message = `Policies do not exist with in table: '${table}'`;
+            return { success: false, code: 400, errors: [message] };
+        }
+    } catch (err) {
+        return { success: false, code: 500, errors: [err.message] };
     }
 }
 
@@ -334,12 +347,17 @@ LIMIT ${limit};`
         query: sqlQuery,
         params: { solutionId: solutionId, planId: planId }
     };
-    const [rows] = await bigqueryUtil.executeQuery(options);
-    if (rows.length === 1) {
-        return { success: true, data: rows[0] };
-    } else {
-        const message = `Policy not found with in table: '${table}'`;
-        return { success: false, code: 400, errors: [message] };
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    try {
+        const [rows] = await bigqueryUtil.executeQuery(options);
+        if (rows.length === 1) {
+            return { success: true, data: rows[0] };
+        } else {
+            const message = `Policy not found with in table: '${table}'`;
+            return { success: false, code: 400, errors: [message] };
+        }
+    } catch (err) {
+        return { success: false, code: 500, errors: [err.message] };
     }
 }
 
@@ -364,10 +382,16 @@ WHERE
         query: sqlQuery,
         params: { policyId: policyId !== null ? policyId : '', solutionId: solutionId, planId: planId }
     };
-    const [rows] = await bigqueryUtil.executeQuery(options);
-    if (rows[0].count === 0) {
-        return true;
-    } else {
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    try {
+        const [rows] = await bigqueryUtil.executeQuery(options);
+        if (rows[0].count === 0) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        console.warn(err);
         return false;
     }
 }

@@ -60,6 +60,7 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
     // Get metadata
     let metadata;
     try {
+        const bigqueryUtil = new BigQueryUtil(projectId);
         metadata = await bigqueryUtil.getDatasetMetadata(datasetId);
     } catch (err) {
         throw err;
@@ -143,6 +144,7 @@ async function performTableMetadataUpdate(projectId, datasetId, tableId, account
     const viewerRole = 'roles/bigquery.dataViewer';
     console.log(`Begin metadata update for table: ${datasetId}.${tableId}`);
     let isDirty = false;
+    const bigqueryUtil = new BigQueryUtil(projectId);
     const tablePolicy = await bigqueryUtil.getTableIamPolicy(projectId, datasetId, tableId);
     let readBinding = {};
     let bindingExists = false;
@@ -223,12 +225,13 @@ async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
         };
     }
 
+    const bigqueryUtil = new BigQueryUtil(projectId);
     const [rows] = await bigqueryUtil.executeQuery(options);
     console.log(`Permission Diff Result: ${JSON.stringify(rows, null, 3)}`);
 
     if (fullRefresh === true) {
         // Update all managed datasets and tables
-        const datasets = await bigqueryUtil.getDatasetsByLabel(projectId, labelKey);
+        const datasets = await bigqueryUtil.getDatasetsByLabel(labelKey);
         for (const dataset of datasets) {
             const datasetId = dataset.datasetId;
             let dsPolicyRecord = underscore.findWhere(rows, { datasetId: datasetId, isTableBased: false });
