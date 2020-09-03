@@ -1,6 +1,6 @@
-title: "DS API Spot Manager Role"
-description: "Custom DS API role for the Spot services to interface with GCP services"
-stage: "BETA"
+title: "Datashare Manager Role"
+description: "Custom Datashare API role to interface with GCP services"
+stage: "GA"
 includedPermissions:
 - bigquery.datasets.create
 - bigquery.datasets.get

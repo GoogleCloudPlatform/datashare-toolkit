@@ -7,10 +7,11 @@
 </template>
 
 <script>
-import firebase from 'firebase/app';
+import authMixin from '../mixins/authMixin';
 
 export default {
   name: 'activation',
+  mixins: [authMixin],
   props: {
     msg: String
   },
@@ -18,21 +19,6 @@ export default {
     user: null,
     activated: false
   }),
-  created() {
-    const user = firebase.auth().currentUser;
-    this.user = user;
-    if (!user) {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      firebase
-        .auth()
-        .signInWithRedirect(provider)
-        .then(result => {
-          this.approveAccount();
-        });
-    } else {
-      this.approveAccount();
-    }
-  },
   methods: {
     getCookie(name) {
       const value = `; ${document.cookie}`;
@@ -66,9 +52,10 @@ export default {
   },
   computed: {
     userSummary() {
-      // <b>Token</b>: ${this.jwtToken}<br/>
-      return `<b>Display Name</b>: ${this.user.displayName}<br/>
-      <b>Email</b>: ${this.user.email}<br/>
+      return `<b>Display Name</b>: ${
+        this.user ? this.user.displayName : ''
+      }<br/>
+      <b>Email</b>: ${this.user ? this.user.email : ''}<br/>
       <b>Activation Status: ${this.activated}</b>`;
     },
     jwtToken() {
@@ -76,32 +63,15 @@ export default {
     }
   },
   mounted() {
-    firebase
-      .auth()
-      .getRedirectResult()
-      .then(function(result) {
-        if (result.credential) {
-          // This gives you a Google Access Token. You can use it to access the Google API.
-          // var token = result.credential.accessToken;
-          // console.log(`Token: ${token}`);
-          // this.$router.replace({ name: 'Welcome' });
-        }
-        // The signed-in user info.
-        // var user = result.user;
-        // console.log(`Result: ${JSON.stringify(user, null, 3)}`);
-      })
-      .catch(function(error) {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // The email of the user's account used.
-        var email = error.email;
-        // The firebase.auth.AuthCredential type that was used.
-        var credential = error.credential;
-
-        this.error = error.message;
-        console.log(`${errorCode} ${errorMessage} ${email} ${credential}`);
-      });
+    this.performLogin().then(result => {
+      if (result) {
+        this.user = {
+          email: this.$store.state.user.data.email,
+          displayName: this.$store.state.user.data.displayName
+        };
+        this.approveAccount();
+      }
+    });
   }
 };
 </script>
