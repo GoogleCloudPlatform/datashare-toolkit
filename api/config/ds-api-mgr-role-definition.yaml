@@ -14,6 +14,7 @@ includedPermissions:
 - bigquery.tables.list
 - bigquery.tables.update
 - bigquery.tables.updateData
+- compute.projects.get
 - iam.serviceAccounts.signBlob
 - pubsub.snapshots.seek
 - pubsub.subscriptions.consume
