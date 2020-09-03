@@ -41,6 +41,7 @@ function getTableFqdn(projectId, datasetId, tableId) {
 async function listProcurements(projectId, stateFilter) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
+        const bigqueryUtil = new BigQueryUtil(projectId);
 
         let filter = 'state=';
         if (stateFilter && stateFilter.length > 0) {
@@ -204,7 +205,7 @@ async function autoApproveEntitlement(projectId, entitlementId) {
                 if (accountData && accountData.success) {
                     console.log(`Account is already activated, will now proceed to approve the entitlement`);
                     const account = accountData.data;
-                    
+
                     // We should not auto approve the entitlement if the account was not activated
                     // as if the account wasn't activated yet, we do not know the email address for the associated user
                     // As a side note, an entitlement cannot be approved unless the associated account is already activated

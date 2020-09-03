@@ -162,8 +162,14 @@ async function listAccounts(projectId, datasetId, policyId) {
             params: { policyId: policyId }
         };
     }
-    const [rows] = await bigqueryUtil.executeQuery(options);
-    return { success: true, data: rows };
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    try {
+        const [rows] = await bigqueryUtil.executeQuery(options);
+        return { success: true, data: rows };
+    } catch (err) {
+        const message = `Accounts do not exist within table: '${table}'`;
+        return { success: false, code: 400, errors: [message] };
+    }
 }
 
 /**
@@ -296,12 +302,17 @@ async function getAccount(projectId, accountId, email, emailType) {
         query: sqlQuery,
         params: params
     };
-    const [rows] = await bigqueryUtil.executeQuery(options);
-    if (rows.length === 1) {
-        return { success: true, data: rows[0] };
-    } else {
-        const message = `Accounts do not exist within table: '${table}'`;
-        return { success: false, code: 400, errors: [message] };
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    try {
+        const [rows] = await bigqueryUtil.executeQuery(options);
+        if (rows.length === 1) {
+            return { success: true, data: rows[0] };
+        } else {
+            const message = `Accounts does not exist within table: '${table}'`;
+            return { success: false, code: 400, errors: [message] };
+        }
+    } catch (err) {
+        return { success: false, code: 500, errors: [err.message] };
     }
 }
 
@@ -323,12 +334,17 @@ LIMIT ${limit}`;
         query: sqlQuery,
         params: { accountName: accountName }
     };
-    const [rows] = await bigqueryUtil.executeQuery(options);
-    if (rows.length === 1) {
-        return { success: true, data: rows[0] };
-    } else {
-        const message = `Accounts does not exist within table: '${table}'`;
-        return { success: false, code: 400, errors: [message] };
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    try {
+        const [rows] = await bigqueryUtil.executeQuery(options);
+        if (rows.length === 1) {
+            return { success: true, data: rows[0] };
+        } else {
+            const message = `Accounts does not exist within table: '${table}'`;
+            return { success: false, code: 400, errors: [message] };
+        }
+    } catch (err) {
+        return { success: false, code: 500, errors: [err.message] };
     }
 }
 
@@ -408,7 +424,7 @@ async function register(projectId, host, token) {
 
     let kid = '';
     if (decoded && decoded.header && decoded.header.kid) {
-        // kid indicates the key ID that was used to secure the JWT. Use the key ID to 
+        // kid indicates the key ID that was used to secure the JWT. Use the key ID to
         // look up the key from the JSON object in the iss attribute in the payload.
         kid = decoded.header.kid;
         // console.log(`jwt kid: ${kid}`);
