@@ -17,6 +17,7 @@ includedPermissions:
 - iam.serviceAccounts.signBlob
 - pubsub.snapshots.seek
 - pubsub.subscriptions.consume
+- pubsub.subscriptions.create
 - pubsub.subscriptions.get
 - pubsub.subscriptions.list
 - pubsub.topics.attachSubscription
