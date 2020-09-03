@@ -1,6 +1,6 @@
 title: "Datashare Manager Role"
 description: "Custom Datashare API role to interface with GCP services"
-stage: "BETA"
+stage: "GA"
 includedPermissions:
 - bigquery.datasets.create
 - bigquery.datasets.get
