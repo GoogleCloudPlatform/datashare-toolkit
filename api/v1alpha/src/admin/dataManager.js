@@ -268,7 +268,7 @@ async function initializePubSubListener() {
             await pubSubUtil.createSubscription(topicName, subscriptionName);
             console.log(`Subscription '${subscriptionName}' created.`);
         } catch (err) {
-            console.error(`Unable to create subscription: '${subscriptionName}' to topic: '${topicName}'. Ensure that the topic exists and you have the proper permissions`);
+            console.error(`Unable to create subscription: '${subscriptionName}' to topic: '${topicName}'. Ensure that the topic exists and you have the proper permissions.`);
             return;
         }
     }
