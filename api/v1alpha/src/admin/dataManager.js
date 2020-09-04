@@ -278,42 +278,46 @@ async function initializePubSubListener() {
 
     // Subscribe
     async function listenForMessages() {
-        console.log(`Creating message handler for subscription: ${subscriptionName}`);
-        const messageHandler = async message => {
-            console.log(`Received message ${message.id}:`);
-            console.log(`\tData: ${message.data}`);
-            console.log(`\tAttributes: ${JSON.stringify(message.attributes)}`);
+        try {
+            console.log(`Creating message handler for subscription: ${subscriptionName}`);
+            const messageHandler = async message => {
+                console.log(`Received message ${message.id}:`);
+                console.log(`\tData: ${message.data}`);
+                console.log(`\tAttributes: ${JSON.stringify(message.attributes)}`);
 
-            // "Ack" (acknowledge receipt of) the message
-            message.ack();
+                // "Ack" (acknowledge receipt of) the message
+                message.ack();
 
-            if (message.data) {
-                const data = JSON.parse(message.data);
-                console.log(`Event type is: ${data.eventType}`);
-                const eventType = data.eventType;
-                if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
-                    console.log(`Running auto approve for eventType: ${eventType}`);
-                    const entitlement = data.entitlement;
-                    await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
-                } else {
-                    console.debug(`Event type not implemented: ${eventType}`);
+                if (message.data) {
+                    const data = JSON.parse(message.data);
+                    console.log(`Event type is: ${data.eventType}`);
+                    const eventType = data.eventType;
+                    if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
+                        console.log(`Running auto approve for eventType: ${eventType}`);
+                        const entitlement = data.entitlement;
+                        await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
+                    } else {
+                        console.debug(`Event type not implemented: ${eventType}`);
+                    }
                 }
-            }
-        };
+            };
 
-        // Create an event handler to handle errors
-        const errorHandler = function (error) {
-            console.error(`ERROR: ${error}`);
-        };
+            // Create an event handler to handle errors
+            const errorHandler = function (error) {
+                console.error(`ERROR: ${error}`);
+            };
 
-        const subscriberOptions = {
-            flowControl: {
-                maxMessages: 1,
-            }
-        };
-        let subscription = pubSubUtil.getSubscription(subscriptionName, subscriberOptions);
-        subscription.on('message', messageHandler);
-        subscription.on('error', errorHandler);
+            const subscriberOptions = {
+                flowControl: {
+                    maxMessages: 1,
+                }
+            };
+            let subscription = pubSubUtil.getSubscription(subscriptionName, subscriberOptions);
+            subscription.on('message', messageHandler);
+            subscription.on('error', errorHandler);
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     // If a new subscription was created, delay to give it time to finish creating
