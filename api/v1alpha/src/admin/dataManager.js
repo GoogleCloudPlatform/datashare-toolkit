@@ -243,7 +243,7 @@ async function initializePubSubListener() {
     if (isAvailable === true) {
         console.log('gcpMetadata is available, getting projectId');
         projectId = await gcpMetadata.project('project-id');
-        console.log(projectId); // ...Project ID of the running instance
+        console.log(`Project Id of running instance: ${projectId}`); // ...Project ID of the running instance
     } else {
         console.log('gcpMetadata is unavailable, will not start PubSub listener');
 
@@ -264,8 +264,13 @@ async function initializePubSubListener() {
     if (exists === true) {
         console.log(`Subscription '${subscriptionName}' already exists`)
     } else {
-        await pubSubUtil.createSubscription(topicName, subscriptionName);
-        console.log(`Subscription '${subscriptionName}' created.`);
+        try {
+            await pubSubUtil.createSubscription(topicName, subscriptionName);
+            console.log(`Subscription '${subscriptionName}' created.`);
+        } catch (err) {
+            console.error(`Unable to create subscription: '${subscriptionName}' to topic: '${topicName}'. Ensure that the topic exists and you have the proper permissions`);
+            return;
+        }
     }
 
     // Subscribe
