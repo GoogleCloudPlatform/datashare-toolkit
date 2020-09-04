@@ -11,6 +11,7 @@ includedPermissions:
 - bigquery.tables.export
 - bigquery.tables.get
 - bigquery.tables.getData
+- bigquery.tables.getIamPolicy
 - bigquery.tables.list
 - bigquery.tables.update
 - bigquery.tables.updateData
