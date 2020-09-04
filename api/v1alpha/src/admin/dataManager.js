@@ -257,8 +257,11 @@ async function initializePubSubListener() {
     }
 
     const topicName = `projects/cloudcommerceproc-prod/topics/${projectId}`;
+    console.log(`Procurement topic name: ${topicName}`);
     const subscriptionName = `projects/${projectId}/subscriptions/procurement-${projectId}`;
+    console.log(`Datashare procurement subscription name: ${subscriptionName}`);
     const pubSubUtil = new PubSubUtil(projectId);
+    console.log('Checking if subscription exists');
     const exists = await pubSubUtil.checkIfSubscriptionExists(topicName, projectId, `procurement-${projectId}`);
 
     if (exists === true) {
