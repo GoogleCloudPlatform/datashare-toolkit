@@ -579,7 +579,6 @@ async function createView(view, overrideSql) {
         return { success: true, data: {} };
     }
     catch (err) {
-        console.error(err);
         console.error(`Failed to create view: ${JSON.stringify(view)} - ${JSON.stringify(err)}`);
         return { success: false, code: 500, errors: [err.message] };
     }
