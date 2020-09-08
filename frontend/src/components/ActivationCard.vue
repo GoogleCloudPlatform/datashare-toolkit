@@ -8,6 +8,7 @@
 
 <script>
 import authMixin from '../mixins/authMixin';
+import config from './../config';
 
 export default {
   name: 'activation',
@@ -33,7 +34,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('submitProcurementAccountApproval', {
-          projectId: this.$store.state.settings.projectId,
+          projectId: config.projectId,
           email: this.user.email,
           'x-gcp-marketplace-token': this.jwtToken
         })

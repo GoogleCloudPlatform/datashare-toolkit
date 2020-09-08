@@ -233,6 +233,7 @@ import {
 } from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 import AccountsCard from '@/components/AccountsCard.vue';
+import config from './../config';
 
 export default {
   components: {
@@ -316,7 +317,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('deleteDataset', {
-          projectId: this.$store.state.settings.projectId,
+          projectId: config.projectId,
           datasetId: item.datasetId
         })
         .then(() => {
@@ -332,7 +333,7 @@ export default {
             if (this.dialogDataset.editing === false) {
               this.$store
                 .dispatch('createDataset', {
-                  projectId: this.$store.state.settings.projectId,
+                  projectId: config.projectId,
                   datasetId: this.dialogDataset.datasetId,
                   description: this.dialogDataset.description
                 })
@@ -353,7 +354,7 @@ export default {
             } else {
               this.$store
                 .dispatch('updateDataset', {
-                  projectId: this.$store.state.settings.projectId,
+                  projectId: config.projectId,
                   datasetId: this.dialogDataset.datasetId,
                   description: this.dialogDataset.description
                 })
@@ -397,7 +398,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getDatasets', {
-          projectId: this.$store.state.settings.projectId
+          projectId: config.projectId
         })
         .then(response => {
           if (response.success) {
@@ -414,10 +415,7 @@ export default {
       return d.toLocaleString();
     },
     navigateToDataset(item) {
-      UrlHelper.navigateToDataset(
-        this.$store.state.settings.projectId,
-        item.datasetId
-      );
+      UrlHelper.navigateToDataset(config.projectId, item.datasetId);
     }
   }
 };

@@ -218,6 +218,7 @@
 <script>
 import EditView from '@/components/EditView';
 import Dialog from '@/components/Dialog.vue';
+import config from './../config';
 import {
   mdiDotsVertical,
   mdiPencil,
@@ -360,7 +361,7 @@ export default {
       return d.toLocaleString();
     },
     navigateToTable(item) {
-      const url = `https://console.cloud.google.com/bigquery?project=${this.$store.state.settings.projectId}&p=${this.$store.state.settings.projectId}&d=${item.datasetId}&t=${item.name}&page=table`;
+      const url = `https://console.cloud.google.com/bigquery?project=${config.projectId}&p=${config.projectId}&d=${item.datasetId}&t=${item.name}&page=table`;
       window.open(url, '_blank');
     }
   }
