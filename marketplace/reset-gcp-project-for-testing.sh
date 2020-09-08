@@ -38,8 +38,16 @@ disable_gcp_apis()
 echo "Disabling GCP APIs that were enabled during the VM solution deployment..."
 disable_gcp_apis "${CLOUD_APIS[*]}"
 
-echo "Deleting the Variable..."
+echo "Deleting the success Variable..."
 gcloud beta runtime-config configs variables unset /success/my-instance --config-name cds-vm-1-startup-config
+if [ $? -eq 0 ]; then
+    echo "Variable $VARIABLE_NAME deleted successfully."
+else 
+    echo "Unable to delete $VARIABLE_NAME"
+fi
+
+echo "Deleting the failure Variable..."
+gcloud beta runtime-config configs variables unset /failure/my-instance --config-name cds-vm-1-startup-config
 if [ $? -eq 0 ]; then
     echo "Variable $VARIABLE_NAME deleted successfully."
 else 
