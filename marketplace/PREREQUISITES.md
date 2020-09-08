@@ -11,7 +11,17 @@ The Security Admin role is required because it needs to modify other service
 accounts with the appropriate permissions so that the Deployment Manager can deploy the full
 solution automatically. 
 
-##  Update service account from Google Cloud Console
+Enable the Kubernetes API as well, since the Datashare API is deployed to Kubernetes.  
+
+## Enable the Kubernetes API
+
+### From Cloud Console
+1. [Enable the API from Cloud Consule](https://pantheon.corp.google.com/apis/library/container.googleapis.com)
+
+### From the command line
+1. `gcloud services enable container.googleapis.com`
+
+## Update service account from Google Cloud Console
 1. Login to Google Cloud Console and select `IAM` from the menu.
 
 ![IAM Menu Item](images/IAM.png "IAM Menu Item")
