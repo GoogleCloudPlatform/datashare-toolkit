@@ -17,7 +17,6 @@
 'use strict';
 
 const { BigQueryUtil, CommerceProcurementUtil } = require('cds-shared');
-let bigqueryUtil = new BigQueryUtil();
 const cfg = require('../lib/config');
 const underscore = require("underscore");
 const accountManager = require('../accounts/dataManager');
