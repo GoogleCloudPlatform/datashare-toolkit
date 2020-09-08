@@ -494,7 +494,7 @@ async function createView(view, overrideSql) {
         if (!viewSql) {
             viewSql = await sqlBuilder.generateSql(view);
         }
-        const bigqueryUtil = new BigQueryUtil(projectId);
+        const bigqueryUtil = new BigQueryUtil(view.projectId);
         let metadataResult = await bigqueryUtil.getTableMetadata(view.datasetId, view.name);
 
         let viewMetadata = metadataResult.metadata;
@@ -579,6 +579,7 @@ async function createView(view, overrideSql) {
         return { success: true, data: {} };
     }
     catch (err) {
+        console.error(err);
         console.error(`Failed to create view: ${JSON.stringify(view)} - ${JSON.stringify(err)}`);
         return { success: false, code: 500, errors: [err.message] };
     }
