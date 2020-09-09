@@ -15,8 +15,18 @@
 # limitations under the License.
 
 if [[ -z "${TAG:=}" ]]; then
-    echo 'Defaulting TAG to "dev"';
     export TAG=dev;
+    echo "Defaulted TAG to '${TAG}'";
+fi
+
+if [[ -z "${OAUTH_CLIENT_ID:=}" ]]; then
+    export OAUTH_CLIENT_ID="863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com";
+    echo "Defaulted OAUTH_CLIENT_ID to '${OAUTH_CLIENT_ID}'";
+fi
+
+if [[ -z "${DATA_PRODUCERS:=}" ]]; then
+    export DATA_PRODUCERS="*@google.com";
+    echo "Defaulted DATA_PRODUCERS to '${DATA_PRODUCERS}'";
 fi
 
 export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
@@ -28,8 +38,6 @@ gcloud builds submit --config api/v1alpha/cloudbuild.yaml --substitutions=TAG_NA
 
 # Move to v1alpha
 cd api/v1alpha
-export OAUTH_CLIENT_ID="863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com"
-export DATA_PRODUCERS="*@google.com"
 export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
 export NAMESPACE=datashare-apis
 export SERVICE_ACCOUNT_NAME=ds-api-mgr;
