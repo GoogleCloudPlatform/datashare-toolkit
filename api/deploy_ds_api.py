@@ -42,23 +42,22 @@ def GenerateConfig(context):
               { # Create the custom role
               'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
               'entrypoint': '/bin/bash',
-              'args': ['-c', 'gcloud iam roles create ' + context.properties['customRoleName'] + ' --project=$PROJECT_ID --file=config/ds-api-mgr-role-definition.yaml || exit 0'],
+              'args': ['-c', 'gcloud iam roles create ' + context.properties['customRoleName'] + ' --project=$PROJECT_ID --file=config/ds-api-mgr-role-definition.yaml --format=disable || exit 0'],
               'dir': 'ds/datashare-toolkit/api' # changes the working directory to /workspace/ds/datashare-toolkit/api
               },
               { # Assign the service account to the custom role
               'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
               'args': ['gcloud', 'projects', 'add-iam-policy-binding', '$PROJECT_ID', 
                 '--member=serviceAccount:' + context.properties['serviceAccountName'] + '@$PROJECT_ID.iam.gserviceaccount.com', 
-                '--role=projects/$PROJECT_ID/roles/' + context.properties['customRoleName']]
+                '--role=projects/$PROJECT_ID/roles/' + context.properties['customRoleName'], '--format=disable']
               },
-              {   # Submit the build configuration to Cloud Build to be the Datashare API container image
-                  'name': 'gcr.io/cloud-builders/gcloud',
+              {   # Submit the build configuration to Cloud Build to be the Datashare API container image only if the ds-api:dev image does not exist
+                  'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
                   'dir': 'ds/datashare-toolkit',
-                  'args': ['builds',
-                            'submit',
-                            '.', # SOURCE current working directory
-                            '--config=api/v1alpha/cloudbuild.yaml',
-                            '--substitutions=TAG_NAME=' + context.properties['containerTag']
+                  'entrypoint': 'bash',
+                  'args': [ '-c', 'if ! gcloud container images describe gcr.io/$PROJECT_ID/ds-api:dev; then ' + 
+                            'gcloud builds submit . --config=api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=' + context.properties['containerTag'] + 
+                            '; else exit 0; fi'
                           ]
               },
               {   # Deploy the container image to Cloud Run
