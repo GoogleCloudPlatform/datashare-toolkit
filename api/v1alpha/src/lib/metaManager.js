@@ -56,14 +56,20 @@ function getBqDatasetAccessType(datashareDatasetAccessType) {
  * @param  {} accounts
  */
 async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
-    console.log(`Begin metadata update for dataset: ${datasetId}`);
+    console.log(`Begin metadata update for dataset: '${datasetId}'`);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const exists = await bigqueryUtil.datasetExists(datasetId);
+    if (!exists) {
+        console.warn(`Skipping metadata update for non-existant dataset: '${datasetId}'`);
+        return false;
+    }
+
     let isDirty = false;
     const accessTypes = ["userByEmail", "groupByEmail"];
 
     // Get metadata
     let metadata;
     try {
-        const bigqueryUtil = new BigQueryUtil(projectId);
         metadata = await bigqueryUtil.getDatasetMetadata(datasetId);
     } catch (err) {
         throw err;
@@ -149,11 +155,16 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
  * @param  {} accounts
  */
 async function performTableMetadataUpdate(projectId, datasetId, tableId, accounts) {
+    console.log(`Begin metadata update for table: ${datasetId}.${tableId}`);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const exists = await bigqueryUtil.tableExists(datasetId, tableId);
+    if (!exists) {
+        console.warn(`Skipping metadata update for non-existant table: ${datasetId}.${tableId}`);
+        return false;
+    }
     const accessTypes = ["user", "group", "serviceAccount"];
     const viewerRole = 'roles/bigquery.dataViewer';
-    console.log(`Begin metadata update for table: ${datasetId}.${tableId}`);
     let isDirty = false;
-    const bigqueryUtil = new BigQueryUtil(projectId);
     const tablePolicy = await bigqueryUtil.getTableIamPolicy(projectId, datasetId, tableId);
     let readBinding = {};
     let bindingExists = false;
