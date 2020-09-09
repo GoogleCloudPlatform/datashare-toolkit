@@ -151,7 +151,7 @@ export default {
       policies: [],
       marketplace: []
     },
-    emailTypes: ['user', 'group'],
+    emailTypes: ['user', 'group', 'serviceAccount'],
     showError: false
   }),
   created() {

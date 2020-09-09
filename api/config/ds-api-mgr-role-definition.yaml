@@ -6,6 +6,7 @@ includedPermissions:
 - bigquery.datasets.get
 - bigquery.datasets.update
 - bigquery.jobs.create
+- bigquery.jobs.list
 - bigquery.tables.create
 - bigquery.tables.delete
 - bigquery.tables.export
