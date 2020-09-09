@@ -13,6 +13,7 @@ includedPermissions:
 - bigquery.tables.getData
 - bigquery.tables.getIamPolicy
 - bigquery.tables.list
+- bigquery.tables.setIamPolicy
 - bigquery.tables.update
 - bigquery.tables.updateData
 - compute.projects.get
