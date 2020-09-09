@@ -21,7 +21,7 @@ PROJECT_NUMBER=`gcloud projects describe $PROJECT --format="value(projectNumber)
 
 # Declare the roles arrays
 DEPLOYMENT_MGR_ROLES=( "roles/storage.admin" )
-CLOUDBUILD_ROLES=( "roles/iam.serviceAccountAdmin" "roles/run.admin" "roles/iam.roleAdmin" "roles/iam.securityAdmin" "roles/run.serviceAgent" )
+CLOUDBUILD_ROLES=( "roles/iam.serviceAccountAdmin" "roles/run.admin" "roles/iam.roleAdmin" "roles/iam.securityAdmin" "roles/run.serviceAgent" "roles/runtimeconfig.admin" )
 CLOUDBUILD_GKE_ROLES=( "roles/container.clusterAdmin" "roles/container.viewer" "roles/container.admin" )
 
 update_gcp_role()
