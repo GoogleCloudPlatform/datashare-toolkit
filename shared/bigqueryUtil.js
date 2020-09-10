@@ -709,10 +709,9 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} projectId
      * @param  {} labelKey
      */
-    async getDatasetsByLabel(projectId, labelKey) {
+    async getDatasetsByLabel(labelKey) {
         let accessTypes = ["userByEmail", "groupByEmail"];
         const [datasets] = await this.bigqueryClient.getDatasets();
         let list = [];

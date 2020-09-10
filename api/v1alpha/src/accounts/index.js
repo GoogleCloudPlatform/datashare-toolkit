@@ -657,10 +657,8 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
                 res.clearCookie(gcpMarketplaceTokenCookieName);
                 res.redirect(cfg.uiBaseUrl + '/activationError');
             } else {
-                // const domain = extractHostname(cfg.uiBaseUrl);
                 console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
                 res.cookie(gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
-                // res.redirect(cfg.uiBaseUrl + '/activation');
                 res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
             }
             break;

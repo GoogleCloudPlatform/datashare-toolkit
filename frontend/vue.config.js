@@ -4,7 +4,7 @@ module.exports = {
   devServer: {
     host: 'localhost'
   },
-  publicPath: process.env.BUCKET_NAME ? `/${process.env.BUCKET_NAME}/` : '/',
+  publicPath: '/',
   chainWebpack: config => {
     if (
       process.env.NODE_ENV === 'production' ||
