@@ -38,7 +38,6 @@ gcloud builds submit --config api/v1alpha/cloudbuild.yaml --substitutions=TAG_NA
 
 # Move to v1alpha
 cd api/v1alpha
-export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
 export NAMESPACE=datashare-apis
 export SERVICE_ACCOUNT_NAME=ds-api-mgr;
 export TAG=dev
