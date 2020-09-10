@@ -96,7 +96,7 @@ def GenerateConfig(context):
                     '--min-instances=1',
                     f'--image=gcr.io/$PROJECT_ID/{cloud_run_deploy_name}:{container_tag}', 
                     '--platform=gke',
-                    '--service-account={service_acct_name}'
+                    f'--service-account={service_acct_name}'
                     ]
 
 
