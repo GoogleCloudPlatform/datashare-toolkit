@@ -149,21 +149,6 @@ resources:
       deployToGke: {{ deployApiToGke }}
       gkeZone: {{ gkeZone }}
       {% endif %}
-
-  # Delete the API.
-  - name: delete-api
-    action: 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create'
-    metadata:
-      dependsOn:
-      - ds-api-build
-      runtimePolicy: 
-      - DELETE
-    properties:
-      steps:
-      - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-        entrypoint: '/bin/bash'
-        args: ['-c', 'gcloud run services delete {{ dsApiName }} --platform=gke --cluster=datashare --cluster-location={{ gcpRegion }} --quiet || gcloud run services delete {{ dsApiName }} --platform=gke --cluster=datashare --cluster-location={{ gcpRegion }} --quiet || exit 0']
-      timeout: 120s
     
   ## Deploy Datashare UI
   - name: build-ui
