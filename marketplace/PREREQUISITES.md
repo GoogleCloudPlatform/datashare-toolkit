@@ -38,7 +38,7 @@ Enable the Kubernetes API as well, since the Datashare API is deployed to Kubern
 * `Service account name` as `datashare-deployment-manager`
 * `Service account description` as `Datashare deployment manager`
 
-5. Select the `Editor` and the `Security Admin` roles.
+5. Select the `Editor`, `Security Admin` and `Kubernetes Admin` roles.
 
 ![Assign roles](images/iam-assign-roles-to-sa.png)
 
