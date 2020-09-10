@@ -18,7 +18,7 @@ RUNTIME_CONFIG="datashare-vm-1-startup-config"
 VARIABLE_NAME="/success/my-instance"
 
 # Declare the roles arrays
-CLOUD_APIS=( "cloudfunctions.googleapis.com" "cloudbuild.googleapis.com" "iam.googleapis.com" "run.googleapis.com" "cloudresourcemanager.googleapis.com" "container.googleapis.com" "containerregistry.googleapis.com" )
+CLOUD_APIS=( "cloudfunctions.googleapis.com" "cloudbuild.googleapis.com" "iam.googleapis.com" "run.googleapis.com" "cloudresourcemanager.googleapis.com" "container.googleapis.com" "containerregistry.googleapis.com" "cloudcommerceprocurement.googleapis.com" )
 
 disable_gcp_apis()
 {

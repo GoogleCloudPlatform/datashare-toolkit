@@ -105,6 +105,14 @@ if [ $? -eq 0 ]; then
 else 
     echo "Container Registry API was not enabled."
 fi
+gcloud services enable cloudcommerceprocurement.googleapis.com --quiet
+if [ $? -eq 0 ]; then
+    echo "Enabled Cloud ProcurementAPI successfully."
+else 
+    echo "Cloud Procurement API was not enabled."
+fi
+
+
 
 # Ingestion Cloud Function - upload Cloud Function to Cloud Storage
 echo "Using Runtime Config Waiter to install Datashare prerequisites..."
