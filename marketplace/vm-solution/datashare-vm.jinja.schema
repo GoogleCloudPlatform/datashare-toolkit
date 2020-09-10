@@ -123,7 +123,7 @@ properties:
     default: PROJECT@PROJECT_NAME.iam.gserviceaccount.com
   input_datashareGithubReleaseVersion:
     type: string
-    default: v0.4.2
+    default: v0.4.3
   input_gcpRegion:
     type: string
     default: us-central1
