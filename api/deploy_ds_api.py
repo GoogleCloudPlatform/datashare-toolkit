@@ -20,19 +20,19 @@ def GenerateConfig(context):
   """Generate YAML resource configuration."""
   
   cmd = "https://github.com/GoogleCloudPlatform/datashare-toolkit.git"
-  gitReleaseVersion = "master"
+  git_release_version = "master"
   namespace = "datashare-apis"
   cluster_name = "datashare"
   cluster_location = context.properties['gkeZone']
 
   if context.properties['datashareGitReleaseTag'] != None:
-      gitReleaseVersion = context.properties['datashareGitReleaseTag']
+      git_release_version = context.properties['datashareGitReleaseTag']
 
   steps = [
               { # Create a service account
               'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
               'entrypoint': '/bin/bash',
-              'args': ['-c', 'gcloud iam service-accounts create ' + context.properties['serviceAccountName'] + ' --display-name="' + context.properties['serviceAccountDesc'] + '" || exit 0']
+              'args': ['-c', 'gcloud iam service-accounts create ' + context.properties['serviceAccountName'] + ' --display-name="' + context.properties['serviceAccountDesc'] + '" --format=disable || exit 0']
               },
               { # Clone the Datashare repository
               'name': 'gcr.io/cloud-builders/git',
@@ -92,26 +92,26 @@ def GenerateConfig(context):
                     ]
 
 
-  gitRelease = { # Checkout the correct release
+  git_release = { # Checkout the correct release
                 'name': 'gcr.io/cloud-builders/git',
                 'dir': 'ds/datashare-toolkit', # changes the working directory to /workspace/ds/datashare-toolkit
-                'args': ['checkout', gitReleaseVersion]
+                'args': ['checkout', git_release_version]
               }
 
-  if gitReleaseVersion != "master":
-    steps.insert(2, gitRelease) # insert the git checkout command into after the git clone step
+  if git_release_version != "master":
+    steps.insert(2, git_release) # insert the git checkout command into after the git clone step
 
   resources = None
   # include the dependsOn property if we are deploying all the components
-  useRuntimeConfigWaiter = context.properties['useRuntimeConfigWaiter']
-  if useRuntimeConfigWaiter:
-    waiterName = context.properties['waiterName']
+  use_runtime_config_waiter = context.properties['useRuntimeConfigWaiter']
+  if use_runtime_config_waiter:
+    waiter_name = context.properties['waiterName']
     resources = [{
       'name': 'ds-api-build',
       'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
       'metadata': {
           'runtimePolicy': ['UPDATE_ALWAYS'],
-          'dependsOn': [waiterName]
+          'dependsOn': [waiter_name]
       },
       'properties': {
           'steps': steps,
