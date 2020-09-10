@@ -1,5 +1,34 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.5.4 Release Notes
+* Build - 9/10/2020
+
+### Datashare
+* Datashare release version is 0.4.3
+* Kubernetes cluster version is 1.16 to support incremental changes
+
+### Updates
+* Deployment Manager will delete the Google Cloud Storage installation bucket, which contains the Datashare Cloud Function zip file, but it will
+not delete the Storage bucket that contains the customer's data. 
+* Deployment Manager will delete the following resources. There is no need to execute the delete script to delete all Datashare components.
+  * Cloud Function
+  * Datashare API running on Cloud Run on GKE
+  * Datashare UI running on Cloud Run managed
+  * Runtime Config Waiter and the success/failure variables
+* Added additional error checking to the startup script to fail fast if any failures occur.
+* Added roles/storage.admin to the Cloud Build service account to allow it to delete the GCS install bucket.  
+* Added conditions to the Cloud Builds so that it executes faster if the container images are already present in the user's project.
+  * ds-frontend-ui will only clone the repository and build the image if it is not present in the project
+  * ds-api will only build the image if it is not present in the project
+* Startup script enables the Cloud Procurement APIs (cloudcommerceprocurement.googleapis.com)
+
+### Bug Fixes
+* None
+
+### Known Bugs
+* If you attempt to delete the Deployment Manager job and it fails for any reason, then you must manually delete all the remaining resources. 
+
+
 ## 0.5.3 Release Notes
 * Build - 8/19/2020
 
@@ -15,6 +44,7 @@
 ### Bug Fixes
 * None
 
+
 ## 0.5.2 Release Notes
 * Build - 8/3/2020
 
@@ -29,6 +59,7 @@
 * When a user attempted to install Datashare via the Marketplace, it attempted to use the Datashare VM image from the user's project, 
 but this image in included in the gcp-financial-services-public project. Modified the URL to point to the gcp-financial-services-public project.
 * Changed Datashare API deployment name to `ds-api`.  
+
 
 ## 0.5.1 Release Notes
 * Build - 7/18/2020
