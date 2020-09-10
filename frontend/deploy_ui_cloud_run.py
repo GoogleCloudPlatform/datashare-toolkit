@@ -32,7 +32,7 @@ def GenerateConfig(context):
                 'dir': 'ds', # changes the working directory to /workspace/ds/
                 'entrypoint': 'bash',
                 'args': [ '-c', 'if ! gcloud container images describe gcr.io/$PROJECT_ID/' + datashare_ui_name + '; then ' +
-                    'clone' + cmd +
+                    'git clone ' + cmd +
                     '; else exit 0; fi'
                     ]
               },
@@ -41,7 +41,7 @@ def GenerateConfig(context):
                   'dir': 'ds/datashare-toolkit/frontend',
                   'entrypoint': 'bash',
                   'args': [ '-c', 'if ! gcloud container images describe gcr.io/$PROJECT_ID/' + datashare_ui_name + '; then ' +
-                      'gcloud builds submit . --config=cloudbuild.yaml' + 
+                      'gcloud builds submit . --config=cloudbuild.yaml ' + 
                       '--substitutions=TAG_NAME=' + context.properties['containerTag'] + 
                       '; else exit 0; fi'
                   ]
@@ -67,7 +67,7 @@ def GenerateConfig(context):
                 'dir': 'ds/datashare-toolkit', # changes the working directory to /workspace/ds/datashare-toolkit
                 'entrypoint': 'bash',
                 'args': [ '-c', 'if ! gcloud container images describe gcr.io/$PROJECT_ID/' + datashare_ui_name + '; then ' +
-                        'git checkout' + git_release_version + 
+                        'git checkout ' + git_release_version + 
                          '; else exit 0; fi'
                         ]
               }
