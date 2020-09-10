@@ -65,7 +65,11 @@ def GenerateConfig(context):
       git_release = { # Checkout the correct release
                 'name': 'gcr.io/cloud-builders/git',
                 'dir': 'ds/datashare-toolkit', # changes the working directory to /workspace/ds/datashare-toolkit
-                'args': ['checkout', git_release_version]
+                'entrypoint': 'bash',
+                'args': [ '-c', 'if ! gcloud container images describe gcr.io/$PROJECT_ID/' + datashare_ui_name + '; then ' +
+                        'git checkout' + git_release_version + 
+                         '; else exit 0; fi'
+                        ]
               }
       steps.insert(1, git_release)
 
