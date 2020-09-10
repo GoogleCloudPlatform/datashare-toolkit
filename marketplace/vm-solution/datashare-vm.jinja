@@ -12,9 +12,16 @@ imports:
 {% set gceServiceAccount = properties["input_gceServiceAccount"] %}
 {% set gcpRegion = properties["input_gcpRegion"] %}
 {% set storageBucketLocation = properties["input_storageBucketLocation"] %}
+{% set ingestionStorageBucketSuffix = "-cds-bucket" %}
+{% set installStorageBucketSuffix = "-install-bucket" %}
+{% set dsApiName = "ds-api" %}
+{% set dsUiName = "ds-frontend-ui" %}
+{% set cloudFunctionName = "processUpload" %}
+{% set cloudFunctionSourceZipFileName = "datashare-toolkit-cloud-function.zip" %}
 {% set useRuntimeConfigWaiter = properties["input_useRuntimeConfigWaiter"] %}
 {% set deployApiToGke = properties["input_deployApiToGke"] %}
 {% set gkeZone = properties["input_gkeZone"] %}
+{% set clusterVersion = "1.16" %}
 {% set gkeClusterName = "datashare" %}
 {% set waiterName = env["deployment"] + "-startup-waiter" %}
 {% set configName = env["deployment"] + "-startup-config" %}
@@ -38,38 +45,57 @@ imports:
 {% set canIpForward = properties["ipForward"] == "On" %}
 
 {% set imageProjects = [project] %}
-{% set imageNames = ["gcp-financial-services-debian-datashare-20200716"] %}
+{% set imageNames = ["gcp-financial-services-debian-datashare-20200920"] %}
 {% set selectedImageIndex = properties["image"]|int %}
 
 resources:
   - type: storage.v1.bucket
-    name: {{ project }}-cds-bucket
+    name: {{ project }}{{ ingestionStorageBucketSuffix }}
     properties:
-      name: {{ project }}-cds-bucket
+      name: {{ project }}{{ ingestionStorageBucketSuffix }}
       project: {{ project }}
       #predefinedAcl: projectPrivate
       #projection: full
       location: {{ storageBucketLocation }}
       storageClass: STANDARD
-
 
   {% if deployApiToGke %}  
   - name: datashare-cluster-manager
     type: cluster.py
+    metadata:
+      dependsOn:
+      - {{ project }}{{ installStorageBucketSuffix }}
+      - delete-api
     properties:
       zone: {{ gkeZone }}
+      # clusterVersion: {{ clusterVersion }}
   {% endif %}
 
   {% if useRuntimeConfigWaiter %}  
   - type: storage.v1.bucket
-    name: {{ project }}-install-bucket
+    name: {{ project }}{{ installStorageBucketSuffix }}
     properties:
-      name: {{ project }}-install-bucket
+      name: {{ project }}{{ installStorageBucketSuffix }}
       project: {{ project }}
       #predefinedAcl: projectPrivate
       #projection: full
       location: {{ storageBucketLocation }}
       storageClass: STANDARD
+  
+  # Will delete the install bucket when the deployment manager job is deleted.
+  - name: delete-install-bucket
+    action: 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create'
+    metadata:
+      dependsOn:
+      - {{ project }}{{ installStorageBucketSuffix }}
+      runtimePolicy: 
+      - DELETE
+    properties:
+      steps:
+      - name: gcr.io/cloud-builders/gsutil
+        entrypoint: 'bash'
+        args: ['-c', 'if gsutil stat gs://{{ project }}{{ installStorageBucketSuffix }}/{{ cloudFunctionSourceZipFileName }}; then gsutil -m rm -r gs://{{ project }}{{ installStorageBucketSuffix }}/*; else exit 0; fi']
+      timeout: 120s
   {% endif %}
 
   ## Deploy the Ingestion Cloud Function
@@ -80,7 +106,7 @@ resources:
       codeLocation: function/
       codeBucket: {{ project }}-install-bucket
       ## codeBucket: fsi-cds-markeplace-sw-dev-datashare-cloud-function
-      codeBucketObject: datashare-toolkit-cloud-function.zip
+      codeBucketObject: {{ cloudFunctionSourceZipFileName }}
       location: {{ gcpRegion }}
       timeout: 60s
       runtime: nodejs10
@@ -89,6 +115,21 @@ resources:
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
       waiterName: {{ waiterName }}
       #temp: $(ref.{{ name }}.selfLink)
+
+  # Delete the Cloud Function when the deployment manager job is deleted.
+  - name: delete-cloud-function
+    action: 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create'
+    metadata:
+      dependsOn:
+      - processUpload
+      runtimePolicy: 
+      - DELETE
+    properties:
+      steps:
+      - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+        args: ['gcloud', 'functions', 'delete', '{{ cloudFunctionName }}', '--region={{ gcpRegion }}']
+      timeout: 120s
+  
 
   ## Deploy Datashare API
   - name: build-api
@@ -108,6 +149,21 @@ resources:
       deployToGke: {{ deployApiToGke }}
       gkeZone: {{ gkeZone }}
       {% endif %}
+
+  # Delete the API.
+  - name: delete-api
+    action: 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create'
+    metadata:
+      dependsOn:
+      - ds-api-build
+      runtimePolicy: 
+      - DELETE
+    properties:
+      steps:
+      - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+        entrypoint: '/bin/bash'
+        args: ['-c', 'gcloud run services delete {{ dsApiName }} --platform=gke --cluster=datashare --cluster-location={{ gcpRegion }} --quiet || gcloud run services delete {{ dsApiName }} --platform=gke --cluster=datashare --cluster-location={{ gcpRegion }} --quiet || exit 0']
+      timeout: 120s
     
   ## Deploy Datashare UI
   - name: build-ui
@@ -120,6 +176,21 @@ resources:
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
       waiterName: {{ waiterName }}
+  
+  # Delete the Cloud UI
+  - name: delete-ui
+    action: 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create'
+    metadata:
+      dependsOn:
+      - ds-ui-build
+      runtimePolicy: 
+      - DELETE
+    properties:
+      steps:
+      - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+        entrypoint: '/bin/bash'
+        args: ['-c', 'gcloud run services delete {{ dsUiName }} --platform=managed --region={{ gcpRegion }} --quiet || exit 0']
+      timeout: 120s
   
   ## Deploy the VM instance
   - name: {{ name }}
@@ -200,30 +271,56 @@ resources:
               echo $USE_RUNTIME_CONFIG_WAITER
               VM_STARTUP_SCRIPT=true
 
+              check_if_command_succeeded()
+              {
+                STATUS=$1
+                CMD=$2
+
+                if [ $STATUS -eq 0 ]; then
+                    echo "$CMD successful!"
+                else
+                    echo "$CMD failed."
+                    gcloud beta runtime-config configs variables set failure/my-instance failure --config-name $CONFIG_NAME 
+                    exit 1;  
+                fi
+              }
+
+              
               if [ "$USE_RUNTIME_CONFIG_WAITER" = "true" ]; then
+                sudo apt-get -y update 
+                
                 echo "Using Runtime Config Waiter to install Datashare prerequisites..."
+                CONFIG_NAME=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/configName -H "Metadata-Flavor: Google"`
+                echo $CONFIG_NAME
+
                 IS_GIT_INSTALLED=`dpkg-query -W -f='${Status}\n' git`
                 if [ "$IS_GIT_INSTALLED" != "install ok installed" ]; then
                     echo "Installing git."
                     sudo apt-get install git -y
+                    check_if_command_succeeded $? "git install"
                 fi
                 IS_ZIP_INSTALLED=`dpkg-query -W -f='${Status}\n' zip`
                 if [ "$IS_ZIP_INSTALLED" != "install ok installed" ]; then
                     echo "Installing zip."
                     sudo apt-get install zip -y
+                    check_if_command_succeeded $? "zip install"
                 fi
                 IS_KUBECTL_INSTALLED=`dpkg-query -W -f='${Status}\n' kubectl`
                 if [ "$IS_KUBECTL_INSTALLED" != "install ok installed" ]; then
                     echo "Installing kubectl."
                     sudo apt-get install kubectl -y
+                    check_if_command_succeeded $? "kubectl install"
                 fi
 
                 cd /opt
                 echo "Cloning the Datashare repository..."
                 git clone https://github.com/GoogleCloudPlatform/datashare-toolkit.git
+                check_if_command_succeeded $? "git clone repo"
                 
                 # checkout the Datashare release version specified in the Deployment package description
                 cd datashare-toolkit
+                check_if_command_succeeded $? "cd datashare-toolkit"
+
                 DATASHARE_GIT_RELEASE_VERSION=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/datashareGitReleaseVersion -H "Metadata-Flavor: Google"`
                 echo $DATASHARE_GIT_RELEASE_VERSION
                 if [ "$DATASHARE_GIT_RELEASE_VERSION" != "master" ]; then
@@ -239,14 +336,22 @@ resources:
 
                 echo "Copying shared module into function directory..."
                 sudo cp -R datashare-toolkit/shared/ "${FUNCTION_SHARED}/"
+                check_if_command_succeeded $? "sudo cp -R datashare-toolkit/shared/ ${FUNCTION_SHARED}/"
 
                 # linux
                 echo 'Running on linux, performing package.json replacement for cds-shared module'
                 sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ./datashare-toolkit/ingestion/batch/package.json
 
                 # Zip the Cloud Function package
-                cd /opt/datashare-toolkit/ingestion/batch
-                zip -r $CLOUD_FUNCTION_ZIP_FILE_NAME * .eslintrc.json configurationManager.js index.js package.js package-lock.json shared/
+                DATASHARE_BATCH_DIR="/opt/datashare-toolkit/ingestion/batch"
+                if [ -d "$DATASHARE_BATCH_DIR" ]; then
+                    cd /opt/datashare-toolkit/ingestion/batch
+                    zip -r $CLOUD_FUNCTION_ZIP_FILE_NAME * .eslintrc.json configurationManager.js index.js package.js package-lock.json shared/  
+                else 
+                    echo "$DATASHARE_BATCH_DIR does not exist. Exiting"
+                    gcloud beta runtime-config configs variables set failure/my-instance failure --config-name $CONFIG_NAME 
+                    exit 1;  
+                fi
 
                 #PROJECT=`curl http://metadata.google.internal/computeMetadata/v1/project/project-id -H "Metadata-Flavor: Google"`
                 export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
@@ -263,44 +368,46 @@ resources:
 
                 # Upload Cloud Function to Google Cloud storage
                 gsutil cp $CLOUD_FUNCTION_ZIP_FILE_NAME gs://$PROJECT_ID-install-bucket/
+                check_if_command_succeeded $? "gsutil cp $CLOUD_FUNCTION_ZIP_FILE_NAME gs://$PROJECT_ID-install-bucket/"
                 # TODO - we should notify a new Waiter here so that the Cloud Function deployment can start at this point instead of waiting until the end.
 
                 # Update permission on Deployment Manager service account (cloudservices.gserviceaccount.com)
                 export PROJECT_NUMBER=`gcloud projects list --filter=$(gcloud config get-value project) --format="value(PROJECT_NUMBER)"`
                 echo "Adding IAM policy to Deployment Manager service account..."
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudservices.gserviceaccount.com" --role="roles/storage.admin"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudservices.gserviceaccount.com" --role="roles/storage.admin --format=disable"
                 
                 # Update permissions on Cloud Build service account (@cloudbuild.gserviceaccount.com)
                 echo "Adding IAM policy to Cloud Build service account..."
                 echo "Adding iam.admin role to Cloud Build service account"
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.serviceAccountAdmin" 
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.serviceAccountAdmin --format=disable" 
                 echo "Adding cloudrun.admin role to Cloud Build service account"
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.admin"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.admin --format=disable"
                 echo "Adding iam.roleadmin role to Cloud Build service account"
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.roleAdmin"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.roleAdmin --format=disable"
                 echo "Adding iam.securityadmin role to Cloud Build service account"
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.securityAdmin"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.securityAdmin --format=disable"
                 echo "Adding run.serviceagent role to Cloud Build service account"
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.serviceAgent"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.serviceAgent --format=disable"
+                echo "Adding storage.admin role to Cloud Build service account"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/storage.admin --format=disable"
+                echo "Adding roles/runtimeconfig.admin role to Cloud Build service account"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/runtimeconfig.admin --format=disable"
                 
                 
                 #echo "Updating apt-get and updating gcloud..." 
-                sudo apt-get -y update && sudo apt-get -y --only-upgrade install google-cloud-sdk-skaffold kubectl google-cloud-sdk-anthos-auth google-cloud-sdk-minikube google-cloud-sdk google-cloud-sdk-app-engine-grpc google-cloud-sdk-kind google-cloud-sdk-pubsub-emulator google-cloud-sdk-app-engine-go google-cloud-sdk-firestore-emulator google-cloud-sdk-cloud-build-local google-cloud-sdk-datastore-emulator google-cloud-sdk-kpt google-cloud-sdk-app-engine-python google-cloud-sdk-spanner-emulator google-cloud-sdk-cbt google-cloud-sdk-bigtable-emulator google-cloud-sdk-app-engine-python-extras google-cloud-sdk-datalab google-cloud-sdk-app-engine-java
+                sudo apt-get -y --only-upgrade install google-cloud-sdk-skaffold kubectl google-cloud-sdk-anthos-auth google-cloud-sdk-minikube google-cloud-sdk google-cloud-sdk-app-engine-grpc google-cloud-sdk-kind google-cloud-sdk-pubsub-emulator google-cloud-sdk-app-engine-go google-cloud-sdk-firestore-emulator google-cloud-sdk-cloud-build-local google-cloud-sdk-datastore-emulator google-cloud-sdk-kpt google-cloud-sdk-app-engine-python google-cloud-sdk-spanner-emulator google-cloud-sdk-cbt google-cloud-sdk-bigtable-emulator google-cloud-sdk-app-engine-python-extras google-cloud-sdk-datalab google-cloud-sdk-app-engine-java
                 # sudo apt-get -y install google-cloud-sdk
-                
-                CONFIG_NAME=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/configName -H "Metadata-Flavor: Google"`
-                echo $CONFIG_NAME
 
                 # Setup GKE cluster
                 DEPLOY_API_TO_GKE=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/deployApiToGke -H "Metadata-Flavor: Google"`
                 GCE_SERVICE_ACCOUNT=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/gceServiceAccount -H "Metadata-Flavor: Google"`
                 if [ "$DEPLOY_API_TO_GKE" = "true" ]; then
                     echo "Adding container.clusterAdmin role to Cloud Build service account"
-                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.clusterAdmin"
-                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.viewer"
-                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.admin"
-                    #gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="roles/container.admin"
-                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$GCE_SERVICE_ACCOUNT" --role="roles/container.admin"
+                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.clusterAdmin --format=disable"
+                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.viewer --format=disable"
+                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.admin --format=disable"
+                    #gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="roles/container.admin --format=disable"
+                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$GCE_SERVICE_ACCOUNT" --role="roles/container.admin --format=disable"
 
                     # This is executing from the VM's startup script
                     if [ "$VM_STARTUP_SCRIPT" = true ]; then
@@ -402,7 +509,6 @@ resources:
   - name: my-waiter
     type: waiter.jinja
     properties:
-      #instanceName: cds-vm-1
       instanceName: {{ instanceName }}
   {% endif %}
 
