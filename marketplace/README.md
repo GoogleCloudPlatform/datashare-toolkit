@@ -34,6 +34,7 @@ The following service account are modified with additional roles as shown below.
     * iam.roleAdmin
     * iam.securityAdmin
     * run.serviceAgent
+    * roles/storage.admin
   * Roles added to this service account when Datashare API is installed in Cloud Run managed with GKE
     * container.clusterAdmin
     * container.viewer
