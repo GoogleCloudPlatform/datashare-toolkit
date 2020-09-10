@@ -22,8 +22,8 @@ def GenerateConfig(context):
   name_prefix = context.env['deployment'] + '-' + context.env['name']
   cluster_name = 'datashare-cluster-resource'
   acutal_cluster_name = 'datashare'
-  cluster_version = '1.16.11-gke.5' # '1.15.12-gke.2' # '1.17.7-gke.15'
   type_name = name_prefix + '-type'
+  cluster_version = '1.16'
   workload_pool = context.env['project'] + '.svc.id.goog'
   machine_type = 'e2-standard-2'
 
@@ -31,6 +31,9 @@ def GenerateConfig(context):
       {
           'name': cluster_name,
           'type': 'container.v1.cluster',
+          #'metadata': {
+          #  'dependsOn': ['delete-api']
+          #},
           'properties': {
               'zone': context.properties['zone'],
               'cluster': {
