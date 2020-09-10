@@ -177,21 +177,6 @@ resources:
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
       waiterName: {{ waiterName }}
   
-  # Delete the Cloud UI
-  - name: delete-ui
-    action: 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create'
-    metadata:
-      dependsOn:
-      - ds-ui-build
-      runtimePolicy: 
-      - DELETE
-    properties:
-      steps:
-      - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-        entrypoint: '/bin/bash'
-        args: ['-c', 'gcloud run services delete {{ dsUiName }} --platform=managed --region={{ gcpRegion }} --quiet || exit 0']
-      timeout: 120s
-  
   ## Deploy the VM instance
   - name: {{ name }}
     type: vm_instance.py
