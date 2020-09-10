@@ -20,7 +20,7 @@ if [[ -z "${TAG:=}" ]]; then
 fi
 
 if [[ -z "${OAUTH_CLIENT_ID:=}" ]]; then
-    export OAUTH_CLIENT_ID="863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com";
+    export OAUTH_CLIENT_ID="[change-me]";
     echo "Defaulted OAUTH_CLIENT_ID to '${OAUTH_CLIENT_ID}'";
 fi
 
