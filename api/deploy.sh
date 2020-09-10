@@ -19,6 +19,16 @@ if [[ -z "${TAG:=}" ]]; then
     echo "Defaulted TAG to '${TAG}'";
 fi
 
+if [[ -z "${REGION:=}" ]]; then
+    export REGION=us-central1;
+    echo "Defaulted REGION to '${REGION}'";
+fi
+
+if [[ -z "${ZONE:=}" ]]; then
+    export ZONE=us-central1-a;
+    echo "Defaulted ZONE to '${ZONE}'";
+fi
+
 if [[ -z "${OAUTH_CLIENT_ID:=}" ]]; then
     export OAUTH_CLIENT_ID="[change-me]";
     echo "Defaulted OAUTH_CLIENT_ID to '${OAUTH_CLIENT_ID}'";
@@ -41,8 +51,6 @@ cd api/v1alpha
 export NAMESPACE=datashare-apis
 export SERVICE_ACCOUNT_NAME=ds-api-mgr;
 CLUSTER=datashare
-REGION=us-central1
-ZONE=us-central1-a
 gcloud config set compute/zone $ZONE
 
 gcloud alpha run deploy ds-api \
