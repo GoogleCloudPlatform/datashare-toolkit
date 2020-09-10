@@ -1,9 +1,11 @@
 import store from './../../store';
 import axios from 'axios';
-import mock from './../mock';
 
-import firebase from 'firebase/app';
 import router from './../../router';
+
+import Vue from 'vue';
+import authMixin from './../../mixins/authMixin';
+import config from './../../config';
 
 // set the default Accept header to application/json
 axios.defaults.headers.common['Accept'] = 'application/json';
@@ -20,10 +22,15 @@ axios.interceptors.request.use(async function(config) {
     if (account) {
       config.headers['x-gcp-account'] = account;
     }
-    const token = await firebase.auth().currentUser.getIdToken();
+    const googleUser = await Vue.GoogleAuth.then(auth2 => {
+      return auth2.currentUser.get();
+    });
+    const token = googleUser.getAuthResponse().id_token;
     config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  } else {
+    return config;
   }
-  return config;
 });
 
 // reject anything that is not application/json
@@ -37,8 +44,7 @@ axios.interceptors.response.use(
   error => {
     if (error.response) {
       if (error.response.status === 401) {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithRedirect(provider);
+        router.replace('/');
       } else if (error.response.status === 403) {
         router.replace('/restricted');
       }
@@ -53,23 +59,7 @@ axios.interceptors.response.use(
 
 export default {
   _apiBaseUrl() {
-    return (
-      store.getters.settings.apiBaseUrl +
-      '/projects/' +
-      store.getters.settings.projectId
-    );
-  },
-  // default to the mock which is just a static config load
-  getSettings() {
-    return mock.getSettings();
-  },
-  // default to the mock which is just a static config load
-  updateSettings(payload) {
-    return mock.updateSettings(payload);
-  },
-  // default to the mock which is just a static config load
-  resetSettings() {
-    return mock.resetSettings();
+    return config.apiBaseUrl + '/projects/' + config.projectId;
   },
   getDatasets(includeAll) {
     let queryAll = false;

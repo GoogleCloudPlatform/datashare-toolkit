@@ -132,14 +132,6 @@ const routerOptions = [
     meta: {
       requiresAuth: true
     }
-  },
-  {
-    path: '/settings',
-    name: 'settings',
-    component: 'Settings',
-    meta: {
-      requiresAuth: true
-    }
   }
 ];
 

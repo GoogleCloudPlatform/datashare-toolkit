@@ -89,16 +89,27 @@
 -->
       <v-tooltip bottom v-if="!user.loggedIn">
         <template v-slot:activator="{ on }">
-          <v-btn icon @click.prevent="signIn" dark v-on="on">
-            <v-icon title="login">{{ icons.login }}</v-icon>
+          <v-btn icon dark v-on="on">
+            <GoogleLogin
+              :params="params"
+              :onSuccess="onAuthSuccess"
+              :onFailure="onAuthFailure"
+              ><v-icon title="login">{{ icons.login }}</v-icon></GoogleLogin
+            >
           </v-btn>
         </template>
         <span>Login</span>
       </v-tooltip>
       <v-tooltip bottom v-if="user.loggedIn">
         <template v-slot:activator="{ on }">
-          <v-btn icon @click.prevent="signOut" dark v-on="on">
-            <v-icon title="login">{{ icons.logout }}</v-icon>
+          <v-btn icon dark v-on="on">
+            <GoogleLogin
+              :params="params"
+              :logoutButton="true"
+              :onSuccess="onAuthSuccess"
+              :onFailure="onAuthFailure"
+              ><v-icon title="logout">{{ icons.logout }}</v-icon></GoogleLogin
+            >
           </v-btn>
         </template>
         <span>Logout</span>
@@ -139,11 +150,17 @@ import {
   mdiBriefcaseAccount
 } from '@mdi/js';
 
-import firebase from 'firebase/app';
 import { mapGetters } from 'vuex';
+import config from '../config';
+import GoogleLogin from 'vue-google-login';
+import authMixin from '../mixins/authMixin';
 
 export default {
   name: 'app-header',
+  mixins: [authMixin],
+  components: {
+    GoogleLogin
+  },
   data: () => ({
     drawer: false,
     mini: true,
@@ -165,51 +182,10 @@ export default {
     },
     toolbar: {
       title: 'Datashare'
-    }
+    },
+    params: {}
   }),
-  mounted() {
-    firebase
-      .auth()
-      .getRedirectResult()
-      .then(function(result) {
-        if (result.credential) {
-          // This gives you a Google Access Token. You can use it to access the Google API.
-          // var token = result.credential.accessToken;
-          // console.log(`Token: ${token}`);
-          // this.$router.replace({ name: 'Welcome' });
-        }
-        // The signed-in user info.
-        // var user = result.user;
-        // console.log(`Result: ${JSON.stringify(user, null, 3)}`);
-      })
-      .catch(function(error) {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // The email of the user's account used.
-        var email = error.email;
-        // The firebase.auth.AuthCredential type that was used.
-        var credential = error.credential;
-
-        this.error = error.message;
-        console.log(`${errorCode} ${errorMessage} ${email} ${credential}`);
-      });
-  },
   methods: {
-    signIn() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      firebase.auth().signInWithRedirect(provider);
-    },
-    signOut() {
-      firebase
-        .auth()
-        .signOut()
-        .then(() => {
-          this.$router.replace({
-            name: 'home'
-          });
-        });
-    },
     canAccessRoute(navItem) {
       let routes = this.$router.options.routes;
       let route = routes.filter(item => {
@@ -298,12 +274,6 @@ export default {
           name: 'admin',
           title: 'Admin',
           icon: mdiShieldKey
-        },
-        {
-          subheader: 'Settings',
-          name: 'settings',
-          title: 'Settings',
-          icon: mdiCog
         }
       ];
       // https://router.vuejs.org/api/#to

@@ -13,39 +13,40 @@ Vue.config.productionTip = false;
 // Enable vue-form
 Vue.use(VueForm);
 
-import firebase from 'firebase/app';
-import 'firebase/auth'; // for authentication
-import 'firebase/analytics'; // for authentication
+import { LoaderPlugin } from 'vue-google-login';
+import config from './config';
 
 // Fetch and load the store settings
-store.dispatch('getSettings').then(() => {
-  // Initialize Firebase with a "default" Firebase project
-  const firebaseConfig = {
-    apiKey: store.state.settings.apiKey,
-    authDomain: store.state.settings.authDomain,
-    projectId: store.state.settings.projectId,
-    storageBucket: store.state.settings.storageBucket,
-    appId: store.state.settings.appId,
-    measurementId: store.state.settings.measurementId
-  };
+fetch(process.env.BASE_URL + 'config/config.json').then(response => {
+  response.json().then(json => {
+    config.initialize(json);
 
-  const defaultProject = firebase.initializeApp(firebaseConfig);
-  firebase.analytics();
+    Vue.use(LoaderPlugin, {
+      client_id: config.googleAppClientId,
+      ux_mode: 'redirect'
+    });
 
-  firebase.auth().useDeviceLanguage();
-  firebase.auth().onAuthStateChanged(user => {
-    store.dispatch('fetchUser', user);
-    if (user) {
-      console.debug('User is signed in');
-    } else {
-      console.debug('No user is signed in');
-    }
-
-    new Vue({
-      vuetify,
-      router,
-      store,
-      render: h => h(App)
-    }).$mount('#app');
+    Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get()) {
+        const googleUser = auth2.currentUser.get();
+        const profile = googleUser.getBasicProfile();
+        const user = {
+          displayName: profile.getName(),
+          email: profile.getEmail(),
+          photoURL: profile.getImageUrl()
+        };
+        return user;
+      }
+      return null;
+    }).then(user => {
+      store.dispatch('fetchUser', user).then(() => {
+        new Vue({
+          vuetify,
+          router,
+          store,
+          render: h => h(App)
+        }).$mount('#app');
+      });
+    });
   });
 });

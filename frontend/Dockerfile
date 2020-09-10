@@ -11,7 +11,7 @@
 FROM node:12.6-alpine as base
 
 # Set the file maintainer (your name - the file's author)
-MAINTAINER Chris Page <chrispage@google.com>
+LABEL maintainer="Chris Page <chrispage@google.com>, Mark Servidio <mservidio@google.com>"
 
 # Set the application directory
 RUN mkdir -p /app
@@ -31,12 +31,17 @@ WORKDIR /app
 # Bundle app source
 COPY src src/
 COPY *.js ./
+COPY public public/
 RUN npm run build
 
 # --- Release with Alpine ----
 FROM nginx:1.17-alpine as release
+RUN apk update && apk add --no-cache jq moreutils
 COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
+
+COPY ./docker/entrypoint.sh /entrypoint.sh
 EXPOSE 8080
+ENTRYPOINT ["sh", "/entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
