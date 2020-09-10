@@ -40,7 +40,6 @@ gcloud builds submit --config api/v1alpha/cloudbuild.yaml --substitutions=TAG_NA
 cd api/v1alpha
 export NAMESPACE=datashare-apis
 export SERVICE_ACCOUNT_NAME=ds-api-mgr;
-export TAG=dev
 CLUSTER=datashare
 REGION=us-central1
 ZONE=us-central1-a
