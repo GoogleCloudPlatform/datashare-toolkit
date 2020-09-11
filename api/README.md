@@ -669,7 +669,7 @@ Before you apply the AuthZ policies, export the **DATA_PRODUCERS** environment v
 
 
 Apply the authZ policies: \
-**Note**: `envsubst` will read the **PROJECT_ID**, **DATA_PRODUCERS**, environment variable, substitute it in the template, then `kubectl` to apply the config:
+**Note**: `envsubst` will read the **PROJECT_ID**, **FQDN**, and **DATA_PRODUCERS** environment variable(s), substitute it in the template, then `kubectl` to apply the config:
 
     cat istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
 
