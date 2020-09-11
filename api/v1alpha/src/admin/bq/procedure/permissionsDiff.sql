@@ -30,7 +30,7 @@ userPolicies AS (
 policyData AS (
   -- Join up all policy data with entitled accounts.
   SELECT
-    p.policyId,
+    r.policyId,
     d.datasetId,
     r.isCurrent,
     r.isTableBased,
@@ -42,7 +42,7 @@ policyData AS (
   FROM rowIdentifiers r
   LEFT JOIN UNNEST(r.datasets) d
   LEFT JOIN UNNEST(d.tables) t
-  JOIN userPolicies p ON r.policyId = p.policyId
+  LEFT JOIN userPolicies p ON r.policyId = p.policyId
 ),
 uniqueIdentifiers as (
   -- This returns the list of all identifiers/datasetId's/tableId's that are affected by the changed policies or all if full refresh.

@@ -42,6 +42,9 @@ function getBqDatasetAccessType(datashareDatasetAccessType) {
         return 'userByEmail';
     } else if (datashareDatasetAccessType === 'group') {
         return 'groupByEmail';
+    } else if (datashareDatasetAccessType === 'serviceAccount') {
+        // Service accounts are handled as 'userByEmail' within Dataset metadata
+        return 'userByEmail';
     } else {
         throw new Error(`Unsupported access type '${datashareDatasetAccessType}'`);
     }
@@ -53,14 +56,20 @@ function getBqDatasetAccessType(datashareDatasetAccessType) {
  * @param  {} accounts
  */
 async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
-    console.log(`Begin metadata update for dataset: ${datasetId}`);
+    console.log(`Begin metadata update for dataset: '${datasetId}'`);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const exists = await bigqueryUtil.datasetExists(datasetId);
+    if (!exists) {
+        console.warn(`Skipping metadata update for non-existant dataset: '${datasetId}'`);
+        return false;
+    }
+
     let isDirty = false;
     const accessTypes = ["userByEmail", "groupByEmail"];
 
     // Get metadata
     let metadata;
     try {
-        const bigqueryUtil = new BigQueryUtil(projectId);
         metadata = await bigqueryUtil.getDatasetMetadata(datasetId);
     } catch (err) {
         throw err;
@@ -87,7 +96,13 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
                 const accessId = a[accessType];
                 if (accessTypes.includes(accessType)) {
                     const dsAccessType = getDatashareDatasetAccessType(accessType);
-                    const shouldHaveAccess = underscore.findWhere(accounts, { email: accessId, emailType: dsAccessType });
+                    let shouldHaveAccess = underscore.findWhere(accounts, { email: accessId, emailType: dsAccessType });
+
+                    // If returns false for a user, also check for service account
+                    if (!shouldHaveAccess && dsAccessType === 'user') {
+                        shouldHaveAccess = underscore.findWhere(accounts, { email: accessId, emailType: 'serviceAccount' });
+                    }
+
                     if (!shouldHaveAccess) {
                         console.log(`Deleting user: ${accessType}:${accessId} from datasetId: ${datasetId}`);
                         metadata.access.splice(i, 1);
@@ -140,11 +155,16 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
  * @param  {} accounts
  */
 async function performTableMetadataUpdate(projectId, datasetId, tableId, accounts) {
-    const accessTypes = ["user", "group"];
-    const viewerRole = 'roles/bigquery.dataViewer';
     console.log(`Begin metadata update for table: ${datasetId}.${tableId}`);
-    let isDirty = false;
     const bigqueryUtil = new BigQueryUtil(projectId);
+    const exists = await bigqueryUtil.tableExists(datasetId, tableId);
+    if (!exists) {
+        console.warn(`Skipping metadata update for non-existant table: ${datasetId}.${tableId}`);
+        return false;
+    }
+    const accessTypes = ["user", "group", "serviceAccount"];
+    const viewerRole = 'roles/bigquery.dataViewer';
+    let isDirty = false;
     const tablePolicy = await bigqueryUtil.getTableIamPolicy(projectId, datasetId, tableId);
     let readBinding = {};
     let bindingExists = false;

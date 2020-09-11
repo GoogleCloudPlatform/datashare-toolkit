@@ -136,6 +136,7 @@ import Dialog from '@/components/Dialog.vue';
 import EditPolicy from '@/components/EditPolicy';
 import UrlHelper from '../urlHelper';
 import { mdiPlus, mdiShopping } from '@mdi/js';
+import config from './../config';
 
 export default {
   components: {
@@ -254,7 +255,7 @@ export default {
     },
     navigateToMarketplace(item) {
       UrlHelper.navigateToMarketplace(
-        this.$store.state.settings.projectId,
+        config.projectId,
         item.marketplace.solutionId
       );
     }

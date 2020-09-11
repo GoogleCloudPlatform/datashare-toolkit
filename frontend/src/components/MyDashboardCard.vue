@@ -433,22 +433,15 @@ export default {
     },
     navigateToMarketplace(item) {
       UrlHelper.navigateToMarketplace(
-        this.$store.state.settings.projectId,
+        config.projectId,
         item.marketplace.solutionId
       );
     },
     navigateToDataset(datasetId) {
-      UrlHelper.navigateToDataset(
-        this.$store.state.settings.projectId,
-        datasetId
-      );
+      UrlHelper.navigateToDataset(config.projectId, datasetId);
     },
     navigateToTable(datasetId, tableId) {
-      UrlHelper.navigateToTable(
-        this.$store.state.settings.projectId,
-        datasetId,
-        tableId
-      );
+      UrlHelper.navigateToTable(config.projectId, datasetId, tableId);
     },
     navigateToMoreInformation() {
       window.open(this.moreInformationButtonUrl, '_blank');

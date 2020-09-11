@@ -512,7 +512,7 @@
 
 <script>
 import Vue from 'vue';
-
+import config from './../config';
 import { required } from 'vee-validate/dist/rules';
 import {
   extend,
@@ -706,7 +706,7 @@ export default {
         copy.expiration.time = this.expirationDateTime.getTime();
       }
 
-      copy.projectId = this.$store.state.settings.projectId;
+      copy.projectId = config.projectId;
 
       return copy;
     }

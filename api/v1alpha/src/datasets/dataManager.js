@@ -494,7 +494,7 @@ async function createView(view, overrideSql) {
         if (!viewSql) {
             viewSql = await sqlBuilder.generateSql(view);
         }
-        const bigqueryUtil = new BigQueryUtil(projectId);
+        const bigqueryUtil = new BigQueryUtil(view.projectId);
         let metadataResult = await bigqueryUtil.getTableMetadata(view.datasetId, view.name);
 
         let viewMetadata = metadataResult.metadata;

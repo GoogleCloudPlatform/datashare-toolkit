@@ -243,7 +243,7 @@ async function initializePubSubListener() {
     if (isAvailable === true) {
         console.log('gcpMetadata is available, getting projectId');
         projectId = await gcpMetadata.project('project-id');
-        console.log(projectId); // ...Project ID of the running instance
+        console.log(`Project Id of running instance: ${projectId}`); // ...Project ID of the running instance
     } else {
         console.log('gcpMetadata is unavailable, will not start PubSub listener');
 
@@ -257,55 +257,67 @@ async function initializePubSubListener() {
     }
 
     const topicName = `projects/cloudcommerceproc-prod/topics/${projectId}`;
+    console.log(`Procurement topic name: ${topicName}`);
     const subscriptionName = `projects/${projectId}/subscriptions/procurement-${projectId}`;
+    console.log(`Datashare procurement subscription name: ${subscriptionName}`);
     const pubSubUtil = new PubSubUtil(projectId);
+    console.log('Checking if subscription exists');
     const exists = await pubSubUtil.checkIfSubscriptionExists(topicName, projectId, `procurement-${projectId}`);
 
     if (exists === true) {
         console.log(`Subscription '${subscriptionName}' already exists`)
     } else {
-        await pubSubUtil.createSubscription(topicName, subscriptionName);
-        console.log(`Subscription '${subscriptionName}' created.`);
+        try {
+            await pubSubUtil.createSubscription(topicName, subscriptionName);
+            console.log(`Subscription '${subscriptionName}' created.`);
+        } catch (err) {
+            console.error(`Unable to create subscription: '${subscriptionName}' to topic: '${topicName}'. Ensure that the topic exists and you have the proper permissions.`);
+            return;
+        }
     }
 
     // Subscribe
     async function listenForMessages() {
-        console.log(`Creating message handler for subscription: ${subscriptionName}`);
-        const messageHandler = async message => {
-            console.log(`Received message ${message.id}:`);
-            console.log(`\tData: ${message.data}`);
-            console.log(`\tAttributes: ${JSON.stringify(message.attributes)}`);
+        try {
+            console.log(`Creating message handler for subscription: ${subscriptionName}`);
+            const messageHandler = async message => {
+                console.log(`Received message ${message.id}:`);
+                console.log(`\tData: ${message.data}`);
+                console.log(`\tAttributes: ${JSON.stringify(message.attributes)}`);
 
-            // "Ack" (acknowledge receipt of) the message
-            message.ack();
+                // "Ack" (acknowledge receipt of) the message
+                message.ack();
 
-            if (message.data) {
-                const data = JSON.parse(message.data);
-                console.log(`Event type is: ${data.eventType}`);
-                const eventType = data.eventType;
-                if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
-                    console.log(`Running auto approve for eventType: ${eventType}`);
-                    const entitlement = data.entitlement;
-                    await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
-                } else {
-                    console.debug(`Event type not implemented: ${eventType}`);
+                if (message.data) {
+                    const data = JSON.parse(message.data);
+                    console.log(`Event type is: ${data.eventType}`);
+                    const eventType = data.eventType;
+                    if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
+                        console.log(`Running auto approve for eventType: ${eventType}`);
+                        const entitlement = data.entitlement;
+                        await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
+                    } else {
+                        console.debug(`Event type not implemented: ${eventType}`);
+                    }
                 }
-            }
-        };
+            };
 
-        // Create an event handler to handle errors
-        const errorHandler = function (error) {
-            console.error(`ERROR: ${error}`);
-        };
+            // Create an event handler to handle errors
+            const errorHandler = function (error) {
+                console.error(`ERROR: ${error}`);
+            };
 
-        const subscriberOptions = {
-            flowControl: {
-                maxMessages: 1,
-            }
-        };
-        let subscription = pubSubUtil.getSubscription(subscriptionName, subscriberOptions);
-        subscription.on('message', messageHandler);
-        subscription.on('error', errorHandler);
+            const subscriberOptions = {
+                flowControl: {
+                    maxMessages: 1,
+                }
+            };
+            let subscription = pubSubUtil.getSubscription(subscriptionName, subscriberOptions);
+            subscription.on('message', messageHandler);
+            subscription.on('error', errorHandler);
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     // If a new subscription was created, delay to give it time to finish creating

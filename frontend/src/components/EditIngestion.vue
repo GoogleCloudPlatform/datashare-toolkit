@@ -95,7 +95,7 @@
 
 <script>
 import Vue from 'vue';
-
+import config from './../config';
 import { required, max } from 'vee-validate/dist/rules';
 import {
   extend,
@@ -203,7 +203,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getDatasets', {
-          projectId: this.$store.state.settings.projectId
+          projectId: config.projectId
         })
         .then(datasets => {
           this.datasets = datasets;
@@ -215,7 +215,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getTables', {
-          projectId: this.$store.state.settings.projectId,
+          projectId: config.projectId,
           datasetId: this.config.datasetId,
           labelKey: 'cds_ingestion_managed'
         })
