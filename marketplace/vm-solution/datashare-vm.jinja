@@ -345,24 +345,24 @@ resources:
                 # Update permission on Deployment Manager service account (cloudservices.gserviceaccount.com)
                 export PROJECT_NUMBER=`gcloud projects list --filter=$(gcloud config get-value project) --format="value(PROJECT_NUMBER)"`
                 echo "Adding IAM policy to Deployment Manager service account..."
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudservices.gserviceaccount.com" --role="roles/storage.admin --format=disable"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudservices.gserviceaccount.com" --role="roles/storage.admin" --format=disable
                 
                 # Update permissions on Cloud Build service account (@cloudbuild.gserviceaccount.com)
                 echo "Adding IAM policy to Cloud Build service account..."
                 echo "Adding iam.admin role to Cloud Build service account"
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.serviceAccountAdmin --format=disable" 
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.serviceAccountAdmin" --format=disable 
                 echo "Adding cloudrun.admin role to Cloud Build service account"
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.admin --format=disable"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.admin" --format=disable
                 echo "Adding iam.roleadmin role to Cloud Build service account"
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.roleAdmin --format=disable"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.roleAdmin" --format=disable
                 echo "Adding iam.securityadmin role to Cloud Build service account"
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.securityAdmin --format=disable"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/iam.securityAdmin" --format=disable
                 echo "Adding run.serviceagent role to Cloud Build service account"
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.serviceAgent --format=disable"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/run.serviceAgent" --format=disable
                 echo "Adding storage.admin role to Cloud Build service account"
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/storage.admin --format=disable"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/storage.admin" --format=disable
                 echo "Adding roles/runtimeconfig.admin role to Cloud Build service account"
-                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/runtimeconfig.admin --format=disable"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/runtimeconfig.admin" --format=disable
                 
                 
                 #echo "Updating apt-get and updating gcloud..." 
@@ -374,11 +374,11 @@ resources:
                 GCE_SERVICE_ACCOUNT=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/gceServiceAccount -H "Metadata-Flavor: Google"`
                 if [ "$DEPLOY_API_TO_GKE" = "true" ]; then
                     echo "Adding container.clusterAdmin role to Cloud Build service account"
-                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.clusterAdmin --format=disable"
-                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.viewer --format=disable"
-                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.admin --format=disable"
-                    #gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="roles/container.admin --format=disable"
-                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$GCE_SERVICE_ACCOUNT" --role="roles/container.admin --format=disable"
+                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.clusterAdmin" --format=disable
+                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.viewer" --format=disable
+                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.admin" --format=disable
+                    #gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="roles/container.admin" --format=disable
+                    gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$GCE_SERVICE_ACCOUNT" --role="roles/container.admin" --format=disable
 
                     # This is executing from the VM's startup script
                     if [ "$VM_STARTUP_SCRIPT" = true ]; then
