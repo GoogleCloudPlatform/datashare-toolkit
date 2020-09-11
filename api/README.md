@@ -23,6 +23,7 @@
   * [Authorization](#authorization)
 * [Development](#development)
 * [Testing](#testing)
+* [Troubleshooting](#troubleshooting)
 * [Contributing](#contributing)
 * [License](#license)
 * [Authors](#authors)
@@ -635,6 +636,7 @@ Verify the DS API preflight requests are accessible without a valid Bearer ID To
 
      curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" https://${FQDN}/v1alpha
 
+**Note**: You can debug HTTP 401/403 Istio [AuthN/AuthZ Errors](#authnauthz-errors) below in the [Troubleshooting](#troubleshooting) section.
 
 You now have [authentication](#authentication) enabled for all endpoints and methods in the DS API service. Next step is to enforce [authorization](#authorization) for the clients:
 
@@ -688,6 +690,7 @@ Verify the DS API preflight requests are accessible without a valid Bearer ID To
 
      curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" https://${FQDN}/v1alpha
 
+**Note**: You can debug HTTP 401/403 Istio [AuthN/AuthZ Errors](#authnauthz-errors) below in the [Troubleshooting](#troubleshooting) section.
 
 You now have [authorization](#authorization) enabled for all endpoints and methods in the DS API service.
 
@@ -723,6 +726,27 @@ The test frameworks include [Chai](https://www.chaijs.com/) and [Supertest](http
 Execute the tests:
 
     npm test
+
+
+## Troubleshooting
+
+These steps below help debug and triage issues with the DS API service.
+
+### AuthN/AuthZ Errors
+
+The DS API leverages Istio for AuthN/AuthZ in Cloud Run on GKE (Anthos). When an auth error occurs, Istio responds with standard HTTP 401/403 Unauthorized/Forbidden error codes which are AuthN/AuthZ errors respectively. Under the covers, Istio will leverage Envoy's JWT auth and filter components to implement the logic. The logging granularity or severity for Istio proxy sidecar containers is not fine enough to troubleshoot why the AuthN/AuthZ errors occur, so this guide will help:
+
+In the DS API (ds-api) knative service pod, enable the **debug** logging severity via `kubectl` on the **istio-proxy** container logs: *http*, *filter*, and *jwt*
+
+    kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?filter=debug&http=debug&jwt=debug” -s
+
+You can them tail the logs via `kubectl` or apply the appropriate GCP console logging filters:
+
+    kubectl logs -f $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy
+
+Set the severity back to **warning** for the istio-proxy container:
+
+    kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?filter=warning&http=warning&jwt=warning” -s
 
 
 ## Contributing
