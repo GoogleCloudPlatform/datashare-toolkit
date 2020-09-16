@@ -738,7 +738,11 @@ The DS API leverages Istio for AuthN/AuthZ in Cloud Run on GKE (Anthos). When an
 
 In the DS API (ds-api) knative service pod, enable the **debug** logging severity via `kubectl` on the **istio-proxy** container logs: *http*, *filter*, and *jwt*
 
-    kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?filter=debug&http=debug&jwt=debug” -s
+    kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?filter=debug" -s
+    
+    kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?http=debug" -s
+    
+    kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?jwt=debug" -s
 
 You can them tail the logs via `kubectl` or apply the appropriate GCP console logging filters:
 
