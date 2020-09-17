@@ -1,5 +1,8 @@
 [Back to DS](./README.md)
 
+# Overview
+The OAuth 2.0 Client ID setup is required in order to provide a credential for the UI to access the APIs.
+
 # Pre-requisites
 Before starting credential setup, ensure that you've configured your domain.
 
