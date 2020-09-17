@@ -1,0 +1,17 @@
+[Back to DS](./README.md)
+
+# Pre-requisites
+Before starting credential setup, ensure that you've configured your domain.
+
+# Setting up OAuth credential
+1. Go to https://console.cloud.google.com/apis/credentials.
+2. Click 'Create Credentials'.
+3. Select the 'OAuth client ID' option.
+4. Select application type 'Web application'.
+5. Provide a name for the credential.
+6. Add the following URIs to the 'Authorized JavaScript origins' by clicking on '+ ADD URI' within the section.
+    - https://{DOMAIN}
+7. Add the following URIs to the 'Authorized redirect URIs' by clicking on '+ ADD URI' within the section.
+    - https://{DOMAIN}/
+    - https://{DOMAIN}/myDashboard
+    - https://{DOMAIN}/activation
