@@ -18,3 +18,5 @@ Before starting credential setup, ensure that you've configured your domain.
     - https://{DOMAIN}/
     - https://{DOMAIN}/myDashboard
     - https://{DOMAIN}/activation
+8. Click 'CREATE'.
+9. Copy the client ID from the section titled 'Your Client ID' in the modal dialog. This will be used later when configuring the VUE_APP_GOOGLE_APP_CLIENT_ID value for the UI.
