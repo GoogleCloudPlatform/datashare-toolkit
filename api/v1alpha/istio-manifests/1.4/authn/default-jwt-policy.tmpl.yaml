@@ -17,6 +17,7 @@ spec:
         - exact: /healthz
         - exact: /metrics
         - exact: /probe
+        - exact: "/v1alpha/projects/$PROJECT_ID/accounts:register"
         - prefix: /_internal/knative
         - prefix: /v1alpha/docs
   - jwt:
@@ -27,6 +28,7 @@ spec:
         - exact: /healthz
         - exact: /metrics
         - exact: /probe
+        - exact: "/v1alpha/projects/$PROJECT_ID/accounts:register"
         - prefix: /_internal/knative
         - prefix: /v1alpha/docs
   - jwt:
@@ -37,6 +39,7 @@ spec:
         - exact: /healthz
         - exact: /metrics
         - exact: /probe
+        - exact: "/v1alpha/projects/$PROJECT_ID/accounts:register"
         - prefix: /_internal/knative
         - prefix: /v1alpha/docs
   - jwt:
@@ -47,6 +50,7 @@ spec:
         - exact: /healthz
         - exact: /metrics
         - exact: /probe
+        - exact: "/v1alpha/projects/$PROJECT_ID/accounts:register"
         - prefix: /_internal/knative
         - prefix: /v1alpha/docs
   principalBinding: USE_ORIGIN
