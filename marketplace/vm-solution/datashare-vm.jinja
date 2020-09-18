@@ -6,10 +6,12 @@ imports:
 - path: deploy_ui_cloud_run.py
 - path: cluster.py
 - path: waiter.jinja
+- name: vm_instance.py
+  path: common/vm_instance.py
 
 {% set project = env["project"] %}
 {% set datashareGitReleaseVersion = properties["input_datashareGithubReleaseVersion"] %}
-{% set gceServiceAccount = properties["input_gceServiceAccount"] %}
+{% set gceServiceAccountValue = properties["gceServiceAccount"] %}
 {% set gcpRegion = properties["input_gcpRegion"] %}
 {% set storageBucketLocation = properties["input_storageBucketLocation"] %}
 {% set ingestionStorageBucketSuffix = "-cds-bucket" %}
@@ -18,17 +20,16 @@ imports:
 {% set dsUiName = "ds-frontend-ui" %}
 {% set cloudFunctionName = "processUpload" %}
 {% set cloudFunctionSourceZipFileName = "datashare-toolkit-cloud-function.zip" %}
-{% set useRuntimeConfigWaiter = properties["input_useRuntimeConfigWaiter"] %}
-{% set deployApiToGke = properties["input_deployApiToGke"] %}
+{% set useRuntimeConfigWaiterValue = properties["useRuntimeConfigWaiter"] %}
+{% set deployApiToGkeValue = properties["deployApiToGke"] %}
 {% set gkeZone = properties["input_gkeZone"] %}
 {% set clusterVersion = "1.16" %}
 {% set gkeClusterName = "datashare" %}
 {% set waiterName = env["deployment"] + "-startup-waiter" %}
 {% set configName = env["deployment"] + "-startup-config" %}
-
 {% set deployment = env["deployment"] %}
 {% set name = "%s-vm-tmpl" % env["name"] %}
-{% set instanceName = "%s-vm" % deployment %}
+{% set instanceNameValue = "%s-vm" % deployment %}
 {% set zone = properties["zone"] %}
 {% set machineType = properties["machineType"] %}
 {% set networks = [] %}
@@ -42,11 +43,11 @@ imports:
 {% set hasExternalIP = externalIPs and externalIPs[0] != "NONE" %}
 {# Software status only works if the VM has an external IP. #}
 {% set enableStatusWaiter = hasExternalIP %}
-{% set canIpForward = properties["ipForward"] == "On" %}
+{% set canIpForwardValue = properties["canIpForward"] == "On" %}
 
 {% set imageProjects = [project] %}
 {% set imageNames = ["gcp-financial-services-debian-datashare-20200920"] %}
-{% set selectedImageIndex = properties["image"]|int %}
+{% set selectedImageIndex = properties["sourceImage"]|int %}
 
 resources:
   - type: storage.v1.bucket
@@ -71,7 +72,7 @@ resources:
       # clusterVersion: {{ clusterVersion }}
   {% endif %}
 
-  {% if useRuntimeConfigWaiter %}  
+  {% if useRuntimeConfigWaiterValue %}  
   - type: storage.v1.bucket
     name: {{ project }}{{ installStorageBucketSuffix }}
     properties:
@@ -112,7 +113,7 @@ resources:
       runtime: nodejs10
       availableMemoryMb: 256
       entryPoint: processEvent
-      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
+      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}
       waiterName: {{ waiterName }}
       #temp: $(ref.{{ name }}.selfLink)
 
@@ -143,7 +144,7 @@ resources:
       region: {{ gcpRegion }}
       timeout: 600s
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
-      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
+      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}
       waiterName: {{ waiterName }}
       {% if deployApiToGke %}  
       deployToGke: {{ deployApiToGke }}
@@ -159,21 +160,22 @@ resources:
       region: {{ gcpRegion }}
       timeout: 600s
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
-      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
+      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}
       waiterName: {{ waiterName }}
-  
+      
   ## Deploy the VM instance
   - name: {{ name }}
     type: vm_instance.py
+    metadata:
     properties:
-      instanceName: {{ instanceName }}
-      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiter }}
+      instanceName: {{ instanceNameValue }}
+      useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}
       waiterConfigName: {{ configName }}
       deployApiToGke: {{ deployApiToGke }}
       sourceImage: https://www.googleapis.com/compute/v1/projects/gcp-financial-services-public/global/images/{{ imageNames[selectedImageIndex] }}
       zone: {{ zone }}
       machineType: {{ machineType }}
-      gceServiceAccount: {{ gceServiceAccount }}
+      gceServiceAccount: {{ gceServiceAccountValue }}
       networks:
       {% for network in networks %}
         - {{ network }}
@@ -192,10 +194,9 @@ resources:
       {% endif %}
       bootDiskType: {{ bootDiskType }}
       bootDiskSizeGb: {{ bootDiskSizeGb }}
-      
-      canIpForward: {{ canIpForward }}
+      canIpForward: {{ canIpForwardValue }}
       serviceAccounts:
-        - email: {{ gceServiceAccount }}
+        - email: {{ gceServiceAccountValue }}
           scopes: 
             - 'https://www.googleapis.com/auth/cloud.useraccounts.readonly'
             - 'https://www.googleapis.com/auth/devstorage.read_only'
@@ -203,21 +204,12 @@ resources:
             - 'https://www.googleapis.com/auth/monitoring.write'
             - 'https://www.googleapis.com/auth/cloud-platform'
             - 'https://www.googleapis.com/auth/cloudruntimeconfig'
-        #- email: default
-        #  scopes:
-        #    - 'https://www.googleapis.com/auth/cloud.useraccounts.readonly'
-        #    - 'https://www.googleapis.com/auth/devstorage.read_only'
-        #    - 'https://www.googleapis.com/auth/logging.write'
-        #    - 'https://www.googleapis.com/auth/monitoring.write'
-        #    - 'https://www.googleapis.com/auth/cloud-platform'
-        #    - 'https://www.googleapis.com/auth/cloudruntimeconfig'
-
       metadata:
         items:
           - key: datashareGitReleaseVersion
             value: {{ datashareGitReleaseVersion }}
           - key: gceServiceAccount
-            value: {{ gceServiceAccount }}
+            value: {{ gceServiceAccountValue }}
           {% if deployApiToGke %}   
           - key: gkeZone
             value: {{ gkeZone }}
@@ -226,9 +218,9 @@ resources:
           - key: gkeClusterName
             value: {{ gkeClusterName }}
           {% endif %}  
-          {% if useRuntimeConfigWaiter %}  
+          {% if useRuntimeConfigWaiterValue %}  
           - key: useRuntimeConfigWaiter
-            value: {{ useRuntimeConfigWaiter }}
+            value: {{ useRuntimeConfigWaiterValue }}
           - key: configName
             value: {{ configName }}
           {% endif %}
@@ -363,6 +355,9 @@ resources:
                 gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/storage.admin" --format=disable
                 echo "Adding roles/runtimeconfig.admin role to Cloud Build service account"
                 gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/runtimeconfig.admin" --format=disable
+                echo "Adding roles/cloudfunctions.developer role to Cloud Build service account"
+                gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/cloudfunctions.developer" --format=disable
+                
                 
                 
                 #echo "Updating apt-get and updating gcloud..." 
@@ -476,11 +471,11 @@ resources:
           - {{ env["deployment"] }}-deployment
   
   # Runtime Config Waiter
-  {% if useRuntimeConfigWaiter %}
+  {% if useRuntimeConfigWaiterValue %}
   - name: my-waiter
     type: waiter.jinja
     properties:
-      instanceName: {{ instanceName }}
+      instanceName: {{ instanceNameValue }}
   {% endif %}
 
   #- name: generated-password-0
@@ -514,7 +509,7 @@ outputs:
   - name: project
     value: {{ project }}
   - name: vmId
-    value: $(ref.{{ instanceName }}.id)
+    value: $(ref.{{ instanceNameValue }}.id)
   - name: vmExternalIP
     {% if hasExternalIP %}
     value: $(ref.{{ name }}.ip)
@@ -524,9 +519,9 @@ outputs:
   - name: vmInternalIP
     value: $(ref.{{ name }}.internalIP)
   - name: vmName
-    value: {{ instanceName }}
+    value: {{ instanceNameValue }}
   - name: vmSelfLink
-    value: $(ref.{{ instanceName }}.selfLink)
+    value: $(ref.{{ instanceNameValue }}.selfLink)
   - name: hasExternalIP
     value: {{ hasExternalIP }}
   - name: mainNetwork

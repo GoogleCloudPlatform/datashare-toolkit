@@ -30,14 +30,14 @@ required:
   - network
   - bootDiskType
   - bootDiskSizeGb
-  - input_gceServiceAccount
+  - gceServiceAccount
 
 properties:
   zone:
     type: string
     x-googleProperty:
       type: GCE_ZONE
-  image:
+  sourceImage:
     type: string
     enum:
       - '0'
@@ -81,7 +81,7 @@ properties:
         networkProperty: network
         notConfigurable: False
         allowStaticIps: True
-  ipForward:
+  canIpForward:
     type: string
     enum:
       - 'On'
@@ -118,27 +118,46 @@ properties:
   input_adminEmail:
     type: string
     default: user@example.com
-  input_gceServiceAccount:
+  gceServiceAccount:
     type: string
     default: PROJECT@PROJECT_NAME.iam.gserviceaccount.com
   input_datashareGithubReleaseVersion:
     type: string
-    default: v0.4.3
+    default: v0.4.4
   input_gcpRegion:
     type: string
     default: us-central1
   input_storageBucketLocation:
     type: string
     default: US
-  input_useRuntimeConfigWaiter:
+  useRuntimeConfigWaiter:
     type: boolean
     default: True
-  input_deployApiToGke:
+  deployApiToGke:
     type: boolean
     default: True
   input_gkeZone:
     type: string
     default: us-central1-a
+  serviceAccounts:
+    type: array
+    default:
+      - email: default
+        scopes:
+          - https://www.googleapis.com/auth/cloud.useraccounts.readonly
+          - https://www.googleapis.com/auth/devstorage.read_only
+          - https://www.googleapis.com/auth/logging.write
+    items:
+      type: object
+      required:
+      - email
+      - scopes
+      properties:
+        email:
+          type: string
+        scopes:
+          description: Scopes to be made available for this service account
+          type: array
 outputs:
   deployment:
     type: string
