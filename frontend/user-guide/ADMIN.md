@@ -1,4 +1,4 @@
-[Datashare User Guide](./README.md)
+[Datashare User Guide](./../README.md)
 
 # Admin
 * [Initialize Schema](#initialize_schema)

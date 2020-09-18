@@ -1,4 +1,4 @@
-[Datashare User Guide](./README.md)
+[Datashare User Guide](./../README.md)
 
 # Procurement Requests
 * [Overview of Consumer Purchase Flow](#consumer_purchase_flow)

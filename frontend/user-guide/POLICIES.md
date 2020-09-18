@@ -1,4 +1,4 @@
-[Datashare User Guide](./README.md)
+[Datashare User Guide](./../README.md)
 
 # Policies
 * [Viewing Policies](#viewing_policies)
