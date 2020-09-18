@@ -160,6 +160,7 @@
 <script>
 import EditAccount from '@/components/EditAccount';
 import Dialog from '@/components/Dialog.vue';
+import config from './../config';
 import {
   mdiChevronRight,
   mdiForward,
@@ -344,7 +345,7 @@ export default {
     resetAccount() {
       this.$store
         .dispatch('submitProcurementAccountReset', {
-          projectId: this.$store.state.settings.projectId,
+          projectId: config.projectId,
           accountId: this.selectedItem.accountId
         })
         .then(result => {

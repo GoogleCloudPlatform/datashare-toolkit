@@ -483,6 +483,7 @@ function isPopulated(value) {
 
 import Dialog from '@/components/Dialog.vue';
 import { mdiShopping } from '@mdi/js';
+import config from './../config';
 
 Array.prototype.diff = function(a, key) {
   return this.filter(function(i) {
@@ -934,7 +935,7 @@ export default {
     },
     navigateToMarketplace(item) {
       UrlHelper.navigateToMarketplace(
-        this.$store.state.settings.projectId,
+        config.projectId,
         item.marketplace.solutionId
       );
     }

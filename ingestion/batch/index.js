@@ -95,7 +95,13 @@ async function processFile(options, throws) {
     const haveDataset = await bigqueryUtil.datasetExists(config.datasetId);
     if (!haveDataset) {
         console.log(`Dataset ${config.datasetId} not found, creating...`);
-        await bigqueryUtil.createDataset(config.datasetId);
+
+        const options = {
+            labels: {}
+        };
+        options.labels[labelName] = "true";
+
+        await bigqueryUtil.createDataset(config.datasetId, options);
         console.log(`Created dataset ${config.datasetId}`);
     } else {
         console.log(`Found dataset ${config.datasetId}`);

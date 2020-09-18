@@ -194,6 +194,7 @@
 <script>
 import Vue from 'vue';
 
+import config from './../config';
 import { required, max } from 'vee-validate/dist/rules';
 import {
   extend,
@@ -367,7 +368,7 @@ export default {
           if (result) {
             this.$store
               .dispatch('submitProcurementEntitlementApproval', {
-                projectId: this.$store.state.settings.projectId,
+                projectId: config.projectId,
                 name: this.selectedItem.name,
                 status: this.approvalDialogData.approvalStatus,
                 reason: this.approvalDialogData.comment,
@@ -399,7 +400,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getProcurementRequests', {
-          projectId: this.$store.state.settings.projectId,
+          projectId: config.projectId,
           stateFilter: this.entitlementStateStringFilter
         })
         .then(response => {

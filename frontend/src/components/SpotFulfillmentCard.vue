@@ -122,6 +122,7 @@
 <script>
 import EditIngestion from '@/components/EditIngestion';
 import { mdiDotsVertical, mdiPencil, mdiViewGrid } from '@mdi/js';
+import config from './../config';
 
 export default {
   components: {
@@ -160,7 +161,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getTables', {
-          projectId: this.$store.state.settings.projectId,
+          projectId: config.projectId,
           datasetId: this.$route.query.datasetId,
           labelKey: 'datashare_managed'
         })
