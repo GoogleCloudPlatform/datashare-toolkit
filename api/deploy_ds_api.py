@@ -40,7 +40,7 @@ def GenerateConfig(context):
               { # Create a service account
               'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
               'entrypoint': '/bin/bash',
-              'args': ['-c', f'gcloud iam service-accounts create {service_acct_name} --display-name="{service_acct_descr}" --format=disable || exit 0']
+              'args': ['-c', f'gcloud iam service-accounts create {service_acct_name} --display-name=\"{service_acct_descr}\" --format=disable || exit 0']
               },
               { # Clone the Datashare repository
               'name': 'gcr.io/cloud-builders/git',
