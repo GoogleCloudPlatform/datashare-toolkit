@@ -154,7 +154,6 @@ def GenerateComputeVM(context, create_disks_separately=True):
     prop.pop(SERVICE_ACCOUNTS)
   else:  # Make sure there is a default service account
     prop.setdefault(SERVICE_ACCOUNTS, copy.deepcopy(DEFAULT_SERVICE_ACCOUNT))
-    prop.setdefault(SERVICE_ACCOUNTS, copy.deepcopy(DEFAULT_SERVICE_ACCOUNT))
 
   resource = []
   resource.insert(
