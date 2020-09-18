@@ -1,10 +1,5 @@
 imports:
 - path: datashare-vm.jinja
-- path: cluster.py
-- path: cloud_function.py
-- path: deploy_ds_api.py
-- path: deploy_ui_cloud_run.py
-- path: waiter.jinja
 
 resources:
 - name: datashare-vm
@@ -14,14 +9,12 @@ resources:
     zone: us-central1-a
     useRuntimeConfigWaiter: True
     deployApiToGke: True
-    sourceImage: gcp-financial-services-debian-datashare-20200716
     machineType: e2-small
-    gceServiceAccount: test-service-account@gmail.com
-    bootDiskType: local-ssd
+    gceServiceAccount: YOUR_GCP_SERVICE_ACCOUNT
+    bootDiskType: pd-ssd
     bootDiskSizeGb: 10
-    canIpForward: True
     serviceAccounts:
-      - email: test-service-account@gmail.com
+      - email: YOUR_GCP_SERVICE_ACCOUNT
         scopes: 
           - 'https://www.googleapis.com/auth/cloud.useraccounts.readonly'
           - 'https://www.googleapis.com/auth/devstorage.read_only'
