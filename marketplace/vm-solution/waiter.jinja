@@ -42,7 +42,8 @@ resources:
   properties:
     steps:
     - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-      args: ['gcloud', 'beta', 'runtime-config', 'configs', 'delete', '{{ configName }}']
+      entrypoint: '/bin/bash'
+      args: ['-c', 'gcloud beta runtime-config configs delete {{ configName }} || exit 0']
     timeout: 120s
 
 - type: runtimeconfig.v1beta1.waiter
@@ -97,7 +98,8 @@ resources:
   properties:
     steps:
     - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-      args: ['gcloud', 'beta', 'runtime-config', 'configs', 'variables', 'unset', '/success/my-instance', '--config-name', '{{ configName }}']
+      entrypoint: '/bin/bash'
+      args: ['gcloud', 'beta', 'runtime-config', 'configs', 'variables', 'unset', '/success/my-instance', '--config-name', '{{ configName }} || exit 0']
     timeout: 120s
 
 # Delete the waiter variables
@@ -111,7 +113,8 @@ resources:
   properties:
     steps:
     - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-      args: ['gcloud', 'beta', 'runtime-config', 'configs', 'variables', 'unset', '/failure/my-instance', '--config-name', '{{ configName }}']
+      entrypoint: '/bin/bash'
+      args: ['gcloud', 'beta', 'runtime-config', 'configs', 'variables', 'unset', '/failure/my-instance', '--config-name', '{{ configName }} || exit 0']
     timeout: 120s
 
 outputs:
