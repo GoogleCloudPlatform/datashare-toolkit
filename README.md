@@ -11,4 +11,5 @@ _This is not an officially supported Google product._
 ## Getting started with Datashare
 1. [Setup your domain](./DOMAIN_SETUP.md)
 2. [Setup OAuth credential](./CREDENTIAL_SETUP.md)
-3. [Run Deployment Manager script](./marketplace/README.md#deploy_from_cli)
+3. [Deploy Datashare](./marketplace/README.md#deploy_from_cli)
+4. 
