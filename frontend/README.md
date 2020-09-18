@@ -1,239 +1,58 @@
-# Datashare UI
-This documentation provides details for how to develop, build, and deploy new versions of the Datashare UI. There are a few different deployment options for you to choose based on developer pererence and/or environment.
+# Datashare User Guide
 
-* [Prerequisites](#prereqs)
-  * [Setup Backend API](#setup_backend)
-* [Develop](#develop)
-  * [Setup Node](#setup_node)
-* [Deployment](#deployment)
-  * [Deploy Prerequisites](#deploy_prereqs)
-    * [New Firebase Setup](#new_firebase)
-    * [Enable Authentication](#authentication)
-    * [Install Firebase CLI](#firebase_cli)
-  * [Deploy Cloud Run Managed](#deploy_cloud_run_managed)
-  * [Deploy Cloud Run with Deployment Manager](#deploy_cloud_run_deployment_manager)
-  * [Deploy Firebase](#deploy_firebase)
+<p align="center">
+  <img src="../../card.png" alt="Datashare" height="175"/>
+</p>
 
+This documentation provides details for using the Datashare user interface. If you have no yet deployed or configured the frontend interface, please see [Datashare UI](../README.md) for information on how to do so. The documentation is structured based on the navigation of the interface. On this page, we'll provide a breakdown of the <a href="./assets/nav_menu.png" target="_blank">navigation menu structure</a> to provide insight into what each page provides. Additionally, you'll see a 'Guide' link next to each section where we've created a usage guide.
 
-## <a name="prereqs">Prerequisites</a>
-These are the prerequisites for the Datashare UI.
+* [Batch](#batch)
+    * [Datasets](#datasets)
+    * [Authorized Views](#authorized_views)
+* [Entitlements](#entitlements)
+    * [Accounts](#accounts)
+    * [Policies](#policies)
+* [Marketplace](#marketplace)
+    * [Procurement Requests](#procurement_requests)
+    * [My Products](#my_products)
+* [Application](#application)
+    * [Admin](#admin)
+    * [Settings](#settings)
 
+## <a name="batch">Batch</a>
+The batch section contains page links for managing batch data. Currently the Datashare UI only supports configuration of batch ingestion and batch data-sharing.
 
-### <a name="setup_backend">Setup Backend API</a>
-DS API setup is a dependency for the Frontend UI if you do not plan to use mock data or do not have an existing DS API endpoint URL.
+### <a name="datasets">Datasets</a> [Guide](./user-guide/DATASETS.md)
+Datasets displays a listing of all of the BigQuery datasets that are managed by Datashare. It provides functionality to create a new dataset, edit or delete an existing one. You can also view the accounts that have access to a given dataset and the list of managed authorized views within each dataset.
 
-[DS API Documentation](https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/api)
+### <a name="authorized_views">Authorized Views</a> [Guide](./user-guide/AUTHORIZED_VIEWS.md)
+Authorized views displays a listing of BigQuery authorized views that are managed by Datashare. Note that any authorized view created or managed by Datashare should only be modified through Datashare. You should not manually edit any managed object outside of Datashare.
 
-## <a name="develop">Develop</a>
-You can develop the locally for now. [NodeJS](https://nodejs.org/en/)
+Datashare provides functionality that allows a non-technical user to define an authorized view through a UI form. It also allows you to view sample data through the UI.
 
+## <a name="entitlements">Entitlements</a>
+The entitlements section is used to manage and grant access to data - which may be a BigQuery dataset, table, or view.
 
-### <a name="setup_node">Setup Node</a>
-These instructions are to run the application Node modules in a stand-alone [NPM](https://www.npmjs.com/) environment that is not optimized for production. This can be locally on your laptop or via cloud VM environment _Node ~= 12.6 is required._
+### <a name="accounts">Accounts</a> [Guide](./user-guide/ACCOUNTS.md)
+Accounts displays a listing of all of the users or groups that are configured for Datashare. Accounts must be associated with policies in order to grant access to data. Note that a user can only be added where the email address and domain is associated with an active Google Account or Google Apps account. If you add any other type of account, it will cause the Datashare permissions to fail.
 
-Verify Node ~= 12.6 is installed:
+### <a name="policies">Policies</a> [Guide](./user-guide/POLICIES.md)
+Policies are used to manage data access. A policy consists of a list of datasets or tables, row level access tags (if applicable), and Marketplace integration configuration.
 
-    node --version
+## <a name="marketplace">Marketplace</a> [Guide](./user-guide/MARKETPLACE_INTEGRATION.md)
+Datashare may be integrated with GCP Marketplace in order to sell access to data using [subscription-based pricing](https://cloud.google.com/marketplace/docs/partners/integrated-saas/select-pricing#subscription-pricing). Datashare provides a UI with all of the basic functionality to integrate with GCP Marketplace and the [Cloud Commerce Partner Procurement API](https://cloud.google.com/marketplace/docs/partners/commerce-procurement-api/reference/rest) to expedite your integration.
 
-Project setup:
+### <a name="procurement_requests">Procurement Requests</a> [Guide](./user-guide/PROCUREMENT_REQUESTS.md)
+Procurement Requests provides a listing of pending entitlement approval requests through the procurement [list](https://cloud.google.com/marketplace/docs/partners/commerce-procurement-api/reference/rest/v1/providers.entitlements/list) api. A pending request can be approved, rejected, or modified with a status comment.
 
-    npm install
+### <a name="my_products">My Products</a> [Guide](./user-guide/MY_PRODUCTS.md)
+My Products provides a listing of Marketplace Solution and Marketplace Plans that the current user is entitled access to.
 
-You can choose to use mock API data or point to a DS Admin REST API endpoint in the applicaiton settings page. The *VUE_APP_APICLIENT* environment variable will dynamically load between the two options.
+## <a name="application">Application</a>
+Provides administrative and settings configuration screens.
 
-Using API client data that is mocked:
+### <a name="admin">Admin</a> [Guide](./user-guide/ADMIN.md)
+The admin screen is used for initializing the Datashare data schema in BigQuery. Additionally, it provides functionlity to sync permissions and views in case they fall out of sync.
 
-    npm run serve
-
-or Using API client data from an endpoint URL:
-
-    VUE_APP_APICLIENT=server npm run serve
-
-Point your browser to http://localhost:8080 and update your DS Frontend `API Base URL` in the UI settings [page](http://localhost:8080/settings)
-
-   http://localhost:8080
-
-
-## <a name="deployment">Deployment</a>
-Once you've deployed the [DS API](https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/api), you should only then proceed to setup the UI. You can deploy the Frontend content via various methods below based off developer preference and/or environment. These are the examples we provide, though you may use other hosting options:
-
-  * [Google Cloud Run](https://cloud.google.com/run/) via [gcloud](https://cloud.google.com/sdk/)
-  * [Firebase Hosting](https://firebase.google.com/docs/hosting) via [firebase cli](https://firebase.google.com/docs/cli)
-
-[Deploy Cloud Run Managed](#deploy-cloud-run-managed) is the _preferred_ method to quickly host the DS Frontend content and generate a unique URL for consumption.
-
-There are some Firebase configuration and environment variables that need to be set for all build and deployment options.
-
-### <a name="deploy_prereqs">Deploy Prerequisites</a>
-The DS Frontend is currently configured for Firebase authentication. A new Firebase project and Firebase application credentials are required for deployment.
-
-There are some environment variables that need to be set for all build and deployment options.
-
-Export the GCP Project ID as *PROJECT_ID* environment variable:
-
-    export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
-
-Export the image/build *TAG* environment variable:
-
-    export TAG=dev;
-
-
-#### <a name="new_firebase">New Firebase Setup</a>
-If you already have Firebase setup for your existing GCP project, skip this step.
-
-1. Go to https://console.firebase.google.com/
-2. Click "Add project"
-
-<img src="assets/add_project.png" alt="Add Project" height="150"/>
-
-3. For the project name type in or select the existing project name for your GCP project, continue.
-
-<img src="assets/select_project.png" alt="Select Project" height="150"/>
-
-4. Confirm your billing plan.
-5. Continue through the prompts, you may choose to use Google Analytics.
-
-The Firebase project will begin to provision, this should take less than a minute.
-
-<img src="assets/project_ready.png" alt="Project Ready" height="150"/>
-
-6. Go to "Project settings"
-
-<img src="assets/project_settings.png" alt="Project settings" height="150"/>
-
-7. Scroll down to the "Your apps" section and click "Add app" or the web app icon </>.
-
-<img src="assets/your_apps.png" alt="Your apps" height="150"/>
-
-8. Enter in the app information and "Continue to console".
-
-<img src="assets/add_firebase_to_your_app.png" alt="Add Firebase to your web app" height="150"/>
-
-9. In the "Firebase SDK snippet" panel, select "Config".
-
-<img src="assets/sdk_snippet_config.png" alt="SDK snippet config" height="150"/>
-
-Copy the values for apiKey, authDomain, projectId, storageBucket, appId, and measurementId overwriting the existing values for each respective attribute within the /src/api/mock/data/settings.json configuration file.
-
-#### <a name="authentication">Enable Authentication</a>
-1. Select "Authentication" on the left navigation menu for the Firebase console.
-
-<img src="assets/authentication_menu.png" alt="Authentication" height="150"/>
-
-2. Select "Set up sign-in method".
-
-<img src="assets/set_up_sign-in_method.png" alt="Set up sign-in method" height="150"/>
-
-3. Click the edit button on the Google row.
-
-<img src="assets/edit_google_auth.png" alt="Enable Google Auth" />
-
-4. Setup the Google Auth, be sure to toggle the "Enabled" button and click "Save".
-
-<img src="assets/setup_google_auth.png" alt="Setup Google Auth" height="150" />
-
-
-#### <a name="firebase_cli">Install Firebase CLI</a>
-If you have not already installed the Firebase CLI, follow the instructions in the [Firebase CLI reference](https://firebase.google.com/docs/cli) document to do so.
-
-Ensure that your CLI is working by running the following command:
-
-```
-firebase projects:list
-```
-
-### <a name="deploy_cloud_run_managed">Deploy Cloud Run Managed</a>
-Deploy with Cloud Run allows stateless HTTP containers on a fully managed environment or GKE cluster. [Cloud Build](https://cloud.google.com/run/docs/quickstarts/build-and-deploy#containerizing) packages the Docker image into your Google Container repository.
-_Cloud Run and Cloud Build APIs will need to be enabled in your GCP project._
-
-Build with Cloud Build and TAG:
-
-    gcloud builds submit --config cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
-
-Deploy with Cloud Run: \
-**Note**: There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--set-env-vars) provides details for how they are set. \
-The GCP project's Cloud IAM policy, *constraints/iam.allowedPolicyMemberDomains* or *Domain Restricted Sharing* must be disabled to allow unauthenticated requests to reach Cloud Run services with the `--allow-unauthenticated` parameter. This policy is currently the default setting as described [here](https://cloud.google.com/resource-manager/docs/organization-policy/org-policy-constraints).
-
-    gcloud run deploy ds-frontend-ui \
-      --image gcr.io/${PROJECT_ID}/ds-frontend-ui:${TAG} \
-      --region=us-central1 \
-      --allow-unauthenticated \
-      --platform managed
-
-Open the app URL in your browser. You can return the FQDN via:
-
-    gcloud run services describe ds-frontend-ui --platform managed --format="value(status.url)"
-
-### <a name="deploy_cloud_run_deployment_manager">Deploy Cloud Run with Deployment Manager</a>
-Use Deployment Manager to deploy the Datashare UI with Cloud Run.
-_Cloud Run and Cloud Build APIs will need to be enabled in your GCP project._
-
-Deployment Manager will use Cloud Build to:
-* build the Docker container and save it to Google Container Registry
-* deploy the container to Cloud Run
-
-```
-gcloud deployment-manager deployments create ds-ui --config deploy_ui_cloud_run.yaml
-```
-
-**Note: If you delete the Deployment Manager template, the resources that it creates will NOT be deleted (container, Cloud Run deployment). You must delete these manually.**
-### <a name="deploy_cloud_run_deployment_manager_config">Configuration</a>
-
-Configure the deployment by updating the properties listed in `deploy_ui_cloud_run.yaml`.
-
-You must include your Firebase API Key before you deploy the Datashare UI.
-
-```
-  properties:
-    containerTag: dev
-    region: us-central1
-    timeout: 600s
-```
-
-### <a name="deploy_firebase">Deploy Firebase</a>
-Navigate to the frontend directory and modify the .firebaserc file with the Firebase projectId and save changes.
-
-```
-cd ~/Git/datashare-toolkit/frontend
-vi .firebaserc
-
-{
-  "projects": {
-    "default": "cds-demo-3"
-  }
-}
-```
-
-Now, you are ready to deploy the application. Run the following commands:
-
-```
-firebase use cds-demo-3
-npm run deploy
-```
-
-Upon successful completion of the Firebase deployment you should see output as follows:
-
-```
- DONE  Build complete. The dist directory is ready to be deployed.
- INFO  Check out deployment instructions at https://cli.vuejs.org/guide/deployment.html
-
-
-=== Deploying to 'cds-demo-3'...
-
-i  deploying hosting
-i  hosting[cds-demo-3]: beginning deploy...
-i  hosting[cds-demo-3]: found 3 files in public
-✔  hosting[cds-demo-3]: file upload complete
-i  hosting[cds-demo-3]: finalizing version...
-✔  hosting[cds-demo-3]: version finalized
-i  hosting[cds-demo-3]: releasing new version...
-✔  hosting[cds-demo-3]: release complete
-
-✔  Deploy complete!
-
-Project Console: https://console.firebase.google.com/project/cds-demo-3/overview
-Hosting URL: https://cds-demo-3.web.app
-
-```
-
-Navigate to the Hosting URL and on the top right click the right most button to sign-in using Google authentication. Next, to initialize the 'Datashare' dataset within BigQuery, navigate to the [Admin](./user-guide/ADMIN.md/#initialize_schema) page and click the "Initialize Schema" button.
+### <a name="settings">Settings</a> [Guide](./user-guide/SETTINGS.md)
+The settings page is used to configure application settings. For further information see [Datashare UI](../README.md).
