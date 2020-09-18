@@ -45,6 +45,7 @@ Enable the Kubernetes API as well, since the Datashare API is deployed to Kubern
 6. Next add two `Service account users roles` to this service account.  These two members need to be able to execute commands on behalf of this service account. Then click the `Done` button. 
 * `PROJECT_ID-compute@developer.gserviceaccount.com`
 * `PROJECT_ID@cloudservices.gserviceaccount.com`
+* `PROJECT_ID@cloudbuild.gserviceaccount.com`
 
 ![Assign members](images/iam-assign-members-to-sa.png)
 
