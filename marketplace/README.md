@@ -20,6 +20,7 @@ The following APIs are enabled during the Marketplace solution launch.
 * Deployment Manager - `cloudresourcemanager.googleapis.com`
 * Cloud Functions - `cloudfunctions.googleapis.com`
 * IAM - `iam.googleapis.com`
+* Cloud Commerce Procurement - `cloudcommerceprocurement.googleapis.com`
 
 ## New roles added to Service Accounts
 The following service account are modified with additional roles as shown below. 
@@ -54,29 +55,21 @@ This section outlines how to deploy Datashare from the command line.
 cd datashare-toolkit/marketplace/releases
 ```
 
-3. Unzip the `datashare-marketplace-vm-solution-v0.5.3` file and cd into the unzipped folder. 
+3. Unzip the `datashare-marketplace-vm-solution-v0.5.4` file and cd into the unzipped folder. 
 ```
-unzip datashare-marketplace-vm-solution-v0.5.3.zip
+unzip datashare-marketplace-vm-solution-v0.5.4.zip
 
 cd vm-solution
 ```
 
-4. Execute the following commands. 
+4. Update the `test_config.yaml` file and replace `YOUR_GCP_SERVICE_ACCOUNT` with the service account that you created in the prerequisites step. 
+
+5. Execute the following commands. 
 
 ```
 gcloud config set project YOUR_PROJECT
 
-gcloud deployment-manager deployments create datashare \
---template datashare-vm.jinja \
---properties deployApiToGke:True,\
-gkeZone:us-central1-a,\
-zone:us-central1-a,\
-machineType:e2-small,\
-input_gceServiceAccount:datashare-deployment-manager@gcp-financial-services-public.iam.gserviceaccount.com,\
-sourceImage:gcp-financial-services-debian-datashare-20200716,\
-input_adminEmail:default-user@example.com,\
-useRuntimeConfigWaiter:True,\
-bootDiskType:pd-standard
+gcloud deployment-manager deployments create datashare --config=test_config.yaml
 ```
 
 After a few minutes you will see the Deployment Manager job executing in the Google Cloud console.  
