@@ -17,7 +17,6 @@ This documentation provides details for using the Datashare user interface. If y
     * [My Products](#my_products)
 * [Application](#application)
     * [Admin](#admin)
-    * [Settings](#settings)
 
 ## <a name="batch">Batch</a>
 The batch section contains page links for managing batch data. Currently the Datashare UI only supports configuration of batch ingestion and batch data-sharing.
@@ -53,6 +52,3 @@ Provides administrative and settings configuration screens.
 
 ### <a name="admin">Admin</a> [Guide](./user-guide/ADMIN.md)
 The admin screen is used for initializing the Datashare data schema in BigQuery. Additionally, it provides functionlity to sync permissions and views in case they fall out of sync.
-
-### <a name="settings">Settings</a> [Guide](./user-guide/SETTINGS.md)
-The settings page is used to configure application settings. For further information see [Datashare UI](../README.md).
