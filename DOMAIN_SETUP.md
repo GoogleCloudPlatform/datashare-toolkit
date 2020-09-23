@@ -26,3 +26,6 @@ If your ownership of the domain needs to be verified, open the Webmaster Central
 ```
 gcloud domains verify $DOMAIN
 ```
+
+# Next
+[Setup OAuth credential](./CREDENTIAL_SETUP.md)
