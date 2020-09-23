@@ -19,16 +19,11 @@ info:
 
 required:
 - containerTag
-- firebaseApiKey
 - region
 - timeout
 
 
 properties:
-  firebaseApiKey:
-    type: string
-    description: Firebase API key
-
   cloudRunDeployName:
     type: string
     description: Cloud run service name that is displayed in the UI.

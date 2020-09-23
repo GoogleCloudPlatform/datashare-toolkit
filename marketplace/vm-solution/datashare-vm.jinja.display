@@ -9,7 +9,7 @@ description:
   tagline: Ingest, entitle, share large volumes of data.
   title: Datashare
   url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
-  version: '0.5.3'
+  version: '0.5.4'
   eulaUrl: https://raw.githubusercontent.com/GoogleCloudPlatform/datashare-toolkit/ecada698551d3022ed12afbabba5e5eae43dfb03/LICENSE.txt
   softwareGroups:
   - type: SOFTWARE_GROUP_OS
@@ -18,9 +18,9 @@ description:
       version: v20200714 LTS
   - software:
     - title: Datashare
-      version: 0.4.2
+      version: 0.4.4
     - title: Cloud Run on GKE
-      version: 1.16.11-gke.5
+      version: 1.16
   documentations:
   - title: Prerequisities
     url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/marketplace/PREREQUISITES.md
@@ -60,10 +60,10 @@ description:
 
 input:
   properties:
-    - name: image
+    - name: sourceImage
       title: Image version
       enumLabels:
-        '0': 'gcp-financial-services-debian-datashare-20200716'
+        '0': 'gcp-financial-services-debian-datashare-20200920'
     - name: zone
       title: Zone
     - name: machineType
@@ -92,14 +92,14 @@ input:
       tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
       placeholder: '0.0.0.0/0, 192.169.0.2/24'
       section: NETWORKING
-    - name: ipForward
+    - name: canIpForward
       title: IP forwarding
       tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
       section: NETWORKING
       level: 1
     - name: input_datashareGithubReleaseVersion
       title: Github Datashare Release Version
-      placeholder: v0.4.2
+      placeholder: v0.4.4
     - name: input_gcpRegion
       title: Google Cloud Platform Region
       subtext: <a href="https://cloud.google.com/compute/docs/regions-zones#available">Valid Google Cloud Platform regions</a>
@@ -110,15 +110,15 @@ input:
       subtext: <a href="https://cloud.google.com/storage/docs/locations">Valid Storage Bucket locations</a>
       tooltip: Create the storage buckets in the specified region; default is US.
       placeholder: US
-    - name: input_useRuntimeConfigWaiter
+    - name: useRuntimeConfigWaiter
       title: Use Google RuntimeConfig Waiter to setup Datashare prereqs.
       tooltip: Enables the <a href="https://cloud.google.com/deployment-manager/runtime-configurator/create-and-delete-runtimeconfig-resources">RuntimeConfig beta</a> feature that will execute a startup-script in the VM to enable APIs, upload Cloud Function source code and configure Cloud Run.
       subtext: Enables CloudBuild, IAM, Cloud Run, Cloud Resource Manager APIs, and uploads Datashare Cloud Function to Cloud Storage.
-    - name: input_deployApiToGke
+    - name: deployApiToGke
       title: Deploy the Datashare API to Cloud Run/GKE
       tooltip: This creates a<a href="https://cloud.google.com/run/docs/gke/setup">GKE cluster and installs Cloud Run</a> and deploys the Datashare API to this Cloud Run instance.
       subtext: Creates a GKE cluster, installs Cloud Run and deploys Datashare API to this cluster.
-    - name: input_gceServiceAccount
+    - name: gceServiceAccount
       title: GCP Service Account
       tooltip: Create a <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/marketplace/PREREQUISITES.md#update-compute-engine-service-account-from-google-cloud-console">service account and assign the Security Admin role</a> to it. This will be used to assign <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/marketplace/README.md#new-roles-added-to-service-accounts">new permissions to other service accounts</a> to install all Datashare components.
       subtext: Include your custom service account here.
@@ -175,79 +175,79 @@ runtime:
       description: <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/marketplace/README.md#remove-elevated-service-account-permissions">Remove elevated permissions from Cloud Build and Deployment Manager</a>
     - heading: Get Kubectl credentials
       description: Get kubectl credentials.
-      showIf: '{{ properties().input_deployApiToGke }}'
+      showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         gcloud container clusters get-credentials datashare --zone {{ properties().input_gkeZone }}
         
     - heading: Datashare API Deployed to Cloud Run managed by GKE
       description: Confirm Datashare deployment, pod and service is running on GKE. Execute the following command from Cloud Shell.
-      showIf: '{{ properties().input_deployApiToGke }}'
+      showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         kubectl get gw,deploy,po,svc -n datashare-apis
 
     - heading: Datashare API Service in GKE
       description: Display the Datashare UI domain name. Execute the following command from Cloud Shell.
-      showIf: '{{ properties().input_deployApiToGke }}'
+      showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         gcloud run services describe ds-api --cluster datashare --cluster-location {{ properties().input_gkeZone }}   --namespace datashare-apis   --platform gke
     
     - heading: Get the Datashare IP address
       description: Execute the following command from Cloud Shell.
-      showIf: '{{ properties().input_deployApiToGke }}'
+      showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         GATEWAY_IP=`kubectl -n gke-system get svc istio-ingress -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`; echo $GATEWAY_IP
     
     - heading: Test the Datashare API
       description: Execute the following commands from Cloud Shell.  This confirms that the API is running.
-      showIf: '{{ properties().input_deployApiToGke }}'
+      showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
     
     - heading: Test access to the Datashare API datasets
       description: Execute the following commands from Cloud Shell. This confirms the UI will be able to access the API.
-      showIf: '{{ properties().input_deployApiToGke }}'
+      showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha/projects/gcp-financial-services-dev/datasets
 
     - heading: Do you want to add your domain name to the GKE cluster?
       description: You must verify that you own the domain first. Execute the following from Cloud Shell. 
-      showIf: '{{ properties().input_deployApiToGke }}'
+      showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         gcloud domains verify YOUR_FQDN
 
     - heading: Assign a static IP address to your GKE cluster
       description: Execute the following command from Cloud Shell.
-      showIf: '{{ properties().input_deployApiToGke }}'
+      showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         gcloud compute addresses create ds-api-static-ip --addresses $GATEWAY_IP --region YOUR_GKE_REGION
 
     - heading: Assign your domain name to the GKE cluster
       description: Execute the following command from Cloud Shell. You must own your domain and verify that you own it. 
-      showIf: '{{ properties().input_deployApiToGke }}'
+      showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         gcloud beta run domain-mappings create --service ds-api --domain YOUR_FQDN --cluster datashare --cluster-location {{ properties().input_gkeZone }} --namespace datashare-apis --platform gke
 
     - heading: Do you want to enable TLS?
       description: Execute the following command from Cloud Shell.
-      showIf: '{{ properties().input_deployApiToGke }}'
+      showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         kubectl get kcert -n datashare-apis
     
     - heading: Confirm TLS is enabled
       description: Execute the following command from Cloud Shell to confirm TLS is enabled. It should display True under the READY column. 
-      showIf: '{{ properties().input_deployApiToGke }}'
+      showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         kubectl get kcert -n datashare-apis
     
     - heading: Test the Datashare API with your domain
       description: Execute the following commands from Cloud Shell.  This confirms that the API is running.
-      showIf: '{{ properties().input_deployApiToGke }}'
+      showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         curl -i https://YOUR_FQDN/v1alpha
     
     - heading: Test access to the Datashare API datasets with your domain
       description: Execute the following commands from Cloud Shell. This confirms the UI will be able to access the API.
-      showIf: '{{ properties().input_deployApiToGke }}'
+      showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         curl -i -H https://YOUR_FQDN/v1alpha/projects/gcp-financial-services-dev/datasets
 
@@ -256,16 +256,16 @@ runtime:
 
     - heading: Deployed with RuntimeConfig beta
       description: Datashare was deployed using the Google Cloud Platform RuntimeConfig beta release to install dependencies.
-      showIf: '{{ properties().input_useRuntimeConfigWaiter }}'
+      showIf: '{{ properties().useRuntimeConfigWaiter }}'
     #- heading: Remove Project Owner role from Compute Engine Service account
     #  description: Remove the Project Owner role from the compute engine service account in <a href="https://cloud.google.com/shell">Cloud Shell</a>.
     #  snippet: >-
     #    $ export PROJECT_NUMBER=`gcloud projects list --filter=$(gcloud config get-value project) --format="value(PROJECT_NUMBER)"`
     #    $ gcloud projects remove-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="roles/owner"
-    #  showIf: '{{ properties().input_useRuntimeConfigWaiter }}'
+    #  showIf: '{{ properties().useRuntimeConfigWaiter }}'
 
 annotations:
   autogenSpecType: 'SINGLE_VM'
-  vmImage0: https://www.googleapis.com/compute/v1/projects/gcp-financial-services-public/global/images/gcp-financial-services-debian-datashare-20200716
+  vmImage0: https://www.googleapis.com/compute/v1/projects/gcp-financial-services-public/global/images/gcp-financial-services-debian-datashare-20200920
 
 metadata_version: v1

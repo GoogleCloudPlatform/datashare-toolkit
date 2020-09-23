@@ -18,7 +18,7 @@ RUNTIME_CONFIG="datashare-vm-1-startup-config"
 VARIABLE_NAME="/success/my-instance"
 
 # Declare the roles arrays
-CLOUD_APIS=( "cloudfunctions.googleapis.com" "cloudbuild.googleapis.com" "iam.googleapis.com" "run.googleapis.com" "cloudresourcemanager.googleapis.com" "container.googleapis.com" "containerregistry.googleapis.com" )
+CLOUD_APIS=( "cloudfunctions.googleapis.com" "cloudbuild.googleapis.com" "iam.googleapis.com" "run.googleapis.com" "cloudresourcemanager.googleapis.com" "container.googleapis.com" "containerregistry.googleapis.com" "cloudcommerceprocurement.googleapis.com" )
 
 disable_gcp_apis()
 {
@@ -38,8 +38,16 @@ disable_gcp_apis()
 echo "Disabling GCP APIs that were enabled during the VM solution deployment..."
 disable_gcp_apis "${CLOUD_APIS[*]}"
 
-echo "Deleting the Variable..."
+echo "Deleting the success Variable..."
 gcloud beta runtime-config configs variables unset /success/my-instance --config-name cds-vm-1-startup-config
+if [ $? -eq 0 ]; then
+    echo "Variable $VARIABLE_NAME deleted successfully."
+else 
+    echo "Unable to delete $VARIABLE_NAME"
+fi
+
+echo "Deleting the failure Variable..."
+gcloud beta runtime-config configs variables unset /failure/my-instance --config-name cds-vm-1-startup-config
 if [ $? -eq 0 ]; then
     echo "Variable $VARIABLE_NAME deleted successfully."
 else 

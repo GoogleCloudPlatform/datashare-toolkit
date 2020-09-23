@@ -20,69 +20,82 @@ def GenerateConfig(context):
   """Generate YAML resource configuration."""
   
   #volumes = [{'name': 'cds-code', 'path': '/cds'}]
+  datashare_ui_name_with_tag = "ds-frontend-ui:dev"
+  container_tag = context.properties['containerTag']
+  cloud_run_deploy_name = context.properties['cloudRunDeployName']
+  datashare_ui_name = "ds-frontend-ui"
+  gcp_region = context.properties['region']
+  delete_timeout = '120s'
+  general_timeout = context.properties['timeout']
   cmd = "https://github.com/GoogleCloudPlatform/datashare-toolkit.git"
-  gitReleaseVersion = "master"
+  git_release_version = "master"
   if context.properties['datashareGitReleaseTag'] != None:
-      gitReleaseVersion = context.properties['datashareGitReleaseTag']
+      git_release_version = context.properties['datashareGitReleaseTag']
 
   steps = [
-              { # Clone the Datashare repository
+              { # Clone the Datashare repository only if the ds-frontend-ui:dev is not present
                 'name': 'gcr.io/cloud-builders/git',
                 'dir': 'ds', # changes the working directory to /workspace/ds/
-                'args': ['clone', cmd]
+                'entrypoint': 'bash',
+                'args': [ '-c', f'if ! gcloud container images describe gcr.io/$PROJECT_ID/{datashare_ui_name_with_tag}; then ' +
+                    'git clone ' + cmd +
+                    '; else exit 0; fi'
+                    ]
               },
-              { # Submit the build configuration to Cloud Build to build the DS UI container image
-                  'name': 'gcr.io/cloud-builders/gcloud',
+              { # Submit the build configuration to Cloud Build to build the DS UI container image only if the ds-frontend-ui:dev is not present
+                  'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
                   'dir': 'ds/datashare-toolkit/frontend',
-                  'args': ['builds',
-                            'submit',
-                            '.', # SOURCE current working directory
-                            '--config=cloudbuild.yaml',
-                            '--substitutions=TAG_NAME=' + context.properties['containerTag']
-                          ]
+                  'entrypoint': 'bash',
+                  'args': [ '-c', f'if ! gcloud container images describe gcr.io/$PROJECT_ID/{datashare_ui_name_with_tag}; then ' +
+                      'gcloud builds submit . --config=cloudbuild.yaml ' + 
+                      f'--substitutions=TAG_NAME={container_tag}' + 
+                      '; else exit 0; fi'
+                  ]
               },
               {   # Deploy the container image to Cloud Run
-                  'name': 'gcr.io/cloud-builders/gcloud',
+                  'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
                   'dir': 'ds/datashare-toolkit/frontend',
-                  'args': ['run',
+                  'args': ['gcloud', 'run',
                             'deploy',
                             context.properties['cloudRunDeployName'],
-                            '--image=gcr.io/$PROJECT_ID/' + context.properties['cloudRunDeployName'] + ':' + context.properties['containerTag'], 
-                            '--region='+ context.properties['region'],
+                            f'--image=gcr.io/$PROJECT_ID/{cloud_run_deploy_name}:{container_tag}', 
+                            f'--region={gcp_region}',
                             '--allow-unauthenticated',
-                            '--platform=managed',
-                            '--set-env-vars=FIREBASE_API_KEY=' + context.properties['firebaseApiKey']
+                            '--platform=managed'
                           ]
               }
           ]
 
-  gitRelease = { # Checkout the correct release
+  if git_release_version != "master":
+      git_release = { # Checkout the correct release
                 'name': 'gcr.io/cloud-builders/git',
                 'dir': 'ds/datashare-toolkit', # changes the working directory to /workspace/ds/datashare-toolkit
-                'args': ['checkout', gitReleaseVersion]
+                'entrypoint': 'bash',
+                'args': [ '-c', 'if ! gcloud container images describe gcr.io/$PROJECT_ID/' + datashare_ui_name_with_tag + '; then ' +
+                        'git checkout ' + git_release_version + 
+                         '; else exit 0; fi'
+                        ]
               }
-
-  if gitReleaseVersion != "master":
-      steps.insert(1, gitRelease)
+      steps.insert(1, git_release)
 
   # include the dependsOn property if we are deploying all the components
-  useRuntimeConfigWaiter = context.properties['useRuntimeConfigWaiter']
-  if useRuntimeConfigWaiter:
-    waiterName = context.properties['waiterName']
-    resources = [{
-      'name': 'ds-ui-build',
-      'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
-      'metadata': {
-          'runtimePolicy': ['UPDATE_ALWAYS'],
-          'dependsOn': [waiterName]
-      },
-      'properties': {
-          'steps': steps,
-          'timeout': context.properties['timeout']
-      }
-    }]
+  use_runtime_config_waiter = context.properties['useRuntimeConfigWaiter']
+  if use_runtime_config_waiter:
+      waiter_name = context.properties['waiterName']
+      resources = [{
+        'name': 'ds-ui-build',
+        'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
+        'metadata': {
+            'runtimePolicy': ['UPDATE_ALWAYS'],
+            'dependsOn': [waiter_name]
+        },
+        'properties': {
+            'steps': steps,
+            'timeout': f'{general_timeout}'
+        }
+        }]
   else:
-    resources = [{
+      resources = [{
       'name': 'ds-ui-build',
       'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
       'metadata': {
@@ -90,8 +103,27 @@ def GenerateConfig(context):
       },
       'properties': {
           'steps': steps,
-          'timeout': context.properties['timeout']
+          'timeout': f'{general_timeout}'
       }
     }]
+
+  resources.append({
+      'name': 'delete-ui',
+      'action': 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create',
+      'metadata': {
+          'dependsOn:': ['ds-ui-build'],
+          'runtimePolicy': ['DELETE']
+      },
+      'properties': {
+          'steps': [
+              {
+                'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
+                'entrypoint': '/bin/bash',
+                'args': ['-c', f'gcloud run services delete {cloud_run_deploy_name} --platform=managed --region={gcp_region} --quiet || exit 0']
+              }
+          ],
+          'timeout': f'{delete_timeout}'
+      }
+  })
   
   return { 'resources': resources }
