@@ -12,4 +12,3 @@ _This is not an officially supported Google product._
 1. [Setup your domain](./DOMAIN_SETUP.md)
 2. [Setup OAuth credential](./CREDENTIAL_SETUP.md)
 3. [Deploy Datashare](./marketplace/README.md#deploy_from_cli)
-4. 

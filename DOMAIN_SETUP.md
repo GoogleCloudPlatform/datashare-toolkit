@@ -6,8 +6,23 @@ Datashare requires two domains, one for the UI, and one for the API layer. We re
 - https://api.datashare.your_domain.com/
 
 # Pre-requisites
-You must have access to configure DNS for the domains that you will use.
+You must have access to administer DNS for the domains that you will use.
 
-# Configuring your domains using the GCP Cloud DNS console
+# Verifying your domain using the gcloud CLI
+Create a DOMAIN environment variable based off the custom subdomain:
 
-# Configuring your domains using the gcloud CLI
+```
+export DOMAIN=datashare.your_domain.com
+```
+
+Verify domain ownership the first time you use that domain in the Google Cloud project:
+
+```
+gcloud domains list-user-verified
+```
+
+If your ownership of the domain needs to be verified, open the Webmaster Central verification page:
+
+```
+gcloud domains verify $DOMAIN
+```
