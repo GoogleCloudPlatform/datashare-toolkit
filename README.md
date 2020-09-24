@@ -24,7 +24,9 @@ The toolkit is open-source. Some supporting infrastructure, such as [storage buc
 ## Setting up Datashare
 1. [Setup your domain](./DOMAIN_SETUP.md)
 2. [Setup OAuth credential](./CREDENTIAL_SETUP.md)
-3. [Deploy Datashare](./marketplace/README.md#deploy_from_cli)
+3. Deploy Datashare
+    - [CLI](./marketplace/README.md#deploy_from_cli)
+    - [Marketplace](./marketplace/README.md#deploy_from_marketplace)
 
 ## Using Datashare
 - [User Guide](./frontend/README.md)
