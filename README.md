@@ -18,6 +18,7 @@ The toolkit is open-source. Some supporting infrastructure, such as [storage buc
 - Publisher UI for creating data sharing policies, managing user accounts, creating views.
 - Ingestion performed by a [Google Cloud Function](https://cloud.google.com/functions/)
 - [GCP Marketplace integration](./frontend/user-guide/MARKETPLACE_INTEGRATION.md) for selling your data.
+- [Multicast client](./client/README.md)
 
 
 ## Setting up Datashare
