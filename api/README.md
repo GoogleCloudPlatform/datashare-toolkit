@@ -212,7 +212,7 @@ Change directories into the current working API version:
 
     cd v1alpha
 
-### Deploy Cloud Run
+###  Cloud Run Prerequisites
 
 Deploy with Cloud Run allows stateless HTTP containers on a fully [managed](https://cloud.google.com/run/docs/choosing-a-platform#cloud-run-fully-managed) environment or [Anthos](https://cloud.google.com/run/docs/choosing-a-platform#cloud-run-for-anthos) GKE cluster. If you do not have a pre-built image, [Cloud Build](https://cloud.google.com/run/docs/quickstarts/build-and-deploy#containerizing) packages the Docker image into your Google Container repository.
 _Cloud Run and Cloud Build APIs will need to be enabled in your GCP project._
