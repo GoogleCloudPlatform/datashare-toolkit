@@ -24,7 +24,7 @@ cp ../api/{deploy_ds_api.py.schema,deploy_ds_api.py,deploy_ds_api.yaml} vm-solut
 cp ../frontend/{deploy_ui_cloud_run.py.schema,deploy_ui_cloud_run.py,deploy_ui_cloud_run.yaml} vm-solution/
 
 # zip the file
-zip -r ds_solution_folder.zip vm-solution/
+zip -r ds_solution_folder.zip vm-solution/ -x 'vm-solution/test/**' -x 'vm-solution/test*/'
 
 # reset vm-solution folder back to its original state
 rm -rf vm-solution

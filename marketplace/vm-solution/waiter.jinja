@@ -31,6 +31,21 @@ resources:
     # within the deployment.
     config: {{ configName }}
 
+# Delete the config waiter
+- name: delete-config-waiter
+  action: 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create'
+  metadata:
+    dependsOn:
+    - {{ configName }}
+    runtimePolicy: 
+    - DELETE
+  properties:
+    steps:
+    - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+      entrypoint: '/bin/bash'
+      args: ['-c', 'gcloud beta runtime-config configs delete {{ configName }} || exit 0']
+    timeout: 120s
+
 - type: runtimeconfig.v1beta1.waiter
   name: {{ waiterName }}
   metadata:
@@ -71,6 +86,36 @@ resources:
       cardinality:
         path: /failure
         number: 1
+
+# Delete the waiter variables
+- name: delete-variables-success
+  action: 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create'
+  metadata:
+    dependsOn:
+    - {{ waiterName }}
+    runtimePolicy: 
+    - DELETE
+  properties:
+    steps:
+    - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+      entrypoint: '/bin/bash'
+      args: ['gcloud', 'beta', 'runtime-config', 'configs', 'variables', 'unset', '/success/my-instance', '--config-name', '{{ configName }} || exit 0']
+    timeout: 120s
+
+# Delete the waiter variables
+- name: delete-variables-failure
+  action: 'gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create'
+  metadata:
+    dependsOn:
+    - {{ waiterName }}
+    runtimePolicy: 
+    - DELETE
+  properties:
+    steps:
+    - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+      entrypoint: '/bin/bash'
+      args: ['gcloud', 'beta', 'runtime-config', 'configs', 'variables', 'unset', '/failure/my-instance', '--config-name', '{{ configName }} || exit 0']
+    timeout: 120s
 
 outputs:
 - name: configName
