@@ -1,4 +1,4 @@
-[Back to DS](./README.md)
+[Back to Datashare](./README.md)
 
 # Overview
 Datashare requires two domains, one for the UI, and one for the API layer. We recommend configuring as such:
