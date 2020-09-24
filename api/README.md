@@ -283,7 +283,11 @@ Download and extract Istio:
 
     gsutil -m cp gs://istio-release/releases/${ISTIO_VERSION}/istio-${ISTIO_VERSION}-linux.tar.gz - | tar zx
 
-Use Helm's local template rendering to create a Kubernetes manifest that installs the Istio sidecar injector webhook:
+Ensure that you have helm installed, otherwise install it:
+
+    brew install helm
+
+Use Helm's local template rendering to create a Kubernetes manifest that installs the Istio sidecar injector webhook.
 
     helm template \
       --namespace gke-system \
@@ -615,6 +619,10 @@ You should also be able to verify the DS API can communicate with GCP services v
 ### Authentication
 
 Authentication is enforced by Istio JWT Policies at the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/). There are three JWT origins for each supported Identity Provider: Google, Firebase, and Marketplace [here](istio-manifests/1.4/authn/default-jwt-policy.tmpl.yaml)
+
+Ensure that you have gettext installed, otherwise install it:
+
+    brew install gettext
 
 Apply the authN policies: \
 **Note**: `envsubst` will read the **PROJECT_ID** environment variable, substitute it in the template, then `kubectl` to apply the config:
