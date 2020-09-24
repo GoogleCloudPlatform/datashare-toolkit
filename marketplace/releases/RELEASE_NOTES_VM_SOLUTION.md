@@ -11,8 +11,10 @@
 * see below. 
 
 ### Bug Fixes
-* Resolved an bug (syntax issue) reported by the Python editor for the `deploy_ds_api.py` file.  
+* Resolve an bug (syntax issue) reported by the Python editor for the `deploy_ds_api.py` file.  
 * Updated the `releases/datashare-marketplace-vm-solution-0.5.4.zip` to include the hot fix to deploy the API to the GKE cluster.
+* Applied Istio authentication and authorization policies in the VM startup script. 
+
 
 ### Known Bugs
 * None

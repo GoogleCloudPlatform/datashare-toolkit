@@ -31,6 +31,8 @@ required:
   - bootDiskType
   - bootDiskSizeGb
   - gceServiceAccount
+  - input_oauthClientId
+  - input_dataProducers
 
 properties:
   zone:
@@ -158,6 +160,10 @@ properties:
         scopes:
           description: Scopes to be made available for this service account
           type: array
+  input_oauthClientId:
+    type: string
+  input_dataProducers:
+    type: string
 outputs:
   deployment:
     type: string
