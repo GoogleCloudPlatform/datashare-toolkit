@@ -1,5 +1,5 @@
 function navigateToMarketplace(projectId, solutionId) {
-  const url = `https://console.cloud.google.com/marketplace/details/${projectId}/${solutionId}`;
+  const url = `https://console.cloud.google.com/marketplace/details/${projectId}/${solutionId}?project=${projectId}`;
   window.open(url, '_blank');
 }
 
