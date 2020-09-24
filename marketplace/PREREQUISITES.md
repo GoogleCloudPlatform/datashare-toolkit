@@ -13,13 +13,15 @@ solution automatically.
 
 Enable the Kubernetes API as well, since the Datashare API is deployed to Kubernetes.  
 
-## Enable the Kubernetes API
+## Enable the Kubernetes and RuntimeConfig APIs
 
 ### From Cloud Console
-1. [Enable the API from Cloud Consule](https://pantheon.corp.google.com/apis/library/container.googleapis.com)
+1. [Enable the Kubernetes API from Cloud Console](https://console.cloud.google.com/apis/library/container.googleapis.com)
+2. [Enable the Runtime Config API from Cloud Console](https://console.cloud.google.com/apis/library/runtimeconfig.googleapis.com)
+3. [Enable the Cloud Build API from Cloud Console](https://console.cloud.google.com/apis/library/cloudbuild.googleapis.com)
 
 ### From the command line
-1. `gcloud services enable container.googleapis.com`
+1. `gcloud services enable container.googleapis.com runtimeconfig.googleapis.com cloudbuild.googleapis.com`
 
 ## Update service account from Google Cloud Console
 1. Login to Google Cloud Console and select `IAM` from the menu.
