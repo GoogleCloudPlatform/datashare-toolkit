@@ -1,5 +1,22 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.5.5 Release Notes
+* Build - 9/24/2020
+
+### Datashare
+* Datashare release version is 0.4.4
+* Kubernetes cluster version is 1.16 to support incremental changes
+
+### Updates
+* see below. 
+
+### Bug Fixes
+* Resolved an bug (syntax issue) reported by the Python editor for the `deploy_ds_api.py` file.  
+* Updated the `releases/datashare-marketplace-vm-solution-0.5.4.zip` to include the hot fix to deploy the API to the GKE cluster.
+
+### Known Bugs
+* None
+
 ## 0.5.4 Release Notes
 * Build - 9/18/2020
 
