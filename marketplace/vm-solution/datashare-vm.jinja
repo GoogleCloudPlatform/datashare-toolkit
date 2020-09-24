@@ -60,7 +60,7 @@ resources:
       location: {{ storageBucketLocation }}
       storageClass: STANDARD
 
-  {% if deployApiToGke %}  
+  {% if deployApiToGkeValue %}  
   - name: datashare-cluster-manager
     type: cluster.py
     metadata:
@@ -146,8 +146,8 @@ resources:
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}
       waiterName: {{ waiterName }}
-      {% if deployApiToGke %}  
-      deployToGke: {{ deployApiToGke }}
+      {% if deployApiToGkeValue %}  
+      deployToGke: {{ deployApiToGkeValue }}
       gkeZone: {{ gkeZone }}
       {% endif %}
     
@@ -171,7 +171,7 @@ resources:
       instanceName: {{ instanceNameValue }}
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}
       waiterConfigName: {{ configName }}
-      deployApiToGke: {{ deployApiToGke }}
+      deployApiToGke: {{ deployApiToGkeValue }}
       sourceImage: https://www.googleapis.com/compute/v1/projects/gcp-financial-services-public/global/images/{{ imageNames[selectedImageIndex] }}
       zone: {{ zone }}
       machineType: {{ machineType }}
@@ -210,11 +210,11 @@ resources:
             value: {{ datashareGitReleaseVersion }}
           - key: gceServiceAccount
             value: {{ gceServiceAccountValue }}
-          {% if deployApiToGke %}   
+          {% if deployApiToGkeValue %}   
           - key: gkeZone
             value: {{ gkeZone }}
           - key: deployApiToGke
-            value: {{ deployApiToGke }}
+            value: {{ deployApiToGkeValue }}
           - key: gkeClusterName
             value: {{ gkeClusterName }}
           {% endif %}  
