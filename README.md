@@ -21,15 +21,13 @@ The toolkit is open-source. Some supporting infrastructure, such as [storage buc
 - [Multicast client](./client/README.md)
 
 
-## Setting up Datashare
+## Getting started with Datashare
 1. [Setup your domain](./DOMAIN_SETUP.md)
 2. [Setup OAuth credential](./CREDENTIAL_SETUP.md)
 3. Deploy Datashare
     - [CLI](./marketplace/README.md#deploy_from_cli)
     - [Marketplace](./marketplace/README.md#deploy_from_marketplace)
-
-## Using Datashare
-- [User Guide](./frontend/README.md)
+4. [User Guide](./frontend/README.md)
 
 ## Requirements
 
