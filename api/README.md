@@ -677,6 +677,9 @@ Before you apply the AuthZ policies, export the **DATA_PRODUCERS** environment v
     export DATA_PRODUCERS="*@google.com"
     export DATA_PRODUCERS="abc@xyz.com,my-trusted-app@my-gcp-project.iam.gserviceaccount.com"
 
+Additionally, export the **OAUTH_CLIENT_ID** environment variable that you created for the UI.
+
+    export OAUTH_CLIENT_ID="abc123..."
 
 Apply the authZ policies: \
 **Note**: `envsubst` will read the **PROJECT_ID**, **FQDN**, and **DATA_PRODUCERS** environment variable(s), substitute it in the template, then `kubectl` to apply the config:
