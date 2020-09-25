@@ -2,8 +2,8 @@
 
 # Overview
 Datashare requires two domains, one for the UI, and one for the API layer. We recommend configuring as such:
-- https://datashare.your_domain.com/
-- https://api.datashare.your_domain.com/
+- https://datashare.your-domain.com/
+- https://api.datashare.your-domain.com/
 
 # Pre-requisites
 You must have access to administer DNS for the domains that you will use.
