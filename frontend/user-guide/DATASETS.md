@@ -1,4 +1,4 @@
-[Datashare User Guide](./README.md)
+[Datashare User Guide](./../README.md)
 
 # Datasets
 * [Viewing Managed Datasets](#viewing_managed_datasets)

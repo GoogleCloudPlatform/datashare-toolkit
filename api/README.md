@@ -212,7 +212,7 @@ Change directories into the current working API version:
 
     cd v1alpha
 
-### Deploy Cloud Run
+### Cloud Run Prerequisites
 
 Deploy with Cloud Run allows stateless HTTP containers on a fully [managed](https://cloud.google.com/run/docs/choosing-a-platform#cloud-run-fully-managed) environment or [Anthos](https://cloud.google.com/run/docs/choosing-a-platform#cloud-run-for-anthos) GKE cluster. If you do not have a pre-built image, [Cloud Build](https://cloud.google.com/run/docs/quickstarts/build-and-deploy#containerizing) packages the Docker image into your Google Container repository.
 _Cloud Run and Cloud Build APIs will need to be enabled in your GCP project._
@@ -283,7 +283,11 @@ Download and extract Istio:
 
     gsutil -m cp gs://istio-release/releases/${ISTIO_VERSION}/istio-${ISTIO_VERSION}-linux.tar.gz - | tar zx
 
-Use Helm's local template rendering to create a Kubernetes manifest that installs the Istio sidecar injector webhook:
+Ensure that you have helm installed, otherwise install it:
+
+    brew install helm
+
+Use Helm's local template rendering to create a Kubernetes manifest that installs the Istio sidecar injector webhook.
 
     helm template \
       --namespace gke-system \
@@ -616,6 +620,10 @@ You should also be able to verify the DS API can communicate with GCP services v
 
 Authentication is enforced by Istio JWT Policies at the Istio [Ingress Gateway](https://archive.istio.io/v1.4/docs/tasks/traffic-management/ingress/ingress-control/). There are three JWT origins for each supported Identity Provider: Google, Firebase, and Marketplace [here](istio-manifests/1.4/authn/default-jwt-policy.tmpl.yaml)
 
+Ensure that you have gettext installed, otherwise install it:
+
+    brew install gettext
+
 Apply the authN policies: \
 **Note**: `envsubst` will read the **PROJECT_ID** environment variable, substitute it in the template, then `kubectl` to apply the config:
 
@@ -669,9 +677,12 @@ Before you apply the AuthZ policies, export the **DATA_PRODUCERS** environment v
     export DATA_PRODUCERS="*@google.com"
     export DATA_PRODUCERS="abc@xyz.com,my-trusted-app@my-gcp-project.iam.gserviceaccount.com"
 
+Additionally, export the **OAUTH_CLIENT_ID** environment variable that you created for the UI.
+
+    export OAUTH_CLIENT_ID="abc123..."
 
 Apply the authZ policies: \
-**Note**: `envsubst` will read the **PROJECT_ID**, **FQDN**, and **DATA_PRODUCERS** environment variable(s), substitute it in the template, then `kubectl` to apply the config:
+**Note**: `envsubst` will read the **PROJECT_ID**, **OAUTH_CLIENT_ID**, and **DATA_PRODUCERS** environment variable(s), substitute it in the template, then `kubectl` to apply the config:
 
     cat istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
 

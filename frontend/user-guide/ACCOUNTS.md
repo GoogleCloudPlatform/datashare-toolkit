@@ -1,4 +1,4 @@
-[Datashare User Guide](./README.md)
+[Datashare User Guide](./../README.md)
 
 # Accounts
 * [Viewing Accounts](#viewing_accounts)

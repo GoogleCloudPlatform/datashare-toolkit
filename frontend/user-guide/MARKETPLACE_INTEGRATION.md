@@ -1,4 +1,4 @@
-[Datashare User Guide](./README.md)
+[Datashare User Guide](./../README.md)
 
 # Marketplace Integration
 * [Becoming a Marketplace vendor](#becoming_a_marketplace_vendor)

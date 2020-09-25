@@ -45,7 +45,8 @@ The following service account are modified with additional roles as shown below.
   * Role added to this service account:
     * storage.admin
 
-## Deploy Datashare from command line
+
+## <a name="deploy_from_cli">Deploy Datashare from command line</a>
 This section outlines how to deploy Datashare from the command line. 
 
 1. Make sure to complete the [prerequistes](https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/marketplace/PREREQUISITES.md).
