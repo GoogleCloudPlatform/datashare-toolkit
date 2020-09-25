@@ -13,6 +13,8 @@ resources:
     gceServiceAccount: YOUR_GCP_SERVICE_ACCOUNT
     bootDiskType: pd-ssd
     bootDiskSizeGb: 10
+    input_oauthClientId: XYZ
+    input_dataProducers: test@example.com
     serviceAccounts:
       - email: YOUR_GCP_SERVICE_ACCOUNT
         scopes: 

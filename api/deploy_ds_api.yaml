@@ -13,3 +13,14 @@ resources:
     region: us-central1
     timeout: 600s
     datashareGitReleaseTag: master
+  #accessControl:
+  #  gcpIamPolicy:
+  #    bindings:
+  #      - role: roles/iam.serviceAccountAdmin
+  #        members:
+          # The default Deployment Manager service account should retain permissions.
+          # Replace this with a different value if you use DM with different
+          # credentials.
+          #- serviceAccount:{{ env['project_number'] }}@cloudservices.gserviceaccount.com
+   #       - serviceAccount:datashare-deployment-manager@gcp-financial-services-dev.iam.gserviceaccount.com
+          

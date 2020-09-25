@@ -10,6 +10,8 @@ imports:
   path: common/vm_instance.py
 
 {% set project = env["project"] %}
+{% set oauthClientId = properties["input_oauthClientId"] %}
+{% set dataProducers = properties["input_dataProducers"] %}
 {% set datashareGitReleaseVersion = properties["input_datashareGithubReleaseVersion"] %}
 {% set gceServiceAccountValue = properties["gceServiceAccount"] %}
 {% set gcpRegion = properties["input_gcpRegion"] %}
@@ -224,6 +226,10 @@ resources:
           - key: configName
             value: {{ configName }}
           {% endif %}
+          - key: oauthClientId
+            value: {{ oauthClientId }}
+          - key: dataProducers
+            value: {{ dataProducers }}
           - key: startup-script
             value: |-
               #!/bin/bash
@@ -451,6 +457,16 @@ resources:
                     kubectl annotate serviceaccount $KSA_NAME -n $NAMESPACE iam.gke.io/gcp-service-account=${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
                     echo "Labeling the namespace."
                     kubectl label namespace $NAMESPACE istio-injection=enabled
+                    
+                    # Apply Authentication policy
+                    echo "Istio - Applying Authentication policies."
+                    cat /opt/datashare-toolkit/istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -
+                    DATA_PRODUCERS=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/dataProducers -H "Metadata-Flavor: Google"`
+                    OAUTH_CLIENT_ID=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/oauthClientId -H "Metadata-Flavor: Google"`
+                    # Apply Authorization policy
+                    echo "Istio - Applying Authorization policies."
+                    cat /opt/datashare-toolkit/istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
+
                     echo "GKE setup complete."
                 fi
 

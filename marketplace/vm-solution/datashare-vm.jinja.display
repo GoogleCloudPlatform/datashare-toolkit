@@ -9,7 +9,7 @@ description:
   tagline: Ingest, entitle, share large volumes of data.
   title: Datashare
   url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
-  version: '0.5.4'
+  version: '0.5.5'
   eulaUrl: https://raw.githubusercontent.com/GoogleCloudPlatform/datashare-toolkit/ecada698551d3022ed12afbabba5e5eae43dfb03/LICENSE.txt
   softwareGroups:
   - type: SOFTWARE_GROUP_OS
@@ -133,6 +133,16 @@ input:
       tooltip: This field is not required. Please ignore.
       subtext: This is field is not required. Please ignore.
       placeholder: user@example.com
+    - name: input_oauthClientId
+      title: OAuth Client Id
+      tooltip: <a href="https://console.cloud.google.com/apis/credentials">Create the OAuth client ID.</a>
+      subtext: The OAuth client ID used by the Datashare UI. 
+      placeholder: OAUTH_CLIENT_ID
+    - name: input_dataProducers
+      title: Data Producers
+      tooltip: Create a service account and include it here or include a wildcard email address.
+      subtext: Project admins or service accounts that require read-write access to Datashare APIs
+      placeholder: user@example.com or *@example.com
     
   sections:
     - name: BOOT_DISK

@@ -11,15 +11,27 @@ The Security Admin role is required because it needs to modify other service
 accounts with the appropriate permissions so that the Deployment Manager can deploy the full
 solution automatically. 
 
-Enable the Kubernetes API as well, since the Datashare API is deployed to Kubernetes.  
+Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud Run on Anthos Kubernetes by default.  
 
-## Enable the Kubernetes API
+## Enable the APIs
 
 ### From Cloud Console
-1. [Enable the API from Cloud Consule](https://pantheon.corp.google.com/apis/library/container.googleapis.com)
+1. [Enable the Kubernetes API from Cloud Console](https://console.cloud.google.com/apis/library/container.googleapis.com)
+2. [Enable the Runtime Config API from Cloud Console](https://console.cloud.google.com/apis/library/runtimeconfig.googleapis.com)
+3. [Enable the Cloud Build API from Cloud Console](https://console.cloud.google.com/apis/library/cloudbuild.googleapis.com)
 
 ### From the command line
-1. `gcloud services enable container.googleapis.com`
+1. `gcloud services enable container.googleapis.com runtimeconfig.googleapis.com cloudbuild.googleapis.com`
+
+## Create a OAuth Client ID
+1. [Create the client id](https://console.cloud.google.com/apis/credentials)
+2. Click `+ Create Credentials`.
+3. Select `OAuth Client ID`.
+
+## Create a Data producers service account
+For this step you can either create a new service account or use an existing service account.
+
+To create an new service account then follow the steps in `Update service account from Google Cloud Console`; however, you don't need to assign any roles to this SA.
 
 ## Update service account from Google Cloud Console
 1. Login to Google Cloud Console and select `IAM` from the menu.
