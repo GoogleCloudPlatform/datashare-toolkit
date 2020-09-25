@@ -1,4 +1,4 @@
-[Datashare User Guide](./README.md)
+[Datashare User Guide](./../README.md)
 
 # Authorized Views
 * [Viewing Authorized Views](#viewing_authorized_views)

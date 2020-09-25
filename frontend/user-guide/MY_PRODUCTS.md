@@ -1,4 +1,4 @@
-[Datashare User Guide](./README.md)
+[Datashare User Guide](./../README.md)
 
 # My Products
 * [Viewing Products](#viewing_products)
