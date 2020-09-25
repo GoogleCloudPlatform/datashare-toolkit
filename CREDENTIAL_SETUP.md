@@ -4,7 +4,7 @@
 The OAuth 2.0 Client ID setup is required in order to provide a credential for the UI to access the APIs. This step must be performed manually through the Google Cloud Console, as there is no CLI to perform the steps due to security concerns.
 
 # Pre-requisites
-Before starting credential setup, ensure that you've configured your domain.
+Before starting credential setup, ensure that you've [configured your domain](./DOMAIN_SETUP.md).
 
 # Setting up OAuth credential
 1. Go to https://console.cloud.google.com/apis/credentials.
