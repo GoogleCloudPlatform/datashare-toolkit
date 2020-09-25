@@ -12,7 +12,7 @@ You must have access to administer DNS for the domains that you will use.
 Create a DOMAIN environment variable based off the custom subdomain:
 
 ```
-export DOMAIN=datashare.your_domain.com
+export DOMAIN=datashare.your-domain.com
 ```
 
 Verify domain ownership the first time you use that domain in the Google Cloud project:
