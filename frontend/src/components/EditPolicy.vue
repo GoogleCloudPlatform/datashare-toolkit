@@ -41,7 +41,7 @@
           @change="accessTypeChanged"
         >
           <v-radio label="Dataset-based Access" :value="false"></v-radio>
-          <v-radio label="Table-based Access" :value="true"></v-radio>
+          <v-radio label="View/Table-based Access" :value="true"></v-radio>
         </v-radio-group>
         <v-expansion-panels multiple v-model="panel">
           <v-expansion-panel v-if="!policy.isTableBased">
