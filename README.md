@@ -15,9 +15,9 @@ While these tools are used for data management and entitlement, they follow a br
 The toolkit is open-source. Some supporting infrastructure, such as [storage buckets](https://cloud.google.com/storage/), serverless functions, and BigQuery datasets, must be maintained within GCP by publishers as a prerequisite. As a consumer, when the GCP accounts are added to the publisher entitlements, the published can be queried directly within BigQuery, ready to integrate into your analytics workflow, machine learning model, or runtime application. Publishers are responsible for managing the limited support infrastructure necessary. While consumers are billed for BigQuery compute and networking, publishers incur costs only on the storage of their data in BigQuery and Cloud Storage.
 
 ## Key Features
-- Publisher UI for creating data sharing policies, managing user accounts, creating views.
+- Publisher UI for creating data sharing policies, managing user accounts, creating views
 - Ingestion performed by a [Google Cloud Function](https://cloud.google.com/functions/)
-- [GCP Marketplace integration](./frontend/user-guide/MARKETPLACE_INTEGRATION.md) for selling your data.
+- [GCP Marketplace integration](./frontend/user-guide/MARKETPLACE_INTEGRATION.md) for selling your data
 - [Multicast client](./client/README.md)
 
 
