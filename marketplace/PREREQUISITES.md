@@ -24,6 +24,8 @@ Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud 
 1. `gcloud services enable container.googleapis.com runtimeconfig.googleapis.com cloudbuild.googleapis.com`
 
 ## Create a OAuth Client ID
+If you need additional assistance, then follow the steps in [Creating your credentials](https://cloud.google.com/docs/authentication/end-user#creating_your_client_credentials)
+in our public documentation.  
 1. [Create the client id](https://console.cloud.google.com/apis/credentials)
 2. Click `+ Create Credentials`.
 3. Select `OAuth Client ID`.
@@ -55,9 +57,9 @@ To create an new service account then follow the steps in `Update service accoun
 ![Assign roles](images/iam-assign-roles-to-sa.png)
 
 6. Next add two `Service account users roles` to this service account.  These two members need to be able to execute commands on behalf of this service account. Then click the `Done` button. 
-* `PROJECT_ID-compute@developer.gserviceaccount.com`
-* `PROJECT_ID@cloudservices.gserviceaccount.com`
-* `PROJECT_ID@cloudbuild.gserviceaccount.com`
+* `PROJECT_NUMBER-compute@developer.gserviceaccount.com`
+* `PROJECT_NUMBER@cloudservices.gserviceaccount.com`
+* `PROJECT_NUMBER@cloudbuild.gserviceaccount.com`
 
 ![Assign members](images/iam-assign-members-to-sa.png)
 
@@ -78,6 +80,11 @@ gcloud config set project YOUR_PROJECT
 
 SA="datashare-deployment-mgr"
 ```
+Create project environment variables
+```
+PROJECT_ID=$(gcloud config get-value project)
+PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(parent.id)")
+```
 
 Create the Service Account
 ```
@@ -89,26 +96,33 @@ gcloud iam service-accounts create $SA \
 Add a project level policy binding for the project editor role and the security admin role. 
 ```
 gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
---member=serviceAccount:$SA@gcp-financial-services-public.iam.gserviceaccount.com \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
 --role=roles/editor
 
 gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
---member=serviceAccount:$SA@gcp-financial-services-public.iam.gserviceaccount.com \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
 --role=roles/iam.securityAdmin
 ```
 
 Assign the Compute instance service account access to the new service account.
 ```
-gcloud iam service-accounts add-iam-policy-binding $SA@gcp-financial-services-public.iam.gserviceaccount.com \
+gcloud iam service-accounts add-iam-policy-binding $SA@$PROJECT_ID.iam.gserviceaccount.com \
 --role=roles/iam.serviceAccountUser\
---member=serviceAcount:PROJECT_ID-compute@developer.gserviceaccount.com
+--member=serviceAcount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com
 ```
 
 Assign the Cloud Services service access to the new service account as well. 
 ```
-gcloud iam service-accounts add-iam-policy-binding $SA@gcp-financial-services-public.iam.gserviceaccount.com \
+gcloud iam service-accounts add-iam-policy-binding $SA@$PROJECT_ID.iam.gserviceaccount.com \
 --role=roles/iam.serviceAccountUser \
---member=serviceAccount:PROJECT@cloudservices.gserviceaccount.com 
+--member=serviceAccount:$PROJECT_NUMBER@cloudservices.gserviceaccount.com 
+```
+
+Assign the Cloud Build service access to the new service account as well. 
+```
+gcloud iam service-accounts add-iam-policy-binding $SA@$PROJECT_ID.iam.gserviceaccount.com \
+--role=roles/iam.serviceAccountUser \
+--member=serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com 
 ```
 
 Now you can click the `Launch` button on the Marketplace and deploy the Datashare solution within your GCP project. 
@@ -116,15 +130,15 @@ Now you can click the `Launch` button on the Marketplace and deploy the Datashar
 ### Delete the Service Account
 Delete the Service Account with the following command. 
 ```
-gcloud iam service-accounts delete $SA@gcp-financial-services-public.iam.gserviceaccount.com
+gcloud iam service-accounts delete $SA@$PROJECT_ID.iam.gserviceaccount.com
 ```
 
 ```
 gcloud projects remove-iam-policy-binding $(gcloud config get-value project) \
---member=serviceAccount:$SA@gcp-financial-services-public.iam.gserviceaccount.com \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
 --role=roles/iam.securityAdmin
 
 gcloud projects remove-iam-policy-binding $(gcloud config get-value project) \
---member=serviceAccount:$SA@gcp-financial-services-public.iam.gserviceaccount.com \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
 --role=roles/editor
 ```
