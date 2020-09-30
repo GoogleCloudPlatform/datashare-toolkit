@@ -9,7 +9,7 @@ description:
   tagline: Ingest, entitle, share large volumes of data.
   title: Datashare
   url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
-  version: '0.5.5'
+  version: '0.5.6'
   eulaUrl: https://raw.githubusercontent.com/GoogleCloudPlatform/datashare-toolkit/ecada698551d3022ed12afbabba5e5eae43dfb03/LICENSE.txt
   softwareGroups:
   - type: SOFTWARE_GROUP_OS
@@ -120,7 +120,7 @@ input:
       subtext: Creates a GKE cluster, installs Cloud Run and deploys Datashare API to this cluster.
     - name: gceServiceAccount
       title: GCP Service Account
-      tooltip: Create a <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/marketplace/PREREQUISITES.md#update-compute-engine-service-account-from-google-cloud-console">service account and assign the Security Admin role</a> to it. This will be used to assign <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/marketplace/README.md#new-roles-added-to-service-accounts">new permissions to other service accounts</a> to install all Datashare components.
+      tooltip: Create a <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/marketplace/PREREQUISITES.md#update-service-account-from-google-cloud-console">new permissions to other service accounts</a> to install all Datashare components.
       subtext: Include your custom service account here.
       placeholder: PROJECT@PROJECT_NAME.iam.gserviceaccount.com
     - name: input_gkeZone
@@ -142,7 +142,7 @@ input:
       title: Data Producers
       tooltip: Create a service account and include it here or include a wildcard email address.
       subtext: Project admins or service accounts that require read-write access to Datashare APIs
-      placeholder: user@example.com or *@example.com
+      placeholder: user@example.com
     
   sections:
     - name: BOOT_DISK
