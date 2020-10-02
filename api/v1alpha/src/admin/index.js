@@ -188,4 +188,13 @@ admin.post('/projects/:projectId/admin::custom', async (req, res) => {
     }
 });
 
+admin.get('/projects/:projectId/admin/isAdmin', async(req, res) => {
+    const code = 200;
+    const data = { };
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
 module.exports = admin;
