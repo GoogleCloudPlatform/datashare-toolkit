@@ -51,8 +51,8 @@ const store = new Vuex.Store({
       return false;
     },
     isAdmin: state => {
-      if (state.user && state.user.isAdmin) {
-        return state.user.isAdmin === true;
+      if (state.user && state.user.data && state.user.data.isAdmin) {
+        return state.user.data.isAdmin === true;
       }
       return false;
     }
@@ -78,7 +78,8 @@ const store = new Vuex.Store({
         commit('setUser', {
           displayName: user.displayName,
           email: user.email,
-          photoURL: user.photoURL
+          photoURL: user.photoURL,
+          isAdmin: user.isAdmin
         });
       } else {
         commit('setUser', null);
@@ -298,6 +299,18 @@ const store = new Vuex.Store({
       return client.syncResources(payload.type).catch(error => {
         notify(error);
       });
+    },
+    // eslint-disable-next-line no-unused-vars
+    isAdmin({ commit }) {
+      return client
+        .isAdmin()
+        .then(result => {
+          return result.code && result.code === 200;
+        })
+        .catch(error => {
+          console.error(error);
+          return false;
+        });
     }
   }
 });

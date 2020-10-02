@@ -291,5 +291,10 @@ export default {
         type: type
       })
       .then(response => response);
+  },
+  isAdmin() {
+    return axios
+      .get(this._apiBaseUrl() + '/admin/isAdmin')
+      .then(response => response);
   }
 };

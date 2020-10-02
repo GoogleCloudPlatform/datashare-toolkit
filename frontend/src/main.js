@@ -26,26 +26,29 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
       ux_mode: 'redirect'
     });
 
-    Vue.GoogleAuth.then(auth2 => {
-      if (auth2.isSignedIn.get()) {
-        const googleUser = auth2.currentUser.get();
-        const profile = googleUser.getBasicProfile();
-        const user = {
-          displayName: profile.getName(),
-          email: profile.getEmail(),
-          photoURL: profile.getImageUrl()
-        };
-        return user;
-      }
-      return null;
-    }).then(user => {
-      store.dispatch('fetchUser', user).then(() => {
-        new Vue({
-          vuetify,
-          router,
-          store,
-          render: h => h(App)
-        }).$mount('#app');
+    store.dispatch('isAdmin').then(isAdmin => {
+      Vue.GoogleAuth.then(auth2 => {
+        if (auth2.isSignedIn.get()) {
+          const googleUser = auth2.currentUser.get();
+          const profile = googleUser.getBasicProfile();
+          const user = {
+            displayName: profile.getName(),
+            email: profile.getEmail(),
+            photoURL: profile.getImageUrl(),
+            isAdmin: isAdmin
+          };
+          return user;
+        }
+        return null;
+      }).then(user => {
+        store.dispatch('fetchUser', user).then(() => {
+          new Vue({
+            vuetify,
+            router,
+            store,
+            render: h => h(App)
+          }).$mount('#app');
+        });
       });
     });
   });
