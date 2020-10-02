@@ -49,6 +49,12 @@ const store = new Vuex.Store({
         return state.user.loggedIn === true;
       }
       return false;
+    },
+    isAdmin: state => {
+      if (state.user && state.user.isAdmin) {
+        return state.user.isAdmin === true;
+      }
+      return false;
     }
   },
 
