@@ -1,5 +1,20 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.5.7 Release Notes
+* Build - 10/1/2020
+
+### Datashare
+* Datashare release version is 0.4.4
+* Kubernetes cluster version is 1.16 to support incremental changes
+
+### Updates  
+
+### Bug Fixes
+* The VM now depends on the GKE cluster during the deployment.
+
+### Known Bugs
+* None
+
 ## 0.5.6 Release Notes
 * Build - 9/30/2020
 

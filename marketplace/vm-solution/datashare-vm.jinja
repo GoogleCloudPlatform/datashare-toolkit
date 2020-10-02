@@ -169,6 +169,10 @@ resources:
   - name: {{ name }}
     type: vm_instance.py
     metadata:
+      {% if deployApiToGkeValue %}  
+      dependsOn:
+      - datashare-cluster-resource
+      {% endif %}
     properties:
       instanceName: {{ instanceNameValue }}
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}

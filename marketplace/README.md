@@ -56,9 +56,9 @@ This section outlines how to deploy Datashare from the command line.
 cd datashare-toolkit/marketplace/releases
 ```
 
-3. Unzip the `datashare-marketplace-vm-solution-v0.5.4` file and cd into the unzipped folder. 
+3. Unzip the `datashare-marketplace-vm-solution-v0.5.7` file and cd into the unzipped folder. 
 ```
-unzip datashare-marketplace-vm-solution-v0.5.4.zip
+unzip datashare-marketplace-vm-solution-v0.5.7.zip
 
 cd vm-solution
 ```
