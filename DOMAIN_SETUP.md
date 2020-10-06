@@ -85,5 +85,9 @@ datashare-demo-2e.fsi.joonix.net. 300 IN TXT	"google-site-verification=zfOoxxxxx
 
 Once the dig command returns the TXT record, then proceed to click the 'VERIFY' button on the 'Webmaster Central' domain verification page.
 
+<img src="./assets/domain/8-domain_verified.png" alt="Domain verified" height="200"/>
+
+To view a list of your verified domains, see the [verification](https://www.google.com/webmasters/verification/home) page on Webmaster Central.
+
 # Next
 [Setup OAuth credential](./CREDENTIAL_SETUP.md)
