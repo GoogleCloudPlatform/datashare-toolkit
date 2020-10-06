@@ -18,6 +18,7 @@ You must have access to administer DNS for the domains that you will use.
     <img src="./assets/domain/1-create_zone.png" alt="Create zone" height="200"/>
 
 3. Take note of the information provided by the 'Registrar Setup' button.
+    
     <img src="./assets/domain/2-zone_details.png" alt="Zone details" height="200"/>
 
     <img src="./assets/domain/3-registrar_setup.png" alt="Registrar setup" height="200"/>
