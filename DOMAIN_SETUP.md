@@ -46,7 +46,44 @@ If your ownership of the domain needs to be verified, open the Webmaster Central
 gcloud domains verify $DOMAIN
 ```
 
-<img src="./assets/domain/5-verify_domain_ownership.png" alt="Registrar top-level setup" height="200"/>
+<img src="./assets/domain/5-verify_domain_ownership.png" alt="Verify domain ownership" height="200"/>
+
+Go back to the zone details for your new domain, and click 'ADD RECORD SET', and enter the value for the TXT record, and click 'CREATE'.
+
+<img src="./assets/domain/6-create_txt_record.png" alt="Create TXT record" height="200"/>
+
+<img src="./assets/domain/7-zone_details.png" alt="Zone details" height="200"/>
+
+Wait at least 5 minutes for the TXT record to propagate. To check to see if the value has propagated, run the command:
+
+```
+dig $DOMAIN TXT
+```
+
+Once the TXT record has propagated, you'll see the it in the result:
+
+```
+; <<>> DiG 9.10.6 <<>> datashare-demo-2e.fsi.joonix.net TXT
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 39707
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;datashare-demo-2e.fsi.joonix.net. IN	TXT
+
+;; ANSWER SECTION:
+datashare-demo-2e.fsi.joonix.net. 300 IN TXT	"google-site-verification=zfOoxxxxxxxxxxxxxxxxxxxxxxxxxxxxxqY"
+
+;; Query time: 314 msec
+;; SERVER: 10.0.0.1#53(10.0.0.1)
+;; WHEN: Tue Oct 06 11:59:36 EDT 2020
+;; MSG SIZE  rcvd: 142
+```
+
+Once the dig command returns the TXT record, then proceed to click the 'VERIFY' button on the 'Webmaster Central' domain verification page.
 
 # Next
 [Setup OAuth credential](./CREDENTIAL_SETUP.md)
