@@ -6,6 +6,21 @@ The OAuth 2.0 Client ID setup is required in order to provide a credential for t
 # Pre-requisites
 Before starting credential setup, ensure that you've [configured your domain](./DOMAIN_SETUP.md). Also, if you have not already, configure the [OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent).
 
+# OAuth consent setup
+If you have not yet configured the [OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent), you should configure it before proceeding.
+
+1. Select the user type and then click 'CREATE'. If you will have Datashare users outside of your organization, choose external, otherwise you can choose internal.
+
+    <img src="./assets/credentials/1-oauth_consent_screen.png" alt="OAuth consent screen" height="200"/>
+
+2. Complete the form information for the app registration, and then click 'SAVE AND CONTINUE'.
+
+    <img src="./assets/credentials/2-oauth_consent_screen.png" alt="OAuth consent screen" height="200"/>
+
+3. Click 'SAVE AND CONTINUE' on the 'Scopes' page.
+4. Click 'SAVE AND CONTINUE' on the 'Optional info' page.
+5. Click 'BACK TO DASHBOARD'.
+
 # Setting up OAuth credential
 1. Go to https://console.cloud.google.com/apis/credentials.
 2. Click 'Create Credentials'.
