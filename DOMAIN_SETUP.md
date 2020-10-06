@@ -31,6 +31,7 @@ Create a DOMAIN environment variable based off the custom subdomain:
 
 ```
 export DOMAIN=datashare.your-domain.com
+export DOMAIN=datashare-demo-2e.fsi.joonix.net
 ```
 
 Verify domain ownership the first time you use that domain in the Google Cloud project:
@@ -44,6 +45,8 @@ If your ownership of the domain needs to be verified, open the Webmaster Central
 ```
 gcloud domains verify $DOMAIN
 ```
+
+<img src="./assets/domain/5-verify_domain_ownership.png" alt="Registrar top-level setup" height="200"/>
 
 # Next
 [Setup OAuth credential](./CREDENTIAL_SETUP.md)
