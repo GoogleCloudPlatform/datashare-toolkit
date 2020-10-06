@@ -31,7 +31,6 @@ You must have access to administer DNS for the domains that you will use.
 Create a DOMAIN environment variable based off the custom subdomain:
 
 ```
-export DOMAIN=datashare.your-domain.com
 export DOMAIN=datashare-demo-2e.fsi.joonix.net
 ```
 
