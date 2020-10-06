@@ -17,13 +17,14 @@ You must have access to administer DNS for the domains that you will use.
 
     <img src="./assets/domain/1-create_zone.png" alt="Create zone" height="200"/>
 
-3. Note the Name Server details, in this example:
-- ns-cloud-b1.googledomains.com.
-- ns-cloud-b2.googledomains.com.
-- ns-cloud-b3.googledomains.com.
-- ns-cloud-b4.googledomains.com.
+3. Take note of the information provided by the 'Registrar Setup' button.
+    <img src="./assets/domain/2-zone_details.png" alt="Zone details" height="200"/>
 
-4. 
+    <img src="./assets/domain/3-registrar_setup.png" alt="Registrar setup" height="200"/>
+
+4. You'll need to enter the NS details in the configuration wherever you maintain the DNS for your top-level domain. For this example we already use a different GCP project to administer the top-level domain, so we'll enter the NS details within our existing top level zone.
+
+    <img src="./assets/domain/4-top_level_ns_setup.png" alt="Registrar top-level setup" height="200"/>
 
 # Verifying your domain using the gcloud CLI
 Create a DOMAIN environment variable based off the custom subdomain:
