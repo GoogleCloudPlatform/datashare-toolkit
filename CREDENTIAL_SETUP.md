@@ -61,4 +61,4 @@ If you have not yet configured the [OAuth consent screen](https://console.cloud.
     <img src="./assets/credentials/oauth_client_created.png" alt="OAuth client created" height="200"/>
 
 # Next
-[Deploy Datashare](./marketplace/README.md#deploy_from_cli)
+[Deploy Datashare](./DEPLOY.md)
