@@ -62,4 +62,5 @@ Once completed, your zone details should look like:
 
 <img src="./assets/deploy/13-zone_details.png" alt="Zone details" height="300"/>
 
-# Configure Environmental Variables
+# Next
+[Configure Environment Variables](./ENVIRONMENT_VARIABLES.md)
