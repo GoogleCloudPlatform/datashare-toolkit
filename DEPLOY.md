@@ -18,4 +18,4 @@
 - OAuth Client Id: Populate this with the OAuth Client Id created during the [credential setup](./CREDENTIAL_SETUP.md) step.
 - Data Producers: Populate this with a comma delimited list of domains or accounts that should be Datashare admins.
 
-    <img src="./assets/deploy/3-deploy.png" alt="Populate deployment form" height="200"/>
+    <img src="./assets/deploy/3-deploy.png" alt="Populate deployment form" height="500"/>
