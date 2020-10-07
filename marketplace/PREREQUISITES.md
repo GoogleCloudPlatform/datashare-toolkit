@@ -23,13 +23,6 @@ Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud 
 ### From the command line
 1. `gcloud services enable container.googleapis.com runtimeconfig.googleapis.com cloudbuild.googleapis.com`
 
-## Create a OAuth Client ID
-If you need additional assistance, then follow the steps in [Creating your credentials](https://cloud.google.com/docs/authentication/end-user#creating_your_client_credentials)
-in our public documentation.  
-1. [Create the client id](https://console.cloud.google.com/apis/credentials)
-2. Click `+ Create Credentials`.
-3. Select `OAuth Client ID`.
-
 ## Create a Data producers service account
 For this step you can either create a new service account or use an existing service account.
 

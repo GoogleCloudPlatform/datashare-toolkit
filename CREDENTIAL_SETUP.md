@@ -1,7 +1,8 @@
 [Back to Datashare](./README.md)
 
 # Overview
-The OAuth 2.0 Client ID setup is required in order to provide a credential for the UI to access the APIs. This step must be performed manually through the Google Cloud Console, as there is no CLI to perform the steps due to security concerns.
+The OAuth 2.0 Client ID setup is required in order to provide a credential for the UI to access the APIs. This step must be performed manually through the Google Cloud Console, as there is no CLI to perform the steps due to security concerns. If you need additional assistance, then follow the steps in [Creating your credentials](https://cloud.google.com/docs/authentication/end-user#creating_your_client_credentials)
+in our public documentation.
 
 # Pre-requisites
 Before starting credential setup, ensure that you've [configured your domain](./DOMAIN_SETUP.md). Also, if you have not already, configure the [OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent).
