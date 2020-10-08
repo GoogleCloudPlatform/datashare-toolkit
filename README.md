@@ -26,7 +26,8 @@ The toolkit is open-source. Some supporting infrastructure, such as [storage buc
 2. [Setup OAuth credential](./CREDENTIAL_SETUP.md)
 3. [Deploy Datashare](./DEPLOY.md)
 4. [Configure Environment Variables](./ENVIRONMENT_VARIABLES.md)
-5. [Initialize](./frontend/user-guide/ADMIN.md#initialize_schema) the Datashare schema
+5. [Apply ISTIO Policies](./APPLY_ISTIO_POLICIES.md)
+6. [Initialize](./frontend/user-guide/ADMIN.md#initialize_schema) the Datashare schema
 
 Then get started, see the [User Guide](./frontend/README.md) for usage information.
 

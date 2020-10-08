@@ -18,3 +18,6 @@ After changing environmental variables, you may have to re-apply the ISTIO polic
 | Name | Required | Description | Example |
 |-|-|-|-|
 | UI_BASE_URL | Yes | The base url for the ui. | https://datashare-demo-2e.fsi.joonix.net |
+
+# Next
+[Apply ISTIO Policies](./APPLY_ISTIO_POLICIES.md)
