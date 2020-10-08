@@ -1,4 +1,7 @@
-## UI
+# Overview
+In order for the UI to function properly, all of the fields marked as required below, must be set within the [Cloud Run Variables](https://cloud.google.com/run/docs/configuring/environment-variables).
+
+## UI (ds-frontend-ui)
 | Name | Value | Required | Description | Example |
 |-|-|-|-|-|
 | VUE_APP_API_BASE_URL | 1 | Yes | The base url for the API. | https://api.datashare-demo-2e.fsi.joonix.net/v1alpha |
@@ -8,7 +11,7 @@
 | VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT | 5 | Optional | The text for the more information button in the banner at the top of the 'My Dashboard' page.  | More Information |
 | VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL | 6 | Optional | The url to open when the more information button is clicked within the banner at the top of the 'My Dashboard' page. | https://google.com |
 
-## API
+## API (ds-api)
 | Name | Value | Required | Description | Example |
 |-|-|-|-|-|
 | UI_BASE_URL | 1 | Yes | The base url for the ui. | https://datashare-demo-2e.fsi.joonix.net |
