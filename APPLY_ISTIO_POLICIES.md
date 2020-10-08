@@ -25,3 +25,6 @@ cat istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -
 cat istio-manifests/1.4/authz/* | envsubst | kubectl delete -f -
 cat istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
 ```
+
+# Next
+[Initialize Schema](./frontend/user-guide/ADMIN.md#initialize_schema)
