@@ -11,5 +11,4 @@
 ## API
 | Name | Value | Required | Description | Example |
 |-|-|-|-|-|
-| UI_BASE_URL | 1 | Yes | The base url for the ui. | https://datashare-demo-2e.fsi.joonix.net
- |
+| UI_BASE_URL | 1 | Yes | The base url for the ui. | https://datashare-demo-2e.fsi.joonix.net |
