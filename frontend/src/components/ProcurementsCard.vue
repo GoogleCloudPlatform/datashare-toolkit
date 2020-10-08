@@ -366,6 +366,9 @@ export default {
         .validate()
         .then(result => {
           if (result) {
+            let policyId = this.selectedItem.policy
+              ? this.selectedItem.policy.policyId
+              : null;
             this.$store
               .dispatch('submitProcurementEntitlementApproval', {
                 projectId: config.projectId,
@@ -373,7 +376,7 @@ export default {
                 status: this.approvalDialogData.approvalStatus,
                 reason: this.approvalDialogData.comment,
                 accountId: this.selectedItem.accountId,
-                policyId: this.selectedItem.policy.policyId
+                policyId: policyId
               })
               .then(result => {
                 this.loading = false;
