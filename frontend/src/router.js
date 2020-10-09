@@ -19,7 +19,7 @@ const routerOptions = [
     component: 'Config',
     meta: {
       requiresAuth: true,
-      requiresAdmin: true
+      requiresDataProducer: true
     }
   },
   {
@@ -28,7 +28,7 @@ const routerOptions = [
     component: 'Datasets',
     meta: {
       requiresAuth: true,
-      requiresAdmin: true
+      requiresDataProducer: true
     }
   },
   {
@@ -37,7 +37,7 @@ const routerOptions = [
     component: 'Views',
     meta: {
       requiresAuth: true,
-      requiresAdmin: true
+      requiresDataProducer: true
     }
   },
   {
@@ -46,7 +46,7 @@ const routerOptions = [
     component: 'Ingestion',
     meta: {
       requiresAuth: true,
-      requiresAdmin: true
+      requiresDataProducer: true
     }
   },
   {
@@ -55,7 +55,7 @@ const routerOptions = [
     component: 'Accounts',
     meta: {
       requiresAuth: true,
-      requiresAdmin: true
+      requiresDataProducer: true
     }
   },
   {
@@ -64,7 +64,7 @@ const routerOptions = [
     component: 'EditView',
     meta: {
       requiresAuth: true,
-      requiresAdmin: true
+      requiresDataProducer: true
     }
   },
   {
@@ -73,7 +73,7 @@ const routerOptions = [
     component: 'EditIngestion',
     meta: {
       requiresAuth: true,
-      requiresAdmin: true
+      requiresDataProducer: true
     }
   },
   {
@@ -82,7 +82,7 @@ const routerOptions = [
     component: 'EditAccount',
     meta: {
       requiresAuth: true,
-      requiresAdmin: true
+      requiresDataProducer: true
     }
   },
   {
@@ -91,7 +91,7 @@ const routerOptions = [
     component: 'Policies',
     meta: {
       requiresAuth: true,
-      requiresAdmin: true
+      requiresDataProducer: true
     }
   },
   {
@@ -100,7 +100,7 @@ const routerOptions = [
     component: 'EditPolicy',
     meta: {
       requiresAuth: true,
-      requiresAdmin: true
+      requiresDataProducer: true
     }
   },
   {
@@ -109,7 +109,7 @@ const routerOptions = [
     component: 'Procurements',
     meta: {
       requiresAuth: true,
-      requiresAdmin: true
+      requiresDataProducer: true
     }
   },
   {
@@ -134,7 +134,7 @@ const routerOptions = [
     component: 'SpotFulfillment',
     meta: {
       requiresAuth: true,
-      requiresAdmin: true
+      requiresDataProducer: true
     }
   },
   {
@@ -143,7 +143,7 @@ const routerOptions = [
     component: 'Admin',
     meta: {
       requiresAuth: true,
-      requiresAdmin: true
+      requiresDataProducer: true
     }
   }
 ];

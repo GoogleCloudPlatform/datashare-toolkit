@@ -200,8 +200,8 @@ export default {
       if (route === undefined || route.length === 0) {
         return true;
       } else if (route[0].meta && route[0].meta.requiresAuth === true) {
-        if (route[0].meta.requiresAdmin === true) {
-          return this.isLoggedIn && this.isAdmin;
+        if (route[0].meta.requiresDataProducer === true) {
+          return this.isLoggedIn && this.isDataProducer;
         } else {
           return this.isLoggedIn;
         }
@@ -215,7 +215,7 @@ export default {
     ...mapGetters({
       user: 'user',
       isLoggedIn: 'isLoggedIn',
-      isAdmin: 'isAdmin'
+      isDataProducer: 'isDataProducer'
     }),
     navigationItems() {
       let items = [

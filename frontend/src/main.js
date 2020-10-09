@@ -26,7 +26,7 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
       ux_mode: 'redirect'
     });
 
-    store.dispatch('isAdmin').then(isAdmin => {
+    store.dispatch('isDataProducer').then(isDataProducer => {
       Vue.GoogleAuth.then(auth2 => {
         if (auth2.isSignedIn.get()) {
           const googleUser = auth2.currentUser.get();
@@ -35,7 +35,7 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
             displayName: profile.getName(),
             email: profile.getEmail(),
             photoURL: profile.getImageUrl(),
-            isAdmin: isAdmin
+            isDataProducer: isDataProducer
           };
           return user;
         }

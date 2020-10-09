@@ -292,9 +292,9 @@ export default {
       })
       .then(response => response);
   },
-  isAdmin() {
+  isDataProducer() {
     return axios
-      .get(this._apiBaseUrl() + '/admin/isAdmin')
+      .get(this._apiBaseUrl() + '/auth/isDataProducer')
       .then(response => response);
   }
 };
