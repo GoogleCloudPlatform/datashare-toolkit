@@ -294,7 +294,7 @@ export default {
   },
   isDataProducer() {
     return axios
-      .get(this._apiBaseUrl() + '/auth/isDataProducer')
+      .post(this._apiBaseUrl() + '/auth/isDataProducer')
       .then(response => response);
   }
 };

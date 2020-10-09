@@ -102,6 +102,8 @@ const accounts = require('./accounts/index');
 const admin = require('./admin/index');
 // Import the Datashare API Procurement service router
 const procurements = require('./procurements/index');
+// Import the Datashare API Auth service router
+const auth = require('./auth/index');
 
 /************************************************************
   API Endpoints
@@ -252,6 +254,7 @@ router.use(policies);
 router.use(accounts);
 router.use(admin);
 router.use(procurements);
+router.use(auth);
 
 /**
  * @swagger
