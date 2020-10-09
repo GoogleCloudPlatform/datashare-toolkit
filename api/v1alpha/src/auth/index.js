@@ -25,13 +25,16 @@ const express = require('express');
 var auth = express.Router();
 // methods that require multiple routes
 
-auth.post('/projects/:projectId/auth/isDataProducer', async(req, res) => {
+auth.post('/projects/:projectId/auth::custom', async (req, res) => {
     const code = 200;
-    const data = { };
-    res.status(code).json({
-        code: code,
-        ... data
-    });
+    const data = {};
+    switch (req.params.custom) {
+        case "isDataProducer":
+            res.status(code).json({
+                code: code,
+                ...data
+            });
+    }
 });
 
 module.exports = auth;
