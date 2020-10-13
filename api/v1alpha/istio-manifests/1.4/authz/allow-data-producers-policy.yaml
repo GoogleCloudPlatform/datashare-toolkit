@@ -22,7 +22,7 @@ spec:
       paths: ["/v1alpha/projects/$PROJECT_ID/admin*, /v1alpha/projects/$PROJECT_ID/admin/*"]
     - operation:
       methods: ["POST"]
-      paths: ["/v1alpha/projects/$PROJECT_ID/auth*, /v1alpha/projects/$PROJECT_ID/auth/*"]
+      paths: ["/v1alpha/projects/$PROJECT_ID/auth*, /v1alpha/projects/$PROJECT_ID/auth:isDataProducer"]
     - operation:
       methods: ["GET"]
       paths: ["/v1alpha/projects/$PROJECT_ID/products*, /v1alpha/projects/$PROJECT_ID/products/*"]
