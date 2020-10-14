@@ -24,18 +24,6 @@ Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud 
 ### From the command line
 1. `gcloud services enable container.googleapis.com runtimeconfig.googleapis.com cloudbuild.googleapis.com cloudcommerceprocurement.googleapis.com`
 
-## Create a OAuth Client ID
-If you need additional assistance, then follow the steps in [Creating your credentials](https://cloud.google.com/docs/authentication/end-user#creating_your_client_credentials)
-in our public documentation.  
-1. [Create the client id](https://console.cloud.google.com/apis/credentials)
-2. Click `+ Create Credentials`.
-3. Select `OAuth Client ID`.
-
-## Create a Data producers service account
-For this step you can either create a new service account or use an existing service account.
-
-To create an new service account then follow the steps in `Update service account from Google Cloud Console`; however, you don't need to assign any roles to this SA.
-
 ## Update service account from Google Cloud Console
 1. Login to Google Cloud Console and select `IAM` from the menu.
 
@@ -84,7 +72,7 @@ SA="datashare-deployment-mgr"
 Create project environment variables
 ```
 PROJECT_ID=$(gcloud config get-value project)
-PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(parent.id)")
+PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
 ```
 
 Create the Service Account
@@ -108,8 +96,8 @@ gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
 Assign the Compute instance service account access to the new service account.
 ```
 gcloud iam service-accounts add-iam-policy-binding $SA@$PROJECT_ID.iam.gserviceaccount.com \
---role=roles/iam.serviceAccountUser\
---member=serviceAcount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com
+--role=roles/iam.serviceAccountUser \
+--member=serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com
 ```
 
 Assign the Cloud Services service access to the new service account as well. 
