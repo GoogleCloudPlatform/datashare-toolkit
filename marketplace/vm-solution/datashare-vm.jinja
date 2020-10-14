@@ -17,8 +17,10 @@ imports:
 {% set gcpRegion = properties["input_gcpRegion"] %}
 {% set storageBucketLocation = properties["input_storageBucketLocation"] %}
 {% set apiDomainName = properties["input_apiDomainName"] %}
+{% set apiStaticIp = properties["input_apiStaticIp"] %}
 {% set uiDomainName = properties["input_uiDomainName"] %}
-{% set ingestionStorageBucketSuffix = "-cds-bucket" %}
+{% set ingestionStorageBucketSuffix = "-datashare-ingestion" %} 
+{% set ingestionBucketName = project + ingestionStorageBucketSuffix %} 
 {% set installStorageBucketSuffix = "-install-bucket" %}
 {% set dsApiName = "ds-api" %}
 {% set dsUiName = "ds-frontend-ui" %}
@@ -55,9 +57,9 @@ imports:
 
 resources:
   - type: storage.v1.bucket
-    name: {{ project }}{{ ingestionStorageBucketSuffix }}
+    name: {{ ingestionBucketName }}
     properties:
-      name: {{ project }}{{ ingestionStorageBucketSuffix }}
+      name: {{ ingestionBucketName }}
       project: {{ project }}
       #predefinedAcl: projectPrivate
       #projection: full
@@ -119,6 +121,7 @@ resources:
       entryPoint: processEvent
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}
       waiterName: {{ waiterName }}
+      ingestionBucketName: {{ ingestionBucketName }}
       #temp: $(ref.{{ name }}.selfLink)
 
   # Delete the Cloud Function when the deployment manager job is deleted.
@@ -189,6 +192,7 @@ resources:
       zone: {{ zone }}
       machineType: {{ machineType }}
       gceServiceAccount: {{ gceServiceAccountValue }}
+      ingestionBucketName: {{ ingestionBucketName }}
       networks:
       {% for network in networks %}
         - {{ network }}

@@ -19,10 +19,10 @@ import six
 def GenerateConfig(context):
   """Generate YAML resource configuration."""
 
-  name_prefix = context.env['deployment'] + '-' + context.env['name']
+  # name_prefix = context.env['deployment'] + '-' + context.env['name']
   cluster_name = 'datashare-cluster-resource'
   acutal_cluster_name = 'datashare'
-  type_name = name_prefix + '-type'
+  # type_name = name_prefix + '-type'
   cluster_version = '1.16'
   workload_pool = context.env['project'] + '.svc.id.goog'
   machine_type = 'e2-standard-2'

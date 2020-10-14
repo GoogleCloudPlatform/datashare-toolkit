@@ -147,6 +147,10 @@ input:
       title: API domain name
       tooltip: The domain name of your Datashare API that is registered and verified (https is default). Do not enter the protocol (https://).
       placeholder: api.datashare.domain.com
+    # - name: input_apiStaticIp
+    #  title: Static IP address for API
+    #  tooltip: Create the static IP address (V4) and add it here.
+    #  placeholder: 192.168.0.1
     - name: input_uiDomainName
       title: UI domain name
       tooltip: The domain name of your Datashare UI that is registered and verified (https is default). Do not enter the protocol (https://).

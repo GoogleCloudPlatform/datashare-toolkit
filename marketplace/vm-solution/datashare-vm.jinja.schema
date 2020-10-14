@@ -169,6 +169,8 @@ properties:
     type: string
   input_uiDomainName:
     type: string
+  # input_apiStaticIp:
+  #  type: string
 
 outputs:
   deployment:

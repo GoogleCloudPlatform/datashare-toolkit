@@ -11,6 +11,7 @@
 * Added new fields to the launch page, to help complete the UI and API deployment successfully.
   * UI domain name - optional
   * API domain name - mandatory
+* Changed the cloud ingestion bucket name from `PROJECT-cds-bucket` to `PROJECT-datashare-ingestion`
 
 ### Bug Fixes
 * Fixed the VM startup script that applied the Istio AuthN/AuthZ policies
