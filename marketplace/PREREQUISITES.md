@@ -43,11 +43,11 @@ To create an new service account then follow the steps in `Update service accoun
 
 2. Select `Service Accounts` on the left side of the screen
 
-![Service Accounts](images/iam-select-service-account.png)
+<img src="images/iam-select-service-account.png" width="400" title="Service Accounts"> 
 
 3. Click `Create Service Account`.
 
-![Create SA](images/iam-create-sa.png)
+<img src="images/iam-create-sa.png" width="400" title="Create SA"> 
 
 4. Enter the following and then click the `Create` button. 
 * `Service account name` as `datashare-deployment-manager`
@@ -55,14 +55,14 @@ To create an new service account then follow the steps in `Update service accoun
 
 5. Select the `Editor`, `Security Admin` and `Kubernetes Admin` roles.
 
-<img src="images/iam-assign-roles-to-sa.png" width="300"> 
+<img src="images/iam-assign-roles-to-sa.png" width="500"> 
 
 6. Next add two `Service account users roles` to this service account.  These two members need to be able to execute commands on behalf of this service account. Then click the `Done` button. 
 * `PROJECT_NUMBER-compute@developer.gserviceaccount.com`
 * `PROJECT_NUMBER@cloudservices.gserviceaccount.com`
 * `PROJECT_NUMBER@cloudbuild.gserviceaccount.com`
 
-![Assign members](images/iam-assign-members-to-sa.png)
+<img src="images/iam-assign-members-to-sa.png" width="500" title="Assign Members">
 
 Now you can click the `Launch` button on the Marketplace and deploy the Datashare solution within your GCP project. 
 
