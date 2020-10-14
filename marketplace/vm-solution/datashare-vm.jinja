@@ -16,6 +16,8 @@ imports:
 {% set gceServiceAccountValue = properties["gceServiceAccount"] %}
 {% set gcpRegion = properties["input_gcpRegion"] %}
 {% set storageBucketLocation = properties["input_storageBucketLocation"] %}
+{% set apiDomainName = properties["input_apiDomainName"] %}
+{% set uiDomainName = properties["input_uiDomainName"] %}
 {% set ingestionStorageBucketSuffix = "-cds-bucket" %}
 {% set installStorageBucketSuffix = "-install-bucket" %}
 {% set dsApiName = "ds-api" %}
@@ -148,6 +150,9 @@ resources:
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}
       waiterName: {{ waiterName }}
+      {% if uiDomainName != '' %}  
+      uiDomainName: {{ uiDomainName }}
+      {% endif %}
       {% if deployApiToGkeValue %}  
       deployToGke: {{ deployApiToGkeValue }}
       gkeZone: {{ gkeZone }}
@@ -164,6 +169,8 @@ resources:
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}
       waiterName: {{ waiterName }}
+      apiDomainName: {{ apiDomainName }}
+      clientId: {{ oauthClientId }}
       
   ## Deploy the VM instance
   - name: {{ name }}

@@ -33,6 +33,7 @@ required:
   - gceServiceAccount
   - input_oauthClientId
   - input_dataProducers
+  - input_apiDomainName
 
 properties:
   zone:
@@ -164,6 +165,11 @@ properties:
     type: string
   input_dataProducers:
     type: string
+  input_apiDomainName:
+    type: string
+  input_uiDomainName:
+    type: string
+
 outputs:
   deployment:
     type: string
