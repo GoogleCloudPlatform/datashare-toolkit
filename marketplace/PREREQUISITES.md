@@ -55,7 +55,7 @@ To create an new service account then follow the steps in `Update service accoun
 
 5. Select the `Editor`, `Security Admin` and `Kubernetes Admin` roles.
 
-![Assign roles](images/iam-assign-roles-to-sa.png)
+<img src="images/iam-assign-roles-to-sa.png" width="100"> 
 
 6. Next add two `Service account users roles` to this service account.  These two members need to be able to execute commands on behalf of this service account. Then click the `Done` button. 
 * `PROJECT_NUMBER-compute@developer.gserviceaccount.com`
