@@ -21,7 +21,8 @@ required:
 - containerTag
 - region
 - timeout
-
+- clientId
+- apiDomainName
 
 properties:
   cloudRunDeployName:
@@ -52,6 +53,14 @@ properties:
     type: boolean
     description: Deploy all the components (UI, API, Ingestion)
     default: False
+
+  clientId:
+    type: string
+    description: The web app client ID.
+
+  apiDomainName:
+    type: string
+    description: The web app client ID.
     
 outputs:
   properties:

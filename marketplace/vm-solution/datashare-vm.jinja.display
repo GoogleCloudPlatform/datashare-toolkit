@@ -9,7 +9,7 @@ description:
   tagline: Ingest, entitle, share large volumes of data.
   title: Datashare
   url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
-  version: '0.5.7'
+  version: '0.5.8'
   eulaUrl: https://raw.githubusercontent.com/GoogleCloudPlatform/datashare-toolkit/ecada698551d3022ed12afbabba5e5eae43dfb03/LICENSE.txt
   softwareGroups:
   - type: SOFTWARE_GROUP_OS
@@ -143,6 +143,19 @@ input:
       tooltip: Create a service account and include it here or include a wildcard email address.
       subtext: Project admins or service accounts that require read-write access to Datashare APIs
       placeholder: user@example.com
+    - name: input_apiDomainName
+      title: API domain name
+      tooltip: The domain name of your Datashare API that is registered and verified (https is default). Do not enter the protocol (https://).
+      placeholder: api.datashare.domain.com
+    # - name: input_apiStaticIp
+    #  title: Static IP address for API
+    #  tooltip: Create the static IP address (V4) and add it here.
+    #  placeholder: 192.168.0.1
+    - name: input_uiDomainName
+      title: UI domain name
+      tooltip: The domain name of your Datashare UI that is registered and verified (https is default). Do not enter the protocol (https://).
+      placeholder: datashare.domain.com
+
     
   sections:
     - name: BOOT_DISK
@@ -179,8 +192,8 @@ runtime:
       description: 'Start using the Datashare UI by accessing the URL from the commands below.'
       snippet: >-
         gcloud run services list --platform=managed
-    - heading: Setup Firebase
-      description: You must configure Firebase. <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/frontend#new-firebase-setup">Follow these instructions.</a>
+      showIf: '{{ properties().input_uiDomainName == "" }}'
+
     - heading: Remove roles from Service Accounts
       description: <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/marketplace/README.md#remove-elevated-service-account-permissions">Remove elevated permissions from Cloud Build and Deployment Manager</a>
     - heading: Get Kubectl credentials
@@ -260,9 +273,6 @@ runtime:
       showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
         curl -i -H https://YOUR_FQDN/v1alpha/projects/gcp-financial-services-dev/datasets
-
-    - heading: Do you want to delete the Datashare solution?
-      description: The best way to delete the Datashare solution is by following this <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/marketplace#delete-vm-solution-components-from-gcpsh">documentation.</a>
 
     - heading: Deployed with RuntimeConfig beta
       description: Datashare was deployed using the Google Cloud Platform RuntimeConfig beta release to install dependencies.

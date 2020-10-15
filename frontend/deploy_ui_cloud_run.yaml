@@ -9,3 +9,5 @@ resources:
     region: us-central1
     timeout: 600s
     datashareGitReleaseTag: master
+    clientId: XYZ
+    apiDomainName: api.datashare.yourdomain.com
