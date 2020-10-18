@@ -25,30 +25,6 @@ const express = require('express');
 var auth = express.Router();
 // methods that require multiple routes
 
-/**
- * @swagger
- *
- * /projects/{projectId}/auth::custom
- *   post:
- *     summary: Auth related endpoints
- *     description: Returns an empty response
- *     tags:
- *       - auth
- *     responses:
- *       200:
- *         description: User is a data producer
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- */
 auth.post('/projects/:projectId/auth::custom', async (req, res) => {
     const code = 200;
     const data = {};
