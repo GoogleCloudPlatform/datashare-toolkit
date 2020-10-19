@@ -26,30 +26,40 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
       ux_mode: 'redirect'
     });
 
-    store.dispatch('isDataProducer').then(isDataProducer => {
-      Vue.GoogleAuth.then(auth2 => {
-        if (auth2.isSignedIn.get()) {
-          const googleUser = auth2.currentUser.get();
-          const profile = googleUser.getBasicProfile();
-          const user = {
-            displayName: profile.getName(),
-            email: profile.getEmail(),
-            photoURL: profile.getImageUrl(),
-            isDataProducer: isDataProducer
-          };
-          return user;
+    let user = {};
+    Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get()) {
+        const googleUser = auth2.currentUser.get();
+        const profile = googleUser.getBasicProfile();
+        user = {
+          displayName: profile.getName(),
+          email: profile.getEmail(),
+          photoURL: profile.getImageUrl()
+        };
+        return user;
+      }
+      return null;
+    })
+      .then(user => {
+        return store.dispatch('fetchUser', user);
+      })
+      .then(() => {
+        // isDataProducer relies on the authentication being supplied through the Authorization header
+        return store.dispatch('isDataProducer');
+      })
+      .then(isDataProducer => {
+        if (user) {
+          user.isDataProducer = isDataProducer;
+          return store.dispatch('fetchUser', user);
         }
-        return null;
-      }).then(user => {
-        store.dispatch('fetchUser', user).then(() => {
-          new Vue({
-            vuetify,
-            router,
-            store,
-            render: h => h(App)
-          }).$mount('#app');
-        });
+      })
+      .then(() => {
+        new Vue({
+          vuetify,
+          router,
+          store,
+          render: h_1 => h_1(App)
+        }).$mount('#app');
       });
-    });
   });
 });
