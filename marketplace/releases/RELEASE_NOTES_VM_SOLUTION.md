@@ -1,5 +1,27 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.5.8 Release Notes
+* Build - 10/14/2020
+
+### Datashare
+* Datashare release version is 0.4.4
+* Kubernetes cluster version is 1.16 to support incremental changes
+
+### Updates  
+* Added new fields to the launch page, to help complete the UI and API deployment successfully.
+  * UI domain name - optional
+  * API domain name - mandatory
+* Changed the cloud ingestion bucket name from `PROJECT-cds-bucket` to `PROJECT-datashare-ingestion`
+
+### Bug Fixes
+* Fixed the VM startup script that applied the Istio AuthN/AuthZ policies
+* Added enabling the cloudcommerceprocurement API as a prerequisite step 
+  * removed this from the VM startup script as it caused a permission error
+
+### Known Bugs
+* None
+
+
 ## 0.5.7 Release Notes
 * Build - 10/1/2020
 

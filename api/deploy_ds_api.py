@@ -13,6 +13,13 @@
 # limitations under the License.
 """Creates service account, custom role and builds DS API image and deploys to Cloud Run."""
 
+def domain_has_protocol(domain):
+    if domain.find("https://") >= 0:
+        return True
+    elif domain.find("http://") >= 0:
+        raise Exception('Invalid protocol provided in uiDomainName (http:// should be https:// or not included)')
+    else:
+        return False
 
 def GenerateConfig(context):
     """Generate YAML resource configuration."""
@@ -28,6 +35,10 @@ def GenerateConfig(context):
     service_acct_name = context.properties['serviceAccountName']
     service_acct_descr = context.properties['serviceAccountDesc']
     custom_role_name = context.properties['customRoleName']
+    ui_domain_name = ""
+    # if hasattr(context.properties, 'uiDomainName'):
+    if context.properties['uiDomainName'] != None:
+        ui_domain_name = context.properties['uiDomainName']
     delete_timeout = '120s'
     general_timeout = context.properties['timeout']
     # admin_sa = context.properties['adminServiceAccount']
@@ -100,6 +111,14 @@ def GenerateConfig(context):
             '--platform=gke',
             '--service-account=' + service_acct_name
             ]
+    
+    # if a user includes the UI domain name then include it as an environment variable
+    domain_protocol = 'https://'
+    if ui_domain_name is not "":
+        if domain_has_protocol(ui_domain_name):
+            steps[5]['args'].append('--set-env-vars=UI_BASE_URL=' + ui_domain_name)
+        else:
+            steps[5]['args'].append('--set-env-vars=UI_BASE_URL=' + domain_protocol + ui_domain_name)
 
     git_release = {  # Checkout the correct release
                 'name': 'gcr.io/cloud-builders/git',

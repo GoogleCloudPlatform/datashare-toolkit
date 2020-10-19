@@ -16,7 +16,11 @@ imports:
 {% set gceServiceAccountValue = properties["gceServiceAccount"] %}
 {% set gcpRegion = properties["input_gcpRegion"] %}
 {% set storageBucketLocation = properties["input_storageBucketLocation"] %}
-{% set ingestionStorageBucketSuffix = "-cds-bucket" %}
+{% set apiDomainName = properties["input_apiDomainName"] %}
+{% set apiStaticIp = properties["input_apiStaticIp"] %}
+{% set uiDomainName = properties["input_uiDomainName"] %}
+{% set ingestionStorageBucketSuffix = "-datashare-ingestion" %} 
+{% set ingestionBucketName = project + ingestionStorageBucketSuffix %} 
 {% set installStorageBucketSuffix = "-install-bucket" %}
 {% set dsApiName = "ds-api" %}
 {% set dsUiName = "ds-frontend-ui" %}
@@ -53,9 +57,9 @@ imports:
 
 resources:
   - type: storage.v1.bucket
-    name: {{ project }}{{ ingestionStorageBucketSuffix }}
+    name: {{ ingestionBucketName }}
     properties:
-      name: {{ project }}{{ ingestionStorageBucketSuffix }}
+      name: {{ ingestionBucketName }}
       project: {{ project }}
       #predefinedAcl: projectPrivate
       #projection: full
@@ -117,6 +121,7 @@ resources:
       entryPoint: processEvent
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}
       waiterName: {{ waiterName }}
+      ingestionBucketName: {{ ingestionBucketName }}
       #temp: $(ref.{{ name }}.selfLink)
 
   # Delete the Cloud Function when the deployment manager job is deleted.
@@ -148,6 +153,9 @@ resources:
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}
       waiterName: {{ waiterName }}
+      {% if uiDomainName != '' %}  
+      uiDomainName: {{ uiDomainName }}
+      {% endif %}
       {% if deployApiToGkeValue %}  
       deployToGke: {{ deployApiToGkeValue }}
       gkeZone: {{ gkeZone }}
@@ -164,6 +172,8 @@ resources:
       datashareGitReleaseTag: {{ datashareGitReleaseVersion }}
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}
       waiterName: {{ waiterName }}
+      apiDomainName: {{ apiDomainName }}
+      clientId: {{ oauthClientId }}
       
   ## Deploy the VM instance
   - name: {{ name }}
@@ -182,6 +192,7 @@ resources:
       zone: {{ zone }}
       machineType: {{ machineType }}
       gceServiceAccount: {{ gceServiceAccountValue }}
+      ingestionBucketName: {{ ingestionBucketName }}
       networks:
       {% for network in networks %}
         - {{ network }}
@@ -238,10 +249,10 @@ resources:
             value: |-
               #!/bin/bash
 
-              CLOUD_FUNCTION_ZIP_FILE_NAME="datashare-toolkit-cloud-function.zip"
-              USE_RUNTIME_CONFIG_WAITER=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/useRuntimeConfigWaiter -H "Metadata-Flavor: Google"`
+              export CLOUD_FUNCTION_ZIP_FILE_NAME="datashare-toolkit-cloud-function.zip"
+              export USE_RUNTIME_CONFIG_WAITER=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/useRuntimeConfigWaiter -H "Metadata-Flavor: Google"`
               echo $USE_RUNTIME_CONFIG_WAITER
-              VM_STARTUP_SCRIPT=true
+              export VM_STARTUP_SCRIPT=true
 
               check_if_command_succeeded()
               {
@@ -262,22 +273,22 @@ resources:
                 sudo apt-get -y update 
                 
                 echo "Using Runtime Config Waiter to install Datashare prerequisites..."
-                CONFIG_NAME=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/configName -H "Metadata-Flavor: Google"`
+                export CONFIG_NAME=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/configName -H "Metadata-Flavor: Google"`
                 echo $CONFIG_NAME
 
-                IS_GIT_INSTALLED=`dpkg-query -W -f='${Status}\n' git`
+                export IS_GIT_INSTALLED=`dpkg-query -W -f='${Status}\n' git`
                 if [ "$IS_GIT_INSTALLED" != "install ok installed" ]; then
                     echo "Installing git."
                     sudo apt-get install git -y
                     check_if_command_succeeded $? "git install"
                 fi
-                IS_ZIP_INSTALLED=`dpkg-query -W -f='${Status}\n' zip`
+                export IS_ZIP_INSTALLED=`dpkg-query -W -f='${Status}\n' zip`
                 if [ "$IS_ZIP_INSTALLED" != "install ok installed" ]; then
                     echo "Installing zip."
                     sudo apt-get install zip -y
                     check_if_command_succeeded $? "zip install"
                 fi
-                IS_KUBECTL_INSTALLED=`dpkg-query -W -f='${Status}\n' kubectl`
+                export IS_KUBECTL_INSTALLED=`dpkg-query -W -f='${Status}\n' kubectl`
                 if [ "$IS_KUBECTL_INSTALLED" != "install ok installed" ]; then
                     echo "Installing kubectl."
                     sudo apt-get install kubectl -y
@@ -293,7 +304,7 @@ resources:
                 cd datashare-toolkit
                 check_if_command_succeeded $? "cd datashare-toolkit"
 
-                DATASHARE_GIT_RELEASE_VERSION=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/datashareGitReleaseVersion -H "Metadata-Flavor: Google"`
+                export DATASHARE_GIT_RELEASE_VERSION=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/datashareGitReleaseVersion -H "Metadata-Flavor: Google"`
                 echo $DATASHARE_GIT_RELEASE_VERSION
                 if [ "$DATASHARE_GIT_RELEASE_VERSION" != "master" ]; then
                     echo "Using Datashare release version $DATASHARE_GIT_RELEASE_VERSION"
@@ -301,7 +312,7 @@ resources:
                 fi
                 
                 cd ..
-                FUNCTION_SHARED="./datashare-toolkit/ingestion/batch/shared"
+                export FUNCTION_SHARED="./datashare-toolkit/ingestion/batch/shared"
                 if [ -d "${FUNCTION_SHARED}" ]; then
                     rm -R "${FUNCTION_SHARED}"
                 fi
@@ -315,7 +326,7 @@ resources:
                 sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ./datashare-toolkit/ingestion/batch/package.json
 
                 # Zip the Cloud Function package
-                DATASHARE_BATCH_DIR="/opt/datashare-toolkit/ingestion/batch"
+                export DATASHARE_BATCH_DIR="/opt/datashare-toolkit/ingestion/batch"
                 if [ -d "$DATASHARE_BATCH_DIR" ]; then
                     cd /opt/datashare-toolkit/ingestion/batch
                     zip -r $CLOUD_FUNCTION_ZIP_FILE_NAME * .eslintrc.json configurationManager.js index.js package.js package-lock.json shared/  
@@ -330,14 +341,14 @@ resources:
 
                 # Enable APIs
                 echo "Enabling Cloud APIs"
-                gcloud services enable cloudbuild.googleapis.com --quiet
-                gcloud services enable cloudfunctions.googleapis.com --quiet
-                gcloud services enable iam.googleapis.com --quiet
-                gcloud services enable run.googleapis.com --quiet
-                gcloud services enable cloudresourcemanager.googleapis.com --quiet
-                gcloud services enable cloudcommerceprocurement.googleapis.com --quiet
+                gcloud services enable cloudbuild.googleapis.com # --quiet
+                gcloud services enable cloudfunctions.googleapis.com # --quiet
+                gcloud services enable iam.googleapis.com #--quiet
+                gcloud services enable run.googleapis.com #--quiet
+                gcloud services enable cloudresourcemanager.googleapis.com #--quiet
+                # gcloud services enable cloudcommerceprocurement.googleapis.com #--quiet
                 # Enabling APIs for GKE cluster
-                gcloud services enable container.googleapis.com containerregistry.googleapis.com --quiet
+                gcloud services enable container.googleapis.com containerregistry.googleapis.com #--quiet
 
                 # Upload Cloud Function to Google Cloud storage
                 gsutil cp $CLOUD_FUNCTION_ZIP_FILE_NAME gs://$PROJECT_ID-install-bucket/
@@ -375,8 +386,8 @@ resources:
                 # sudo apt-get -y install google-cloud-sdk
 
                 # Setup GKE cluster
-                DEPLOY_API_TO_GKE=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/deployApiToGke -H "Metadata-Flavor: Google"`
-                GCE_SERVICE_ACCOUNT=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/gceServiceAccount -H "Metadata-Flavor: Google"`
+                export DEPLOY_API_TO_GKE=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/deployApiToGke -H "Metadata-Flavor: Google"`
+                export GCE_SERVICE_ACCOUNT=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/gceServiceAccount -H "Metadata-Flavor: Google"`
                 if [ "$DEPLOY_API_TO_GKE" = "true" ]; then
                     echo "Adding container.clusterAdmin role to Cloud Build service account"
                     gcloud projects add-iam-policy-binding $(gcloud config get-value project) --member="serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com" --role="roles/container.clusterAdmin" --format=disable
@@ -392,8 +403,8 @@ resources:
                     # This is executing from Cloud Shell
                         export KUBECONFIG="~/.kube/config"
                     fi
-                    GKE_ZONE=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/gkeZone -H "Metadata-Flavor: Google"`
-                    GKE_CLUSTER_NAME=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/gkeClusterName -H "Metadata-Flavor: Google"`
+                    export GKE_ZONE=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/gkeZone -H "Metadata-Flavor: Google"`
+                    export GKE_CLUSTER_NAME=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/gkeClusterName -H "Metadata-Flavor: Google"`
                     
                     echo "Getting the cluster credentials"
                     gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
@@ -406,11 +417,11 @@ resources:
                         --clusterrole cluster-admin \
                         --user ${GCE_SERVICE_ACCOUNT}
                 
-                    ISTIO_PACKAGE=$(kubectl -n gke-system get deployments istio-pilot \
+                    export ISTIO_PACKAGE=$(kubectl -n gke-system get deployments istio-pilot \
                         -o jsonpath="{.spec.template.spec.containers[0].image}" | \
                         cut -d':' -f2)
                     echo "Istio Package is " + $ISTIO_PACKAGE
-                    ISTIO_VERSION=$(echo $ISTIO_PACKAGE | cut -d'-' -f1)
+                    export ISTIO_VERSION=$(echo $ISTIO_PACKAGE | cut -d'-' -f1)
                     echo "Istio version is " + $ISTIO_VERSION
 
                     echo "Fetching Istio release."
@@ -464,12 +475,17 @@ resources:
                     
                     # Apply Authentication policy
                     echo "Istio - Applying Authentication policies."
-                    cat /opt/datashare-toolkit/istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -
-                    DATA_PRODUCERS=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/dataProducers -H "Metadata-Flavor: Google"`
-                    OAUTH_CLIENT_ID=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/oauthClientId -H "Metadata-Flavor: Google"`
+                    export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
+                    cat /opt/datashare-toolkit/api/v1alpha/istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -
+                    check_if_command_succeeded $? "cat /opt/datashare-toolkit/api/v1alpha/istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -"
+                    export DATA_PRODUCERS=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/dataProducers -H "Metadata-Flavor: Google"`
+                    # echo "DATA_PRODUCERS=$DATA_PRODUCERS"
+                    export OAUTH_CLIENT_ID=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/oauthClientId -H "Metadata-Flavor: Google"`
+                    # echo "OAUTH_CLIENT_ID=$OAUTH_CLIENT_ID"
                     # Apply Authorization policy
                     echo "Istio - Applying Authorization policies."
-                    cat /opt/datashare-toolkit/istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
+                    cat /opt/datashare-toolkit/api/v1alpha/istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
+                    check_if_command_succeeded $? "cat /opt/datashare-toolkit/api/v1alpha/istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -"
 
                     echo "GKE setup complete."
                 fi

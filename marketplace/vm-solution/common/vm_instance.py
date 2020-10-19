@@ -1,4 +1,4 @@
-# Copyright 2015 Google Inc. All rights reserved.
+# Copyright 2020 Google Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Creates an Instance VM with common defaults."""
-# pylint: disable=g-import-not-at-top
+
 import copy
 import re
 import common
@@ -111,7 +111,8 @@ def GenerateComputeVM(context, create_disks_separately=True):
   project = context.env[default.PROJECT]
   deployApiToGke = context.properties['deployApiToGke']
   datashare_install_bucket_name = project + '-install-bucket'
-  datashare_ingestion_bucket_name = project + '-cds-bucket'
+  ingestion_bucket_name = context.properties['ingestionBucketName']
+  
   k8s_cluster_name = 'datashare-cluster-resource'
   # gce_service_account = context.properties['gceServiceAccount']
 
@@ -162,7 +163,7 @@ def GenerateComputeVM(context, create_disks_separately=True):
           'type': default.INSTANCE,
           'metadata': {
               'dependsOn': [ 
-                datashare_ingestion_bucket_name
+                ingestion_bucket_name
               ]
           },
           'properties': {

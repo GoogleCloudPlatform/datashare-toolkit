@@ -19,9 +19,10 @@ Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud 
 1. [Enable the Kubernetes API from Cloud Console](https://console.cloud.google.com/apis/library/container.googleapis.com)
 2. [Enable the Runtime Config API from Cloud Console](https://console.cloud.google.com/apis/library/runtimeconfig.googleapis.com)
 3. [Enable the Cloud Build API from Cloud Console](https://console.cloud.google.com/apis/library/cloudbuild.googleapis.com)
+4. [Enable the Commerce API from Cloud Console](https://console.cloud.google.com/apis/library/cloudcommerceprocurement.googleapis.com)
 
 ### From the command line
-1. `gcloud services enable container.googleapis.com runtimeconfig.googleapis.com cloudbuild.googleapis.com`
+1. `gcloud services enable container.googleapis.com runtimeconfig.googleapis.com cloudbuild.googleapis.com cloudcommerceprocurement.googleapis.com`
 
 ## Update service account from Google Cloud Console
 1. Login to Google Cloud Console and select `IAM` from the menu.
@@ -30,11 +31,11 @@ Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud 
 
 2. Select `Service Accounts` on the left side of the screen
 
-![Service Accounts](images/iam-select-service-account.png)
+<img src="images/iam-select-service-account.png" width="400" title="Service Accounts"> 
 
 3. Click `Create Service Account`.
 
-![Create SA](images/iam-create-sa.png)
+<img src="images/iam-create-sa.png" width="400" title="Create SA"> 
 
 4. Enter the following and then click the `Create` button. 
 * `Service account name` as `datashare-deployment-manager`
@@ -42,14 +43,14 @@ Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud 
 
 5. Select the `Editor`, `Security Admin` and `Kubernetes Admin` roles.
 
-![Assign roles](images/iam-assign-roles-to-sa.png)
+<img src="images/iam-assign-roles-to-sa.png" width="500"> 
 
 6. Next add two `Service account users roles` to this service account.  These two members need to be able to execute commands on behalf of this service account. Then click the `Done` button. 
 * `PROJECT_NUMBER-compute@developer.gserviceaccount.com`
 * `PROJECT_NUMBER@cloudservices.gserviceaccount.com`
 * `PROJECT_NUMBER@cloudbuild.gserviceaccount.com`
 
-![Assign members](images/iam-assign-members-to-sa.png)
+<img src="images/iam-assign-members-to-sa.png" width="500" title="Assign Members">
 
 Now you can click the `Launch` button on the Marketplace and deploy the Datashare solution within your GCP project. 
 

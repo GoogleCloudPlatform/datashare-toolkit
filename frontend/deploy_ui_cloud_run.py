@@ -15,6 +15,13 @@
 
 import json
 
+def domain_has_protocol(domain):
+    if domain.find("https://") >= 0:
+        return True
+    elif domain.find("http://") >= 0:
+        raise Exception('Invalid protocol provided in API Domain Name (http:// should be https:// or not included)')
+    else:
+        return False
 
 def GenerateConfig(context):
   """Generate YAML resource configuration."""
@@ -23,14 +30,20 @@ def GenerateConfig(context):
   datashare_ui_name_with_tag = "ds-frontend-ui:dev"
   container_tag = context.properties['containerTag']
   cloud_run_deploy_name = context.properties['cloudRunDeployName']
-  datashare_ui_name = "ds-frontend-ui"
+  #datashare_ui_name = "ds-frontend-ui"
   gcp_region = context.properties['region']
+  client_id = context.properties['clientId']
   delete_timeout = '120s'
   general_timeout = context.properties['timeout']
   cmd = "https://github.com/GoogleCloudPlatform/datashare-toolkit.git"
   git_release_version = "master"
   if context.properties['datashareGitReleaseTag'] != None:
       git_release_version = context.properties['datashareGitReleaseTag']
+
+  api_domain_name = ""
+  # if hasattr(context.properties, 'uiDomainName'):
+  if context.properties['apiDomainName'] != None:
+      api_domain_name = context.properties['apiDomainName']
 
   steps = [
               { # Clone the Datashare repository only if the ds-frontend-ui:dev is not present
@@ -65,7 +78,20 @@ def GenerateConfig(context):
                           ]
               }
           ]
-
+  # if a user includes the UI domain name then include it as an environment variable
+  domain_protocol = 'https://'
+  base_path = '/v1alpha'
+  environment_variables = ""
+  if api_domain_name is not "":
+      if domain_has_protocol(api_domain_name):
+          environment_variables = 'VUE_APP_API_BASE_URL=' + api_domain_name + base_path
+      else:
+          environment_variables = 'VUE_APP_API_BASE_URL=' + domain_protocol + api_domain_name + base_path
+  # set the Project ID and Client ID environment variables
+  environment_variables += ',VUE_APP_PROJECT_ID=$PROJECT_ID'
+  environment_variables += ',VUE_APP_GOOGLE_APP_CLIENT_ID=' + client_id
+  steps[2]['args'].append('--set-env-vars=' + environment_variables)
+  
   if git_release_version != "master":
       git_release = { # Checkout the correct release
                 'name': 'gcr.io/cloud-builders/git',

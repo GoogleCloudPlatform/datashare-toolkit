@@ -1,0 +1,15 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-letsencrypt-acme-challenge
+  namespace: datashare-apis
+spec:
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        methods:
+        - GET
+        paths:
+        - /.well-known/acme-challenge/*

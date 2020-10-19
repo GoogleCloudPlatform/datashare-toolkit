@@ -20,7 +20,7 @@ def GenerateConfig(context):
   source_archive_url = 'gs://%s/%s' % (context.properties['codeBucket'],
                                        'datashare-toolkit-cloud-function.zip')
   print(source_archive_url)
-
+  ingestion_bucket_name = context.properties['ingestionBucketName']
   useWaiter = context.properties['useRuntimeConfigWaiter']    
   #cmd = "echo '%s' | base64 -d > /function/function.zip;" % (content.decode('ascii'))
 
@@ -44,7 +44,7 @@ def GenerateConfig(context):
               context.properties['entryPoint'],
           'eventTrigger': {
               'eventType': 'providers/cloud.storage/eventTypes/object.change',
-              'resource': 'projects/' + context.env['project'] + '/buckets/' + context.env['project'] + '-cds-bucket'
+              'resource': 'projects/' + context.env['project'] + '/buckets/' + ingestion_bucket_name # + context.env['project'] + '-cds-bucket'
           },
           'timeout':
               context.properties['timeout'],

@@ -22,6 +22,7 @@ required:
 - codeBucket
 - codeBucketObject
 - runtime
+- ingestionBucketName
 
 properties:
   codeLocation:
@@ -55,6 +56,10 @@ properties:
   runtime:
     type: string
     description: Node.js runtime
+
+  ingestionBucketName:
+    type: string
+    description: Storage bucket where customer uploads their source data files to be ingested by Datashare
 
 outputs:
   properties:
