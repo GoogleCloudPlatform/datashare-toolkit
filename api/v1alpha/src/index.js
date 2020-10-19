@@ -140,6 +140,8 @@ if (
  *     description: The Datashare API Spot Services
  *   - name: admin
  *     description: The Datashare API Admin Services
+ *   - name: auth
+ *     description: The Datashare API Auth Services
  *   - name: docs
  *     description: The OpenAPI specification documents for the Datashare API services
  *   - name: default
