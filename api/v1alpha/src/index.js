@@ -102,6 +102,8 @@ const accounts = require('./accounts/index');
 const admin = require('./admin/index');
 // Import the Datashare API Procurement service router
 const procurements = require('./procurements/index');
+// Import the Datashare API Auth service router
+const auth = require('./auth/index');
 
 /************************************************************
   API Endpoints
@@ -138,6 +140,8 @@ if (
  *     description: The Datashare API Spot Services
  *   - name: admin
  *     description: The Datashare API Admin Services
+ *   - name: auth
+ *     description: The Datashare API Auth Services
  *   - name: docs
  *     description: The OpenAPI specification documents for the Datashare API services
  *   - name: default
@@ -252,6 +256,7 @@ router.use(policies);
 router.use(accounts);
 router.use(admin);
 router.use(procurements);
+router.use(auth);
 
 /**
  * @swagger

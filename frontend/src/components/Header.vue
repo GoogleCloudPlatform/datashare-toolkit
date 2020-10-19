@@ -28,7 +28,11 @@
             </v-list-item>
           </v-list-group>
           <!-- parent menus -->
-          <v-list-item :to="{ name: item.name }" :key="index" v-else>
+          <v-list-item
+            :to="{ name: item.name }"
+            :key="index"
+            v-else-if="item.name && item.title"
+          >
             <v-list-item-action>
               <v-icon v-html="item.icon"></v-icon>
             </v-list-item-action>
@@ -193,10 +197,14 @@ export default {
           return true;
         }
       });
-      if (route === undefined) {
+      if (route === undefined || route.length === 0) {
         return true;
       } else if (route[0].meta && route[0].meta.requiresAuth === true) {
-        return this.isLoggedIn;
+        if (route[0].meta.requiresDataProducer === true) {
+          return this.isLoggedIn && this.isDataProducer;
+        } else {
+          return this.isLoggedIn;
+        }
       } else {
         return true;
       }
@@ -206,7 +214,8 @@ export default {
     // map `this.user` to `this.$store.getters.user`
     ...mapGetters({
       user: 'user',
-      isLoggedIn: 'isLoggedIn'
+      isLoggedIn: 'isLoggedIn',
+      isDataProducer: 'isDataProducer'
     }),
     navigationItems() {
       let items = [
@@ -238,7 +247,9 @@ export default {
           icon: mdiBadgeAccount
         },
         {
-          section: 'Marketplace',
+          section: 'Marketplace'
+        },
+        {
           name: 'procurements',
           title: 'Procurement Requests',
           icon: mdiShopping
@@ -247,26 +258,6 @@ export default {
           name: 'myDashboard',
           title: 'My Products',
           icon: mdiBriefcaseAccount
-        },
-        {
-          section: 'Ingestion',
-          name: 'ingestion',
-          title: 'Ingestion',
-          icon: mdiApplicationImport,
-          hidden: true
-        },
-        {
-          section: 'Spot Fulfillment',
-          name: 'spotFulfillment',
-          title: 'Spot Fulfillment',
-          icon: mdiHubspot,
-          hidden: true
-        },
-        {
-          name: 'spotFulfillment',
-          title: 'Parameter Dictionary',
-          icon: mdiBookOpen,
-          hidden: true
         },
         {
           section: 'Application',

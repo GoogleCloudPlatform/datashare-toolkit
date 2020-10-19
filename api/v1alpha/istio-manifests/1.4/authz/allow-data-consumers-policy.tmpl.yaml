@@ -14,9 +14,6 @@ spec:
     - operation:
         methods: ["GET,POST"]
         paths: ["/v1alpha/projects/$PROJECT_ID/accounts:activate"]
-    - operation:
-        methods: ["GET"]
-        paths: ["/v1alpha/projects/$PROJECT_ID/admin/uiConfiguration"]
     when:
     - key: request.auth.claims[aud]
       values:

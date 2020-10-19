@@ -18,7 +18,8 @@ const routerOptions = [
     name: 'config',
     component: 'Config',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataProducer: true
     }
   },
   {
@@ -26,7 +27,8 @@ const routerOptions = [
     name: 'datasets',
     component: 'Datasets',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataProducer: true
     }
   },
   {
@@ -34,7 +36,8 @@ const routerOptions = [
     name: 'views',
     component: 'Views',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataProducer: true
     }
   },
   {
@@ -42,7 +45,8 @@ const routerOptions = [
     name: 'ingestion',
     component: 'Ingestion',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataProducer: true
     }
   },
   {
@@ -50,7 +54,8 @@ const routerOptions = [
     name: 'accounts',
     component: 'Accounts',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataProducer: true
     }
   },
   {
@@ -58,7 +63,8 @@ const routerOptions = [
     name: 'editView',
     component: 'EditView',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataProducer: true
     }
   },
   {
@@ -66,7 +72,8 @@ const routerOptions = [
     name: 'editIngestion',
     component: 'EditIngestion',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataProducer: true
     }
   },
   {
@@ -74,7 +81,8 @@ const routerOptions = [
     name: 'editAccount',
     component: 'EditAccount',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataProducer: true
     }
   },
   {
@@ -82,7 +90,8 @@ const routerOptions = [
     name: 'policies',
     component: 'Policies',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataProducer: true
     }
   },
   {
@@ -90,7 +99,8 @@ const routerOptions = [
     name: 'editPolicy',
     component: 'EditPolicy',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataProducer: true
     }
   },
   {
@@ -98,7 +108,8 @@ const routerOptions = [
     name: 'procurements',
     component: 'Procurements',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataProducer: true
     }
   },
   {
@@ -122,7 +133,8 @@ const routerOptions = [
     name: 'spotFulfillment',
     component: 'SpotFulfillment',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataProducer: true
     }
   },
   {
@@ -130,7 +142,8 @@ const routerOptions = [
     name: 'admin',
     component: 'Admin',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataProducer: true
     }
   }
 ];

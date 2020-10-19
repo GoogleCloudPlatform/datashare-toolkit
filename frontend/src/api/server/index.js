@@ -274,11 +274,6 @@ export default {
       .get(this._apiBaseUrl() + '/products')
       .then(response => response);
   },
-  getUiConfiguration() {
-    return axios
-      .get(this._apiBaseUrl() + '/admin/uiConfiguration')
-      .then(response => response);
-  },
   initSchema(payload) {
     return axios
       .post(this._apiBaseUrl() + '/admin:initSchema')
@@ -290,6 +285,11 @@ export default {
       .post(this._apiBaseUrl() + `/admin:syncResources`, {
         type: type
       })
+      .then(response => response);
+  },
+  isDataProducer() {
+    return axios
+      .post(this._apiBaseUrl() + '/auth:isDataProducer')
       .then(response => response);
   }
 };
