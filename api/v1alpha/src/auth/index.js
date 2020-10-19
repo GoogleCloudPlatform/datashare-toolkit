@@ -25,9 +25,33 @@ const express = require('express');
 var auth = express.Router();
 // methods that require multiple routes
 
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/auth:isDataProducer:
+ *   get:
+ *     summary: Simple endpoint to check if user is a data producer
+ *     description: Returns a 200 response
+ *     tags:
+ *       - auth
+ *     responses:
+ *       200:
+ *         description: isDataPRoducer 200 response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   description: HTTP status code
+ */
 auth.post('/projects/:projectId/auth::custom', async (req, res) => {
     const code = 200;
-    const data = {};
+    const data = { success: true };
     switch (req.params.custom) {
         case "isDataProducer":
             res.status(code).json({
