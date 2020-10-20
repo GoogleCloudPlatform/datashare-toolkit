@@ -121,9 +121,9 @@ const routerOptions = [
     }
   },
   {
-    path: '/myDashboard',
-    name: 'myDashboard',
-    component: 'MyDashboard',
+    path: '/myProducts',
+    name: 'myProducts',
+    component: 'MyProducts',
     meta: {
       requiresAuth: true
     }

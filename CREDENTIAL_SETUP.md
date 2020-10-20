@@ -47,7 +47,7 @@ If you have not yet configured the [OAuth consent screen](https://console.cloud.
 
 7. Add the following URIs to the 'Authorized redirect URIs' by clicking on '+ ADD URI' within the section.
     - https://{DOMAIN}/
-    - https://{DOMAIN}/myDashboard
+    - https://{DOMAIN}/myProducts
     - https://{DOMAIN}/activation
 
     <img src="./assets/credentials/authorized_redirect_uris.png" alt="Add authorized redirect URIs" height="150"/>

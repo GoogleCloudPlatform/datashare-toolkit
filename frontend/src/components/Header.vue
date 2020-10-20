@@ -255,7 +255,7 @@ export default {
           icon: mdiShopping
         },
         {
-          name: 'myDashboard',
+          name: 'myProducts',
           title: 'My Products',
           icon: mdiBriefcaseAccount
         },

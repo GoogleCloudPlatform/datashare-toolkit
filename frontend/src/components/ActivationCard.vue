@@ -42,7 +42,7 @@ export default {
           if (response.success) {
             this.activated = true;
             this.$router.replace({
-              name: 'myDashboard'
+              name: 'myProducts'
             });
           } else {
             this.activated = false;
