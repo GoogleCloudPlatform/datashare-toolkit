@@ -115,3 +115,15 @@ it("extension doesn't exist", () => {
 it("extension (double) is valid", () => {
     expect(commonUtil.isExtensionSupported("test.json.txt", ["json", "csv"])).is.false;
 });
+
+it("parse hostname", () => {
+    expect(commonUtil.extractHostname('http://google.com')).equals('google.com');
+});
+
+it("parse hostname with params", () => {
+    expect(commonUtil.extractHostname('http://google.com/test/')).equals('google.com');
+});
+
+it("parse hostname with request vars", () => {
+    expect(commonUtil.extractHostname('http://google.com/test?var=test123')).equals('google.com');
+});

@@ -22,6 +22,9 @@ const dataManager = require("./dataManager");
 const cfg = require('../lib/config');
 const gcpMarketplaceTokenCookieName = 'gmt';
 
+const { CommonUtil } = require('cds-shared');
+const commonUtil = CommonUtil;
+
 /************************************************************
   API Endpoints
  ************************************************************/
@@ -609,26 +612,13 @@ accounts.get('/projects/:projectId/datasets/:datasetId/accounts', async (req, re
     });
 });
 
-function extractHostname(url) {
-    var hostname;
-    if (url.indexOf("//") > -1) {
-        hostname = url.split('/')[2];
-    }
-    else {
-        hostname = url.split('/')[0];
-    }
-    hostname = hostname.split(':')[0];
-    hostname = hostname.split('?')[0];
-    return hostname;
-}
-
 // Temporary for development
 accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
     const projectId = req.params.projectId;
     const token = req.query['x-gcp-marketplace-token'];
     console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
-    const host = extractHostname(req.headers.host);
+    const host = commonUtil.extractHostname(req.headers.host);
     const data = await dataManager.register(projectId, host, token);
     console.log(`Data: ${JSON.stringify(data)}`);
 
@@ -636,7 +626,7 @@ accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
         res.clearCookie(gcpMarketplaceTokenCookieName);
         res.redirect(cfg.uiBaseUrl + '/activationError');
     } else {
-        const host = extractHostname(req.headers.host);
+        const host = commonUtil.extractHostname(req.headers.host);
         res.cookie(gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
         res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
     }
@@ -644,7 +634,7 @@ accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
 
 accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
     const projectId = req.params.projectId;
-    const host = extractHostname(req.headers.host);
+    const host = commonUtil.extractHostname(req.headers.host);
     switch (req.params.custom) {
         case "register": {
             const token = req.body['x-gcp-marketplace-token'];
