@@ -148,7 +148,7 @@ procurements.post('/projects/:projectId/procurements/approve', async (req, res) 
     });
 });
 
-procurements.post('/projects/:projectId/procurements/dashboard', async (req, res) => {
+procurements.post('/projects/:projectId/procurements/myProducts', async (req, res) => {
     const projectId = req.params.projectId;
     const host = commonUtil.extractHostname(req.headers.host);
 

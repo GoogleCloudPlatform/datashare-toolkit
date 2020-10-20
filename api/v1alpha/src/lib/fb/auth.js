@@ -39,8 +39,12 @@ const checkIfAuthenticated = (req, res, next) => {
         // Allow unauthenticated calls to the accounts:register endpoint
         console.log(`accounts:register called with headers: ${JSON.stringify(req.headers)} and body: ${JSON.stringify(req.body)}`);
         return next();
+    } else if (req.path.match(/\/projects\/.+\/procurements\/myProducts/g)) {
+        // Allow unauthenticated calls to the procurements/myProducts endpoint
+        console.log(`procurements/myProducts called with headers: ${JSON.stringify(req.headers)} and body: ${JSON.stringify(req.body)}`);
+        return next();
     } else if (req.path.match(/\/projects\/.+\/products/g)) {
-        // Allow unauthenticated calls to the accounts:register endpoint
+        // Allow unauthenticated calls to the products endpoint
         console.log(`products called with headers: ${JSON.stringify(req.headers)} and body: ${JSON.stringify(req.body)}`);
         return next();
     }
