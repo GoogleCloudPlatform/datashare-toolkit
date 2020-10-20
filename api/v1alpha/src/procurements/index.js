@@ -18,6 +18,9 @@
 
 const express = require('express');
 const dataManager = require("./dataManager");
+const { CommonUtil } = require('cds-shared');
+const commonUtil = CommonUtil;
+const cfg = require('../lib/config');
 
 /************************************************************
   API Endpoints
@@ -143,6 +146,27 @@ procurements.post('/projects/:projectId/procurements/approve', async (req, res) 
         code: code,
         ...data
     });
+});
+
+procurements.post('/projects/:projectId/procurements/dashboard', async (req, res) => {
+    const projectId = req.params.projectId;
+    const host = commonUtil.extractHostname(req.headers.host);
+
+    const token = req.body['x-gcp-marketplace-token'];
+    console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
+
+    const accountManager = require('../accounts/dataManager');
+    const data = await accountManager.register(projectId, host, token);
+    console.log(`Data: ${JSON.stringify(data)}`);
+
+    if (data && data.success === false) {
+        res.clearCookie(cfg.gcpMarketplaceTokenCookieName);
+        res.redirect(cfg.uiBaseUrl + '/myDashboard');
+    } else {
+        console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
+        res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: host });
+        res.redirect(cfg.uiBaseUrl + `/myDashboard?gmt=${token}`);
+    }
 });
 
 module.exports = procurements;

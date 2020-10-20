@@ -20,7 +20,6 @@ const express = require('express');
 
 const dataManager = require("./dataManager");
 const cfg = require('../lib/config');
-const gcpMarketplaceTokenCookieName = 'gmt';
 
 const { CommonUtil } = require('cds-shared');
 const commonUtil = CommonUtil;
@@ -623,11 +622,11 @@ accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
     console.log(`Data: ${JSON.stringify(data)}`);
 
     if (data && data.success === false) {
-        res.clearCookie(gcpMarketplaceTokenCookieName);
+        res.clearCookie(cfg.gcpMarketplaceTokenCookieName);
         res.redirect(cfg.uiBaseUrl + '/activationError');
     } else {
         const host = commonUtil.extractHostname(req.headers.host);
-        res.cookie(gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
+        res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
         res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
     }
 });
@@ -644,11 +643,11 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
             console.log(`Data: ${JSON.stringify(data)}`);
 
             if (data && data.success === false) {
-                res.clearCookie(gcpMarketplaceTokenCookieName);
+                res.clearCookie(cfg.gcpMarketplaceTokenCookieName);
                 res.redirect(cfg.uiBaseUrl + '/activationError');
             } else {
                 console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
-                res.cookie(gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
+                res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
                 res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
             }
             break;

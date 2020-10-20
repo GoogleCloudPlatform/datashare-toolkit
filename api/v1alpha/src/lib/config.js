@@ -64,4 +64,6 @@ config.procurementIssuer = process.env.PROCUREMENT_ISSUER || 'https://www.google
 
 config.uiBaseUrl = process.env.UI_BASE_URL || 'http://localhost:8080';
 
+config.gcpMarketplaceTokenCookieName = 'gmt';
+
 module.exports = config;
