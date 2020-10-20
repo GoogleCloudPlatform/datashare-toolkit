@@ -33,10 +33,5 @@ spec:
         methods: ["GET,POST"]
         paths: ["/v1alpha/projects/$PROJECT_ID/spots*"]
   - when:
-    - key: request.auth.claims[iss]
-      values:
-      - accounts.google.com
-      - https://accounts.google.com
-      - https://securetoken.google.com/$PROJECT_ID
     - key: request.auth.claims[email]
       values: ["$DATA_PRODUCERS"]
