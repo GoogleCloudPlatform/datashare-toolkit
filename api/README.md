@@ -765,7 +765,7 @@ You can them tail the logs via `kubectl` or apply the appropriate GCP console lo
 
 Set the severity back to **warning** for the istio-proxy container:
 
-    kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?filter=warning&http=warning&jwt=warning” -s
+    kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?filter=warning&http=warning&jwt=warning" -s
 
 
 ## Contributing
