@@ -160,12 +160,10 @@ procurements.post('/projects/:projectId/procurements/myProducts', async (req, re
     console.log(`Data: ${JSON.stringify(data)}`);
 
     if (data && data.success === false) {
-        res.clearCookie(cfg.gcpMarketplaceTokenCookieName);
         res.redirect(cfg.uiBaseUrl + '/myProducts');
     } else {
         console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
-        res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: host });
-        res.redirect(cfg.uiBaseUrl + `/myProducts?gmt=${token}`);
+        res.redirect(cfg.uiBaseUrl + '/myProducts');
     }
 });
 
