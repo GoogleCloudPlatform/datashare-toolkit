@@ -153,7 +153,7 @@ procurements.post('/projects/:projectId/procurements/dashboard', async (req, res
     const host = commonUtil.extractHostname(req.headers.host);
 
     const token = req.body['x-gcp-marketplace-token'];
-    console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
+    console.log(`Dashboard called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
     const accountManager = require('../accounts/dataManager');
     const data = await accountManager.register(projectId, host, token);
