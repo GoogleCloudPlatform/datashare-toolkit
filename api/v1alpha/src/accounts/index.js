@@ -626,7 +626,7 @@ accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
         res.redirect(cfg.uiBaseUrl + '/activationError');
     } else {
         const host = commonUtil.extractHostname(req.headers.host);
-        res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
+        res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: host });
         res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
     }
 });
@@ -647,7 +647,7 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
                 res.redirect(cfg.uiBaseUrl + '/activationError');
             } else {
                 console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
-                res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host =='localhost' ? false : true, expires: 0, domain: host });
+                res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: host });
                 res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
             }
             break;
@@ -693,6 +693,9 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
             });
             break;
         }
+        default:
+            res.status(404).json();
+            break;
     }
 });
 
