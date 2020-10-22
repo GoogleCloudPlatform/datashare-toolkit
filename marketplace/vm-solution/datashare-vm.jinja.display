@@ -9,7 +9,7 @@ description:
   tagline: Ingest, entitle, share large volumes of data.
   title: Datashare
   url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
-  version: '0.5.8'
+  version: '0.6.0'
   eulaUrl: https://raw.githubusercontent.com/GoogleCloudPlatform/datashare-toolkit/ecada698551d3022ed12afbabba5e5eae43dfb03/LICENSE.txt
   softwareGroups:
   - type: SOFTWARE_GROUP_OS
@@ -155,8 +155,6 @@ input:
       title: UI domain name
       tooltip: The domain name of your Datashare UI that is registered and verified (https is default). Do not enter the protocol (https://).
       placeholder: datashare.domain.com
-
-    
   sections:
     - name: BOOT_DISK
       title: Boot Disk
