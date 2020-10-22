@@ -9,11 +9,16 @@ spec:
   rules:
   - to:
     - operation:
-        methods: ["GET"]
-        paths: ["/v1alpha/projects/$PROJECT_ID/products"]
+        methods:
+        - GET
+        paths: 
+        - /v1alpha/projects/$PROJECT_ID/products
     - operation:
-        methods: ["GET","POST"]
-        paths: ["/v1alpha/projects/$PROJECT_ID/accounts:activate"]
+        methods:
+        - GET
+        - POST
+        paths: 
+        - /v1alpha/projects/$PROJECT_ID/accounts:activate
     when:
     - key: request.auth.claims[aud]
       values:

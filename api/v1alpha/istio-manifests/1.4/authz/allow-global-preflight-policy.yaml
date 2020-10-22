@@ -9,4 +9,5 @@ spec:
   rules:
   - to:
     - operation:
-        methods: ["OPTIONS"]
+        methods:
+        - OPTIONS

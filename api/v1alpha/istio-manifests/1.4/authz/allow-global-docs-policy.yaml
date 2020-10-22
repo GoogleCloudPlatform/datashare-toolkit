@@ -9,5 +9,8 @@ spec:
   rules:
   - to:
     - operation:
-        methods: ["GET"]
-        paths: ["/v1alpha/docs", "/v1alpha/docs/*"]
+        methods:
+        - GET
+        paths:
+        - /v1alpha/docs
+        - /v1alpha/docs/*

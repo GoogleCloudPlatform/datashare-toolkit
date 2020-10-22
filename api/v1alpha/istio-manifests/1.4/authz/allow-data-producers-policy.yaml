@@ -9,29 +9,33 @@ spec:
   rules:
   - to:
     - operation:
-        methods: ["OPTIONS", "GET", "POST", "PUT", "DELETE"]
-        paths: ["/v1alpha/projects/$PROJECT_ID/accounts*"]
+        methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        paths:
+        - /v1alpha/projects/$PROJECT_ID/accounts*
+        - /v1alpha/projects/$PROJECT_ID/policies*
+        - /v1alpha/projects/$PROJECT_ID/datasets*
     - operation:
-        methods: ["OPTIONS", "GET", "POST", "PUT", "DELETE"]
-        paths: ["/v1alpha/projects/$PROJECT_ID/policies*"]
+        methods:
+        - POST
+        paths:
+        - /v1alpha/projects/$PROJECT_ID/admin*
+        - /v1alpha/projects/$PROJECT_ID/auth:isDataProducer
     - operation:
-        methods: ["OPTIONS", "GET", "POST", "PUT", "DELETE"]
-        paths: ["/v1alpha/projects/$PROJECT_ID/datasets*"]
+        methods:
+        - GET
+        paths:
+        - /v1alpha/projects/$PROJECT_ID/products*
     - operation:
-        methods: ["OPTIONS", "POST"]
-        paths: ["/v1alpha/projects/$PROJECT_ID/admin*"]
-    - operation:
-        methods: ["OPTIONS", POST"]
-        paths: ["/v1alpha/projects/$PROJECT_ID/auth:isDataProducer"]
-    - operation:
-        methods: ["OPTIONS", "GET"]
-        paths: ["/v1alpha/projects/$PROJECT_ID/products*"]
-    - operation:
-        methods: ["OPTIONS", "GET", "POST"]
-        paths: ["/v1alpha/projects/$PROJECT_ID/procurements*"]
-    - operation:
-        methods: ["OPTIONS", "GET", "POST"]
-        paths: ["/v1alpha/projects/$PROJECT_ID/spots*"]
-  - when:
+        methods:
+        - GET
+        - POST
+        paths:
+        - /v1alpha/projects/$PROJECT_ID/procurements*
+        - /v1alpha/projects/$PROJECT_ID/spots*
+    when:
     - key: request.auth.claims[email]
       values: ["$DATA_PRODUCERS"]
