@@ -15,28 +15,38 @@ spec:
         - PUT
         - DELETE
         paths:
-        - /v1alpha/projects/$PROJECT_ID/accounts*
-        - /v1alpha/projects/$PROJECT_ID/policies*
-        - /v1alpha/projects/$PROJECT_ID/datasets*
+        - /v1alpha/projects/$PROJECT_ID/datasets/*
+        methods:
+        - GET
+        - PUT
+        - DELETE
+        paths:
+        - /v1alpha/projects/$PROJECT_ID/accounts/*
+        - /v1alpha/projects/$PROJECT_ID/policies/*
     - operation:
         methods:
         - POST
         paths:
+        - /v1alpha/projects/$PROJECT_ID/accounts:reset
         - /v1alpha/projects/$PROJECT_ID/admin:initSchema
         - /v1alpha/projects/$PROJECT_ID/admin:syncResources
         - /v1alpha/projects/$PROJECT_ID/auth:isDataProducer
+        - /v1alpha/projects/$PROJECT_ID/datasets
+        - /v1alpha/projects/$PROJECT_ID/procurements/approve
     - operation:
         methods:
         - GET
         paths:
+        - /v1alpha/projects/$PROJECT_ID/datasets?*
+        - /v1alpha/projects/$PROJECT_ID/procurements
         - /v1alpha/projects/$PROJECT_ID/views
-        - /v1alpha/projects/$PROJECT_ID/products*
     - operation:
         methods:
         - GET
         - POST
         paths:
-        - /v1alpha/projects/$PROJECT_ID/procurements*
+        - /v1alpha/projects/$PROJECT_ID/accounts
+        - /v1alpha/projects/$PROJECT_ID/policies
         - /v1alpha/projects/$PROJECT_ID/spots*
     when:
     - key: request.auth.claims[email]
