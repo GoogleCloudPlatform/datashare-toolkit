@@ -302,7 +302,6 @@ const store = new Vuex.Store({
           return result.code && result.code === 200;
         })
         .catch(error => {
-          console.error(error);
           return false;
         });
     }
