@@ -18,7 +18,7 @@ spec:
         - exact: /metrics
         - exact: /probe
         - exact: "/v1alpha/projects/$PROJECT_ID/accounts:register"
-        - exact: "/v1alpha/projects/$PROJECT_ID/procurements/myProducts"
+        - exact: "/v1alpha/projects/$PROJECT_ID/procurements:myProducts"
         - prefix: /_internal/knative
         - prefix: /v1alpha/docs
         - prefix: /.well-known/acme-challenge/
@@ -31,7 +31,7 @@ spec:
         - exact: /metrics
         - exact: /probe
         - exact: "/v1alpha/projects/$PROJECT_ID/accounts:register"
-        - exact: "/v1alpha/projects/$PROJECT_ID/procurements/myProducts"
+        - exact: "/v1alpha/projects/$PROJECT_ID/procurements:myProducts"
         - prefix: /_internal/knative
         - prefix: /v1alpha/docs
         - prefix: /.well-known/acme-challenge/
@@ -44,7 +44,7 @@ spec:
         - exact: /metrics
         - exact: /probe
         - exact: "/v1alpha/projects/$PROJECT_ID/accounts:register"
-        - exact: "/v1alpha/projects/$PROJECT_ID/procurements/myProducts"
+        - exact: "/v1alpha/projects/$PROJECT_ID/procurements:myProducts"
         - prefix: /_internal/knative
         - prefix: /v1alpha/docs
         - prefix: /.well-known/acme-challenge/
@@ -57,7 +57,7 @@ spec:
         - exact: /metrics
         - exact: /probe
         - exact: "/v1alpha/projects/$PROJECT_ID/accounts:register"
-        - exact: "/v1alpha/projects/$PROJECT_ID/procurements/myProducts"
+        - exact: "/v1alpha/projects/$PROJECT_ID/procurements:myProducts"
         - prefix: /_internal/knative
         - prefix: /v1alpha/docs
         - prefix: /.well-known/acme-challenge/
