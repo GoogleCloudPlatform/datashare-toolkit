@@ -16,6 +16,7 @@ spec:
         - DELETE
         paths:
         - /v1alpha/projects/$PROJECT_ID/datasets/*
+    - operation:
         methods:
         - GET
         - PUT
