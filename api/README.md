@@ -665,7 +665,7 @@ Datashare end-user or data consumers that require read-write access to Account a
 #### Marketplace Service Account:
 Google Cloud Marketplace integration Service Account that is required for redirecting end-users to registration and sign-up pages in the UI. This service account authenticates via Google.
 * read-write (POST) access to `accounts:register`
-* read-write (POST) access to `procurements/myProducts`
+* read-write (POST) access to `procurements:myProducts`
 
 #### Preflight Requests:
 Unauthenticated clients (single page applications) and browsers that make CORS preflight requests require *OPTIONS* to all service endpoints:
