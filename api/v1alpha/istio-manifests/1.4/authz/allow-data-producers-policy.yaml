@@ -22,12 +22,14 @@ spec:
         methods:
         - POST
         paths:
-        - /v1alpha/projects/$PROJECT_ID/admin*
+        - /v1alpha/projects/$PROJECT_ID/admin:initSchema
+        - /v1alpha/projects/$PROJECT_ID/admin:syncResources
         - /v1alpha/projects/$PROJECT_ID/auth:isDataProducer
     - operation:
         methods:
         - GET
         paths:
+        - /v1alpha/projects/$PROJECT_ID/views
         - /v1alpha/projects/$PROJECT_ID/products*
     - operation:
         methods:
