@@ -134,6 +134,8 @@ if (
  *     description: The Datashare API Dataset Services
  *   - name: policies
  *     description: The Datashare API Policy Services
+ *   - name: procurements
+ *     description: The Datashare API Procurements Services
  *   - name: accounts
  *     description: The Datashare API Account Services
  *   - name: spots
