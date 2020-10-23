@@ -11,19 +11,10 @@ spec:
     - operation:
         methods:
         - GET
-        - POST
-        - PUT
-        - DELETE
         paths:
-        - /v1alpha/projects/$PROJECT_ID/datasets/*
-    - operation:
-        methods:
-        - GET
-        - PUT
-        - DELETE
-        paths:
-        - /v1alpha/projects/$PROJECT_ID/accounts/*
-        - /v1alpha/projects/$PROJECT_ID/policies/*
+        - /v1alpha/projects/$PROJECT_ID/datasets?*
+        - /v1alpha/projects/$PROJECT_ID/procurements
+        - /v1alpha/projects/$PROJECT_ID/views
     - operation:
         methods:
         - POST
@@ -37,18 +28,26 @@ spec:
     - operation:
         methods:
         - GET
-        paths:
-        - /v1alpha/projects/$PROJECT_ID/datasets?*
-        - /v1alpha/projects/$PROJECT_ID/procurements
-        - /v1alpha/projects/$PROJECT_ID/views
-    - operation:
-        methods:
-        - GET
         - POST
         paths:
         - /v1alpha/projects/$PROJECT_ID/accounts
         - /v1alpha/projects/$PROJECT_ID/policies
-        - /v1alpha/projects/$PROJECT_ID/spots*
+    - operation:
+        methods:
+        - GET
+        - PUT
+        - DELETE
+        paths:
+        - /v1alpha/projects/$PROJECT_ID/accounts/*
+        - /v1alpha/projects/$PROJECT_ID/policies/*
+    - operation:
+      methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      paths:
+      - /v1alpha/projects/$PROJECT_ID/datasets/*
     when:
     - key: request.auth.claims[email]
       values: ["$DATA_PRODUCERS"]
