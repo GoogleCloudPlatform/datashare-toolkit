@@ -78,12 +78,12 @@ fi
 
 if [ -z "$FQDN" ]; then
     echo "--fqdn must be supplied"
-    exit 2
+    exit 3
 fi
 
 if [ -z "$DATA_PRODUCERS" ]; then
     echo "--data-producers must be supplied"
-    exit 2
+    exit 4
 fi
 
 cd api/v1alpha
