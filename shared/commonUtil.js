@@ -59,9 +59,27 @@ function isExtensionSupported(fileName, acceptable) {
     return acceptable.includes(ext.toLowerCase());
 }
 
+/**
+ * @param  {} url
+ * Extract the hostname from a url
+ */
+function extractHostname(url) {
+    var hostname;
+    if (url.indexOf("//") > -1) {
+        hostname = url.split('/')[2];
+    }
+    else {
+        hostname = url.split('/')[0];
+    }
+    hostname = hostname.split(':')[0];
+    hostname = hostname.split('?')[0];
+    return hostname;
+}
+
 module.exports = {
     isJsonString,
     isYamlString,
     parseYaml,
-    isExtensionSupported
+    isExtensionSupported,
+    extractHostname
 };

@@ -665,10 +665,15 @@ Datashare end-user or data consumers that require read-write access to Account a
 #### Marketplace Service Account:
 Google Cloud Marketplace integration Service Account that is required for redirecting end-users to registration and sign-up pages in the UI. This service account authenticates via Google.
 * read-write (POST) access to `accounts:register`
+* read-write (POST) access to `procurements:myProducts`
 
 #### Preflight Requests:
 Unauthenticated clients (single page applications) and browsers that make CORS preflight requests require *OPTIONS* to all service endpoints:
 * read-only (OPTIONS) access to `*`
+
+#### Letsencrypt Requests:
+Unauthenticated Letsencrypt CA servers that make ACME Challenges via [HTTP01](https://cert-manager.io/docs/configuration/acme/http01/) requests require *GET* to this specific endpoints (more details [here](https://cloud.google.com/run/docs/gke/troubleshooting#user_configuration_errors):
+* read-only (GET) access to `/.well-known/acme-challenge/*`
 
 Before you apply the AuthZ policies, export the **DATA_PRODUCERS** environment variable as a comma separated list of email addresses: e.g.
 **Note**: You can wildcard an email address domain or explicity add them individually
@@ -750,9 +755,9 @@ The DS API leverages Istio for AuthN/AuthZ in Cloud Run on GKE (Anthos). When an
 In the DS API (ds-api) knative service pod, enable the **debug** logging severity via `kubectl` on the **istio-proxy** container logs: *http*, *filter*, and *jwt*
 
     kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?filter=debug" -s
-    
+
     kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?http=debug" -s
-    
+
     kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?jwt=debug" -s
 
 You can them tail the logs via `kubectl` or apply the appropriate GCP console logging filters:
@@ -761,7 +766,7 @@ You can them tail the logs via `kubectl` or apply the appropriate GCP console lo
 
 Set the severity back to **warning** for the istio-proxy container:
 
-    kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?filter=warning&http=warning&jwt=warning” -s
+    kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?filter=warning&http=warning&jwt=warning" -s
 
 
 ## Contributing

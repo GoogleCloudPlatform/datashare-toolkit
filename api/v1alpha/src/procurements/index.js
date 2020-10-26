@@ -18,6 +18,9 @@
 
 const express = require('express');
 const dataManager = require("./dataManager");
+const { CommonUtil } = require('cds-shared');
+const commonUtil = CommonUtil;
+const cfg = require('../lib/config');
 
 /************************************************************
   API Endpoints
@@ -125,6 +128,44 @@ procurements.get('/projects/:projectId/procurements', async (req, res) => {
     });
 });
 
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/procurements/approve:
+ *   post:
+ *     summary: Change the marketplace entititlement approval status based off request parameters
+ *     description: Returns a response indicating if successful
+ *     tags:
+ *       - procurements
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Procurement request
+ *     responses:
+ *       200:
+ *         description: Procurement list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 code:
+ *                   type: integer
+ *                   default: 200
+ *                   description: HTTP status code
+ *       500:
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Error'
+ */
 procurements.post('/projects/:projectId/procurements/approve', async (req, res) => {
     const projectId = req.params.projectId;
     const name = req.body.name;
@@ -143,6 +184,45 @@ procurements.post('/projects/:projectId/procurements/approve', async (req, res) 
         code: code,
         ...data
     });
+});
+
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/procurements:myProducts:
+ *   post:
+ *     summary: Performs redirect to the Datashare My Products UI page.
+ *     description: Returns a 301 redirect response
+ *     tags:
+ *       - procurements
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Procurement request
+ *     responses:
+ *       301:
+ *         description: Redirect to My Products URL
+ */
+procurements.post('/projects/:projectId/procurements:myProducts', async (req, res) => {
+    const projectId = req.params.projectId;
+    const host = commonUtil.extractHostname(req.headers.host);
+
+    const token = req.body['x-gcp-marketplace-token'];
+    console.log(`Dashboard called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
+
+    const accountManager = require('../accounts/dataManager');
+    const data = await accountManager.register(projectId, host, token);
+    console.log(`Data: ${JSON.stringify(data)}`);
+
+    if (data && data.success === false) {
+        res.redirect(cfg.uiBaseUrl + '/myProducts');
+    } else {
+        console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
+        res.redirect(cfg.uiBaseUrl + '/myProducts');
+    }
 });
 
 module.exports = procurements;

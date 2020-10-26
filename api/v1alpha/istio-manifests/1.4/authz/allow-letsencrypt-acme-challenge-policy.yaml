@@ -2,7 +2,7 @@
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-preflight-requests
+  name: allow-letsencrypt-acme-challenge
   namespace: datashare-apis
 spec:
   action: ALLOW
@@ -10,4 +10,6 @@ spec:
   - to:
     - operation:
         methods:
-        - OPTIONS
+        - GET
+        paths:
+        - /.well-known/acme-challenge/*
