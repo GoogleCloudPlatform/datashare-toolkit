@@ -18,14 +18,18 @@ You must have the values for the following variables:
 
 # Upgrading
 1. Clone the GitHub repo.
-2. cd datashare-toolkit
+2.
+```
+cd datashare-toolkit
+```
 
+3. Execute the upgrade script
 ```
 ./upgrade.sh \
-    --project-id="cds-demo-1-271622" \
-    --oauth-client-id="114619800218-p5v4os5f1i88m4rffuctt9m7su7p445q.apps.googleusercontent.com" \
-    --fqdn="api.datashare-demo-1.fsi.joonix.net" \
-    --data-producers="*@google.com" \
+    --project-id="your_project-id" \
+    --oauth-client-id="your_oauth-client-id" \
+    --fqdn="your_fqdn" \
+    --data-producers="your_data-producers" \
     --tag="dev" \
     --region="us-central1" \
     --zone="us-central1-a"
