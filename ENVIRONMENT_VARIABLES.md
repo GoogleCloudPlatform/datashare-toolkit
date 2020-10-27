@@ -3,7 +3,6 @@ In order for the UI to function properly, all of the fields marked as required b
 
 After changing environmental variables, you may have to re-apply the ISTIO policies.
 
-
 ## UI (ds-frontend-ui)
 | Name | Required | Description | Example |
 |-|-|-|-|

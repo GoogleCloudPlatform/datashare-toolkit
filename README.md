@@ -31,6 +31,9 @@ The toolkit is open-source. Some supporting infrastructure, such as [storage buc
 
 Then get started, see the [User Guide](./frontend/README.md) for usage information.
 
+## Updating Datashare
+[Perform Datashare upgrade](./UPGRADE.md)
+
 ## Requirements
 
 ### Publishers
