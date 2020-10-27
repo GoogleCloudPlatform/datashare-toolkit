@@ -1,7 +1,7 @@
 [Back to Datashare](./README.md)
 
 # Overview
-In order to perform an upgrade of Datashare, you must have completed the initial installation.
+In order to perform an upgrade of Datashare, you must have completed the initial installation, and have administrative access to perform updates on the deployed resources.
 
 # Pre-requisites
 You must have the values for the following variables:
