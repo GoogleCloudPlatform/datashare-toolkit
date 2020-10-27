@@ -219,7 +219,7 @@ async function deleteDataset(projectId, datasetId, createdBy) {
     JOIN \`datashare.currentPolicy\` cp on dr.rowId = cp.rowId
     LEFT JOIN policyDatasets pd on cp.rowId = pd.rowId;`;
 
-        console.log(`Executing policy update: ${policyStatement}`);
+        // console.log(`Executing policy update: ${policyStatement}`);
         const policyOptions = {
             query: policyStatement,
             params: { createdBy: createdBy, datasetId: datasetId }
