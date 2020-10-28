@@ -34,3 +34,5 @@ cd datashare-toolkit
     --region="us-central1" \
     --zone="us-central1-a"
 ```
+
+4. Go to the admin page https://datashare.your-domain.com/admin, and click 'INITIALIZE SCHEMA'.
