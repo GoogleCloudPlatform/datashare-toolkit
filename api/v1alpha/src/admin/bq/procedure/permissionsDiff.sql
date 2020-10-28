@@ -43,6 +43,7 @@ policyData AS (
   LEFT JOIN UNNEST(r.datasets) d
   LEFT JOIN UNNEST(d.tables) t
   LEFT JOIN userPolicies p ON r.policyId = p.policyId
+  WHERE d.datasetId IS NOT NULL
 ),
 uniqueIdentifiers as (
   -- This returns the list of all identifiers/datasetId's/tableId's that are affected by the changed policies or all if full refresh.

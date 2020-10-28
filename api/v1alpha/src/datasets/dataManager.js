@@ -17,7 +17,6 @@
 'use strict';
 
 const { BigQueryUtil } = require('cds-shared');
-let bigqueryUtil = new BigQueryUtil();
 const uuidv4 = require('uuid/v4');
 
 const ConfigValidator = require('./views/configValidator');
@@ -190,7 +189,7 @@ async function deleteDataset(projectId, datasetId, createdBy) {
         WHERE datasetId = @datasetId)
     ),
     datasets as (
-      SELECT cp.rowId, d.datasetId
+      SELECT cp.rowId, d.datasetId, d.tables
       FROM \`datashare.currentPolicy\` cp
       CROSS JOIN cp.datasets d
       JOIN datasetRows dr on cp.rowId = dr.rowId
@@ -200,7 +199,7 @@ async function deleteDataset(projectId, datasetId, createdBy) {
       FROM INFORMATION_SCHEMA.SCHEMATA
     ),
     policyDatasets as (
-      SELECT d.rowId, ARRAY_AGG(STRUCT(d.datasetId)) as datasets
+      SELECT d.rowId, ARRAY_AGG(STRUCT(d.datasetId, d.tables)) as datasets
       FROM datasets d
       JOIN availableDatasets a on a.datasetId = d.datasetId
       GROUP BY d.rowId
