@@ -3,6 +3,7 @@ description: "Custom Datashare API role to interface with GCP services"
 stage: "BETA"
 includedPermissions:
 - bigquery.datasets.create
+- bigquery.datasets.delete
 - bigquery.datasets.get
 - bigquery.datasets.update
 - bigquery.jobs.create
