@@ -41,16 +41,9 @@ Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud 
 * `Service account name` as `datashare-deployment-manager`
 * `Service account description` as `Datashare deployment manager`
 
-5. Select the `Editor`, `Security Admin` and `Kubernetes Admin` roles.
+5. Select the `Editor`, `Security Admin`, `Kubernetes Admin`, `Role Administrator` (roles/iam.roleAdmin) roles.
 
 <img src="images/iam-assign-roles-to-sa.png" width="500"> 
-
-6. Next add two `Service account users roles` to this service account.  These two members need to be able to execute commands on behalf of this service account. Then click the `Done` button. 
-* `PROJECT_NUMBER-compute@developer.gserviceaccount.com`
-* `PROJECT_NUMBER@cloudservices.gserviceaccount.com`
-* `PROJECT_NUMBER@cloudbuild.gserviceaccount.com`
-
-<img src="images/iam-assign-members-to-sa.png" width="500" title="Assign Members">
 
 Now you can click the `Launch` button on the Marketplace and deploy the Datashare solution within your GCP project. 
 

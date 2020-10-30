@@ -33,8 +33,8 @@ def GenerateConfig(context):
     container_tag = context.properties['containerTag']
     region = context.properties['region']
     service_acct_name = context.properties['serviceAccountName']
-    service_acct_descr = context.properties['serviceAccountDesc']
-    custom_role_name = context.properties['customRoleName']
+    #service_acct_descr = context.properties['serviceAccountDesc']
+    #custom_role_name = context.properties['customRoleName']
     ui_domain_name = ""
     # if hasattr(context.properties, 'uiDomainName'):
     if context.properties['uiDomainName'] != None:
@@ -46,30 +46,30 @@ def GenerateConfig(context):
         git_release_version = context.properties['datashareGitReleaseTag']
 
     steps = [
-        {  # Create a service account
-            'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
-            'entrypoint': '/bin/bash',
-            'args': ['-c',
-                     'gcloud iam service-accounts create ' + service_acct_name + ' --display-name="' + service_acct_descr + '" --format=disable || exit 0'
-                     ]
-        },
+        #{  # Create a service account
+        #    'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
+        #    'entrypoint': '/bin/bash',
+        #    'args': ['-c',
+        #             'gcloud iam service-accounts create ' + service_acct_name + ' --display-name="' + service_acct_descr + '" --format=disable || exit 0'
+        #             ]
+        #},
         {  # Clone the Datashare repository
             'name': 'gcr.io/cloud-builders/git',
             'dir': 'ds',  # changes the working directory to /workspace/ds/
             'args': ['clone', cmd]
         },
-        {  # Create the custom role
-            'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
-            'entrypoint': '/bin/bash',
-            'args': ['-c', 'gcloud iam roles create ' + custom_role_name + ' --project=$PROJECT_ID --file=config/ds-api-mgr-role-definition.yaml --format=disable || exit 0'],
-            'dir': 'ds/datashare-toolkit/api'  # changes the working directory to /workspace/ds/datashare-toolkit/api
-        },
-        {  # Assign the service account to the custom role
-            'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
-            'entrypoint': '/bin/bash',
-            'args': ['-c', 'gcloud projects add-iam-policy-binding $PROJECT_ID --member=serviceAccount:' + service_acct_name + '@$PROJECT_ID.iam.gserviceaccount.com --role="projects/$PROJECT_ID/roles/' + custom_role_name + '" --format=disable'
-                     ]
-        },
+        #{  # Create the custom role
+        #    'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
+        #    'entrypoint': '/bin/bash',
+        #    'args': ['-c', 'gcloud iam roles create ' + custom_role_name + ' --project=$PROJECT_ID --file=config/ds-api-mgr-role-definition.yaml --format=disable || exit 0'],
+        #    'dir': 'ds/datashare-toolkit/api'  # changes the working directory to /workspace/ds/datashare-toolkit/api
+        #},
+        #{  # Assign the service account to the custom role
+        #    'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
+        #    'entrypoint': '/bin/bash',
+        #    'args': ['-c', 'gcloud projects add-iam-policy-binding $PROJECT_ID --member=serviceAccount:' + service_acct_name + '@$PROJECT_ID.iam.gserviceaccount.com --role="projects/$PROJECT_ID/roles/' + custom_role_name + '" --format=disable'
+        #             ]
+        #},
         {   # Submit the build configuration to Cloud Build to be the Datashare API container image only if the ds-api:dev image does not exist
             'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
             'dir': 'ds/datashare-toolkit',
@@ -87,7 +87,7 @@ def GenerateConfig(context):
         ]
     # select the correct deploy command based on whether deployToGke is True or False
     if context.properties['deployToGke'] is False or context.properties['deployToGke'] == "false":
-        steps[5]['args'] = [
+        steps[2]['args'] = [
             'run',
             'deploy',
             cloud_run_deploy_name,
@@ -98,7 +98,7 @@ def GenerateConfig(context):
             '--service-account=' + service_acct_name + '@$PROJECT_ID.iam.gserviceaccount.com'
             ]
     else:
-        steps[5]['args'] = [
+        steps[2]['args'] = [
             'alpha',
             'run',
             'deploy',
@@ -116,9 +116,9 @@ def GenerateConfig(context):
     domain_protocol = 'https://'
     if ui_domain_name is not "":
         if domain_has_protocol(ui_domain_name):
-            steps[5]['args'].append('--set-env-vars=UI_BASE_URL=' + ui_domain_name)
+            steps[2]['args'].append('--set-env-vars=UI_BASE_URL=' + ui_domain_name)
         else:
-            steps[5]['args'].append('--set-env-vars=UI_BASE_URL=' + domain_protocol + ui_domain_name)
+            steps[2]['args'].append('--set-env-vars=UI_BASE_URL=' + domain_protocol + ui_domain_name)
 
     git_release = {  # Checkout the correct release
                 'name': 'gcr.io/cloud-builders/git',
@@ -127,7 +127,7 @@ def GenerateConfig(context):
                 }
 
     if git_release_version != "master":
-        steps.insert(2, git_release)  # insert the git checkout command into after the git clone step
+        steps.insert(1, git_release)  # insert the git checkout command into after the git clone step
 
     resources = None
     # include the dependsOn property if we are deploying all the components

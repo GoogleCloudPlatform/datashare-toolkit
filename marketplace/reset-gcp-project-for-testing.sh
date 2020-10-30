@@ -65,3 +65,6 @@ fi
 . remove-elevated-permissions-from-cloudbuild-deploymentmgr.sh 
 
 # gcloud beta runtime-config configs waiters create [WAITER_NAME] --config-name [CONFIG_NAME]
+
+echo "Enable prerequisite APIs in GCP project"
+gcloud services enable container.googleapis.com runtimeconfig.googleapis.com cloudbuild.googleapis.com cloudcommerceprocurement.googleapis.com
