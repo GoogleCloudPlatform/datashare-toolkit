@@ -69,6 +69,8 @@ done
 if [ -z "$PROJECT_ID" ]; then
     export PROJECT_ID=`gcloud config list --format 'value(core.project)'`;
     echo "--project-id not supplied, using current gcloud config projectId of $PROJECT_ID"
+else
+    gcloud config set project "$PROJECT_ID"
 fi
 
 if [ -z "$OAUTH_CLIENT_ID" ]; then
