@@ -1,7 +1,7 @@
 [Back to Datashare](./README.md)
 
 # Overview
-The Data Producers are users that should have administrative access to the Datashare UI. To modify the list of Data Producers for an existing setup, you must edit the ```allow-data-producers``` authorization policy. Run the following command to edit the authorization policy.
+Data Producers are users that should have administrative access to the Datashare UI. To modify the list of Data Producers for an existing setup, you must edit the ```allow-data-producers``` authorization policy. Run the following command to edit the authorization policy.
 
 ```
 export NAMESPACE=datashare-apis
