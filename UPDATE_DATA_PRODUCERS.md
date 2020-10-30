@@ -20,4 +20,4 @@ Scroll to the bottom and you'll see a when condition that looks like this:
       - '*@google.com'
 ```
 
-Modify the values portion to include the list of domains or users. For more information see the Istio documentation: [Authorization Policies](https://istio.io/v1.4/docs/reference/config/security/authorization-policy/).
+Modify the values portion to include the list of domains or users and save. For more information see the Istio documentation: [Authorization Policies](https://istio.io/v1.4/docs/reference/config/security/authorization-policy/).
