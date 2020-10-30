@@ -1,7 +1,7 @@
 [Back to Datashare](./README.md)
 
 # Overview
-Data Producers are users that should have administrative access to the Datashare UI. To modify the list of Data Producers for an existing setup, you must edit the ```allow-data-producers``` authorization policy.
+Data Producers are users that should have administrative access to the Datashare UI. To modify the list of Data Producers for an existing setup, you must edit the [allow-data-producers](./api/v1alpha/istio-manifests/1.4/authz/allow-data-producers-policy.yaml) authorization policy.
 
 # Updating the Authorization Policy
 Run the following command to edit the authorization policy.
