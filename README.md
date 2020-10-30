@@ -32,8 +32,8 @@ The toolkit is open-source. Some supporting infrastructure, such as [storage buc
 Then get started, see the [User Guide](./frontend/README.md) for usage information.
 
 ## Updating Datashare
-- [Perform Datashare version upgrade](./UPGRADE.md) - Update the API and UI software versions
-- [Update Data Producers](./UPDATE_DATA_PRODUCERS.md) - Modify the administrators for the Datashare UI
+- [Perform Datashare version upgrade](./UPGRADE.md) - Update the API and UI software versions.
+- [Update Data Producers](./UPDATE_DATA_PRODUCERS.md) - Modify the administrators for the Datashare UI.
 
 ## Requirements
 
