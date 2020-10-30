@@ -6,8 +6,6 @@ resources:
   type: deploy_ds_api.py
   properties:
     serviceAccountName: ds-api-mgr
-    serviceAccountDesc: DS API Manager
-    customRoleName: custom.ds.api.mgr
     cloudRunDeployName: ds-api
     containerTag: dev
     region: us-central1

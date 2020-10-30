@@ -1,5 +1,24 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.6.0 Release Notes
+* Build - 10/26/2020
+
+### Datashare
+* Datashare release version is 0.5.0
+* Kubernetes cluster version is 1.16 to support incremental changes
+
+### Updates  
+* Updated solution so that customers don't have add default service accounts to the custom datashare-deployment-manager service account.
+* Removed some elevated permissions from the Cloud Build Service account.
+  * iam.admin, iam.roleadmin, iam.securityadmin, iam.storageadmin
+* Added the iam.roleAdmin to the datashare-deployment-manager service account.
+
+### Bug Fixes
+
+### Known Bugs
+* None
+
+
 ## 0.5.8 Release Notes
 * Build - 10/14/2020
 
