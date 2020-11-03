@@ -22,7 +22,10 @@ Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud 
 4. [Enable the Commerce API from Cloud Console](https://console.cloud.google.com/apis/library/cloudcommerceprocurement.googleapis.com)
 
 ### From the command line
-1. ```gcloud services enable container.googleapis.com runtimeconfig.googleapis.com cloudbuild.googleapis.com cloudcommerceprocurement.googleapis.com```
+1.
+```
+gcloud services enable container.googleapis.com runtimeconfig.googleapis.com cloudbuild.googleapis.com cloudcommerceprocurement.googleapis.com
+```
 
 ## Update service account from Google Cloud Console
 1. Login to Google Cloud Console and select `IAM` from the menu.
