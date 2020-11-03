@@ -14,6 +14,7 @@ solution automatically.
 Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud Run on Anthos Kubernetes by default.  
 
 ## Enable the APIs
+Note you can only enable the Commerce API (cloudcommerceprocurement.googleapis.com) if your project has been permissioned to the Partner Portal, otherwise you will need to enable this permission after you are provided with access to Partner Portal.
 
 ### From Cloud Console
 1. [Enable the Kubernetes API from Cloud Console](https://console.cloud.google.com/apis/library/container.googleapis.com)
