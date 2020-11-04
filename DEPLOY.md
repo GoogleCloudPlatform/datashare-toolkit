@@ -42,7 +42,10 @@ gcloud beta run domain-mappings create --service ds-frontend-ui \
 To check the status, run the following:
 ```
 REGION=us-central1
-gcloud beta run domain-mappings describe --domain=$FQDN --platform=managed --region=$REGION
+gcloud beta run domain-mappings describe \
+  --domain=$FQDN \
+  --platform=managed \
+  --region=$REGION
 ```
 
 ### Map the API domain
