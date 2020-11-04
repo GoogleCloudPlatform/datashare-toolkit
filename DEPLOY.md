@@ -26,7 +26,7 @@
 
     <img src="./assets/deploy/4-deploy-completed.png" alt="Populate deployment form" height="500"/>
 
-# Map the domains
+# Set up domain mappings
 See [Domain Mappings](https://cloud.google.com/sdk/gcloud/reference/beta/run/domain-mappings) for further information.
 
 ## Using the gcloud CLI (Recommended)
