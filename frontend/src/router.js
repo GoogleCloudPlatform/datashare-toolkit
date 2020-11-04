@@ -14,15 +14,6 @@ const routerOptions = [
     component: 'Restricted'
   },
   {
-    path: '/config',
-    name: 'config',
-    component: 'Config',
-    meta: {
-      requiresAuth: true,
-      requiresDataProducer: true
-    }
-  },
-  {
     path: '/datasets',
     name: 'datasets',
     component: 'Datasets',
@@ -35,15 +26,6 @@ const routerOptions = [
     path: '/views',
     name: 'views',
     component: 'Views',
-    meta: {
-      requiresAuth: true,
-      requiresDataProducer: true
-    }
-  },
-  {
-    path: '/ingestion',
-    name: 'ingestion',
-    component: 'Ingestion',
     meta: {
       requiresAuth: true,
       requiresDataProducer: true
@@ -129,15 +111,6 @@ const routerOptions = [
     }
   },
   {
-    path: '/spotFulfillment',
-    name: 'spotFulfillment',
-    component: 'SpotFulfillment',
-    meta: {
-      requiresAuth: true,
-      requiresDataProducer: true
-    }
-  },
-  {
     path: '/admin',
     name: 'admin',
     component: 'Admin',
@@ -165,14 +138,20 @@ let router = new Router({
 
 // https://github.com/christiannwamba/vuex-auth-jwt/blob/master/src/router.js
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
+  if (to.matched.some(record => record.meta.requiresDataProducer)) {
+    if (store.getters.isLoggedIn && store.getters.isDataProducer) {
+      next();
+      return;
+    } else {
+      router.replace('/restricted');
+    }
+  } else if (to.matched.some(record => record.meta.requiresAuth)) {
     if (store.getters.isLoggedIn) {
       next();
       return;
+    } else {
+      router.replace('/restricted');
     }
-    // Redirect to login page: next('/login')
-    // For now putting next() to avoid issue because we're not persisting auth properly.
-    next();
   } else {
     next();
   }
