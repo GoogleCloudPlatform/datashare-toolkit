@@ -63,4 +63,4 @@ Once completed, your zone details should look like:
 <img src="./assets/deploy/13-zone_details.png" alt="Zone details" height="300"/>
 
 # Next
-[Configure Environment Variables](./ENVIRONMENT_VARIABLES.md)
+[Initialize Schema](./frontend/user-guide/ADMIN.md#initialize_schema)
