@@ -27,6 +27,52 @@
     <img src="./assets/deploy/4-deploy-completed.png" alt="Populate deployment form" height="500"/>
 
 # Map the domains
+See [Domain Mappings](https://cloud.google.com/sdk/gcloud/reference/beta/run/domain-mappings) for further information.
+
+## Using the gcloud CLI (Recommended)
+After executing the command to map the domains, take note of the A, AAAA, and/or CNAME records that you will need to configure for your domain in your DNS management.
+### Map the UI domain
+```
+FQDN=datashare-demo-2e.fsi.joonix.net
+gcloud beta run domain-mappings create --service ds-frontend-ui \
+  --domain $FQDN \
+  --platform managed
+```
+
+To check the status, run the following:
+```
+REGION=us-central1
+gcloud beta run domain-mappings describe --domain=$FQDN --platform=managed --region=$REGION
+```
+
+### Map the API domain
+```
+FQDN=api.datashare-demo-2e.fsi.joonix.net
+CLUSTER=datashare
+ZONE=us-central1-a
+gcloud config set compute/zone $ZONE
+NAMESPACE=datashare-apis
+
+gcloud beta run domain-mappings create --service ds-api \
+  --domain $FQDN \
+  --cluster $CLUSTER \
+  --cluster-location $ZONE \
+  --namespace $NAMESPACE \
+  --platform gke
+```
+
+To check the status, run the following:
+```
+gcloud beta run domain-mappings describe \
+  --domain $FQDN \
+  --cluster $CLUSTER \
+  --cluster-location $ZONE \
+  --namespace $NAMESPACE \
+  --platform gke
+```
+
+## Using the GCP Console
+
 1. Go to the [Cloud Run console](https://console.cloud.google.com/run).
 2. Click 'MANAGE CUSTOM DOMAINS'.
 3. Click '+ ADD MAPPING'.
