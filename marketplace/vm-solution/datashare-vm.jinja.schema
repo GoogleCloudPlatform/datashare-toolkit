@@ -38,8 +38,36 @@ required:
 properties:
   zone:
     type: string
+    default: us-central1-a
     x-googleProperty:
       type: GCE_ZONE
+      gceZone:
+        whitelistedZones:
+        - asia-east1-a
+        - asia-east1-b
+        - asia-east1-c
+        - asia-southeast1-a
+        - asia-southeast1-b
+        - asia-southeast1-c
+        - europe-west1-b
+        - europe-west1-c
+        - europe-west1-d
+        - europe-west4-a
+        - europe-west4-b
+        - europe-west4-c
+        - us-central1-a
+        - us-central1-b
+        - us-central1-c
+        - us-central1-f
+        - us-east1-b
+        - us-east1-c
+        - us-east1-d
+        - us-east4-a
+        - us-east4-b
+        - us-east4-c
+        - us-west1-a
+        - us-west1-b
+        - us-west1-c
   sourceImage:
     type: string
     enum:
@@ -123,16 +151,45 @@ properties:
     default: user@example.com
   gceServiceAccount:
     type: string
-    default: PROJECT@PROJECT_NAME.iam.gserviceaccount.com
+    pattern: "[a-z]([-a-z0-9]*[a-z0-9])"
+    default: datashare-deployment-manager
+    x-googleProperty:
+      type: IAM_SERVICE_ACCOUNT
+      iamServiceAccount:
+        roles:
+        - roles/project.editor
+        - roles/container.admin	
+        - roles/iam.securityAdmin
+        - roles/iam.roleAdmin
   input_datashareGithubReleaseVersion:
     type: string
-    default: v0.5.0
+    default: v0.5.2
+    enum:
+      - 'v0.5.2'
+      - 'v0.5.1'
   input_gcpRegion:
     type: string
     default: us-central1
+    x-googleProperty:
+      type: GCE_REGION
+      gceZone:
+        whitelistedZones:
+        - asia-east1
+        - asia-southeast1
+        - europe-west1
+        - europe-west4
+        - us-central1
+        - us-east1
+        - us-east4
+        - us-west1
   input_storageBucketLocation:
     type: string
     default: US
+    enum:
+      - 'ASIA'  
+      - 'EU'
+      - 'US'
+      
   useRuntimeConfigWaiter:
     type: boolean
     default: True
@@ -142,6 +199,35 @@ properties:
   input_gkeZone:
     type: string
     default: us-central1-a
+    x-googleProperty:
+      type: GCE_ZONE
+      gceZone:
+        whitelistedZones:
+        - asia-east1-a
+        - asia-east1-b
+        - asia-east1-c
+        - asia-southeast1-a
+        - asia-southeast1-b
+        - asia-southeast1-c
+        - europe-west1-b
+        - europe-west1-c
+        - europe-west1-d
+        - europe-west4-a
+        - europe-west4-b
+        - europe-west4-c
+        - us-central1-a
+        - us-central1-b
+        - us-central1-c
+        - us-central1-f
+        - us-east1-b
+        - us-east1-c
+        - us-east1-d
+        - us-east4-a
+        - us-east4-b
+        - us-east4-c
+        - us-west1-a
+        - us-west1-b
+        - us-west1-c
   serviceAccounts:
     type: array
     default:

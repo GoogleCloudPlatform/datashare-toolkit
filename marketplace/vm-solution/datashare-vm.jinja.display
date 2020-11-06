@@ -9,7 +9,7 @@ description:
   tagline: Ingest, entitle, share large volumes of data.
   title: Datashare
   url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
-  version: '0.6.0'
+  version: '0.6.1'
   eulaUrl: https://raw.githubusercontent.com/GoogleCloudPlatform/datashare-toolkit/ecada698551d3022ed12afbabba5e5eae43dfb03/LICENSE.txt
   softwareGroups:
   - type: SOFTWARE_GROUP_OS
@@ -18,7 +18,7 @@ description:
       version: v20200714 LTS
   - software:
     - title: Datashare
-      version: 0.5.0
+      version: 0.5.2
     - title: Cloud Run on GKE
       version: 1.16
   documentations:
@@ -99,7 +99,7 @@ input:
       level: 1
     - name: input_datashareGithubReleaseVersion
       title: Github Datashare Release Version
-      placeholder: v0.5.0
+      placeholder: v0.5.2
     - name: input_gcpRegion
       title: Google Cloud Platform Region
       subtext: <a href="https://cloud.google.com/compute/docs/regions-zones#available">Valid Google Cloud Platform regions</a>
@@ -127,7 +127,6 @@ input:
       title: GKE zone.
       tooltip: This will create the GKE cluster in the specified zone; default zone is us-central1-a
       subtext: Create the GKE cluster in the specified zone;
-      placeholder: us-central1-a
     - name: input_adminEmail
       title: Admin Email
       tooltip: This field is not required. Please ignore.
