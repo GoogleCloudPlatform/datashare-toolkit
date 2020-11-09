@@ -277,7 +277,31 @@ resources:
                     exit 1;  
                 fi
               }
+              {% raw %}
+              format_data_producers_field()
+              {
+                DATA_PRODUCERS=$1
+                DATA_PRODUCERS_FORMATTED=""
+                COMMA=","
 
+                if [[ "$DATA_PRODUCERS" == *"$COMMA"* ]]; then
+                    # convert comma delimitted string into an array
+                    IFS=', ' read -r -a LIST <<< "$DATA_PRODUCERS"
+                    LENGTH=$((${#LIST[*]} - 1))
+                    for INDEX in "${!LIST[@]}"
+                    do
+                        if [ $INDEX -ne $LENGTH ]; then
+                            DATA_PRODUCERS_FORMATTED="$DATA_PRODUCERS_FORMATTED\"${LIST[INDEX]}\","
+                        else
+                            DATA_PRODUCERS_FORMATTED="$DATA_PRODUCERS_FORMATTED\"${LIST[INDEX]}\""
+                        fi 
+                    done
+                    echo ${DATA_PRODUCERS_FORMATTED:1:-1}
+                else
+                    echo $DATA_PRODUCERS
+                fi
+              }
+              {% endraw %}
               
               if [ "$USE_RUNTIME_CONFIG_WAITER" = "true" ]; then
                 sudo apt-get -y update 
@@ -500,7 +524,8 @@ resources:
                     export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
                     cat /opt/datashare-toolkit/api/v1alpha/istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -
                     check_if_command_succeeded $? "cat /opt/datashare-toolkit/api/v1alpha/istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -"
-                    export DATA_PRODUCERS=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/dataProducers -H "Metadata-Flavor: Google"`
+                    export DATA_PRODUCERS_RAW=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/dataProducers -H "Metadata-Flavor: Google"`
+                    export DATA_PRODUCERS=`format_data_producers_field $DATA_PRODUCERS_RAW`
                     # echo "DATA_PRODUCERS=$DATA_PRODUCERS"
                     export OAUTH_CLIENT_ID=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/oauthClientId -H "Metadata-Flavor: Google"`
                     # echo "OAUTH_CLIENT_ID=$OAUTH_CLIENT_ID"

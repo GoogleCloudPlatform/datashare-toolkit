@@ -139,7 +139,7 @@ input:
       placeholder: OAUTH_CLIENT_ID
     - name: input_dataProducers
       title: Data Producers
-      tooltip: Create a service account and include it here or include a wildcard email address.
+      tooltip: <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/marketplace/DATA_PRODUCERS.md">Review the Data Producers formatting instructions.</a>
       subtext: Project admins or service accounts that require read-write access to Datashare APIs
       placeholder: user@example.com
     - name: input_apiDomainName
