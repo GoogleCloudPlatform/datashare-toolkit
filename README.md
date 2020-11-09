@@ -20,8 +20,9 @@ The toolkit is open-source. Some supporting infrastructure, such as [storage buc
 - [GCP Marketplace integration](./frontend/user-guide/MARKETPLACE_INTEGRATION.md) for selling your data
 - [Multicast client](./client/README.md)
 
-
 ## Getting started with Datashare
+If you plan to use GCP Marketplace integration, the production project that you install and manage Datashare from must follow the required naming convention (punctuation and spaces not allowed): ```[yourcompanyname]-public```.
+
 1. [Setup your domain](./DOMAIN_SETUP.md)
 2. [Setup OAuth credential](./CREDENTIAL_SETUP.md)
 3. [Deploy Datashare](./DEPLOY.md)
