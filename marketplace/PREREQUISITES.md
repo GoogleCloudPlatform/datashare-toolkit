@@ -41,7 +41,13 @@ Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud 
 * `Service account name` as `datashare-deployment-manager`
 * `Service account description` as `Datashare deployment manager`
 
-5. Select the `Editor`, `Security Admin`, `Kubernetes Admin`, `Role Administrator` (roles/iam.roleAdmin) roles.
+5. Select the following roles
+* `Security Admin`
+* `Kubernetes Admin` 
+* `Role Administrator` (roles/iam.roleAdmin)
+* `Service Useage Admin`
+* `Storage Admin`
+* `Project IAM Admin`
 
 <img src="images/iam-assign-roles-to-sa.png" width="500"> 
 

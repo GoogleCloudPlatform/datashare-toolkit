@@ -151,20 +151,24 @@ properties:
     default: user@example.com
   gceServiceAccount:
     type: string
-    pattern: "[a-z]([-a-z0-9]*[a-z0-9])"
+    default: PROJECT@PROJECT_NAME.iam.gserviceaccount.com
+    # pattern: "[.]*"
     default: datashare-deployment-manager
     x-googleProperty:
       type: IAM_SERVICE_ACCOUNT
       iamServiceAccount:
         roles:
-        - roles/project.editor
-        - roles/container.admin	
+        - roles/container.admin
         - roles/iam.securityAdmin
         - roles/iam.roleAdmin
+        - roles/serviceusage.serviceUsageAdmin
+        - roles/storage.admin
+        - roles/resourcemanager.projectIamAdmin
   input_datashareGithubReleaseVersion:
     type: string
     default: v0.5.2
     enum:
+      - 'master'
       - 'v0.5.2'
       - 'v0.5.1'
   input_gcpRegion:
