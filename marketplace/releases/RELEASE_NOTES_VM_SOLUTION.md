@@ -1,5 +1,23 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.6.1 Release Notes
+* Build - 11/10/2020
+
+### Datashare
+* Datashare release version is 0.5.2
+* Kubernetes cluster version is 1.16 to support incremental changes
+
+### Updates  
+* Updated all fields that were previous text boxes to drop down menus.
+* Allow a user to select an existing service account (SA) with the appropriate permissions to be used as the SA during the Datashare deployment.
+
+### Bug Fixes
+* Data Producers field did not accept a comma delimitted string.
+
+### Known Bugs
+* A user is not able to create a new service account during the launch page - [bug #376](https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/376).
+
+
 ## 0.6.0 Release Notes
 * Build - 10/26/2020
 
