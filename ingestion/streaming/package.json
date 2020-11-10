@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "ws": "~3.3.1",
-    "@google-cloud/pubsub": "^0.28.1"
+    "@google-cloud/pubsub": "^2.6.0"
   },
   "bin": {
     "pubsock": "index.js"
