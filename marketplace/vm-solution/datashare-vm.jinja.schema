@@ -164,6 +164,8 @@ properties:
         - roles/serviceusage.serviceUsageAdmin
         - roles/storage.admin
         - roles/resourcemanager.projectIamAdmin
+        - roles/runtimeconfig.admin
+        # - roles/resourcemanager.projects.setIamPolicy
   input_datashareGithubReleaseVersion:
     type: string
     default: v0.5.2

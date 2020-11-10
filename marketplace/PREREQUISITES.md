@@ -48,6 +48,7 @@ Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud 
 * `Service Useage Admin`
 * `Storage Admin`
 * `Project IAM Admin`
+* `Cloud Runtime Config Admin` (roles/runtimeconfig.admin)
 
 <img src="images/iam-assign-roles-to-sa.png" width="500"> 
 
