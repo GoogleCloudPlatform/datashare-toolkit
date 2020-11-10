@@ -278,25 +278,40 @@ resources:
                 fi
               }
               {% raw %}
+              surround_with_quotes()
+              {
+                INPUT=$1
+                FORMATTED=""
+                IFS=', ' read -r -a LIST <<< "$INPUT"
+                LENGTH=$((${#LIST[*]} - 1))
+                for INDEX in "${!LIST[@]}"
+                do
+                    if [ $INDEX -ne $LENGTH ]; then
+                        FORMATTED="$FORMATTED\"${LIST[INDEX]}\","
+                    else
+                        FORMATTED="$FORMATTED\"${LIST[INDEX]}\""
+                    fi 
+                done
+                echo $FORMATTED
+              }
+
               format_data_producers_field()
               {
                 DATA_PRODUCERS=$1
                 DATA_PRODUCERS_FORMATTED=""
                 COMMA=","
+                DOUBLE_QUOTE="\""
 
-                if [[ "$DATA_PRODUCERS" == *"$COMMA"* ]]; then
+                if [[ "$DATA_PRODUCERS" == *"$DOUBLE_QUOTE"* ]] && [[ "$DATA_PRODUCERS" == *"$COMMA"* ]]; then
+                    QUOTES_REMOVED=${DATA_PRODUCERS:1:-1}
+                    DATA_PRODUCERS=`surround_with_quotes $QUOTES_REMOVED`
+                    echo ${DATA_PRODUCERS:1:-1}
+                elif [[ "$DATA_PRODUCERS" == *"$COMMA"* ]]; then
                     # convert comma delimitted string into an array
-                    IFS=', ' read -r -a LIST <<< "$DATA_PRODUCERS"
-                    LENGTH=$((${#LIST[*]} - 1))
-                    for INDEX in "${!LIST[@]}"
-                    do
-                        if [ $INDEX -ne $LENGTH ]; then
-                            DATA_PRODUCERS_FORMATTED="$DATA_PRODUCERS_FORMATTED\"${LIST[INDEX]}\","
-                        else
-                            DATA_PRODUCERS_FORMATTED="$DATA_PRODUCERS_FORMATTED\"${LIST[INDEX]}\""
-                        fi 
-                    done
+                    DATA_PRODUCERS_FORMATTED=`surround_with_quotes $DATA_PRODUCERS`
                     echo ${DATA_PRODUCERS_FORMATTED:1:-1}
+                elif [[ "$DATA_PRODUCERS" == *"$DOUBLE_QUOTE"* ]]; then
+                    echo ${DATA_PRODUCERS:1:-1}
                 else
                     echo $DATA_PRODUCERS
                 fi
