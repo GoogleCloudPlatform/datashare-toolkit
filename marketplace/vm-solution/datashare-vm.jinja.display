@@ -18,7 +18,7 @@ description:
       version: v20200714 LTS
   - software:
     - title: Datashare
-      version: 0.5.2
+      version: 0.5.3
     - title: Cloud Run on GKE
       version: 1.16
   documentations:
@@ -99,7 +99,7 @@ input:
       level: 1
     - name: input_datashareGithubReleaseVersion
       title: Github Datashare Release Version
-      placeholder: v0.5.2
+      placeholder: v0.5.3
     - name: input_gcpRegion
       title: Google Cloud Platform Region
       subtext: <a href="https://cloud.google.com/compute/docs/regions-zones#available">Valid Google Cloud Platform regions</a>
