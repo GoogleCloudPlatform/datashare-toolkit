@@ -20,19 +20,19 @@ The toolkit is open-source. Some supporting infrastructure, such as [storage buc
 - [GCP Marketplace integration](./frontend/user-guide/MARKETPLACE_INTEGRATION.md) for selling your data
 - [Multicast client](./client/README.md)
 
-
 ## Getting started with Datashare
+If you plan to use GCP Marketplace integration, the production project that you install and manage Datashare from must follow the required naming convention (punctuation and spaces not allowed): ```[yourcompanyname]-public```.
+
 1. [Setup your domain](./DOMAIN_SETUP.md)
 2. [Setup OAuth credential](./CREDENTIAL_SETUP.md)
 3. [Deploy Datashare](./DEPLOY.md)
-4. [Configure Environment Variables](./ENVIRONMENT_VARIABLES.md)
-5. [Apply ISTIO Policies](./APPLY_ISTIO_POLICIES.md)
-6. [Initialize Schema](./frontend/user-guide/ADMIN.md#initialize_schema) the Datashare schema
+4. [Initialize Schema](./frontend/user-guide/ADMIN.md#initialize_schema)
 
 Then get started, see the [User Guide](./frontend/README.md) for usage information.
 
 ## Updating Datashare
-[Perform Datashare upgrade](./UPGRADE.md)
+- [Perform Datashare version upgrade](./UPGRADE.md) - Update the API and UI software versions.
+- [Update Data Producers](./UPDATE_DATA_PRODUCERS.md) - Modify the administrators for the Datashare UI.
 
 ## Requirements
 
