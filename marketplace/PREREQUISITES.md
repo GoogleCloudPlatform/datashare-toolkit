@@ -45,7 +45,14 @@ gcloud services enable container.googleapis.com runtimeconfig.googleapis.com clo
 * `Service account name` as `datashare-deployment-manager`
 * `Service account description` as `Datashare deployment manager`
 
-5. Select the `Editor`, `Security Admin`, `Kubernetes Admin`, `Role Administrator` (roles/iam.roleAdmin) roles.
+5. Select the following roles
+* `Security Admin`
+* `Kubernetes Admin` 
+* `Role Administrator` (roles/iam.roleAdmin)
+* `Service Useage Admin`
+* `Storage Admin`
+* `Project IAM Admin`
+* `Cloud Runtime Config Admin` (roles/runtimeconfig.admin)
 
 <img src="images/iam-assign-roles-to-sa.png" width="500"> 
 
