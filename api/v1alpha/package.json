@@ -17,12 +17,12 @@
         "uuid": "^3.3.3",
         "cds-shared": "file:../../shared",
         "jsonschema": "^1.2.6",
-        "firebase-admin": "^8.10.0",
+        "firebase-admin": "^9.3.0",
         "axios": "^0.19.2",
         "jsonwebtoken": "^8.5.1",
         "jwks-rsa": "^1.8.0",
         "ms": "^2.1.2",
-        "gcp-metadata": "^4.1.4"
+        "gcp-metadata": "^4.2.1"
     },
     "scripts": {
         "dev": "nodemon src/index.js",
