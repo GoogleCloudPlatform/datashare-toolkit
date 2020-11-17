@@ -2,6 +2,7 @@
 
 # Marketplace Integration
 * [Becoming a Marketplace vendor](#becoming_a_marketplace_vendor)
+* [Pre-requistites]($prerequisites)
 * [Creating your first solution](#creating_your_first_solution)
 * [Marketplace Concepts](#marketplace_concepts)
     * [Plans & Features](#plans_and_features)
@@ -10,6 +11,13 @@
 
 ## <a name="becoming_a_marketplace_vendor">Becoming a Marketplace vendor</a>
 In order to integrate Datashare with Google Cloud Marketplace, you must first sign up to become a [Google Cloud Marketplace vendor](https://cloud.google.com/marketplace/docs/partners). Once you have been approved as a partner you may then list your data solutions within Marketplace.
+
+## <a name="prerequisites">Pre-requistites</a>
+Enable the Cloud Commerce Procurement API:
+
+```
+gcloud services enable cloudcommerceprocurement.googleapis.com
+```
 
 ## <a name="creating_your_first_solution">Creating your first solution</a>
 In order to create a data solution in Google Cloud Marketplace and sell it, follow the instructions below:
