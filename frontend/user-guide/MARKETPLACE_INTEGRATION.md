@@ -28,8 +28,6 @@ gcloud services enable cloudcommerceprocurement.googleapis.com
     5. Click 'ADD MEMBER', enter the Datashare service account ds-api-mgr@[your_project_id].iam.gserviceaccount.com, and select role 'Billing' > 'Billing Account Adminstrator'.
     6. Click 'SAVE'.
 
-3. 
-
 ## <a name="creating_your_first_solution">Creating your first solution</a>
 In order to create a data solution in Google Cloud Marketplace and sell it, follow the instructions below:
 
