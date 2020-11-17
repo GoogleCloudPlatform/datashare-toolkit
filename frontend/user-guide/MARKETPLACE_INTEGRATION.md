@@ -2,7 +2,7 @@
 
 # Marketplace Integration
 * [Becoming a Marketplace vendor](#becoming_a_marketplace_vendor)
-* [Pre-requistites]($prerequisites)
+* [Pre-requistites](#prerequisites)
 * [Creating your first solution](#creating_your_first_solution)
 * [Marketplace Concepts](#marketplace_concepts)
     * [Plans & Features](#plans_and_features)
