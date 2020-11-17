@@ -2,6 +2,7 @@
 
 # Marketplace Integration
 * [Becoming a Marketplace vendor](#becoming_a_marketplace_vendor)
+* [Pre-requistites](#prerequisites)
 * [Creating your first solution](#creating_your_first_solution)
 * [Marketplace Concepts](#marketplace_concepts)
     * [Plans & Features](#plans_and_features)
@@ -10,6 +11,22 @@
 
 ## <a name="becoming_a_marketplace_vendor">Becoming a Marketplace vendor</a>
 In order to integrate Datashare with Google Cloud Marketplace, you must first sign up to become a [Google Cloud Marketplace vendor](https://cloud.google.com/marketplace/docs/partners). Once you have been approved as a partner you may then list your data solutions within Marketplace.
+
+## <a name="prerequisites">Pre-requistites</a>
+1. Enable the Cloud Commerce Procurement API:
+
+```
+gcloud services enable cloudcommerceprocurement.googleapis.com
+```
+
+2. Grant the Datashare service account billing account adminstrator access.
+
+    1. Go to the [GCP console](http://console.cloud.google.com/).
+    2. Select 'Billing' from the menu.
+    3. On the top right where it says 'Billing account', click the 'Manage' link.
+    4. If the Info panel is not showing on the right side, click 'SHOW INFO PANEL'.
+    5. Click 'ADD MEMBER', enter the Datashare service account ds-api-mgr@[your_project_id].iam.gserviceaccount.com, and select role 'Billing' > 'Billing Account Adminstrator'.
+    6. Click 'SAVE'.
 
 ## <a name="creating_your_first_solution">Creating your first solution</a>
 In order to create a data solution in Google Cloud Marketplace and sell it, follow the instructions below:
