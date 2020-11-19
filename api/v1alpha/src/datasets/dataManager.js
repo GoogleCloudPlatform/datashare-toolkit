@@ -74,6 +74,7 @@ async function listDatasets(projectId, includeAll) {
         const message = `Datasets do not exist with labelKey: '${labelKey}'`;
         return { success: false, code: 400, errors: [message] };
     }
+    
     return { success: true, data: datasets }
 }
 

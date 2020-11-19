@@ -160,7 +160,9 @@ async function setupDatasharePrerequisites(projectId) {
 
     if (await bigqueryUtil.datasetExists(cfg.cdsDatasetId) === false) {
         console.log('Creating datashare dataset');
-        const options = { description: 'Datashare Master Dataset' };
+        let labels = {};
+        labels[cfg.cdsMetadataLabelKey] = true;
+        const options = { description: 'Datashare Master Dataset', labels: labels };
         await bigqueryUtil.createDataset(cfg.cdsDatasetId, options);
     } else {
         console.log('Datashare dataset already exists');
