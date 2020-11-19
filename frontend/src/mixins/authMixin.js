@@ -47,7 +47,7 @@ export default {
       const name = 'home';
       if (this.$route.name !== name) {
         this.$router.replace({
-          name: 'home'
+          name: name
         });
       }
     }
