@@ -30,7 +30,6 @@ function notify(error) {
 
 const store = new Vuex.Store({
   state: {
-    settings: {},
     user: {
       loggedIn: false,
       data: null
@@ -59,10 +58,6 @@ const store = new Vuex.Store({
   },
 
   mutations: {
-    setSettings(state, settings) {
-      this._vm.$session.set('settings', settings);
-      state.settings = settings;
-    },
     setLoggedIn(state, value) {
       state.user.loggedIn = value;
     },
