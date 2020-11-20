@@ -87,6 +87,11 @@ async function listDatasets(projectId, includeAll) {
         return true;
     });
 
+    // Sort the list
+    result = underscore.sortBy(result, (item) => {
+        return item.datasetId.toLowerCase();
+    });
+
     return { success: true, data: result }
 }
 
