@@ -22,6 +22,7 @@ const uuidv4 = require('uuid/v4');
 const ConfigValidator = require('./views/configValidator');
 const sqlBuilder = require('./views/sqlBuilder');
 const cfg = require('../lib/config');
+const underscore = require("underscore");
 
 /**
  * @param  {string} projectId
@@ -74,8 +75,19 @@ async function listDatasets(projectId, includeAll) {
         const message = `Datasets do not exist with labelKey: '${labelKey}'`;
         return { success: false, code: 400, errors: [message] };
     }
-    
-    return { success: true, data: datasets }
+
+    let result = datasets.filter((d) => {
+        if (d.labels) {
+            for (const l of cfg.cdsExclusionLabels) {
+                if (underscore.has(d.labels, l)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    });
+
+    return { success: true, data: result }
 }
 
 /**
@@ -566,7 +578,7 @@ async function createView(view, overrideSql) {
                 await bigqueryUtil.shareAuthorizeView(cfg.cdsDatasetId, view.projectId, view.datasetId, view.name, viewCreated);
             }
         }
-        else if(view.hasOwnProperty('custom') && view.custom !== null) {
+        else if (view.hasOwnProperty('custom') && view.custom !== null) {
             // Custom sql
             let custom = view.custom;
             if (custom.authorizeFromDatasetIds && custom.authorizeFromDatasetIds.length > 0) {

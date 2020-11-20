@@ -715,20 +715,6 @@ class BigQueryUtil {
     }
 
     /**
-     * @param  {} labelFilter Provided in format 'labels.color:green'
-     * Lists all datasets in current GCP project, filtering by label.
-     * Not using currently for UI.
-     */
-    async getDatasetsByLabelFilter(labelFilter) {
-        const options = {
-            filter: labelFilter
-        };
-        const [datasets] = await this.bigqueryClient.getDatasets(options);
-        datasets.forEach(dataset => console.log(dataset.id));
-        return datasets.map(d => d.id);
-    }
-
-    /**
      * @param  {} labelKey
      */
     async getDatasetsByLabel(labelKey) {
