@@ -611,6 +611,7 @@ class BigQueryUtil {
             console.log(`${datasetId} labels:`);
             console.log(apiResponse.labels);
         }
+        return apiResponse;
     }
 
     /**
