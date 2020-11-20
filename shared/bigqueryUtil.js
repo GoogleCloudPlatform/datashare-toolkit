@@ -593,6 +593,26 @@ class BigQueryUtil {
         return null;
     }
 
+    async setDatasetLabel(datasetId, key, value) {
+        const dataset = this.bigqueryClient.dataset(datasetId);
+
+        // Retrieve current table metadata
+        const [metadata] = await dataset.getMetadata();
+
+        if (!metadata.labels) {
+            metadata.labels = {};
+        }
+
+        // Set label in table metadata
+        metadata.labels[key] = value;
+
+        const [apiResponse] = await dataset.setMetadata(metadata);
+        if (this.VERBOSE_MODE) {
+            console.log(`${datasetId} labels:`);
+            console.log(apiResponse.labels);
+        }
+    }
+
     /**
      * @param  {} datasetId
      * @param  {} tableId

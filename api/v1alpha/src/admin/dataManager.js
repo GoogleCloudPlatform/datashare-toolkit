@@ -166,6 +166,9 @@ async function setupDatasharePrerequisites(projectId) {
         await bigqueryUtil.createDataset(cfg.cdsDatasetId, options);
     } else {
         console.log('Datashare dataset already exists');
+        // Update existing dataset to add the label
+        // This can be split out later to an update process if we need to make bigger changes
+        await bigqueryUtil.setDatasetLabel(cfg.cdsDatasetId, cfg.cdsMetadataLabelKey, true);
     }
 
     if (await bigqueryUtil.tableExists(cfg.cdsDatasetId, cfg.cdsPolicyTableId) === false) {
