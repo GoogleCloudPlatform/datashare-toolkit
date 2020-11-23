@@ -22,6 +22,8 @@ config.verboseMode = false;
 config.productName = 'Datashare';
 config.productVersion = '0.0.1';
 config.cdsManagedLabelKey = 'datashare_managed';
+config.cdsMetadataLabelKey = 'datashare_metadata';
+config.cdsExclusionLabels = [config.cdsMetadataLabelKey];
 
 config.cdsDatasetId = "datashare";
 

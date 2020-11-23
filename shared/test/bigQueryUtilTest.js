@@ -153,6 +153,18 @@ describe('BigQueryUtil', () => {
                     });
                 });
             });
+
+            context('set and get label with arguments', () => {
+                it("should include new label", async () => {
+                    let testLabel = 'abcdef';
+                    await bigqueryUtil.setDatasetLabel(uuid, testLabel, false).then((result) => {
+                        console.log(`label result is: ${JSON.stringify(result)}`);
+                        expect(result.labels[testLabel]).is.equal('false');
+                    }).catch((reason) => {
+                        expect.fail(`Failed: ${reason}`);
+                    });
+                });
+            });
         });
 
         describe('Dataset and table created/deleted in pre/post setup', () => {

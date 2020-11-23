@@ -593,6 +593,27 @@ class BigQueryUtil {
         return null;
     }
 
+    async setDatasetLabel(datasetId, key, value) {
+        const dataset = this.bigqueryClient.dataset(datasetId);
+
+        // Retrieve current table metadata
+        const [metadata] = await dataset.getMetadata();
+
+        if (!metadata.labels) {
+            metadata.labels = {};
+        }
+
+        // Set label in table metadata
+        metadata.labels[key] = value;
+
+        const [apiResponse] = await dataset.setMetadata(metadata);
+        if (this.VERBOSE_MODE) {
+            console.log(`${datasetId} labels:`);
+            console.log(apiResponse.labels);
+        }
+        return apiResponse;
+    }
+
     /**
      * @param  {} datasetId
      * @param  {} tableId
@@ -692,20 +713,6 @@ class BigQueryUtil {
             throw err;
         }
         return true;
-    }
-
-    /**
-     * @param  {} labelFilter Provided in format 'labels.color:green'
-     * Lists all datasets in current GCP project, filtering by label.
-     * Not using currently for UI.
-     */
-    async getDatasetsByLabelFilter(labelFilter) {
-        const options = {
-            filter: labelFilter
-        };
-        const [datasets] = await this.bigqueryClient.getDatasets(options);
-        datasets.forEach(dataset => console.log(dataset.id));
-        return datasets.map(d => d.id);
     }
 
     /**
