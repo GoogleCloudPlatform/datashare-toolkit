@@ -20,6 +20,15 @@ Producer Portal can be accessed at: http://console.cloud.google.com/producer-por
 gcloud services enable cloudcommerceproducer.googleapis.com
 ```
 
+2. Grant the Datashare service account billing account adminstrator access.
+
+    1. Go to the [GCP console](http://console.cloud.google.com/).
+    2. Select 'Billing' from the menu.
+    3. On the top right where it says 'Billing account', click the 'Manage' link.
+    4. If the Info panel is not showing on the right side, click 'SHOW INFO PANEL'.
+    5. Click 'ADD MEMBER', enter the Datashare service account ds-api-mgr@[your_project_id].iam.gserviceaccount.com, and select role 'Billing' > 'Billing Account Adminstrator'.
+    6. Click 'SAVE'.
+
 ## Using Partner Portal (Legacy)
 Partner Portal can be accessed at: https://console.cloud.google.com/partner
 
@@ -63,7 +72,7 @@ In order to create a data solution in Google Cloud Marketplace and sell it, foll
 #### <a name="plans_and_features">Plans & Features</a>
 Marketplace has the concept of plans and features. Plans are the sellable item which include one or more features.
 
-<img src="./assets/marketplace_features.png" alt="Marketplace Features" height="150"/>
+<img src="./assets/partner_portal/marketplace_features.png" alt="Marketplace Features" height="150"/>
 
 ##### <a name="service_features">Service Features</a>
 A service feature can be included in multiple plans. When selling data through Marketplace, an example of a feature could be different types of data included in the same purchase. For example using baseball data, you may sell access to multiple views containing historical data for: game logs, ballparks, and team. You could define each as a feature, so we set up features for:
@@ -72,7 +81,7 @@ A service feature can be included in multiple plans. When selling data through M
 * Ballparks
 * Teams
 
-<img src="./assets/add_service_features.png" alt="Add Marketplace Service Features" height="150"/>
+<img src="./assets/partner_portal/add_service_features.png" alt="Add Marketplace Service Features" height="150"/>
 
 ##### <a name="service_plans">Service Plans</a>
 A service plan is a grouping of features that can be sold. Using the baseball data example above, you may decide to sell three different plans (tiers). For example:
@@ -83,10 +92,10 @@ A service plan is a grouping of features that can be sold. Using the baseball da
 
 When defining a plan, you will need to create a unique 'Service Level' identifier which will be used as the 'Plan Id' within the Datashare policy. This is how datashare will associate to a plan purchase.
 
-<img src="./assets/add_service_plans.png" alt="Add Marketplace Service Plans" height="200"/>
+<img src="./assets/partner_portal/add_service_plans.png" alt="Add Marketplace Service Plans" height="200"/>
 
 Once you've finished configuring plans, you can review the matrix that was generated for 'Features & pricing'.
 
-<img src="./assets/features_and_pricing.png" alt="Marketplace Features and Pricing" height="150"/>
+<img src="./assets/partner_portal/features_and_pricing.png" alt="Marketplace Features and Pricing" height="150"/>
 
 This is similar to the view that your potential customers will see when they're shopping Google Cloud Marketplace and are viewing your solution.
