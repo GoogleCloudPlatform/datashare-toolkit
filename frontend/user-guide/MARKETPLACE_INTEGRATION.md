@@ -13,14 +13,16 @@
 In order to integrate Datashare with Google Cloud Marketplace, you must first sign up to become a [Google Cloud Marketplace vendor](https://cloud.google.com/marketplace/docs/partners). Once you have been approved as a partner you may then list your data solutions within Marketplace.
 
 ## Using Producer Portal
+Producer Portal can be accessed at: http://console.cloud.google.com/producer-portal
 
 1. Enable the Cloud Commerce Producer API:
 ```
 gcloud services enable cloudcommerceproducer.googleapis.com
 ```
 
-
 ## Using Partner Portal (Legacy)
+Partner Portal can be accessed at: https://console.cloud.google.com/partner
+
 ### <a name="prerequisites">Pre-requistites</a>
 1. Enable the Cloud Commerce Procurement API:
 
