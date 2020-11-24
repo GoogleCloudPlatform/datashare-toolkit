@@ -46,3 +46,35 @@ In order to create a data solution in Google Cloud Marketplace and sell it, foll
 13. Link the Datashare service account for both the 'Partner Procurement API integration' and the 'Cloud Pub/Sub integration'. IE: ds-api-mgr@[YOUR_PROJECT_ID].iam.gserviceaccount.com. Click 'NEXT'.
 14. For the Sign up URL, use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/accounts:register```
 15. Leave SSO Login disabled, for the 'Login URL', use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/procurements:myProducts```, and click 'SUBMIT'.
+
+### <a name="producer_portal_marketplace_concepts">Marketplace Concepts</a>
+#### <a name="producer_portal_plans_and_features">Plans & Features</a>
+Marketplace has the concept of plans and features. Plans are the sellable item which include one or more features.
+
+<img src="./assets/partner_portal/marketplace_features.png" alt="Marketplace Features" height="150"/>
+
+##### <a name="producer_portal_service_features">Service Features</a>
+A service feature can be included in multiple plans. When selling data through Marketplace, an example of a feature could be different types of data included in the same purchase. For example using baseball data, you may sell access to multiple views containing historical data for: game logs, ballparks, and team. You could define each as a feature, so we set up features for:
+
+* Game Logs
+* Ballparks
+* Teams
+
+<img src="./assets/partner_portal/add_service_features.png" alt="Add Marketplace Service Features" height="150"/>
+
+##### <a name="producer_portal_service_plans">Service Plans</a>
+A service plan is a grouping of features that can be sold. Using the baseball data example above, you may decide to sell three different plans (tiers). For example:
+
+* Bronze
+* Silver
+* Gold
+
+When defining a plan, you will need to create a unique 'Service Level' identifier which will be used as the 'Plan Id' within the Datashare policy. This is how datashare will associate to a plan purchase.
+
+<img src="./assets/partner_portal/add_service_plans.png" alt="Add Marketplace Service Plans" height="200"/>
+
+Once you've finished configuring plans, you can review the matrix that was generated for 'Features & pricing'.
+
+<img src="./assets/partner_portal/features_and_pricing.png" alt="Marketplace Features and Pricing" height="150"/>
+
+This is similar to the view that your potential customers will see when they're shopping Google Cloud Marketplace and are viewing your solution.
