@@ -51,7 +51,7 @@ In order to create a data solution in Google Cloud Marketplace and sell it, foll
 #### <a name="producer_portal_plans_and_features">Plans & Features</a>
 Marketplace has the concept of plans and features. Plans are the sellable item which include one or more features.
 
-<img src="./assets/partner_portal/marketplace_features.png" alt="Marketplace Features" height="150"/>
+<img src="./assets/producer_portal/pricing_features.png" alt="Marketplace Features" height="150"/>
 
 ##### <a name="producer_portal_service_features">Service Features</a>
 A service feature can be included in multiple plans. When selling data through Marketplace, an example of a feature could be different types of data included in the same purchase. For example using baseball data, you may sell access to multiple views containing historical data for: game logs, ballparks, and team. You could define each as a feature, so we set up features for:
