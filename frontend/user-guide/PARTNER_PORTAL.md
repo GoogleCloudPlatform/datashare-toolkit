@@ -2,12 +2,12 @@
 
 # Partner Portal Integration
 * [Using Partner Portal](#partner_portal)
-    * [Pre-requistites](#partner_portal_prerequisites)
-    * [Creating your first solution](#partner_portal_creating_your_first_solution)
-        * [Marketplace Concepts](#partner_portal_marketplace_concepts)
-            * [Plans & Features](#partner_portal_plans_and_features)
-                * [Service Features](#partner_portal_service_features)
-                * [Service Plans](#partner_portal_service_plans)
+* [Pre-requistites](#partner_portal_prerequisites)
+* [Creating your first solution](#partner_portal_creating_your_first_solution)
+    * [Marketplace Concepts](#partner_portal_marketplace_concepts)
+        * [Plans & Features](#partner_portal_plans_and_features)
+            * [Service Features](#partner_portal_service_features)
+            * [Service Plans](#partner_portal_service_plans)
 
 ## <a name="partner_portal">Using Partner Portal</a>
 Partner Portal can be accessed at: https://console.cloud.google.com/partner

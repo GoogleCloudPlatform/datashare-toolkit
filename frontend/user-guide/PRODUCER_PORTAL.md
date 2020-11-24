@@ -2,12 +2,12 @@
 
 # Producer Portal Integration
 * [Using Producer Portal](#producer_portal)
-    * [Pre-requistites](#producer_portal_prerequisites)
-    * [Creating your first solution](#producer_portal_creating_your_first_solution)
-        * [Marketplace Concepts](#producer_portal_marketplace_concepts)
-            * [Plans & Features](#producer_portal_plans_and_features)
-                * [Service Features](#producer_portal_service_features)
-                * [Service Plans](#producer_portal_service_plans)
+* [Pre-requistites](#producer_portal_prerequisites)
+* [Creating your first solution](#producer_portal_creating_your_first_solution)
+    * [Marketplace Concepts](#producer_portal_marketplace_concepts)
+        * [Plans & Features](#producer_portal_plans_and_features)
+            * [Service Features](#producer_portal_service_features)
+            * [Service Plans](#producer_portal_service_plans)
 
 ## <a name="producer_portal">Using Producer Portal</a>
 Producer Portal can be accessed at: https://console.cloud.google.com/producer-portal
