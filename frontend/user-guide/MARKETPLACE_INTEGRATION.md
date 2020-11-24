@@ -18,7 +18,7 @@
                 * [Service Plans](#partner_portal_service_plans)
 
 ## <a name="becoming_a_marketplace_vendor">Becoming a Marketplace vendor</a>
-In order to integrate Datashare with Google Cloud Marketplace, you must first sign up to become a [Google Cloud Marketplace vendor](https://cloud.google.com/marketplace/docs/partners). Once you have been approved as a partner you may then list your data solutions within Marketplace.
+In order to integrate Datashare with Google Cloud Marketplace, you must first sign up to become a [Google Cloud Marketplace vendor](https://cloud.google.com/marketplace/docs/partners). Once you have been approved as a partner you may then list your data solutions within Marketplace. The on-boarding team will provide you with access to the Producer Portal or the Partner Portal which you will use to create your marketplace solutions.
 
 ## <a name="producer_portal">Using Producer Portal</a>
 Producer Portal can be accessed at: https://console.cloud.google.com/producer-portal
