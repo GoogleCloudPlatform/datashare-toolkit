@@ -2,17 +2,25 @@
 
 # Marketplace Integration
 * [Becoming a Marketplace vendor](#becoming_a_marketplace_vendor)
-* [Pre-requistites](#prerequisites)
-* [Creating your first solution](#creating_your_first_solution)
-* [Marketplace Concepts](#marketplace_concepts)
-    * [Plans & Features](#plans_and_features)
-        * [Service Features](#service_features)
-        * [Service Plans](#service_plans)
+* [Using Producer Portal](#producer_portal)
+    * [Pre-requistites](#producer_portal_prerequisites)
+    * [Creating your first solution](#producer_portal_creating_your_first_solution)
+        * [Marketplace Concepts](#producer_portal_marketplace_concepts)
+            * [Plans & Features](#producer_portal_plans_and_features)
+                * [Service Features](#producer_portal_service_features)
+                * [Service Plans](#producer_portal_service_plans)
+* [Using Partner Portal](#partner_portal)
+    * [Pre-requistites](#partner_portal_prerequisites)
+    * [Creating your first solution](#partner_portal_creating_your_first_solution)
+        * [Marketplace Concepts](#partner_portal_marketplace_concepts)
+            * [Plans & Features](#partner_portal_plans_and_features)
+                * [Service Features](#partner_portal_service_features)
+                * [Service Plans](#partner_portal_service_plans)
 
 ## <a name="becoming_a_marketplace_vendor">Becoming a Marketplace vendor</a>
 In order to integrate Datashare with Google Cloud Marketplace, you must first sign up to become a [Google Cloud Marketplace vendor](https://cloud.google.com/marketplace/docs/partners). Once you have been approved as a partner you may then list your data solutions within Marketplace.
 
-## Using Producer Portal
+## <a name="producer_portal">Using Producer Portal</a>
 Producer Portal can be accessed at: https://console.cloud.google.com/producer-portal
 
 1. Enable the Cloud Commerce Producer API:
@@ -29,7 +37,7 @@ gcloud services enable cloudcommerceproducer.googleapis.com
     5. Click 'ADD MEMBER', enter the Datashare service account ds-api-mgr@[your_project_id].iam.gserviceaccount.com, and select role 'Billing' > 'Billing Account Adminstrator'.
     6. Click 'SAVE'.
 
-### <a name="creating_your_first_solution">Creating your first solution</a>
+### <a name="producer_portal_creating_your_first_solution">Creating your first solution</a>
 In order to create a data solution in Google Cloud Marketplace and sell it, follow the instructions below:
 
 1. Go to [Producer Portal](https://console.cloud.google.com/producer-portal).
@@ -49,10 +57,10 @@ In order to create a data solution in Google Cloud Marketplace and sell it, foll
 14. For the Sign up URL, use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/accounts:register```
 15. Leave SSO Login disabled, for the 'Login URL', use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/procurements:myProducts```, and click 'SUBMIT'.
 
-## Using Partner Portal (Legacy)
+## <a name="partner_portal">Using Partner Portal</a>
 Partner Portal can be accessed at: https://console.cloud.google.com/partner
 
-### <a name="prerequisites">Pre-requistites</a>
+### <a name="partner_portal_prerequisites">Pre-requistites</a>
 1. Enable the Cloud Commerce Procurement API:
 
 ```
@@ -68,7 +76,7 @@ gcloud services enable cloudcommerceprocurement.googleapis.com
     5. Click 'ADD MEMBER', enter the Datashare service account ds-api-mgr@[your_project_id].iam.gserviceaccount.com, and select role 'Billing' > 'Billing Account Adminstrator'.
     6. Click 'SAVE'.
 
-### <a name="creating_your_first_solution">Creating your first solution</a>
+### <a name="partner_portal_creating_your_first_solution">Creating your first solution</a>
 In order to create a data solution in Google Cloud Marketplace and sell it, follow the instructions below:
 
 1. Go to [Partner Portal](https://console.cloud.google.com/partner/solutions).
@@ -88,13 +96,13 @@ In order to create a data solution in Google Cloud Marketplace and sell it, foll
 8. Go to the Datashare 'Policies' UI. In the examples below we defined three service plans. To support three service plans defined in the Google Cloud Marketplace Solution, we will need to [create](./POLICIES.md/#creating_a_policy) three separate Datashare policies.
 9. Within each policy, scroll down to the 'Marketplace' section and enter in the 'Solution Id' and the 'Plan Id' (Service Level) that you defined in the services and plans section of partner portal. The 'Solution Id' was generated when you created a solution name in step 3. If you're unsure of what it is, load the [solutions](https://console.cloud.google.com/partner/solutions) page to check.
 
-### <a name="marketplace_concepts">Marketplace Concepts</a>
-#### <a name="plans_and_features">Plans & Features</a>
+### <a name="partner_portal_marketplace_concepts">Marketplace Concepts</a>
+#### <a name="partner_portal_plans_and_features">Plans & Features</a>
 Marketplace has the concept of plans and features. Plans are the sellable item which include one or more features.
 
 <img src="./assets/partner_portal/marketplace_features.png" alt="Marketplace Features" height="150"/>
 
-##### <a name="service_features">Service Features</a>
+##### <a name="partner_portal_service_features">Service Features</a>
 A service feature can be included in multiple plans. When selling data through Marketplace, an example of a feature could be different types of data included in the same purchase. For example using baseball data, you may sell access to multiple views containing historical data for: game logs, ballparks, and team. You could define each as a feature, so we set up features for:
 
 * Game Logs
@@ -103,7 +111,7 @@ A service feature can be included in multiple plans. When selling data through M
 
 <img src="./assets/partner_portal/add_service_features.png" alt="Add Marketplace Service Features" height="150"/>
 
-##### <a name="service_plans">Service Plans</a>
+##### <a name="partner_portal_service_plans">Service Plans</a>
 A service plan is a grouping of features that can be sold. Using the baseball data example above, you may decide to sell three different plans (tiers). For example:
 
 * Bronze
