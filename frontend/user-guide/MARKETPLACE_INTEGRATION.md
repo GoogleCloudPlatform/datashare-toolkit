@@ -33,7 +33,21 @@ gcloud services enable cloudcommerceproducer.googleapis.com
 In order to create a data solution in Google Cloud Marketplace and sell it, follow the instructions below:
 
 1. Go to [Producer Portal](https://console.cloud.google.com/producer-portal).
-2. 
+2. Click 'ADD PRODUCT'.
+3. 'SaaS' type will be selected by default.
+4. Enter a Product name and a Product ID and click 'CREATE'.
+5. Go to 'EDIT' for 'Product details review' and fill in the required product information and click 'NEXT'.
+6. Fill in the required documentation information and click 'NEXT'.
+7. Fill in the required product metadata information and click 'SUBMIT'.
+8. Go to 'Pricing' and set up your pricing plan structure. Once completed, click 'SETUP'.
+    * Note that Datashare only supports Pricing options of 'Free' and 'Subscription'. Usage is not supported by Datashare.
+9. Go to the 'FEATURES' tab, and enter in the features applicable to each plan, then click 'NEXT'.
+10. Fill in the required tax category information, and click 'NEXT'.
+11. Click 'SUBMIT'.
+12. Go to the 'Technical integration' menu item.
+13. Link the Datashare service account for both the 'Partner Procurement API integration' and the 'Cloud Pub/Sub integration'. IE: ds-api-mgr@[YOUR_PROJECT_ID].iam.gserviceaccount.com. Click 'NEXT'.
+14. For the Sign up URL, use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/accounts:register```
+15. Leave SSO Login disabled, for the 'Login URL', use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/procurements:myProducts```, and click 'SUBMIT'.
 
 ## Using Partner Portal (Legacy)
 Partner Portal can be accessed at: https://console.cloud.google.com/partner
