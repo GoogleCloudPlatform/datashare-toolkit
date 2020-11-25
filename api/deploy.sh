@@ -53,7 +53,7 @@ export SERVICE_ACCOUNT_NAME=ds-api-mgr;
 CLUSTER=datashare
 gcloud config set compute/zone $ZONE
 
-gcloud alpha run deploy ds-api \
+gcloud beta run deploy ds-api \
   --cluster $CLUSTER \
   --cluster-location $ZONE \
   --min-instances 1 \
@@ -61,6 +61,13 @@ gcloud alpha run deploy ds-api \
   --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
   --platform gke \
   --service-account ${SERVICE_ACCOUNT_NAME}
+
+gcloud run services update-traffic ds-api \
+    --cluster $CLUSTER \
+    --cluster-location $ZONE \
+    --to-latest \
+    --namespace $NAMESPACE \
+    --platform gke
 
 gcloud container clusters get-credentials $CLUSTER
 kubectl config current-context
