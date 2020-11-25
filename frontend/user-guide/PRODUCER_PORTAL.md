@@ -48,8 +48,13 @@ In order to create a data solution in Google Cloud Marketplace and sell it, foll
 14. For the Sign up URL, use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/accounts:register```
 15. Leave SSO Login disabled, for the 'Login URL', use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/procurements:myProducts```, and click 'SUBMIT'.
 
-### <a name="producer_portal_link_policy">Modify Datashare Policy</a>
-TODO
+### <a name="producer_portal_link_policy">Link Datashare Policy</a>
+In order Marketplace purchases to work, you need to associate marketplace pricing plans to Datashare policies. There are two fields within the Datashare policy form to link a Marketplace solution, they are Solution Id and Plan Id.
+
+You can find the Solution Id 
+The Solution Id can be found on the 'Overview' page of the Producer Portal in the products section, denoted by 'ID'. You can also find it within a solution on the 'Technical integration' page in the 'Product level identifier' section.
+
+Once a plan is defined, a unique 'Service Level' identifier will be generated which will be used as the 'Plan Id' within the Datashare policy. This is how datashare will associate to a plan purchase. To find the plan level identifiers, click the 'Technical integration' menu item and you will find the plan level identifiers in the 'Plan level identifier' section.
 
 ### <a name="producer_portal_marketplace_concepts">Marketplace Concepts</a>
 #### <a name="producer_portal_plans_and_features">Plans & Features</a>
@@ -72,8 +77,6 @@ A service plan is a grouping of features that can be sold. Using the baseball da
 * Bronze
 * Silver
 * Gold
-
-Once a plan is defined, a unique 'Service Level' identifier will be generated which will be used as the 'Plan Id' within the Datashare policy. This is how datashare will associate to a plan purchase. To find the service level identifiers, click the 'Technical integration' menu item and you will find the service level identifiers in the 'Plan level identifier' section.
 
 <img src="./assets/partner_portal/add_service_plans.png" alt="Add Marketplace Service Plans" height="200"/>
 
