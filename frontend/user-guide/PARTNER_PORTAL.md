@@ -50,7 +50,12 @@ In order to create a data solution in Google Cloud Marketplace and sell it, foll
 9. Within each policy, scroll down to the 'Marketplace' section and enter in the 'Solution Id' and the 'Plan Id' (Service Level) that you defined in the services and plans section of partner portal. The 'Solution Id' was generated when you created a solution name in step 3. If you're unsure of what it is, load the [solutions](https://console.cloud.google.com/partner/solutions) page to check.
 
 ### <a name="partner_portal_link_policy">Link Datashare Policy</a>
-TODO
+In order Marketplace purchases to work, you need to associate marketplace pricing plans to Datashare policies. There are two fields within the Datashare policy form to link a Marketplace solution, they are Solution Id and Plan Id.
+
+You can find the Solution Id 
+The Solution Id can be found on the [Solutions](https://console.cloud.google.com/partner/solutions) page of the Partner Portal.
+
+The Plan Id (otherwise known as the 'Service Level') is defined within the pricing plan section of a solution.
 
 ### <a name="partner_portal_marketplace_concepts">Marketplace Concepts</a>
 #### <a name="partner_portal_plans_and_features">Plans & Features</a>
@@ -83,4 +88,3 @@ Once you've finished configuring plans, you can review the matrix that was gener
 <img src="./assets/partner_portal/features_and_pricing.png" alt="Marketplace Features and Pricing" height="150"/>
 
 This is similar to the view that your potential customers will see when they're shopping Google Cloud Marketplace and are viewing your solution.
-
