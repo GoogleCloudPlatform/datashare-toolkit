@@ -54,7 +54,11 @@ In order Marketplace purchases to work, you need to associate marketplace pricin
 You can find the Solution Id 
 The Solution Id can be found on the 'Overview' page of the Producer Portal in the products section, denoted by 'ID'. You can also find it within a solution on the 'Technical integration' page in the 'Product level identifier' section.
 
+<img src="./assets/producer_portal/products_in_progress.png" alt="Products in Progress" height="150"/>
+
 Once a plan is defined, a unique 'Service Level' identifier will be generated which will be used as the 'Plan Id' within the Datashare policy. This is how datashare will associate to a plan purchase. To find the plan level identifiers, click the 'Technical integration' menu item and you will find the plan level identifiers in the 'Plan level identifier' section.
+
+<img src="./assets/producer_portal/plan_level_identifiers.png" alt="Plan level identifiers" height="150"/>
 
 ### <a name="producer_portal_marketplace_concepts">Marketplace Concepts</a>
 #### <a name="producer_portal_plans_and_features">Plans & Features</a>
