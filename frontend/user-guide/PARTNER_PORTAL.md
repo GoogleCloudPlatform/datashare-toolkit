@@ -4,10 +4,11 @@
 * [Using Partner Portal](#partner_portal)
 * [Pre-requistites](#partner_portal_prerequisites)
 * [Creating your first solution](#partner_portal_creating_your_first_solution)
-    * [Marketplace Concepts](#partner_portal_marketplace_concepts)
-        * [Plans & Features](#partner_portal_plans_and_features)
-            * [Service Features](#partner_portal_service_features)
-            * [Service Plans](#partner_portal_service_plans)
+* [Link Datashare Policy](#partner_portal_link_policy)
+* [Marketplace Concepts](#partner_portal_marketplace_concepts)
+    * [Plans & Features](#partner_portal_plans_and_features)
+        * [Service Features](#partner_portal_service_features)
+        * [Service Plans](#partner_portal_service_plans)
 
 ## <a name="partner_portal">Using Partner Portal</a>
 Partner Portal can be accessed at: https://console.cloud.google.com/partner
@@ -48,6 +49,9 @@ In order to create a data solution in Google Cloud Marketplace and sell it, foll
 8. Go to the Datashare 'Policies' UI. In the examples below we defined three service plans. To support three service plans defined in the Google Cloud Marketplace Solution, we will need to [create](./POLICIES.md/#creating_a_policy) three separate Datashare policies.
 9. Within each policy, scroll down to the 'Marketplace' section and enter in the 'Solution Id' and the 'Plan Id' (Service Level) that you defined in the services and plans section of partner portal. The 'Solution Id' was generated when you created a solution name in step 3. If you're unsure of what it is, load the [solutions](https://console.cloud.google.com/partner/solutions) page to check.
 
+### <a name="partner_portal_link_policy">Link Datashare Policy</a>
+TODO
+
 ### <a name="partner_portal_marketplace_concepts">Marketplace Concepts</a>
 #### <a name="partner_portal_plans_and_features">Plans & Features</a>
 Marketplace has the concept of plans and features. Plans are the sellable item which include one or more features.
@@ -79,3 +83,4 @@ Once you've finished configuring plans, you can review the matrix that was gener
 <img src="./assets/partner_portal/features_and_pricing.png" alt="Marketplace Features and Pricing" height="150"/>
 
 This is similar to the view that your potential customers will see when they're shopping Google Cloud Marketplace and are viewing your solution.
+

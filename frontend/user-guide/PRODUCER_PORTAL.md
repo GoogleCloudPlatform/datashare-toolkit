@@ -4,10 +4,11 @@
 * [Using Producer Portal](#producer_portal)
 * [Pre-requistites](#producer_portal_prerequisites)
 * [Creating your first solution](#producer_portal_creating_your_first_solution)
-    * [Marketplace Concepts](#producer_portal_marketplace_concepts)
-        * [Plans & Features](#producer_portal_plans_and_features)
-            * [Service Features](#producer_portal_service_features)
-            * [Service Plans](#producer_portal_service_plans)
+* [Link Datashare Policy](#producer_portal_link_policy)
+* [Marketplace Concepts](#producer_portal_marketplace_concepts)
+    * [Plans & Features](#producer_portal_plans_and_features)
+        * [Service Features](#producer_portal_service_features)
+        * [Service Plans](#producer_portal_service_plans)
 
 ## <a name="producer_portal">Using Producer Portal</a>
 Producer Portal can be accessed at: https://console.cloud.google.com/producer-portal
@@ -46,6 +47,9 @@ In order to create a data solution in Google Cloud Marketplace and sell it, foll
 13. Link the Datashare service account for both the 'Partner Procurement API integration' and the 'Cloud Pub/Sub integration'. IE: ds-api-mgr@[YOUR_PROJECT_ID].iam.gserviceaccount.com. Click 'NEXT'.
 14. For the Sign up URL, use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/accounts:register```
 15. Leave SSO Login disabled, for the 'Login URL', use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/procurements:myProducts```, and click 'SUBMIT'.
+
+### <a name="producer_portal_link_policy">Modify Datashare Policy</a>
+TODO
 
 ### <a name="producer_portal_marketplace_concepts">Marketplace Concepts</a>
 #### <a name="producer_portal_plans_and_features">Plans & Features</a>
