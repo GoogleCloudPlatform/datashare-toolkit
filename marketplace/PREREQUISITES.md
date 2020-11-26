@@ -22,10 +22,10 @@ Note you can only enable the Producer API (cloudcommerceproducer.googleapis.com)
 3. [Enable the Cloud Build API from Cloud Console](https://console.cloud.google.com/apis/library/cloudbuild.googleapis.com)
 4. Enable the Marketplace API
     * Producer Portal:
-        * [Enabling the Producer Portal API from Cloud Console](https://console.cloud.google.com/apis/library/cloudcommerceproducer.googleapis.com)
+        * [Enable the Cloud Commerce Producer API from Cloud Console](https://console.cloud.google.com/apis/library/cloudcommerceproducer.googleapis.com)
         * See [Producer Portal Pre-requistites](./../PRODUCER_PORTAL/#producer_portal_prerequisites) for more information.
     * Partner Portal:
-        * [Enabling the Partner Portal Commerce API from Cloud Console](https://console.cloud.google.com/apis/library/cloudcommerceprocurement.googleapis.com)
+        * [Enable the Cloud Commerce Partner Procurement API from Cloud Console](https://console.cloud.google.com/apis/library/cloudcommerceprocurement.googleapis.com)
         * See [Partner Portal Pre-requistites](./../PARTNER_PORTAL/#partner_portal_prerequisites) for more information.
 
 ### From the command line
