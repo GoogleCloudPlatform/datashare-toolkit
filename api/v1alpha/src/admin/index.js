@@ -17,7 +17,6 @@
 'use strict';
 
 const express = require('express');
-
 const dataManager = require("./dataManager");
 
 /************************************************************
@@ -150,8 +149,8 @@ var admin = express.Router();
  */
 admin.post('/projects/:projectId/admin::custom', async (req, res) => {
     const projectId = req.params.projectId;
-    var data;
-    var code;
+    let data;
+    let code;
 
     switch (req.params.custom) {
         case "initSchema": {
