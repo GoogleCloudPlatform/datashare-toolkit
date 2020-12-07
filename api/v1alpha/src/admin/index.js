@@ -149,13 +149,13 @@ var admin = express.Router();
  *               $ref: '#/definitions/Error'
  */
 admin.post('/projects/:projectId/admin::custom', async (req, res) => {
-    var data;
     const projectId = req.params.projectId;
+    var data;
+    var code;
 
     switch (req.params.custom) {
-        case "initSchema":
+        case "initSchema": {
             data = await dataManager.initializeSchema(projectId);
-            var code;
             if (data && data.success === false) {
                 code = (data.code === undefined) ? 500 : data.code;
             } else {
@@ -165,7 +165,8 @@ admin.post('/projects/:projectId/admin::custom', async (req, res) => {
                 code: code,
                 ...data
             });
-        case "syncResources":
+        }
+        case "syncResources": {
             const syncType = req.body.type;
             if (!syncType) {
                 return res.status(400).json({
@@ -175,7 +176,6 @@ admin.post('/projects/:projectId/admin::custom', async (req, res) => {
                 });
             }
             data = await dataManager.syncResources(projectId, syncType);
-            var code;
             if (data && data.success === false) {
                 code = (data.code === undefined) ? 500 : data.code;
             } else {
@@ -185,6 +185,7 @@ admin.post('/projects/:projectId/admin::custom', async (req, res) => {
                 code: code,
                 ...data
             });
+        }
     }
 });
 
