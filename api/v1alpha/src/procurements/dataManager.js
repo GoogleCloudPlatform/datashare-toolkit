@@ -151,7 +151,6 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
                 // TODO: Get rid of this conversion
                 accountData.policies = accountData.policies.map(e => e.policyId);
                 accountData.createdBy = accountData.email;
-                console.log(`Updating account: ${JSON.stringify(accountData, null, 3)}`);
                 await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
             }
             return { success: true, data: result };
@@ -168,8 +167,12 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
     }
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} accountId
+ * @param  {} policyId
+ */
 async function removeEntitlement(projectId, accountId, policyId) {
-    console.log('removeEntitlement called');
     const account = await accountManager.getAccount(projectId, accountId);
     const policyRecord = { policyId: policyId };
     let accountData = account.data;
@@ -178,18 +181,15 @@ async function removeEntitlement(projectId, accountId, policyId) {
     if (found) {
         // Remove the matched policyId.
         policies = underscore.without(policies, underscore.findWhere(policies, policyRecord));
-
         const filtered = policies.filter(function (el) {
             return el != null && el.policyId.trim() !== '';
         });
-
         // TODO: Get rid of this conversion
         accountData.policies = filtered.map(e => e.policyId);
         accountData.createdBy = accountData.email;
-        console.log(`Updating account: ${JSON.stringify(accountData, null, 3)}`);
         await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
     } else {
-        console.warn(`Policy not found: '${policyId}', account '${accountId}' will not be updated.`);
+        console.error(`Policy not found: '${policyId}', account '${accountId}' will not be updated.`);
     }
 }
 
