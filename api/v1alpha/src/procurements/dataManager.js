@@ -272,6 +272,8 @@ async function cancelEntitlement(projectId, entitlementId) {
             const account = accountData.data;
             await removeEntitlement(projectId, account.accountId, policyData.data.policyId);
         }
+    } else {
+        console.error(`Policy not found for cancelled entitlementId: ${entitlementId}`);
     }
 }
 
