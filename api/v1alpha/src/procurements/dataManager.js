@@ -187,7 +187,7 @@ async function removeEntitlement(projectId, accountId, policyId) {
         accountData.policies = filtered.map(e => e.policyId);
         accountData.createdBy = accountData.email;
         console.log(`Updating account: ${JSON.stringify(accountData, null, 3)}`);
-        // await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
+        await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
     } else {
         console.warn(`Policy not found: '${policyId}', account '${accountId}' will not be updated.`);
     }
