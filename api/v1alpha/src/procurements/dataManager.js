@@ -245,6 +245,10 @@ async function autoApproveEntitlement(projectId, entitlementId) {
     }
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} entitlementId
+ */
 async function cancelEntitlement(projectId, entitlementId) {
     const procurementUtil = new CommerceProcurementUtil(projectId);
 
