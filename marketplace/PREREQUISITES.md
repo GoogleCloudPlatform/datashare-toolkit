@@ -13,14 +13,22 @@ solution automatically.
 
 Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud Run on Anthos Kubernetes by default.  
 
+To create solutions in the Marketplace you must also be a marketplace vendor. See [becoming a Marketplace vendor](./../frontend/user-guide/MARKETPLACE_INTEGRATION.md/#becoming_a_marketplace_vendor) for more information.
+
 ## Enable the APIs
-Note you can only enable the Commerce API (cloudcommerceprocurement.googleapis.com) if your project has been permissioned to the Partner Portal, otherwise you will need to enable this permission after you are provided with access to Partner Portal.
+Note you can only enable the Cloud Commerce Producer API (cloudcommerceproducer.googleapis.com) or the Cloud Commerce Partner Procurement API (cloudcommerceprocurement.googleapis.com) if your project has been permissioned to the Producer or Partner Portal, otherwise you will need to enable this permission after you are provided with access to Producer Portal Partner Portal.
 
 ### From Cloud Console
 1. [Enable the Kubernetes API from Cloud Console](https://console.cloud.google.com/apis/library/container.googleapis.com)
 2. [Enable the Runtime Config API from Cloud Console](https://console.cloud.google.com/apis/library/runtimeconfig.googleapis.com)
 3. [Enable the Cloud Build API from Cloud Console](https://console.cloud.google.com/apis/library/cloudbuild.googleapis.com)
-4. [Enable the Commerce API from Cloud Console](https://console.cloud.google.com/apis/library/cloudcommerceprocurement.googleapis.com)
+4. Enable the Marketplace API
+    * Producer Portal:
+        * [Enable the Cloud Commerce Producer API from Cloud Console](https://console.cloud.google.com/apis/library/cloudcommerceproducer.googleapis.com)
+        * See [Producer Portal Pre-requistites](./../PRODUCER_PORTAL/#producer_portal_prerequisites) for more information.
+    * Partner Portal:
+        * [Enable the Cloud Commerce Partner Procurement API from Cloud Console](https://console.cloud.google.com/apis/library/cloudcommerceprocurement.googleapis.com)
+        * See [Partner Portal Pre-requistites](./../PARTNER_PORTAL/#partner_portal_prerequisites) for more information.
 
 ### From the command line
 1.
