@@ -13,7 +13,7 @@ solution automatically.
 
 Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud Run on Anthos Kubernetes by default.  
 
-To create solutions in the Marketplace you must also be a [marketplace vendor](./../frontend/user-guide/MARKETPLACE_INTEGRATION.md/#becoming_a_marketplace_vendor).
+To create solutions in the Marketplace you must also be a marketplace vendor. See [Becoming a Marketplace vendor] for more information(./../frontend/user-guide/MARKETPLACE_INTEGRATION.md/#becoming_a_marketplace_vendor).
 
 ## Enable the APIs
 Note you can only enable the Cloud Commerce Producer API (cloudcommerceproducer.googleapis.com) or the Cloud Commerce Partner Procurement API (cloudcommerceprocurement.googleapis.com) if your project has been permissioned to the Producer or Partner Portal, otherwise you will need to enable this permission after you are provided with access to Producer Portal Partner Portal.
