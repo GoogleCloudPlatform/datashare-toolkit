@@ -151,7 +151,6 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
                 // TODO: Get rid of this conversion
                 accountData.policies = accountData.policies.map(e => e.policyId);
                 accountData.createdBy = accountData.email;
-                console.log(`Updating account: ${JSON.stringify(accountData, null, 3)}`);
                 await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
             }
             return { success: true, data: result };
@@ -165,6 +164,32 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
     } catch (err) {
         console.error(err);
         return { success: false, errors: ['Failed to approve entitlement', err] };
+    }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} accountId
+ * @param  {} policyId
+ */
+async function removeEntitlement(projectId, accountId, policyId) {
+    const account = await accountManager.getAccount(projectId, accountId);
+    const policyRecord = { policyId: policyId };
+    let accountData = account.data;
+    let policies = accountData.policies || [];
+    const found = underscore.findWhere(policies, policyRecord);
+    if (found) {
+        // Remove the matched policyId.
+        policies = underscore.without(policies, underscore.findWhere(policies, policyRecord));
+        const filtered = policies.filter(function (el) {
+            return el != null && el.policyId.trim() !== '';
+        });
+        // TODO: Get rid of this conversion
+        accountData.policies = filtered.map(e => e.policyId);
+        accountData.createdBy = accountData.email;
+        await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
+    } else {
+        console.error(`Policy not found: '${policyId}', account '${accountId}' will not be updated.`);
     }
 }
 
@@ -220,8 +245,41 @@ async function autoApproveEntitlement(projectId, entitlementId) {
     }
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} entitlementId
+ */
+async function cancelEntitlement(projectId, entitlementId) {
+    const procurementUtil = new CommerceProcurementUtil(projectId);
+
+    // Get the fully qualified entitlement resource name
+    const entitlementName = procurementUtil.getEntitlementName(projectId, entitlementId);
+
+    // Get the entitlement object from the procurement api
+    const entitlement = await procurementUtil.getEntitlement(entitlementName);
+    console.log(`Entitlement: ${JSON.stringify(entitlement, null, 3)}`);
+    const product = entitlement.product;
+    const plan = entitlement.plan;
+    const accountName = entitlement.account;
+
+    const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
+    console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
+    if (policyData.success === true) {
+        const accountData = await accountManager.findMarketplaceAccount(projectId, accountName);
+        console.log(`Account data: ${JSON.stringify(accountData, null, 3)}`);
+        if (accountData && accountData.success) {
+            console.log(`Account found, will now proceed to remove the entitlement`);
+            const account = accountData.data;
+            await removeEntitlement(projectId, account.accountId, policyData.data.policyId);
+        }
+    } else {
+        console.error(`Policy not found for cancelled entitlementId: ${entitlementId}`);
+    }
+}
+
 module.exports = {
     listProcurements,
     approveEntitlement,
-    autoApproveEntitlement
+    autoApproveEntitlement,
+    cancelEntitlement
 };
