@@ -768,6 +768,16 @@ Set the severity back to **warning** for the istio-proxy container:
 
     kubectl exec $(kubectl get pods -l serving.knative.dev/service=ds-api -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}') -n $NAMESPACE -c istio-proxy  -- curl -X POST "localhost:15000/logging?filter=warning&http=warning&jwt=warning" -s
 
+### "Could not refresh access token" Errors
+
+If you see the following error in the Cloud Run API service logs, you most likely have not
+set up the binding of the iam.workloadIdentityUser role for the KSA to GSA.
+
+```
+Could not refresh access token: A Not Found error was returned while attempting to retrieve an accesstoken for the Compute Engine built-in service account. This may be because the Compute Engine instance does not have any permission scopes specified: Could not refresh access token: Unsuccessful response status code. Request failed with status code 404
+```
+
+See the [Workload Identity](#workload-identity) section for more information.
 
 ## Contributing
 
