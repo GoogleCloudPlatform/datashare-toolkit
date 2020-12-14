@@ -309,14 +309,14 @@ export default {
         name: 'Cancelled',
         value: 'ENTITLEMENT_CANCELLED'
       },
-      /*{
+      {
         name: 'Pending Plan Change',
         value: 'ENTITLEMENT_PENDING_PLAN_CHANGE'
       },
       {
         name: 'Pending Plan Change Approval',
         value: 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'
-      },*/
+      },
       {
         name: 'Suspended',
         value: 'ENTITLEMENT_SUSPENDED'
