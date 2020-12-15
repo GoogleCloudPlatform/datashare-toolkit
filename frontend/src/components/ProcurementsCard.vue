@@ -159,7 +159,10 @@
                 <v-radio
                   v-if="
                     selectedItem.activated === true &&
-                      selectedItem.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'
+                      (selectedItem.state ===
+                        'ENTITLEMENT_ACTIVATION_REQUESTED' ||
+                        selectedItem.state ===
+                          'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL')
                   "
                   label="Approve"
                   value="approve"
@@ -436,11 +439,6 @@ export default {
       this.presentApprovalDialog(item, 'approve');
     },
     entitlementStateChanged() {
-      /*console.log(
-        `Entitlement state changed ${JSON.stringify(
-          this.selectedEntitlementStates
-        )}`
-      );*/
       this.loadProcurementRequests();
     }
   }
