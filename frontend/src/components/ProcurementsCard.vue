@@ -64,7 +64,13 @@
       <template v-slot:item.updateTime="{ item }">
         {{ toLocalTime(item.updateTime) }} </template
       ><template v-slot:item.action="{ item }">
-        <v-tooltip top v-if="item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'">
+        <v-tooltip
+          top
+          v-if="
+            item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED' ||
+              item.state === 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'
+          "
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
@@ -94,7 +100,8 @@
           top
           v-if="
             item.activated === true &&
-              item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'
+              (item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED' ||
+                item.state === 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL')
           "
         >
           <template v-slot:activator="{ on }">
