@@ -151,7 +151,11 @@
                   color="red"
                 ></v-radio>
                 <v-radio
-                  v-if="selectedItem.state !== 'ENTITLEMENT_CANCELLED'"
+                  v-if="
+                    selectedItem.state !== 'ENTITLEMENT_CANCELLED' &&
+                      selectedItem.state !==
+                        'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'
+                  "
                   label="Comment"
                   value="comment"
                   color="amber"
@@ -173,6 +177,10 @@
                 v-slot="{ errors }"
                 name="Comment"
                 rules="required"
+                v-if="
+                  approvalDialogData.approvalStatus == 'comment' ||
+                    approvalDialogData.approvalStatus == 'reject'
+                "
               >
                 <v-textarea
                   v-model="approvalDialogData.comment"
