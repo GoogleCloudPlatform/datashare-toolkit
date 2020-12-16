@@ -135,31 +135,36 @@ WHERE m.accountName IN UNNEST(@accountNames)`;
  * @param  {} reason Only provided for a rejection
  * @param  {} accountId The datashare accountId
  * @param  {} policyId The datashare policyId
+ * @param  {} state The current state of the entitlement
  */
-async function approveEntitlement(projectId, name, status, reason, accountId, policyId) {
+async function approveEntitlement(projectId, name, status, reason, accountId, policyId, state) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
-        if (status === 'approve') {
-            const result = await procurementUtil.approveEntitlement(name);
-            const account = await accountManager.getAccount(projectId, accountId);
-            const policyRecord = { policyId: policyId };
-            let accountData = account.data;
-            let policies = accountData.policies || [];
-            const found = underscore.findWhere(policies, policyRecord);
-            if (!found) {
-                policies.push(policyRecord);
-                // TODO: Get rid of this conversion
-                accountData.policies = accountData.policies.map(e => e.policyId);
-                accountData.createdBy = accountData.email;
-                await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
+        if (state === 'ENTITLEMENT_ACTIVATION_REQUESTED') {
+            if (status === 'approve') {
+                const result = await procurementUtil.approveEntitlement(name);
+                const account = await accountManager.getAccount(projectId, accountId);
+                const policyRecord = { policyId: policyId };
+                let accountData = account.data;
+                let policies = accountData.policies || [];
+                const found = underscore.findWhere(policies, policyRecord);
+                if (!found) {
+                    policies.push(policyRecord);
+                    // TODO: Get rid of this conversion
+                    accountData.policies = accountData.policies.map(e => e.policyId);
+                    accountData.createdBy = accountData.email;
+                    await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
+                }
+                return { success: true, data: result };
+            } else if (status === 'reject') {
+                const result = await procurementUtil.rejectEntitlement(name, reason);
+                return { success: true, data: result };
+            } else if (status === 'comment') {
+                const result = await procurementUtil.updateEntitlementMessage(name, reason);
+                return { success: true, data: result };
             }
-            return { success: true, data: result };
-        } else if (status === 'reject') {
-            const result = await procurementUtil.rejectEntitlement(name, reason);
-            return { success: true, data: result };
-        } else if (status === 'comment') {
-            const result = await procurementUtil.updateEntitlementMessage(name, reason);
-            return { success: true, data: result };
+        } else if (state === 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL') {
+            // Handle approval and rejection for plan change approval
         }
     } catch (err) {
         console.error(err);
