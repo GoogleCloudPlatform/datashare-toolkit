@@ -165,6 +165,15 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
             }
         } else if (state === 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL') {
             // Handle approval and rejection for plan change approval
+            if (status === 'approve') {
+                // Approve plan change, this would only be for a manual approve.
+                // An automated approval would be handled by a Pub/Sub notification.
+                // Remove user from current policy and add to new plan related policy.
+                // Re-factor removeEntitlement so that it doesn't call createOrUpdateAccount maybe, in order that we can remove and add using the same functions.
+            } else if (status === 'reject') {
+                // Reject plan change
+                // No need to do anything further, existing plan and policy relations will remain the same.
+            }
         }
     } catch (err) {
         console.error(err);
