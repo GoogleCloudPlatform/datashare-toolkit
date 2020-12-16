@@ -394,7 +394,8 @@ export default {
                 status: this.approvalDialogData.approvalStatus,
                 reason: this.approvalDialogData.comment,
                 accountId: this.selectedItem.accountId,
-                policyId: policyId
+                policyId: policyId,
+                state: this.selectedItem.state
               })
               .then(result => {
                 this.loading = false;
