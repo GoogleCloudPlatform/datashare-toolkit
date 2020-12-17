@@ -145,15 +145,14 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
                 const result = await procurementUtil.approveEntitlement(name);
                 const account = await accountManager.getAccount(projectId, accountId);
                 const policyRecord = { policyId: policyId };
-                let accountData = account.data;
-                let policies = accountData.policies || [];
+                let policies = account.policies || [];
                 const found = underscore.findWhere(policies, policyRecord);
                 if (!found) {
                     policies.push(policyRecord);
                     // TODO: Get rid of this conversion
-                    accountData.policies = accountData.policies.map(e => e.policyId);
-                    accountData.createdBy = accountData.email;
-                    await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
+                    account.policies = account.policies.map(e => e.policyId);
+                    account.createdBy = account.email;
+                    await accountManager.createOrUpdateAccount(projectId, accountId, account);
                 }
                 return { success: true, data: result };
             } else if (status === 'reject') {
@@ -212,6 +211,15 @@ function removeEntitlement(accountData, policyId) {
         console.error(`Policy not found: '${policyId}'`);
         return { changed: false, account: accountData };
     }
+}
+
+/**
+ * @param  {} accountData
+ * @param  {} policyId
+ */
+function addEntitlement(accountData, policyId) {
+    const policyRecord = { policyId: policyId };
+
 }
 
 /**
