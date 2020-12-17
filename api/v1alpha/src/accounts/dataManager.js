@@ -181,7 +181,8 @@ async function createOrUpdateAccount(projectId, accountId, data) {
     let _accountId = accountId;
 
     // If provided policies is not a string array, re-format it to string array
-    // TODO: clean up format before passing from UI
+    // TODO: Clean up format before passing from UI to eliminate this conversion
+    // From here policies are handled as an array until they're formatted for saving in BQ
     let policies = data.policies || [];
     if (policies && typeof policies[0] !== 'string') {
         data.policies = policies.map(p => { return p.policyId });
@@ -228,7 +229,7 @@ async function createOrUpdateAccount(projectId, accountId, data) {
     } else {
         // String array is passed in reformat for storing as dictionaries
         // Reformat for storing into BQ
-        data.policies = policies.map(p => { return { policyId: p }; });
+        data.policies = data.policies.map(p => { return { policyId: p }; });
     }
 
     let marketplace = data.marketplace || [];

@@ -305,6 +305,10 @@ async function initializePubSubListener() {
                         console.log(`Running cancellation for eventType: ${eventType}`);
                         const entitlement = data.entitlement;
                         await procurementManager.cancelEntitlement(projectId, entitlement.id)
+                    } else if (eventType === 'ENTITLEMENT_PLAN_CHANGE_REQUESTED') {
+                        // TODO: Implement call to auth approve
+                        const entitlement = data.entitlement;
+                        console.log(`ENTITLEMENT_PLAN_CHANGE_REQUESTED logic to be implemented: ${entitlement}`);
                     }
                     else {
                         console.debug(`Event type not implemented: ${eventType}`);

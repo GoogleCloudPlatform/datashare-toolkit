@@ -190,7 +190,8 @@ async function approveEntitlement(projectId, name, status, reason) {
                 const pendingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.newPendingPlan);
 
                 let updateOne = removeEntitlement(account, existingPolicy.policyId);
-                let updateTwo = addEntitlement(updateOne, pendingPolicy.policyId);
+                let updateTwo = addEntitlement(updateOne.account, pendingPolicy.policyId);
+
                 if (updateOne.changed === true || updateTwo.changed === true) {
                     await accountManager.createOrUpdateAccount(projectId, updateTwo.account.accountId, updateTwo.account);
                 }
@@ -218,13 +219,11 @@ function removeEntitlement(accountData, policyId) {
     let policies = accountData.policies || [];
     const found = underscore.findWhere(policies, policyRecord);
     if (found) {
-        // Remove the matched policyId
         policies = underscore.without(policies, underscore.findWhere(policies, policyRecord));
         const filtered = policies.filter(function (el) {
             return el != null && el.policyId.trim() !== '';
         });
-        // TODO: Get rid of this conversion
-        accountData.policies = filtered.map(e => e.policyId);
+        accountData.policies = filtered;
         accountData.createdBy = accountData.email;
         return { changed: true, account: accountData };
     } else {
@@ -243,8 +242,10 @@ function addEntitlement(accountData, policyId) {
     const found = underscore.findWhere(policies, policyRecord);
     if (!found) {
         policies.push(policyRecord);
-        // TODO: Get rid of this conversion
-        accountData.policies = accountData.policies.map(e => e.policyId);
+        const filtered = policies.filter(function (el) {
+            return el != null && el.policyId.trim() !== '';
+        });
+        accountData.policies = filtered;
         accountData.createdBy = accountData.email;
         return { changed: true, account: accountData };
     } else {
@@ -269,6 +270,9 @@ async function autoApproveEntitlement(projectId, entitlementId) {
     const product = entitlement.product;
     const plan = entitlement.plan;
     const accountName = entitlement.account;
+
+
+    // TODO: Handle state for plan change, and update as necessary.
 
     const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
     console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
