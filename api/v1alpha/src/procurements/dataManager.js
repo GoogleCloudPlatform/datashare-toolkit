@@ -135,31 +135,54 @@ WHERE m.accountName IN UNNEST(@accountNames)`;
  * @param  {} reason Only provided for a rejection
  * @param  {} accountId The datashare accountId
  * @param  {} policyId The datashare policyId
+ * @param  {} state The current state of the entitlement
  */
-async function approveEntitlement(projectId, name, status, reason, accountId, policyId) {
+async function approveEntitlement(projectId, name, status, reason, accountId, policyId, state) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
-        if (status === 'approve') {
-            const result = await procurementUtil.approveEntitlement(name);
-            const account = await accountManager.getAccount(projectId, accountId);
-            const policyRecord = { policyId: policyId };
-            let accountData = account.data;
-            let policies = accountData.policies || [];
-            const found = underscore.findWhere(policies, policyRecord);
-            if (!found) {
-                policies.push(policyRecord);
-                // TODO: Get rid of this conversion
-                accountData.policies = accountData.policies.map(e => e.policyId);
-                accountData.createdBy = accountData.email;
-                await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
+        if (state === 'ENTITLEMENT_ACTIVATION_REQUESTED') {
+            if (status === 'approve') {
+                const result = await procurementUtil.approveEntitlement(name);
+                const account = await accountManager.getAccount(projectId, accountId);
+                const policyRecord = { policyId: policyId };
+                let accountData = account.data;
+                let policies = accountData.policies || [];
+                const found = underscore.findWhere(policies, policyRecord);
+                if (!found) {
+                    policies.push(policyRecord);
+                    // TODO: Get rid of this conversion
+                    accountData.policies = accountData.policies.map(e => e.policyId);
+                    accountData.createdBy = accountData.email;
+                    await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
+                }
+                return { success: true, data: result };
+            } else if (status === 'reject') {
+                const result = await procurementUtil.rejectEntitlement(name, reason);
+                return { success: true, data: result };
+            } else if (status === 'comment') {
+                const result = await procurementUtil.updateEntitlementMessage(name, reason);
+                return { success: true, data: result };
             }
-            return { success: true, data: result };
-        } else if (status === 'reject') {
-            const result = await procurementUtil.rejectEntitlement(name, reason);
-            return { success: true, data: result };
-        } else if (status === 'comment') {
-            const result = await procurementUtil.updateEntitlementMessage(name, reason);
-            return { success: true, data: result };
+        } else if (state === 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL') {
+            // Handle approval and rejection for plan change approval
+            // Do an entitlement get to find the current plan name and the new pending name
+            // Parameter for getting the entitlement is the name: name.
+            const entitlement = await procurementUtil.getEntitlement(name);
+            // const currentPlan = entitlement.currentPlan;
+            const newPendingPlan = entitlement.newPendingPlan;
+            if (status === 'approve') {
+                // Approve plan change, this would only be for a manual approve.
+                // An automated approval would be handled by a Pub/Sub notification.
+                // Remove user from current policy and add to new plan related policy.
+                // Re-factor removeEntitlement so that it doesn't call createOrUpdateAccount maybe, in order that we can remove and add using the same functions.
+                // const result = await procurementUtil.approvePlanChange(name, newPendingPlan);
+                const result = {};
+                return { success: true, data: result };
+            } else if (status === 'reject') {
+                // No need to do anything further, existing plan and policy relations will remain the same.
+                const result = await procurementUtil.rejectPlanChange(name, newPendingPlan, reason);
+                return { success: true, data: result };
+            }
         }
     } catch (err) {
         console.error(err);
