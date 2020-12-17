@@ -145,18 +145,20 @@ WHERE m.accountName IN UNNEST(@accountNames)`;
  * @param  {} name Name of the entitlement resource
  * @param  {} status The approval status, should be one of ['approve', 'reject', 'comment']
  * @param  {} reason Only provided for a rejection
- * @param  {} accountId The datashare accountId
- * @param  {} policyId The datashare policyId
- * @param  {} state The current state of the entitlement
  */
-async function approveEntitlement(projectId, name, status, reason, accountId, policyId, state) {
+async function approveEntitlement(projectId, name, status, reason) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
+        const entitlement = await procurementUtil.getEntitlement(name);
+        const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
+        const product = entitlement.product;
+        const plan = entitlement.plan;
+        const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
+        const state = entitlement.state;
         if (state === 'ENTITLEMENT_ACTIVATION_REQUESTED') {
             if (status === 'approve') {
                 const result = await procurementUtil.approveEntitlement(name);
-                const account = await accountManager.getAccount(projectId, accountId);
-                const modifiedAccount = addEntitlement(account, policyId);
+                const modifiedAccount = addEntitlement(account, policy.policyId);
                 if (modifiedAccount.changed === true) {
                     await accountManager.createOrUpdateAccount(projectId, modifiedAccount.account.accountId, modifiedAccount.account);
                 }
@@ -172,7 +174,6 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
             // Handle approval and rejection for plan change approval
             // Do an entitlement get to find the current plan name and the new pending name
             // Parameter for getting the entitlement is the name: name.
-            const entitlement = await procurementUtil.getEntitlement(name);
             // const currentPlan = entitlement.currentPlan;
             const newPendingPlan = entitlement.newPendingPlan;
             if (status === 'approve') {

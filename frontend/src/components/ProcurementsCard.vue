@@ -399,10 +399,7 @@ export default {
                 projectId: config.projectId,
                 name: this.selectedItem.name,
                 status: this.approvalDialogData.approvalStatus,
-                reason: this.approvalDialogData.comment,
-                accountId: this.selectedItem.accountId,
-                policyId: policyId,
-                state: this.selectedItem.state
+                reason: this.approvalDialogData.comment
               })
               .then(result => {
                 this.loading = false;
