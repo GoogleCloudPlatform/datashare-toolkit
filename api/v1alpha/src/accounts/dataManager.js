@@ -309,9 +309,11 @@ async function getAccount(projectId, accountId, email, emailType) {
         } else {
             const message = `Account '${accountId}:${email}:${emailType}' does not exist within table: '${table}'`;
             console.warn(message);
+            return null;
         }
     } catch (err) {
         console.error(`Error in getAccount when searching for '${accountId}:${email}:${emailType}': ${err.message}`);
+        return null;
     }
 }
 
@@ -341,9 +343,11 @@ LIMIT ${limit}`;
         } else {
             const message = `Account '${accountName}' does not exist within table: '${table}'`;
             console.warn(message);
+            return null;
         }
     } catch (err) {
         console.error(`Error in findMarketplaceAccount when searching for '${accountName}': ${err.message}`);
+        return null;
     }
 }
 
