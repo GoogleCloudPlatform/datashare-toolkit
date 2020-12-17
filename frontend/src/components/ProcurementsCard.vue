@@ -6,8 +6,6 @@
       :items="procurementRequests"
       :search="search"
       :loading="loading"
-      :sort-by.sync="sortBy"
-      :sort-desc.sync="sortDesc"
     >
       <template v-slot:loading>
         <v-row justify="center" align="center">
@@ -66,13 +64,7 @@
       <template v-slot:item.updateTime="{ item }">
         {{ toLocalTime(item.updateTime) }} </template
       ><template v-slot:item.action="{ item }">
-        <v-tooltip
-          top
-          v-if="
-            item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED' ||
-              item.state === 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'
-          "
-        >
+        <v-tooltip top v-if="item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'">
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
@@ -102,8 +94,7 @@
           top
           v-if="
             item.activated === true &&
-              (item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED' ||
-                item.state === 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL')
+              item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'
           "
         >
           <template v-slot:activator="{ on }">
@@ -153,11 +144,7 @@
                   color="red"
                 ></v-radio>
                 <v-radio
-                  v-if="
-                    selectedItem.state !== 'ENTITLEMENT_CANCELLED' &&
-                      selectedItem.state !==
-                        'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'
-                  "
+                  v-if="selectedItem.state !== 'ENTITLEMENT_CANCELLED'"
                   label="Comment"
                   value="comment"
                   color="amber"
@@ -165,10 +152,7 @@
                 <v-radio
                   v-if="
                     selectedItem.activated === true &&
-                      (selectedItem.state ===
-                        'ENTITLEMENT_ACTIVATION_REQUESTED' ||
-                        selectedItem.state ===
-                          'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL')
+                      selectedItem.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'
                   "
                   label="Approve"
                   value="approve"
@@ -179,10 +163,6 @@
                 v-slot="{ errors }"
                 name="Comment"
                 rules="required"
-                v-if="
-                  approvalDialogData.approvalStatus == 'comment' ||
-                    approvalDialogData.approvalStatus == 'reject'
-                "
               >
                 <v-textarea
                   v-model="approvalDialogData.comment"
@@ -329,22 +309,20 @@ export default {
         name: 'Cancelled',
         value: 'ENTITLEMENT_CANCELLED'
       },
-      {
+      /*{
         name: 'Pending Plan Change',
         value: 'ENTITLEMENT_PENDING_PLAN_CHANGE'
       },
       {
         name: 'Pending Plan Change Approval',
         value: 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'
-      },
+      },*/
       {
         name: 'Suspended',
         value: 'ENTITLEMENT_SUSPENDED'
       }
     ],
-    selectedEntitlementStates: ['ENTITLEMENT_ACTIVATION_REQUESTED'],
-    sortBy: 'updateTime',
-    sortDesc: true
+    selectedEntitlementStates: ['ENTITLEMENT_ACTIVATION_REQUESTED']
   }),
   created() {
     this.loadProcurementRequests();
@@ -398,8 +376,7 @@ export default {
                 status: this.approvalDialogData.approvalStatus,
                 reason: this.approvalDialogData.comment,
                 accountId: this.selectedItem.accountId,
-                policyId: policyId,
-                state: this.selectedItem.state
+                policyId: policyId
               })
               .then(result => {
                 this.loading = false;
@@ -452,6 +429,11 @@ export default {
       this.presentApprovalDialog(item, 'approve');
     },
     entitlementStateChanged() {
+      /*console.log(
+        `Entitlement state changed ${JSON.stringify(
+          this.selectedEntitlementStates
+        )}`
+      );*/
       this.loadProcurementRequests();
     }
   }

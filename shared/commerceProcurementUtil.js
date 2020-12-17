@@ -278,9 +278,7 @@ class CommerceProcurementUtil {
         try {
             const res = await client.providers.entitlements.reject({
                 name: name,
-                requestBody: {
-                    reason: reason
-                }
+                reason: reason
             });
             if (this.VERBOSE_MODE) {
                 console.log(res.data);
@@ -302,58 +300,7 @@ class CommerceProcurementUtil {
         try {
             const res = await client.providers.entitlements.suspend({
                 name: name,
-                requestBody: {
-                    reason: reason
-                }
-            });
-            if (this.VERBOSE_MODE) {
-                console.log(res.data);
-            }
-            return res.data;
-        } catch (err) {
-            if (this.VERBOSE_MODE) {
-                console.warn(err);
-            }
-            throw err;
-        }
-    }
-
-    /**
-     * Approve an entitlement plan change that is in the EntitlementState.ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL state.
-     */
-    async approvePlanChange(name, pendingPlanName) {
-        const client = await this.getClient();
-        try {
-            const res = await client.providers.entitlements.approvePlanChange({
-                name: name,
-                requestBody: {
-                    pendingPlanName: pendingPlanName
-                }
-            });
-            if (this.VERBOSE_MODE) {
-                console.log(res.data);
-            }
-            return res.data;
-        } catch (err) {
-            if (this.VERBOSE_MODE) {
-                console.warn(err);
-            }
-            throw err;
-        }
-    }
-
-    /**
-     * Reject an entitlement plan change that is in the EntitlementState.ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL state.
-     */
-    async rejectPlanChange(name, pendingPlanName, reason) {
-        const client = await this.getClient();
-        try {
-            const res = await client.providers.entitlements.rejectPlanChange({
-                name: name,
-                requestBody: {
-                    reason: reason,
-                    pendingPlanName: pendingPlanName
-                }
+                reason: reason
             });
             if (this.VERBOSE_MODE) {
                 console.log(res.data);
