@@ -6,6 +6,8 @@
       :items="procurementRequests"
       :search="search"
       :loading="loading"
+      :sort-by.sync="sortBy"
+      :sort-desc.sync="sortDesc"
     >
       <template v-slot:loading>
         <v-row justify="center" align="center">
@@ -340,7 +342,9 @@ export default {
         value: 'ENTITLEMENT_SUSPENDED'
       }
     ],
-    selectedEntitlementStates: ['ENTITLEMENT_ACTIVATION_REQUESTED']
+    selectedEntitlementStates: ['ENTITLEMENT_ACTIVATION_REQUESTED'],
+    sortBy: 'updateTime',
+    sortDesc: true
   }),
   created() {
     this.loadProcurementRequests();
