@@ -301,8 +301,8 @@ accounts.get('/projects/:projectId/accounts/:accountId', async (req, res) => {
         code = (data.code === undefined) ? 200 : data.code;
     }
     res.status(code).json({
-        code: code,
-        ...data
+        code,
+        data
     });
 });
 

@@ -103,9 +103,8 @@ WHERE
 
         const accountManager = require('../accounts/dataManager');
         const account = await accountManager.getAccount(projectId, null, email, 'user');
-        if (account.success) {
-            const accountData = account.data;
-            const accountNames = accountData.marketplace.map(e => e.accountName);
+        if (account) {
+            const accountNames = account.marketplace.map(e => e.accountName);
             if (accountNames && accountNames.length > 0) {
                 const procurementUtil = new CommerceProcurementUtil(projectId);
                 let accountFilter = '';
