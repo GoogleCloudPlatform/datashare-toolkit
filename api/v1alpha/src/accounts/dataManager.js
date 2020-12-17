@@ -169,6 +169,10 @@ async function listAccounts(projectId, datasetId, policyId) {
         const message = `Accounts do not exist within table: '${table}'`;
         return { success: false, code: 400, errors: [message] };
     }
+
+    // TODO: https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/397
+    // Query for all 'Active' entitlements, and match them off using the accountName.
+    // If a match is not found, pass an indicator to display this in the policy schema.
 }
 
 /**
