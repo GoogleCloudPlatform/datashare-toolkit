@@ -169,7 +169,9 @@ export default {
   },
   computed: {
     hasPolicyChanges() {
+      // TODO: https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/398
       console.log(this.initialSelectedPolicies);
+      console.log(this.user.policies);
       let added = [];
       let removed = [];
       if (
