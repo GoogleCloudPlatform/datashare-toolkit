@@ -202,7 +202,7 @@ async function removeEntitlement(projectId, accountId, policyId) {
     let policies = accountData.policies || [];
     const found = underscore.findWhere(policies, policyRecord);
     if (found) {
-        // Remove the matched policyId.
+        // Remove the matched policyId
         policies = underscore.without(policies, underscore.findWhere(policies, policyRecord));
         const filtered = policies.filter(function (el) {
             return el != null && el.policyId.trim() !== '';
@@ -233,10 +233,9 @@ async function autoApproveEntitlement(projectId, entitlementId) {
     const plan = entitlement.plan;
     const accountName = entitlement.account;
 
-    const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
-    console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
-    if (policyData && policyData.success === true && policyData.data.marketplace) {
-        const policy = policyData.data;
+    const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
+    console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
+    if (policy && policy.marketplace) {
         const enableAutoApprove = policy.marketplace.enableAutoApprove;
         if (enableAutoApprove === true) {
             console.log(`Auto approve is enabled for policy ${policy.policyId}, will check if the user account is already activated`);
@@ -247,12 +246,10 @@ async function autoApproveEntitlement(projectId, entitlementId) {
                 // When activating an account, check if there are any pending entitlement activations
                 // which are associated to policies that allow enableAutoApprove
                 // If so, upon activating the account, associate the policy and approve the entitlement
-                const accountData = await accountManager.findMarketplaceAccount(projectId, accountName);
-                console.log(`Account data: ${JSON.stringify(accountData, null, 3)}`);
-                if (accountData && accountData.success) {
+                const account = await accountManager.findMarketplaceAccount(projectId, accountName);
+                console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
+                if (account) {
                     console.log(`Account is already activated, will now proceed to approve the entitlement`);
-                    const account = accountData.data;
-
                     // We should not auto approve the entitlement if the account was not activated
                     // as if the account wasn't activated yet, we do not know the email address for the associated user
                     // As a side note, an entitlement cannot be approved unless the associated account is already activated
@@ -285,15 +282,14 @@ async function cancelEntitlement(projectId, entitlementId) {
     const plan = entitlement.plan;
     const accountName = entitlement.account;
 
-    const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
-    console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
-    if (policyData.success === true) {
-        const accountData = await accountManager.findMarketplaceAccount(projectId, accountName);
-        console.log(`Account data: ${JSON.stringify(accountData, null, 3)}`);
-        if (accountData && accountData.success) {
+    const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
+    console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
+    if (policy) {
+        const account = await accountManager.findMarketplaceAccount(projectId, accountName);
+        console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
+        if (account) {
             console.log(`Account found, will now proceed to remove the entitlement`);
-            const account = accountData.data;
-            await removeEntitlement(projectId, account.accountId, policyData.data.policyId);
+            await removeEntitlement(projectId, account.accountId, policy.policyId);
         }
     } else {
         console.error(`Policy not found for cancelled entitlementId: ${entitlementId}`);

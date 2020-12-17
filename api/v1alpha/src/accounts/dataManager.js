@@ -190,19 +190,19 @@ async function createOrUpdateAccount(projectId, accountId, data) {
     let impactedPolicies = data.policies ? Array.from(data.policies) : [];
     const currentAccount = await getAccount(projectId, accountId, data.email, data.emailType);
     console.log(`currentAccount response: ${JSON.stringify(currentAccount)}`);
-    if (currentAccount.success) {
+    if (currentAccount) {
         // Update logic
-        if (data.rowId && currentAccount.data.rowId !== data.rowId) {
+        if (data.rowId && currentAccount.rowId !== data.rowId) {
             // If user is updating an existing record, compare the rowId to ensure they're making updates from the latest record.
             return { success: false, code: 500, errors: ["STALE"] };
         }
         else if (accountId) {
             // Only merge the existing policies if user is updating an existing row.
             // If user is re-instating a deleted record, ignore the old policies.
-            impactedPolicies = underscore.union(impactedPolicies, currentAccount.data.policies.map(p => p.policyId));
+            impactedPolicies = underscore.union(impactedPolicies, currentAccount.policies.map(p => p.policyId));
         }
         // In case getAccount was found based on email and emailType from a previously deleted record.
-        _accountId = currentAccount.data.accountId;
+        _accountId = currentAccount.accountId;
     }
     else {
         _accountId = uuidv4();
@@ -305,13 +305,13 @@ async function getAccount(projectId, accountId, email, emailType) {
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
         if (rows.length === 1) {
-            return { success: true, data: rows[0] };
+            return rows[0];
         } else {
-            const message = `Accounts does not exist within table: '${table}'`;
-            return { success: false, code: 400, errors: [message] };
+            const message = `Account '${accountId}:${email}:${emailType}' does not exist within table: '${table}'`;
+            console.warn(message);
         }
     } catch (err) {
-        return { success: false, code: 500, errors: [err.message] };
+        console.error(`Error in getAccount when searching for '${accountId}:${email}:${emailType}': ${err.message}`);
     }
 }
 
@@ -337,13 +337,13 @@ LIMIT ${limit}`;
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
         if (rows.length === 1) {
-            return { success: true, data: rows[0] };
+            return rows[0];
         } else {
-            const message = `Accounts does not exist within table: '${table}'`;
-            return { success: false, code: 400, errors: [message] };
+            const message = `Account '${accountName}' does not exist within table: '${table}'`;
+            console.warn(message);
         }
     } catch (err) {
-        return { success: false, code: 500, errors: [err.message] };
+        console.error(`Error in findMarketplaceAccount when searching for '${accountName}': ${err.message}`);
     }
 }
 
@@ -354,10 +354,10 @@ LIMIT ${limit}`;
  */
 async function deleteAccount(projectId, accountId, data) {
     const currentAccount = await getAccount(projectId, accountId);
-    if (!currentAccount.success) {
+    if (!currentAccount) {
         return { success: false, code: 404, errors: ["AccountId not found"] };
     }
-    if (currentAccount.success && currentAccount.data.rowId !== data.rowId) {
+    if (currentAccount && currentAccount.rowId !== data.rowId) {
         return { success: false, code: 500, errors: ["STALE"] };
     }
 
@@ -371,7 +371,7 @@ async function deleteAccount(projectId, accountId, data) {
     await _deleteData(projectId, fields, values, params);
 
     let policyIds = [];
-    currentAccount.data.policies.forEach(p => {
+    currentAccount.policies.forEach(p => {
         policyIds.push(p.policyId);
     })
     console.log(`Policy id's requiring refresh result ${JSON.stringify(policyIds)}`);
@@ -517,25 +517,23 @@ async function activate(projectId, host, token, reason, email) {
             }
 
             // Insert the account records
-            let accountData;
             let account = await getAccount(projectId, null, email, 'user');
-            if (account.success) {
-                accountData = account.data;
-                if (accountData.policies) {
-                    accountData.policies = accountData.policies.map(e => e.policyId);
+            if (account) {
+                if (account.policies) {
+                    account.policies = account.policies.map(e => e.policyId);
                 }
-                if (accountData.marketplace) {
-                    const found = underscore.findWhere(accountData.marketplace, accountRecord);
+                if (account.marketplace) {
+                    const found = underscore.findWhere(account.marketplace, accountRecord);
                     if (!found) {
-                        accountData.marketplace.push(accountRecord);
+                        account.marketplace.push(accountRecord);
                     }
                 } else {
-                    accountData.marketplace = [accountRecord];
+                    account.marketplace = [accountRecord];
                 }
-                accountData.createdBy = email;
+                account.createdBy = email;
             } else {
                 // Create the account
-                accountData = {
+                account = {
                     email: email,
                     emailType: 'user',
                     createdBy: email,
@@ -545,15 +543,15 @@ async function activate(projectId, host, token, reason, email) {
 
             if (newPolicies.length > 0) {
                 // Initialize policies array if necessary
-                if (!accountData.policies) {
+                if (!account.policies) {
                     console.log(`Initializing policies array`);
-                    accountData.policies = [];
+                    account.policies = [];
                 }
 
                 newPolicies.forEach(p => {
-                    const found = accountData.policies.includes(p);
+                    const found = account.policies.includes(p);
                     if (!found) {
-                        accountData.policies.push(p);
+                        account.policies.push(p);
                         console.log(`Added policy: ${p}`);
                     } else {
                         console.log(`Policy already in array: ${p}`);
@@ -562,7 +560,7 @@ async function activate(projectId, host, token, reason, email) {
             }
 
             // This will create or update the account. At this point no new policies will be associated.
-            await createOrUpdateAccount(projectId, null, accountData);
+            await createOrUpdateAccount(projectId, null, account);
 
             return { success: true, code: 200, data: approval };
         }
@@ -579,26 +577,24 @@ async function activate(projectId, host, token, reason, email) {
 async function reset(projectId, accountId) {
     try {
         console.log(`Reset called for accountId: ${accountId}`);
-        let accountData;
         let account = await getAccount(projectId, accountId, 'user');
-        if (account.success) {
-            accountData = account.data;
-            if (accountData.policies) {
+        if (account) {
+            if (account.policies) {
                 // Reformat policies for saving.
                 // TODO: Re-factor so this isn't a mess
-                accountData.policies = accountData.policies.map(e => e.policyId);
+                account.policies = account.policies.map(e => e.policyId);
             }
-            if (accountData.marketplace && accountData.marketplace.length > 0) {
-                const accountNames = accountData.marketplace.map(e => e.accountName);
+            if (account.marketplace && account.marketplace.length > 0) {
+                const accountNames = account.marketplace.map(e => e.accountName);
                 // Clear the associated accountNames
-                accountData.marketplace = [];
+                account.marketplace = [];
                 const procurementUtil = new CommerceProcurementUtil(projectId);
                 for (const name of accountNames) {
                     console.log(`Resetting account for name: ${name}`);
                     await procurementUtil.resetAccount(name);
                 }
                 // Save the updated account record
-                await createOrUpdateAccount(projectId, null, accountData);
+                await createOrUpdateAccount(projectId, null, account);
             }
         }
         return { success: true, code: 200 };

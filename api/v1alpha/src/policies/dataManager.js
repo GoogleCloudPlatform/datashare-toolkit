@@ -350,13 +350,13 @@ LIMIT ${limit};`
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
         if (rows.length === 1) {
-            return { success: true, data: rows[0] };
+            return rows[0];
         } else {
-            const message = `Policy not found with in table: '${table}'`;
-            return { success: false, code: 400, errors: [message] };
+            const message = `Policy for solution: '${solutionId}' and plan: '${planId}' does not exist within table: '${table}'`;
+            console.warn(message);
         }
     } catch (err) {
-        return { success: false, code: 500, errors: [err.message] };
+        console.error(`Error in findMarketplacePolicy when searching for solution: '${solutionId}' and plan: '${planId}': ${err.message}`);
     }
 }
 
