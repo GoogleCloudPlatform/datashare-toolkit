@@ -342,7 +342,10 @@ export default {
         value: 'ENTITLEMENT_SUSPENDED'
       }
     ],
-    selectedEntitlementStates: ['ENTITLEMENT_ACTIVATION_REQUESTED'],
+    selectedEntitlementStates: [
+      'ENTITLEMENT_ACTIVATION_REQUESTED',
+      'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'
+    ],
     sortBy: 'updateTime',
     sortDesc: true
   }),
