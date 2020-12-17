@@ -191,14 +191,11 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
 }
 
 /**
- * @param  {} projectId
- * @param  {} accountId
+ * @param  {} accountData
  * @param  {} policyId
  */
-async function removeEntitlement(projectId, accountId, policyId) {
-    const account = await accountManager.getAccount(projectId, accountId);
+function removeEntitlement(accountData, policyId) {
     const policyRecord = { policyId: policyId };
-    let accountData = account.data;
     let policies = accountData.policies || [];
     const found = underscore.findWhere(policies, policyRecord);
     if (found) {
@@ -210,9 +207,10 @@ async function removeEntitlement(projectId, accountId, policyId) {
         // TODO: Get rid of this conversion
         accountData.policies = filtered.map(e => e.policyId);
         accountData.createdBy = accountData.email;
-        await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
+        return { changed: true, account: accountData };
     } else {
-        console.error(`Policy not found: '${policyId}', account '${accountId}' will not be updated.`);
+        console.error(`Policy not found: '${policyId}'`);
+        return { changed: false, account: accountData };
     }
 }
 
@@ -289,7 +287,10 @@ async function cancelEntitlement(projectId, entitlementId) {
         console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
         if (account) {
             console.log(`Account found, will now proceed to remove the entitlement`);
-            await removeEntitlement(projectId, account.accountId, policy.policyId);
+            const result = removeEntitlement(projectId, account.accountId, policy.policyId);
+            if (result.changed === true) {
+                await accountManager.createOrUpdateAccount(projectId, result.account.accountId, result.account);
+            }
         }
     } else {
         console.error(`Policy not found for cancelled entitlementId: ${entitlementId}`);
