@@ -144,15 +144,9 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
             if (status === 'approve') {
                 const result = await procurementUtil.approveEntitlement(name);
                 const account = await accountManager.getAccount(projectId, accountId);
-                const policyRecord = { policyId: policyId };
-                let policies = account.policies || [];
-                const found = underscore.findWhere(policies, policyRecord);
-                if (!found) {
-                    policies.push(policyRecord);
-                    // TODO: Get rid of this conversion
-                    account.policies = account.policies.map(e => e.policyId);
-                    account.createdBy = account.email;
-                    await accountManager.createOrUpdateAccount(projectId, accountId, account);
+                const modifiedAccount = addEntitlement(account, policyId);
+                if (modifiedAccount.changed === true) {
+                    await accountManager.createOrUpdateAccount(projectId, modifiedAccount.account.accountId, modifiedAccount.account);
                 }
                 return { success: true, data: result };
             } else if (status === 'reject') {
@@ -219,7 +213,18 @@ function removeEntitlement(accountData, policyId) {
  */
 function addEntitlement(accountData, policyId) {
     const policyRecord = { policyId: policyId };
-
+    let policies = accountData.policies || [];
+    const found = underscore.findWhere(policies, policyRecord);
+    if (!found) {
+        policies.push(policyRecord);
+        // TODO: Get rid of this conversion
+        accountData.policies = accountData.policies.map(e => e.policyId);
+        accountData.createdBy = accountData.email;
+        return { changed: true, account: accountData };
+    } else {
+        console.error(`Policy not found: '${policyId}'`);
+        return { changed: false, account: accountData };
+    }
 }
 
 /**
@@ -295,7 +300,7 @@ async function cancelEntitlement(projectId, entitlementId) {
         console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
         if (account) {
             console.log(`Account found, will now proceed to remove the entitlement`);
-            const result = removeEntitlement(projectId, account.accountId, policy.policyId);
+            const result = removeEntitlement(account.accountId, policy.policyId);
             if (result.changed === true) {
                 await accountManager.createOrUpdateAccount(projectId, result.account.accountId, result.account);
             }
