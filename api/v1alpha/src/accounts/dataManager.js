@@ -265,9 +265,6 @@ async function createOrUpdateAccount(projectId, accountId, data) {
         } catch (err) {
             return { success: false, code: 500, errors: [err.message] };
         }
-        // Retrieving the record after insert makes another round-trip and is not
-        // efficient. For now, just return the original data.
-        // return await getAccount(projectId, accountId);
         return { success: true, data: data };
     } else {
         const message = `Account did not create with data values: '${data}'`;
