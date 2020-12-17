@@ -49,8 +49,20 @@ async function listProcurements(projectId, stateFilter) {
             filter += 'ENTITLEMENT_ACTIVATION_REQUESTED';
         }
 
-        const result = await procurementUtil.listEntitlements(filter);
-        let entitlements = result.entitlements || [];
+        // Should use filter, but due to bug with 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL' 
+        // passing null and filtering locally.
+        const result = await procurementUtil.listEntitlements(null);
+        let entitlements = [];
+        if (result.entitlements) {
+            // Work around for bug [#00012788] Error filtering on ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL
+            if (stateFilter && stateFilter.length > 0) {
+                entitlements = underscore.filter(result.entitlements, (row) => {
+                    return stateFilter.includes(row.state);
+                });
+            } else {
+                entitlements = result.entitlements;
+            }
+        }
 
         const accountNames = underscore.uniq(entitlements.map(e => e.account));
 
