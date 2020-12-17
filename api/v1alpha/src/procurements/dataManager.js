@@ -278,7 +278,7 @@ async function autoApproveEntitlement(projectId, entitlementId) {
                     // as if the account wasn't activated yet, we do not know the email address for the associated user
                     // As a side note, an entitlement cannot be approved unless the associated account is already activated
                     // the account should always be approved first, followed by the entitlement
-                    await approveEntitlement(projectId, entitlementName, 'approve', null, account.accountId, policy.policyId);
+                    await approveEntitlement(projectId, entitlementName, 'approve', 'Auto-approved');
                 } else {
                     console.log(`Account was not found, entitlement will not be auto-approved`);
                 }
