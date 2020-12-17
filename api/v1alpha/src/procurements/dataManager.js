@@ -150,18 +150,17 @@ async function approveEntitlement(projectId, name, status, reason) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
         const entitlement = await procurementUtil.getEntitlement(name);
-        const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
-        const product = entitlement.product;
-        const plan = entitlement.plan;
-        const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
         const state = entitlement.state;
+
         if (state === 'ENTITLEMENT_ACTIVATION_REQUESTED') {
             if (status === 'approve') {
-                const result = await procurementUtil.approveEntitlement(name);
+                const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
+                const policy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
                 const modifiedAccount = addEntitlement(account, policy.policyId);
                 if (modifiedAccount.changed === true) {
                     await accountManager.createOrUpdateAccount(projectId, modifiedAccount.account.accountId, modifiedAccount.account);
                 }
+                const result = await procurementUtil.approveEntitlement(name);
                 return { success: true, data: result };
             } else if (status === 'reject') {
                 const result = await procurementUtil.rejectEntitlement(name, reason);
@@ -175,18 +174,27 @@ async function approveEntitlement(projectId, name, status, reason) {
             // Do an entitlement get to find the current plan name and the new pending name
             // Parameter for getting the entitlement is the name: name.
             // const currentPlan = entitlement.currentPlan;
-            const newPendingPlan = entitlement.newPendingPlan;
             if (status === 'approve') {
                 // Approve plan change, this would only be for a manual approve.
                 // An automated approval would be handled by a Pub/Sub notification.
                 // Remove user from current policy and add to new plan related policy.
                 // Re-factor removeEntitlement so that it doesn't call createOrUpdateAccount maybe, in order that we can remove and add using the same functions.
-                // const result = await procurementUtil.approvePlanChange(name, newPendingPlan);
-                const result = {};
+                const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
+
+                const existingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
+                const pendingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.newPendingPlan);
+
+                let updateOne = removeEntitlement(account, existingPolicy.policyId);
+                let updateTwo = addEntitlement(updateOne, pendingPolicy.policyId);
+                if (updateOne.changed === true || updateTwo.changed === true) {
+                    await accountManager.createOrUpdateAccount(projectId, updateTwo.account.accountId, updateTwo.account);
+                }
+
+                const result = await procurementUtil.approvePlanChange(name, entitlement.newPendingPlan);
                 return { success: true, data: result };
             } else if (status === 'reject') {
                 // No need to do anything further, existing plan and policy relations will remain the same.
-                const result = await procurementUtil.rejectPlanChange(name, newPendingPlan, reason);
+                const result = await procurementUtil.rejectPlanChange(name, entitlement.newPendingPlan, reason);
                 return { success: true, data: result };
             }
         }
