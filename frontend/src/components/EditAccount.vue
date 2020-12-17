@@ -169,6 +169,7 @@ export default {
   },
   computed: {
     hasPolicyChanges() {
+      console.log(this.initialSelectedPolicies);
       let added = [];
       let removed = [];
       if (

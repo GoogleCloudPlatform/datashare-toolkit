@@ -42,12 +42,17 @@ async function listProcurements(projectId, stateFilter) {
         const procurementUtil = new CommerceProcurementUtil(projectId);
         const bigqueryUtil = new BigQueryUtil(projectId);
 
+        /*
         let filter = 'state=';
         if (stateFilter && stateFilter.length > 0) {
             filter += stateFilter.join(' OR state=')
         } else {
             filter += 'ENTITLEMENT_ACTIVATION_REQUESTED';
         }
+
+        const result = await procurementUtil.listEntitlements(filter);
+        let entitlements = result.entitlements || [];
+        */
 
         // Should use filter, but due to bug with 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL' 
         // passing null and filtering locally.
