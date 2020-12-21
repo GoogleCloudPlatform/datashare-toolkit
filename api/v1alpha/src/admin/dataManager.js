@@ -306,9 +306,9 @@ async function initializePubSubListener() {
                         const entitlement = data.entitlement;
                         await procurementManager.cancelEntitlement(projectId, entitlement.id)
                     } else if (eventType === 'ENTITLEMENT_PLAN_CHANGE_REQUESTED') {
-                        // TODO: Implement call to auth approve
+                        console.log(`Running auto approve for eventType: ${eventType}`);
                         const entitlement = data.entitlement;
-                        console.log(`ENTITLEMENT_PLAN_CHANGE_REQUESTED logic to be implemented: ${JSON.stringify(entitlement)}`);
+                        await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
                     }
                     else {
                         console.debug(`Event type not implemented: ${eventType}`);

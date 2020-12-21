@@ -267,41 +267,63 @@ async function autoApproveEntitlement(projectId, entitlementId) {
     // Get the entitlement object from the procurement api
     const entitlement = await procurementUtil.getEntitlement(entitlementName);
     console.log(`Entitlement: ${JSON.stringify(entitlement, null, 3)}`);
+
+    const state = entitlement.state;
     const product = entitlement.product;
     const plan = entitlement.plan;
     const accountName = entitlement.account;
 
-
     // TODO: Handle state for plan change, and update as necessary.
 
-    const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
-    console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
-    if (policy && policy.marketplace) {
-        const enableAutoApprove = policy.marketplace.enableAutoApprove;
-        if (enableAutoApprove === true) {
-            console.log(`Auto approve is enabled for policy ${policy.policyId}, will check if the user account is already activated`);
-            // We need to associate the user to this entitlement, so user must register and activate.
-            if (accountName) {
-                // Approve the account (if it's activated in Datashare already)
-                // Otherwise, do not approve - return, and only approve upon the account dataManager activation
-                // When activating an account, check if there are any pending entitlement activations
-                // which are associated to policies that allow enableAutoApprove
-                // If so, upon activating the account, associate the policy and approve the entitlement
-                const account = await accountManager.findMarketplaceAccount(projectId, accountName);
-                console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
-                if (account) {
-                    console.log(`Account is already activated, will now proceed to approve the entitlement`);
-                    // We should not auto approve the entitlement if the account was not activated
-                    // as if the account wasn't activated yet, we do not know the email address for the associated user
-                    // As a side note, an entitlement cannot be approved unless the associated account is already activated
-                    // the account should always be approved first, followed by the entitlement
-                    await approveEntitlement(projectId, entitlementName, 'approve', 'Auto-approved');
-                } else {
-                    console.log(`Account was not found, entitlement will not be auto-approved`);
+    if (state === 'ENTITLEMENT_ACTIVATION_REQUESTED') {
+        const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
+        console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
+        if (policy && policy.marketplace) {
+            const enableAutoApprove = policy.marketplace.enableAutoApprove;
+            if (enableAutoApprove === true) {
+                console.log(`Auto approve is enabled for policy ${policy.policyId}, will check if the user account is already activated`);
+                // We need to associate the user to this entitlement, so user must register and activate.
+                if (accountName) {
+                    // Approve the account (if it's activated in Datashare already)
+                    // Otherwise, do not approve - return, and only approve upon the account dataManager activation
+                    // When activating an account, check if there are any pending entitlement activations
+                    // which are associated to policies that allow enableAutoApprove
+                    // If so, upon activating the account, associate the policy and approve the entitlement
+                    const account = await accountManager.findMarketplaceAccount(projectId, accountName);
+                    console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
+                    if (account) {
+                        console.log(`Account is already activated, will now proceed to approve the entitlement`);
+                        // We should not auto approve the entitlement if the account was not activated
+                        // as if the account wasn't activated yet, we do not know the email address for the associated user
+                        // As a side note, an entitlement cannot be approved unless the associated account is already activated
+                        // the account should always be approved first, followed by the entitlement
+                        await approveEntitlement(projectId, entitlementName, 'approve', 'Auto-approved');
+                    } else {
+                        console.log(`Account was not found, entitlement will not be auto-approved`);
+                    }
+                }
+            } else {
+                console.log(`Auto approve is not enabled for policy: ${policy.policyId}`);
+            }
+        }
+    } else if (state === 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL') {
+        const policy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.newPendingPlan);
+        console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
+        if (policy && policy.marketplace) {
+            const enableAutoApprove = policy.marketplace.enableAutoApprove;
+            if (enableAutoApprove === true) {
+                console.log(`Auto approve is enabled for policy ${policy.policyId}, will check if the user account is already activated`);
+                if (accountName) {
+                    const account = await accountManager.findMarketplaceAccount(projectId, accountName);
+                    console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
+                    if (account) {
+                        console.log(`Account is already activated, will now proceed to approve the entitlement`);
+                        await approveEntitlement(projectId, entitlementName, 'approve', 'Auto-approved plan change');
+                    } else {
+                        console.log(`Account was not found, entitlement will not be auto-approved`);
+                    }
                 }
             }
-        } else {
-            console.log(`Auto approve is not enabled for policy: ${policy.policyId}`);
         }
     }
 }
