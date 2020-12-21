@@ -100,7 +100,11 @@ async function listAccounts(projectId, datasetId, policyId) {
     const limit = 10;
     let sqlQuery = `SELECT ca.* except(policies),
         array(
-            select as struct pm.policyId, pm.name
+            select as struct
+                pm.policyId,
+                pm.name,
+                pm.marketplace.solutionId,
+                pm.marketplace.planId
             from unnest(ca.policies) p
             join \`${policyTable}\` pm on p.policyId = pm.policyId
             where pm.isDeleted is false
@@ -116,6 +120,8 @@ async function listAccounts(projectId, datasetId, policyId) {
               cp.policyId,
               cp.name,
               cp.isTableBased,
+              cp.marketplace.solutionId,
+              cp.marketplace.planId,
               d.datasetId
             FROM \`${policyTable}\` cp
             cross join unnest(cp.datasets) d
