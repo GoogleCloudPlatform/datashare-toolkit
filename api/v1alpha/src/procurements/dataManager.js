@@ -330,7 +330,7 @@ async function cancelEntitlement(projectId, entitlementId) {
         console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
         if (account) {
             console.log(`Account found, will now proceed to remove the entitlement`);
-            const result = removeEntitlement(account.accountId, policy.policyId);
+            const result = removeEntitlement(account, policy.policyId);
             if (result.changed === true) {
                 await accountManager.createOrUpdateAccount(projectId, result.account.accountId, result.account);
             }

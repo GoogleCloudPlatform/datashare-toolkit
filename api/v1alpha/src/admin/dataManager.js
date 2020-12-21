@@ -308,7 +308,7 @@ async function initializePubSubListener() {
                     } else if (eventType === 'ENTITLEMENT_PLAN_CHANGE_REQUESTED') {
                         // TODO: Implement call to auth approve
                         const entitlement = data.entitlement;
-                        console.log(`ENTITLEMENT_PLAN_CHANGE_REQUESTED logic to be implemented: ${entitlement}`);
+                        console.log(`ENTITLEMENT_PLAN_CHANGE_REQUESTED logic to be implemented: ${JSON.stringify(entitlement)}`);
                     }
                     else {
                         console.debug(`Event type not implemented: ${eventType}`);
