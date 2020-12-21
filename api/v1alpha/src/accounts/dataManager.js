@@ -109,7 +109,7 @@ async function listAccounts(projectId, datasetId, policyId) {
             join \`${policyTable}\` pm on p.policyId = pm.policyId
             where pm.isDeleted is false
            ) as policies
-        FROM \`${projectId}.datashare.currentAccount\` ca
+        FROM \`${table}\` ca
         where ca.isDeleted is false;`
     let options = {
         query: sqlQuery
@@ -175,6 +175,14 @@ async function listAccounts(projectId, datasetId, policyId) {
         const message = `Accounts do not exist within table: '${table}'`;
         return { success: false, code: 400, errors: [message] };
     }
+
+    // All and Dataset should have the info on granted outside of Marketplace information.
+    // const filterString = `state=ENTITLEMENT_ACTIVE`;
+    // const result = await procurementUtil.listEntitlements(filterString);
+    // Iterate over all of the active entitlements
+    // The entitlement.account will contain the fully-qualified account name which should be matched against
+    // marketplace.accountName in the currentAccount view.
+    // The entitlement.product, entitlement.plan will contain the required information to find the associated policy
 
     // TODO: https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/397
     // Query for all 'Active' entitlements, and match them off using the accountName.
