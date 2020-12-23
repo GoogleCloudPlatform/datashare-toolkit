@@ -225,7 +225,7 @@ export default {
             'Indicates if the account has been activated with Datashare via GCP Marketplace'
         },
         {
-          text: 'Marketplace In-sync',
+          text: 'Marketplace In Sync',
           value: 'marketplaceSynced',
           tooltip:
             'Indicates if the Datashare policies a user is entitled to are in sync with the entitlements they have purchased in GCP Marketplace'

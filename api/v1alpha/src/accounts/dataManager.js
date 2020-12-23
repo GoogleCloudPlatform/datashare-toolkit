@@ -172,6 +172,7 @@ async function listAccounts(projectId, datasetId, policyId) {
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
 
+        // Re-factor so that this can be re-used with getAccount also
         // Check if marketplace procurements are in sync with datashare policies
         const filterString = `state=ENTITLEMENT_ACTIVE`;
         const procurementUtil = new CommerceProcurementUtil(projectId);
