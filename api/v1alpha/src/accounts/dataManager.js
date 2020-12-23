@@ -173,6 +173,9 @@ async function listAccounts(projectId, datasetId, policyId) {
         const [rows] = await bigqueryUtil.executeQuery(options);
 
         // Re-factor so that this can be re-used with getAccount also
+        // See policy dataManager listUserPolicies function.
+        // Take in an account object or account name filter, and filter this data. Return back the list of 
+        // purchased entitlements for the provided user.
         // Check if marketplace procurements are in sync with datashare policies
         const filterString = `state=ENTITLEMENT_ACTIVE`;
         const procurementUtil = new CommerceProcurementUtil(projectId);
