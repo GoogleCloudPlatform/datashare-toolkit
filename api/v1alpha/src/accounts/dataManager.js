@@ -167,26 +167,58 @@ async function listAccounts(projectId, datasetId, policyId) {
             params: { policyId: policyId }
         };
     }
+
     const bigqueryUtil = new BigQueryUtil(projectId);
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
+        // All and Dataset should have the info on granted outside of Marketplace information.
+        const filterString = `state=ENTITLEMENT_ACTIVE`;
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        const result = await procurementUtil.listEntitlements(filterString);
+        const entitlements = result.entitlements || [];
+        // console.log(JSON.stringify(rows, null, 3));
+        // console.log(JSON.stringify(entitlements, null, 3));
+
+        // Iterate over all of the active entitlements
+        // The entitlement.account will contain the fully-qualified account name which should be matched against
+        // marketplace.accountName in the currentAccount view.
+        // The entitlement.product, entitlement.plan will contain the required information to find the associated policy
+
+        // TODO: https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/397
+        // Query for all 'Active' entitlements, and match them off using the accountName.
+        // If a match is not found, pass an indicator to display this in the policy schema.
+
+        // Iterate every account
+        rows.forEach((account) => {
+            // Get distinct list of account names associated to each datashare account
+            let accountNames = [];
+            if (account.marketplace && account.marketplace.length > 0) {
+                accountNames = account.marketplace.map(i => i.accountName);
+            }
+
+            let userEntitlements = [];
+            if (accountNames && accountNames.length > 0) {
+                userEntitlements = underscore.filter(entitlements, (e) => {
+                    return accountNames.includes(e.account);
+                });
+            }
+
+            if (account.policies && account.policies.length > 0) {
+                account.policies.forEach((p) => {
+                    p.entitlementActive = false;
+                    const userEntitlement = underscore.findWhere(userEntitlements, { product: p.solutionId, plan: p.planId });
+                    if (userEntitlement) {
+                        p.entitlementActive = true;
+                    }
+                });
+            }
+        });
+
         return { success: true, data: rows };
     } catch (err) {
-        const message = `Accounts do not exist within table: '${table}'`;
-        return { success: false, code: 400, errors: [message] };
+        console.error(err);
+        return { success: false, code: 500, errors: ['Unable to retrieve accounts'] };
     }
-
-    // All and Dataset should have the info on granted outside of Marketplace information.
-    // const filterString = `state=ENTITLEMENT_ACTIVE`;
-    // const result = await procurementUtil.listEntitlements(filterString);
-    // Iterate over all of the active entitlements
-    // The entitlement.account will contain the fully-qualified account name which should be matched against
-    // marketplace.accountName in the currentAccount view.
-    // The entitlement.product, entitlement.plan will contain the required information to find the associated policy
-
-    // TODO: https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/397
-    // Query for all 'Active' entitlements, and match them off using the accountName.
-    // If a match is not found, pass an indicator to display this in the policy schema.
 }
 
 /**
