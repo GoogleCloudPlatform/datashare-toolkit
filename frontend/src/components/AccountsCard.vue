@@ -97,7 +97,7 @@
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
-              v-if="item.marketplace.length > 0"
+              v-if="item.marketplaceActivated === true"
               small
               @click="resetItem(item)"
             >
