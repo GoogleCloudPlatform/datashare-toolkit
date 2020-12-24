@@ -194,7 +194,6 @@ async function checkProcurementEntitlement(projectId, account) {
             const name = e.substring(e.lastIndexOf('/') + 1);
             accountFilter += `account=${name}`;
         });
-
         let result = await checkProcurementEntitlements(projectId, [account], accountFilter);
         return result[0];
     }
@@ -209,7 +208,7 @@ async function checkProcurementEntitlement(projectId, account) {
 async function checkProcurementEntitlements(projectId, accounts, accountFilter) {
     let filterString = `state=ENTITLEMENT_ACTIVE`;
     if (accountFilter) {
-        filterString = `state=ENTITLEMENT_ACTIVATION_REQUESTED AND (${accountFilter})`;
+        filterString = `state=ENTITLEMENT_ACTIVE AND (${accountFilter})`;
     }
     const procurementUtil = new CommerceProcurementUtil(projectId);
     const result = await procurementUtil.listEntitlements(filterString);
