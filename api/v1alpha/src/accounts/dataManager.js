@@ -372,6 +372,7 @@ async function getAccount(projectId, accountId, email, emailType) {
         params = { email: email, emailType: emailType };
     }
 
+    // Update query to use similiar policies join as listAccounts has to pull in the solutionId and planId
     const sqlQuery = `SELECT ${fields} FROM \`${table}\` ${filter} LIMIT ${limit};`
     const options = {
         query: sqlQuery,
