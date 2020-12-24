@@ -239,9 +239,9 @@ async function checkProcurementEntitlements(projectId, accounts, accountFilter) 
             account.policies.forEach((p) => {
                 const userEntitlement = underscore.findWhere(userEntitlements, { product: p.solutionId, plan: p.planId });
                 if (userEntitlement) {
-                    p.entitlementActive = true;
+                    p.marketplaceEntitlementActive = true;
                 } else {
-                    p.entitlementActive = false;
+                    p.marketplaceEntitlementActive = false;
                     account.marketplaceSynced = false;
                 }
             });
@@ -382,7 +382,8 @@ async function getAccount(projectId, accountId, email, emailType) {
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
         if (rows.length === 1) {
-            return rows[0];
+            const account = checkProcurementEntitlement(projectId, rows[0]);
+            return account;
         } else {
             const message = `Account '${accountId}:${email}:${emailType}' does not exist within table: '${table}'`;
             console.warn(message);
