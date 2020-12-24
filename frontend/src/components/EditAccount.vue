@@ -62,6 +62,7 @@
                     <v-checkbox
                       :value="item.policyId"
                       v-model="user.policies"
+                      :color="policyCheckboxColor(item.policyId)"
                     ></v-checkbox>
                   </v-list-item-action>
                 </template>
@@ -143,6 +144,7 @@ export default {
     policies: [],
     loading: false,
     initialSelectedPolicies: [],
+    marketplacePurchasedPolicies: [],
     user: {
       rowId: null,
       accountId: null,
@@ -271,9 +273,20 @@ export default {
             this.user.policies = policies;
             this.user.marketplace = account.marketplace;
             this.initialSelectedPolicies = policies;
+            this.marketplacePurchasedPolicies = account.policies
+              .filter(p => p.marketplaceEntitlementActive === true)
+              .map(p => p.policyId);
           }
           this.loading = false;
         });
+    },
+    policyCheckboxColor(policyId) {
+      console.log(policyId);
+      console.log(JSON.stringify(this.marketplacePurchasedPolicies));
+      if (this.marketplacePurchasedPolicies.includes(policyId)) {
+        return 'green';
+      }
+      return '';
     }
   }
 };
