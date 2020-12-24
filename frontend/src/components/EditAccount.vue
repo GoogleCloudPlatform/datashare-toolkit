@@ -53,7 +53,10 @@
               <v-list-item v-else :key="`item-${i}`" :value="item">
                 <template v-slot:default="{}">
                   <v-list-item-content>
-                    <v-list-item-title v-text="item.name"></v-list-item-title>
+                    <v-list-item-title
+                      :style="policyTitleColor(item.policyId)"
+                      v-text="item.name"
+                    ></v-list-item-title>
                     <v-list-item-subtitle
                       v-text="item.description"
                     ></v-list-item-subtitle>
@@ -285,6 +288,13 @@ export default {
       console.log(JSON.stringify(this.marketplacePurchasedPolicies));
       if (this.marketplacePurchasedPolicies.includes(policyId)) {
         return 'green';
+      }
+      return '';
+    },
+    policyTitleColor(policyId) {
+      const cbColor = this.policyCheckboxColor(policyId);
+      if (cbColor != '') {
+        return `color:${cbColor}`;
       }
       return '';
     }
