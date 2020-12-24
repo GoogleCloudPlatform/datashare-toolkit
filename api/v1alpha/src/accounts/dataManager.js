@@ -360,7 +360,7 @@ async function createOrUpdateAccount(projectId, accountId, data) {
  */
 async function getAccount(projectId, accountId, email, emailType) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
-    const fields = Array.from(cfg.cdsAccountViewFields).join();
+    const policyTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const limit = 2;
     let filter = 'WHERE accountId = @accountId AND isDeleted is false';
     let params = {};
@@ -372,8 +372,20 @@ async function getAccount(projectId, accountId, email, emailType) {
         params = { email: email, emailType: emailType };
     }
 
-    // Update query to use similiar policies join as listAccounts has to pull in the solutionId and planId
-    const sqlQuery = `SELECT ${fields} FROM \`${table}\` ${filter} LIMIT ${limit};`
+    const sqlQuery = `SELECT ca.* except(policies),
+    array(
+        select as struct
+            pm.policyId,
+            pm.name,
+            pm.marketplace.solutionId,
+            pm.marketplace.planId
+        from unnest(ca.policies) p
+        join \`${policyTable}\` pm on p.policyId = pm.policyId
+        where pm.isDeleted is false
+       ) as policies
+FROM \`${table}\` ca
+${filter} LIMIT ${limit};`
+
     const options = {
         query: sqlQuery,
         params: params
