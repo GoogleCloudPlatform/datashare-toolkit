@@ -171,55 +171,84 @@ async function listAccounts(projectId, datasetId, policyId) {
     const bigqueryUtil = new BigQueryUtil(projectId);
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
-
-        // Re-factor so that this can be re-used with getAccount also
-        // See policy dataManager listUserPolicies function.
-        // Take in an account object or account name filter, and filter this data. Return back the list of 
-        // purchased entitlements for the provided user.
-        // Check if marketplace procurements are in sync with datashare policies
-        const filterString = `state=ENTITLEMENT_ACTIVE`;
-        const procurementUtil = new CommerceProcurementUtil(projectId);
-        const result = await procurementUtil.listEntitlements(filterString);
-        const entitlements = result.entitlements || [];
-
-        // Iterate every account
-        rows.forEach((account) => {
-            account.marketplaceSynced = true;
-
-            // Get distinct list of account names associated to each datashare account
-            let accountNames = [];
-            if (account.marketplace && account.marketplace.length > 0) {
-                accountNames = account.marketplace.map(i => i.accountName);
-                account.marketplaceActivated = true;
-            } else {
-                account.marketplaceActivated = false;
-            }
-
-            let userEntitlements = [];
-            if (accountNames && accountNames.length > 0) {
-                userEntitlements = underscore.filter(entitlements, (e) => {
-                    return accountNames.includes(e.account);
-                });
-            }
-
-            if (account.policies && account.policies.length > 0) {
-                account.policies.forEach((p) => {
-                    const userEntitlement = underscore.findWhere(userEntitlements, { product: p.solutionId, plan: p.planId });
-                    if (userEntitlement) {
-                        p.entitlementActive = true;
-                    } else {
-                        p.entitlementActive = false;
-                        account.marketplaceSynced = false;
-                    }
-                });
-            }
-        });
-
-        return { success: true, data: rows };
+        const accounts = await checkProcurementEntitlements(projectId, rows);
+        return { success: true, data: accounts };
     } catch (err) {
         console.error(err);
         return { success: false, code: 500, errors: ['Unable to retrieve accounts'] };
     }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} account
+ */
+async function checkProcurementEntitlement(projectId, account) {
+    if (account.marketplace && account.marketplace.length > 0) {
+        const accountNames = account.marketplace.map(i => i.accountName);
+        let accountFilter = '';
+        accountNames.forEach(e => {
+            if (accountFilter != '') {
+                accountFilter += ' OR ';
+            }
+            const name = e.substring(e.lastIndexOf('/') + 1);
+            accountFilter += `account=${name}`;
+        });
+
+        let result = await checkProcurementEntitlements(projectId, [account], accountFilter);
+        return result[0];
+    }
+    return account;
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} accounts
+ * @param  {} accountFilter
+ */
+async function checkProcurementEntitlements(projectId, accounts, accountFilter) {
+    let filterString = `state=ENTITLEMENT_ACTIVE`;
+    if (accountFilter) {
+        filterString = `state=ENTITLEMENT_ACTIVATION_REQUESTED AND (${accountFilter})`;
+    }
+    const procurementUtil = new CommerceProcurementUtil(projectId);
+    const result = await procurementUtil.listEntitlements(filterString);
+    const entitlements = result.entitlements || [];
+
+    // Iterate every account
+    accounts.forEach((account) => {
+        account.marketplaceSynced = true;
+
+        // Get distinct list of account names associated to each datashare account
+        let accountNames = [];
+        if (account.marketplace && account.marketplace.length > 0) {
+            accountNames = account.marketplace.map(i => i.accountName);
+            account.marketplaceActivated = true;
+        } else {
+            account.marketplaceActivated = false;
+        }
+
+        let userEntitlements = [];
+        if (accountNames && accountNames.length > 0) {
+            userEntitlements = underscore.filter(entitlements, (e) => {
+                return accountNames.includes(e.account);
+            });
+        }
+
+        if (account.policies && account.policies.length > 0) {
+            account.policies.forEach((p) => {
+                const userEntitlement = underscore.findWhere(userEntitlements, { product: p.solutionId, plan: p.planId });
+                if (userEntitlement) {
+                    p.entitlementActive = true;
+                } else {
+                    p.entitlementActive = false;
+                    account.marketplaceSynced = false;
+                }
+            });
+        }
+    });
+
+    return accounts;
 }
 
 /**
