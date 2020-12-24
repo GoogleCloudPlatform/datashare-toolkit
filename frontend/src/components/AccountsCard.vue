@@ -219,18 +219,6 @@ export default {
           tooltip: 'The policies that the account is entitled to'
         },
         {
-          text: 'Marketplace Activated',
-          value: 'marketplaceActivated',
-          tooltip:
-            'Indicates if the account has been activated with Datashare via GCP Marketplace'
-        },
-        {
-          text: 'Marketplace In Sync',
-          value: 'marketplaceSynced',
-          tooltip:
-            'Indicates if the Datashare policies a user is entitled to are in sync with the entitlements they have purchased in GCP Marketplace'
-        },
-        {
           text: 'Policy Search String',
           value: 'policySearchString',
           align: ' d-none'
@@ -239,6 +227,18 @@ export default {
 
       if (!this.selectedDataset) {
         h.push(
+          {
+            text: 'Marketplace Activated',
+            value: 'marketplaceActivated',
+            tooltip:
+              'Indicates if the account has been activated with Datashare via GCP Marketplace'
+          },
+          {
+            text: 'Marketplace In Sync',
+            value: 'marketplaceSynced',
+            tooltip:
+              'Indicates if the Datashare policies a user is entitled to are in sync with the entitlements they have purchased in GCP Marketplace'
+          },
           {
             text: 'Modified At',
             value: 'createdAt',
