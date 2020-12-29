@@ -284,8 +284,6 @@ export default {
         });
     },
     policyCheckboxColor(policyId) {
-      console.log(policyId);
-      console.log(JSON.stringify(this.marketplacePurchasedPolicies));
       if (this.marketplacePurchasedPolicies.includes(policyId)) {
         return 'green';
       }
