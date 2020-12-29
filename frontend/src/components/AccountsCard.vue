@@ -62,6 +62,8 @@
           <v-chip
             v-for="policy in item.policies.slice(0, 4)"
             :key="policy.policyId"
+            :color="chipColor(policy)"
+            :text-color="chipTextColor(policy)"
           >
             {{ policy.name }}
           </v-chip>
@@ -379,6 +381,18 @@ export default {
     toLocalTime(epoch) {
       let d = new Date(epoch);
       return d.toLocaleString();
+    },
+    chipColor(policy) {
+      if (policy.marketplaceEntitlementActive === true) {
+        return 'green';
+      }
+      return '';
+    },
+    chipTextColor(policy) {
+      if (policy.marketplaceEntitlementActive === true) {
+        return 'white';
+      }
+      return '';
     }
   }
 };
