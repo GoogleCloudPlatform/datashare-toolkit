@@ -322,6 +322,9 @@ export default {
             let data = response.data;
             data.forEach(function(element) {
               if (element.policies && element.policies.length > 0) {
+                element.policies.sort((x, y) => {
+                  return x === y ? 0 : x ? 1 : -1;
+                });
                 element.policySearchString = element.policies
                   .map(e => e.name)
                   .join('');
