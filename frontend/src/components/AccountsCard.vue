@@ -323,7 +323,12 @@ export default {
             data.forEach(function(element) {
               if (element.policies && element.policies.length > 0) {
                 element.policies.sort((x, y) => {
-                  return x === y ? 0 : x ? 1 : -1;
+                  return x.marketplaceEntitlementActive ===
+                    y.marketplaceEntitlementActive
+                    ? 0
+                    : x.marketplaceEntitlementActive
+                    ? 1
+                    : -1;
                 });
                 element.policySearchString = element.policies
                   .map(e => e.name)
@@ -386,16 +391,35 @@ export default {
       return d.toLocaleString();
     },
     chipColor(policy) {
-      if (policy.marketplaceEntitlementActive === true) {
-        return 'green';
+      if (this.marketplaceActivated(policy) === true) {
+        if (policy.marketplaceEntitlementActive === true) {
+          return 'green';
+        } else {
+          return 'orange';
+        }
       }
       return '';
     },
     chipTextColor(policy) {
-      if (policy.marketplaceEntitlementActive === true) {
-        return 'white';
+      if (this.marketplaceActivated(policy) === true) {
+        if (policy.marketplaceEntitlementActive === true) {
+          return 'white';
+        } else {
+          return '';
+        }
       }
       return '';
+    },
+    marketplaceActivated(policy) {
+      if (
+        policy.solutionId &&
+        policy.planId &&
+        policy.solutionId.length > 0 &&
+        policy.planId.length > 0
+      ) {
+        return true;
+      }
+      return false;
     }
   }
 };

@@ -154,7 +154,8 @@ export default {
       emailType: null,
       email: null,
       policies: [],
-      marketplace: []
+      marketplace: [],
+      marketplaceActivated: null
     },
     emailTypes: ['user', 'group', 'serviceAccount'],
     showError: false
@@ -276,6 +277,7 @@ export default {
             this.user.policies = policies;
             this.user.marketplace = account.marketplace;
             this.initialSelectedPolicies = policies;
+            this.user.marketplaceActivated = account.marketplaceActivated;
             this.marketplacePurchasedPolicies = account.policies
               .filter(p => p.marketplaceEntitlementActive === true)
               .map(p => p.policyId);
@@ -284,15 +286,21 @@ export default {
         });
     },
     policyCheckboxColor(policyId) {
-      if (this.marketplacePurchasedPolicies.includes(policyId)) {
-        return 'green';
+      if (this.user.marketplaceActivated === true) {
+        if (this.marketplacePurchasedPolicies.includes(policyId)) {
+          return 'green';
+        } else {
+          return 'orange';
+        }
       }
       return '';
     },
     policyTitleColor(policyId) {
-      const cbColor = this.policyCheckboxColor(policyId);
-      if (cbColor != '') {
-        return `color:${cbColor}`;
+      if (this.user.marketplaceActivated === true) {
+        const cbColor = this.policyCheckboxColor(policyId);
+        if (cbColor != '') {
+          return `color:${cbColor}`;
+        }
       }
       return '';
     }
