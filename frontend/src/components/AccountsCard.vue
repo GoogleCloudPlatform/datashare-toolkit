@@ -62,6 +62,8 @@
           <v-chip
             v-for="policy in item.policies.slice(0, 4)"
             :key="policy.policyId"
+            :color="chipColor(policy)"
+            :text-color="chipTextColor(policy)"
           >
             {{ policy.name }}
           </v-chip>
@@ -97,7 +99,7 @@
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
-              v-if="item.marketplace.length > 0"
+              v-if="item.marketplaceActivated === true"
               small
               @click="resetItem(item)"
             >
@@ -228,6 +230,18 @@ export default {
       if (!this.selectedDataset) {
         h.push(
           {
+            text: 'Marketplace Activated',
+            value: 'marketplaceActivated',
+            tooltip:
+              'Indicates if the account has been activated with Datashare via GCP Marketplace'
+          },
+          {
+            text: 'Marketplace In Sync',
+            value: 'marketplaceSynced',
+            tooltip:
+              'Indicates if the Datashare policies a user is entitled to are in sync with the entitlements they have purchased in GCP Marketplace'
+          },
+          {
             text: 'Modified At',
             value: 'createdAt',
             tooltip: 'The last modified time for the account'
@@ -308,6 +322,14 @@ export default {
             let data = response.data;
             data.forEach(function(element) {
               if (element.policies && element.policies.length > 0) {
+                element.policies.sort((x, y) => {
+                  return x.marketplaceEntitlementActive ===
+                    y.marketplaceEntitlementActive
+                    ? 0
+                    : x.marketplaceEntitlementActive
+                    ? 1
+                    : -1;
+                });
                 element.policySearchString = element.policies
                   .map(e => e.name)
                   .join('');
@@ -367,6 +389,37 @@ export default {
     toLocalTime(epoch) {
       let d = new Date(epoch);
       return d.toLocaleString();
+    },
+    chipColor(policy) {
+      if (this.marketplaceActivated(policy) === true) {
+        if (policy.marketplaceEntitlementActive === true) {
+          return 'green';
+        } else {
+          return 'orange';
+        }
+      }
+      return '';
+    },
+    chipTextColor(policy) {
+      if (this.marketplaceActivated(policy) === true) {
+        if (policy.marketplaceEntitlementActive === true) {
+          return 'white';
+        } else {
+          return '';
+        }
+      }
+      return '';
+    },
+    marketplaceActivated(policy) {
+      if (
+        policy.solutionId &&
+        policy.planId &&
+        policy.solutionId.length > 0 &&
+        policy.planId.length > 0
+      ) {
+        return true;
+      }
+      return false;
     }
   }
 };

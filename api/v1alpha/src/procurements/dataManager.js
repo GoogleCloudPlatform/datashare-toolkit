@@ -42,6 +42,7 @@ async function listProcurements(projectId, stateFilter) {
         const procurementUtil = new CommerceProcurementUtil(projectId);
         const bigqueryUtil = new BigQueryUtil(projectId);
 
+        /*
         let filter = 'state=';
         if (stateFilter && stateFilter.length > 0) {
             filter += stateFilter.join(' OR state=')
@@ -51,6 +52,22 @@ async function listProcurements(projectId, stateFilter) {
 
         const result = await procurementUtil.listEntitlements(filter);
         let entitlements = result.entitlements || [];
+        */
+
+        // Should use filter, but due to bug with 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL' 
+        // passing null and filtering locally.
+        const result = await procurementUtil.listEntitlements(null);
+        let entitlements = [];
+        if (result.entitlements) {
+            // Work around for bug [#00012788] Error filtering on ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL
+            if (stateFilter && stateFilter.length > 0) {
+                entitlements = underscore.filter(result.entitlements, (row) => {
+                    return stateFilter.includes(row.state);
+                });
+            } else {
+                entitlements = result.entitlements;
+            }
+        }
 
         const accountNames = underscore.uniq(entitlements.map(e => e.account));
 
@@ -133,33 +150,59 @@ WHERE m.accountName IN UNNEST(@accountNames)`;
  * @param  {} name Name of the entitlement resource
  * @param  {} status The approval status, should be one of ['approve', 'reject', 'comment']
  * @param  {} reason Only provided for a rejection
- * @param  {} accountId The datashare accountId
- * @param  {} policyId The datashare policyId
  */
-async function approveEntitlement(projectId, name, status, reason, accountId, policyId) {
+async function approveEntitlement(projectId, name, status, reason) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
-        if (status === 'approve') {
-            const result = await procurementUtil.approveEntitlement(name);
-            const account = await accountManager.getAccount(projectId, accountId);
-            const policyRecord = { policyId: policyId };
-            let accountData = account.data;
-            let policies = accountData.policies || [];
-            const found = underscore.findWhere(policies, policyRecord);
-            if (!found) {
-                policies.push(policyRecord);
-                // TODO: Get rid of this conversion
-                accountData.policies = accountData.policies.map(e => e.policyId);
-                accountData.createdBy = accountData.email;
-                await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
+        const entitlement = await procurementUtil.getEntitlement(name);
+        const state = entitlement.state;
+
+        if (state === 'ENTITLEMENT_ACTIVATION_REQUESTED') {
+            if (status === 'approve') {
+                const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
+                const policy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
+                const modifiedAccount = addEntitlement(account, policy.policyId);
+                if (modifiedAccount.changed === true) {
+                    await accountManager.createOrUpdateAccount(projectId, modifiedAccount.account.accountId, modifiedAccount.account);
+                }
+                const result = await procurementUtil.approveEntitlement(name);
+                return { success: true, data: result };
+            } else if (status === 'reject') {
+                const result = await procurementUtil.rejectEntitlement(name, reason);
+                return { success: true, data: result };
+            } else if (status === 'comment') {
+                const result = await procurementUtil.updateEntitlementMessage(name, reason);
+                return { success: true, data: result };
             }
-            return { success: true, data: result };
-        } else if (status === 'reject') {
-            const result = await procurementUtil.rejectEntitlement(name, reason);
-            return { success: true, data: result };
-        } else if (status === 'comment') {
-            const result = await procurementUtil.updateEntitlementMessage(name, reason);
-            return { success: true, data: result };
+        } else if (state === 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL') {
+            // Handle approval and rejection for plan change approval
+            // Do an entitlement get to find the current plan name and the new pending name
+            // Parameter for getting the entitlement is the name: name.
+            // const currentPlan = entitlement.currentPlan;
+            if (status === 'approve') {
+                // Approve plan change, this would only be for a manual approve.
+                // An automated approval would be handled by a Pub/Sub notification.
+                // Remove user from current policy and add to new plan related policy.
+                // Re-factor removeEntitlement so that it doesn't call createOrUpdateAccount maybe, in order that we can remove and add using the same functions.
+                const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
+
+                const existingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
+                const pendingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.newPendingPlan);
+
+                let updateOne = removeEntitlement(account, existingPolicy.policyId);
+                let updateTwo = addEntitlement(updateOne.account, pendingPolicy.policyId);
+
+                if (updateOne.changed === true || updateTwo.changed === true) {
+                    await accountManager.createOrUpdateAccount(projectId, updateTwo.account.accountId, updateTwo.account);
+                }
+
+                const result = await procurementUtil.approvePlanChange(name, entitlement.newPendingPlan);
+                return { success: true, data: result };
+            } else if (status === 'reject') {
+                // No need to do anything further, existing plan and policy relations will remain the same.
+                const result = await procurementUtil.rejectPlanChange(name, entitlement.newPendingPlan, reason);
+                return { success: true, data: result };
+            }
         }
     } catch (err) {
         console.error(err);
@@ -168,28 +211,46 @@ async function approveEntitlement(projectId, name, status, reason, accountId, po
 }
 
 /**
- * @param  {} projectId
- * @param  {} accountId
+ * @param  {} accountData
  * @param  {} policyId
  */
-async function removeEntitlement(projectId, accountId, policyId) {
-    const account = await accountManager.getAccount(projectId, accountId);
+function removeEntitlement(accountData, policyId) {
     const policyRecord = { policyId: policyId };
-    let accountData = account.data;
     let policies = accountData.policies || [];
     const found = underscore.findWhere(policies, policyRecord);
     if (found) {
-        // Remove the matched policyId.
         policies = underscore.without(policies, underscore.findWhere(policies, policyRecord));
         const filtered = policies.filter(function (el) {
             return el != null && el.policyId.trim() !== '';
         });
-        // TODO: Get rid of this conversion
-        accountData.policies = filtered.map(e => e.policyId);
+        accountData.policies = filtered;
         accountData.createdBy = accountData.email;
-        await accountManager.createOrUpdateAccount(projectId, accountId, accountData);
+        return { changed: true, account: accountData };
     } else {
-        console.error(`Policy not found: '${policyId}', account '${accountId}' will not be updated.`);
+        console.error(`Policy not found: '${policyId}'`);
+        return { changed: false, account: accountData };
+    }
+}
+
+/**
+ * @param  {} accountData
+ * @param  {} policyId
+ */
+function addEntitlement(accountData, policyId) {
+    const policyRecord = { policyId: policyId };
+    let policies = accountData.policies || [];
+    const found = underscore.findWhere(policies, policyRecord);
+    if (!found) {
+        policies.push(policyRecord);
+        const filtered = policies.filter(function (el) {
+            return el != null && el.policyId.trim() !== '';
+        });
+        accountData.policies = filtered;
+        accountData.createdBy = accountData.email;
+        return { changed: true, account: accountData };
+    } else {
+        console.error(`Policy not found: '${policyId}'`);
+        return { changed: false, account: accountData };
     }
 }
 
@@ -206,41 +267,63 @@ async function autoApproveEntitlement(projectId, entitlementId) {
     // Get the entitlement object from the procurement api
     const entitlement = await procurementUtil.getEntitlement(entitlementName);
     console.log(`Entitlement: ${JSON.stringify(entitlement, null, 3)}`);
+
+    const state = entitlement.state;
     const product = entitlement.product;
     const plan = entitlement.plan;
     const accountName = entitlement.account;
 
-    const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
-    console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
-    if (policyData && policyData.success === true && policyData.data.marketplace) {
-        const policy = policyData.data;
-        const enableAutoApprove = policy.marketplace.enableAutoApprove;
-        if (enableAutoApprove === true) {
-            console.log(`Auto approve is enabled for policy ${policy.policyId}, will check if the user account is already activated`);
-            // We need to associate the user to this entitlement, so user must register and activate.
-            if (accountName) {
-                // Approve the account (if it's activated in Datashare already)
-                // Otherwise, do not approve - return, and only approve upon the account dataManager activation
-                // When activating an account, check if there are any pending entitlement activations
-                // which are associated to policies that allow enableAutoApprove
-                // If so, upon activating the account, associate the policy and approve the entitlement
-                const accountData = await accountManager.findMarketplaceAccount(projectId, accountName);
-                console.log(`Account data: ${JSON.stringify(accountData, null, 3)}`);
-                if (accountData && accountData.success) {
-                    console.log(`Account is already activated, will now proceed to approve the entitlement`);
-                    const account = accountData.data;
+    // TODO: Handle state for plan change, and update as necessary.
 
-                    // We should not auto approve the entitlement if the account was not activated
-                    // as if the account wasn't activated yet, we do not know the email address for the associated user
-                    // As a side note, an entitlement cannot be approved unless the associated account is already activated
-                    // the account should always be approved first, followed by the entitlement
-                    await approveEntitlement(projectId, entitlementName, 'approve', null, account.accountId, policy.policyId);
-                } else {
-                    console.log(`Account was not found, entitlement will not be auto-approved`);
+    if (state === 'ENTITLEMENT_ACTIVATION_REQUESTED') {
+        const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
+        console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
+        if (policy && policy.marketplace) {
+            const enableAutoApprove = policy.marketplace.enableAutoApprove;
+            if (enableAutoApprove === true) {
+                console.log(`Auto approve is enabled for policy ${policy.policyId}, will check if the user account is already activated`);
+                // We need to associate the user to this entitlement, so user must register and activate.
+                if (accountName) {
+                    // Approve the account (if it's activated in Datashare already)
+                    // Otherwise, do not approve - return, and only approve upon the account dataManager activation
+                    // When activating an account, check if there are any pending entitlement activations
+                    // which are associated to policies that allow enableAutoApprove
+                    // If so, upon activating the account, associate the policy and approve the entitlement
+                    const account = await accountManager.findMarketplaceAccount(projectId, accountName);
+                    console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
+                    if (account) {
+                        console.log(`Account is already activated, will now proceed to approve the entitlement`);
+                        // We should not auto approve the entitlement if the account was not activated
+                        // as if the account wasn't activated yet, we do not know the email address for the associated user
+                        // As a side note, an entitlement cannot be approved unless the associated account is already activated
+                        // the account should always be approved first, followed by the entitlement
+                        await approveEntitlement(projectId, entitlementName, 'approve', 'Auto-approved');
+                    } else {
+                        console.log(`Account was not found, entitlement will not be auto-approved`);
+                    }
+                }
+            } else {
+                console.log(`Auto approve is not enabled for policy: ${policy.policyId}`);
+            }
+        }
+    } else if (state === 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL') {
+        const policy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.newPendingPlan);
+        console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
+        if (policy && policy.marketplace) {
+            const enableAutoApprove = policy.marketplace.enableAutoApprove;
+            if (enableAutoApprove === true) {
+                console.log(`Auto approve is enabled for policy ${policy.policyId}, will check if the user account is already activated`);
+                if (accountName) {
+                    const account = await accountManager.findMarketplaceAccount(projectId, accountName);
+                    console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
+                    if (account) {
+                        console.log(`Account is already activated, will now proceed to approve the entitlement`);
+                        await approveEntitlement(projectId, entitlementName, 'approve', 'Auto-approved plan change');
+                    } else {
+                        console.log(`Account was not found, entitlement will not be auto-approved`);
+                    }
                 }
             }
-        } else {
-            console.log(`Auto approve is not enabled for policy: ${policy.policyId}`);
         }
     }
 }
@@ -262,15 +345,17 @@ async function cancelEntitlement(projectId, entitlementId) {
     const plan = entitlement.plan;
     const accountName = entitlement.account;
 
-    const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
-    console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
-    if (policyData.success === true) {
-        const accountData = await accountManager.findMarketplaceAccount(projectId, accountName);
-        console.log(`Account data: ${JSON.stringify(accountData, null, 3)}`);
-        if (accountData && accountData.success) {
+    const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
+    console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
+    if (policy) {
+        const account = await accountManager.findMarketplaceAccount(projectId, accountName);
+        console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
+        if (account) {
             console.log(`Account found, will now proceed to remove the entitlement`);
-            const account = accountData.data;
-            await removeEntitlement(projectId, account.accountId, policyData.data.policyId);
+            const result = removeEntitlement(account, policy.policyId);
+            if (result.changed === true) {
+                await accountManager.createOrUpdateAccount(projectId, result.account.accountId, result.account);
+            }
         }
     } else {
         console.error(`Policy not found for cancelled entitlementId: ${entitlementId}`);

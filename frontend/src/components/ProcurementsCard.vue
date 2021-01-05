@@ -6,6 +6,8 @@
       :items="procurementRequests"
       :search="search"
       :loading="loading"
+      :sort-by.sync="sortBy"
+      :sort-desc.sync="sortDesc"
     >
       <template v-slot:loading>
         <v-row justify="center" align="center">
@@ -64,7 +66,13 @@
       <template v-slot:item.updateTime="{ item }">
         {{ toLocalTime(item.updateTime) }} </template
       ><template v-slot:item.action="{ item }">
-        <v-tooltip top v-if="item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'">
+        <v-tooltip
+          top
+          v-if="
+            item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED' ||
+              item.state === 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'
+          "
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
@@ -94,7 +102,8 @@
           top
           v-if="
             item.activated === true &&
-              item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'
+              (item.state === 'ENTITLEMENT_ACTIVATION_REQUESTED' ||
+                item.state === 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL')
           "
         >
           <template v-slot:activator="{ on }">
@@ -144,7 +153,11 @@
                   color="red"
                 ></v-radio>
                 <v-radio
-                  v-if="selectedItem.state !== 'ENTITLEMENT_CANCELLED'"
+                  v-if="
+                    selectedItem.state !== 'ENTITLEMENT_CANCELLED' &&
+                      selectedItem.state !==
+                        'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'
+                  "
                   label="Comment"
                   value="comment"
                   color="amber"
@@ -152,7 +165,10 @@
                 <v-radio
                   v-if="
                     selectedItem.activated === true &&
-                      selectedItem.state === 'ENTITLEMENT_ACTIVATION_REQUESTED'
+                      (selectedItem.state ===
+                        'ENTITLEMENT_ACTIVATION_REQUESTED' ||
+                        selectedItem.state ===
+                          'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL')
                   "
                   label="Approve"
                   value="approve"
@@ -163,6 +179,10 @@
                 v-slot="{ errors }"
                 name="Comment"
                 rules="required"
+                v-if="
+                  approvalDialogData.approvalStatus == 'comment' ||
+                    approvalDialogData.approvalStatus == 'reject'
+                "
               >
                 <v-textarea
                   v-model="approvalDialogData.comment"
@@ -309,20 +329,25 @@ export default {
         name: 'Cancelled',
         value: 'ENTITLEMENT_CANCELLED'
       },
-      /*{
+      {
         name: 'Pending Plan Change',
         value: 'ENTITLEMENT_PENDING_PLAN_CHANGE'
       },
       {
         name: 'Pending Plan Change Approval',
         value: 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'
-      },*/
+      },
       {
         name: 'Suspended',
         value: 'ENTITLEMENT_SUSPENDED'
       }
     ],
-    selectedEntitlementStates: ['ENTITLEMENT_ACTIVATION_REQUESTED']
+    selectedEntitlementStates: [
+      'ENTITLEMENT_ACTIVATION_REQUESTED',
+      'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'
+    ],
+    sortBy: 'updateTime',
+    sortDesc: true
   }),
   created() {
     this.loadProcurementRequests();
@@ -374,9 +399,7 @@ export default {
                 projectId: config.projectId,
                 name: this.selectedItem.name,
                 status: this.approvalDialogData.approvalStatus,
-                reason: this.approvalDialogData.comment,
-                accountId: this.selectedItem.accountId,
-                policyId: policyId
+                reason: this.approvalDialogData.comment
               })
               .then(result => {
                 this.loading = false;
@@ -429,11 +452,6 @@ export default {
       this.presentApprovalDialog(item, 'approve');
     },
     entitlementStateChanged() {
-      /*console.log(
-        `Entitlement state changed ${JSON.stringify(
-          this.selectedEntitlementStates
-        )}`
-      );*/
       this.loadProcurementRequests();
     }
   }

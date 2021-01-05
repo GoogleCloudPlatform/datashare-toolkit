@@ -171,9 +171,7 @@ procurements.post('/projects/:projectId/procurements/approve', async (req, res) 
     const name = req.body.name;
     const status = req.body.status;
     const reason = req.body.reason;
-    const accountId = req.body.accountId;
-    const policyId = req.body.policyId;
-    const data = await dataManager.approveEntitlement(projectId, name, status, reason, accountId, policyId);
+    const data = await dataManager.approveEntitlement(projectId, name, status, reason);
     var code;
     if (data && data.success === false) {
         code = (data.code === undefined) ? 500 : data.code;

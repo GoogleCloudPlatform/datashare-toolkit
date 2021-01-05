@@ -53,7 +53,10 @@
               <v-list-item v-else :key="`item-${i}`" :value="item">
                 <template v-slot:default="{}">
                   <v-list-item-content>
-                    <v-list-item-title v-text="item.name"></v-list-item-title>
+                    <v-list-item-title
+                      :style="policyTitleColor(item.policyId)"
+                      v-text="item.name"
+                    ></v-list-item-title>
                     <v-list-item-subtitle
                       v-text="item.description"
                     ></v-list-item-subtitle>
@@ -62,6 +65,7 @@
                     <v-checkbox
                       :value="item.policyId"
                       v-model="user.policies"
+                      :color="policyCheckboxColor(item.policyId)"
                     ></v-checkbox>
                   </v-list-item-action>
                 </template>
@@ -143,13 +147,15 @@ export default {
     policies: [],
     loading: false,
     initialSelectedPolicies: [],
+    marketplacePurchasedPolicies: [],
     user: {
       rowId: null,
       accountId: null,
       emailType: null,
       email: null,
       policies: [],
-      marketplace: []
+      marketplace: [],
+      marketplaceActivated: null
     },
     emailTypes: ['user', 'group', 'serviceAccount'],
     showError: false
@@ -169,6 +175,9 @@ export default {
   },
   computed: {
     hasPolicyChanges() {
+      // TODO: https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/398
+      console.log(this.initialSelectedPolicies);
+      console.log(this.user.policies);
       let added = [];
       let removed = [];
       if (
@@ -268,9 +277,32 @@ export default {
             this.user.policies = policies;
             this.user.marketplace = account.marketplace;
             this.initialSelectedPolicies = policies;
+            this.user.marketplaceActivated = account.marketplaceActivated;
+            this.marketplacePurchasedPolicies = account.policies
+              .filter(p => p.marketplaceEntitlementActive === true)
+              .map(p => p.policyId);
           }
           this.loading = false;
         });
+    },
+    policyCheckboxColor(policyId) {
+      if (this.user.marketplaceActivated === true) {
+        if (this.marketplacePurchasedPolicies.includes(policyId)) {
+          return 'green';
+        } else {
+          return 'orange';
+        }
+      }
+      return '';
+    },
+    policyTitleColor(policyId) {
+      if (this.user.marketplaceActivated === true) {
+        const cbColor = this.policyCheckboxColor(policyId);
+        if (cbColor != '') {
+          return `color:${cbColor}`;
+        }
+      }
+      return '';
     }
   }
 };

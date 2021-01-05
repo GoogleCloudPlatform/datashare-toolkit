@@ -294,15 +294,17 @@ accounts.get('/projects/:projectId/accounts/:accountId', async (req, res) => {
     const projectId = req.params.projectId;
     const accountId = req.params.accountId;
     const data = await dataManager.getAccount(projectId, accountId);
+    const success = data !== null;
     var code;
-    if (data && data.success === false) {
-        code = (data.code === undefined) ? 500 : data.code;
+    if (data && success === false) {
+        code = 404;
     } else {
-        code = (data.code === undefined) ? 200 : data.code;
+        code = 200;
     }
     res.status(code).json({
-        code: code,
-        ...data
+        code,
+        success,
+        data,
     });
 });
 

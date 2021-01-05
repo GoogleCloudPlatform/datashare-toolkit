@@ -305,6 +305,10 @@ async function initializePubSubListener() {
                         console.log(`Running cancellation for eventType: ${eventType}`);
                         const entitlement = data.entitlement;
                         await procurementManager.cancelEntitlement(projectId, entitlement.id)
+                    } else if (eventType === 'ENTITLEMENT_PLAN_CHANGE_REQUESTED') {
+                        console.log(`Running auto approve for eventType: ${eventType}`);
+                        const entitlement = data.entitlement;
+                        await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
                     }
                     else {
                         console.debug(`Event type not implemented: ${eventType}`);
