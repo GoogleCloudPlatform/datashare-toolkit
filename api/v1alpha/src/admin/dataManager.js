@@ -242,6 +242,7 @@ async function initializePubSubListener() {
 
     let projectId = cfg.projectId;
     if (!projectId) {
+        // If projectId is not available, attempt fallback using gcp-metadata
         // https://github.com/googleapis/gcp-metadata
         // https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata
         const gcpMetadata = require('gcp-metadata');
