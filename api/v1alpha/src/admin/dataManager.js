@@ -240,24 +240,20 @@ async function setupDatasharePrerequisites(projectId) {
 async function initializePubSubListener() {
     console.log(`Initializing PubSub listener`);
 
-    let projectId = '';
-    // https://github.com/googleapis/gcp-metadata
-    // https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata
-    const gcpMetadata = require('gcp-metadata');
-    const isAvailable = await gcpMetadata.isAvailable();
-    if (isAvailable === true) {
-        console.log('gcpMetadata is available, getting projectId');
-        projectId = await gcpMetadata.project('project-id');
-        console.log(`Project Id of running instance: ${projectId}`); // ...Project ID of the running instance
-    } else {
-        console.log('gcpMetadata is unavailable, will not start PubSub listener');
-
-        if (process.env.NODE_ENV === 'production' || process.env.VUE_APP_APICLIENT == 'server') {
+    let projectId = cfg.projectId;
+    if (!projectId) {
+        // If projectId is not available, attempt fallback using gcp-metadata
+        // https://github.com/googleapis/gcp-metadata
+        // https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata
+        const gcpMetadata = require('gcp-metadata');
+        const isAvailable = await gcpMetadata.isAvailable();
+        if (isAvailable === true) {
+            console.log('gcpMetadata is available, getting projectId');
+            projectId = await gcpMetadata.project('project-id');
+            console.log(`Project Id of running instance: ${projectId}`); // ...Project ID of the running instance
+        } else {
             console.log('Could not identify project, will not start up subscription');
             return;
-        } else {
-            console.log('Running locally will default to demo project');
-            projectId = 'cds-demo-2';
         }
     }
 
