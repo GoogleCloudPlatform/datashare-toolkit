@@ -678,9 +678,8 @@ async function deleteDatasetView(projectId, datasetId, viewId, data) {
         // console.log(`Executing policy update: ${policyStatement}`);
         const policyOptions = {
             query: policyStatement,
-            params: { createdBy: data.createdBy, datasetId: datasetId, tableId: viewId }
+            params: { createdBy: data.createdBy, datasetId: datasetId, tableId: currentView.data.name }
         };
-        console.log(policyOptions.query);
         await bigqueryUtil.executeQuery(policyOptions);
 
         return { success: true, data: {} };
