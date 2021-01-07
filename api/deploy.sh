@@ -53,14 +53,15 @@ export SERVICE_ACCOUNT_NAME=ds-api-mgr;
 CLUSTER=datashare
 gcloud config set compute/zone $ZONE
 
-gcloud beta run deploy ds-api \
+gcloud run deploy ds-api \
   --cluster $CLUSTER \
   --cluster-location $ZONE \
   --min-instances 1 \
   --namespace $NAMESPACE \
   --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
   --platform gke \
-  --service-account ${SERVICE_ACCOUNT_NAME}
+  --service-account ${SERVICE_ACCOUNT_NAME} \
+  --update-env-vars=PROJECT_ID="${PROJECT_ID}"
 
 gcloud run services update-traffic ds-api \
     --cluster $CLUSTER \
