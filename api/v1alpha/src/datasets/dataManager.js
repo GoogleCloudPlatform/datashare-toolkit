@@ -575,6 +575,12 @@ async function createView(view, overrideSql) {
         console.log("Authorizing view objects for access from other datasets");
         if (view.hasOwnProperty('source') && view.source !== null) {
             let source = view.source;
+            // https://github.com/GoogleCloudPlatform/datashare-toolkit/pull/409
+            // Before table-level access was allowed, it wasn't valid to authorize a view within the same dataset, as if you have
+            // access to a dataset, you would have access to all of its objects
+            // Now that table-level access is available, there are cases where a user does not have dataset-level access,
+            // but have access to one or more tables or views, in which case authorizing views at the dataset level is required
+            // if and when selecting data from another object within the same dataset for which a user does not have direct permission.
             await bigqueryUtil.shareAuthorizeView(source.datasetId, view.projectId, view.datasetId, view.name, viewCreated);
             if (view.accessControl && view.accessControl.enabled === true && cfg.cdsDatasetId !== view.datasetId) {
                 await bigqueryUtil.shareAuthorizeView(cfg.cdsDatasetId, view.projectId, view.datasetId, view.name, viewCreated);
