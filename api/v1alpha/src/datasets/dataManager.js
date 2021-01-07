@@ -575,10 +575,7 @@ async function createView(view, overrideSql) {
         console.log("Authorizing view objects for access from other datasets");
         if (view.hasOwnProperty('source') && view.source !== null) {
             let source = view.source;
-            if (source.datasetId !== view.datasetId) {
-                // Need to authorize the view from the source tables
-                await bigqueryUtil.shareAuthorizeView(source.datasetId, view.projectId, view.datasetId, view.name, viewCreated);
-            }
+            await bigqueryUtil.shareAuthorizeView(source.datasetId, view.projectId, view.datasetId, view.name, viewCreated);
             if (view.accessControl && view.accessControl.enabled === true && cfg.cdsDatasetId !== view.datasetId) {
                 await bigqueryUtil.shareAuthorizeView(cfg.cdsDatasetId, view.projectId, view.datasetId, view.name, viewCreated);
             }
