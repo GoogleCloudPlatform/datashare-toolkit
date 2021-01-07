@@ -630,6 +630,59 @@ async function deleteDatasetView(projectId, datasetId, viewId, data) {
         await _deleteData(projectId, fields, values, params);
         const bigqueryUtil = new BigQueryUtil(projectId);
         await bigqueryUtil.deleteTable(currentView.data.datasetId, currentView.data.name, false);
+
+        // Updated related policies to remove the deleted dataset
+        const policyStatement = `INSERT INTO \`datashare.policy\` (rowId, policyId, name, description, isTableBased, datasets, rowAccessTags, createdBy, createdAt, isDeleted)
+    WITH datasetRows as (
+      SELECT rowId
+      FROM \`datashare.currentPolicy\` cp
+      WHERE cp.isDeleted = FALSE AND cp.isTableBased IS TRUE AND EXISTS (SELECT 1
+        FROM UNNEST(cp.datasets) d
+        CROSS JOIN UNNEST(d.tables) t
+        WHERE datasetId = @datasetId AND t.tableId = @tableId)
+    ),
+    datasets as (
+      SELECT cp.rowId, d.datasetId, ARRAY_AGG(STRUCT(t.tableId)) as tables
+      FROM \`datashare.currentPolicy\` cp
+      CROSS JOIN cp.datasets d
+      JOIN datasetRows dr on cp.rowId = dr.rowId
+      CROSS JOIN d.tables t
+      WHERE t.tableId != @tableId
+      GROUP BY cp.rowId, d.datasetId
+    ),
+    availableDatasets as (
+      SELECT schema_name as datasetId
+      FROM INFORMATION_SCHEMA.SCHEMATA
+    ),
+    policyDatasets as (
+      SELECT d.rowId, ARRAY_AGG(STRUCT(d.datasetId, d.tables)) as datasets
+      FROM datasets d
+      JOIN availableDatasets a on a.datasetId = d.datasetId
+      GROUP BY d.rowId
+    )
+    select
+      GENERATE_UUID() as rowId,
+      policyId,
+      name,
+      description,
+      isTableBased,
+      pd.datasets,
+      rowAccessTags,
+      @createdBy,
+      CURRENT_TIMESTAMP() as createdAt,
+      isDeleted
+    FROM datasetRows dr
+    JOIN \`datashare.currentPolicy\` cp on dr.rowId = cp.rowId
+    LEFT JOIN policyDatasets pd on cp.rowId = pd.rowId;`;
+
+        // console.log(`Executing policy update: ${policyStatement}`);
+        const policyOptions = {
+            query: policyStatement,
+            params: { createdBy: data.createdBy, datasetId: datasetId, tableId: viewId }
+        };
+        console.log(policyOptions.query);
+        await bigqueryUtil.executeQuery(policyOptions);
+
         return { success: true, data: {} };
     } catch (err) {
         console.log(err);
