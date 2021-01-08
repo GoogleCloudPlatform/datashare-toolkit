@@ -175,13 +175,12 @@ export default {
   },
   computed: {
     hasPolicyChanges() {
-      console.log(this.user.policies);
-
       const _initialSelectedPolicies = JSON.parse(
         JSON.stringify(this.initialSelectedPolicies)
       );
-      const _userPolicies = JSON.parse(JSON.stringify(this.user.policies));
+      const _userPolicies = this.user.policies.map(p => p.policyId);
 
+      console.log(this.user.policies);
       console.log(_initialSelectedPolicies);
       console.log(_userPolicies);
 
