@@ -740,6 +740,7 @@ export default {
                   this.dialogTitle = 'Validation Status';
                   this.dialogText = 'The view configuration is valid.';
                   this.showDialog = true;
+                  this.setErrors(null);
                 } else {
                   if (response.data) {
                     if (response.data.rows && response.data.rows.length > 0) {

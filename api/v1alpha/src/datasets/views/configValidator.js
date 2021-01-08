@@ -141,8 +141,7 @@ class ConfigValidator {
         else {
             if (await bigqueryUtil.datasetExists(view.datasetId) === false) {
                 this.logIssue(IssueType.ERROR, `Dataset '${view.datasetId}' does not exist`, 'datasetId');
-            }
-            else {
+            } else {
                 datasetFound = true;
                 let labelValue = await bigqueryUtil.getDatasetLabelValue(view.datasetId, cfg.cdsManagedLabelKey);
                 if (labelValue !== 'true') {
@@ -151,11 +150,38 @@ class ConfigValidator {
             }
         }
 
+        const isNewTable = (!view.rowId && !view.viewId) ? true : false;
+        let duplicateIdentified = false;
+
         if (datasetFound && view.name) {
-            if (await bigqueryUtil.viewExists(view.datasetId, view.name)) {
+            const tableExists = await bigqueryUtil.tableExists(view.datasetId, view.name);
+            if (tableExists === true) {
                 let labelValue = await bigqueryUtil.getTableLabelValue(view.datasetId, view.name, cfg.cdsManagedLabelKey);
                 if (labelValue !== 'true') {
-                    this.logIssue(IssueType.ERROR, `An existing view exists for '${view.projectId}.${view.name}'. In order to modify this view, the label '${cfg.cdsManagedLabelKey}' must be defined on the view with current configuration value '${view.name}'. You may also resolve the issue by giving the view a unique name that does not currently exist in BigQuery.`);
+                    this.logIssue(IssueType.ERROR, `An existing view already exists for '${view.projectId}.${view.name}'. In order to modify this view, the label '${cfg.cdsManagedLabelKey}' must be defined on the view with value 'true'. You may also resolve the issue by giving the view a unique name that does not currently exist in BigQuery.`, 'name');
+                    duplicateIdentified = true;
+                } else if (isNewTable) {
+                    this.logIssue(IssueType.ERROR, `An existing view already exists with the name '${view.projectId}.${view.name}'.`, 'name');
+                    duplicateIdentified = true;
+                }
+            }
+
+            if (duplicateIdentified === false && isNewTable === true) {
+                const table = this.getTableFqdn(view.projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId);
+                const query = `SELECT COUNT(*) AS count
+            FROM \`${table}\`
+            WHERE datasetId = @datasetId AND name = @tableId AND isDeleted IS FALSE
+            `;
+                const options = {
+                    query: query,
+                    params: { datasetId: view.datasetId, tableId: view.name }
+                };
+                console.log(options);
+                const [rows] = await bigqueryUtil.executeQuery(options);
+                const count = rows[0].count;
+                if (count > 0) {
+                    this.logIssue(IssueType.ERROR, `An existing view already exists with the name '${view.projectId}.${view.name}'.`, 'name');
+                    duplicateIdentified = true;
                 }
             }
         }
@@ -239,20 +265,20 @@ class ConfigValidator {
         /*
         if (source.hasOwnProperty('accessControl')) {
             let accessControl = source.accessControl;
-
+        
             // If accessControlEnabled is true, than accessControlLabelColumn must be provided.
             if (accessControl.enabled && accessControl.enabled === true) {
                 if (!accessControl.labelColumn || accessControl.labelColumn.length === 0) {
                     this.logIssue(IssueType.ERROR, `'accessControl.labelColumn' must be provided for view '${view.name}'`, 'source.accessControl.labelColumn');
                 }
-
+        
                 if (_tableExists === true) {
                     // Check for the existance of labelColumn
                     await this.areAllColumnsAvailable([accessControl.labelColumn], source.datasetId, source.tableId, `View '${view.name}' has a 'labelColumn' defined that is not available in source table '${source.datasetId}.${source.tableId}'`, 'accessControl.labelColumn');
                 }
             }
         }*/
-        
+
         if (view.hasOwnProperty('custom')) {
             let custom = view.custom;
 
@@ -373,6 +399,16 @@ class ConfigValidator {
             }
         }
         return missingColumns;
+    }
+
+    /**
+ * @param  {string} projectId
+ * @param  {string} datasetId
+ * @param  {string} tableId
+ * Get the FQDN format for a project's table or view name
+ */
+    getTableFqdn(projectId, datasetId, tableId) {
+        return `${projectId}.${datasetId}.${tableId}`;
     }
 }
 
