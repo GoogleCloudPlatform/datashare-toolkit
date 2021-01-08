@@ -11,7 +11,9 @@
 * Sets the GCP project ID as an environment variable on the API.
 
 ### Bug Fixes
-* Resolved a bug where the deployment would fail if the user did not include the UI domain name in the launch page.
+* Resolved a bug where the deployment would fail if the user did not include the UI domain name in the launch page [406](https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/406)
+* Resolved issue [411](https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/411)
+* Resolved issue [413](https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/413)
 
 ### Known Bugs
 
