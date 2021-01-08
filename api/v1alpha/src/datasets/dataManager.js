@@ -575,10 +575,13 @@ async function createView(view, overrideSql) {
         console.log("Authorizing view objects for access from other datasets");
         if (view.hasOwnProperty('source') && view.source !== null) {
             let source = view.source;
-            if (source.datasetId !== view.datasetId) {
-                // Need to authorize the view from the source tables
-                await bigqueryUtil.shareAuthorizeView(source.datasetId, view.projectId, view.datasetId, view.name, viewCreated);
-            }
+            // https://github.com/GoogleCloudPlatform/datashare-toolkit/pull/409
+            // Before table-level access was allowed, it wasn't valid to authorize a view within the same dataset, as if you have
+            // access to a dataset, you would have access to all of its objects.
+            // Now that table-level access is available, there are cases where a user does not have dataset-level access,
+            // but have access to one or more tables or views, in which case authorizing views at the dataset level is required
+            // if and when selecting data from another object within the same dataset for which a user does not have direct permission.
+            await bigqueryUtil.shareAuthorizeView(source.datasetId, view.projectId, view.datasetId, view.name, viewCreated);
             if (view.accessControl && view.accessControl.enabled === true && cfg.cdsDatasetId !== view.datasetId) {
                 await bigqueryUtil.shareAuthorizeView(cfg.cdsDatasetId, view.projectId, view.datasetId, view.name, viewCreated);
             }
@@ -627,6 +630,58 @@ async function deleteDatasetView(projectId, datasetId, viewId, data) {
         await _deleteData(projectId, fields, values, params);
         const bigqueryUtil = new BigQueryUtil(projectId);
         await bigqueryUtil.deleteTable(currentView.data.datasetId, currentView.data.name, false);
+
+        // Updated related policies to remove the deleted table/view
+        const policyStatement = `INSERT INTO \`datashare.policy\` (rowId, policyId, name, description, isTableBased, datasets, rowAccessTags, createdBy, createdAt, isDeleted)
+    WITH datasetRows as (
+      SELECT rowId
+      FROM \`datashare.currentPolicy\` cp
+      WHERE cp.isDeleted = FALSE AND cp.isTableBased IS TRUE AND EXISTS (SELECT 1
+        FROM UNNEST(cp.datasets) d
+        CROSS JOIN UNNEST(d.tables) t
+        WHERE datasetId = @datasetId AND t.tableId = @tableId)
+    ),
+    datasets as (
+      SELECT cp.rowId, d.datasetId, ARRAY_AGG(STRUCT(t.tableId)) as tables
+      FROM \`datashare.currentPolicy\` cp
+      CROSS JOIN cp.datasets d
+      JOIN datasetRows dr on cp.rowId = dr.rowId
+      CROSS JOIN d.tables t
+      WHERE t.tableId != @tableId
+      GROUP BY cp.rowId, d.datasetId
+    ),
+    availableDatasets as (
+      SELECT schema_name as datasetId
+      FROM INFORMATION_SCHEMA.SCHEMATA
+    ),
+    policyDatasets as (
+      SELECT d.rowId, ARRAY_AGG(STRUCT(d.datasetId, d.tables)) as datasets
+      FROM datasets d
+      JOIN availableDatasets a on a.datasetId = d.datasetId
+      GROUP BY d.rowId
+    )
+    select
+      GENERATE_UUID() as rowId,
+      policyId,
+      name,
+      description,
+      isTableBased,
+      pd.datasets,
+      rowAccessTags,
+      @createdBy,
+      CURRENT_TIMESTAMP() as createdAt,
+      isDeleted
+    FROM datasetRows dr
+    JOIN \`datashare.currentPolicy\` cp on dr.rowId = cp.rowId
+    LEFT JOIN policyDatasets pd on cp.rowId = pd.rowId;`;
+
+        // console.log(`Executing policy update: ${policyStatement}`);
+        const policyOptions = {
+            query: policyStatement,
+            params: { createdBy: data.createdBy, datasetId: datasetId, tableId: currentView.data.name }
+        };
+        await bigqueryUtil.executeQuery(policyOptions);
+
         return { success: true, data: {} };
     } catch (err) {
         console.log(err);

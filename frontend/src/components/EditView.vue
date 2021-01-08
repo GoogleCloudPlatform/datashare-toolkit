@@ -23,6 +23,7 @@
           rules="required|bigQueryTableIdRule"
         >
           <v-text-field
+            :readonly="viewData != null"
             v-model="view.name"
             :error-messages="errors"
             :counter="1024"
@@ -52,6 +53,7 @@
           rules="required"
         >
           <v-select
+            :readonly="viewData != null"
             v-model="view.datasetId"
             :items="referenceData.managedDatasets"
             item-text="datasetId"
@@ -740,6 +742,7 @@ export default {
                   this.dialogTitle = 'Validation Status';
                   this.dialogText = 'The view configuration is valid.';
                   this.showDialog = true;
+                  this.setErrors(null);
                 } else {
                   if (response.data) {
                     if (response.data.rows && response.data.rows.length > 0) {
