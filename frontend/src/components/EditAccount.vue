@@ -178,7 +178,7 @@ export default {
       const _initialSelectedPolicies = JSON.parse(
         JSON.stringify(this.initialSelectedPolicies)
       );
-      const _userPolicies = this.user.policies.map(p => p.policyId);
+      const _userPolicies = JSON.parse(JSON.stringify(this.user.policies));
 
       console.log(this.user.policies);
       console.log(_initialSelectedPolicies);
