@@ -131,7 +131,9 @@ async function listAccounts(projectId, datasetId, policyId) {
             select
               ca.* EXCEPT(policies),
               cp.policyId,
-              cp.name
+              cp.name,
+              cp.solutionId,
+              cp.planId
             FROM \`${table}\` ca
             cross join unnest(ca.policies) as p
             join policies cp on p.policyId = cp.policyId
@@ -145,7 +147,7 @@ async function listAccounts(projectId, datasetId, policyId) {
             up.createdAt,
             up.createdBy,
             up.version,
-            ARRAY_AGG(struct(policyId, name)) as policies
+            ARRAY_AGG(struct(policyId, name, solutionId, planId)) as policies
           from userPolicies up
           group by up.rowId, up.email, up.emailType, up.accountId, up.createdAt, up.createdBy, up.version`;
         options = {
