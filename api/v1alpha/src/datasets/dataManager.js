@@ -631,7 +631,7 @@ async function deleteDatasetView(projectId, datasetId, viewId, data) {
         const bigqueryUtil = new BigQueryUtil(projectId);
         await bigqueryUtil.deleteTable(currentView.data.datasetId, currentView.data.name, false);
 
-        // Updated related policies to remove the deleted dataset
+        // Updated related policies to remove the deleted table/view
         const policyStatement = `INSERT INTO \`datashare.policy\` (rowId, policyId, name, description, isTableBased, datasets, rowAccessTags, createdBy, createdAt, isDeleted)
     WITH datasetRows as (
       SELECT rowId
