@@ -1,5 +1,21 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.6.2 Release Notes
+* Build - 1/8/2021
+
+### Datashare
+* Datashare release version is 0.5.4
+* Kubernetes cluster version is 1.16 to support incremental changes
+
+### Updates  
+* Sets the GCP project ID as an environment variable on the API.
+
+### Bug Fixes
+* Resolved a bug where the deployment would fail if the user did not include the UI domain name in the launch page.
+
+### Known Bugs
+
+
 ## 0.6.1 Release Notes
 * Build - 11/10/2020
 
@@ -12,7 +28,7 @@
 * Allow a user to select an existing service account (SA) with the appropriate permissions to be used as the SA during the Datashare deployment.
 
 ### Bug Fixes
-* Data Producers field did not accept a comma delimitted string.
+* Data Producers field did not accept a comma delimited string.
 
 ### Known Bugs
 * A user is not able to create a new service account during the launch page - [bug #376](https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/376).
@@ -52,7 +68,7 @@
 
 ### Bug Fixes
 * Fixed the VM startup script that applied the Istio AuthN/AuthZ policies
-* Added enabling the cloudcommerceprocurement API as a prerequisite step 
+* Added enabling the cloudcommerceprocurement API as a prerequisite step
   * removed this from the VM startup script as it caused a permission error
 
 ### Known Bugs
@@ -82,7 +98,7 @@
 * Kubernetes cluster version is 1.16 to support incremental changes
 
 ### Updates
-* Updated the prerequisites documentation. 
+* Updated the prerequisites documentation.
 
 ### Bug Fixes
 * Fixed a broken link in the display.jinja file.  
@@ -98,12 +114,12 @@
 * Kubernetes cluster version is 1.16 to support incremental changes
 
 ### Updates
-* see below. 
+* see below.
 
 ### Bug Fixes
 * Resolve an bug (syntax issue) reported by the Python editor for the `deploy_ds_api.py` file.  
 * Updated the `releases/datashare-marketplace-vm-solution-0.5.4.zip` to include the hot fix to deploy the API to the GKE cluster.
-* Applied Istio authentication and authorization policies in the VM startup script. 
+* Applied Istio authentication and authorization policies in the VM startup script.
 
 
 ### Known Bugs
@@ -118,7 +134,7 @@
 
 ### Updates
 * Deployment Manager will delete the Google Cloud Storage installation bucket, which contains the Datashare Cloud Function zip file, but it will
-not delete the Storage bucket that contains the customer's data. 
+not delete the Storage bucket that contains the customer's data.
 * Deployment Manager will delete the following resources. There is no need to execute the delete script to delete all Datashare components.
   * Cloud Function
   * Datashare API running on Cloud Run on GKE
@@ -135,7 +151,7 @@ not delete the Storage bucket that contains the customer's data.
 * None
 
 ### Known Bugs
-* If you attempt to delete the Deployment Manager job and it fails for any reason, then you must manually delete all the remaining resources. 
+* If you attempt to delete the Deployment Manager job and it fails for any reason, then you must manually delete all the remaining resources.
 
 
 ## 0.5.3 Release Notes
@@ -165,7 +181,7 @@ not delete the Storage bucket that contains the customer's data.
 * Increased the waiter timeout to 900 seconds from 600 seconds.
 
 ### Bug Fixes
-* When a user attempted to install Datashare via the Marketplace, it attempted to use the Datashare VM image from the user's project, 
+* When a user attempted to install Datashare via the Marketplace, it attempted to use the Datashare VM image from the user's project,
 but this image in included in the gcp-financial-services-public project. Modified the URL to point to the gcp-financial-services-public project.
 * Changed Datashare API deployment name to `ds-api`.  
 
@@ -177,8 +193,8 @@ but this image in included in the gcp-financial-services-public project. Modifie
 * Datashare release version is 0.5.0.
 
 ### Updates
-* Marketplace VM solution requires the input_adminEmail to be included in the schema even if it is not used. 
-  Added this field to the schema to resolve the Marketplace submission error. 
+* Marketplace VM solution requires the input_adminEmail to be included in the schema even if it is not used.
+  Added this field to the schema to resolve the Marketplace submission error.
 
 
 ## 0.5 Release Notes
@@ -207,7 +223,7 @@ The VM solution deployment manager completes the following
   * install bucket
   * ingestion bucket
 * Creates a 3 node GKE cluster (E2 nodes) with Cloud Run enabled
-* Creates a small VM and executes startup script 
+* Creates a small VM and executes startup script
   * Zips the Datashare ingestion Cloud Function and uploads it to install bucket
   * Enables Google Cloud Platform [APIs](https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/marketplace#google-apis-enabled)
   * Creates services accounts with appropriate permissions
