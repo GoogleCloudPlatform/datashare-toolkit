@@ -176,19 +176,24 @@ export default {
   computed: {
     hasPolicyChanges() {
       // TODO: https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/398
-      console.log(this.initialSelectedPolicies);
       console.log(this.user.policies);
+
+      const _initialSelectedPolicies = JSON.parse(
+        JSON.stringify(this.initialSelectedPolicies)
+      );
+      const _userPolicies = JSON.parse(JSON.stringify(this.user.policies));
+
+      console.log(_initialSelectedPolicies);
+      console.log(_userPolicies);
+
       let added = [];
       let removed = [];
-      if (
-        this.initialSelectedPolicies &&
-        this.initialSelectedPolicies.length > 0
-      ) {
-        added = this.user.policies.diff(this.initialSelectedPolicies);
-        removed = this.initialSelectedPolicies.diff(this.user.policies);
+      if (_initialSelectedPolicies && _initialSelectedPolicies.length > 0) {
+        added = _userPolicies.diff(_initialSelectedPolicies);
+        removed = _initialSelectedPolicies.diff(_userPolicies);
       } else {
         // New record, handle all as added
-        added = this.user.policies;
+        added = _userPolicies;
       }
       console.log(`Added: ${JSON.stringify(added)}`);
       console.log(`Removed: ${JSON.stringify(removed)}`);
