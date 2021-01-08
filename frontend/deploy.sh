@@ -27,4 +27,5 @@ gcloud run deploy ds-frontend-ui \
   --image gcr.io/${PROJECT_ID}/ds-frontend-ui:${TAG} \
   --region=us-central1 \
   --allow-unauthenticated \
-  --platform managed
+  --platform managed \
+  --update-env-vars=VUE_APP_PROJECT_ID="${PROJECT_ID}"
