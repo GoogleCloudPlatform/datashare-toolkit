@@ -176,7 +176,6 @@ class ConfigValidator {
                     query: query,
                     params: { datasetId: view.datasetId, tableId: view.name }
                 };
-                console.log(options);
                 const [rows] = await bigqueryUtil.executeQuery(options);
                 const count = rows[0].count;
                 if (count > 0) {
