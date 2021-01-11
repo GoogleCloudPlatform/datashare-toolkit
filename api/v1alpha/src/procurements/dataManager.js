@@ -273,8 +273,6 @@ async function autoApproveEntitlement(projectId, entitlementId) {
     const plan = entitlement.plan;
     const accountName = entitlement.account;
 
-    // TODO: Handle state for plan change, and update as necessary.
-
     if (state === 'ENTITLEMENT_ACTIVATION_REQUESTED') {
         const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
         console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
