@@ -364,13 +364,13 @@ async function getAccount(projectId, accountId, email, emailType) {
     const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
     const policyTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const limit = 2;
-    let filter = 'WHERE accountId = @accountId AND isDeleted is false';
+    let filter = 'WHERE accountId = @accountId AND isDeleted IS FALSE';
     let params = {};
     if (accountId) {
         params.accountId = accountId;
     }
     else if (email && emailType) {
-        filter = 'WHERE email = @email AND emailType = @emailType'; // AND isDeleted is true
+        filter = 'WHERE email = @email AND emailType = @emailType AND isDeleted IS FALSE';
         params = { email: email, emailType: emailType };
     }
 
