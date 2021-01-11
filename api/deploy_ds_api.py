@@ -13,13 +13,25 @@
 # limitations under the License.
 """Creates service account, custom role and builds DS API image and deploys to Cloud Run."""
 
+
 def domain_has_protocol(domain):
+    """ check if the user provided domain name includes the protocol (http or https) """
     if domain.find("https://") >= 0:
         return True
     elif domain.find("http://") >= 0:
         raise Exception('Invalid protocol provided in uiDomainName (http:// should be https:// or not included)')
     else:
         return False
+
+
+def format_domain_name(domain):
+    """ Prepend the domain protocol (https) to the user provided domain name only if it doesn't have the protocol."""
+    domain_protocol = 'https://'
+    if domain_has_protocol(domain):
+        return domain
+    else:
+        return domain_protocol + domain
+
 
 def GenerateConfig(context):
     """Generate YAML resource configuration."""
@@ -35,10 +47,8 @@ def GenerateConfig(context):
     service_acct_name = context.properties['serviceAccountName']
     #service_acct_descr = context.properties['serviceAccountDesc']
     #custom_role_name = context.properties['customRoleName']
-    ui_domain_name = ""
+    ui_domain_name = context.properties['uiDomainName'] if context.properties.get('uiDomainName') != None and context.properties['uiDomainName'] != None and context.properties['uiDomainName'] != '' else ''
     # if hasattr(context.properties, 'uiDomainName'):
-    if context.properties['uiDomainName'] != None:
-        ui_domain_name = context.properties['uiDomainName']
     delete_timeout = '120s'
     general_timeout = context.properties['timeout']
     # admin_sa = context.properties['adminServiceAccount']
@@ -74,8 +84,8 @@ def GenerateConfig(context):
             'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
             'dir': 'ds/datashare-toolkit',
             'entrypoint': 'bash',
-            'args': ['-c', 'if ! gcloud container images describe gcr.io/$PROJECT_ID/ds-api:dev; then ' + 
-                     'gcloud builds submit . --config=api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=' + container_tag + 
+            'args': ['-c', 'if ! gcloud container images describe gcr.io/$PROJECT_ID/ds-api:dev; then ' +
+                     'gcloud builds submit . --config=api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=' + container_tag +
                      '; else exit 0; fi'
                      ]
         },
@@ -86,7 +96,7 @@ def GenerateConfig(context):
         }
         ]
     # select the correct deploy command based on whether deployToGke is True or False
-    if context.properties['deployToGke'] is False or context.properties['deployToGke'] == "false":
+    if context.properties.get('deployToGke') == None or (context.properties['deployToGke'] is False or context.properties['deployToGke'] == "false"):
         steps[2]['args'] = [
             'run',
             'deploy',
@@ -107,18 +117,20 @@ def GenerateConfig(context):
             '--cluster-location=' + cluster_location,
             '--namespace=' + namespace,
             '--min-instances=1',
-            '--image=gcr.io/$PROJECT_ID/' + cloud_run_deploy_name + ':' + container_tag, 
+            '--image=gcr.io/$PROJECT_ID/' + cloud_run_deploy_name + ':' + container_tag,
             '--platform=gke',
             '--service-account=' + service_acct_name
             ]
-    
+
     # if a user includes the UI domain name then include it as an environment variable
-    domain_protocol = 'https://'
+    set_env_vars = '--set-env-vars='
+    project_id_env_var = 'PROJECT_ID=$PROJECT_ID'
     if ui_domain_name is not "":
-        if domain_has_protocol(ui_domain_name):
-            steps[2]['args'].append('--set-env-vars=UI_BASE_URL=' + ui_domain_name)
-        else:
-            steps[2]['args'].append('--set-env-vars=UI_BASE_URL=' + domain_protocol + ui_domain_name)
+        flag = set_env_vars + 'UI_BASE_URL='
+        flag += format_domain_name(ui_domain_name)
+        steps[2]['args'].append(flag + ',' + project_id_env_var)
+    else:
+        steps[2]['args'].append(set_env_vars + project_id_env_var)
 
     git_release = {  # Checkout the correct release
                 'name': 'gcr.io/cloud-builders/git',
@@ -178,7 +190,7 @@ def GenerateConfig(context):
                     'timeout': delete_timeout
                 }
             }
-    if context.properties['deployToGke'] is False or context.properties['deployToGke'] == "false":
+    if context.properties.get('deployToGke') == None or (context.properties['deployToGke'] is False or context.properties['deployToGke'] == "false"):
         delete_action['properties']['steps'][0]['args'][1] = 'gcloud run services delete ' + cloud_run_deploy_name + ' --platform=managed --region=' + region + ' --quiet || exit 0'
     resources.append(delete_action)
 

@@ -11,6 +11,7 @@ resources:
     region: us-central1
     timeout: 600s
     datashareGitReleaseTag: master
+    #uiDomainName: ds.com
   #accessControl:
   #  gcpIamPolicy:
   #    bindings:
@@ -21,4 +22,3 @@ resources:
           # credentials.
           #- serviceAccount:{{ env['project_number'] }}@cloudservices.gserviceaccount.com
    #       - serviceAccount:datashare-deployment-manager@gcp-financial-services-dev.iam.gserviceaccount.com
-          
