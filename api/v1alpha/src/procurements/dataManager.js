@@ -115,7 +115,7 @@ WHERE marketplaceId IN UNNEST(@products)`;
             const query = `SELECT a.accountId, m.accountName, a.email
 FROM \`${table}\` a
 CROSS JOIN UNNEST(a.marketplace) AS m
-WHERE m.isDeleted IS FALSE AND m.accountName IN UNNEST(@accountNames)`;
+WHERE a.isDeleted IS FALSE AND m.accountName IN UNNEST(@accountNames)`;
 
             const options = {
                 query: query,
