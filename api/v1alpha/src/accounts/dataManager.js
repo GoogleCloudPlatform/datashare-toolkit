@@ -421,7 +421,7 @@ async function findMarketplaceAccount(projectId, accountName) {
     const sqlQuery = `SELECT ${fields}
 FROM \`${table}\` c
 CROSS JOIN UNNEST(c.marketplace) m
-WHERE m.accountName = @accountName
+WHERE c.isDeleted IS FALSE AND m.accountName = @accountName
 LIMIT ${limit}`;
     const options = {
         query: sqlQuery,
