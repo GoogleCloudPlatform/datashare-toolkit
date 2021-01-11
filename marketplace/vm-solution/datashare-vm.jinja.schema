@@ -168,11 +168,11 @@ properties:
         # - roles/resourcemanager.projects.setIamPolicy
   input_datashareGithubReleaseVersion:
     type: string
-    default: v0.5.3
+    default: v0.5.4
     enum:
       - 'master'
+      - 'v0.5.4'
       - 'v0.5.3'
-      - 'v0.5.2'
   input_gcpRegion:
     type: string
     default: us-central1
@@ -192,10 +192,10 @@ properties:
     type: string
     default: US
     enum:
-      - 'ASIA'  
+      - 'ASIA'
       - 'EU'
       - 'US'
-      
+
   useRuntimeConfigWaiter:
     type: boolean
     default: True
