@@ -84,7 +84,7 @@ async function listProcurements(projectId, stateFilter) {
         name,
         description
     FROM \`${table}\`
-    WHERE marketplace IS NOT NULL
+    WHERE isDeleted IS FALSE AND marketplace IS NOT NULL
 )
 SELECT *
 FROM policyData
@@ -115,7 +115,7 @@ WHERE marketplaceId IN UNNEST(@products)`;
             const query = `SELECT a.accountId, m.accountName, a.email
 FROM \`${table}\` a
 CROSS JOIN UNNEST(a.marketplace) AS m
-WHERE m.accountName IN UNNEST(@accountNames)`;
+WHERE m.isDeleted IS FALSE AND m.accountName IN UNNEST(@accountNames)`;
 
             const options = {
                 query: query,
