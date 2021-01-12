@@ -8,7 +8,7 @@ function navigateToDataset(projectId, datasetId) {
   window.open(url, '_blank');
 }
 
-function navigateToTable(datasetId, tableId) {
+function navigateToTable(projectId, datasetId, tableId) {
   const url = `https://console.cloud.google.com/bigquery?project=${projectId}&p=${projectId}&d=${datasetId}&t=${tableId}&page=table`;
   window.open(url, '_blank');
 }
