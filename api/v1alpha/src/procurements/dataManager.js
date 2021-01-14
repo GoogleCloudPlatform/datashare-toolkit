@@ -149,10 +149,11 @@ WHERE a.isDeleted IS FALSE AND m.accountName IN UNNEST(@accountNames)`;
  * @param  {} projectId
  * @param  {} entitlementId
  */
-async function activeNewEntitlement(projectId, entitlementId) {
+async function activateNewEntitlement(projectId, entitlementId) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
-        const entitlement = await procurementUtil.getEntitlement(entitlementId);
+        const entitlementName = procurementUtil.getEntitlementName(projectId, entitlementId);
+        const entitlement = await procurementUtil.getEntitlement(entitlementName);
         const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
         const policy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
         const modifiedAccount = addEntitlement(account, policy.policyId);
@@ -172,7 +173,8 @@ async function activeNewEntitlement(projectId, entitlementId) {
 async function activateNewPlanChange(projectId, entitlementId) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
-        const entitlement = await procurementUtil.getEntitlement(entitlementId);
+        const entitlementName = procurementUtil.getEntitlementName(projectId, entitlementId);
+        const entitlement = await procurementUtil.getEntitlement(entitlementName);
         const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
         const existingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
         const pendingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.newPendingPlan);
@@ -420,7 +422,7 @@ module.exports = {
     listProcurements,
     approveEntitlement,
     autoApproveEntitlement,
-    activeNewEntitlement,
+    activateNewEntitlement,
     activateNewPlanChange,
     cancelEntitlement,
     deleteAccount
