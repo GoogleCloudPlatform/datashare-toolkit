@@ -307,11 +307,10 @@ async function initializePubSubListener() {
                     } else if (eventType === 'ENTITLEMENT_PLAN_CHANGED') {
                         // Grant permissions for the plan change
                         console.log(`Running auto approve for eventType: ${eventType}`);
-                        const entitlement = data.entitlement;
-                        await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
+                        await procurementManager.autoApproveEntitlement(projectId, data.entitlement.id)
                     } else if (eventType === 'ACCOUNT_DELETED') {
                         // Delete the user account
-                        await procurementManager.deleteAccount(projectId, entitlement.id);
+                        await procurementManager.deleteAccount(projectId, data.entitlement.id);
                     } else {
                         console.debug(`Event type not implemented: ${eventType}`);
                     }
