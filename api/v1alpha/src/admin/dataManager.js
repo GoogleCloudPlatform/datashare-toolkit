@@ -269,7 +269,8 @@ async function initializePubSubListener() {
         console.log(`Subscription '${subscriptionName}' already exists`)
     } else {
         try {
-            await pubSubUtil.createSubscription(topicName, subscriptionName);
+            const options = {};
+            await pubSubUtil.createSubscription(topicName, subscriptionName, options);
             console.log(`Subscription '${subscriptionName}' created.`);
         } catch (err) {
             console.error(`Unable to create subscription: '${subscriptionName}' to topic: '${topicName}'. Ensure that the topic exists and you have the proper permissions.`);
@@ -299,7 +300,7 @@ async function initializePubSubListener() {
                         await procurementManager.autoApproveEntitlement(projectId, data.entitlement.id)
                     } else if (eventType === 'ENTITLEMENT_ACTIVE') {
                         // Grant permissions for newly active entitlement
-                        await procurementManager.activeNewEntitlement(projectId, data.entitlement.id)
+                        await procurementManager.activateNewEntitlement(projectId, data.entitlement.id)
                     } else if (eventType === 'ENTITLEMENT_CANCELLED' || eventType === 'ENTITLEMENT_DELETED') {
                         // Remove user from the policy
                         console.log(`Running cancellation for eventType: ${eventType}`);
