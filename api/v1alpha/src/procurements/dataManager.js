@@ -157,14 +157,12 @@ async function approveEntitlement(projectId, name, status, reason) {
         const entitlement = await procurementUtil.getEntitlement(name);
         const state = entitlement.state;
 
+        // Newly purchased entitlement
         if (state === 'ENTITLEMENT_ACTIVATION_REQUESTED') {
             if (status === 'approve') {
                 const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
                 const policy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
-                const modifiedAccount = addEntitlement(account, policy.policyId);
-                if (modifiedAccount.changed === true) {
-                    await accountManager.createOrUpdateAccount(projectId, modifiedAccount.account.accountId, modifiedAccount.account);
-                }
+                console.log(`Approving entitlement for account:${account} with policy: ${policy}`);
                 const result = await procurementUtil.approveEntitlement(name);
                 return { success: true, data: result };
             } else if (status === 'reject') {
