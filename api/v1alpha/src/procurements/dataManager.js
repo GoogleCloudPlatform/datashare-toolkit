@@ -208,7 +208,7 @@ async function approveEntitlement(projectId, name, status, reason) {
             if (status === 'approve') {
                 const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
                 const policy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
-                console.log(`Approving entitlement for account:${account} with policy: ${policy}`);
+                console.log(`Approving entitlement for account:${JSON.stringify(account)} with policy: ${JSON.stringify(policy)}`);
                 const result = await procurementUtil.approveEntitlement(name);
                 return { success: true, data: result };
             } else if (status === 'reject') {
@@ -231,7 +231,7 @@ async function approveEntitlement(projectId, name, status, reason) {
                 const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
                 const existingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
                 const pendingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.newPendingPlan);
-                console.log(`Approving entitlement for account:${account} from policy: ${existingPolicy} to policy: ${pendingPolicy}`);
+                console.log(`Approving entitlement for account:${JSON.stringify(account)} from policy: ${JSON.stringify(existingPolicy)} to policy: ${JSON.stringify(pendingPolicy)}`);
                 const result = await procurementUtil.approvePlanChange(name, entitlement.newPendingPlan);
                 return { success: true, data: result };
             } else if (status === 'reject') {
