@@ -269,7 +269,11 @@ async function initializePubSubListener() {
         console.log(`Subscription '${subscriptionName}' already exists`)
     } else {
         try {
-            const options = {};
+            const options = {
+                ackDeadlineSeconds: 600,
+                expirationPolicy: { seconds: null },
+                messageRetentionDuration: (60 * 60 * 24 * 7)
+            };
             await pubSubUtil.createSubscription(topicName, subscriptionName, options);
             console.log(`Subscription '${subscriptionName}' created.`);
         } catch (err) {
@@ -330,6 +334,7 @@ async function initializePubSubListener() {
                 }
             };
             let subscription = pubSubUtil.getSubscription(subscriptionName, subscriberOptions);
+            console.log(subscription);
             subscription.on('message', messageHandler);
             subscription.on('error', errorHandler);
         } catch (err) {
