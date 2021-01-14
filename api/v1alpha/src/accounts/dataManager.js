@@ -590,10 +590,9 @@ async function activate(projectId, host, token, reason, email) {
                             console.log(`${entitlementName} is pending activation for product: ${product} and plan: ${plan}`);
 
                             // Check the policy table to see if there is a policy object matching the marketplace product and plan
-                            const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
-                            console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
-                            if (policyData && policyData.success === true && policyData.data.marketplace) {
-                                const policy = policyData.data;
+                            const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
+                            console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
+                            if (policy && policy.marketplace) {
                                 const enableAutoApprove = policy.marketplace.enableAutoApprove;
 
                                 // If enableAutoApprove is set to true, approve the entitlement via the procurement api
