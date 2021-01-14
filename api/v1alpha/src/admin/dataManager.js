@@ -291,9 +291,6 @@ async function initializePubSubListener() {
                 console.log(`\tData: ${message.data}`);
                 console.log(`\tAttributes: ${JSON.stringify(message.attributes)}`);
 
-                // "Ack" (acknowledge receipt of) the message
-                message.ack();
-
                 if (message.data) {
                     const data = JSON.parse(message.data);
                     console.log(`Event type is: ${data.eventType}`);
@@ -321,6 +318,9 @@ async function initializePubSubListener() {
                         console.debug(`Event type not implemented: ${eventType}`);
                     }
                 }
+
+                // "Ack" (acknowledge receipt of) the message
+                message.ack();
             };
 
             // Create an event handler to handle errors
@@ -334,7 +334,6 @@ async function initializePubSubListener() {
                 }
             };
             let subscription = pubSubUtil.getSubscription(subscriptionName, subscriberOptions);
-            console.log(subscription);
             subscription.on('message', messageHandler);
             subscription.on('error', errorHandler);
         } catch (err) {
