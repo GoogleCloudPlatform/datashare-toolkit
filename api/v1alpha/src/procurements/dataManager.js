@@ -203,17 +203,9 @@ async function approveEntitlement(projectId, name, status, reason) {
                 // Remove user from current policy and add to new plan related policy.
                 // Re-factor removeEntitlement so that it doesn't call createOrUpdateAccount maybe, in order that we can remove and add using the same functions.
                 const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
-
                 const existingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
                 const pendingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.newPendingPlan);
-
-                let updateOne = removeEntitlement(account, existingPolicy.policyId);
-                let updateTwo = addEntitlement(updateOne.account, pendingPolicy.policyId);
-
-                if (updateOne.changed === true || updateTwo.changed === true) {
-                    await accountManager.createOrUpdateAccount(projectId, updateTwo.account.accountId, updateTwo.account);
-                }
-
+                console.log(`Approving entitlement for account:${account} from policy: ${existingPolicy} to policy: ${pendingPolicy}`);
                 const result = await procurementUtil.approvePlanChange(name, entitlement.newPendingPlan);
                 return { success: true, data: result };
             } else if (status === 'reject') {

@@ -293,24 +293,17 @@ async function initializePubSubListener() {
                     const data = JSON.parse(message.data);
                     console.log(`Event type is: ${data.eventType}`);
                     const eventType = data.eventType;
-                    if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
+                    if (eventType === 'ENTITLEMENT_CREATION_REQUESTED' || eventType === 'ENTITLEMENT_PLAN_CHANGE_REQUESTED') {
                         // Perform auto-approve here for policies that have auto-approve enabled.
                         console.log(`Running auto approve for eventType: ${eventType}`);
                         await procurementManager.autoApproveEntitlement(projectId, data.entitlement.id)
                     } else if (eventType === 'ENTITLEMENT_ACTIVE') {
                         // Grant permissions for newly active entitlement.
                         await procurementManager.activeNewEntitlement(projectId, data.entitlement.id)
-                    } else if (eventType === 'ENTITLEMENT_CANCELLED') {
+                    } else if (eventType === 'ENTITLEMENT_CANCELLED' || eventType === 'ENTITLEMENT_DELETED') {
                         // Remove user from the policy.
                         console.log(`Running cancellation for eventType: ${eventType}`);
                         await procurementManager.cancelEntitlement(projectId, data.entitlement.id)
-                    } else if (eventType === 'ENTITLEMENT_DELETED') {
-                        // Remove user from the policy.
-                        console.log(`Running cancellation for eventType: ${eventType}`);
-                        const entitlement = data.entitlement;
-                        await procurementManager.cancelEntitlement(projectId, entitlement.id)
-                    } else if (eventType === 'ENTITLEMENT_PLAN_CHANGE_REQUESTED') {
-                        // If auto-approve is enabled, approve the plan change.
                     } else if (eventType === 'ENTITLEMENT_PLAN_CHANGED') {
                         // Grant permissions for the plan change.
                         console.log(`Running auto approve for eventType: ${eventType}`);
