@@ -146,6 +146,26 @@ WHERE a.isDeleted IS FALSE AND m.accountName IN UNNEST(@accountNames)`;
 }
 
 /**
+ * @param  {} projectId
+ * @param  {} name
+ */
+async function activeNewEntitlement(projectId, name) {
+    try {
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        const entitlement = await procurementUtil.getEntitlement(name);
+        const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
+        const policy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
+        const modifiedAccount = addEntitlement(account, policy.policyId);
+        if (modifiedAccount.changed === true) {
+            await accountManager.createOrUpdateAccount(projectId, modifiedAccount.account.accountId, modifiedAccount.account);
+        }
+    } catch (err) {
+        console.error(err);
+        return { success: false, errors: ['Failed to grant entitlement', err] };
+    }
+}
+
+/**
  * @param  {} projectId The projectId for the provider
  * @param  {} name Name of the entitlement resource
  * @param  {} status The approval status, should be one of ['approve', 'reject', 'comment']
@@ -362,5 +382,6 @@ module.exports = {
     listProcurements,
     approveEntitlement,
     autoApproveEntitlement,
+    activeNewEntitlement,
     cancelEntitlement
 };

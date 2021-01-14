@@ -296,15 +296,14 @@ async function initializePubSubListener() {
                     if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
                         // Perform auto-approve here for policies that have auto-approve enabled.
                         console.log(`Running auto approve for eventType: ${eventType}`);
-                        const entitlement = data.entitlement;
-                        await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
+                        await procurementManager.autoApproveEntitlement(projectId, data.entitlement.id)
                     } else if (eventType === 'ENTITLEMENT_ACTIVE') {
                         // Grant permissions for newly active entitlement.
+                        await procurementManager.activeNewEntitlement(projectId, data.entitlement.id)
                     } else if (eventType === 'ENTITLEMENT_CANCELLED') {
                         // Remove user from the policy.
                         console.log(`Running cancellation for eventType: ${eventType}`);
-                        const entitlement = data.entitlement;
-                        await procurementManager.cancelEntitlement(projectId, entitlement.id)
+                        await procurementManager.cancelEntitlement(projectId, data.entitlement.id)
                     } else if (eventType === 'ENTITLEMENT_DELETED') {
                         // Remove user from the policy.
                         console.log(`Running cancellation for eventType: ${eventType}`);
