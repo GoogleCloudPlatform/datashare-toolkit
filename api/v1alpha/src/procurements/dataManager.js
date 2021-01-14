@@ -370,10 +370,33 @@ async function cancelEntitlement(projectId, entitlementId) {
     }
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} entitlementId
+ */
+async function deleteAccount(projectId, entitlementId) {
+    const procurementUtil = new CommerceProcurementUtil(projectId);
+
+    // Get the fully qualified entitlement resource name
+    const entitlementName = procurementUtil.getEntitlementName(projectId, entitlementId);
+
+    // Get the entitlement object from the procurement api
+    const entitlement = await procurementUtil.getEntitlement(entitlementName);
+    console.log(`Entitlement: ${JSON.stringify(entitlement, null, 3)}`);
+
+    const accountName = entitlement.account;
+    const account = await accountManager.findMarketplaceAccount(projectId, accountName);
+    console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
+    if (account) {
+        await accountManager.deleteAccount(projectId, account.accountId);
+    }
+}
+
 module.exports = {
     listProcurements,
     approveEntitlement,
     autoApproveEntitlement,
     activeNewEntitlement,
-    cancelEntitlement
+    cancelEntitlement,
+    deleteAccount
 };
