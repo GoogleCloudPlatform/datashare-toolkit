@@ -313,7 +313,7 @@ async function initializePubSubListener() {
                     } else if (eventType === 'ACCOUNT_DELETED') {
                         // Delete the user account
                         console.log(`Running delete account for eventType: ${eventType}`);
-                        await procurementManager.deleteAccount(projectId, data.entitlement.id);
+                        await procurementManager.deleteAccount(projectId, data.account.id);
                     } else {
                         console.debug(`Event type not implemented: ${eventType}`);
                     }
