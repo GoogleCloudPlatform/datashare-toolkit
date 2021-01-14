@@ -294,19 +294,29 @@ async function initializePubSubListener() {
                     console.log(`Event type is: ${data.eventType}`);
                     const eventType = data.eventType;
                     if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
+                        // Perform auto-approve here for policies that have auto-approve enabled.
                         console.log(`Running auto approve for eventType: ${eventType}`);
                         const entitlement = data.entitlement;
                         await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
+                    } else if (eventType === 'ENTITLEMENT_ACTIVE') {
+                        // Grant permissions for newly active entitlement.
                     } else if (eventType === 'ENTITLEMENT_CANCELLED') {
+                        // Remove user from the policy.
                         console.log(`Running cancellation for eventType: ${eventType}`);
                         const entitlement = data.entitlement;
                         await procurementManager.cancelEntitlement(projectId, entitlement.id)
+                    } else if (eventType === 'ENTITLEMENT_DELETED') {
+                        // Remove user from the policy.
                     } else if (eventType === 'ENTITLEMENT_PLAN_CHANGE_REQUESTED') {
+                        // If auto-approve is enabled, approve the plan change.
+                    } else if (eventType === 'ENTITLEMENT_PLAN_CHANGED') {
+                        // Grant permissions for the plan change.
                         console.log(`Running auto approve for eventType: ${eventType}`);
                         const entitlement = data.entitlement;
                         await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
-                    }
-                    else {
+                    } else if (eventType === 'ACCOUNT_DELETED') {
+                        // Delete the user account.
+                    } else {
                         console.debug(`Event type not implemented: ${eventType}`);
                     }
                 }
