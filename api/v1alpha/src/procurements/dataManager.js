@@ -147,12 +147,12 @@ WHERE a.isDeleted IS FALSE AND m.accountName IN UNNEST(@accountNames)`;
 
 /**
  * @param  {} projectId
- * @param  {} name
+ * @param  {} entitlementId
  */
-async function activeNewEntitlement(projectId, name) {
+async function activeNewEntitlement(projectId, entitlementId) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
-        const entitlement = await procurementUtil.getEntitlement(name);
+        const entitlement = await procurementUtil.getEntitlement(entitlementId);
         const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
         const policy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
         const modifiedAccount = addEntitlement(account, policy.policyId);
@@ -161,7 +161,31 @@ async function activeNewEntitlement(projectId, name) {
         }
     } catch (err) {
         console.error(err);
-        return { success: false, errors: ['Failed to grant entitlement', err] };
+        return { success: false, errors: ['Failed to activate new entitlement', err] };
+    }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} entitlementId
+ */
+async function activateNewPlanChange(projectId, entitlementId) {
+    try {
+        const procurementUtil = new CommerceProcurementUtil(projectId);
+        const entitlement = await procurementUtil.getEntitlement(entitlementId);
+        const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
+        const existingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
+        const pendingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.newPendingPlan);
+
+        let updateOne = removeEntitlement(account, existingPolicy.policyId);
+        let updateTwo = addEntitlement(updateOne.account, pendingPolicy.policyId);
+
+        if (updateOne.changed === true || updateTwo.changed === true) {
+            await accountManager.createOrUpdateAccount(projectId, updateTwo.account.accountId, updateTwo.account);
+        }
+    } catch (err) {
+        console.error(err);
+        return { success: false, errors: ['Failed to activate plan change', err] };
     }
 }
 
@@ -397,6 +421,7 @@ module.exports = {
     approveEntitlement,
     autoApproveEntitlement,
     activeNewEntitlement,
+    activateNewPlanChange,
     cancelEntitlement,
     deleteAccount
 };
