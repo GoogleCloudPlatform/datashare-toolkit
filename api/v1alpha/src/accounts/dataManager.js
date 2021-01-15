@@ -208,6 +208,11 @@ async function checkProcurementEntitlement(projectId, account) {
  * @param  {} accountFilter
  */
 async function checkProcurementEntitlements(projectId, accounts, accountFilter) {
+    // Check if marketplace integration is enabled before making procurement calls.
+    if (cfg.marketplaceIntegration === false) {
+        return accounts;
+    }
+
     /*let filterString = `(state=ENTITLEMENT_ACTIVE OR state=ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL)`;
     if (accountFilter) {
         filterString = `(state=ENTITLEMENT_ACTIVE OR state=ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL) AND (${accountFilter})`;

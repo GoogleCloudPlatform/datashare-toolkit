@@ -245,7 +245,12 @@ async function setupDatasharePrerequisites(projectId) {
  * Initializes PubSub listener for entitlement auto approvals
  */
 async function initializePubSubListener() {
-    console.log(`Initializing PubSub listener`);
+    if (cfg.marketplaceIntegration === false) {
+        console.log('Marketplace integration is disabled, PubSub listener will not be started');
+        return;
+    } else {
+        console.log(`Initializing PubSub listener`);
+    }
 
     let projectId = cfg.projectId;
     if (!projectId) {
