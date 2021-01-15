@@ -17,7 +17,6 @@
 'use strict';
 
 const CommerceProcurementUtil = require('./commerceProcurementUtil');
-let commerceProcurementUtil = new CommerceProcurementUtil();
 
 async function getAccount(projectId, name) {
     try {
