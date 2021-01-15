@@ -22,7 +22,7 @@
           >Sync BigQuery Views</v-btn
         >
       </div>
-      <div class="my-2">
+      <div class="my-2" v-if="config.marketplaceIntegrationEnabled === true">
         <v-btn
           :disabled="loading"
           color="primary"
@@ -53,6 +53,7 @@
 
 <script>
 import Vue from 'vue';
+import config from './../config';
 
 import { setInteractionMode } from 'vee-validate';
 
@@ -171,6 +172,9 @@ export default {
       console.log(
         `cancel clicked for dialog object: ${JSON.stringify(object)}`
       );
+    },
+    config() {
+      return config;
     }
   }
 };

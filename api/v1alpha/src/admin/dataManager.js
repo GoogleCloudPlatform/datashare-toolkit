@@ -68,12 +68,12 @@ async function syncResources(projectId, type) {
             views = true;
         } else if (type === 'MARKETPLACE') {
             console.log('Sync marketplace entitlements called');
-            marketplace = true;
+            marketplace = cfg.marketplaceIntegration;
         } else if (type === 'ALL') {
             console.log('Sync all called');
             permissions = true;
             views = true;
-            marketplace = true;
+            marketplace = cfg.marketplaceIntegration;
         }
 
         const labelKey = cfg.cdsManagedLabelKey;
