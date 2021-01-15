@@ -81,6 +81,15 @@ class Config {
       false
     );
   }
+
+  get marketplaceIntegrationEnabled() {
+    const m = this.getConfigValue('VUE_APP_MARKETPLACE_INTEGRATION', false);
+    if (m === undefined) {
+      return true;
+    } else {
+      return m;
+    }
+  }
 }
 
 module.exports = new Config();

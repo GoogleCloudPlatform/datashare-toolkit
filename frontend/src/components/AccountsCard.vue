@@ -257,19 +257,23 @@ export default {
       ];
 
       if (!this.selectedDataset) {
+        if (config.marketplaceIntegrationEnabled === true) {
+          h.push(
+            {
+              text: 'Marketplace Activated',
+              value: 'marketplaceActivated',
+              tooltip:
+                'Indicates if the account has been activated with Datashare via GCP Marketplace'
+            },
+            {
+              text: 'Marketplace In Sync',
+              value: 'marketplaceSynced',
+              tooltip:
+                'Indicates if the Datashare policies a user is entitled to are in sync with the entitlements they have purchased in GCP Marketplace'
+            }
+          );
+        }
         h.push(
-          {
-            text: 'Marketplace Activated',
-            value: 'marketplaceActivated',
-            tooltip:
-              'Indicates if the account has been activated with Datashare via GCP Marketplace'
-          },
-          {
-            text: 'Marketplace In Sync',
-            value: 'marketplaceSynced',
-            tooltip:
-              'Indicates if the Datashare policies a user is entitled to are in sync with the entitlements they have purchased in GCP Marketplace'
-          },
           {
             text: 'Modified At',
             value: 'createdAt',
@@ -456,7 +460,10 @@ export default {
       return d.toLocaleString();
     },
     chipColor(policy) {
-      if (this.marketplaceActivated(policy) === true) {
+      if (
+        config.marketplaceActivated === true &&
+        this.marketplaceActivated(policy) === true
+      ) {
         if (policy.marketplaceEntitlementActive === true) {
           return 'green';
         } else {
@@ -466,7 +473,10 @@ export default {
       return '';
     },
     chipTextColor(policy) {
-      if (this.marketplaceActivated(policy) === true) {
+      if (
+        config.marketplaceActivated === true &&
+        this.marketplaceActivated(policy) === true
+      ) {
         if (policy.marketplaceEntitlementActive === true) {
           return 'white';
         } else {

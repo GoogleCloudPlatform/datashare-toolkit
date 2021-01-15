@@ -152,7 +152,18 @@ export default {
       showDialog: false,
       showCreatePolicy: false,
       selectedItem: null,
-      headers: [
+      icons: {
+        marketplace: mdiShopping,
+        plus: mdiPlus
+      }
+    };
+  },
+  created() {
+    this.loadPolicies();
+  },
+  computed: {
+    headers() {
+      let h = [
         { text: 'Name', value: 'name', tooltip: 'Name of the policy' },
         {
           text: 'Description',
@@ -163,17 +174,25 @@ export default {
           text: 'Account Usage',
           value: 'accountCount',
           tooltip: 'The # of accounts using this policy'
-        },
-        {
-          text: 'Marketplace Solution',
-          value: 'marketplace.solutionId',
-          tooltip: 'The associated GCP Marketplace Solution Id'
-        },
-        {
-          text: 'Marketplace Plan',
-          value: 'marketplace.planId',
-          tooltip: 'The associated GCP Marketplace Plan Id'
-        },
+        }
+      ];
+
+      if (config.marketplaceIntegrationEnabled === true) {
+        h.push(
+          {
+            text: 'Marketplace Solution',
+            value: 'marketplace.solutionId',
+            tooltip: 'The associated GCP Marketplace Solution Id'
+          },
+          {
+            text: 'Marketplace Plan',
+            value: 'marketplace.planId',
+            tooltip: 'The associated GCP Marketplace Plan Id'
+          }
+        );
+      }
+
+      h.push(
         {
           text: 'Modified At',
           value: 'createdAt',
@@ -185,17 +204,10 @@ export default {
           tooltip: 'The last user that modified the policy'
         },
         { text: '', value: 'action', sortable: false }
-      ],
-      icons: {
-        marketplace: mdiShopping,
-        plus: mdiPlus
-      }
-    };
-  },
-  created() {
-    this.loadPolicies();
-  },
-  computed: {
+      );
+
+      return h;
+    },
     deleteDialogTitle() {
       return `Delete policy '${this.selectedItem.name}'?`;
     },
