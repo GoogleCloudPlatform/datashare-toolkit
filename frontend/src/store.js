@@ -31,7 +31,6 @@ function notify(error) {
 const store = new Vuex.Store({
   state: {
     user: {
-      loggedIn: false,
       data: null
     }
   },
@@ -44,8 +43,8 @@ const store = new Vuex.Store({
       return state.user;
     },
     isLoggedIn: state => {
-      if (state.user && state.user.loggedIn && state.user.data.email) {
-        return state.user.loggedIn === true;
+      if (state.user && state.user.data && state.user.data.email) {
+        return true;
       }
       return false;
     },
@@ -58,9 +57,6 @@ const store = new Vuex.Store({
   },
 
   mutations: {
-    setLoggedIn(state, value) {
-      state.user.loggedIn = value;
-    },
     setUser(state, data) {
       state.user.data = data;
     }
@@ -68,7 +64,6 @@ const store = new Vuex.Store({
 
   actions: {
     fetchUser({ commit }, user) {
-      commit('setLoggedIn', user !== null);
       if (user) {
         commit('setUser', {
           displayName: user.displayName,

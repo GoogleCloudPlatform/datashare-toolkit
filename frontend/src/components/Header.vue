@@ -91,7 +91,7 @@
         <span>More items</span>
       </v-tooltip>
 -->
-      <v-tooltip bottom v-if="!user.loggedIn">
+      <v-tooltip bottom v-if="this.isLoggedIn === false">
         <template v-slot:activator="{ on }">
           <v-btn icon dark v-on="on">
             <GoogleLogin
@@ -104,7 +104,7 @@
         </template>
         <span>Login</span>
       </v-tooltip>
-      <v-tooltip bottom v-if="user.loggedIn">
+      <v-tooltip bottom v-if="this.isLoggedIn === true">
         <template v-slot:activator="{ on }">
           <v-btn icon dark v-on="on">
             <GoogleLogin
@@ -118,7 +118,7 @@
         </template>
         <span>Logout</span>
       </v-tooltip>
-      <v-avatar v-if="user.loggedIn" size="28">
+      <v-avatar v-if="this.isLoggedIn === true" size="28">
         <img
           v-if="user && user.data && user.data.photoURL"
           :src="user.data.photoURL"
