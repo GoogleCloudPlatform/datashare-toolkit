@@ -302,7 +302,7 @@ async function initializePubSubListener() {
                     } else if (eventType === 'ENTITLEMENT_ACTIVE') {
                         // Grant permissions for newly active entitlement
                         await procurementManager.activateNewEntitlement(projectId, data.entitlement.id)
-                    } else if (eventType === 'ENTITLEMENT_CANCELLED' || eventType === 'ENTITLEMENT_DELETED') {
+                    } else if (eventType === 'ENTITLEMENT_CANCELLED' || eventType === 'ENTITLEMENT_DELETED' || eventType === 'ENTITLEMENT_SUSPENDED') {
                         // Remove user from the policy
                         console.log(`Running cancellation for eventType: ${eventType}`);
                         await procurementManager.cancelEntitlement(projectId, data.entitlement.id)
