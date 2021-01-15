@@ -429,7 +429,26 @@ export default {
       this.selectedItem = null;
     },
     syncMarketplace() {
-      // Perform the sync
+      this.$store
+        .dispatch('syncMarketplaceEntitlements', {
+          projectId: config.projectId,
+          accountId: this.selectedItem.accountId
+        })
+        .then(result => {
+          this.loading = false;
+          if (!result.success) {
+            this.showError = true;
+            this.errorDialogTitle = 'Error syncing marketplace entitlements';
+            this.errorDialogText = result.errors.join(', ');
+          } else {
+            this.showError = false;
+            this.loadAccounts();
+            this.syncMarketplaceCompleted();
+          }
+        })
+        .catch(error => {
+          console.error(`Error syncing marketplace entitlements: ${error}`);
+        });
     },
     toLocalTime(epoch) {
       let d = new Date(epoch);

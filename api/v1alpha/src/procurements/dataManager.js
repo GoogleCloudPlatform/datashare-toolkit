@@ -452,18 +452,23 @@ async function deleteAccount(projectId, accountId) {
  * @param  {} accountId
  */
 async function syncAccountEntitlements(projectId, account) {
-    if (account && account.marketplace && account.marketplace.length > 0) {
-        // Marketplace is activated
-        const accountNames = account.marketplace.map(i => i.accountName);
-        const result = await listProcurements(projectId, 'ENTITLEMENT_ACTIVE', accountNames);
-        const entitlements = result.data || [];
-        account = clearEntitlements(account).account;
-        entitlements.forEach(e => {
-            if (e.policy && e.policy.policyId) {
-                account = addEntitlement(account, e.policy.policyId).account;
-            }
-        });
-        await accountManager.createOrUpdateAccount(projectId, account.accountId, account);
+    try {
+        if (account && account.marketplace && account.marketplace.length > 0) {
+            // Marketplace is activated
+            const accountNames = account.marketplace.map(i => i.accountName);
+            const result = await listProcurements(projectId, 'ENTITLEMENT_ACTIVE', accountNames);
+            const entitlements = result.data || [];
+            account = clearEntitlements(account).account;
+            entitlements.forEach(e => {
+                if (e.policy && e.policy.policyId) {
+                    account = addEntitlement(account, e.policy.policyId).account;
+                }
+            });
+            await accountManager.createOrUpdateAccount(projectId, account.accountId, account);
+        }
+        return { success: true, code: 200 };
+    } catch (err) {
+        return { success: false, code: 500, errors: ['Failed to sync account entitlements', err] };
     }
 }
 
@@ -496,5 +501,6 @@ module.exports = {
     activateNewPlanChange,
     cancelEntitlement,
     deleteAccount,
+    syncAccountEntitlements,
     syncAllAccountEntitlements
 };
