@@ -212,8 +212,6 @@ export default {
       entitlements: [],
       componentKey: 0,
       loading: false,
-      showCreateAccount: false,
-      showDeleteDialog: false,
       selectedItem: null,
       selectedItems: [],
       icons: {
@@ -225,7 +223,10 @@ export default {
         sync: mdiSync
       },
       search: '',
-      showResetDialog: false
+      showCreateAccount: false,
+      showDeleteDialog: false,
+      showResetDialog: false,
+      showMarketplaceSyncDialog: false
     };
   },
   computed: {

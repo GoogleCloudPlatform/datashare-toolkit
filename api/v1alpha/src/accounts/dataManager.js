@@ -208,13 +208,30 @@ async function checkProcurementEntitlement(projectId, account) {
  * @param  {} accountFilter
  */
 async function checkProcurementEntitlements(projectId, accounts, accountFilter) {
-    let filterString = `state=ENTITLEMENT_ACTIVE`;
+    /*let filterString = `(state=ENTITLEMENT_ACTIVE OR state=ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL)`;
     if (accountFilter) {
-        filterString = `state=ENTITLEMENT_ACTIVE AND (${accountFilter})`;
+        filterString = `(state=ENTITLEMENT_ACTIVE OR state=ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL) AND (${accountFilter})`;
+    }*/
+    let filterString = '';
+    if (accountFilter) {
+        filterString = accountFilter;
     }
     const procurementUtil = new CommerceProcurementUtil(projectId);
     const result = await procurementUtil.listEntitlements(filterString);
-    const entitlements = result.entitlements || [];
+    // const entitlements = result.entitlements || [];
+
+    const stateFilter = ['ENTITLEMENT_ACTIVE', 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'];
+    let entitlements = [];
+    if (result.entitlements) {
+        // Work around for bug [#00012788] Error filtering on ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL
+        if (stateFilter && stateFilter.length > 0) {
+            entitlements = underscore.filter(result.entitlements, (row) => {
+                return stateFilter.includes(row.state);
+            });
+        } else {
+            entitlements = result.entitlements;
+        }
+    }
 
     // Iterate every account
     accounts.forEach((account) => {
