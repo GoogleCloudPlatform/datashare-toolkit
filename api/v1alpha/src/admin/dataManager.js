@@ -123,6 +123,7 @@ async function syncResources(projectId, type) {
                 }
             }
         }
+        console.log('Sync completed');
     } catch (err) {
         return { success: false, code: 500, errors: [err.message] };
     }
