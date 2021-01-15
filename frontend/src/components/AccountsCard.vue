@@ -99,6 +99,22 @@
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
+              v-if="
+                item.marketplaceActivated === true &&
+                  item.marketplaceSynced === false
+              "
+              small
+              @click="syncMarketplaceItem(item)"
+            >
+              {{ icons.sync }}
+            </v-icon>
+          </template>
+          <span>Sync Marketplace Entitlements</span>
+        </v-tooltip>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              v-on="on"
               v-if="item.marketplaceActivated === true"
               small
               @click="resetItem(item)"
@@ -138,6 +154,16 @@
       confirmButtonColor="red darken-1"
       confirmButtonText="Reset"
     />
+    <Dialog
+      v-if="showMarketplaceSyncDialog"
+      v-model="showMarketplaceSyncDialog"
+      :title="marketplaceSyncDialogTitle"
+      :text="marketplaceSyncDialogText"
+      v-on:confirmed="syncMarketplace(selectedItem)"
+      v-on:canceled="syncMarketplaceCompleted"
+      confirmButtonColor="red darken-1"
+      confirmButtonText="Sync"
+    />
     <v-card-text
       style="height: 100px; position: relative"
       v-if="showAddAccountButton"
@@ -168,7 +194,8 @@ import {
   mdiForward,
   mdiDotsVertical,
   mdiPlus,
-  mdiReplay
+  mdiReplay,
+  mdiSync
 } from '@mdi/js';
 
 export default {
@@ -194,7 +221,8 @@ export default {
         forward: mdiForward,
         verticalDots: mdiDotsVertical,
         plus: mdiPlus,
-        reset: mdiReplay
+        reset: mdiReplay,
+        sync: mdiSync
       },
       search: '',
       showResetDialog: false
@@ -268,6 +296,12 @@ export default {
     },
     resetDialogText() {
       return `Please click 'Reset' to confirm that you want to delete the marketplace account(s) for ${this.selectedItem.email}.`;
+    },
+    marketplaceSyncDialogTitle() {
+      return 'Sync marketplace entitlements?';
+    },
+    marketplaceSyncDialogText() {
+      return `Please click 'Sync' to confirm that you want to sync marketplace entitlements for ${this.selectedItem.email}.`;
     }
   },
   created() {
@@ -385,6 +419,17 @@ export default {
         .catch(error => {
           console.error(`Error submitting approval change: ${error}`);
         });
+    },
+    syncMarketplaceItem(item) {
+      this.selectedItem = item;
+      this.showMarketplaceSyncDialog = true;
+    },
+    syncMarketplaceCompleted() {
+      this.showMarketplaceSyncDialog = false;
+      this.selectedItem = null;
+    },
+    syncMarketplace() {
+      // Perform the sync
     },
     toLocalTime(epoch) {
       let d = new Date(epoch);

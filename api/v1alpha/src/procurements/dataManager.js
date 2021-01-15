@@ -476,8 +476,8 @@ async function syncAllAccountEntitlements(projectId) {
         for (const a of result.data) {
             if (a.marketplaceActivated === true && a.marketplaceSynced === false) {
                 // Sync the account
-                const account = accountManager.getAccount(projectId, a.accountId);
-                console.log(`Account of of sync with marketplace: ${account}`);
+                const account = await accountManager.getAccount(projectId, a.accountId);
+                console.log(`Account out of sync with marketplace: ${JSON.stringify(account)}`);
                 if (account) {
                     await syncAccountEntitlements(projectId, account);
                 }
