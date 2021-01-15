@@ -77,7 +77,8 @@
         <v-tooltip
           top
           v-if="
-            item.marketplace &&
+            config.marketplaceIntegrationEnabled === true &&
+              item.marketplace &&
               item.marketplace.solutionId &&
               item.marketplace.planId
           "
@@ -270,6 +271,9 @@ export default {
         config.projectId,
         item.marketplace.solutionId
       );
+    },
+    config() {
+      return config;
     }
   }
 };

@@ -247,17 +247,20 @@ export default {
           icon: mdiBadgeAccount
         },
         {
-          section: 'Marketplace'
+          section: 'Marketplace',
+          hidden: config.marketplaceIntegrationEnabled === false
         },
         {
           name: 'procurements',
           title: 'Procurement Requests',
-          icon: mdiShopping
+          icon: mdiShopping,
+          hidden: config.marketplaceIntegrationEnabled === false
         },
         {
           name: 'myProducts',
           title: 'My Products',
-          icon: mdiBriefcaseAccount
+          icon: mdiBriefcaseAccount,
+          hidden: config.marketplaceIntegrationEnabled === false
         },
         {
           section: 'Application',

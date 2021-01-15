@@ -95,7 +95,7 @@
           </template>
           <span>Delete</span>
         </v-tooltip>
-        <v-tooltip top>
+        <v-tooltip top v-if="config.marketplaceIntegrationEnabled === true">
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
@@ -111,7 +111,7 @@
           </template>
           <span>Sync Marketplace Entitlements</span>
         </v-tooltip>
-        <v-tooltip top>
+        <v-tooltip top v-if="config.marketplaceIntegrationEnabled === true">
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
