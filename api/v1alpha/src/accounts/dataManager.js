@@ -220,7 +220,7 @@ async function checkProcurementEntitlements(projectId, accounts, accountFilter) 
     const result = await procurementUtil.listEntitlements(filterString);
     // const entitlements = result.entitlements || [];
 
-    const stateFilter = ['ENTITLEMENT_ACTIVE', 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'];
+    const stateFilter = ['ENTITLEMENT_ACTIVE', 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL', 'ENTITLEMENT_PENDING_PLAN_CHANGE'];
     let entitlements = [];
     if (result.entitlements) {
         // Work around for bug [#00012788] Error filtering on ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL
