@@ -194,7 +194,9 @@ async function activateNewPlanChange(projectId, entitlementId) {
         const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
         console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
         await syncAccountEntitlements(projectId, account);
+
         /*
+        // The ENTITLEMENT_PLAN_CHANGED does not contain the old and new plan.
         const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
         const existingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
         const pendingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.newPendingPlan);
