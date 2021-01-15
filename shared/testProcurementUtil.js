@@ -104,7 +104,7 @@ const account1 = 'providers/cds-demo-2/accounts/E-FEA0-5C23-1B4F-9E5D';
 const account2 = 'providers/cds-demo-2/accounts/E-41E2-CF7B-BA71-CA8B';
 console.log('Starting');
 
-getEntitlement('cds-demo-2', 'providers/cds-demo-2/entitlements/84b05068-01a9-4ca9-9943-b9babf0b5030')
+getEntitlement('cds-demo-2', 'providers/cds-demo-2/entitlements/80b1302d-da6b-40c4-b527-a05a7722e0a5')
     .then((res) => {
         console.log(`getEntitlement:\n${JSON.stringify(res, null, 3)}`);
         return true;
