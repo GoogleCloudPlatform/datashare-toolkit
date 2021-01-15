@@ -35,9 +35,10 @@ function getTableFqdn(projectId, datasetId, tableId) {
 /**
  * @param  {string} projectId
  * @param  {} stateFilter
+ * @param  {} accountNameFilter
  * Get a list of Procurements
  */
-async function listProcurements(projectId, stateFilter) {
+async function listProcurements(projectId, stateFilter, accountNameFilter) {
     try {
         const procurementUtil = new CommerceProcurementUtil(projectId);
         const bigqueryUtil = new BigQueryUtil(projectId);
@@ -54,9 +55,24 @@ async function listProcurements(projectId, stateFilter) {
         let entitlements = result.entitlements || [];
         */
 
+        let filterString = null;
+        if (accountNameFilter) {
+            let accountFilter = '';
+            accountNameFilter.forEach(e => {
+                if (accountFilter != '') {
+                    accountFilter += ' OR ';
+                }
+                const name = e.substring(e.lastIndexOf('/') + 1);
+                accountFilter += `account=${name}`;
+            });
+            if (accountFilter) {
+                filterString = accountFilter;
+            }
+        }
+
         // Should use filter, but due to bug with 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL' 
         // passing null and filtering locally.
-        const result = await procurementUtil.listEntitlements(null);
+        const result = await procurementUtil.listEntitlements(filterString);
         let entitlements = [];
         if (result.entitlements) {
             // Work around for bug [#00012788] Error filtering on ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL
@@ -176,6 +192,10 @@ async function activateNewPlanChange(projectId, entitlementId) {
         const entitlementName = procurementUtil.getEntitlementName(projectId, entitlementId);
         const entitlement = await procurementUtil.getEntitlement(entitlementName);
         const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
+        console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
+        await syncAccountEntitlements(projectId, account);
+        /*
+        const account = await accountManager.findMarketplaceAccount(projectId, entitlement.account);
         const existingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.plan);
         const pendingPolicy = await policyManager.findMarketplacePolicy(projectId, entitlement.product, entitlement.newPendingPlan);
 
@@ -185,6 +205,7 @@ async function activateNewPlanChange(projectId, entitlementId) {
         if (updateOne.changed === true || updateTwo.changed === true) {
             await accountManager.createOrUpdateAccount(projectId, updateTwo.account.accountId, updateTwo.account);
         }
+        */
     } catch (err) {
         console.error(err);
         return { success: false, errors: ['Failed to activate plan change', err] };
@@ -286,6 +307,20 @@ function addEntitlement(accountData, policyId) {
         return { changed: true, account: accountData };
     } else {
         console.error(`Policy not found: '${policyId}'`);
+        return { changed: false, account: accountData };
+    }
+}
+
+/**
+ * @param  {} accountData
+ */
+function clearEntitlements(accountData) {
+    let policies = accountData.policies || [];
+    if (policies.length > 0) {
+        policies = [];
+        accountData.policies = policies;
+        return { changed: true, account: accountData };
+    } else {
         return { changed: false, account: accountData };
     }
 }
@@ -407,6 +442,26 @@ async function deleteAccount(projectId, accountId) {
     console.log(`Account data: ${JSON.stringify(account, null, 3)}`);
     if (account) {
         await accountManager.deleteAccount(projectId, account.accountId);
+    }
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} accountId
+ */
+async function syncAccountEntitlements(projectId, account) {
+    if (account && account.marketplace && account.marketplace.length > 0) {
+        // Marketplace is activated
+        const accountNames = account.marketplace.map(i => i.accountName);
+        const result = await listProcurements(projectId, 'ENTITLEMENT_ACTIVE', accountNames);
+        const entitlements = result.data || [];
+        account = clearEntitlements(account).account;
+        entitlements.forEach(e => {
+            if (e.policy && e.policy.policyId) {
+                account = addEntitlement(account, e.policy.policyId).account;
+            }
+        });
+        await accountManager.createOrUpdateAccount(projectId, account.accountId, account);
     }
 }
 

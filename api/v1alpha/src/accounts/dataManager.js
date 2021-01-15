@@ -236,6 +236,7 @@ async function checkProcurementEntitlements(projectId, accounts, accountFilter) 
             });
         }
 
+        // Iterate datashare account policies
         if (account.policies && account.policies.length > 0) {
             account.policies.forEach((p) => {
                 const userEntitlement = underscore.findWhere(userEntitlements, { product: p.solutionId, plan: p.planId });
@@ -247,6 +248,18 @@ async function checkProcurementEntitlements(projectId, accounts, accountFilter) 
                 }
             });
         }
+
+        // Iterate marketplace entitlements
+        userEntitlements.forEach((e) => {
+            if (account.policies && account.policies.length > 0) {
+                const policy = underscore.findWhere(account.policies, { solutionId: e.product, planId: e.plan });
+                if (!policy) {
+                    account.marketplaceSynced = false;
+                }
+            } else {
+                account.marketplaceSynced = false;
+            }
+        });
     });
 
     return accounts;
