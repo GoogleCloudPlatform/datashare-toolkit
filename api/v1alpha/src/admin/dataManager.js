@@ -58,22 +58,28 @@ async function syncResources(projectId, type) {
     const bigqueryUtil = new BigQueryUtil(projectId);
     let permissions = false;
     let views = false;
+    let marketplace = false;
     try {
         if (type === 'PERMISSIONS') {
             console.log('Sync permissions called');
             permissions = true;
-        }
-        else if (type === 'VIEWS') {
+        } else if (type === 'VIEWS') {
             console.log('Sync views called');
             views = true;
-        }
-        else if (type === 'ALL') {
+        } else if (type === 'MARKETPLACE') {
+            console.log('Sync marketplace entitlements called');
+            marketplace = true;
+        } else if (type === 'ALL') {
             console.log('Sync all called');
             permissions = true;
             views = true;
+            marketplace = true;
         }
 
         const labelKey = cfg.cdsManagedLabelKey;
+        if (marketplace) {
+            await procurementManager.syncAllAccountEntitlements(projectId);
+        }
         if (permissions) {
             await metaManager.performPolicyUpdates(projectId, null, true);
         }

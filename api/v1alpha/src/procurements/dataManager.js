@@ -467,6 +467,27 @@ async function syncAccountEntitlements(projectId, account) {
     }
 }
 
+/**
+ * @param  {} projectId
+ */
+async function syncAllAccountEntitlements(projectId) {
+    let result = await accountManager.listAccounts(projectId);
+    if (result.success) {
+        for (const a of result.data) {
+            if (a.marketplaceActivated === true && a.marketplaceSynced === false) {
+                // Sync the account
+                const account = accountManager.getAccount(projectId, a.accountId);
+                console.log(`Account of of sync with marketplace: ${account}`);
+                if (account) {
+                    await syncAccountEntitlements(projectId, account);
+                }
+            }
+        }
+    } else {
+        console.error(`Failed to get list of accounts`);
+    }
+}
+
 module.exports = {
     listProcurements,
     approveEntitlement,
@@ -474,5 +495,6 @@ module.exports = {
     activateNewEntitlement,
     activateNewPlanChange,
     cancelEntitlement,
-    deleteAccount
+    deleteAccount,
+    syncAllAccountEntitlements
 };
