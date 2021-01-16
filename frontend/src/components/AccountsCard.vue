@@ -464,7 +464,7 @@ export default {
     },
     chipColor(policy) {
       if (
-        this.config.marketplaceActivated === true &&
+        this.config.marketplaceIntegrationEnabled === true &&
         this.marketplaceActivated(policy) === true
       ) {
         if (policy.marketplaceEntitlementActive === true) {
@@ -477,7 +477,7 @@ export default {
     },
     chipTextColor(policy) {
       if (
-        this.config.marketplaceActivated === true &&
+        this.config.marketplaceIntegrationEnabled === true &&
         this.marketplaceActivated(policy) === true
       ) {
         if (policy.marketplaceEntitlementActive === true) {
