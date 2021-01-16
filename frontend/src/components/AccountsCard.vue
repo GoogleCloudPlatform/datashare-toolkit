@@ -188,7 +188,7 @@
 <script>
 import EditAccount from '@/components/EditAccount';
 import Dialog from '@/components/Dialog.vue';
-import config from './../config';
+import _config from './../config';
 import {
   mdiChevronRight,
   mdiForward,
@@ -230,6 +230,9 @@ export default {
     };
   },
   computed: {
+    config() {
+      return _config;
+    },
     datasetId() {
       if (this.selectedDataset && this.selectedDataset.datasetId) {
         return this.selectedDataset.datasetId;
@@ -257,7 +260,7 @@ export default {
       ];
 
       if (!this.selectedDataset) {
-        if (config.marketplaceIntegrationEnabled === true) {
+        if (this.config.marketplaceIntegrationEnabled === true) {
           h.push(
             {
               text: 'Marketplace Activated',
@@ -461,7 +464,7 @@ export default {
     },
     chipColor(policy) {
       if (
-        config.marketplaceActivated === true &&
+        this.config.marketplaceActivated === true &&
         this.marketplaceActivated(policy) === true
       ) {
         if (policy.marketplaceEntitlementActive === true) {
@@ -474,7 +477,7 @@ export default {
     },
     chipTextColor(policy) {
       if (
-        config.marketplaceActivated === true &&
+        this.config.marketplaceActivated === true &&
         this.marketplaceActivated(policy) === true
       ) {
         if (policy.marketplaceEntitlementActive === true) {

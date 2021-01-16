@@ -24,7 +24,7 @@
       </div>
       <div
         class="my-2"
-        v-if="this.uiConfig().marketplaceIntegrationEnabled === true"
+        v-if="this.config.marketplaceIntegrationEnabled === true"
       >
         <v-btn
           :disabled="loading"
@@ -56,7 +56,7 @@
 
 <script>
 import Vue from 'vue';
-import config from './../config';
+import _config from './../config';
 
 import { setInteractionMode } from 'vee-validate';
 
@@ -79,6 +79,11 @@ export default {
     dialogObject: {},
     showError: false
   }),
+  computed: {
+    config() {
+      return _config;
+    }
+  },
   methods: {
     initSchema() {
       this.dialogObject = { type: 'initSchema' };
@@ -175,10 +180,6 @@ export default {
       console.log(
         `cancel clicked for dialog object: ${JSON.stringify(object)}`
       );
-    },
-    uiConfig() {
-      console.log(config);
-      return config;
     }
   }
 };

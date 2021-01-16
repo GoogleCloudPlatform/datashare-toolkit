@@ -436,7 +436,7 @@
 
 <script>
 import Vue from 'vue';
-import config from './../config';
+import _config from './../config';
 import UrlHelper from '../urlHelper';
 
 import { required, max } from 'vee-validate/dist/rules';
@@ -558,6 +558,9 @@ export default {
     }
   },
   computed: {
+    config() {
+      return _config;
+    },
     datasetHeaders() {
       let h = [
         { text: 'Dataset Id', value: 'datasetId' },
@@ -937,12 +940,9 @@ export default {
     },
     navigateToMarketplace(item) {
       UrlHelper.navigateToMarketplace(
-        config.projectId,
+        this.config.projectId,
         item.marketplace.solutionId
       );
-    },
-    config() {
-      return config;
     }
   }
 };
