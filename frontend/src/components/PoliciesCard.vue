@@ -137,7 +137,7 @@ import Dialog from '@/components/Dialog.vue';
 import EditPolicy from '@/components/EditPolicy';
 import UrlHelper from '../urlHelper';
 import { mdiPlus, mdiShopping } from '@mdi/js';
-import config from './../config';
+import _config from './../config';
 
 export default {
   components: {
@@ -163,6 +163,9 @@ export default {
     this.loadPolicies();
   },
   computed: {
+    config() {
+      return _config;
+    },
     headers() {
       let h = [
         { text: 'Name', value: 'name', tooltip: 'Name of the policy' },
@@ -178,7 +181,7 @@ export default {
         }
       ];
 
-      if (config.marketplaceIntegrationEnabled === true) {
+      if (this.config.marketplaceIntegrationEnabled === true) {
         h.push(
           {
             text: 'Marketplace Solution',
@@ -268,12 +271,9 @@ export default {
     },
     navigateToMarketplace(item) {
       UrlHelper.navigateToMarketplace(
-        config.projectId,
+        this.config.projectId,
         item.marketplace.solutionId
       );
-    },
-    config() {
-      return config;
     }
   }
 };
