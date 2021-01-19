@@ -19,6 +19,7 @@
 const express = require('express');
 
 const dataManager = require("./dataManager");
+const procurementManager = require("./../procurements/dataManager");
 const cfg = require('../lib/config');
 
 const { CommonUtil } = require('cds-shared');
@@ -681,6 +682,25 @@ accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
             console.log(`Reset account called for project ${projectId}, accountId: ${accountId}, body: ${JSON.stringify(req.body)}`);
 
             const data = await dataManager.reset(projectId, accountId);
+            console.log(`Data: ${JSON.stringify(data)}`);
+
+            let code;
+            if (data && data.success === false) {
+                code = (data.code === undefined) ? 500 : data.code;
+            } else {
+                code = (data.code === undefined) ? 200 : data.code;
+            }
+            res.status(code).json({
+                code: code,
+                ...data
+            });
+            break;
+        }
+        case "syncMarketplace": {
+            const accountId = req.body.accountId;
+            console.log(`Sync marketplace entitlements called for project ${projectId}, accountId: ${accountId}, body: ${JSON.stringify(req.body)}`);
+            const account = await dataManager.getAccount(projectId, accountId);
+            const data = await procurementManager.syncAccountEntitlements(projectId, account);
             console.log(`Data: ${JSON.stringify(data)}`);
 
             let code;

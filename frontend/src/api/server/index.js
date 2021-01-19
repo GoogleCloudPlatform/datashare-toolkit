@@ -264,6 +264,11 @@ export default {
       .post(this._apiBaseUrl() + '/accounts:reset', payload)
       .then(response => response);
   },
+  syncMarketplaceEntitlements(payload) {
+    return axios
+      .post(this._apiBaseUrl() + '/accounts:syncMarketplace', payload)
+      .then(response => response);
+  },
   submitProcurementEntitlementApproval(payload) {
     return axios
       .post(this._apiBaseUrl() + '/procurements/approve', payload)

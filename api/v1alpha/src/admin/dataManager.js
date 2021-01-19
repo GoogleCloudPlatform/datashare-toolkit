@@ -58,22 +58,28 @@ async function syncResources(projectId, type) {
     const bigqueryUtil = new BigQueryUtil(projectId);
     let permissions = false;
     let views = false;
+    let marketplace = false;
     try {
         if (type === 'PERMISSIONS') {
             console.log('Sync permissions called');
             permissions = true;
-        }
-        else if (type === 'VIEWS') {
+        } else if (type === 'VIEWS') {
             console.log('Sync views called');
             views = true;
-        }
-        else if (type === 'ALL') {
+        } else if (type === 'MARKETPLACE') {
+            console.log('Sync marketplace entitlements called');
+            marketplace = cfg.marketplaceIntegration;
+        } else if (type === 'ALL') {
             console.log('Sync all called');
             permissions = true;
             views = true;
+            marketplace = cfg.marketplaceIntegration;
         }
 
         const labelKey = cfg.cdsManagedLabelKey;
+        if (marketplace) {
+            await procurementManager.syncAllAccountEntitlements(projectId);
+        }
         if (permissions) {
             await metaManager.performPolicyUpdates(projectId, null, true);
         }
@@ -117,6 +123,7 @@ async function syncResources(projectId, type) {
                 }
             }
         }
+        console.log('Sync completed');
     } catch (err) {
         return { success: false, code: 500, errors: [err.message] };
     }
@@ -238,7 +245,12 @@ async function setupDatasharePrerequisites(projectId) {
  * Initializes PubSub listener for entitlement auto approvals
  */
 async function initializePubSubListener() {
-    console.log(`Initializing PubSub listener`);
+    if (cfg.marketplaceIntegration === false) {
+        console.log('Marketplace integration is disabled, PubSub listener will not be started');
+        return;
+    } else {
+        console.log(`Initializing PubSub listener`);
+    }
 
     let projectId = cfg.projectId;
     if (!projectId) {
@@ -269,7 +281,12 @@ async function initializePubSubListener() {
         console.log(`Subscription '${subscriptionName}' already exists`)
     } else {
         try {
-            await pubSubUtil.createSubscription(topicName, subscriptionName);
+            const options = {
+                ackDeadlineSeconds: 600,
+                expirationPolicy: { seconds: null },
+                messageRetentionDuration: (60 * 60 * 24 * 7)
+            };
+            await pubSubUtil.createSubscription(topicName, subscriptionName, options);
             console.log(`Subscription '${subscriptionName}' created.`);
         } catch (err) {
             console.error(`Unable to create subscription: '${subscriptionName}' to topic: '${topicName}'. Ensure that the topic exists and you have the proper permissions.`);
@@ -286,30 +303,36 @@ async function initializePubSubListener() {
                 console.log(`\tData: ${message.data}`);
                 console.log(`\tAttributes: ${JSON.stringify(message.attributes)}`);
 
-                // "Ack" (acknowledge receipt of) the message
-                message.ack();
-
                 if (message.data) {
                     const data = JSON.parse(message.data);
                     console.log(`Event type is: ${data.eventType}`);
                     const eventType = data.eventType;
-                    if (eventType === 'ENTITLEMENT_CREATION_REQUESTED') {
+                    if (eventType === 'ENTITLEMENT_CREATION_REQUESTED' || eventType === 'ENTITLEMENT_PLAN_CHANGE_REQUESTED') {
+                        // Perform auto-approve here for policies that have auto-approve enabled
                         console.log(`Running auto approve for eventType: ${eventType}`);
-                        const entitlement = data.entitlement;
-                        await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
-                    } else if (eventType === 'ENTITLEMENT_CANCELLED') {
+                        await procurementManager.autoApproveEntitlement(projectId, data.entitlement.id)
+                    } else if (eventType === 'ENTITLEMENT_ACTIVE') {
+                        // Grant permissions for newly active entitlement
+                        await procurementManager.activateNewEntitlement(projectId, data.entitlement.id)
+                    } else if (eventType === 'ENTITLEMENT_CANCELLED' || eventType === 'ENTITLEMENT_DELETED' || eventType === 'ENTITLEMENT_SUSPENDED') {
+                        // Remove user from the policy
                         console.log(`Running cancellation for eventType: ${eventType}`);
-                        const entitlement = data.entitlement;
-                        await procurementManager.cancelEntitlement(projectId, entitlement.id)
-                    } else if (eventType === 'ENTITLEMENT_PLAN_CHANGE_REQUESTED') {
+                        await procurementManager.cancelEntitlement(projectId, data.entitlement.id)
+                    } else if (eventType === 'ENTITLEMENT_PLAN_CHANGED') {
+                        // Grant permissions for the plan change
                         console.log(`Running auto approve for eventType: ${eventType}`);
-                        const entitlement = data.entitlement;
-                        await procurementManager.autoApproveEntitlement(projectId, entitlement.id)
-                    }
-                    else {
+                        await procurementManager.activateNewPlanChange(projectId, data.entitlement.id);
+                    } else if (eventType === 'ACCOUNT_DELETED') {
+                        // Delete the user account
+                        console.log(`Running delete account for eventType: ${eventType}`);
+                        await procurementManager.deleteAccount(projectId, data.account.id);
+                    } else {
                         console.debug(`Event type not implemented: ${eventType}`);
                     }
                 }
+
+                // "Ack" (acknowledge receipt of) the message
+                message.ack();
             };
 
             // Create an event handler to handle errors

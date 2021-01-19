@@ -208,13 +208,35 @@ async function checkProcurementEntitlement(projectId, account) {
  * @param  {} accountFilter
  */
 async function checkProcurementEntitlements(projectId, accounts, accountFilter) {
-    let filterString = `state=ENTITLEMENT_ACTIVE`;
+    // Check if marketplace integration is enabled before making procurement calls.
+    if (cfg.marketplaceIntegration === false) {
+        return accounts;
+    }
+
+    /*let filterString = `(state=ENTITLEMENT_ACTIVE OR state=ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL)`;
     if (accountFilter) {
-        filterString = `state=ENTITLEMENT_ACTIVE AND (${accountFilter})`;
+        filterString = `(state=ENTITLEMENT_ACTIVE OR state=ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL) AND (${accountFilter})`;
+    }*/
+    let filterString = '';
+    if (accountFilter) {
+        filterString = accountFilter;
     }
     const procurementUtil = new CommerceProcurementUtil(projectId);
     const result = await procurementUtil.listEntitlements(filterString);
-    const entitlements = result.entitlements || [];
+    // const entitlements = result.entitlements || [];
+
+    const stateFilter = ['ENTITLEMENT_ACTIVE', 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL', 'ENTITLEMENT_PENDING_PLAN_CHANGE'];
+    let entitlements = [];
+    if (result.entitlements) {
+        // Work around for bug [#00012788] Error filtering on ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL
+        if (stateFilter && stateFilter.length > 0) {
+            entitlements = underscore.filter(result.entitlements, (row) => {
+                return stateFilter.includes(row.state);
+            });
+        } else {
+            entitlements = result.entitlements;
+        }
+    }
 
     // Iterate every account
     accounts.forEach((account) => {
@@ -236,6 +258,7 @@ async function checkProcurementEntitlements(projectId, accounts, accountFilter) 
             });
         }
 
+        // Iterate datashare account policies
         if (account.policies && account.policies.length > 0) {
             account.policies.forEach((p) => {
                 const userEntitlement = underscore.findWhere(userEntitlements, { product: p.solutionId, plan: p.planId });
@@ -247,6 +270,18 @@ async function checkProcurementEntitlements(projectId, accounts, accountFilter) 
                 }
             });
         }
+
+        // Iterate marketplace entitlements
+        userEntitlements.forEach((e) => {
+            if (account.policies && account.policies.length > 0) {
+                const policy = underscore.findWhere(account.policies, { solutionId: e.product, planId: e.plan });
+                if (!policy) {
+                    account.marketplaceSynced = false;
+                }
+            } else {
+                account.marketplaceSynced = false;
+            }
+        });
     });
 
     return accounts;
@@ -590,10 +625,9 @@ async function activate(projectId, host, token, reason, email) {
                             console.log(`${entitlementName} is pending activation for product: ${product} and plan: ${plan}`);
 
                             // Check the policy table to see if there is a policy object matching the marketplace product and plan
-                            const policyData = await policyManager.findMarketplacePolicy(projectId, product, plan);
-                            console.log(`Found policy ${JSON.stringify(policyData, null, 3)}`);
-                            if (policyData && policyData.success === true && policyData.data.marketplace) {
-                                const policy = policyData.data;
+                            const policy = await policyManager.findMarketplacePolicy(projectId, product, plan);
+                            console.log(`Found policy ${JSON.stringify(policy, null, 3)}`);
+                            if (policy && policy.marketplace) {
                                 const enableAutoApprove = policy.marketplace.enableAutoApprove;
 
                                 // If enableAutoApprove is set to true, approve the entitlement via the procurement api

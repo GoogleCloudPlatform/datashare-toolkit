@@ -195,7 +195,9 @@
               </v-data-table>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-expansion-panel>
+          <v-expansion-panel
+            v-if="config.marketplaceIntegrationEnabled === true"
+          >
             <v-expansion-panel-header>Marketplace</v-expansion-panel-header>
             <v-expansion-panel-content>
               <ValidationProvider
@@ -434,6 +436,7 @@
 
 <script>
 import Vue from 'vue';
+import _config from './../config';
 import UrlHelper from '../urlHelper';
 
 import { required, max } from 'vee-validate/dist/rules';
@@ -483,7 +486,6 @@ function isPopulated(value) {
 
 import Dialog from '@/components/Dialog.vue';
 import { mdiShopping } from '@mdi/js';
-import config from './../config';
 
 Array.prototype.diff = function(a, key) {
   return this.filter(function(i) {
@@ -556,6 +558,9 @@ export default {
     }
   },
   computed: {
+    config() {
+      return _config;
+    },
     datasetHeaders() {
       let h = [
         { text: 'Dataset Id', value: 'datasetId' },
@@ -935,7 +940,7 @@ export default {
     },
     navigateToMarketplace(item) {
       UrlHelper.navigateToMarketplace(
-        config.projectId,
+        this.config.projectId,
         item.marketplace.solutionId
       );
     }

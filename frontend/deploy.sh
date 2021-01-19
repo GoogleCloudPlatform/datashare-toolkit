@@ -19,13 +19,18 @@ if [[ -z "${TAG:=}" ]]; then
     export TAG=dev;
 fi
 
+if [[ -z "${REGION:=}" ]]; then
+    echo 'Defaulting REGION to "us-central1"';
+    export REGION=us-central1;
+fi
+
 export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
 
 gcloud builds submit --config cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 gcloud run deploy ds-frontend-ui \
   --image gcr.io/${PROJECT_ID}/ds-frontend-ui:${TAG} \
-  --region=us-central1 \
+  --region=${REGION} \
   --allow-unauthenticated \
   --platform managed \
   --update-env-vars=VUE_APP_PROJECT_ID="${PROJECT_ID}"

@@ -60,12 +60,13 @@ class PubSubUtil {
     /**
      * @param  {string} topicName
      * @param  {string} subscriptionName
+     * @param  {object} options
      * create subscription by name and return true
      */
-    async createSubscription(topicName, subscriptionName) {
-        const sub = await this.pubsub.topic(topicName).createSubscription(subscriptionName);
+    async createSubscription(topicName, subscriptionName, options) {
+        const sub = await this.pubsub.topic(topicName).createSubscription(subscriptionName, options);
         if (this.VERBOSE_MODE) {
-            console.log(`Subscription '${subscriptionName}' created for '${topicName}'.`);
+            console.log(`Subscription '${subscriptionName}' created for '${topicName}' with options: ${options}.`);
         }
         return sub[0];
     }

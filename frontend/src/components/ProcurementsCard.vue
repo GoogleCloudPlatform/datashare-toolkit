@@ -279,6 +279,12 @@ export default {
         tooltip: 'The GCP Marketplace Plan Id that was subscribed to'
       },
       {
+        text: 'New Pending Plan',
+        value: 'newPendingPlan',
+        tooltip:
+          'The GCP Marketplace Pending Plan Id in the event that user has requested a plan change'
+      },
+      {
         text: 'Entitlement Name',
         value: 'name',
         tooltip: 'The Cloud Commerce Procurement entitlement resource name'
@@ -356,6 +362,7 @@ export default {
     selectedItemSummary() {
       return `<b>Product</b>: ${this.selectedItem.product}<br/>
       <b>Plan</b>: ${this.selectedItem.plan}<br/>
+      <b>New Pending Plan</b>: ${this.selectedItem.newPendingPlan}<br/>
       <b>Account</b>: ${this.selectedItem.email ||
         this.selectedItem.account}<br/>
       <b>Created At</b>: ${this.toLocalTime(this.selectedItem.createTime)}`;

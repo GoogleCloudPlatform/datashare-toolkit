@@ -127,6 +127,7 @@ extend('email', {
 });
 
 import Dialog from '@/components/Dialog.vue';
+import config from '../config';
 
 Array.prototype.diff = function(a) {
   return this.filter(function(i) {
@@ -289,7 +290,10 @@ export default {
         });
     },
     policyCheckboxColor(policyId) {
-      if (this.user.marketplaceActivated === true) {
+      if (
+        config.marketplaceIntegrationEnabled === true &&
+        this.user.marketplaceActivated === true
+      ) {
         if (this.marketplacePurchasedPolicies.includes(policyId)) {
           return 'green';
         } else {
@@ -299,7 +303,10 @@ export default {
       return '';
     },
     policyTitleColor(policyId) {
-      if (this.user.marketplaceActivated === true) {
+      if (
+        config.marketplaceIntegrationEnabled === true &&
+        this.user.marketplaceActivated === true
+      ) {
         const cbColor = this.policyCheckboxColor(policyId);
         if (cbColor != '') {
           return `color:${cbColor}`;

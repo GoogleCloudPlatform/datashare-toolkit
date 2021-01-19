@@ -95,7 +95,23 @@
           </template>
           <span>Delete</span>
         </v-tooltip>
-        <v-tooltip top>
+        <v-tooltip top v-if="config.marketplaceIntegrationEnabled === true">
+          <template v-slot:activator="{ on }">
+            <v-icon
+              v-on="on"
+              v-if="
+                item.marketplaceActivated === true &&
+                  item.marketplaceSynced === false
+              "
+              small
+              @click="syncMarketplaceItem(item)"
+            >
+              {{ icons.sync }}
+            </v-icon>
+          </template>
+          <span>Sync Marketplace Entitlements</span>
+        </v-tooltip>
+        <v-tooltip top v-if="config.marketplaceIntegrationEnabled === true">
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
@@ -138,6 +154,16 @@
       confirmButtonColor="red darken-1"
       confirmButtonText="Reset"
     />
+    <Dialog
+      v-if="showMarketplaceSyncDialog"
+      v-model="showMarketplaceSyncDialog"
+      :title="marketplaceSyncDialogTitle"
+      :text="marketplaceSyncDialogText"
+      v-on:confirmed="syncMarketplace(selectedItem)"
+      v-on:canceled="syncMarketplaceCompleted"
+      confirmButtonColor="red darken-1"
+      confirmButtonText="Sync"
+    />
     <v-card-text
       style="height: 100px; position: relative"
       v-if="showAddAccountButton"
@@ -162,13 +188,14 @@
 <script>
 import EditAccount from '@/components/EditAccount';
 import Dialog from '@/components/Dialog.vue';
-import config from './../config';
+import _config from './../config';
 import {
   mdiChevronRight,
   mdiForward,
   mdiDotsVertical,
   mdiPlus,
-  mdiReplay
+  mdiReplay,
+  mdiSync
 } from '@mdi/js';
 
 export default {
@@ -185,8 +212,6 @@ export default {
       entitlements: [],
       componentKey: 0,
       loading: false,
-      showCreateAccount: false,
-      showDeleteDialog: false,
       selectedItem: null,
       selectedItems: [],
       icons: {
@@ -194,13 +219,20 @@ export default {
         forward: mdiForward,
         verticalDots: mdiDotsVertical,
         plus: mdiPlus,
-        reset: mdiReplay
+        reset: mdiReplay,
+        sync: mdiSync
       },
       search: '',
-      showResetDialog: false
+      showCreateAccount: false,
+      showDeleteDialog: false,
+      showResetDialog: false,
+      showMarketplaceSyncDialog: false
     };
   },
   computed: {
+    config() {
+      return _config;
+    },
     datasetId() {
       if (this.selectedDataset && this.selectedDataset.datasetId) {
         return this.selectedDataset.datasetId;
@@ -228,19 +260,23 @@ export default {
       ];
 
       if (!this.selectedDataset) {
+        if (this.config.marketplaceIntegrationEnabled === true) {
+          h.push(
+            {
+              text: 'Marketplace Activated',
+              value: 'marketplaceActivated',
+              tooltip:
+                'Indicates if the account has been activated with Datashare via GCP Marketplace'
+            },
+            {
+              text: 'Marketplace In Sync',
+              value: 'marketplaceSynced',
+              tooltip:
+                'Indicates if the Datashare policies a user is entitled to are in sync with the entitlements they have purchased in GCP Marketplace'
+            }
+          );
+        }
         h.push(
-          {
-            text: 'Marketplace Activated',
-            value: 'marketplaceActivated',
-            tooltip:
-              'Indicates if the account has been activated with Datashare via GCP Marketplace'
-          },
-          {
-            text: 'Marketplace In Sync',
-            value: 'marketplaceSynced',
-            tooltip:
-              'Indicates if the Datashare policies a user is entitled to are in sync with the entitlements they have purchased in GCP Marketplace'
-          },
           {
             text: 'Modified At',
             value: 'createdAt',
@@ -268,6 +304,12 @@ export default {
     },
     resetDialogText() {
       return `Please click 'Reset' to confirm that you want to delete the marketplace account(s) for ${this.selectedItem.email}.`;
+    },
+    marketplaceSyncDialogTitle() {
+      return 'Sync marketplace entitlements?';
+    },
+    marketplaceSyncDialogText() {
+      return `Please click 'Sync' to confirm that you want to sync marketplace entitlements for ${this.selectedItem.email}.`;
     }
   },
   created() {
@@ -386,12 +428,45 @@ export default {
           console.error(`Error submitting approval change: ${error}`);
         });
     },
+    syncMarketplaceItem(item) {
+      this.selectedItem = item;
+      this.showMarketplaceSyncDialog = true;
+    },
+    syncMarketplaceCompleted() {
+      this.showMarketplaceSyncDialog = false;
+      this.selectedItem = null;
+    },
+    syncMarketplace() {
+      this.$store
+        .dispatch('syncMarketplaceEntitlements', {
+          projectId: config.projectId,
+          accountId: this.selectedItem.accountId
+        })
+        .then(result => {
+          this.loading = false;
+          if (!result.success) {
+            this.showError = true;
+            this.errorDialogTitle = 'Error syncing marketplace entitlements';
+            this.errorDialogText = result.errors.join(', ');
+          } else {
+            this.showError = false;
+            this.loadAccounts();
+            this.syncMarketplaceCompleted();
+          }
+        })
+        .catch(error => {
+          console.error(`Error syncing marketplace entitlements: ${error}`);
+        });
+    },
     toLocalTime(epoch) {
       let d = new Date(epoch);
       return d.toLocaleString();
     },
     chipColor(policy) {
-      if (this.marketplaceActivated(policy) === true) {
+      if (
+        this.config.marketplaceIntegrationEnabled === true &&
+        this.marketplaceActivated(policy) === true
+      ) {
         if (policy.marketplaceEntitlementActive === true) {
           return 'green';
         } else {
@@ -401,7 +476,10 @@ export default {
       return '';
     },
     chipTextColor(policy) {
-      if (this.marketplaceActivated(policy) === true) {
+      if (
+        this.config.marketplaceIntegrationEnabled === true &&
+        this.marketplaceActivated(policy) === true
+      ) {
         if (policy.marketplaceEntitlementActive === true) {
           return 'white';
         } else {

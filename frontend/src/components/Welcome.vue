@@ -45,6 +45,8 @@
 </template>
 
 <script>
+import config from './../config';
+
 export default {
   name: 'welcome',
   props: {
@@ -54,14 +56,13 @@ export default {
     documentation: [
       {
         text: 'Datashare User Guide',
-        href:
-          'https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master/frontend/user-guide/README.md'
+        href: config.userGuideUrl
       }
     ],
     importantLinks: [
       {
-        text: 'Datashare Home',
-        href: 'https://github.com/GoogleCloudPlatform/datashare-toolkit'
+        text: 'Datashare (GitHub)',
+        href: config.githubUrl
       },
       {
         text: 'Google Cloud',

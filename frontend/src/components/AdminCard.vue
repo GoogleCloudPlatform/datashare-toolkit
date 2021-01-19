@@ -22,6 +22,17 @@
           >Sync BigQuery Views</v-btn
         >
       </div>
+      <div
+        class="my-2"
+        v-if="this.config.marketplaceIntegrationEnabled === true"
+      >
+        <v-btn
+          :disabled="loading"
+          color="primary"
+          @click.stop="sync('MARKETPLACE')"
+          >Sync Marketplace Entitlements</v-btn
+        >
+      </div>
       <div class="my-2">
         <v-btn :disabled="loading" color="primary" @click.stop="sync('ALL')"
           >Sync All</v-btn
@@ -45,6 +56,7 @@
 
 <script>
 import Vue from 'vue';
+import _config from './../config';
 
 import { setInteractionMode } from 'vee-validate';
 
@@ -67,6 +79,11 @@ export default {
     dialogObject: {},
     showError: false
   }),
+  computed: {
+    config() {
+      return _config;
+    }
+  },
   methods: {
     initSchema() {
       this.dialogObject = { type: 'initSchema' };
@@ -99,6 +116,11 @@ export default {
         this.dialogTitle = 'Sync BigQuery Views?';
         this.dialogText =
           'Are you sure you want to sync all BigQuery views from Datashare?';
+      } else if (type === 'MARKETPLACE') {
+        console.log('Sync marketplace entitlements clicked');
+        this.dialogTitle = 'Sync Marketplace Entitlements?';
+        this.dialogText =
+          'Are you sure you want to sync all Marketplace Entitlements?';
       }
       this.showDialog = true;
     },
@@ -121,6 +143,9 @@ export default {
             } else if (object.syncType === 'VIEWS') {
               this.dialogTitle = 'Sync Views';
               this.dialogText = 'Sync all views completed.';
+            } else if (object.syncType === 'MARKETPLACE') {
+              this.dialogTitle = 'Sync Marketplace Entitlements';
+              this.dialogText = 'Sync Marketplace Entitlements completed.';
             }
 
             if (!result.success) {
