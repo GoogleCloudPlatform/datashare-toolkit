@@ -15,6 +15,7 @@ Vue.use(VueForm);
 
 import { LoaderPlugin } from 'vue-google-login';
 import config from './config';
+import browserHelper from './browserHelper';
 
 // Fetch and load the store settings
 fetch(process.env.BASE_URL + 'config/config.json').then(response => {
@@ -23,7 +24,7 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
 
     Vue.use(LoaderPlugin, {
       client_id: config.googleAppClientId,
-      ux_mode: 'redirect'
+      ux_mode: browserHelper.isBrowserChrome() ? 'redirect' : 'popup'
     });
 
     let user = {};
