@@ -149,6 +149,7 @@ router.beforeEach((to, from, next) => {
     if (store.getters.isLoggedIn) {
       next();
       return;
+      return;
     } else {
       router.replace('/restricted');
     }
