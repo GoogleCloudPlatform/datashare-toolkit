@@ -65,7 +65,7 @@
             icon
             dark
             v-on="on"
-            href="https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/frontend/README.md"
+            :href="config.userGuideUrl"
             target="_blank"
           >
             <v-icon>{{ icons.helpCircle }}</v-icon>
@@ -73,24 +73,6 @@
         </template>
         <span>Help</span>
       </v-tooltip>
-      <!--
-      <v-tooltip bottom>
-        <template v-slot:activator="{ on }">
-          <v-btn icon dark v-on="on">
-            <v-icon>{{ icons.bell }}</v-icon>
-          </v-btn>
-        </template>
-        <span>Notifications</span>
-      </v-tooltip>
-      <v-tooltip bottom>
-        <template v-slot:activator="{ on }">
-          <v-btn icon dark v-on="on">
-            <v-icon>{{ icons.verticalDots }}</v-icon>
-          </v-btn>
-        </template>
-        <span>More items</span>
-      </v-tooltip>
--->
       <v-tooltip bottom v-if="this.isLoggedIn === false">
         <template v-slot:activator="{ on }">
           <v-btn icon dark v-on="on">
@@ -155,7 +137,7 @@ import {
 } from '@mdi/js';
 
 import { mapGetters } from 'vuex';
-import config from '../config';
+import _config from '../config';
 import GoogleLogin from 'vue-google-login';
 import authMixin from '../mixins/authMixin';
 
@@ -217,6 +199,9 @@ export default {
       isLoggedIn: 'isLoggedIn',
       isDataProducer: 'isDataProducer'
     }),
+    config() {
+      return _config;
+    },
     navigationItems() {
       let items = [
         {
@@ -248,19 +233,19 @@ export default {
         },
         {
           section: 'Marketplace',
-          hidden: config.marketplaceIntegrationEnabled === false
+          hidden: _config.marketplaceIntegrationEnabled === false
         },
         {
           name: 'procurements',
           title: 'Procurement Requests',
           icon: mdiShopping,
-          hidden: config.marketplaceIntegrationEnabled === false
+          hidden: _config.marketplaceIntegrationEnabled === false
         },
         {
           name: 'myProducts',
           title: 'My Products',
           icon: mdiBriefcaseAccount,
-          hidden: config.marketplaceIntegrationEnabled === false
+          hidden: _config.marketplaceIntegrationEnabled === false
         },
         {
           section: 'Application',

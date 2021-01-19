@@ -5,5 +5,6 @@
   "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT": "To grant access to additional users, please click for further information.",
   "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT": "More Information",
   "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL": "https://google.com",
-  "VUE_APP_MARKETPLACE_INTEGRATION": true
+  "VUE_APP_MARKETPLACE_INTEGRATION": true,
+  "VUE_APP_USER_GUIDE_URL": "https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/frontend/README.md"
 }

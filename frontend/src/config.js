@@ -90,6 +90,10 @@ class Config {
       return m;
     }
   }
+
+  get userGuideUrl() {
+    return this.getConfigValue('VUE_APP_USER_GUIDE_URL', false);
+  }
 }
 
 module.exports = new Config();
