@@ -94,6 +94,10 @@ class Config {
   get userGuideUrl() {
     return this.getConfigValue('VUE_APP_USER_GUIDE_URL', false);
   }
+
+  get githubUrl() {
+    return this.getConfigValue('VUE_APP_GITHUB_URL', false);
+  }
 }
 
 module.exports = new Config();

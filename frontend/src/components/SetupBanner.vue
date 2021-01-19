@@ -30,10 +30,7 @@ export default {
   },
   methods: {
     navigateToSetupIssues() {
-      window.open(
-        'https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/frontend/README.md',
-        '_blank'
-      );
+      window.open(config.userGuideUrl, '_blank');
     }
   }
 };
