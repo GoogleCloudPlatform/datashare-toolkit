@@ -456,7 +456,7 @@ async function syncAccountEntitlements(projectId, account) {
         if (account && account.marketplace && account.marketplace.length > 0) {
             // Marketplace is activated
             const accountNames = account.marketplace.map(i => i.accountName);
-            const result = await listProcurements(projectId, ['ENTITLEMENT_ACTIVE', 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL', 'ENTITLEMENT_PENDING_PLAN_CHANGE'], accountNames);
+            const result = await listProcurements(projectId, ['ENTITLEMENT_ACTIVE', 'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL', 'ENTITLEMENT_PENDING_PLAN_CHANGE', 'ENTITLEMENT_PENDING_CANCELLATION'], accountNames);
             const entitlements = result.data || [];
             account = clearEntitlements(account).account;
             entitlements.forEach(e => {
