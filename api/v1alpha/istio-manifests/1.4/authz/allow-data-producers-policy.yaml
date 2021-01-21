@@ -52,4 +52,4 @@ spec:
         - /v1alpha/projects/$PROJECT_ID/datasets/*
     when:
     - key: request.auth.claims[email]
-      values: ["$DATA_PRODUCERS"]
+      values: [$DATA_PRODUCERS]
