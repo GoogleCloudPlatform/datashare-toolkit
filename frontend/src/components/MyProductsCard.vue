@@ -165,6 +165,13 @@
                       >
                         {{ icons.databaseSearch }}
                       </v-icon>
+                      <v-icon
+                        small
+                        class="mr-2"
+                        @click="copyQueryToClipboard(item.datasetId)"
+                      >
+                        {{ icons.contentCopy }}
+                      </v-icon>
                     </template>
                   </v-data-table>
                 </v-expansion-panel-content>
@@ -208,6 +215,18 @@
                       >
                         {{ icons.tableHeadersEye }}
                       </v-icon>
+                      <v-icon
+                        small
+                        class="mr-2"
+                        @click="
+                          copyQueryToClipboard(item.datasetId, item.tableId)
+                        "
+                      >
+                        {{ icons.contentCopy }}
+                      </v-icon>
+                      <button type="button" v-clipboard:copy="message">
+                        Copy!
+                      </button>
                     </template>
                   </v-data-table>
                 </v-expansion-panel-content>
@@ -281,7 +300,8 @@ import {
   mdiCardSearch,
   mdiDatabaseSearch,
   mdiTableHeadersEye,
-  mdiInformation
+  mdiInformation,
+  mdiContentCopy
 } from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 import UrlHelper from '../urlHelper';
@@ -324,6 +344,7 @@ export default {
         { text: '', value: 'action', sortable: false }
       ],
       icons: {
+        contentCopy: mdiContentCopy,
         information: mdiInformation,
         search: mdiCardSearch,
         marketplace: mdiShopping,
@@ -445,6 +466,16 @@ export default {
     },
     navigateToMoreInformation() {
       window.open(this.moreInformationButtonUrl, '_blank');
+    },
+    copyQueryToClipboard(datasetId, tableId) {
+      const query = `SELECT * FROM \`${datasetId}.${
+        tableId ? tableId : '[TABLE NAME HERE]'
+      }\` LIMIT 10`;
+      if (this.navigator && this.navigator.clipboard) {
+        navigator.clipboard.writeText(query);
+      } else {
+        console.warn('Unable to copy, clipboard not available');
+      }
     }
   }
 };
