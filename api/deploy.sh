@@ -35,7 +35,7 @@ if [[ -z "${OAUTH_CLIENT_ID:=}" ]]; then
 fi
 
 if [[ -z "${DATA_PRODUCERS:=}" ]]; then
-    export DATA_PRODUCERS="*@google.com";
+    export DATA_PRODUCERS='"*@google.com"';
     echo "Defaulted DATA_PRODUCERS to '${DATA_PRODUCERS}'";
 fi
 
