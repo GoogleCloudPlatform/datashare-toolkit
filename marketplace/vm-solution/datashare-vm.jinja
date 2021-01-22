@@ -293,24 +293,23 @@ resources:
 
               format_data_producers_field()
               {
-                DATA_PRODUCERS=$1
-                DATA_PRODUCERS_FORMATTED=""
-                COMMA=","
-                DOUBLE_QUOTE="\""
+              DATA_PRODUCERS=$1
+              DATA_PRODUCERS_FORMATTED=""
+              COMMA=","
+              DOUBLE_QUOTE="\""
 
-                if [[ "$DATA_PRODUCERS" == *"$DOUBLE_QUOTE"* ]] && [[ "$DATA_PRODUCERS" == *"$COMMA"* ]]; then
-                    QUOTES_REMOVED=${DATA_PRODUCERS:1:-1}
-                    DATA_PRODUCERS=`surround_with_quotes $QUOTES_REMOVED`
-                    echo ${DATA_PRODUCERS:1:-1}
-                elif [[ "$DATA_PRODUCERS" == *"$COMMA"* ]]; then
-                    # convert comma delimitted string into an array
-                    DATA_PRODUCERS_FORMATTED=`surround_with_quotes $DATA_PRODUCERS`
-                    echo ${DATA_PRODUCERS_FORMATTED:1:-1}
-                elif [[ "$DATA_PRODUCERS" == *"$DOUBLE_QUOTE"* ]]; then
-                    echo ${DATA_PRODUCERS:1:-1}
-                else
-                    echo $DATA_PRODUCERS
-                fi
+              if [[ "$DATA_PRODUCERS" == *"$DOUBLE_QUOTE"* ]] && [[ "$DATA_PRODUCERS" == *"$COMMA"* ]]; then
+                  DATA_PRODUCERS=`surround_with_quotes $DATA_PRODUCERS`
+                  echo ${DATA_PRODUCERS:1:-1}
+              elif [[ "$DATA_PRODUCERS" == *"$COMMA"* ]]; then
+                  # convert comma delimitted string into an array
+                  DATA_PRODUCERS_FORMATTED=`surround_with_quotes $DATA_PRODUCERS`
+                  echo ${DATA_PRODUCERS_FORMATTED}
+              elif [[ "$DATA_PRODUCERS" == *"$DOUBLE_QUOTE"* ]]; then
+                  echo ${DATA_PRODUCERS}
+              else
+                  echo \"$DATA_PRODUCERS\"
+              fi
               }
               {% endraw %}
 

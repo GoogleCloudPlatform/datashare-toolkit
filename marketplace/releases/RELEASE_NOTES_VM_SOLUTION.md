@@ -1,5 +1,20 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.6.4 Release Notes
+* Build - 1/22/2021
+
+### Datashare
+* Datashare release version is 0.6.2
+* Kubernetes cluster version is 1.16 to support incremental changes
+
+### Updates  
+* Added Datashare v0.6.2 and v0.6.1 as items in the drop down menu.
+* Updated how the Istio policies are applied, the startup script quotes the data producers
+
+### Bug Fixes
+
+### Known Bugs
+
 ## 0.6.3 Release Notes
 * Build - 1/20/2021
 
