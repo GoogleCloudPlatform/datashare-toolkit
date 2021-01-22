@@ -159,19 +159,31 @@
                       ></v-text-field>
                     </template>
                     <template v-slot:item.action="{ item }">
-                      <v-icon
-                        class="mr-2"
-                        @click="navigateToDataset(item.datasetId)"
-                      >
-                        {{ icons.databaseSearch }}
-                      </v-icon>
-                      <v-icon
-                        small
-                        class="mr-2"
-                        @click="copyQueryToClipboard(item.datasetId)"
-                      >
-                        {{ icons.contentCopy }}
-                      </v-icon>
+                      <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                          <v-icon
+                            v-on="on"
+                            class="mr-2"
+                            @click="navigateToDataset(item.datasetId)"
+                          >
+                            {{ icons.databaseSearch }}
+                          </v-icon>
+                        </template>
+                        <span>Navigate to Dataset</span>
+                      </v-tooltip>
+                      <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                          <v-icon
+                            v-on="on"
+                            small
+                            class="mr-2"
+                            @click="copyQueryToClipboard(item.datasetId)"
+                          >
+                            {{ icons.contentCopy }}
+                          </v-icon>
+                        </template>
+                        <span>Copy Query to Clipboard</span>
+                      </v-tooltip>
                     </template>
                   </v-data-table>
                 </v-expansion-panel-content>
@@ -209,21 +221,35 @@
                       ></v-text-field>
                     </template>
                     <template v-slot:item.action="{ item }">
-                      <v-icon
-                        class="mr-2"
-                        @click="navigateToTable(item.datasetId, item.tableId)"
-                      >
-                        {{ icons.tableHeadersEye }}
-                      </v-icon>
-                      <v-icon
-                        small
-                        class="mr-2"
-                        @click="
-                          copyQueryToClipboard(item.datasetId, item.tableId)
-                        "
-                      >
-                        {{ icons.contentCopy }}
-                      </v-icon>
+                      <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                          <v-icon
+                            v-on="on"
+                            class="mr-2"
+                            @click="
+                              navigateToTable(item.datasetId, item.tableId)
+                            "
+                          >
+                            {{ icons.tableHeadersEye }}
+                          </v-icon>
+                        </template>
+                        <span>Navigate to Table</span>
+                      </v-tooltip>
+                      <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                          <v-icon
+                            v-on="on"
+                            small
+                            class="mr-2"
+                            @click="
+                              copyQueryToClipboard(item.datasetId, item.tableId)
+                            "
+                          >
+                            {{ icons.contentCopy }}
+                          </v-icon>
+                        </template>
+                        <span>Copy Query to Clipboard</span>
+                      </v-tooltip>
                     </template>
                   </v-data-table>
                 </v-expansion-panel-content>
@@ -465,7 +491,7 @@ export default {
       window.open(this.moreInformationButtonUrl, '_blank');
     },
     copyQueryToClipboard(datasetId, tableId) {
-      const query = `SELECT * FROM \`${datasetId}.${
+      const query = `SELECT * FROM \`${config.projectId}.${datasetId}.${
         tableId ? tableId : '[TABLE NAME HERE]'
       }\` LIMIT 10`;
       if (navigator && navigator.clipboard) {
