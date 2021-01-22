@@ -224,9 +224,6 @@
                       >
                         {{ icons.contentCopy }}
                       </v-icon>
-                      <button type="button" v-clipboard:copy="message">
-                        Copy!
-                      </button>
                     </template>
                   </v-data-table>
                 </v-expansion-panel-content>
