@@ -172,7 +172,6 @@ properties:
     enum:
       - 'master'
       - 'v0.6.2'
-      - 'v0.6.1'
   input_gcpRegion:
     type: string
     default: us-central1
