@@ -468,7 +468,7 @@ export default {
       const query = `SELECT * FROM \`${datasetId}.${
         tableId ? tableId : '[TABLE NAME HERE]'
       }\` LIMIT 10`;
-      if (this.navigator && this.navigator.clipboard) {
+      if (navigator && navigator.clipboard) {
         navigator.clipboard.writeText(query);
       } else {
         console.warn('Unable to copy, clipboard not available');
