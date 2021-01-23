@@ -679,7 +679,7 @@ Before you apply the AuthZ policies, export the **DATA_PRODUCERS** environment v
 **Note**: You can wildcard an email address domain or explicity add them individually
 
 
-    export DATA_PRODUCERS="*@google.com"
+    export DATA_PRODUCERS='"*@google.com"';
     export DATA_PRODUCERS="abc@xyz.com,my-trusted-app@my-gcp-project.iam.gserviceaccount.com"
 
 Additionally, export the **OAUTH_CLIENT_ID** environment variable that you created for the UI.
