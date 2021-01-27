@@ -92,14 +92,10 @@ class PubSubUtil {
      * this function will only work if you have the necessary permissions on the topic
      */
     async checkIfSubscriptionExists(topicName, subscriptionProjectId, subscriptionName) {
-        const topic = this.pubsub.topic(topicName);
-        const formattedSubscription = this.client.subscriptionPath(subscriptionProjectId, subscriptionName);
-        const subscription = topic.subscription(formattedSubscription);
+        const formattedSubscription = `projects/${subscriptionProjectId}/subscriptions/${subscriptionName}`;
+        const subscription = this.getSubscription(formattedSubscription);
         const response = await subscription.exists();
         const exists = response[0];
-        if (this.VERBOSE_MODE) {
-            console.log(`Checking if subscription exists: '${topicName}': ${formattedSubscription}`);
-        }
         return exists;
     }
 
