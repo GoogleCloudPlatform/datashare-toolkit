@@ -23,6 +23,7 @@ const metaManager = require('../lib/metaManager');
 const datasetManager = require('../datasets/dataManager');
 const procurementManager = require('../procurements/dataManager');
 const fs = require('fs');
+const retry = require('async-retry');
 
 require.extensions['.sql'] = function (module, filename) {
     module.exports = fs.readFileSync(filename, 'utf8');
@@ -242,6 +243,26 @@ async function setupDatasharePrerequisites(projectId) {
 }
 
 /**
+ * Starts the PubSub listener, and retries if launch failure
+ */
+async function startPubSubListener() {
+    function logRetry(error, attempt) {
+        console.log(`PubSub listener performing retry attempt: ${attempt} after ${error}`);
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    await retry(async bail => {
+        await initializePubSubListener();
+    }, {
+        // retries: 5,
+        forever: true,
+        minTimeout: 30000,
+        maxTimeout: 60000,
+        onRetry: logRetry
+    })
+}
+
+/**
  * Initializes PubSub listener for entitlement auto approvals
  */
 async function initializePubSubListener() {
@@ -348,6 +369,12 @@ async function initializePubSubListener() {
             let subscription = pubSubUtil.getSubscription(subscriptionName, subscriberOptions);
             subscription.on('message', messageHandler);
             subscription.on('error', errorHandler);
+            subscription.detached((cb) => {
+                console.error('Subscription detached');
+                if (cb) {
+                    console.error(cb);
+                }
+            });
         } catch (err) {
             console.error(err);
         }
@@ -362,6 +389,6 @@ async function initializePubSubListener() {
 module.exports = {
     initializeSchema,
     syncResources,
-    initializePubSubListener
+    startPubSubListener
 };
 

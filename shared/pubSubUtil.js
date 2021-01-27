@@ -94,9 +94,8 @@ class PubSubUtil {
     async checkIfSubscriptionExists(topicName, subscriptionProjectId, subscriptionName) {
         console.log('Getting topic object');
         const topic = this.pubsub.topic(topicName);
-        console.log('Getting formatted subscription name');
-        const formattedSubscription = this.client.subscriptionPath(subscriptionProjectId, subscriptionName);
-        console.log('Getting subscription');
+        const formattedSubscription = `projects/${subscriptionProjectId}/subscriptions/${subscriptionName}`;
+        console.log(`Getting subscription: ${formattedSubscription}`);
         const subscription = topic.subscription(formattedSubscription);
         console.log('Checking if subscription exists');
         const response = await subscription.exists();
