@@ -93,30 +93,10 @@ class PubSubUtil {
      */
     async checkIfSubscriptionExists(topicName, subscriptionProjectId, subscriptionName) {
         const formattedSubscription = `projects/${subscriptionProjectId}/subscriptions/${subscriptionName}`;
-        console.log('getSubscription');
         const subscription = this.getSubscription(formattedSubscription);
-        console.log('calling exists()');
         const response = await subscription.exists();
         const exists = response[0];
         return exists;
-
-        /*
-        console.log('Getting topic object');
-        const topic = this.pubsub.topic(topicName);
-        const formattedSubscription = `projects/${subscriptionProjectId}/subscriptions/${subscriptionName}`;
-        console.log(`Getting subscription: ${formattedSubscription}`);
-        const subscription = topic.subscription(formattedSubscription);
-        console.log('Checking if subscription exists');
-        const response = await subscription.exists();
-        console.log('Exists check done');
-        console.log(response);
-        const exists = response[0];
-        if (this.VERBOSE_MODE) {
-            console.log(`Checking if subscription exists: '${topicName}': ${formattedSubscription}`);
-        }
-        console.log(`Exists is: ${exists}`);
-        return exists;
-        */
     }
 
     /**
