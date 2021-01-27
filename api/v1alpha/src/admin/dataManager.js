@@ -369,8 +369,9 @@ async function initializePubSubListener() {
             let subscription = pubSubUtil.getSubscription(subscriptionName, subscriberOptions);
             subscription.on('message', messageHandler);
             subscription.on('error', errorHandler);
+            subscription.on('close', () => { console.error('Subscription closed') });
             subscription.detached((cb) => {
-                console.error('Subscription detached');
+                console.warn('Subscription detached');
                 if (cb) {
                     console.error(cb);
                 }
