@@ -247,7 +247,7 @@ async function setupDatasharePrerequisites(projectId) {
  */
 async function startPubSubListener() {
     function logRetry(error, attempt) {
-        console.log(`PubSub listener performing retry attempt: ${attempt} after ${error}`);
+        console.warn(`PubSub listener performing retry attempt: ${attempt} after ${error}`);
     }
 
     // eslint-disable-next-line no-unused-vars
