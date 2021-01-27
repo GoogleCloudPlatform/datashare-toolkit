@@ -62,7 +62,7 @@ gcloud run deploy ds-api \
   --platform gke \
   --service-account ${SERVICE_ACCOUNT_NAME} \
   --update-env-vars=PROJECT_ID="${PROJECT_ID}" \
-  --use-http2
+  --no-use-http2
 
 gcloud run services update-traffic ds-api \
     --cluster $CLUSTER \
