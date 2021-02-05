@@ -895,6 +895,16 @@ class BigQueryUtil {
         let isValid = errors.length === 0;
         return { isValid, errors };
     }
+
+    /**
+     * @param  {} projectId
+     * @param  {} datasetId
+     * @param  {} tableId
+     * Get the FQDN format for a project's table or view name
+     */
+    getTableFqdn(projectId, datasetId, tableId) {
+        return `${projectId}.${datasetId}.${tableId}`;
+    }
 }
 
 module.exports = BigQueryUtil;

@@ -30,16 +30,6 @@ require.extensions['.sql'] = function (module, filename) {
 };
 
 /**
- * @param  {string} projectId
- * @param  {string} datasetId
- * @param  {string} tableId
- * Get the FQDN format for a project's table or view name
- */
-function getTableFqdn(projectId, datasetId, tableId) {
-    return `${projectId}.${datasetId}.${tableId}`;
-}
-
-/**
  * @param  {} projectId
  */
 async function initializeSchema(projectId) {
@@ -136,25 +126,27 @@ async function syncResources(projectId, type) {
  * @param  {} text
  */
 function sqlReplacements(projectId, text) {
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    
     let sql = text;
     sql = sql.replace(/\$\{projectId\}/g, projectId);
 
-    const policyTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyTableId);
+    const policyTable = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyTableId);
     sql = sql.replace(/\$\{policyTable\}/g, policyTable);
 
-    const accountTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountTableId);
+    const accountTable = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountTableId);
     sql = sql.replace(/\$\{accountTable\}/g, accountTable);
 
-    const authorizedViewTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId);
+    const authorizedViewTable = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId);
     sql = sql.replace(/\$\{authorizedViewTable\}/g, authorizedViewTable);
 
-    const policyView = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+    const policyView = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     sql = sql.replace(/\$\{policyView\}/g, policyView);
 
-    const accountView = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+    const accountView = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
     sql = sql.replace(/\$\{accountView\}/g, accountView);
 
-    const permissionsDiffProcedure = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.permissionsDiffProcedureId);
+    const permissionsDiffProcedure = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.permissionsDiffProcedureId);
     sql = sql.replace(/\$\{permissionsDiffProcedure\}/g, permissionsDiffProcedure);
 
     return sql;
