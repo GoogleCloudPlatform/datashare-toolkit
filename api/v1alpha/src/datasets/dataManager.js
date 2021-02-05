@@ -25,23 +25,14 @@ const cfg = require('../lib/config');
 const underscore = require("underscore");
 
 /**
- * @param  {string} projectId
- * @param  {string} datasetId
- * @param  {string} tableId
- * Get the FQDN format for a project's table or view name
- */
-function getTableFqdn(projectId, datasetId, tableId) {
-    return `${projectId}.${datasetId}.${tableId}`;
-}
-
-/**
  * @param  {} projectId
  * @param  {} fields
  * @param  {} values
  * @param  {} data
  */
 async function _deleteData(projectId, fields, values, data) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId);
     const sqlQuery = `INSERT INTO \`${table}\` (${fields})
         SELECT ${values}
         FROM \`${table}\`
@@ -52,7 +43,7 @@ async function _deleteData(projectId, fields, values, data) {
         query: sqlQuery,
         params: data
     };
-    const bigqueryUtil = new BigQueryUtil(projectId);
+
     return await bigqueryUtil.executeQuery(options);
 }
 
@@ -289,7 +280,8 @@ async function listTableColumns(projectId, datasetId, tableId) {
  * @param  {} includeAllFields
  */
 async function listDatasetViews(projectId, datasetId, includeAllFields) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
     let fields = new Set(cfg.cdsAuthorizedViewViewFields);
     if (!includeAllFields) {
         let remove = [];
@@ -313,7 +305,6 @@ async function listDatasetViews(projectId, datasetId, includeAllFields) {
         options.params = { datasetId: datasetId };
     }
 
-    const bigqueryUtil = new BigQueryUtil(projectId);
     const [rows] = await bigqueryUtil.executeQuery(options);
     return { success: true, data: rows }
 }
@@ -324,7 +315,8 @@ async function listDatasetViews(projectId, datasetId, includeAllFields) {
  * @param  {} viewId
  */
 async function getDatasetView(projectId, datasetId, viewId) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId);
     let fields = new Set(cfg.cdsAuthorizedViewViewFields);
     let remove = ['version', 'isDeleted', 'createdBy', 'createdAt', 'viewSql'];
     remove.forEach(f => fields.delete(f));
@@ -336,7 +328,6 @@ async function getDatasetView(projectId, datasetId, viewId) {
         query: sqlQuery,
         params: { authorizedViewId: viewId }
     };
-    const bigqueryUtil = new BigQueryUtil(projectId);
     const [rows] = await bigqueryUtil.executeQuery(options);
     if (rows.length === 1) {
         const result = rows[0];

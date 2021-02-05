@@ -39,30 +39,20 @@ const client = jwksClient({
 
 /**
  * @param  {string} projectId
- * @param  {string} datasetId
- * @param  {string} tableId
- * Get the FQDN format for a project's table or view name
- */
-function getTableFqdn(projectId, datasetId, tableId) {
-    return `${projectId}.${datasetId}.${tableId}`;
-}
-
-/**
- * @param  {string} projectId
  * @param  {object} fields
  * @param  {object} values
  * @param  {object} data
  * Insert account data
  */
 async function _insertData(projectId, fields, values, data) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountTableId);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountTableId);
     const sqlQuery = `INSERT INTO \`${table}\` (${fields}) VALUES (${values})`;
     console.log(sqlQuery);
     const options = {
         query: sqlQuery,
         params: data
     };
-    const bigqueryUtil = new BigQueryUtil(projectId);
     return await bigqueryUtil.executeQuery(options);
 }
 
@@ -73,7 +63,8 @@ async function _insertData(projectId, fields, values, data) {
  * @param  {} data
  */
 async function _deleteData(projectId, fields, values, data) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountTableId);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountTableId);
     const sqlQuery = `INSERT INTO \`${table}\` (${fields})
         SELECT ${values}
         FROM \`${table}\`
@@ -84,7 +75,6 @@ async function _deleteData(projectId, fields, values, data) {
         query: sqlQuery,
         params: data
     };
-    const bigqueryUtil = new BigQueryUtil(projectId);
     return await bigqueryUtil.executeQuery(options);
 }
 
@@ -95,8 +85,9 @@ async function _deleteData(projectId, fields, values, data) {
  * Get a list of Accounts
  */
 async function listAccounts(projectId, datasetId, policyId) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
-    const policyTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+    const policyTable = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const limit = 10;
     let sqlQuery = `SELECT ca.* except(policies),
         array(
@@ -170,7 +161,6 @@ async function listAccounts(projectId, datasetId, policyId) {
         };
     }
 
-    const bigqueryUtil = new BigQueryUtil(projectId);
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
         const accounts = await checkProcurementEntitlements(projectId, rows);
@@ -396,8 +386,9 @@ async function createOrUpdateAccount(projectId, accountId, data) {
  * Get a Account based off projectId and accountId
  */
 async function getAccount(projectId, accountId, email, emailType) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
-    const policyTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+    const policyTable = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const limit = 2;
     let filter = 'WHERE accountId = @accountId AND isDeleted IS FALSE';
     let params = {};
@@ -427,7 +418,7 @@ ${filter} LIMIT ${limit};`
         query: sqlQuery,
         params: params
     };
-    const bigqueryUtil = new BigQueryUtil(projectId);
+
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
         if (rows.length === 1) {
@@ -449,7 +440,8 @@ ${filter} LIMIT ${limit};`
  * @param  {} accountName
  */
 async function findMarketplaceAccount(projectId, accountName) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
     const fields = Array.from(cfg.cdsAccountViewFields).join();
     const limit = 2;
 
@@ -462,7 +454,7 @@ LIMIT ${limit}`;
         query: sqlQuery,
         params: { accountName: accountName }
     };
-    const bigqueryUtil = new BigQueryUtil(projectId);
+
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
         if (rows.length === 1) {

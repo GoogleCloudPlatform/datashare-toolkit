@@ -24,16 +24,6 @@ const metaManager = require('../lib/metaManager');
 
 /**
  * @param  {string} projectId
- * @param  {string} datasetId
- * @param  {string} tableId
- * Get the FQDN format for a project's table or view name
- */
-function getTableFqdn(projectId, datasetId, tableId) {
-    return `${projectId}.${datasetId}.${tableId}`;
-}
-
-/**
- * @param  {string} projectId
  * @param  {object} fields
  * @param  {object} values
  * @param  {object} data
@@ -51,7 +41,8 @@ async function _insertData(projectId, fields, values, data) {
  * @param  {} data
  */
 async function _deleteData(projectId, fields, values, data) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyTableId);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyTableId);
     const sqlQuery = `INSERT INTO \`${table}\` (${fields})
         SELECT ${values}
         FROM \`${table}\`
@@ -62,7 +53,7 @@ async function _deleteData(projectId, fields, values, data) {
         query: sqlQuery,
         params: data
     };
-    const bigqueryUtil = new BigQueryUtil(projectId);
+
     return await bigqueryUtil.executeQuery(options);
 }
 
@@ -72,11 +63,12 @@ async function _deleteData(projectId, fields, values, data) {
  */
 async function listUserPolicies(projectId, email) {
     try {
-        const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+        const bigqueryUtil = new BigQueryUtil(projectId);
+        const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
         let fields = new Set(cfg.cdsPolicyViewFields);
         fields.delete('isDeleted');
         fields = Array.from(fields).map(i => 'cp.' + i).join();
-        const accountTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+        const accountTable = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
         let sqlQuery = `WITH currentAccount AS (
     SELECT policies.policyId
     FROM \`${accountTable}\` ca
@@ -94,7 +86,6 @@ WHERE
             query: sqlQuery,
             params: { email: email.toLowerCase() }
         };
-        const bigqueryUtil = new BigQueryUtil(projectId);
         const [rows] = await bigqueryUtil.executeQuery(options);
 
         rows.forEach(e => {
@@ -144,7 +135,8 @@ WHERE
  * Get a list of Policies
  */
 async function listPolicies(projectId, datasetId, accountId) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const fields = Array.from(cfg.cdsPolicyViewFields).join();
     let sqlQuery = `with accountCounts AS (
         select p.policyId, count(ca.accountId) as count
@@ -170,7 +162,7 @@ async function listPolicies(projectId, datasetId, accountId) {
         let fields = new Set(cfg.cdsPolicyViewFields);
         fields.delete('isDeleted');
         fields = Array.from(fields).map(i => 'cp.' + i).join();
-        const accountTable = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+        const accountTable = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
         sqlQuery = `WITH currentAccount AS (
             SELECT policies.policyId
             FROM \`${accountTable}\` ca
@@ -187,7 +179,7 @@ async function listPolicies(projectId, datasetId, accountId) {
             params: { accountId: accountId }
         };
     }
-    const bigqueryUtil = new BigQueryUtil(projectId);
+
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
         return { success: true, data: rows };
@@ -304,7 +296,8 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
  * Get a Policy based off projectId and policyId
  */
 async function getPolicy(projectId, policyId) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const fields = Array.from(cfg.cdsPolicyViewFields).join();
     const limit = 2;
     const sqlQuery = `SELECT ${fields} FROM \`${table}\` WHERE policyId = @policyId AND isDeleted IS false LIMIT ${limit};`
@@ -312,7 +305,6 @@ async function getPolicy(projectId, policyId) {
         query: sqlQuery,
         params: { policyId: policyId }
     };
-    const bigqueryUtil = new BigQueryUtil(projectId);
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
         if (rows.length === 1) {
@@ -332,7 +324,8 @@ async function getPolicy(projectId, policyId) {
  * @param  {} planId
  */
 async function findMarketplacePolicy(projectId, solutionId, planId) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const fields = Array.from(cfg.cdsPolicyViewFields).join();
     const limit = 2;
     const sqlQuery = `SELECT ${fields}
@@ -345,7 +338,7 @@ LIMIT ${limit};`
         query: sqlQuery,
         params: { solutionId: solutionId, planId: planId }
     };
-    const bigqueryUtil = new BigQueryUtil(projectId);
+
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
         if (rows.length === 1) {
@@ -366,7 +359,8 @@ LIMIT ${limit};`
  * @param  {} planId
  */
 async function isMarketplaceSolutionPlanUnique(projectId, policyId, solutionId, planId) {
-    const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
     const sqlQuery = `SELECT
     COUNT(policyId) as count
 FROM \`${table}\`
@@ -380,7 +374,7 @@ WHERE
         query: sqlQuery,
         params: { policyId: policyId !== null ? policyId : '', solutionId: solutionId, planId: planId }
     };
-    const bigqueryUtil = new BigQueryUtil(projectId);
+
     try {
         const [rows] = await bigqueryUtil.executeQuery(options);
         if (rows[0].count === 0) {

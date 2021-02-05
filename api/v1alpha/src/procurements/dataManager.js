@@ -24,16 +24,6 @@ const policyManager = require('../policies/dataManager');
 
 /**
  * @param  {string} projectId
- * @param  {string} datasetId
- * @param  {string} tableId
- * Get the FQDN format for a project's table or view name
- */
-function getTableFqdn(projectId, datasetId, tableId) {
-    return `${projectId}.${datasetId}.${tableId}`;
-}
-
-/**
- * @param  {string} projectId
  * @param  {} stateFilter
  * @param  {} accountNameFilter
  * Get a list of Procurements
@@ -91,7 +81,7 @@ async function listProcurements(projectId, stateFilter, accountNameFilter) {
         const products = entitlements.map(e => e.product + '$||$' + e.plan);
 
         if (products && products.length > 0) {
-            const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
+            const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsPolicyViewId);
             const query = `WITH policyData AS (
     SELECT
         policyId,
@@ -127,7 +117,7 @@ WHERE marketplaceId IN UNNEST(@products)`;
         });
 
         if (accountNames && accountNames.length > 0) {
-            const table = getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
+            const table = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.cdsAccountViewId);
             const query = `SELECT a.accountId, m.accountName, a.email
 FROM \`${table}\` a
 CROSS JOIN UNNEST(a.marketplace) AS m
