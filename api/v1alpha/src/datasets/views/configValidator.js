@@ -167,7 +167,7 @@ class ConfigValidator {
             }
 
             if (duplicateIdentified === false && isNewTable === true) {
-                const table = this.getTableFqdn(view.projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId);
+                const table = bigqueryUtil.getTableFqdn(view.projectId, cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId);
                 const query = `SELECT COUNT(*) AS count
             FROM \`${table}\`
             WHERE datasetId = @datasetId AND name = @tableId AND isDeleted IS FALSE
