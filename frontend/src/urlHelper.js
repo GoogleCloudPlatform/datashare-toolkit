@@ -4,7 +4,7 @@ function navigateToMarketplace(projectId, solutionId) {
 }
 
 function navigateToDataset(projectId, datasetId) {
-  const url = `https://console.cloud.google.com/bigquery?project=${projectId}&p=${projectId}&d=${datasetId}`;
+  const url = `https://console.cloud.google.com/bigquery?project=${projectId}&p=${projectId}&d=${datasetId}&page=dataset`;
   window.open(url, '_blank');
 }
 
