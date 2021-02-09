@@ -223,4 +223,43 @@ procurements.post('/projects/:projectId/procurements:myProducts', async (req, re
     }
 });
 
+/**
+ * @swagger
+ *
+ * /projects/{projectId}/procurements:myProducts:
+ *   get:
+ *     summary: Performs redirect to the Datashare My Products UI page.
+ *     description: Returns a 301 redirect response
+ *     tags:
+ *       - procurements
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: Project Id of the Procurement request
+ *     responses:
+ *       301:
+ *         description: Redirect to My Products URL
+ */
+procurements.get('/projects/:projectId/procurements:myProducts', async (req, res) => {
+    const projectId = req.params.projectId;
+    const host = commonUtil.extractHostname(req.headers.host);
+
+    const token = req.query['x-gcp-marketplace-token'];
+    console.log(`Dashboard called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
+
+    const accountManager = require('../accounts/dataManager');
+    const data = await accountManager.register(projectId, host, token);
+    console.log(`Data: ${JSON.stringify(data)}`);
+
+    if (data && data.success === false) {
+        res.redirect(cfg.uiBaseUrl + '/myProducts');
+    } else {
+        console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
+        res.redirect(cfg.uiBaseUrl + '/myProducts');
+    }
+});
+
 module.exports = procurements;
