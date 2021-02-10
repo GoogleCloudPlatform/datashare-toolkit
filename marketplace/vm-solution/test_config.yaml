@@ -10,7 +10,7 @@ resources:
     useRuntimeConfigWaiter: True
     deployApiToGke: True
     machineType: e2-small
-    gceServiceAccount: YOUR_GCP_SERVICE_ACCOUNT
+    gceServiceAccount: gcp-financial-services@cloud-launcher-verifier-prd.iam.gserviceaccount.com
     bootDiskType: pd-ssd
     bootDiskSizeGb: 10
     input_oauthClientId: XYZ
@@ -18,8 +18,8 @@ resources:
     input_uiDomainName: datashare.com
     input_apiDomainName: api.datashare.com
     serviceAccounts:
-      - email: YOUR_GCP_SERVICE_ACCOUNT
-        scopes: 
+      - email: gcp-financial-services@cloud-launcher-verifier-prd.iam.gserviceaccount.com
+        scopes:
           - 'https://www.googleapis.com/auth/cloud.useraccounts.readonly'
           - 'https://www.googleapis.com/auth/devstorage.read_only'
           - 'https://www.googleapis.com/auth/logging.write'
