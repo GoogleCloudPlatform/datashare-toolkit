@@ -45,6 +45,8 @@ def GenerateConfig(context):
     container_tag = context.properties['containerTag']
     region = context.properties['region']
     service_acct_name = context.properties['serviceAccountName']
+    custom_cloud_build_sa = context.properties['customCloudBuildSA']
+    logging_options = { "logging": "CLOUD_LOGGING_ONLY" }
     #service_acct_descr = context.properties['serviceAccountDesc']
     #custom_role_name = context.properties['customRoleName']
     ui_domain_name = context.properties['uiDomainName'] if context.properties.get('uiDomainName') != None and context.properties['uiDomainName'] != None and context.properties['uiDomainName'] != '' else ''
@@ -155,7 +157,9 @@ def GenerateConfig(context):
             },
             'properties': {
                 'steps': steps,
-                'timeout': general_timeout
+                'timeout': general_timeout,
+                'serviceAccount': custom_cloud_build_sa,
+                'options': logging_options
             }
         }]
     else:
@@ -167,7 +171,9 @@ def GenerateConfig(context):
             },
             'properties': {
                 'steps': steps,
-                'timeout': general_timeout
+                'timeout': general_timeout,
+                'serviceAccount': custom_cloud_build_sa,
+                'options': logging_options
             }
         }]
 
@@ -187,7 +193,9 @@ def GenerateConfig(context):
                                  ' --cluster-location=' + region + ' --quiet || exit 0'
                                  ]
                     }],
-                    'timeout': delete_timeout
+                    'timeout': delete_timeout,
+                    'serviceAccount': custom_cloud_build_sa,
+                    'options': logging_options
                 }
             }
     if context.properties.get('deployToGke') == None or (context.properties['deployToGke'] is False or context.properties['deployToGke'] == "false"):

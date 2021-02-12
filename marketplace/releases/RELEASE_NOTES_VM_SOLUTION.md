@@ -1,5 +1,27 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+
+## 0.6.5 Release Notes
+* Build - 2/11/2021
+
+### Datashare
+* Datashare release version is 0.6.2
+* Kubernetes cluster version is 1.16 to support incremental changes
+
+### Updates  
+* Added two new service account roles to the `datashare-deployment-mgr` SA, so that Datashare can be deployed publicly.
+  * The default Cloud Build service account is **not** modified during the deployment.  
+  * The default Compute Engine service account is **not** modified during the deployment.
+  * Kubernetes Engine Administrator (`roles/container.admin`)
+  * Service Account Creator (`roles/iam.serviceAccounts.create`)  
+* The VM startup script creates a new service account named `datashare-cloud-build` and assigns the appropriate permissions so that it can deploy the Cloud Build resources (UI and API).
+  * This functionality is based on a [preview release](https://cloud.google.com/cloud-build/docs/securing-builds/configure-user-specified-service-accounts#json)
+
+### Bug Fixes
+
+### Known Bugs
+
+
 ## 0.6.4 Release Notes
 * Build - 1/22/2021
 

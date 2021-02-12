@@ -25,7 +25,7 @@ def domain_has_protocol(domain):
 
 def GenerateConfig(context):
   """Generate YAML resource configuration."""
-  
+
   #volumes = [{'name': 'cds-code', 'path': '/cds'}]
   datashare_ui_name_with_tag = "ds-frontend-ui:dev"
   container_tag = context.properties['containerTag']
@@ -39,7 +39,8 @@ def GenerateConfig(context):
   git_release_version = "master"
   if context.properties['datashareGitReleaseTag'] != None:
       git_release_version = context.properties['datashareGitReleaseTag']
-
+  custom_cloud_build_sa = context.properties['customCloudBuildSA']
+  logging_options = { "logging": "CLOUD_LOGGING_ONLY" }
   api_domain_name = ""
   # if hasattr(context.properties, 'uiDomainName'):
   if context.properties['apiDomainName'] != None:
@@ -60,8 +61,8 @@ def GenerateConfig(context):
                   'dir': 'ds/datashare-toolkit/frontend',
                   'entrypoint': 'bash',
                   'args': [ '-c', f'if ! gcloud container images describe gcr.io/$PROJECT_ID/{datashare_ui_name_with_tag}; then ' +
-                      'gcloud builds submit . --config=cloudbuild.yaml ' + 
-                      f'--substitutions=TAG_NAME={container_tag}' + 
+                      'gcloud builds submit . --config=cloudbuild.yaml ' +
+                      f'--substitutions=TAG_NAME={container_tag}' +
                       '; else exit 0; fi'
                   ]
               },
@@ -71,7 +72,7 @@ def GenerateConfig(context):
                   'args': ['gcloud', 'run',
                             'deploy',
                             context.properties['cloudRunDeployName'],
-                            f'--image=gcr.io/$PROJECT_ID/{cloud_run_deploy_name}:{container_tag}', 
+                            f'--image=gcr.io/$PROJECT_ID/{cloud_run_deploy_name}:{container_tag}',
                             f'--region={gcp_region}',
                             '--allow-unauthenticated',
                             '--platform=managed'
@@ -91,14 +92,14 @@ def GenerateConfig(context):
   environment_variables += ',VUE_APP_PROJECT_ID=$PROJECT_ID'
   environment_variables += ',VUE_APP_GOOGLE_APP_CLIENT_ID=' + client_id
   steps[2]['args'].append('--set-env-vars=' + environment_variables)
-  
+
   if git_release_version != "master":
       git_release = { # Checkout the correct release
                 'name': 'gcr.io/cloud-builders/git',
                 'dir': 'ds/datashare-toolkit', # changes the working directory to /workspace/ds/datashare-toolkit
                 'entrypoint': 'bash',
                 'args': [ '-c', 'if ! gcloud container images describe gcr.io/$PROJECT_ID/' + datashare_ui_name_with_tag + '; then ' +
-                        'git checkout ' + git_release_version + 
+                        'git checkout ' + git_release_version +
                          '; else exit 0; fi'
                         ]
               }
@@ -117,7 +118,9 @@ def GenerateConfig(context):
         },
         'properties': {
             'steps': steps,
-            'timeout': f'{general_timeout}'
+            'timeout': f'{general_timeout}',
+            'serviceAccount': custom_cloud_build_sa,
+            'options': logging_options
         }
         }]
   else:
@@ -129,7 +132,9 @@ def GenerateConfig(context):
       },
       'properties': {
           'steps': steps,
-          'timeout': f'{general_timeout}'
+          'timeout': f'{general_timeout}',
+          'serviceAccount': custom_cloud_build_sa,
+          'options': logging_options
       }
     }]
 
@@ -148,8 +153,10 @@ def GenerateConfig(context):
                 'args': ['-c', f'gcloud run services delete {cloud_run_deploy_name} --platform=managed --region={gcp_region} --quiet || exit 0']
               }
           ],
-          'timeout': f'{delete_timeout}'
+          'timeout': f'{delete_timeout}',
+          'serviceAccount': custom_cloud_build_sa,
+          'options': logging_options
       }
   })
-  
+
   return { 'resources': resources }

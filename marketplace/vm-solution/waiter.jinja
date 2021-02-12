@@ -37,7 +37,7 @@ resources:
   metadata:
     dependsOn:
     - {{ configName }}
-    runtimePolicy: 
+    runtimePolicy:
     - DELETE
   properties:
     steps:
@@ -93,7 +93,7 @@ resources:
   metadata:
     dependsOn:
     - {{ waiterName }}
-    runtimePolicy: 
+    runtimePolicy:
     - DELETE
   properties:
     steps:
@@ -101,6 +101,9 @@ resources:
       entrypoint: '/bin/bash'
       args: ['gcloud', 'beta', 'runtime-config', 'configs', 'variables', 'unset', '/success/my-instance', '--config-name', '{{ configName }} || exit 0']
     timeout: 120s
+    serviceAccount: {{ properties["cloudBuildCustomSAFullPath"] }}
+    options:
+      logging: CLOUD_LOGGING_ONLY
 
 # Delete the waiter variables
 - name: delete-variables-failure
@@ -108,7 +111,7 @@ resources:
   metadata:
     dependsOn:
     - {{ waiterName }}
-    runtimePolicy: 
+    runtimePolicy:
     - DELETE
   properties:
     steps:
@@ -116,6 +119,9 @@ resources:
       entrypoint: '/bin/bash'
       args: ['gcloud', 'beta', 'runtime-config', 'configs', 'variables', 'unset', '/failure/my-instance', '--config-name', '{{ configName }} || exit 0']
     timeout: 120s
+    serviceAccount: {{ properties["cloudBuildCustomSAFullPath"] }}
+    options:
+      logging: CLOUD_LOGGING_ONLY
 
 outputs:
 - name: configName

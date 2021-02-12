@@ -9,7 +9,7 @@ to build and deploy the Datashare UI and API to Cloud Run.
 
 The Security Admin role is required because it needs to modify other service
 accounts with the appropriate permissions so that the Deployment Manager can deploy the full
-solution automatically. 
+solution automatically.
 
 Enable the Kubernetes API as well, since the Datashare API is deployed to Cloud Run on Anthos Kubernetes by default.  
 
@@ -43,28 +43,36 @@ gcloud services enable container.googleapis.com runtimeconfig.googleapis.com clo
 
 2. Select `Service Accounts` on the left side of the screen
 
-<img src="images/iam-select-service-account.png" width="400" title="Service Accounts"> 
+<img src="images/iam-select-service-account.png" width="400" title="Service Accounts">
 
 3. Click `Create Service Account`.
 
-<img src="images/iam-create-sa.png" width="400" title="Create SA"> 
+<img src="images/iam-create-sa.png" width="400" title="Create SA">
 
-4. Enter the following and then click the `Create` button. 
+4. Enter the following and then click the `Create` button.
 * `Service account name` as `datashare-deployment-manager`
 * `Service account description` as `Datashare deployment manager`
 
 5. Select the following roles
 * `Security Admin`
-* `Kubernetes Admin` 
+* `Kubernetes Admin`
 * `Role Administrator` (roles/iam.roleAdmin)
 * `Service Useage Admin`
 * `Storage Admin`
 * `Project IAM Admin`
 * `Cloud Runtime Config Admin` (roles/runtimeconfig.admin)
+* `Cloud Run Admin` (roles/run.admin)
+* `Cloud Run Service Agent` (roles/run.serviceAgent)
+* `Runtime Config Admin` (roles/runtimeconfig.admin)
+* `Cloud Functions Developer` (roles/cloudfunctions.developer)
+* `Kubernetes Engine Cluster Admin` (roles/container.clusterAdmin)
+* `Kubernetes Engine Admin` (roles/container.admin)
+* `Kubernetes Engine Viewer` (roles/container.viewer)
+* `Service Account Creator`
 
-<img src="images/iam-assign-roles-to-sa.png" width="500"> 
+<img src="images/iam-assign-roles-to-sa.png" width="500">
 
-Now you can click the `Launch` button on the Marketplace and deploy the Datashare solution within your GCP project. 
+Now you can click the `Launch` button on the Marketplace and deploy the Datashare solution within your GCP project.
 
 ## Create the new Service Account from Cloud Shell
 1. Open `Cloud Shell` from your Google Cloud console (top right corner).
@@ -73,7 +81,7 @@ Now you can click the `Launch` button on the Marketplace and deploy the Datashar
 
 
 2. Cloud Shell will open at the bottom of your window and it will be connected to your existing project. Execute the following commands.
-These commands will clone the repository to your Cloud Shell instance, change into the correct directory and execute a 
+These commands will clone the repository to your Cloud Shell instance, change into the correct directory and execute a
 shell script to add the Security IAM Admin role to your Compute Engine service account.
 
 ```
@@ -94,7 +102,7 @@ gcloud iam service-accounts create $SA \
 --description "Datashare deployment manager"
 ```
 
-Add a project level policy binding for the project editor role and the security admin role. 
+Add a project level policy binding for the project editor role and the security admin role.
 ```
 gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
 --member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
@@ -103,33 +111,57 @@ gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
 gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
 --member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
 --role=roles/iam.securityAdmin
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--role=roles/iam.ContainerAdmin
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--role=roles/iam.ContainerAdmin
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--role=roles/iam.roleAdmin
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--roles/serviceusage.serviceUsageAdmin
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--roles/storage.admin
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--roles/resourcemanager.projectIamAdmin
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--roles/runtimeconfig.admin
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--roles/cloudfunctions.developer
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--roles/container.clusterAdmin
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--roles/container.admin
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--roles/container.viewer
 ```
 
-Assign the Compute instance service account access to the new service account.
-```
-gcloud iam service-accounts add-iam-policy-binding $SA@$PROJECT_ID.iam.gserviceaccount.com \
---role=roles/iam.serviceAccountUser \
---member=serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com
-```
 
-Assign the Cloud Services service access to the new service account as well. 
-```
-gcloud iam service-accounts add-iam-policy-binding $SA@$PROJECT_ID.iam.gserviceaccount.com \
---role=roles/iam.serviceAccountUser \
---member=serviceAccount:$PROJECT_NUMBER@cloudservices.gserviceaccount.com 
-```
-
-Assign the Cloud Build service access to the new service account as well. 
-```
-gcloud iam service-accounts add-iam-policy-binding $SA@$PROJECT_ID.iam.gserviceaccount.com \
---role=roles/iam.serviceAccountUser \
---member=serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com 
-```
-
-Now you can click the `Launch` button on the Marketplace and deploy the Datashare solution within your GCP project. 
+Now you can click the `Launch` button on the Marketplace and deploy the Datashare solution within your GCP project.
 
 ### Delete the Service Account
-Delete the Service Account with the following command. 
+Delete the Service Account with the following command.
 ```
 gcloud iam service-accounts delete $SA@$PROJECT_ID.iam.gserviceaccount.com
 ```
