@@ -165,6 +165,13 @@ properties:
         - roles/storage.admin
         - roles/resourcemanager.projectIamAdmin
         - roles/runtimeconfig.admin
+        - roles/run.admin
+        - roles/run.serviceAgent
+        - roles/runtimeconfig.admin
+        - roles/cloudfunctions.developer
+        - roles/container.clusterAdmin
+        - roles/container.viewer
+        - roles/container.admin
         #- roles/iam.serviceAccounts.create causes an error during deployment as it is not allowed.
         # - roles/resourcemanager.projects.setIamPolicy
   input_datashareGithubReleaseVersion:

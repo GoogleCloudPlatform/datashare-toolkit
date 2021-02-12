@@ -61,7 +61,14 @@ gcloud services enable container.googleapis.com runtimeconfig.googleapis.com clo
 * `Storage Admin`
 * `Project IAM Admin`
 * `Cloud Runtime Config Admin` (roles/runtimeconfig.admin)
-*  `Service Account Creator`
+* `Cloud Run Admin` (roles/run.admin)
+* `Cloud Run Service Agent` (roles/run.serviceAgent)
+* `Runtime Config Admin` (roles/runtimeconfig.admin)
+* `Cloud Functions Developer` (roles/cloudfunctions.developer)
+* `Kubernetes Engine Cluster Admin` (roles/container.clusterAdmin)
+* `Kubernetes Engine Admin` (roles/container.admin)
+* `Kubernetes Engine Viewer` (roles/container.viewer)
+* `Service Account Creator`
 
 <img src="images/iam-assign-roles-to-sa.png" width="500">
 
@@ -132,6 +139,22 @@ gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
 gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
 --member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
 --roles/runtimeconfig.admin
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--roles/cloudfunctions.developer
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--roles/container.clusterAdmin
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--roles/container.admin
+
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+--member=serviceAccount:$SA@$PROJECT_ID.iam.gserviceaccount.com \
+--roles/container.viewer
 ```
 
 

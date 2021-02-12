@@ -39,8 +39,7 @@ def GenerateConfig(context):
   git_release_version = "master"
   if context.properties['datashareGitReleaseTag'] != None:
       git_release_version = context.properties['datashareGitReleaseTag']
-  cloud_build_sa_name = context.properties['customCloudBuildSA'] if context.properties['customCloudBuildSA'] != None and context.properties['customCloudBuildSA'] != '' else 'datashare-cloud-build'
-  custom_cloud_build_sa = "projects/$PROJECT_ID/serviceAccounts/" + cloud_build_sa_name + "@$PROJECT_ID.iam.gserviceaccount.com"
+  custom_cloud_build_sa = context.properties['customCloudBuildSA']
   logging_options = { "logging": "CLOUD_LOGGING_ONLY" }
   api_domain_name = ""
   # if hasattr(context.properties, 'uiDomainName'):
