@@ -151,9 +151,7 @@ properties:
     default: user@example.com
   gceServiceAccount:
     type: string
-    default: PROJECT@PROJECT_NAME.iam.gserviceaccount.com
     # pattern: "[.]*"
-    default: datashare-deployment-manager
     x-googleProperty:
       type: IAM_SERVICE_ACCOUNT
       iamServiceAccount:
@@ -167,19 +165,18 @@ properties:
         - roles/runtimeconfig.admin
         - roles/run.admin
         - roles/run.serviceAgent
-        - roles/runtimeconfig.admin
         - roles/cloudfunctions.developer
         - roles/container.clusterAdmin
         - roles/container.viewer
-        - roles/container.admin
         #- roles/iam.serviceAccounts.create causes an error during deployment as it is not allowed.
         # - roles/resourcemanager.projects.setIamPolicy
   input_datashareGithubReleaseVersion:
     type: string
-    default: v0.6.2
+    default: v0.6.5
     enum:
       - 'master'
-      - 'v0.6.2'
+      - 'v0.6.5'
+      - 'v0.6.4'
   input_gcpRegion:
     type: string
     default: us-central1
