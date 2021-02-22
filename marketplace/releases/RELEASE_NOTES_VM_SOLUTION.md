@@ -1,5 +1,20 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.6.6 Release Notes
+* Build - 2/22/2021
+
+### Datashare
+* Datashare release version is 0.6.5
+* Kubernetes cluster version is 1.16 to support incremental changes
+
+### Updates  
+* Updated Datashare release to 0.6.5
+
+### Bug Fixes
+* Fixed a bug where the service account roles are not displayed in the launch page, which occurred because there were duplicate roles included in the SA list.
+
+### Known Bugs
+
 
 ## 0.6.5 Release Notes
 * Build - 2/11/2021
