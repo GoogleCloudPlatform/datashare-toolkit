@@ -58,30 +58,11 @@ def GenerateConfig(context):
         git_release_version = context.properties['datashareGitReleaseTag']
 
     steps = [
-        #{  # Create a service account
-        #    'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
-        #    'entrypoint': '/bin/bash',
-        #    'args': ['-c',
-        #             'gcloud iam service-accounts create ' + service_acct_name + ' --display-name="' + service_acct_descr + '" --format=disable || exit 0'
-        #             ]
-        #},
         {  # Clone the Datashare repository
             'name': 'gcr.io/cloud-builders/git',
             'dir': 'ds',  # changes the working directory to /workspace/ds/
             'args': ['clone', cmd]
         },
-        #{  # Create the custom role
-        #    'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
-        #    'entrypoint': '/bin/bash',
-        #    'args': ['-c', 'gcloud iam roles create ' + custom_role_name + ' --project=$PROJECT_ID --file=config/ds-api-mgr-role-definition.yaml --format=disable || exit 0'],
-        #    'dir': 'ds/datashare-toolkit/api'  # changes the working directory to /workspace/ds/datashare-toolkit/api
-        #},
-        #{  # Assign the service account to the custom role
-        #    'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
-        #    'entrypoint': '/bin/bash',
-        #    'args': ['-c', 'gcloud projects add-iam-policy-binding $PROJECT_ID --member=serviceAccount:' + service_acct_name + '@$PROJECT_ID.iam.gserviceaccount.com --role="projects/$PROJECT_ID/roles/' + custom_role_name + '" --format=disable'
-        #             ]
-        #},
         {   # Submit the build configuration to Cloud Build to be the Datashare API container image only if the ds-api:dev image does not exist
             'name': 'gcr.io/google.com/cloudsdktool/cloud-sdk',
             'dir': 'ds/datashare-toolkit',

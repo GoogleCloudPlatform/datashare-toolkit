@@ -1,5 +1,20 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.6.7 Release Notes
+* Build - 3/8/2021
+
+### Datashare
+* Datashare release version is 0.6.5
+* Kubernetes cluster version is 1.16 to support incremental changes
+
+### Updates  
+* Removed the following roles from the `datashare-deployment-mgr` service account per the Marketplace engineering team's request.  Since these roles were removed from the deployment manager service account, then the customer must create service account listed below.
+  * roles/iam.securityAdmin
+  * roles/iam.roleAdmin
+  * roles/resourcemanager.projectIamAdmin
+* Added prerequisite step where the customer must execute a shell script to create the `ds-api-mgr` service account and the custom role associated to it.
+
+
 ## 0.6.6 Release Notes
 * Build - 2/22/2021
 
