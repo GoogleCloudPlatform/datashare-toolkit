@@ -9,7 +9,7 @@ description:
   tagline: Ingest, entitle, share large volumes of data.
   title: Datashare
   url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
-  version: '0.6.6'
+  version: '0.6.7'
   eulaUrl: https://raw.githubusercontent.com/GoogleCloudPlatform/datashare-toolkit/ecada698551d3022ed12afbabba5e5eae43dfb03/LICENSE.txt
   softwareGroups:
   - type: SOFTWARE_GROUP_OS

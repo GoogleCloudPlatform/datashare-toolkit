@@ -36,6 +36,20 @@ Note you can only enable the Cloud Commerce Producer API (cloudcommerceproducer.
 gcloud services enable container.googleapis.com runtimeconfig.googleapis.com cloudbuild.googleapis.com cloudcommerceprocurement.googleapis.com
 ```
 
+## Create the ds-api-mgr service account and custom role
+You must complete this step to setup Datashare correctly.
+1. Clone this repository into Google Cloud Shell.
+```
+git clone https://github.com/GoogleCloudPlatform/datashare-toolkit.git
+```
+
+2. Execute the `create-datashare-service-account.sh` script, which will create the `ds-api-mgr` service account and the new `custom.ds.api.mgr` role into your Google Cloud project.
+
+```
+cd datashare-toolkit/marketplace/
+./create-datashare-service-account.sh
+```
+
 ## Update service account from Google Cloud Console
 1. Login to Google Cloud Console and select `IAM` from the menu.
 
@@ -54,12 +68,9 @@ gcloud services enable container.googleapis.com runtimeconfig.googleapis.com clo
 * `Service account description` as `Datashare deployment manager`
 
 5. Select the following roles
-* `Security Admin`
 * `Kubernetes Admin`
-* `Role Administrator` (roles/iam.roleAdmin)
 * `Service Useage Admin`
 * `Storage Admin`
-* `Project IAM Admin`
 * `Cloud Runtime Config Admin` (roles/runtimeconfig.admin)
 * `Cloud Run Admin` (roles/run.admin)
 * `Cloud Run Service Agent` (roles/run.serviceAgent)
