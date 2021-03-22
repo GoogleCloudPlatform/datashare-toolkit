@@ -8,3 +8,6 @@ In order to integrate Datashare with Google Cloud Marketplace, you must first si
 
 - [Producer Portal Integration](./PRODUCER_PORTAL.md)
 - [Partner Portal Integration](./PARTNER_PORTAL.md)
+
+## Testing your published products
+After your products are published on Google Cloud Marketplace, you can test them without being charged for your usage of the products. See [Testing your published Google Cloud Marketplace products](https://cloud.google.com/marketplace/docs/partners/testing-products) - for more information on how to set up your products for testing.
