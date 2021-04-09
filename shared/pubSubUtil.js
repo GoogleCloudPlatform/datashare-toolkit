@@ -20,7 +20,6 @@ const pubsub = require('@google-cloud/pubsub');
 
 class PubSubUtil {
     constructor(projectId) {
-        this.projectId = projectId;
         const options = {};
         if (projectId) {
             options.projectId = projectId;
