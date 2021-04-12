@@ -20,7 +20,9 @@ const pubsub = require('@google-cloud/pubsub');
 
 class PubSubUtil {
     constructor(projectId) {
-        const options = {};
+        const options = {
+            scopes:['https://www.googleapis.com/auth/cloud-platform']
+        };
         if (projectId) {
             options.projectId = projectId;
         }

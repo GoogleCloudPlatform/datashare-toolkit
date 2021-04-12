@@ -27,7 +27,9 @@ const underscore = require("underscore");
 class BigQueryUtil {
     constructor(projectId) {
         this.projectId = projectId;
-        const options = {};
+        const options = {
+            scopes:['https://www.googleapis.com/auth/cloud-platform']
+        };
         if (projectId) {
             options.projectId = projectId;
         }
