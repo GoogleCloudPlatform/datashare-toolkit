@@ -362,7 +362,7 @@ async function initializePubSubListener() {
             subscription.on('error', errorHandler);
             subscription.on('close', () => { console.error('Subscription closed') });
             subscription.detached((err, exists) => {
-                console.warn(`Is subscription detached: ${exists}`);
+                console.log(`Is subscription detached: ${exists}`);
                 if (err) {
                     console.error(err);
                 }
