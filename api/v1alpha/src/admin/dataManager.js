@@ -246,8 +246,7 @@ async function startPubSubListener() {
     await retry(async bail => {
         await initializePubSubListener();
     }, {
-        // retries: 5,
-        forever: true,
+        retries: 5,
         minTimeout: 30000,
         maxTimeout: 60000,
         onRetry: logRetry
@@ -362,10 +361,10 @@ async function initializePubSubListener() {
             subscription.on('message', messageHandler);
             subscription.on('error', errorHandler);
             subscription.on('close', () => { console.error('Subscription closed') });
-            subscription.detached((cb) => {
-                console.warn('Subscription detached');
-                if (cb) {
-                    console.error(cb);
+            subscription.detached((err, exists) => {
+                console.log(`Is subscription detached: ${exists}`);
+                if (err) {
+                    console.error(err);
                 }
             });
         } catch (err) {
