@@ -291,6 +291,7 @@ Use Helm's local template rendering to create a Kubernetes manifest that install
 
     helm template \
       --namespace gke-system \
+      --set global.proxy.excludeIPRanges=169.254.169.254/32 \
       --set global.hub=gcr.io/gke-release/asm \
       --set global.tag=$ISTIO_PACKAGE \
       --set pilot.enabled=false \
