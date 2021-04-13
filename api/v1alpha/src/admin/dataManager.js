@@ -247,7 +247,6 @@ async function startPubSubListener() {
         await initializePubSubListener();
     }, {
         retries: 5,
-        // forever: true,
         minTimeout: 30000,
         maxTimeout: 60000,
         onRetry: logRetry
