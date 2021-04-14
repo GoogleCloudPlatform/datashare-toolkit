@@ -21,8 +21,8 @@ imports:
 {% set apiServiceAccountName = "ds-api-mgr" %}
 {% set apiServiceAccountDescr = "DS API Manager" %}
 {% set apiCustomRole = "custom.ds.api.mgr" %}
+{% set istioExcludeIpRanges = "169.254.169.254/32" %}
 
-{% set cloudBuildCustomSA = "datashare-deployment-managerv2" %}
 {% set cloudBuildCustomSAFullPath = "projects/" + project + "/serviceAccounts/" + gceServiceAccountValue %}
 {% set uiDomainName = properties["input_uiDomainName"] %}
 {% set ingestionStorageBucketSuffix = "-datashare-ingestion" %}
@@ -247,6 +247,8 @@ resources:
             value: {{ deployApiToGkeValue }}
           - key: gkeClusterName
             value: {{ gkeClusterName }}
+          - key: istioExcludeIpRanges
+            value: {{ istioExcludeIpRanges }}
           {% endif %}
           {% if useRuntimeConfigWaiterValue %}
           - key: useRuntimeConfigWaiter
@@ -439,6 +441,7 @@ resources:
                     fi
                     export GKE_ZONE=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/gkeZone -H "Metadata-Flavor: Google"`
                     export GKE_CLUSTER_NAME=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/gkeClusterName -H "Metadata-Flavor: Google"`
+                    export ISTIO_EXCLUDE_IP_RANGES=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/istioExcludeIpRanges -H "Metadata-Flavor: Google"`
 
                     echo "Getting the cluster credentials"
                     gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE
@@ -478,6 +481,7 @@ resources:
                         --set global.hub=gcr.io/gke-release/asm \
                         --set global.tag=$ISTIO_PACKAGE \
                         --set pilot.enabled=false \
+                        --set global.proxy.excludeIPRanges=${ISTIO_EXCLUDE_IP_RANGES} \
                         --set security.enabled=true \
                         --set sidecarInjectorWebhook.enabled=true \
                         --set sidecarInjectorWebhook.rewriteAppHTTPProbe=true \
