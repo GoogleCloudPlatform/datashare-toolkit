@@ -149,7 +149,7 @@ router.beforeEach((to, from, next) => {
     if (store.getters.isLoggedIn) {
       next();
       return;
-    } else if (to.name === 'myProducts') {
+    } else if (to.name === 'myProducts' || to.name === 'activation') {
       next();
       return;
     } else {
