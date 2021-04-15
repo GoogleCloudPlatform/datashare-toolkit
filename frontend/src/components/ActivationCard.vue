@@ -64,8 +64,10 @@ export default {
     }
   },
   mounted() {
+    console.log(`token is: ${this.jwtToken}`);
     this.performLogin().then(result => {
       if (result) {
+        console.log(`token is now: ${this.jwtToken}`);
         this.user = {
           email: this.$store.state.user.data.email,
           displayName: this.$store.state.user.data.displayName
