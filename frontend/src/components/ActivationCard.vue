@@ -71,7 +71,7 @@ export default {
       console.log(`token is now: ${this.jwtToken}`);
       localStorage.removeItem('gmt');
     }
-    
+
     this.performLogin().then(result => {
       if (result) {
         this.user = {
