@@ -43,9 +43,9 @@ class Config {
     } else {
       val = this.config[key];
       if (val) {
-        if (val === 'true') {
+        if (val.toLowerCase() === 'true') {
           val = true;
-        } else if (val === 'false') {
+        } else if (val.toLowerCase() === 'false') {
           val = false;
         }
       }
