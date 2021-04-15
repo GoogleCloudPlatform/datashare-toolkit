@@ -18,7 +18,8 @@ export default {
   },
   data: () => ({
     user: null,
-    activated: false
+    activated: false,
+    jwtToken: null
   }),
   methods: {
     getCookie(name) {
@@ -58,12 +59,18 @@ export default {
       }<br/>
       <b>Email</b>: ${this.user ? this.user.email : ''}<br/>
       <b>Activation Status: ${this.activated}</b>`;
-    },
-    jwtToken() {
-      return this.getCookie('gmt') || this.$route.query.gmt;
     }
   },
   mounted() {
+    const token = this.getCookie('gmt') || this.$route.query.gmt;
+    if (token) {
+      this.jwtToken = token;
+      localStorage.setItem('gmt', token);
+    } else {
+      this.jwtToken = localStorage.getItem('gmt');
+      localStorage.removeItem('gmt');
+    }
+
     this.performLogin().then(result => {
       if (result) {
         this.user = {
