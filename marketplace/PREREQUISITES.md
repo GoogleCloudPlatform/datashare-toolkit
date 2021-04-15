@@ -69,7 +69,7 @@ cd datashare-toolkit/marketplace/
 
 5. Select the following roles
 * `Kubernetes Admin`
-* `Service Useage Admin`
+* `Service Usage Admin`
 * `Storage Admin`
 * `Cloud Runtime Config Admin` (roles/runtimeconfig.admin)
 * `Cloud Run Admin` (roles/run.admin)
@@ -80,6 +80,7 @@ cd datashare-toolkit/marketplace/
 * `Kubernetes Engine Admin` (roles/container.admin)
 * `Kubernetes Engine Viewer` (roles/container.viewer)
 * `Service Account Creator`
+* `Role Admin`
 
 <img src="images/iam-assign-roles-to-sa.png" width="500">
 

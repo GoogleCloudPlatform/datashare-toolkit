@@ -1,5 +1,18 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.6.8 Release Notes
+* Build - 4/14/2021
+
+### Datashare
+* Datashare release version is 0.6.6
+* Kubernetes cluster version is 1.16 to support incremental changes
+
+### Updates  
+* Updated the Datashare Helm VM install script to include the following item:
+  * `--set global.proxy.excludeIPRanges=169.254.169.254/32`
+* Updated the prerequisites page to instruct the user to add the `Role Admin` role to the service account.  
+  * roles/iam.roleAdmin
+
 ## 0.6.7 Release Notes
 * Build - 3/8/2021
 
