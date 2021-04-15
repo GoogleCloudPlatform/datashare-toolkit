@@ -18,7 +18,8 @@ export default {
   },
   data: () => ({
     user: null,
-    activated: false
+    activated: false,
+    jwtToken: null
   }),
   methods: {
     getCookie(name) {
@@ -58,12 +59,10 @@ export default {
       }<br/>
       <b>Email</b>: ${this.user ? this.user.email : ''}<br/>
       <b>Activation Status: ${this.activated}</b>`;
-    },
-    jwtToken() {
-      return this.getCookie('gmt') || this.$route.query.gmt;
     }
   },
   mounted() {
+    this.jwtToken = this.getCookie('gmt') || this.$route.query.gmt;
     console.log(`token is: ${this.jwtToken}`);
     this.performLogin().then(result => {
       if (result) {
