@@ -42,7 +42,7 @@ class Config {
       val = process.env[key] || this.config[key];
     } else {
       val = this.config[key];
-      if (val) {
+      if (val && typeof val === 'string') {
         if (val.toLowerCase() === 'true') {
           val = true;
         } else if (val.toLowerCase() === 'false') {
