@@ -64,6 +64,7 @@ export default {
   mounted() {
     const token = this.getCookie('gmt') || this.$route.query.gmt;
     if (token) {
+      this.jwtToken = token;
       localStorage.setItem('gmt', token);
       console.log(`token is: ${token}`);
     } else {
