@@ -42,6 +42,13 @@ class Config {
       val = process.env[key] || this.config[key];
     } else {
       val = this.config[key];
+      if (val) {
+        if (val.toLowerCase() === 'true') {
+          val = true;
+        } else if (val.toLowerCase() === 'false') {
+          val = false;
+        }
+      }
     }
     if (throws && !val) {
       throw new Error(`Configuration missing for key: ${key}`);
