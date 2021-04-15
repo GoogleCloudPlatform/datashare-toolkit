@@ -66,10 +66,8 @@ export default {
     if (token) {
       this.jwtToken = token;
       localStorage.setItem('gmt', token);
-      console.log(`token is: ${token}`);
     } else {
       this.jwtToken = localStorage.getItem('gmt');
-      console.log(`token is now: ${this.jwtToken}`);
       localStorage.removeItem('gmt');
     }
 
