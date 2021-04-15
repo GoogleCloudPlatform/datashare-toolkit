@@ -64,8 +64,11 @@ export default {
   mounted() {
     this.jwtToken = this.getCookie('gmt') || this.$route.query.gmt;
     console.log(`token is: ${this.jwtToken}`);
+    localStorage.setItem('gmt', this.jwtToken);
     this.performLogin().then(result => {
       if (result) {
+        this.jwtToken = localStorage.getItem('gmt');
+        localStorage.removeItem('gmt');
         console.log(`token is now: ${this.jwtToken}`);
         this.user = {
           email: this.$store.state.user.data.email,
