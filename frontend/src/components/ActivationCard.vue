@@ -65,10 +65,10 @@ export default {
     const token = this.getCookie('gmt') || this.$route.query.gmt;
     if (token) {
       this.jwtToken = token;
-      localStorage.setItem('gmt', token);
+      sessionStorage.setItem('gmt', token);
     } else {
-      this.jwtToken = localStorage.getItem('gmt');
-      localStorage.removeItem('gmt');
+      this.jwtToken = sessionStorage.getItem('gmt');
+      sessionStorage.removeItem('gmt');
     }
 
     this.performLogin().then(result => {
