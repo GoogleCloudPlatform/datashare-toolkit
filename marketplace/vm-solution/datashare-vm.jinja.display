@@ -18,7 +18,7 @@ description:
       version: v20200714 LTS
   - software:
     - title: Datashare
-      version: 0.6.6
+      version: 0.7.0
     - title: Cloud Run on GKE
       version: 1.16
   documentations:
