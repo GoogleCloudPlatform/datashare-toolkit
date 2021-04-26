@@ -483,6 +483,12 @@ policies.put('/projects/:projectId/policies/:policyId', async(req, res) => {
  *          type: string
  *       required: true
  *       description: Policy Id of the Policy request
+ *     - in: header
+ *       name: x-gcp-account
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: GCP account name of the calling user
  *     requestBody:
  *       description: Request parameters for Policy
  *       content:

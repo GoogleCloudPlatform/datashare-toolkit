@@ -441,6 +441,12 @@ accounts.put('/projects/:projectId/accounts/:accountId', async (req, res) => {
  *          type: string
  *       required: true
  *       description: Account Id of the Account request
+ *     - in: header
+ *       name: x-gcp-account
+ *       schema:
+ *          type: string
+ *       required: true
+ *       description: GCP account name of the calling user
  *     requestBody:
  *       description: Request parameters for Account
  *       content:
