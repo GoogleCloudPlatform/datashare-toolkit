@@ -169,8 +169,8 @@ accounts.get('/projects/:projectId/accounts', async (req, res) => {
  *          type: string
  *       required: true
  *       description: Project Id of the Account request
- *      - in: header
- *       name: X-Gcp-Account
+ *     - in: header
+ *       name: x-gcp-account
  *       schema:
  *          type: string
  *       required: true
@@ -337,8 +337,8 @@ accounts.get('/projects/:projectId/accounts/:accountId', async (req, res) => {
  *          type: string
  *       required: true
  *       description: Account Id of the Account request
- *      - in: header
- *       name: X-Gcp-Account
+ *     - in: header
+ *       name: x-gcp-account
  *       schema:
  *          type: string
  *       required: true

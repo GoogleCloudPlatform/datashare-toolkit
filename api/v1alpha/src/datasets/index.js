@@ -115,8 +115,8 @@ datasets.get('/projects/:projectId/datasets', async(req, res) => {
  *          type: string
  *       required: true
  *       description: Project Id of the Dataset request
- *      - in: header
- *       name: X-Gcp-Account
+ *     - in: header
+ *       name: x-gcp-account
  *       schema:
  *          type: string
  *       required: true
@@ -199,8 +199,8 @@ datasets.post('/projects/:projectId/datasets', async(req, res) => {
  *          type: string
  *       required: true
  *       description: Project Id of the Dataset request
- *      - in: header
- *       name: X-Gcp-Account
+ *     - in: header
+ *       name: x-gcp-account
  *       schema:
  *          type: string
  *       required: true

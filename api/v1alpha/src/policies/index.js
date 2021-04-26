@@ -181,8 +181,8 @@ policies.get('/projects/:projectId/products', async(req, res) => {
  *          type: string
  *       required: true
  *       description: Project Id of the Policy request
- *      - in: header
- *       name: X-Gcp-Account
+ *     - in: header
+ *       name: x-gcp-account
  *       schema:
  *          type: string
  *       required: true
@@ -363,8 +363,8 @@ policies.get('/projects/:projectId/policies/:policyId', async(req, res) => {
  *          type: string
  *       required: true
  *       description: Policy Id of the Policy request
- *      - in: header
- *       name: X-Gcp-Account
+ *     - in: header
+ *       name: x-gcp-account
  *       schema:
  *          type: string
  *       required: true
