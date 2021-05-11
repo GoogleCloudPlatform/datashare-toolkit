@@ -100,13 +100,13 @@ columns:
 * The actual measurement observed (`mean_temperature`, in this case)
 
 The `schema.json` file will map to the
-[entire representation](config/ingestion/schema.json) of
+[entire representation](observation/config/schema.json) of
 the source file being ingested.
 
 The `transform.sql` configuration file will do the work of transforming
 the source columns to the destination data format. This
 formatting is inferred by the types returned by the SQL fragment
-you specify in [transform.sql](config/ingestion/transform.sql).
+you specify in [transform.sql](observation/config/transform.sql).
 
 The `transform.sql` contents are:
 
