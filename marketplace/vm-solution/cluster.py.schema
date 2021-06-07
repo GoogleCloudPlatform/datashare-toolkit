@@ -31,7 +31,7 @@ properties:
   clusterVersion:
     type: string
     description: Initial number of nodes desired in the cluster.
-    default: "1.16"
+    default: "1.18"
   initialNodeCount:
     type: integer
     description: Initial number of nodes desired in the cluster.

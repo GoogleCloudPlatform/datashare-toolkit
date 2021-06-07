@@ -35,7 +35,7 @@ imports:
 {% set useRuntimeConfigWaiterValue = properties["useRuntimeConfigWaiter"] %}
 {% set deployApiToGkeValue = properties["deployApiToGke"] %}
 {% set gkeZone = properties["input_gkeZone"] %}
-{% set clusterVersion = "1.16" %}
+{% set clusterVersion = "1.18" + "" %}
 {% set gkeClusterName = "datashare" %}
 {% set waiterName = env["deployment"] + "-startup-waiter" %}
 {% set configName = env["deployment"] + "-startup-config" %}

@@ -1,5 +1,15 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.7.0 Release Notes
+* Build - 6/3/2021
+
+### Datashare
+* Kubernetes cluster version is 1.18 
+  * https://cloud.google.com/kubernetes-engine/docs/release-notes
+
+### Updates  
+* N/A
+
 ## 0.6.8 Release Notes
 * Build - 4/19/2021
 

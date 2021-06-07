@@ -23,7 +23,8 @@ def GenerateConfig(context):
   cluster_name = 'datashare-cluster-resource'
   acutal_cluster_name = 'datashare'
   # type_name = name_prefix + '-type'
-  cluster_version = '1.16'
+  cluster_version_num = context.properties['clusterVersion']
+  cluster_version = '' + str(cluster_version_num) + ''
   workload_pool = context.env['project'] + '.svc.id.goog'
   machine_type = 'e2-standard-2'
 
@@ -38,7 +39,7 @@ def GenerateConfig(context):
               'zone': context.properties['zone'],
               'cluster': {
                   'name': acutal_cluster_name,
-                  'initialClusterVersion': cluster_version,
+                  'initialClusterVersion': '' + cluster_version + '',
                   'initialNodeCount': 3,
                   'ipAllocationPolicy': {
                       'useIpAliases': True,
