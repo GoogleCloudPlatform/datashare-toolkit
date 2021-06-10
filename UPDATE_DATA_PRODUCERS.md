@@ -7,6 +7,13 @@ Data Producers are users that should have administrative access to the Datashare
 Run the following command to edit the authorization policy.
 
 ```
+CLUSTER=datashare
+
+# Replace with the zone
+export ZONE=us-central1-a;
+
+gcloud config set compute/zone $ZONE
+
 export NAMESPACE=datashare-apis
 kubectl edit authorizationpolicy.security.istio.io/allow-data-producers -n "$NAMESPACE"
 ```
