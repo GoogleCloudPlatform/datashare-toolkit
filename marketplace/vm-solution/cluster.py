@@ -25,8 +25,12 @@ def GenerateConfig(context):
   # type_name = name_prefix + '-type'
   cluster_version_num = context.properties['clusterVersion']
   cluster_version = '' + str(cluster_version_num) + ''
+  is_private_gke_cluster = context.properties['isPrivateGkeCluster']
   workload_pool = context.env['project'] + '.svc.id.goog'
   machine_type = 'e2-standard-2'
+  network = context.properties['network']
+  subnetwork = context.properties['subnetwork']
+  ## TODO add control statement to add PrivateClusterConfig if user selects true;
 
   resources = [
       {
@@ -44,6 +48,8 @@ def GenerateConfig(context):
                   'ipAllocationPolicy': {
                       'useIpAliases': True,
                   },
+                  'network': network,
+                  'subnetwork': subnetwork,
                   'workloadIdentityConfig': {
                       'workloadPool': workload_pool,
                   },
@@ -74,6 +80,13 @@ def GenerateConfig(context):
           }
       }
   ]
+
+  if is_private_gke_cluster == True:
+      resources[0]['privateClusterConfig'] =  {
+                      'enablePrivateNodes': True,
+                      'masterIpv4CidrBlock': '172.16.0.32/28'
+                  }
+                  
   outputs = []
   
   return {'resources': resources, 'outputs': outputs}

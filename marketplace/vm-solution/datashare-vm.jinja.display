@@ -9,7 +9,7 @@ description:
   tagline: Ingest, entitle, share large volumes of data.
   title: Datashare
   url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
-  version: '0.7.0'
+  version: '0.7.1'
   eulaUrl: https://raw.githubusercontent.com/GoogleCloudPlatform/datashare-toolkit/ecada698551d3022ed12afbabba5e5eae43dfb03/LICENSE.txt
   softwareGroups:
   - type: SOFTWARE_GROUP_OS
@@ -80,9 +80,11 @@ input:
     - name: subnetwork
       title: Subnetwork name
       section: NETWORKING
+      # if you set the external IP to None, then you must configure a NAT instance automatically as well otherwise the build will fail
     - name: externalIP
       title: External IP
       tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+      placeholder: 'Ephemeral' # Change this to None if you don't want an external IP address, but you configure NAT as well or build fails
       section: NETWORKING
     - name: enableTcp80
       title: Allow HTTP traffic from Internet
@@ -99,10 +101,15 @@ input:
       level: 1
     - name: input_datashareGithubReleaseVersion
       title: Github Datashare Release Version
+    - name: input_cloudFunctionRegion
+      title: Google Cloud Platform Cloud Function region
+      subtext: <a href="https://cloud.google.com/compute/docs/regions-zones#available">Valid Google Cloud Platform regions</a>
+      tooltip: Deploys the Cloud Function to this region; default is us-central1.
+      placeholder: us-central1      
     - name: input_gcpRegion
       title: Google Cloud Platform Region
       subtext: <a href="https://cloud.google.com/compute/docs/regions-zones#available">Valid Google Cloud Platform regions</a>
-      tooltip: Deploys the Cloud Function, Datashare API and UI to this region; default is us-central1.
+      tooltip: Deploys the Datashare API and UI to this region; default is us-central1.
       placeholder: us-central1
     - name: input_storageBucketLocation
       title: Google Cloud Platform Storage Bucket location
@@ -117,6 +124,11 @@ input:
       title: Deploy the Datashare API to Cloud Run/GKE
       tooltip: This creates a<a href="https://cloud.google.com/run/docs/gke/setup">GKE cluster and installs Cloud Run</a> and deploys the Datashare API to this Cloud Run instance.
       subtext: Creates a GKE cluster, installs Cloud Run and deploys Datashare API to this cluster.
+    # Not ready to be enabled just yet. Needs additional testing
+    #- name: isPrivateGkeCluster
+    #  title: Create private GKE Cluster
+    #  tooltip: This creates a<a href="https://cloud.google.com/run/docs/gke/setup">private GKE</a>.
+    #  subtext: Ensures the nodes in the GKE cluster are private (i.e. do not have external IP addresses).      
     - name: gceServiceAccount
       title: GCP Service Account
       tooltip: Create a <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/marketplace/PREREQUISITES.md#update-service-account-from-google-cloud-console">new permissions to other service accounts</a> to install all Datashare components.

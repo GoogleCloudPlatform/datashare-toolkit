@@ -20,4 +20,6 @@ resources:
   type: cluster.py
   properties:
     zone: us-central1-a
+    network: default
+    subnetwork: default
 

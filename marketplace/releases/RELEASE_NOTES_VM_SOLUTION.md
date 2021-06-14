@@ -1,5 +1,18 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.7.1 Release Notes
+* Build - 6/11/2021
+
+### Datashare
+* Datashare release version is 0.7.0
+* Kubernetes cluster version is 1.18
+
+### Marketplace Release Updates  
+* Updated launch page so that it allows you to select the Cloud Function region
+* Updated the GKE Cluster deployment to deploy the GKE nodes to the network/subnetwork specified in the launch page.   
+* Updated the documentation on the required roles to deploy Datashare into your GCP project.
+* Fixed an issue in the drop down menus where it would display all available regions/zones as opposed to the regions/zone explicitly specified in the list.
+
 ## 0.7.0 Release Notes
 * Build - 6/3/2021
 
