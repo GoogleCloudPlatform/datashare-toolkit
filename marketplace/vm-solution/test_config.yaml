@@ -17,6 +17,7 @@ resources:
     input_dataProducers: test@example.com
     input_uiDomainName: datashare.com
     input_apiDomainName: api.datashare.com
+    input_cloudFunctionRegion: us-central1
     serviceAccounts:
       - email: gcp-financial-services@cloud-launcher-verifier-prd.iam.gserviceaccount.com
         scopes:

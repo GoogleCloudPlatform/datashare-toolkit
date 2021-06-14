@@ -36,6 +36,18 @@ properties:
     type: integer
     description: Initial number of nodes desired in the cluster.
     default: 3
+  network: 
+    type: string
+    description: Network to deploy GKE cluster
+    default: "default"
+  subnetwork: 
+    type: string
+    description: Subnetwork to deploy GKE cluster
+    default: "default"    
+  privateGkeCluster:
+    type: boolean
+    description: Private GKE cluster nodes
+    default: false
 
 outputs:
   clusterType:

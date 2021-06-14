@@ -68,19 +68,17 @@ cd datashare-toolkit/marketplace/
 * `Service account description` as `Datashare deployment manager`
 
 5. Select the following roles
-* `Kubernetes Admin`
-* `Service Usage Admin`
-* `Storage Admin`
-* `Cloud Runtime Config Admin` (roles/runtimeconfig.admin)
-* `Cloud Run Admin` (roles/run.admin)
-* `Cloud Run Service Agent` (roles/run.serviceAgent)
-* `Runtime Config Admin` (roles/runtimeconfig.admin)
-* `Cloud Functions Developer` (roles/cloudfunctions.developer)
-* `Kubernetes Engine Cluster Admin` (roles/container.clusterAdmin)
-* `Kubernetes Engine Admin` (roles/container.admin)
-* `Kubernetes Engine Viewer` (roles/container.viewer)
-* `Service Account Creator`
-* `Role Admin`
+* [`Service Usage Admin`](https://cloud.google.com/iam/docs/understanding-roles#service-usage-roles) (roles/serviceusage.serviceUsageAdmin)
+* [`Storage Admin`](https://cloud.google.com/iam/docs/understanding-roles#cloud-storage-roles) (roles/storage.admin)
+* [`Cloud Runtime Config Admin`](https://cloud.google.com/iam/docs/understanding-roles#other-roles) (roles/runtimeconfig.admin)
+* [`Cloud Run Admin`](https://cloud.google.com/iam/docs/understanding-roles#cloud-run-roles) (roles/run.admin)
+* [`Cloud Run Service Agent` (roles/run.serviceAgent)
+* [`Cloud Functions Developer`](https://cloud.google.com/iam/docs/understanding-roles#cloud-functions-roles) (roles/cloudfunctions.developer)
+* [`Kubernetes Engine Cluster Admin`](https://cloud.google.com/iam/docs/understanding-roles#kubernetes-engine-roles) (roles/container.clusterAdmin)
+* [`Kubernetes Engine Admin`](https://cloud.google.com/iam/docs/understanding-roles#kubernetes-engine-roles) (roles/container.admin)
+* [`Kubernetes Engine Viewer`](https://cloud.google.com/iam/docs/understanding-roles#kubernetes-engine-roles) (roles/container.viewer)
+* [`Service Account Creator`](https://cloud.google.com/iam/docs/understanding-roles#service-accounts-roles) (roles/iam.serviceAccountCreator)
+* Project [`Role Admin`](https://cloud.google.com/iam/docs/understanding-roles#roles-roles) (roles/iam.roleAdmin)
 
 <img src="images/iam-assign-roles-to-sa.png" width="500">
 

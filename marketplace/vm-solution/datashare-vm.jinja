@@ -15,6 +15,8 @@ imports:
 {% set datashareGitReleaseVersion = properties["input_datashareGithubReleaseVersion"] %}
 {% set gceServiceAccountValue = properties["gceServiceAccount"] %}
 {% set gcpRegion = properties["input_gcpRegion"] %}
+{% set cloudFunctionRegion = properties["input_cloudFunctionRegion"] %}
+
 {% set storageBucketLocation = properties["input_storageBucketLocation"] %}
 {% set apiDomainName = properties["input_apiDomainName"] %}
 {% set apiStaticIp = properties["input_apiStaticIp"] %}
@@ -34,6 +36,7 @@ imports:
 {% set cloudFunctionSourceZipFileName = "datashare-toolkit-cloud-function.zip" %}
 {% set useRuntimeConfigWaiterValue = properties["useRuntimeConfigWaiter"] %}
 {% set deployApiToGkeValue = properties["deployApiToGke"] %}
+ # {% set isPrivateGkeCluster = properties["isPrivateGkeCluster"] %}
 {% set gkeZone = properties["input_gkeZone"] %}
 {% set clusterVersion = "1.18" + "" %}
 {% set gkeClusterName = "datashare" %}
@@ -82,6 +85,9 @@ resources:
     properties:
       zone: {{ gkeZone }}
       # clusterVersion: {{ clusterVersion }}
+      network: {{ networks[0] }}
+      subnetworks: {{ subnetwork }}
+      isPrivateGkeCluster: {{ isPrivateGkeCluster }}
   {% endif %}
 
   {% if useRuntimeConfigWaiterValue %}
@@ -120,7 +126,7 @@ resources:
       codeBucket: {{ project }}-install-bucket
       ## codeBucket: fsi-cds-markeplace-sw-dev-datashare-cloud-function
       codeBucketObject: {{ cloudFunctionSourceZipFileName }}
-      location: {{ gcpRegion }}
+      location: {{ cloudFunctionRegion }}
       timeout: 60s
       runtime: nodejs10
       availableMemoryMb: 256
