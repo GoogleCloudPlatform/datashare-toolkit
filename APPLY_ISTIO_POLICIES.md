@@ -11,9 +11,14 @@ The following variables must be set before executing the apply scripts.
 # Executing from CLI
 
 ```
+# Replace with the data producers comma delimited list
 export DATA_PRODUCERS='"*@google.com"';
+
+# Replace with the oauth client id
 export OAUTH_CLIENT_ID="8xxxxxxxxxx-xxxxxxxxxxx.apps.googleusercontent.com"
 export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
+
+# Replace with the zone
 export ZONE=us-central1-a;
 gcloud config set compute/zone $ZONE
 CLUSTER=datashare
