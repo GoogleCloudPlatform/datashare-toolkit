@@ -125,10 +125,6 @@ Create custom DS API role:
 
     gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml
 
-**Note**: If the custom role already exists, just update the stage:
-
-    gcloud iam roles update ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --stage BETA
-
 Grant the new GCP service role to service account:
 
     gcloud projects add-iam-policy-binding ${PROJECT_ID} \
