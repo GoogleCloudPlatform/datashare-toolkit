@@ -442,7 +442,7 @@ Create a **FQDN** environment variable based off service name and subdomain abov
 
 Map your service to the custom FQDN:
 
-    gcloud beta run domain-mappings create --service ds-api \
+    gcloud run domain-mappings create --service ds-api \
       --domain $FQDN \
       --cluster $CLUSTER \
       --cluster-location $ZONE \
