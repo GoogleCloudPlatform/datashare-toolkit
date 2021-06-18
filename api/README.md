@@ -352,10 +352,9 @@ Label the **namespace** with `istio-injection=enabled` so that the Istio sidecar
 
     kubectl label namespace $NAMESPACE istio-injection=enabled
 
-Deploy ths DS API service to Cloud Run for Anthos in the **NAMESPACE**: \
-**Note**: We need to use the *alpha* version of gcloud command thaht supports the KSA's `serviceAccountName` value for the GKE service pod.
+Deploy ths DS API service to Cloud Run for Anthos in the **NAMESPACE**:
 
-    gcloud alpha run deploy ds-api \
+    gcloud run deploy ds-api \
       --cluster $CLUSTER \
       --cluster-location $ZONE \
       --min-instances 1 \
