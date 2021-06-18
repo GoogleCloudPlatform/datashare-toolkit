@@ -348,14 +348,6 @@ You can check the binding via:
 
 #### Deploy the service
 
-Create a **NAMESPACE** environment variable called **datashare-apis**:
-
-    export NAMESPACE=datashare-apis
-
-Create the **NAMESPACE** in the GKE cluster:
-
-    kubectl create namespace $NAMESPACE
-
 Label the **namespace** with `istio-injection=enabled` so that the Istio sidecar proxy is injected to all pods in the namespace by default:
 
     kubectl label namespace $NAMESPACE istio-injection=enabled
