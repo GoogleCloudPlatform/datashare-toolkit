@@ -54,10 +54,23 @@
         <span>Navigation menu</span>
       </v-tooltip>
       <v-toolbar-title>{{ toolbar.title }}</v-toolbar-title>
+      <v-divider class="mx-4" inset vertical></v-divider>
+      <v-select
+        class="mt-7"
+        dense
+        style="maxWidth: 200px;"
+        :readonly="availableProjectIds.length === 1"
+        v-model="projectId"
+        :items="availableProjectIds"
+        label="GCP Project ID"
+        required
+        @change="projectIdChanged"
+      ></v-select>
       <v-spacer></v-spacer>
       <v-avatar :tile="true" height="25" width="25">
         <img :src="require('@/assets/datashare-alpha-24px.svg')" alt="logo" />
       </v-avatar>
+      <v-spacer></v-spacer>
       <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
@@ -169,7 +182,9 @@ export default {
     toolbar: {
       title: 'Datashare'
     },
-    params: {}
+    params: {},
+    projectId: 'cds-demo-2',
+    availableProjectIds: ['cds-demo-1-271622', 'cds-demo-2', 'cds-demo-3']
   }),
   methods: {
     canAccessRoute(navItem) {
@@ -190,6 +205,10 @@ export default {
       } else {
         return true;
       }
+    },
+    projectIdChanged() {
+      console.log(`GCP ProjectId changed to ${this.projectId}`);
+      _config.projectId = this.projectId;
     }
   },
   computed: {

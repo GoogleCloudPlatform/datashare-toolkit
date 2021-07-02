@@ -60,6 +60,10 @@ class Config {
     return this.getConfigValue('VUE_APP_API_BASE_URL');
   }
 
+  set projectId(p) {
+    this.config.VUE_APP_PROJECT_ID = p;
+  }
+
   get projectId() {
     return this.getConfigValue('VUE_APP_PROJECT_ID');
   }
