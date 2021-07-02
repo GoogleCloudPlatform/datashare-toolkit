@@ -69,4 +69,12 @@ config.projectId = process.env.PROJECT_ID;
 
 config.gcpMarketplaceTokenCookieName = 'gmt';
 config.marketplaceIntegration = process.env.MARKETPLACE_INTEGRATION === 'false' ? false : true;
+
+if (process.env.MANAGED_PROJECTS) {
+    config.managedProjects = process.env.MANAGED_PROJECTS.split(',') || [];
+} else {
+    // TODO: REMOVE
+    config.managedProjects = ['cds-demo-1-271622', 'cds-demo-2', 'cds-demo-3'];
+}
+
 module.exports = config;
