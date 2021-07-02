@@ -15,6 +15,11 @@ spec:
         - /v1alpha/projects/$PROJECT_ID/products
     - operation:
         methods:
+        - POST
+        paths: 
+        - /v1alpha/projects/$PROJECT_ID/auth:isDataProducer
+    - operation:
+        methods:
         - GET
         - POST
         paths: 

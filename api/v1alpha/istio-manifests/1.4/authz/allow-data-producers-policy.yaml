@@ -24,7 +24,6 @@ spec:
         - /v1alpha/projects/$PROJECT_ID/accounts:syncMarketplace
         - /v1alpha/projects/$PROJECT_ID/admin:initSchema
         - /v1alpha/projects/$PROJECT_ID/admin:syncResources
-        - /v1alpha/projects/$PROJECT_ID/auth:isDataProducer
         - /v1alpha/projects/$PROJECT_ID/datasets
         - /v1alpha/projects/$PROJECT_ID/procurements/approve
     - operation:

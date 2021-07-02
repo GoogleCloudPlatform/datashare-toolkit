@@ -57,8 +57,8 @@ config.cdsCurrentUserPermissionViewId = "currentUserPermission";
 
 config.permissionsDiffProcedureId = "permissionsDiff";
 
-if (process.env.ADMIN_USERS) {
-    config.adminUsers = process.env.ADMIN_USERS.split(',') || [];
+if (process.env.DATA_PRODUCERS) {
+    config.dataProducers = process.env.DATA_PRODUCERS.split(',') || [];
 }
 
 config.procurementJwksUri = process.env.PROCUREMENT_JWKS_URI || 'https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com';
@@ -76,5 +76,8 @@ if (process.env.MANAGED_PROJECTS) {
     // TODO: REMOVE
     config.managedProjects = ['cds-demo-1-271622', 'cds-demo-2', 'cds-demo-3'];
 }
+
+// TODO: Remove hardcoded for testing
+config.oauthClientId = process.env.OAUTH_CLIENT_ID || '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com';
 
 module.exports = config;
