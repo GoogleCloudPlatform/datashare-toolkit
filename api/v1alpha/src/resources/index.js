@@ -19,7 +19,7 @@
 const express = require('express');
 const { Resource } = require('@google-cloud/resource-manager');
 const options = {
-    scopes:['https://www.googleapis.com/auth/cloud-platform']
+    scopes: ['https://www.googleapis.com/auth/cloud-platform']
 };
 const resource = new Resource(options);
 const cfg = require('../lib/config');
@@ -37,7 +37,11 @@ resources.get('/resources/projects', async (req, res) => {
     const [projects] = await resource.getProjects();
     projects.forEach(project => console.log(project.id));
     const include = cfg.managedProjects;
-    const list = projects.filter(project => include.includes(project.id)).map(project => project.id);
+    const list = projects.filter(project => include.includes(project.id)).map(project => project.id).sort(function (a, b) {
+        return a
+            .toLowerCase()
+            .localeCompare(b.toLowerCase());
+    });
 
     const data = { success: true, projects: list };
     res.status(code).json({
