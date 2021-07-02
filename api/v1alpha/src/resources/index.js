@@ -33,8 +33,9 @@ var resources = express.Router();
 
 resources.get('/resources/projects', async (req, res) => {
     const code = 200;
+    // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
     const [projects] = await resource.getProjects();
-    
+    projects.forEach(project => console.log(project.id));
     const include = cfg.managedProjects;
     const list = projects.filter(project => include.includes(project.id)).map(project => project.id);
 
