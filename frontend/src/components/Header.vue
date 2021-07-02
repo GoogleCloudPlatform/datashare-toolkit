@@ -59,12 +59,13 @@
         class="mt-7"
         dense
         style="maxWidth: 200px;"
-        :readonly="availableProjectIds.length === 1"
+        :readonly="managedProjects.length === 1"
         v-model="projectId"
-        :items="availableProjectIds"
+        :items="managedProjects"
         label="GCP Project ID"
         required
         @change="projectIdChanged"
+        :loading="loading"
       ></v-select>
       <v-spacer></v-spacer>
       <v-avatar :tile="true" height="25" width="25">
@@ -183,9 +184,20 @@ export default {
       title: 'Datashare'
     },
     params: {},
+    // Store and retrieve from storage data
     projectId: 'cds-demo-2',
-    availableProjectIds: ['cds-demo-1-271622', 'cds-demo-2', 'cds-demo-3']
+    managedProjects: [''],
+    loading: false
   }),
+  created() {
+    this.loading = true;
+    this.$store.dispatch('getManagedProjects').then(response => {
+      if (response.success) {
+        this.managedProjects = response.projects;
+      }
+      this.loading = false;
+    });
+  },
   methods: {
     canAccessRoute(navItem) {
       let routes = this.$router.options.routes;

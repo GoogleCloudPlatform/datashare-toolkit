@@ -61,6 +61,9 @@ export default {
   _apiBaseUrl() {
     return config.apiBaseUrl + '/projects/' + config.projectId;
   },
+  _resourceBaseUrl() {
+    return config.apiBaseUrl;
+  },
   getDatasets(includeAll) {
     let queryAll = false;
     if (includeAll && includeAll === true) {
@@ -295,6 +298,11 @@ export default {
   isDataProducer() {
     return axios
       .post(this._apiBaseUrl() + '/auth:isDataProducer')
+      .then(response => response);
+  },
+  getManagedProjects() {
+    return axios
+      .get(this._resourceBaseUrl() + '/resources/projects')
       .then(response => response);
   }
 };
