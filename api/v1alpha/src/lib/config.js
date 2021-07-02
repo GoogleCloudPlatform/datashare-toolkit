@@ -20,7 +20,10 @@ var config = {};
 
 config.verboseMode = false;
 config.productName = 'Datashare';
+
+// TODO: Update through CI
 config.productVersion = '0.0.1';
+
 config.cdsManagedLabelKey = 'datashare_managed';
 config.cdsMetadataLabelKey = 'datashare_metadata';
 config.cdsExclusionLabels = [config.cdsMetadataLabelKey];
