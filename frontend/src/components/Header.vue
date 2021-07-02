@@ -221,6 +221,7 @@ export default {
     projectIdChanged() {
       console.log(`GCP ProjectId changed to ${this.projectId}`);
       _config.projectId = this.projectId;
+      // this.$router.go();
     }
   },
   computed: {
