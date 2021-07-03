@@ -64,7 +64,7 @@
         :items="managedProjects"
         label="GCP Project ID"
         required
-        @change="projectIdChanged"
+        @change="projectIdChanged(true)"
         :loading="loading"
       ></v-select>
       <v-spacer></v-spacer>
@@ -185,8 +185,8 @@ export default {
     },
     params: {},
     // Store and retrieve from storage data
-    projectId: 'cds-demo-2',
-    managedProjects: [''],
+    projectId: null,
+    managedProjects: [],
     loading: false
   }),
   created() {
@@ -194,6 +194,15 @@ export default {
     this.$store.dispatch('getManagedProjects').then(response => {
       if (response.success) {
         this.managedProjects = response.projects;
+        if (_config.projectId === null) {
+          if (this.managedProjects.length > 0) {
+            this.projectId = this.managedProjects[0];
+            this.projectIdChanged(false);
+          }
+        } else {
+          this.projectId = _config.projectId;
+          this.projectIdChanged(false);
+        }
       }
       this.loading = false;
     });
@@ -218,10 +227,11 @@ export default {
         return true;
       }
     },
-    projectIdChanged() {
-      console.log(`GCP ProjectId changed to ${this.projectId}`);
+    projectIdChanged(reload) {
       _config.projectId = this.projectId;
-      // this.$router.go();
+      if (reload === true) {
+        this.redirectHome();
+      }
     }
   },
   computed: {

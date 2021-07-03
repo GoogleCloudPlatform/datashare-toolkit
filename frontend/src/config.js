@@ -62,10 +62,16 @@ class Config {
 
   set projectId(p) {
     this.config.VUE_APP_PROJECT_ID = p;
+    localStorage.setItem('projectId', p);
+    console.log(`ProjectId set to ${p}`);
   }
 
   get projectId() {
-    return this.getConfigValue('VUE_APP_PROJECT_ID');
+    if (localStorage.getItem('projectId')) {
+      return localStorage.getItem('projectId');
+    } else {
+      return this.getConfigValue('VUE_APP_PROJECT_ID');
+    }
   }
 
   get googleAppClientId() {
