@@ -46,18 +46,14 @@ resources.get('/resources/projects', async (req, res) => {
  * @param  {} async(req
  * @param  {} res
  */
-resources.get('/resources/project/configuration', async (req, res) => {
+resources.get('/projects/:projectId/configuration', async (req, res) => {
+    const projectId = req.params.projectId
+    let token = req.header('Authorization');
+    token = token.split(" ")[1];
+    console.log(token);
+    const c = await dataManager.getConfiguration(projectId, token);
+    const data = { success: true, configuration: c };
     const code = 200;
-    // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
-    const [projects] = await resource.getProjects();
-    const include = config.managedProjects;
-    const list = projects.filter(project => include.includes(project.id)).map(project => project.id).sort(function (a, b) {
-        return a
-            .toLowerCase()
-            .localeCompare(b.toLowerCase());
-    });
-
-    const data = { success: true, projects: list };
     res.status(code).json({
         ...data
     });

@@ -21,6 +21,8 @@ const config = require('../lib/config');
 const { CommonUtil } = require('cds-shared');
 const commonUtil = CommonUtil;
 
+/**
+ */
 async function getManagedProjects() {
     const { Resource } = require('@google-cloud/resource-manager');
     const options = {
@@ -39,10 +41,21 @@ async function getManagedProjects() {
     return list;
 }
 
-async function getConfiguration(projectId) {
-
+/**
+ * @param  {} projectId
+ */
+async function getConfiguration(projectId, token) {
+    let dict = {};
+    let commerce = await commerceEnabled(projectId);
+    let dataProducer = await isDataProducer(token)
+    dict.isDataProducer = dataProducer;
+    dict.isMarketplaceEnabled = commerce;
+    return dict;
 }
 
+/**
+ * @param  {} token
+ */
 async function isDataProducer(token) {
     // https://github.com/googleapis/google-auth-library-nodejs#oauth2
     const { OAuth2Client } = require('google-auth-library');
@@ -73,6 +86,33 @@ async function isDataProducer(token) {
         }
     }
     return isProducer;
+}
+
+async function commerceEnabled(projectId) {
+    // TODO: Enable serviceusage.googleapis.com API through deployment.
+    // https://cloud.google.com/service-usage/docs/access-control
+
+    // Imports the Google Cloud client library
+    const { ServiceUsageClient } = require('@google-cloud/service-usage');
+
+    const parent = `projects/${projectId}`, // Project to list service usage for.
+        filter = 'state:ENABLED' // Filter when listing services.
+
+    // Creates a client
+    const client = new ServiceUsageClient();
+
+    let commerceEnabled = false;
+    for await (const service of client.listServicesAsync({
+        parent,
+        filter,
+    })) {
+        const svc = service.config.name;
+        if (svc === 'cloudcommerceproducer.googleapis.com' || svc === 'cloudcommerceprocurement.googleapis.com') {
+            commerceEnabled = true;
+            break;
+        }
+    }
+    return commerceEnabled;
 }
 
 module.exports = {
