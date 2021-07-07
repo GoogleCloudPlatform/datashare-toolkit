@@ -54,12 +54,19 @@
         <span>Navigation menu</span>
       </v-tooltip>
       <v-toolbar-title>{{ toolbar.title }}</v-toolbar-title>
-      <v-divider class="mx-4" inset vertical></v-divider>
+      <v-spacer v-if="!projectSelectorEnabled"></v-spacer>
+      <v-divider
+        class="mx-4"
+        inset
+        vertical
+        v-if="projectSelectorEnabled"
+      ></v-divider>
       <v-select
+        v-if="projectSelectorEnabled"
         class="mt-7"
         dense
         style="maxWidth: 200px;"
-        :readonly="managedProjects.length === 1"
+        :readonly="!projectSelectorEnabled"
         v-model="projectId"
         :items="managedProjects"
         label="GCP Project ID"
@@ -243,6 +250,12 @@ export default {
     }),
     config() {
       return _config;
+    },
+    projectSelectorEnabled() {
+      if (this.managedProjects) {
+        return this.managedProjects.length > 1;
+      }
+      return false;
     },
     navigationItems() {
       let items = [
