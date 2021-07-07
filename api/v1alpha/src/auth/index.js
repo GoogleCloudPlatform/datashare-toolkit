@@ -17,10 +17,7 @@
 'use strict';
 
 const express = require('express');
-const config = require('../lib/config');
-
-const { CommonUtil } = require('cds-shared');
-const commonUtil = CommonUtil;
+const dataManager = require('../resources/dataManager');
 
 /************************************************************
   API Endpoints
@@ -54,38 +51,9 @@ var auth = express.Router();
  *                   description: HTTP status code
  */
 auth.post('/projects/:projectId/auth::custom', async (req, res) => {
-    // https://github.com/googleapis/google-auth-library-nodejs#oauth2
-    const { OAuth2Client } = require('google-auth-library');
-    const CLIENT_ID = config.oauthClientId;
-    const client = new OAuth2Client(CLIENT_ID);
-
     let token = req.header('Authorization');
     token = token.split(" ")[1];
-
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
-        // Or, if multiple clients access the backend:
-        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
-    });
-    const payload = ticket.getPayload();
-    const userid = payload['email'];
-    const domain = payload['hd'];
-
-    let isProducer = false;
-    for (const p of config.dataProducers) {
-        if (p.toLowerCase() === userid.toLowerCase()) {
-            isProducer = true;
-            break;
-        }
-        else if (p.includes('*') || p.includes('?')) {
-            if (commonUtil.wildTest(p, domain)) {
-                isProducer = true;
-                break;
-            }
-        }
-    }
-
+    const isProducer = await dataManager.isDataProducer(token);
     const code = 200;
     const data = { success: true, isDataProducer: isProducer };
     switch (req.params.custom) {

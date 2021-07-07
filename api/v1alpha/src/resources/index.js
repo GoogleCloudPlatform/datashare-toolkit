@@ -17,12 +17,7 @@
 'use strict';
 
 const express = require('express');
-const { Resource } = require('@google-cloud/resource-manager');
-const options = {
-    scopes: ['https://www.googleapis.com/auth/cloud-platform']
-};
-const resource = new Resource(options);
-const cfg = require('../lib/config');
+const dataManager = require("./dataManager");
 
 /************************************************************
   API Endpoints
@@ -31,17 +26,37 @@ const cfg = require('../lib/config');
 var resources = express.Router();
 // methods that require multiple routes
 
+/**
+ * @param  {} '/resources/projects'
+ * @param  {} async(req
+ * @param  {} res
+ */
 resources.get('/resources/projects', async (req, res) => {
     const code = 200;
     // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
+    const list = await dataManager.getManagedProjects();
+    const data = { success: true, projects: list };
+    res.status(code).json({
+        ...data
+    });
+});
+
+/**
+ * @param  {} '/resources/project/configuration'
+ * @param  {} async(req
+ * @param  {} res
+ */
+resources.get('/resources/project/configuration', async (req, res) => {
+    const code = 200;
+    // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
     const [projects] = await resource.getProjects();
-    const include = cfg.managedProjects;
+    const include = config.managedProjects;
     const list = projects.filter(project => include.includes(project.id)).map(project => project.id).sort(function (a, b) {
         return a
             .toLowerCase()
             .localeCompare(b.toLowerCase());
     });
-    
+
     const data = { success: true, projects: list };
     res.status(code).json({
         ...data
