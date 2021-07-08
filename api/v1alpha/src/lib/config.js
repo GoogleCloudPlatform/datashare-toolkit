@@ -79,7 +79,7 @@ config.gcpMarketplaceTokenCookieName = 'gmt';
 
 if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_PROJECTS)) {
     config.managedProjects = JSON.parse(process.env.MANAGED_PROJECTS);
-} else {
+} /*else {
     // TODO: Remove and move to Cloud Run env vars
     config.managedProjects = {
         'cds-demo-1-271622': {
@@ -96,7 +96,7 @@ if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_
             VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL: ''
         }
     };
-}
+}*/
 
 // TODO: Remove hardcoded for testing
 config.oauthClientId = process.env.OAUTH_CLIENT_ID || '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com';
