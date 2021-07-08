@@ -50,7 +50,6 @@ resources.get('/projects/:projectId/configuration', async (req, res) => {
     const projectId = req.params.projectId
     let token = req.header('Authorization');
     token = token.split(" ")[1];
-    console.log(token);
     const c = await dataManager.getConfiguration(projectId, token);
     const data = { success: true, configuration: c };
     const code = 200;

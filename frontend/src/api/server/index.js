@@ -304,5 +304,10 @@ export default {
     return axios
       .get(this._resourceBaseUrl() + '/resources/projects')
       .then(response => response);
+  },
+  getProjectConfiguration() {
+    return axios
+      .get(this._apiBaseUrl() + '/configuration')
+      .then(response => response);
   }
 };

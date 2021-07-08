@@ -47,7 +47,8 @@ async function getManagedProjects() {
 async function getConfiguration(projectId, token) {
     let dict = {};
     let commerce = await commerceEnabled(projectId);
-    let dataProducer = await isDataProducer(token)
+    let dataProducer = await isDataProducer(token);
+    dict.projectId = projectId;
     dict.isDataProducer = dataProducer;
     dict.isMarketplaceEnabled = commerce;
     return dict;

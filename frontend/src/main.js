@@ -46,13 +46,10 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
       })
       .then(() => {
         // isDataProducer relies on the authentication being supplied through the Authorization header
-        return store.dispatch('isDataProducer');
+        return store.dispatch('getProjectConfiguration');
       })
-      .then(isDataProducer => {
-        if (user) {
-          user.isDataProducer = isDataProducer;
-          return store.dispatch('fetchUser', user);
-        }
+      .then(c => {
+        return store.dispatch('setProjectConfiguration', c.configuration);
       })
       .then(() => {
         new Vue({

@@ -16,6 +16,7 @@
 
 'use strict';
 const underscore = require('underscore');
+import store from './store';
 
 class Config {
   initialize(config) {
@@ -100,7 +101,7 @@ class Config {
   }
 
   get marketplaceIntegrationEnabled() {
-    const m = this.getConfigValue('VUE_APP_MARKETPLACE_INTEGRATION', false);
+    const m = store.state.project.data.isMarketplaceEnabled;
     if (m === undefined) {
       return true;
     } else {
@@ -117,4 +118,4 @@ class Config {
   }
 }
 
-module.exports = new Config();
+export default new Config();
