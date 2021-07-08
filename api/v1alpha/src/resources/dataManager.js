@@ -92,7 +92,6 @@ async function isDataProducer(token) {
 
 module.exports = {
     getManagedProjects,
-    getConfiguration,
-    isDataProducer
+    getConfiguration
 };
 
