@@ -65,6 +65,11 @@ async function getConfiguration(projectId, token) {
  * @param  {} token
  */
 async function isDataProducer(token) {
+    if (!config.dataProducers) {
+        console.error('DATA_PRODUCERS environmental variable is not defined');
+        return false;
+    }
+    
     // https://github.com/googleapis/google-auth-library-nodejs#oauth2
     const { OAuth2Client } = require('google-auth-library');
     const CLIENT_ID = config.oauthClientId;
