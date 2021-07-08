@@ -76,6 +76,10 @@ function extractHostname(url) {
     return hostname;
 }
 
+/**
+ * @param  {} wildcard
+ * @param  {} str
+ */
 function wildTest(wildcard, str) {
     let w = wildcard.replace(/[.+^${}()|[\]\\]/g, '\\$&'); // regexp escape 
     const re = new RegExp(`^${w.replace(/\*/g, '.*').replace(/\?/g, '.')}$`, 'i');
