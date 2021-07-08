@@ -75,7 +75,7 @@ config.gcpMarketplaceTokenCookieName = 'gmt';
 if (process.env.MANAGED_PROJECTS) {
     config.managedProjects = process.env.MANAGED_PROJECTS.split(',') || [];
 } else {
-    // TODO: REMOVE
+    // TODO: Remove and move to Cloud Run env vars
     config.managedProjects = ['cds-demo-1-271622', 'cds-demo-2', 'cds-demo-3'];
 }
 
