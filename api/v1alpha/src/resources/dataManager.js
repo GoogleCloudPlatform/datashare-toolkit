@@ -33,7 +33,7 @@ async function getManagedProjects() {
 
     // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
     const [projects] = await resource.getProjects();
-    const include = config.managedProjects;
+    const include = Object.keys(config.managedProjects);
     const list = projects.filter(project => include.includes(project.id)).map(project => project.id).sort(function (a, b) {
         return a
             .toLowerCase()
@@ -52,6 +52,12 @@ async function getConfiguration(projectId, token) {
     dict.projectId = projectId;
     dict.isDataProducer = dataProducer;
     dict.isMarketplaceEnabled = commerce;
+
+    if (projectId in config.managedProjects) {
+        const projectDict = config.managedProjects[projectId];
+        dict.labels = projectDict;
+    }
+
     return dict;
 }
 

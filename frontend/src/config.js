@@ -19,10 +19,24 @@ const underscore = require('underscore');
 import store from './store';
 
 class Config {
+  /**
+   * @param  {} config
+  Used to initialize the config
+   */
   initialize(config) {
     this.config = config;
     if (!this.config) {
       this.config = {};
+    }
+  }
+
+  /**
+   * @param  {} source
+  Used to update config using the runtime source.
+   */
+  update(source) {
+    if (this.config && source) {
+      this.config = Object.assign(this.config, source);
     }
   }
 

@@ -16,6 +16,9 @@
 
 'use strict';
 
+const { CommonUtil } = require('cds-shared');
+const commonUtil = CommonUtil;
+
 var config = {};
 
 config.verboseMode = false;
@@ -53,7 +56,7 @@ config.cdsAuthorizedViewTableFields = new Set(['rowId', 'authorizedViewId', 'nam
 
 config.cdsAuthorizedViewViewId = "currentAuthorizedView";
 config.cdsAuthorizedViewViewFields = new Set(['rowId', 'authorizedViewId', 'name', 'description',
-    'datasetId', 'source', 'custom', 'accessControl', 'expiration', 'createdBy', 'createdAt', 'viewSql', 
+    'datasetId', 'source', 'custom', 'accessControl', 'expiration', 'createdBy', 'createdAt', 'viewSql',
     'version', 'isDeleted']);
 
 config.cdsCurrentUserPermissionViewId = "currentUserPermission";
@@ -72,11 +75,25 @@ config.projectId = process.env.PROJECT_ID;
 
 config.gcpMarketplaceTokenCookieName = 'gmt';
 
-if (process.env.MANAGED_PROJECTS) {
-    config.managedProjects = process.env.MANAGED_PROJECTS.split(',') || [];
+if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_PROJECTS)) {
+    config.managedProjects = JSON.parse(process.env.MANAGED_PROJECTS);
 } else {
     // TODO: Remove and move to Cloud Run env vars
-    config.managedProjects = ['cds-demo-1-271622', 'cds-demo-2', 'cds-demo-3'];
+    config.managedProjects = {
+        'cds-demo-1-271622': {
+            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT: '',
+            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT: '',
+            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL: ''
+        }, 'cds-demo-2': {
+            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT: '2 - text',
+            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT: '2 button',
+            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL: 'google.com'
+        }, 'cds-demo-3': {
+            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT: '',
+            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT: '',
+            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL: ''
+        }
+    };
 }
 
 // TODO: Remove hardcoded for testing

@@ -49,7 +49,12 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
         return store.dispatch('getProjectConfiguration');
       })
       .then(c => {
-        return store.dispatch('setProjectConfiguration', c.configuration);
+        const _c = c.configuration;
+        const labels = _c.labels;
+        if (labels) {
+          config.update(labels);
+        }
+        return store.dispatch('setProjectConfiguration', _c);
       })
       .then(() => {
         new Vue({
