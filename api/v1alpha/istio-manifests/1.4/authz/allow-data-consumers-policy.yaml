@@ -12,12 +12,9 @@ spec:
         methods:
         - GET
         paths: 
+        - /v1alpha/projects/$PROJECT_ID/configuration
         - /v1alpha/projects/$PROJECT_ID/products
-    - operation:
-        methods:
-        - POST
-        paths: 
-        - /v1alpha/projects/$PROJECT_ID/auth:isDataProducer
+        - /v1alpha/resources/projects
     - operation:
         methods:
         - GET
