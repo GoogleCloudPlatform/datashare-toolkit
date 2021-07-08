@@ -237,7 +237,7 @@ export default {
     projectIdChanged(reload) {
       _config.projectId = this.projectId;
       if (reload === true) {
-        this.redirectHome();
+        this.$router.go();
       }
     }
   },

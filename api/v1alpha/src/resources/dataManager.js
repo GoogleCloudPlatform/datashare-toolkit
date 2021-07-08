@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ const config = require('../lib/config');
 
 const { CommonUtil } = require('cds-shared');
 const commonUtil = CommonUtil;
+const runtimeConfig = require('../lib/runtimeConfig');
 
 /**
  */
@@ -46,7 +47,7 @@ async function getManagedProjects() {
  */
 async function getConfiguration(projectId, token) {
     let dict = {};
-    let commerce = await commerceEnabled(projectId);
+    let commerce = await runtimeConfig.marketplaceIntegration(projectId);
     let dataProducer = await isDataProducer(token);
     dict.projectId = projectId;
     dict.isDataProducer = dataProducer;
@@ -87,33 +88,6 @@ async function isDataProducer(token) {
         }
     }
     return isProducer;
-}
-
-async function commerceEnabled(projectId) {
-    // TODO: Enable serviceusage.googleapis.com API through deployment.
-    // https://cloud.google.com/service-usage/docs/access-control
-
-    // Imports the Google Cloud client library
-    const { ServiceUsageClient } = require('@google-cloud/service-usage');
-
-    const parent = `projects/${projectId}`, // Project to list service usage for.
-        filter = 'state:ENABLED' // Filter when listing services.
-
-    // Creates a client
-    const client = new ServiceUsageClient();
-
-    let commerceEnabled = false;
-    for await (const service of client.listServicesAsync({
-        parent,
-        filter,
-    })) {
-        const svc = service.config.name;
-        if (svc === 'cloudcommerceproducer.googleapis.com' || svc === 'cloudcommerceprocurement.googleapis.com') {
-            commerceEnabled = true;
-            break;
-        }
-    }
-    return commerceEnabled;
 }
 
 module.exports = {

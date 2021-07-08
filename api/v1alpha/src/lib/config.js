@@ -71,7 +71,6 @@ config.uiBaseUrl = process.env.UI_BASE_URL || 'http://localhost:8080';
 config.projectId = process.env.PROJECT_ID;
 
 config.gcpMarketplaceTokenCookieName = 'gmt';
-config.marketplaceIntegration = process.env.MARKETPLACE_INTEGRATION === 'false' ? false : true;
 
 if (process.env.MANAGED_PROJECTS) {
     config.managedProjects = process.env.MANAGED_PROJECTS.split(',') || [];
