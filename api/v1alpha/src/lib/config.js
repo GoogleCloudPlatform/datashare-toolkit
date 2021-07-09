@@ -17,7 +17,6 @@
 'use strict';
 
 const { CommonUtil } = require('cds-shared');
-const { exists } = require('node:fs');
 const commonUtil = CommonUtil;
 
 var config = {};
@@ -84,24 +83,6 @@ if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_
 } else {
     console.log('Not json or does not exist');
 }
-    /*else {
-    // TODO: Remove and move to Cloud Run env vars
-    config.managedProjects = {
-        'cds-demo-1-271622': {
-            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT: '',
-            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT: '',
-            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL: ''
-        }, 'cds-demo-2': {
-            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT: '2 - text',
-            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT: '2 button',
-            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL: 'google.com'
-        }, 'cds-demo-3': {
-            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT: '',
-            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT: '',
-            VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL: ''
-        }
-    };
-}*/
 
 // TODO: Remove hardcoded for testing
 config.oauthClientId = process.env.OAUTH_CLIENT_ID || '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com';
