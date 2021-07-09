@@ -33,4 +33,5 @@ gcloud run deploy ds-frontend-ui \
   --region=${REGION} \
   --allow-unauthenticated \
   --platform managed \
+  --max-instances 10 \
   --update-env-vars=VUE_APP_PROJECT_ID="${PROJECT_ID}"

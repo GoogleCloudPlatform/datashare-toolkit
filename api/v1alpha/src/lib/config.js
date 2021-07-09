@@ -81,7 +81,7 @@ console.log(process.env.MANAGED_PROJECTS);
 if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_PROJECTS)) {
     config.managedProjects = JSON.parse(process.env.MANAGED_PROJECTS);
 } else {
-    console.log('Not json or does not exist');
+    console.log('MANAGED_PROJECTS invalid or does not exist');
 }
 
 // TODO: Remove hardcoded for testing
