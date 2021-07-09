@@ -75,14 +75,26 @@ class Config {
     return this.getConfigValue('VUE_APP_API_BASE_URL');
   }
 
+  /**
+   * @param  {} p
+  Set the sessionStorage projectId, and the localStorage projectId. The localStorage item is used for getting the last selected projectId when opening a new session/window/tab
+   */
   set projectId(p) {
     this.config.VUE_APP_PROJECT_ID = p;
+    sessionStorage.setItem('projectId', p);
     localStorage.setItem('projectId', p);
   }
 
+  /**
+  Get the session projectId if exists, then get the local projectId if exists, otherwise get the config projectId.
+   */
   get projectId() {
-    if (localStorage.getItem('projectId')) {
-      return localStorage.getItem('projectId');
+    const session = sessionStorage.getItem('projectId');
+    const local = localStorage.getItem('projectId');
+    if (session) {
+      return session;
+    } else if (local) {
+      return local;
     } else {
       return this.getConfigValue('VUE_APP_PROJECT_ID');
     }
