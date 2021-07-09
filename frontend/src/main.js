@@ -45,7 +45,6 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
         return store.dispatch('fetchUser', user);
       })
       .then(() => {
-        // isDataProducer relies on the authentication being supplied through the Authorization header
         return store.dispatch('getProjectConfiguration');
       })
       .then(c => {

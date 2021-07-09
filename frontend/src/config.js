@@ -80,6 +80,7 @@ class Config {
   Set the sessionStorage projectId, and the localStorage projectId. The localStorage item is used for getting the last selected projectId when opening a new session/window/tab
    */
   set projectId(p) {
+    console.log(`projectId set to: ${p}`);
     this.config.VUE_APP_PROJECT_ID = p;
     sessionStorage.setItem('projectId', p);
     localStorage.setItem('projectId', p);

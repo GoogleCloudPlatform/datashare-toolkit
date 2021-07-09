@@ -205,7 +205,14 @@ procurements.post('/procurements/approve', async (req, res) => {
  *         description: Redirect to My Products URL
  */
 procurements.post('/procurements:myProducts', async (req, res) => {
-    const projectId = req.header('x-gcp-project-id');
+    let projectId = cfg.projectId;
+
+    // Check if override for projectId is set
+    const p = req.query.projectId;
+    if (p) {
+        projectId = p;
+    }
+
     const host = commonUtil.extractHostname(req.headers.host);
 
     const token = req.body['x-gcp-marketplace-token'];
@@ -216,10 +223,10 @@ procurements.post('/procurements:myProducts', async (req, res) => {
     console.log(`Data: ${JSON.stringify(data)}`);
 
     if (data && data.success === false) {
-        res.redirect(cfg.uiBaseUrl + '/myProducts');
+        res.redirect(cfg.uiBaseUrl + `/myProducts?${projectId}`);
     } else {
         console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
-        res.redirect(cfg.uiBaseUrl + '/myProducts');
+        res.redirect(cfg.uiBaseUrl + `/myProducts?${projectId}`);
     }
 });
 

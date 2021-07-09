@@ -61,6 +61,18 @@ async function getConfiguration(projectId, token) {
         }
     }
 
+    if (!dict.labels) {
+        dict.labels = { };
+    }
+
+    if (!dict.labels.VUE_APP_USER_GUIDE_URL) {
+        dict.labels.VUE_APP_USER_GUIDE_URL = config.appUserGuideUrl;
+    }
+
+    if (!dict.labels.VUE_APP_GITHUB_URL) {
+        dict.labels.VUE_APP_GITHUB_URL = config.githubUrl;
+    }
+
     return dict;
 }
 

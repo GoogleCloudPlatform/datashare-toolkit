@@ -385,6 +385,13 @@ export default {
       moreInformationButtonUrl: ''
     };
   },
+  created() {
+    // Check if override for projectId is set
+    const p = this.$route.query.projectId;
+    if (p) {
+      config.projectId = p;
+    }
+  },
   mounted() {
     this.performLogin().then(result => {
       if (result) {

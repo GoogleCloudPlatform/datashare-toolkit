@@ -634,7 +634,14 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
 
 // Temporary for development
 accounts.get('/accounts:register', async (req, res) => {
-    const projectId = req.header('x-gcp-project-id');
+    let projectId = cfg.projectId;
+
+    // Check if override for projectId is set
+    const p = req.query.projectId;
+    if (p) {
+        projectId = p;
+    }
+
     const token = req.query['x-gcp-marketplace-token'];
     console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
@@ -643,20 +650,32 @@ accounts.get('/accounts:register', async (req, res) => {
     console.log(`Data: ${JSON.stringify(data)}`);
 
     if (data && data.success === false) {
+        // TODO: Remove cookie logic
         res.clearCookie(cfg.gcpMarketplaceTokenCookieName);
+
         res.redirect(cfg.uiBaseUrl + '/activationError');
     } else {
         const host = commonUtil.extractHostname(req.headers.host);
+        
+        // TODO: Remove cookie logic
         res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: host });
-        res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
+        
+        res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}&projectId=${projectId}`);
     }
 });
 
 accounts.post('/accounts::custom', async (req, res) => {
-    const projectId = req.header('x-gcp-project-id');
+    let projectId = req.header('x-gcp-project-id');
     const host = commonUtil.extractHostname(req.headers.host);
     switch (req.params.custom) {
         case "register": {
+            // Check if override for projectId is set
+            const p = req.query.projectId;
+            if (p) {
+                projectId = p;
+            } else {
+                projectId = cfg.projectId;
+            }
             const token = req.body['x-gcp-marketplace-token'];
             console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
@@ -664,12 +683,16 @@ accounts.post('/accounts::custom', async (req, res) => {
             console.log(`Data: ${JSON.stringify(data)}`);
 
             if (data && data.success === false) {
+                // TODO: Remove cookie logic
                 res.clearCookie(cfg.gcpMarketplaceTokenCookieName);
+                
                 res.redirect(cfg.uiBaseUrl + '/activationError');
             } else {
+                // TODO: Remove cookie logic
                 console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
                 res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: host });
-                res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
+
+                res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}&projectId=${projectId}`);
             }
             break;
         }
