@@ -109,8 +109,8 @@ var procurements = express.Router();
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-procurements.get('/projects/:projectId/procurements', async (req, res) => {
-    const projectId = req.params.projectId;
+procurements.get('/procurements', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     let stateFilter = null;
     if (req.query.stateFilter) {
         stateFilter = req.query.stateFilter.split(',');
@@ -166,8 +166,8 @@ procurements.get('/projects/:projectId/procurements', async (req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-procurements.post('/projects/:projectId/procurements/approve', async (req, res) => {
-    const projectId = req.params.projectId;
+procurements.post('/procurements/approve', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const name = req.body.name;
     const status = req.body.status;
     const reason = req.body.reason;
@@ -204,8 +204,8 @@ procurements.post('/projects/:projectId/procurements/approve', async (req, res) 
  *       301:
  *         description: Redirect to My Products URL
  */
-procurements.post('/projects/:projectId/procurements:myProducts', async (req, res) => {
-    const projectId = req.params.projectId;
+procurements.post('/procurements:myProducts', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const host = commonUtil.extractHostname(req.headers.host);
 
     const token = req.body['x-gcp-marketplace-token'];
@@ -243,8 +243,8 @@ procurements.post('/projects/:projectId/procurements:myProducts', async (req, re
  *       301:
  *         description: Redirect to My Products URL
  */
-procurements.get('/projects/:projectId/procurements:myProducts', async (req, res) => {
-    const projectId = req.params.projectId;
+procurements.get('/procurements:myProducts', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const host = commonUtil.extractHostname(req.headers.host);
 
     const token = req.query['x-gcp-marketplace-token'];

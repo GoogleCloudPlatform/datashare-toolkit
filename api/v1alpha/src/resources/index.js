@@ -42,12 +42,12 @@ resources.get('/resources/projects', async (req, res) => {
 });
 
 /**
- * @param  {} '/resources/project/configuration'
+ * @param  {} '/resources/configuration'
  * @param  {} async(req
  * @param  {} res
  */
-resources.get('/projects/:projectId/configuration', async (req, res) => {
-    const projectId = req.params.projectId
+resources.get('/resources/configuration', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     let token = req.header('Authorization');
     token = token.split(" ")[1];
     const c = await dataManager.getConfiguration(projectId, token);

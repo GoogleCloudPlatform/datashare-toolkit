@@ -83,8 +83,8 @@ var datasets = express.Router();
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-datasets.get('/projects/:projectId/datasets', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.get('/datasets', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const includeAll = req.query.includeAll === 'true';
     const data = await dataManager.listDatasets(projectId, includeAll);
     var code;
@@ -158,8 +158,8 @@ datasets.get('/projects/:projectId/datasets', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-datasets.post('/projects/:projectId/datasets', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.post('/datasets', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.body.datasetId;
     const description = req.body.description;
 
@@ -242,8 +242,8 @@ datasets.post('/projects/:projectId/datasets', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-datasets.put('/projects/:projectId/datasets/:datasetId', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.put('/datasets/:datasetId', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const description = req.body.description;
 
@@ -308,8 +308,8 @@ datasets.put('/projects/:projectId/datasets/:datasetId', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-datasets.get('/projects/:projectId/datasets/:datasetId', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.get('/datasets/:datasetId', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const data = await dataManager.getDataset(projectId, datasetId);
     var code;
@@ -389,8 +389,8 @@ datasets.get('/projects/:projectId/datasets/:datasetId', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-datasets.delete('/projects/:projectId/datasets/:datasetId', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.delete('/datasets/:datasetId', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const createdBy = req.header('x-gcp-account');
     const data = await dataManager.deleteDataset(projectId, datasetId, createdBy);
@@ -406,8 +406,8 @@ datasets.delete('/projects/:projectId/datasets/:datasetId', async(req, res) => {
     });
 });
 
-datasets.get('/projects/:projectId/datasets/:datasetId/tables', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.get('/datasets/:datasetId/tables', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const data = await dataManager.listTables(projectId, datasetId);
     var code;
@@ -422,8 +422,8 @@ datasets.get('/projects/:projectId/datasets/:datasetId/tables', async(req, res) 
     });
 });
 
-datasets.get('/projects/:projectId/datasets/:datasetId/tables/:tableId/columns', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.get('/datasets/:datasetId/tables/:tableId/columns', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const tableId = req.params.tableId;
     const data = await dataManager.listTableColumns(projectId, datasetId, tableId);
@@ -439,8 +439,8 @@ datasets.get('/projects/:projectId/datasets/:datasetId/tables/:tableId/columns',
     });
 });
 
-datasets.get('/projects/:projectId/views', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.get('/views', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const data = await dataManager.listDatasetViews(projectId, null);
     var code;
     if (data && data.success === false) {
@@ -454,8 +454,8 @@ datasets.get('/projects/:projectId/views', async(req, res) => {
     });
 });
 
-datasets.get('/projects/:projectId/datasets/:datasetId/views', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.get('/datasets/:datasetId/views', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const data = await dataManager.listDatasetViews(projectId, datasetId);
     var code;
@@ -470,8 +470,8 @@ datasets.get('/projects/:projectId/datasets/:datasetId/views', async(req, res) =
     });
 });
 
-datasets.get('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.get('/datasets/:datasetId/views/:viewId', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const viewId = req.params.viewId;
     const data = await dataManager.getDatasetView(projectId, datasetId, viewId);
@@ -487,8 +487,8 @@ datasets.get('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req
     });
 });
 
-datasets.post('/projects/:projectId/datasets/:datasetId/views:validate', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.post('/datasets/:datasetId/views:validate', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const view = req.body.view;
     const includeSampleData = req.body.includeSampleData;
@@ -505,8 +505,8 @@ datasets.post('/projects/:projectId/datasets/:datasetId/views:validate', async(r
     });
 });
 
-datasets.post('/projects/:projectId/datasets/:datasetId/views', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.post('/datasets/:datasetId/views', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const view = req.body;
     const createdBy = req.header('x-gcp-account');
@@ -523,8 +523,8 @@ datasets.post('/projects/:projectId/datasets/:datasetId/views', async(req, res) 
     });
 });
 
-datasets.put('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.put('/datasets/:datasetId/views/:viewId', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const viewId = req.params.viewId;
     const view = req.body;
@@ -542,8 +542,8 @@ datasets.put('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req
     });
 });
 
-datasets.delete('/projects/:projectId/datasets/:datasetId/views/:viewId', async(req, res) => {
-    const projectId = req.params.projectId;
+datasets.delete('/datasets/:datasetId/views/:viewId', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const viewId = req.params.viewId;
     if (!req.body.rowId) {

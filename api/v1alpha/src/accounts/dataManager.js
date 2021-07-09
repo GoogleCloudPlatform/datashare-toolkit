@@ -513,11 +513,10 @@ async function deleteAccount(projectId, accountId, data) {
 }
 
 /**
- * @param  {} projectId
  * @param  {} host
  * @param  {} token
  */
-async function register(projectId, host, token) {
+async function register(host, token) {
     // https://cloud.google.com/marketplace/docs/partners/integrated-saas/frontend-integration#verify-jwt
     const jwt = require('jsonwebtoken');
 
@@ -588,7 +587,7 @@ async function activate(projectId, host, token, reason, email) {
     try {
         console.log(`Activate called for token: ${token} for email: ${email}`);
         const procurementUtil = new CommerceProcurementUtil(projectId);
-        const registration = await register(projectId, host, token);
+        const registration = await register(host, token);
         console.log(`registration: ${JSON.stringify(registration)}`);
         if (registration.success === true) {
             console.log('Registration success');

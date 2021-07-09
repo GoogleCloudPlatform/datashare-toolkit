@@ -147,8 +147,8 @@ var admin = express.Router();
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-admin.post('/projects/:projectId/admin::custom', async (req, res) => {
-    const projectId = req.params.projectId;
+admin.post('/admin::custom', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     let data;
     let code;
 

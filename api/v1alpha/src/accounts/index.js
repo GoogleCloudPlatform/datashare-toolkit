@@ -138,8 +138,8 @@ var accounts = express.Router();
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.get('/projects/:projectId/accounts', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.get('/accounts', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const data = await dataManager.listAccounts(projectId);
     var code;
     if (data && data.success === false) {
@@ -212,8 +212,8 @@ accounts.get('/projects/:projectId/accounts', async (req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.post('/projects/:projectId/accounts', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.post('/accounts', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     if (!req.body.email) {
         return res.status(400).json({
             success: false,
@@ -297,8 +297,8 @@ accounts.post('/projects/:projectId/accounts', async (req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.get('/projects/:projectId/accounts/:accountId', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.get('/accounts/:accountId', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const accountId = req.params.accountId;
     const data = await dataManager.getAccount(projectId, accountId);
     const success = data !== null;
@@ -380,8 +380,8 @@ accounts.get('/projects/:projectId/accounts/:accountId', async (req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.put('/projects/:projectId/accounts/:accountId', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.put('/accounts/:accountId', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const accountId = req.params.accountId;
     if (!req.body.email) {
         return res.status(400).json({
@@ -484,8 +484,8 @@ accounts.put('/projects/:projectId/accounts/:accountId', async (req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.delete('/projects/:projectId/accounts/:accountId', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.delete('/accounts/:accountId', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const accountId = req.params.accountId;
     const values = {
         rowId: req.body.rowId,
@@ -552,8 +552,8 @@ accounts.delete('/projects/:projectId/accounts/:accountId', async (req, res) => 
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.get('/projects/:projectId/policies/:policyId/accounts', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.get('/policies/:policyId/accounts', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const policyId = req.params.policyId;
     const data = await dataManager.listAccounts(projectId, null, policyId);
     var code;
@@ -616,8 +616,8 @@ accounts.get('/projects/:projectId/policies/:policyId/accounts', async (req, res
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.get('/projects/:projectId/datasets/:datasetId/accounts', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const data = await dataManager.listAccounts(projectId, datasetId);
     var code;
@@ -633,8 +633,8 @@ accounts.get('/projects/:projectId/datasets/:datasetId/accounts', async (req, re
 });
 
 // Temporary for development
-accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.get('/accounts:register', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const token = req.query['x-gcp-marketplace-token'];
     console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
@@ -652,8 +652,8 @@ accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
     }
 });
 
-accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.post('/accounts::custom', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const host = commonUtil.extractHostname(req.headers.host);
     switch (req.params.custom) {
         case "register": {

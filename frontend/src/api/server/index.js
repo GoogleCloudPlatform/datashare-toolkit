@@ -16,22 +16,24 @@ const validContentTypes = [
   'application/json; charset=utf-8'
 ];
 
-axios.interceptors.request.use(async function(config) {
+axios.interceptors.request.use(async function(reqConfig) {
   const projectId = config.projectId;
-  config.headers['x-gcp-project-id'] = projectId;
+  if (projectId) {
+    reqConfig.headers['x-gcp-project-id'] = projectId;
+  }
   if (store.getters.isLoggedIn) {
     const account = store.state.user.data.email;
     if (account) {
-      config.headers['x-gcp-account'] = account;
+      reqConfig.headers['x-gcp-account'] = account;
     }
     const googleUser = await Vue.GoogleAuth.then(auth2 => {
       return auth2.currentUser.get();
     });
     const token = googleUser.getAuthResponse().id_token;
-    config.headers.Authorization = `Bearer ${token}`;
-    return config;
+    reqConfig.headers.Authorization = `Bearer ${token}`;
+    return reqConfig;
   } else {
-    return config;
+    return reqConfig;
   }
 });
 
@@ -61,9 +63,6 @@ axios.interceptors.response.use(
 
 export default {
   _apiBaseUrl() {
-    return config.apiBaseUrl + '/projects/' + config.projectId;
-  },
-  _resourceBaseUrl() {
     return config.apiBaseUrl;
   },
   getDatasets(includeAll) {
@@ -304,12 +303,12 @@ export default {
   },
   getManagedProjects() {
     return axios
-      .get(this._resourceBaseUrl() + '/resources/projects')
+      .get(this._apiBaseUrl() + '/resources/projects')
       .then(response => response);
   },
   getProjectConfiguration() {
     return axios
-      .get(this._apiBaseUrl() + '/configuration')
+      .get(this._apiBaseUrl() + '/resources/configuration')
       .then(response => response);
   }
 };
