@@ -44,6 +44,7 @@ async function getManagedProjects() {
 
 /**
  * @param  {} projectId
+ * @param  {} token
  */
 async function getConfiguration(projectId, token) {
     let dict = {};
