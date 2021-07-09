@@ -12,7 +12,7 @@ spec:
         methods:
         - GET
         paths: 
-        - /v1alpha/projects/$PROJECT_ID/configuration
+        - /v1alpha/projects/**/configuration
         - /v1alpha/projects/$PROJECT_ID/products
         - /v1alpha/resources/projects
     - operation:
