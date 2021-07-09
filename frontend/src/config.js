@@ -100,6 +100,10 @@ class Config {
     }
   }
 
+  get apiProjectId() {
+    return store.state.project.data.apiProjectId;
+  }
+
   get googleAppClientId() {
     return this.getConfigValue('VUE_APP_GOOGLE_APP_CLIENT_ID');
   }

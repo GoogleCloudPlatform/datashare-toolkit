@@ -17,6 +17,8 @@ const validContentTypes = [
 ];
 
 axios.interceptors.request.use(async function(config) {
+  const projectId = config.projectId;
+  config.headers['x-gcp-project-id'] = projectId;
   if (store.getters.isLoggedIn) {
     const account = store.state.user.data.email;
     if (account) {
