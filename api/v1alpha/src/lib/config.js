@@ -17,6 +17,7 @@
 'use strict';
 
 const { CommonUtil } = require('cds-shared');
+const { exists } = require('node:fs');
 const commonUtil = CommonUtil;
 
 var config = {};
@@ -77,9 +78,13 @@ config.projectId = process.env.PROJECT_ID;
 
 config.gcpMarketplaceTokenCookieName = 'gmt';
 
+console.log(process.env.MANAGED_PROJECTS);
 if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_PROJECTS)) {
     config.managedProjects = JSON.parse(process.env.MANAGED_PROJECTS);
-} /*else {
+} else {
+    console.log('Not json or does not exist');
+}
+    /*else {
     // TODO: Remove and move to Cloud Run env vars
     config.managedProjects = {
         'cds-demo-1-271622': {
