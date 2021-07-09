@@ -53,7 +53,7 @@ async function getConfiguration(projectId, token) {
     dict.isDataProducer = dataProducer;
     dict.isMarketplaceEnabled = commerce;
 
-    if (projectId in config.managedProjects) {
+    if ('projectId' in config.managedProjects) {
         const projectDict = config.managedProjects[projectId];
         dict.labels = projectDict;
     }
@@ -69,7 +69,7 @@ async function isDataProducer(token) {
         console.error('DATA_PRODUCERS environmental variable is not defined');
         return false;
     }
-    
+
     // https://github.com/googleapis/google-auth-library-nodejs#oauth2
     const { OAuth2Client } = require('google-auth-library');
     const CLIENT_ID = config.oauthClientId;
