@@ -23,6 +23,7 @@ const runtimeConfig = require('../lib/runtimeConfig');
 const metaManager = require('../lib/metaManager');
 const datasetManager = require('../datasets/dataManager');
 const procurementManager = require('../procurements/dataManager');
+const resourceManager = require('../resources/dataManager');
 const fs = require('fs');
 const retry = require('async-retry');
 
@@ -258,21 +259,10 @@ async function startPubSubListener() {
  * Initializes PubSub listener for entitlement auto approvals
  */
 async function initializePubSubListener() {
-    let projectId = cfg.projectId;
+    let projectId = await resourceManager.getCurrentProjectId();
     if (!projectId) {
-        // If projectId is not available, attempt fallback using gcp-metadata
-        // https://github.com/googleapis/gcp-metadata
-        // https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata
-        const gcpMetadata = require('gcp-metadata');
-        const isAvailable = await gcpMetadata.isAvailable();
-        if (isAvailable === true) {
-            console.log('gcpMetadata is available, getting projectId');
-            projectId = await gcpMetadata.project('project-id');
-            console.log(`Project Id of running instance: ${projectId}`); // ...Project ID of the running instance
-        } else {
-            console.log('Could not identify project, will not start up subscription');
-            return;
-        }
+        console.log('Could not identify project, will not start up subscription');
+        return;
     }
 
     if (await runtimeConfig.marketplaceIntegration(projectId) === false) {

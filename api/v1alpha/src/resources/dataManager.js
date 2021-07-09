@@ -49,13 +49,16 @@ async function getConfiguration(projectId, token) {
     let dict = {};
     let commerce = await runtimeConfig.marketplaceIntegration(projectId);
     let dataProducer = await isDataProducer(token);
+    dict.apiProjectId = await getCurrentProjectId();
     dict.projectId = projectId;
     dict.isDataProducer = dataProducer;
     dict.isMarketplaceEnabled = commerce;
 
-    if ('projectId' in config.managedProjects) {
-        const projectDict = config.managedProjects[projectId];
-        dict.labels = projectDict;
+    if (config.managedProjects) {
+        if (projectId in config.managedProjects) {
+            const projectDict = config.managedProjects[projectId];
+            dict.labels = projectDict;
+        }
     }
 
     return dict;
@@ -101,8 +104,30 @@ async function isDataProducer(token) {
     return isProducer;
 }
 
+/**
+ */
+async function getCurrentProjectId() {
+    let projectId = config.projectId;
+    if (!projectId) {
+        // If projectId is not available, attempt fallback using gcp-metadata
+        // https://github.com/googleapis/gcp-metadata
+        // https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata
+        const gcpMetadata = require('gcp-metadata');
+        const isAvailable = await gcpMetadata.isAvailable();
+        if (isAvailable === true) {
+            console.log('gcpMetadata is available, getting projectId');
+            projectId = await gcpMetadata.project('project-id');
+            console.log(`Project Id of running instance: ${projectId}`); // ...Project ID of the running instance
+        } else {
+            console.log('Could not identify current project');
+        }
+    }
+    return projectId;
+}
+
 module.exports = {
     getManagedProjects,
-    getConfiguration
+    getConfiguration,
+    getCurrentProjectId
 };
 
