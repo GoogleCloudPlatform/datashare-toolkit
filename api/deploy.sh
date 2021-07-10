@@ -57,6 +57,7 @@ gcloud run deploy ds-api \
   --cluster $CLUSTER \
   --cluster-location $ZONE \
   --min-instances 1 \
+  --max-instances 10 \
   --namespace $NAMESPACE \
   --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
   --platform gke \
