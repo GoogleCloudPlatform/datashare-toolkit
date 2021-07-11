@@ -80,6 +80,7 @@ kubectl config current-context
 if [[ ${DATA_PRODUCERS} == *"*"* ]]; then
   echo "* found adding quotes"
   export DATA_PRODUCERS='"'${DATA_PRODUCERS}'"'
+  echo ${DATA_PRODUCERS}
 fi
 
 # cat istio-manifests/1.4/authn/* | envsubst | kubectl delete -f -
