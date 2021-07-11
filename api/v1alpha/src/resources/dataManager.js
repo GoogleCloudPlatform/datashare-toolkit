@@ -109,7 +109,7 @@ async function isDataProducer(token) {
             break;
         }
         else if (p.includes('*') || p.includes('?')) {
-            if (commonUtil.wildTest(p, userid.toLowerCase())) {
+            if (commonUtil.wildTest(p.toLowerCase(), userid.toLowerCase())) {
                 console.log('wild test matched');
                 isProducer = true;
                 break;
