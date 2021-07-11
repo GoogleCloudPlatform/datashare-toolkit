@@ -204,8 +204,9 @@ procurements.post('/procurements/approve', async (req, res) => {
  *       301:
  *         description: Redirect to My Products URL
  */
-procurements.post('/procurements:myProducts', async (req, res) => {
-    let projectId = cfg.projectId;
+// Backwards compatibility for marketplace
+procurements.post(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], async (req, res) => {
+    let projectId = req.params.projectId ||cfg.projectId;
 
     // Check if override for projectId is set
     const p = req.query.projectId;
@@ -250,8 +251,16 @@ procurements.post('/procurements:myProducts', async (req, res) => {
  *       301:
  *         description: Redirect to My Products URL
  */
-procurements.get('/procurements:myProducts', async (req, res) => {
-    const projectId = req.header('x-gcp-project-id');
+// Backwards compatibility for marketplace
+procurements.get(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], async (req, res) => {
+    let projectId = req.params.projectId || cfg.projectId;
+
+    // Check if override for projectId is set
+    const p = req.query.projectId;
+    if (p) {
+        projectId = p;
+    }
+
     const host = commonUtil.extractHostname(req.headers.host);
 
     const token = req.query['x-gcp-marketplace-token'];

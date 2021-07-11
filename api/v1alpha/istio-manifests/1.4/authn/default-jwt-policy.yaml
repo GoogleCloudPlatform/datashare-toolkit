@@ -17,6 +17,10 @@ spec:
         - exact: /healthz
         - exact: /metrics
         - exact: /probe
+        # BEGIN: Backwards compatibility for marketplace
+        - exact: "/v1alpha/projects/$PROJECT_ID/accounts:register"
+        - exact: "/v1alpha/projects/$PROJECT_ID/procurements:myProducts"
+        # END: Backwards compatibility for marketplace
         - exact: "/v1alpha/accounts:register"
         - exact: "/v1alpha/procurements:myProducts"
         - prefix: /_internal/knative
@@ -30,6 +34,10 @@ spec:
         - exact: /healthz
         - exact: /metrics
         - exact: /probe
+        # BEGIN: Backwards compatibility for marketplace
+        - exact: "/v1alpha/projects/$PROJECT_ID/accounts:register"
+        - exact: "/v1alpha/projects/$PROJECT_ID/procurements:myProducts"
+        # END: Backwards compatibility for marketplace
         - exact: "/v1alpha/accounts:register"
         - exact: "/v1alpha/procurements:myProducts"
         - prefix: /_internal/knative
@@ -43,6 +51,10 @@ spec:
         - exact: /healthz
         - exact: /metrics
         - exact: /probe
+        # BEGIN: Backwards compatibility for marketplace
+        - exact: "/v1alpha/projects/$PROJECT_ID/accounts:register"
+        - exact: "/v1alpha/projects/$PROJECT_ID/procurements:myProducts"
+        # END: Backwards compatibility for marketplace
         - exact: "/v1alpha/accounts:register"
         - exact: "/v1alpha/procurements:myProducts"
         - prefix: /_internal/knative
@@ -56,6 +68,10 @@ spec:
         - exact: /healthz
         - exact: /metrics
         - exact: /probe
+        # BEGIN: Backwards compatibility for marketplace
+        - exact: "/v1alpha/projects/$PROJECT_ID/accounts:register"
+        - exact: "/v1alpha/projects/$PROJECT_ID/procurements:myProducts"
+        # END: Backwards compatibility for marketplace
         - exact: "/v1alpha/accounts:register"
         - exact: "/v1alpha/procurements:myProducts"
         - prefix: /_internal/knative

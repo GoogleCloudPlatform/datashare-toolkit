@@ -633,8 +633,9 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
 });
 
 // Temporary for development
-accounts.get('/accounts:register', async (req, res) => {
-    let projectId = cfg.projectId;
+// Backwards compatibility for marketplace
+accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], async (req, res) => {
+    let projectId = req.params.projectId || cfg.projectId;
 
     // Check if override for projectId is set
     const p = req.query.projectId;
@@ -664,8 +665,9 @@ accounts.get('/accounts:register', async (req, res) => {
     }
 });
 
-accounts.post('/accounts::custom', async (req, res) => {
-    let projectId = req.header('x-gcp-project-id');
+// Backwards compatibility for marketplace
+accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], async (req, res) => {
+    let projectId = req.params.projectId || req.header('x-gcp-project-id');
     const host = commonUtil.extractHostname(req.headers.host);
     switch (req.params.custom) {
         case "register": {
