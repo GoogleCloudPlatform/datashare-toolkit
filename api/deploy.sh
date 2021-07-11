@@ -35,7 +35,7 @@ if [[ -z "${OAUTH_CLIENT_ID:=}" ]]; then
 fi
 
 if [[ -z "${DATA_PRODUCERS:=}" ]]; then
-    export DATA_PRODUCERS='"*@google.com"';
+    export DATA_PRODUCERS="*@google.com";
     echo "Defaulted DATA_PRODUCERS to '${DATA_PRODUCERS}'";
 fi
 
@@ -62,7 +62,7 @@ gcloud run deploy ds-api \
   --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
   --platform gke \
   --service-account ${SERVICE_ACCOUNT_NAME} \
-  --update-env-vars=PROJECT_ID="${PROJECT_ID}",OAUTH_CLIENT_ID="${OAUTH_CLIENT_ID}",DATA_PRODUCERS=${DATA_PRODUCERS} \
+  --update-env-vars=PROJECT_ID="${PROJECT_ID}",OAUTH_CLIENT_ID="${OAUTH_CLIENT_ID}",DATA_PRODUCERS="${DATA_PRODUCERS}" \
   --no-use-http2
 
 gcloud run services update-traffic ds-api \
@@ -74,6 +74,13 @@ gcloud run services update-traffic ds-api \
 
 gcloud container clusters get-credentials $CLUSTER
 kubectl config current-context
+
+# If '*' wildcard is used in the data producers, quote the full string as needed for YAML/applying the policy
+# https://stackoverflow.com/questions/19109912/yaml-do-i-need-quotes-for-strings-in-yaml
+if [[ ${DATA_PRODUCERS} == *"*"* ]]; then
+  echo "* found adding quotes"
+  export DATA_PRODUCERS='"'${DATA_PRODUCERS}'"'
+fi
 
 # cat istio-manifests/1.4/authn/* | envsubst | kubectl delete -f -
 kubectl get policy.authentication.istio.io -n "$NAMESPACE"
