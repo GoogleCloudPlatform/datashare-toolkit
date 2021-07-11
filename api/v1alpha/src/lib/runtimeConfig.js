@@ -20,7 +20,7 @@ class RuntimeConfig {
     async marketplaceIntegration(projectId) {
         const enabled = await this.commerceEnabled(projectId);
         if (enabled === true) {
-            return process.env.MARKETPLACE_INTEGRATION === 'false' ? false : true
+            return process.env.MARKETPLACE_INTEGRATION === 'true' ? true : false
         }
         return enabled;
     }
