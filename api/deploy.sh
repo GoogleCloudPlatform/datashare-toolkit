@@ -44,7 +44,7 @@ cd "$(dirname "$0")"
 
 # Up to root
 cd ../
-# gcloud builds submit --config api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
+gcloud builds submit --config api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 # Move to v1alpha
 cd api/v1alpha
@@ -53,24 +53,24 @@ export SERVICE_ACCOUNT_NAME=ds-api-mgr;
 CLUSTER=datashare
 gcloud config set compute/zone $ZONE
 
-# gcloud run deploy ds-api \
-#   --cluster $CLUSTER \
-#   --cluster-location $ZONE \
-#   --min-instances 1 \
-#   --max-instances 10 \
-#   --namespace $NAMESPACE \
-#   --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
-#   --platform gke \
-#   --service-account ${SERVICE_ACCOUNT_NAME} \
-#   --update-env-vars=PROJECT_ID="${PROJECT_ID}",OAUTH_CLIENT_ID="${OAUTH_CLIENT_ID}",DATA_PRODUCERS="${DATA_PRODUCERS}" \
-#   --no-use-http2
+gcloud run deploy ds-api \
+  --cluster $CLUSTER \
+  --cluster-location $ZONE \
+  --min-instances 1 \
+  --max-instances 10 \
+  --namespace $NAMESPACE \
+  --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
+  --platform gke \
+  --service-account ${SERVICE_ACCOUNT_NAME} \
+  --update-env-vars=PROJECT_ID="${PROJECT_ID}",OAUTH_CLIENT_ID="${OAUTH_CLIENT_ID}",DATA_PRODUCERS="${DATA_PRODUCERS}" \
+  --no-use-http2
 
-# gcloud run services update-traffic ds-api \
-#     --cluster $CLUSTER \
-#     --cluster-location $ZONE \
-#     --to-latest \
-#     --namespace $NAMESPACE \
-#     --platform gke
+gcloud run services update-traffic ds-api \
+    --cluster $CLUSTER \
+    --cluster-location $ZONE \
+    --to-latest \
+    --namespace $NAMESPACE \
+    --platform gke
 
 gcloud container clusters get-credentials $CLUSTER
 kubectl config current-context
