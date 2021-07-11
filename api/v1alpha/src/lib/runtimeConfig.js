@@ -20,6 +20,8 @@ class RuntimeConfig {
     async marketplaceIntegration(projectId) {
         const enabled = await this.commerceEnabled(projectId);
         if (enabled === true) {
+            // process.env.MARKETPLACE_INTEGRATION needs to be a project setting.
+            // Or we do a top level for backwards compability and in the managed_projects dictionary for per-project
             return process.env.MARKETPLACE_INTEGRATION === 'true' ? true : false
         }
         return enabled;
