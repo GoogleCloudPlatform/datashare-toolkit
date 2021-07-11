@@ -103,12 +103,14 @@ async function isDataProducer(token) {
 
     let isProducer = false;
     for (const p of config.dataProducers) {
+        console.log(`p: ${p}, hd: ${domain}`);
         if (p.toLowerCase() === userid.toLowerCase()) {
             isProducer = true;
             break;
         }
         else if (p.includes('*') || p.includes('?')) {
             if (commonUtil.wildTest(p, domain)) {
+                console.log('wild test matched');
                 isProducer = true;
                 break;
             }
