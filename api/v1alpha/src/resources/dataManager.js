@@ -55,10 +55,13 @@ async function getConfiguration(projectId, token) {
     dict.isDataProducer = dataProducer;
     dict.isMarketplaceEnabled = commerce;
 
+    // Append UI labels
     if (config.managedProjects) {
         if (projectId in config.managedProjects) {
             const projectDict = config.managedProjects[projectId];
-            dict.labels = projectDict;
+            if (projectDict.labels) {
+                dict.labels = projectDict.labels;
+            }
         }
     }
 
