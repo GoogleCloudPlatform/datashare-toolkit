@@ -77,7 +77,7 @@ config.projectId = process.env.PROJECT_ID;
 
 config.gcpMarketplaceTokenCookieName = 'gmt';
 
-console.log(process.env.MANAGED_PROJECTS);
+console.log(`MANAGED_PROJECTS: ${process.env.MANAGED_PROJECTS}`);
 if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_PROJECTS)) {
     config.managedProjects = JSON.parse(process.env.MANAGED_PROJECTS);
 } else {
