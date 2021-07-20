@@ -292,7 +292,7 @@ class ConfigValidator {
 
             if (custom.authorizeFromDatasetIds && custom.authorizeFromDatasetIds.length > 0) {
                 for (const d of custom.authorizeFromDatasetIds) {
-                    const ads = configUtil.performTextVariableReplacements(view, null, d);
+                    const ads = configUtil.performTextVariableReplacements(view, d);
                     if (await bigqueryUtil.datasetExists(ads) === false) {
                         this.logIssue(IssueType.ERROR, `authorizeViewFromDataset '${ads}' defined in view '${view.name}' does not exist`, 'custom.authorizeFromDatasetIds');
                     }
