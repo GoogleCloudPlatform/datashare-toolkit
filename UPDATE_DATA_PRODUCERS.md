@@ -34,3 +34,18 @@ To confirm and view the changes, you can run this:
 ```
 kubectl describe authorizationpolicy.security.istio.io/allow-data-producers -n "$NAMESPACE"
 ```
+
+Once the ISTIO policies have been updated, update the API environmental variable.
+
+```
+export NAMESPACE=datashare-apis
+CLUSTER=datashare
+export ZONE=us-central1-a;
+
+gcloud run services update ds-api \
+  --platform gke \
+  --namespace $NAMESPACE \
+  --cluster $CLUSTER \
+  --cluster-location $ZONE \
+  --update-env-vars=DATA_PRODUCERS="*@google.com"
+```
