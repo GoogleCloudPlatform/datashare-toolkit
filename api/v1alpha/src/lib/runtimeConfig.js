@@ -36,7 +36,7 @@ class RuntimeConfig {
     * @param  {} projectId
     */
     async commerceEnabled(projectId) {
-        // TODO: Enable serviceusage.googleapis.com API through deployment.
+        // TODO: Enable serviceusage.googleapis.com API through deployment documentation
         // https://cloud.google.com/service-usage/docs/access-control
 
         // Imports the Google Cloud client library
