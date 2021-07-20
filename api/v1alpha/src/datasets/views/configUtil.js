@@ -33,10 +33,9 @@ function isPublicAccessEnabled(view) {
 
 /**
  * @param  {} config
- * @param  {} view
  * @param  {} text
  */
-function performTextVariableReplacements(config, view, text) {
+function performTextVariableReplacements(config, text) {
     if (!text) {
         return text;
     }
