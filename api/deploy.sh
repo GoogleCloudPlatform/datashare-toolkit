@@ -69,7 +69,7 @@ gcloud run deploy ds-api \
 
 if ! gcloud run services describe ds-api --cluster $CLUSTER --cluster-location $ZONE --namespace $NAMESPACE --platform gke | grep -q MANAGED_PROJECTS; then
     echo "MANAGED_PROJECTS env variable not found, creating it"
-    MANAGED_PROJECTS="{ \"${PROJECT_ID}\": { \"MARKETPLACE_INTEGRATION_ENABLED\": false, \"labels\": { \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT\": \"\", \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT\": \"\", \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL\": \"\" } } }"
+    MANAGED_PROJECTS='{ "'${PROJECT_ID}'": { "MARKETPLACE_INTEGRATION_ENABLED": false, "labels": { "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT": "", "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT": "", "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL": "" } } }'
     echo ${MANAGED_PROJECTS}
     gcloud run services update ds-api \
         --platform gke \
