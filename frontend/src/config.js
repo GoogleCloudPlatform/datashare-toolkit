@@ -81,10 +81,6 @@ class Config {
    */
   set projectId(p) {
     console.log(`projectId set to: ${p}`);
-
-    // TODO: Remove the VUE_APP_PROJECT_ID reference here and in the getter
-    // this.config.VUE_APP_PROJECT_ID = p;
-
     sessionStorage.setItem('projectId', p);
     localStorage.setItem('projectId', p);
   }
@@ -100,10 +96,8 @@ class Config {
     } else if (local) {
       return local;
     } else {
-      console.error(
-        'Unknown projectId defaulting to VUE_APP_PROJECT_ID if exists'
-      );
-      return null; //this.getConfigValue('VUE_APP_PROJECT_ID');
+      console.error('Unknown projectId');
+      return null;
     }
   }
 
