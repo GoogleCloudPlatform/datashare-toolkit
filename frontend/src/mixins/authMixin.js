@@ -67,7 +67,7 @@ export default {
           console.log('Cannot reload configuration, user not logged in');
           return this.$store.dispatch('setProjectConfiguration', null);
         }
-        console.log('reloading project configuration');
+        console.log('loading project configuration');
         this.$store.dispatch('getProjectConfiguration').then(response => {
           const _c = response.configuration;
           const labels = _c.labels;
@@ -84,7 +84,7 @@ export default {
           console.log('Cannot reload managed projects, user not logged in');
           return this.$store.dispatch('setManagedProjects', null);
         }
-        console.log('reloading managed projects');
+        console.log('loading managed projects');
         return this.$store.dispatch('getManagedProjects').then(response => {
           if (response.success) {
             const managedProjects = response.projects;
