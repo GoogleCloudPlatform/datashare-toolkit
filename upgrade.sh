@@ -91,9 +91,9 @@ fi
 cd api/v1alpha
 
 echo "Starting upgrade for $PROJECT_ID";
-npm run deploy
+# npm run deploy
 cd ..
-gcloud iam roles update ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml --quiet
+# gcloud iam roles update ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml --quiet
 cd ../frontend
 npm run deploy
 echo "Completed upgrade for $PROJECT_ID";
