@@ -47,20 +47,6 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
         return store.dispatch('fetchUser', user);
       })
       .then(() => {
-        if (signedIn) {
-          // This handles loading the configuration when the user is already signed in
-          return store.dispatch('getProjectConfiguration').then(response => {
-            const _c = response.configuration;
-            const labels = _c.labels;
-            if (labels) {
-              config.update(labels);
-            }
-            return store.dispatch('setProjectConfiguration', _c);
-          });
-        }
-        return;
-      })
-      .then(() => {
         new Vue({
           vuetify,
           router,
