@@ -51,7 +51,14 @@ async function getConfiguration(projectId, token) {
     let commerce = await runtimeConfig.marketplaceIntegration(projectId);
     let dataProducer = await isDataProducer(token);
     dict.apiProjectId = await getCurrentProjectId();
-    dict.projectId = projectId;
+
+    // If projectId is null, default to the current projectId
+    if (projectId) {
+        dict.projectId = projectId;
+    } else {
+        dict.projectId = apiProjectId;
+    }    
+
     dict.isDataProducer = dataProducer;
     dict.isMarketplaceEnabled = commerce;
 
