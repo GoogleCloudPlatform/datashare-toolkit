@@ -17,6 +17,9 @@
 'use strict';
 
 const config = require('../lib/config');
+const NodeCache = require("node-cache");
+const dsCache = new NodeCache();
+const projectIdCacheKey = 'projectId';
 
 class RuntimeConfig {
     /**
@@ -24,20 +27,27 @@ class RuntimeConfig {
     or uses gcp-metadata to get current projectId as fallback
      */
     async getCurrentProjectId() {
-        let projectId = config.projectId;
-        if (!projectId) {
-            // If projectId is not available, attempt fallback using gcp-metadata
-            // https://github.com/googleapis/gcp-metadata
-            // https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata
-            const gcpMetadata = require('gcp-metadata');
-            const isAvailable = await gcpMetadata.isAvailable();
-            if (isAvailable === true) {
-                console.log('gcpMetadata is available, getting projectId');
-                projectId = await gcpMetadata.project('project-id');
-                console.log(`Project Id of running instance: ${projectId}`); // ...Project ID of the running instance
-            } else {
-                console.log('Could not identify current project');
+        // Check if projectId exists in cache first
+        let projectId = dsCache.get(projectIdCacheKey);
+        if (projectId == undefined) {
+            projectId = config.projectId;
+            if (!projectId) {
+                // If projectId is not available, attempt fallback using gcp-metadata
+                // https://github.com/googleapis/gcp-metadata
+                // https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata
+                const gcpMetadata = require('gcp-metadata');
+                const isAvailable = await gcpMetadata.isAvailable();
+                if (isAvailable === true) {
+                    console.log('gcpMetadata is available, getting projectId');
+                    projectId = await gcpMetadata.project('project-id');
+                    console.log(`Project Id of running instance: ${projectId}`); // ...Project ID of the running instance
+                } else {
+                    console.log('Could not identify current project');
+                }
             }
+
+            // Set projectId to cache
+            dsCache.set(projectIdCacheKey, projectId);
         }
         return projectId;
     }
@@ -52,7 +62,7 @@ class RuntimeConfig {
             scopes: ['https://www.googleapis.com/auth/cloud-platform']
         };
         const resource = new Resource(options);
-    
+
         // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
         const [projects] = await resource.getProjects();
         const include = Object.keys(config.managedProjects);
@@ -63,7 +73,7 @@ class RuntimeConfig {
         });
         return list;
     }
-    
+
     /**
      * @param  {} projectId
     Returns true if marketplace integration is enabled
