@@ -206,7 +206,7 @@ procurements.post('/procurements/approve', async (req, res) => {
  */
 // Backwards compatibility for marketplace
 procurements.post(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], async (req, res) => {
-    let projectId = req.params.projectId ||cfg.projectId;
+    let projectId = req.params.projectId || cfg.projectId;
 
     // Check if override for projectId is set
     const p = req.query.projectId;
