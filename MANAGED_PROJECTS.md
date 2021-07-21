@@ -6,7 +6,7 @@ The managed projects configuration allows the API and UI to support multiple GCP
 # Properties
 | Name | Required | Description | Example |
 |-|-|-|-|
-| MARKETPLACE_INTEGRATION_ENABLED | No | Specifies if Marketplace integration should be enabled. | true |
+| MARKETPLACE_INTEGRATION_ENABLED | Optional | Specifies if Marketplace integration should be enabled. | true |
 | labels.VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT | Optional | The text to display in a banner at the top of the 'My Dashboard' page. | To grant access to additional users, please click for further information. |
 | labels.VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT | Optional | The text for the more information button in the banner at the top of the 'My Dashboard' page.  | More Information |
 | labels.VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL | Optional | The url to open when the more information button is clicked within the banner at the top of the 'My Dashboard' page. | https://google.com |
