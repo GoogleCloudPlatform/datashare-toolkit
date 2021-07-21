@@ -87,7 +87,4 @@ if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_
 // TODO: Remove hardcoded for testing
 config.oauthClientId = process.env.OAUTH_CLIENT_ID || '863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com';
 
-config.appUserGuideUrl = 'https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/frontend/README.md';
-config.githubUrl = 'https://github.com/GoogleCloudPlatform/datashare-toolkit';
-
 module.exports = config;

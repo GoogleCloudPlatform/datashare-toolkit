@@ -146,17 +146,11 @@ class Config {
   }
 
   get userGuideUrl() {
-    return (
-      this.getConfigValue('VUE_APP_USER_GUIDE_URL', false) ||
-      'https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/frontend/README.md'
-    );
+    return 'https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/frontend/README.md';
   }
 
   get githubUrl() {
-    return (
-      this.getConfigValue('VUE_APP_GITHUB_URL', false) ||
-      'https://github.com/GoogleCloudPlatform/datashare-toolkit'
-    );
+    return 'https://github.com/GoogleCloudPlatform/datashare-toolkit';
   }
 }
 
