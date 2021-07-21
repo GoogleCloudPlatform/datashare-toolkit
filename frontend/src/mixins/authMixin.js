@@ -20,6 +20,7 @@ export default {
       });
     },
     onAuthSuccess(googleUser) {
+      console.log('auth success called');
       if (googleUser) {
         const profile = googleUser.getBasicProfile();
         const user = {
@@ -28,7 +29,7 @@ export default {
           photoURL: profile.getImageUrl()
         };
         return this.$store.dispatch('fetchUser', user).then(() => {
-          this.reloadConfiguration().then(result => {
+          this.reloadConfigData().then(result => {
             return true;
           });
         });
@@ -40,6 +41,7 @@ export default {
       }
     },
     onAuthFailure(error) {
+      console.log('auth failed called');
       console.error(error);
       return this.$store.dispatch('fetchUser', null).then(() => {
         this.redirectHome();
@@ -53,6 +55,11 @@ export default {
           name: name
         });
       }
+    },
+    reloadConfigData() {
+      return this.reloadManagedProjects().then(() => {
+        return this.reloadConfiguration();
+      });
     },
     reloadConfiguration() {
       return Vue.GoogleAuth.then(auth2 => {

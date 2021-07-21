@@ -16,7 +16,6 @@ Vue.use(VueForm);
 import { LoaderPlugin } from 'vue-google-login';
 import config from './config';
 import browserHelper from './browserHelper';
-import authMixin from './mixins/authMixin';
 
 // Fetch and load the store settings
 fetch(process.env.BASE_URL + 'config/config.json').then(response => {
@@ -29,8 +28,10 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
     });
 
     let user = {};
+    let signedIn = false;
     Vue.GoogleAuth.then(auth2 => {
-      if (auth2.isSignedIn.get()) {
+      signedIn = auth2.isSignedIn.get();
+      if (signedIn) {
         const googleUser = auth2.currentUser.get();
         const profile = googleUser.getBasicProfile();
         user = {
@@ -44,6 +45,20 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
     })
       .then(user => {
         return store.dispatch('fetchUser', user);
+      })
+      .then(() => {
+        console.log('loading configuration at main.js');
+        if (signedIn) {
+          return store.dispatch('getProjectConfiguration').then(response => {
+            const _c = response.configuration;
+            const labels = _c.labels;
+            if (labels) {
+              config.update(labels);
+            }
+            return store.dispatch('setProjectConfiguration', _c);
+          });
+        }
+        return;
       })
       .then(() => {
         new Vue({
