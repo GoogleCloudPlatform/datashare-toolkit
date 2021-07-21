@@ -68,7 +68,7 @@ const store = new Vuex.Store({
       if (state.managedProjects && state.managedProjects.data) {
         return state.managedProjects.data;
       }
-      return null;
+      return [];
     }
   },
 
