@@ -66,7 +66,7 @@
         class="mt-7"
         dense
         style="maxWidth: 200px;"
-        :readonly="!projectSelectorEnabled"
+        :readonly="!projectSelectorChangeable"
         v-model="projectId"
         :items="managedProjects"
         label="GCP Project ID"
@@ -251,12 +251,15 @@ export default {
       return _config;
     },
     projectSelectorEnabled() {
-      if (this.isLoggedIn === false || this.isDataProducer === false) {
+      if (this.isLoggedIn === false) {
         return false;
       } else if (this.managedProjects) {
         return this.managedProjects.length > 1;
       }
       return false;
+    },
+    projectSelectorChangeable() {
+      return this.projectSelectorEnabled() && this.isDataProducer;
     },
     navigationItems() {
       let items = [
