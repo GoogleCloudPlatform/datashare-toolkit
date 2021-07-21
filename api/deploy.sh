@@ -66,6 +66,18 @@ gcloud run deploy ds-api \
   --remove-env-vars=MARKETPLACE_INTEGRATION \
   --no-use-http2
 
+if ! gcloud run services describe ds-api --cluster $CLUSTER --cluster-location $ZONE --namespace $NAMESPACE --platform gke | grep -q DATA_PRODUCERS; then
+  echo "MANAGED_PROJECTS env variable not found, creating it"
+  MANAGED_PROJECTS='{ "'${PROJECT_ID}'": { "MARKETPLACE_INTEGRATION_ENABLED": false, "labels": { "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT": "", "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT": "", "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL": "" } } }'
+
+    gcloud run services update ds-api \
+        --platform gke \
+        --namespace $NAMESPACE \
+        --cluster $CLUSTER \
+        --cluster-location $ZONE \
+        --update-env-vars=MANAGED_PROJECTS="${MANAGED_PROJECTS}"
+fi
+
 gcloud run services update-traffic ds-api \
     --cluster $CLUSTER \
     --cluster-location $ZONE \
