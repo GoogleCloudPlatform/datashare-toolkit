@@ -196,6 +196,8 @@ export default {
   }),
   created() {
     this.loading = true;
+    // Loads the managed project list. If the user isn't signed in, the list will initially return as empty.
+    // Once the user signs in, the onAuthSuccess function will load this list.
     this.reloadManagedProjects().then(result => {
       if (_config.projectId === null) {
         if (this.managedProjects.length > 0) {

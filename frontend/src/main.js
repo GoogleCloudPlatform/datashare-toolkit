@@ -41,14 +41,14 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
         };
         return user;
       }
-      return null;
+      return;
     })
       .then(user => {
         return store.dispatch('fetchUser', user);
       })
       .then(() => {
-        console.log('loading configuration at main.js');
         if (signedIn) {
+          // This handles loading the configuration when the user is already signed in
           return store.dispatch('getProjectConfiguration').then(response => {
             const _c = response.configuration;
             const labels = _c.labels;
