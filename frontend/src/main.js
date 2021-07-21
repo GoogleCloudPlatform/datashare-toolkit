@@ -16,6 +16,7 @@ Vue.use(VueForm);
 import { LoaderPlugin } from 'vue-google-login';
 import config from './config';
 import browserHelper from './browserHelper';
+import authMixin from './mixins/authMixin';
 
 // Fetch and load the store settings
 fetch(process.env.BASE_URL + 'config/config.json').then(response => {

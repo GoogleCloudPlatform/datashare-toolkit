@@ -35,6 +35,9 @@ const store = new Vuex.Store({
     },
     project: {
       data: null
+    },
+    managedProjects: {
+      data: null
     }
   },
 
@@ -60,6 +63,12 @@ const store = new Vuex.Store({
         return state.project.data.isDataProducer === true;
       }
       return false;
+    },
+    managedProjects: state => {
+      if (state.managedProjects && state.managedProjects.data) {
+        return state.managedProjects.data;
+      }
+      return null;
     }
   },
 
@@ -69,6 +78,9 @@ const store = new Vuex.Store({
     },
     setProjectConfiguration(state, data) {
       state.project.data = data;
+    },
+    setManagedProjects(state, data) {
+      state.managedProjects.data = data;
     }
   },
 
@@ -89,6 +101,13 @@ const store = new Vuex.Store({
         commit('setProjectConfiguration', configuration);
       } else {
         commit('setProjectConfiguration', null);
+      }
+    },
+    setManagedProjects({ commit }, data) {
+      if (data) {
+        commit('setManagedProjects', data);
+      } else {
+        commit('setManagedProjects', null);
       }
     },
     // eslint-disable-next-line no-unused-vars

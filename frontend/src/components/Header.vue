@@ -193,23 +193,19 @@ export default {
     params: {},
     // Store and retrieve from storage data
     projectId: null,
-    managedProjects: [],
     loading: false
   }),
   created() {
     this.loading = true;
-    this.$store.dispatch('getManagedProjects').then(response => {
-      if (response.success) {
-        this.managedProjects = response.projects;
-        if (_config.projectId === null) {
-          if (this.managedProjects.length > 0) {
-            this.projectId = this.managedProjects[0];
-            this.projectIdChanged(false);
-          }
-        } else {
-          this.projectId = _config.projectId;
+    this.reloadManagedProjects().then(result => {
+      if (_config.projectId === null) {
+        if (this.managedProjects.length > 0) {
+          this.projectId = this.managedProjects[0];
           this.projectIdChanged(false);
         }
+      } else {
+        this.projectId = _config.projectId;
+        this.projectIdChanged(false);
       }
       this.loading = false;
     });
@@ -247,7 +243,8 @@ export default {
     ...mapGetters({
       user: 'user',
       isLoggedIn: 'isLoggedIn',
-      isDataProducer: 'isDataProducer'
+      isDataProducer: 'isDataProducer',
+      managedProjects: 'managedProjects'
     }),
     config() {
       return _config;
