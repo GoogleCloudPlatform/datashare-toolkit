@@ -72,7 +72,7 @@ config.procurementIssuer = process.env.PROCUREMENT_ISSUER || 'https://www.google
 
 config.uiBaseUrl = process.env.UI_BASE_URL || 'http://localhost:8080';
 
-// Attribute used by Pub/Sub listener
+// Only to be consumed by runtimeConfig, do not use this directly from anywhere else
 config.projectId = process.env.PROJECT_ID;
 
 config.gcpMarketplaceTokenCookieName = 'gmt';

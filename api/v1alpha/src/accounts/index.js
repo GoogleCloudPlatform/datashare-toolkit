@@ -23,6 +23,7 @@ const procurementManager = require("./../procurements/dataManager");
 const cfg = require('../lib/config');
 
 const { CommonUtil } = require('cds-shared');
+const runtimeConfig = require('../lib/runtimeConfig');
 const commonUtil = CommonUtil;
 
 /************************************************************
@@ -635,7 +636,7 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
 // Temporary for development
 // Backwards compatibility for marketplace
 accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], async (req, res) => {
-    let projectId = req.params.projectId || cfg.projectId;
+    let projectId = req.params.projectId || runtimeConfig.projectId;
 
     // Check if override for projectId is set
     const p = req.query.projectId;
@@ -676,7 +677,7 @@ accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], as
             if (p) {
                 projectId = p;
             } else {
-                projectId = cfg.projectId;
+                projectId = runtimeConfig.projectId;
             }
             const token = req.body['x-gcp-marketplace-token'];
             console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);

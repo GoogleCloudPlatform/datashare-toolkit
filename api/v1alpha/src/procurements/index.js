@@ -21,6 +21,7 @@ const dataManager = require("./dataManager");
 const { CommonUtil } = require('cds-shared');
 const commonUtil = CommonUtil;
 const cfg = require('../lib/config');
+const runtimeConfig = require('../lib/runtimeConfig');
 
 /************************************************************
   API Endpoints
@@ -206,7 +207,7 @@ procurements.post('/procurements/approve', async (req, res) => {
  */
 // Backwards compatibility for marketplace
 procurements.post(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], async (req, res) => {
-    let projectId = req.params.projectId || cfg.projectId;
+    let projectId = req.params.projectId || runtimeConfig.projectId;
 
     // Check if override for projectId is set
     const p = req.query.projectId;
@@ -253,7 +254,7 @@ procurements.post(['/projects/:projectId/procurements:myProducts', '/procurement
  */
 // Backwards compatibility for marketplace
 procurements.get(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], async (req, res) => {
-    let projectId = req.params.projectId || cfg.projectId;
+    let projectId = req.params.projectId || runtimeConfig.projectId;
 
     // Check if override for projectId is set
     const p = req.query.projectId;

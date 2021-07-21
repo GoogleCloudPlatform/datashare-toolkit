@@ -38,12 +38,14 @@ class RuntimeConfig {
                 const gcpMetadata = require('gcp-metadata');
                 const isAvailable = await gcpMetadata.isAvailable();
                 if (isAvailable === true) {
-                    console.log('gcpMetadata is available, getting projectId');
+                    console.log('gcp-metadata is available, getting projectId');
                     projectId = await gcpMetadata.project('project-id');
                     console.log(`Project Id of running instance: ${projectId}`); // ...Project ID of the running instance
                 } else {
-                    console.log('Could not identify current project');
+                    console.log('gcp-metadata is unavailable, unable to identify current project');
                 }
+            } else {
+                console.log('Using projectId from env variable');
             }
 
             // Set projectId to cache
