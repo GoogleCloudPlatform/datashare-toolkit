@@ -76,7 +76,7 @@ if ! gcloud run services describe ds-api --cluster $CLUSTER --cluster-location $
         --namespace $NAMESPACE \
         --cluster $CLUSTER \
         --cluster-location $ZONE \
-        --update-env-vars=MANAGED_PROJECTS="${MANAGED_PROJECTS}"
+        --update-env-vars=^---^MANAGED_PROJECTS="${MANAGED_PROJECTS}"
 fi
 
 gcloud run services update-traffic ds-api \
