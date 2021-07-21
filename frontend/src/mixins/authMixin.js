@@ -65,7 +65,7 @@ export default {
       return Vue.GoogleAuth.then(auth2 => {
         if (auth2.isSignedIn.get() === false) {
           console.log('Cannot reload configuration, user not logged in');
-          return;
+          return this.$store.dispatch('setProjectConfiguration', null);
         }
         console.log('reloading project configuration');
         this.$store.dispatch('getProjectConfiguration').then(response => {
@@ -82,7 +82,7 @@ export default {
       return Vue.GoogleAuth.then(auth2 => {
         if (auth2.isSignedIn.get() === false) {
           console.log('Cannot reload managed projects, user not logged in');
-          return;
+          return this.$store.dispatch('setManagedProjects', null);
         }
         console.log('reloading managed projects');
         return this.$store.dispatch('getManagedProjects').then(response => {
