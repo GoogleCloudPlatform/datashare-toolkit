@@ -34,5 +34,5 @@ gcloud run deploy ds-frontend-ui \
   --allow-unauthenticated \
   --platform managed \
   --max-instances 10 \
-  --update-env-vars=VUE_APP_PROJECT_ID="${PROJECT_ID}"
+  --update-env-vars=VUE_APP_PROJECT_ID="${PROJECT_ID}" \
   --remove-env-vars=VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT,VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT,VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL,VUE_APP_PROJECT_ID,VUE_APP_MARKETPLACE_INTEGRATION
