@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import config from '../config';
 
 export default {
   methods: {
@@ -27,7 +28,9 @@ export default {
           photoURL: profile.getImageUrl()
         };
         return this.$store.dispatch('fetchUser', user).then(() => {
-          return true;
+          this.reloadConfiguration().then(result => {
+            return true;
+          });
         });
       } else {
         return this.$store.dispatch('fetchUser', null).then(() => {
@@ -50,6 +53,23 @@ export default {
           name: name
         });
       }
+    },
+    reloadConfiguration() {
+      return Vue.GoogleAuth.then(auth2 => {
+        if (auth2.isSignedIn.get() === false) {
+          console.log('Cannot reload configuration, user not logged in');
+          return;
+        }
+        console.log('Reloading configuration');
+        this.$store.dispatch('getProjectConfiguration').then(response => {
+          const _c = response.configuration;
+          const labels = _c.labels;
+          if (labels) {
+            config.update(labels);
+          }
+          return this.$store.dispatch('setProjectConfiguration', _c);
+        });
+      });
     }
   }
 };

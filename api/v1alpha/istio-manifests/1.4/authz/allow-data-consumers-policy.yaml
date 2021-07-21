@@ -13,6 +13,7 @@ spec:
         - GET
         paths: 
         - /v1alpha/products
+        - /v1alpha/resources/configuration
         - /v1alpha/resources/projects
     - operation:
         methods:

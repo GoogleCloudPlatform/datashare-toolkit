@@ -96,7 +96,7 @@ class Config {
     } else if (local) {
       return local;
     } else {
-      console.error('Unknown projectId');
+      console.info('Unknown projectId');
       return null;
     }
   }
@@ -131,6 +131,9 @@ class Config {
   }
 
   get marketplaceIntegrationEnabled() {
+    if (!store.state.project || !store.state.project.data) {
+      return false;
+    }
     const m = store.state.project.data.isMarketplaceEnabled;
     if (m === undefined) {
       return true;

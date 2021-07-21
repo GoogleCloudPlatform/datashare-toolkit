@@ -239,6 +239,7 @@ export default {
       if (reload === true) {
         this.$router.go();
       }
+      this.reloadConfiguration();
     }
   },
   computed: {
@@ -252,7 +253,9 @@ export default {
       return _config;
     },
     projectSelectorEnabled() {
-      if (this.managedProjects) {
+      if (this.isLoggedIn === false) {
+        return false;
+      } else if (this.managedProjects) {
         return this.managedProjects.length > 1;
       }
       return false;
