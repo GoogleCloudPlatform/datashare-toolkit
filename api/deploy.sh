@@ -53,6 +53,7 @@ export SERVICE_ACCOUNT_NAME=ds-api-mgr;
 CLUSTER=datashare
 gcloud config set compute/zone $ZONE
 
+# TODO: Remove $PROJECT_ID at --remove-env-vars
 gcloud run deploy ds-api \
   --cluster $CLUSTER \
   --cluster-location $ZONE \
