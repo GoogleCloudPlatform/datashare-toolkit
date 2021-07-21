@@ -30,13 +30,14 @@ async function getConfiguration(projectId, token) {
     let dict = {};
     let commerce = await runtimeConfig.marketplaceIntegration(projectId);
     let dataProducer = await isDataProducer(token);
-    dict.apiProjectId = await runtimeConfig.getCurrentProjectId();
+    let currentProjectId = await runtimeConfig.getCurrentProjectId();
+    dict.apiProjectId = currentProjectId;
 
     // If projectId is null, default to the current projectId
     if (projectId) {
         dict.projectId = projectId;
     } else {
-        dict.projectId = apiProjectId;
+        dict.projectId = currentProjectId;
     }    
 
     dict.isDataProducer = dataProducer;
