@@ -342,6 +342,7 @@ const store = new Vuex.Store({
         notify(error);
       });
     },
+    // eslint-disable-next-line no-unused-vars
     getProjectConfiguration({ commit }, payload) {
       return client.getProjectConfiguration().catch(error => {
         notify(error);
