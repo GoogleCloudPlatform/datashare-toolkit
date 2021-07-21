@@ -23,26 +23,6 @@ const commonUtil = CommonUtil;
 const runtimeConfig = require('../lib/runtimeConfig');
 
 /**
- */
-async function getManagedProjects() {
-    const { Resource } = require('@google-cloud/resource-manager');
-    const options = {
-        scopes: ['https://www.googleapis.com/auth/cloud-platform']
-    };
-    const resource = new Resource(options);
-
-    // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
-    const [projects] = await resource.getProjects();
-    const include = Object.keys(config.managedProjects);
-    const list = projects.filter(project => include.includes(project.id)).map(project => project.id).sort(function (a, b) {
-        return a
-            .toLowerCase()
-            .localeCompare(b.toLowerCase());
-    });
-    return list;
-}
-
-/**
  * @param  {} projectId
  * @param  {} token
  */
@@ -128,7 +108,6 @@ async function isDataProducer(token) {
 }
 
 module.exports = {
-    getManagedProjects,
     getConfiguration
 };
 

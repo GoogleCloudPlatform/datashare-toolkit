@@ -18,6 +18,7 @@
 
 const express = require('express');
 const dataManager = require("./dataManager");
+const runtimeConfig = require('../lib/runtimeConfig');
 
 /************************************************************
   API Endpoints
@@ -34,7 +35,7 @@ var resources = express.Router();
 resources.get('/resources/projects', async (req, res) => {
     const code = 200;
     // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
-    const list = await dataManager.getManagedProjects();
+    const list = await runtimeConfig.getManagedProjects();
     const data = { success: true, projects: list };
     res.status(code).json({
         ...data
