@@ -102,6 +102,9 @@ class Config {
   }
 
   get apiProjectId() {
+    if (!store.state.project || !store.state.project.data) {
+      return false;
+    }
     return store.state.project.data.apiProjectId;
   }
 
