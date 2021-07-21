@@ -54,6 +54,7 @@ CLUSTER=datashare
 gcloud config set compute/zone $ZONE
 
 # TODO: Remove $PROJECT_ID at --remove-env-vars
+# PROJECT_ID="${PROJECT_ID}",
 gcloud run deploy ds-api \
   --cluster $CLUSTER \
   --cluster-location $ZONE \
@@ -63,8 +64,8 @@ gcloud run deploy ds-api \
   --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
   --platform gke \
   --service-account ${SERVICE_ACCOUNT_NAME} \
-  --update-env-vars=PROJECT_ID="${PROJECT_ID}",OAUTH_CLIENT_ID="${OAUTH_CLIENT_ID}",DATA_PRODUCERS="${DATA_PRODUCERS}" \
-  --remove-env-vars=MARKETPLACE_INTEGRATION \
+  --update-env-vars=OAUTH_CLIENT_ID="${OAUTH_CLIENT_ID}",DATA_PRODUCERS="${DATA_PRODUCERS}" \
+  --remove-env-vars=PROJECT_ID,MARKETPLACE_INTEGRATION \
   --no-use-http2
 
 if ! gcloud run services describe ds-api --cluster $CLUSTER --cluster-location $ZONE --namespace $NAMESPACE --platform gke | grep -q MANAGED_PROJECTS; then
