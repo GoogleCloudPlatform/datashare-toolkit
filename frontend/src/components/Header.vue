@@ -191,7 +191,6 @@ export default {
       title: 'Datashare'
     },
     params: {},
-    // Store and retrieve from storage data
     projectId: null,
     loading: false
   }),
