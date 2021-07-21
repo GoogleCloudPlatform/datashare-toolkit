@@ -259,7 +259,7 @@ export default {
       return false;
     },
     projectSelectorChangeable() {
-      return this.projectSelectorEnabled() && this.isDataProducer;
+      return this.projectSelectorEnabled && this.isDataProducer;
     },
     navigationItems() {
       let items = [
