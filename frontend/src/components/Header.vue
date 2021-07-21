@@ -251,7 +251,7 @@ export default {
       return _config;
     },
     projectSelectorEnabled() {
-      if (this.isLoggedIn === false) {
+      if (this.isLoggedIn === false || this.isDataProducer === false) {
         return false;
       } else if (this.managedProjects) {
         return this.managedProjects.length > 1;
