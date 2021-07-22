@@ -80,7 +80,7 @@ class Config {
   Set the sessionStorage projectId, and the localStorage projectId. The localStorage item is used for getting the last selected projectId when opening a new session/window/tab
    */
   set projectId(p) {
-    console.log(`projectId set to: ${p}`);
+    console.debug(`projectId set to: ${p}`);
     sessionStorage.setItem('projectId', p);
     localStorage.setItem('projectId', p);
   }
@@ -96,7 +96,7 @@ class Config {
     } else if (local) {
       return local;
     } else {
-      console.info('Unknown projectId');
+      console.debug('unknown projectId');
       return null;
     }
   }
@@ -162,11 +162,12 @@ class Config {
   async reloadProjectConfiguration() {
     return Vue.GoogleAuth.then(auth2 => {
       if (auth2.isSignedIn.get() === false) {
-        console.log('Cannot reload configuration, user not logged in');
+        console.debug('cannot reload configuration, user not logged in');
         return store.dispatch('setProjectConfiguration', null);
       }
-      console.log('loading project configuration');
+      console.debug('loading project configuration');
       return store.dispatch('getProjectConfiguration').then(response => {
+        console.debug(`project configuration: ${JSON.stringfy(response)}`);
         const _c = response.configuration;
         const labels = _c.labels;
         if (labels) {
@@ -180,11 +181,12 @@ class Config {
   async reloadManagedProjects() {
     return Vue.GoogleAuth.then(auth2 => {
       if (auth2.isSignedIn.get() === false) {
-        console.log('Cannot reload managed projects, user not logged in');
+        console.debug('cannot reload managed projects, user not logged in');
         return store.dispatch('setManagedProjects', null);
       }
-      console.log('loading managed projects');
+      console.debug('loading managed projects');
       return store.dispatch('getManagedProjects').then(response => {
+        console.debug(`managed projects: ${JSON.stringfy(response)}`);
         if (response.success) {
           const managedProjects = response.projects;
           if (this.projectId === null) {

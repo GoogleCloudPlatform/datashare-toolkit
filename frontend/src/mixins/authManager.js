@@ -48,7 +48,7 @@ class AuthManager {
   }
 
   async onAuthSuccess(googleUser, reloadProjectConfigurationOnly) {
-    console.log('auth success called');
+    console.debug('auth success called');
     if (googleUser) {
       const profile = googleUser.getBasicProfile();
       const user = {
