@@ -20,6 +20,7 @@ const config = require('../lib/config');
 const NodeCache = require("node-cache");
 const dsCache = new NodeCache();
 const projectIdCacheKey = 'projectId';
+const managedProjectsCacheKey = 'managedProjects';
 
 class RuntimeConfig {
     /**
@@ -48,7 +49,7 @@ class RuntimeConfig {
                 console.log('Using projectId from env variable');
             }
 
-            // Set projectId to cache
+            // Set projectId to cache indefinitely
             dsCache.set(projectIdCacheKey, projectId);
         }
         return projectId;
@@ -59,20 +60,27 @@ class RuntimeConfig {
     that the current account has access to
      */
     async getManagedProjects() {
-        const { Resource } = require('@google-cloud/resource-manager');
-        const options = {
-            scopes: ['https://www.googleapis.com/auth/cloud-platform']
-        };
-        const resource = new Resource(options);
+        // Cache this list
+        let list = dsCache.get(managedProjectsCacheKey);
+        if (list == undefined) {
+            const { Resource } = require('@google-cloud/resource-manager');
+            const options = {
+                scopes: ['https://www.googleapis.com/auth/cloud-platform']
+            };
+            const resource = new Resource(options);
 
-        // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
-        const [projects] = await resource.getProjects();
-        const include = Object.keys(config.managedProjects);
-        const list = projects.filter(project => include.includes(project.id)).map(project => project.id).sort(function (a, b) {
-            return a
-                .toLowerCase()
-                .localeCompare(b.toLowerCase());
-        });
+            // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
+            const [projects] = await resource.getProjects();
+            const include = Object.keys(config.managedProjects);
+            list = projects.filter(project => include.includes(project.id)).map(project => project.id).sort(function (a, b) {
+                return a
+                    .toLowerCase()
+                    .localeCompare(b.toLowerCase());
+            });
+
+            // Set managed projects to cache for 5 minutes
+            dsCache.set(managedProjectsCacheKey, list, 300);
+        }
         return list;
     }
 

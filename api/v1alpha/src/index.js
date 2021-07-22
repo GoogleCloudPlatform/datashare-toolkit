@@ -23,6 +23,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const { verifyProject } = require('./lib/auth');
 
 const apiVersion = "v1alpha";
 const PORT = process.env.PORT || 5555;
@@ -86,7 +87,7 @@ const app = express();
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
-app.use(bodyParser.raw({type: 'application/octet-stream'}));
+app.use(bodyParser.raw({ type: 'application/octet-stream' }));
 app.use(cookieParser());
 
 // Import the Datashare API Spots service router
@@ -113,7 +114,7 @@ var router = express.Router();
 var routes = [];
 
 // CORS will be controlled by the API GW layer
-router.all('*', cors());
+router.all('*', cors(), verifyProject);
 
 /**
  * @swagger
@@ -187,7 +188,7 @@ router.all('*', cors());
  *                   type: string
  *                   description: Status message
  */
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
     res.status(200).json({
         success: true,
         code: 200,
@@ -237,7 +238,7 @@ routes = [
     '/docs/openapi_spec.json',
     '/openapi_spec'
 ]
-router.get(routes, function(req, res) {
+router.get(routes, function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.send(openapiSpec);
 });
@@ -279,7 +280,7 @@ router.use(resources);
  *                   type: string
  *                   description: Status message
  */
-router.get('*', function(req, res) {
+router.get('*', function (req, res) {
     res.status(404).json({
         success: true,
         code: 404,
@@ -291,7 +292,7 @@ router.get('*', function(req, res) {
 app.use('/' + apiVersion, router);
 
 // default app route redirects to current API version for now
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
     res.redirect('/' + apiVersion);
 });
 
