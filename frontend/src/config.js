@@ -167,7 +167,7 @@ class Config {
       }
       console.debug('loading project configuration');
       return store.dispatch('getProjectConfiguration').then(response => {
-        console.debug(`project configuration: ${JSON.stringfy(response)}`);
+        console.debug(`project configuration: ${JSON.stringify(response)}`);
         const _c = response.configuration;
         const labels = _c.labels;
         if (labels) {
@@ -186,7 +186,7 @@ class Config {
       }
       console.debug('loading managed projects');
       return store.dispatch('getManagedProjects').then(response => {
-        console.debug(`managed projects: ${JSON.stringfy(response)}`);
+        console.debug(`managed projects: ${JSON.stringify(response)}`);
         if (response.success) {
           const managedProjects = response.projects;
           if (this.projectId === null) {
