@@ -27,13 +27,13 @@ This functionality so far is mainly to be used for non-marketplace integrated us
 - Marketplace integration is no longer enabled by default. It must be enabled through the configured `MANAGED_PROJECTS` [dictionary](./MANAGED_PROJECTS.md) in the API environmental variable. In addition to the environmental variable, there is also a runtime check made with the GCP service usage API to ensure the required API is enabled.
 
 ## Enabling a new projectId for Datashare
-- Create Datashare Manager Role in the target project
+1. Create Datashare Manager Role in the target project
 
-```
-cd api
-export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
-CUSTOM_ROLE_NAME=custom.ds.api.mgr;
-gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml
-```
+    ```
+    cd api
+    export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
+    CUSTOM_ROLE_NAME=custom.ds.api.mgr;
+    gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml
+    ```
 
-- Grant access to the service account running the main API and UI Cloud Run Services.
+2. Grant access for role custom.ds.api.mgr to the service account running the main API and UI Cloud Run Services.
