@@ -51,7 +51,7 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
       ux_mode: browserHelper.isBrowserChrome() ? 'redirect' : 'popup'
     });
 
-    authManager.performLogin().then(() => {
+    authManager.init().then(() => {
       new Vue({
         vuetify,
         router,

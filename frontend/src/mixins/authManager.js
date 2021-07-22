@@ -19,11 +19,21 @@ import config from '../config';
 import store from '../store';
 
 class AuthManager {
-  async performLogin() {
+  async init() {
     return Vue.GoogleAuth.then(auth2 => {
       if (auth2.isSignedIn.get() === true) {
         const googleUser = auth2.currentUser.get();
         return this.onAuthSuccess(googleUser, true);
+      }
+    });
+  }
+
+  async performLogin() {
+    return Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get() === true) {
+        // const googleUser = auth2.currentUser.get();
+        // return this.onAuthSuccess(googleUser, true);
+        return true;
       } else {
         return auth2
           .signIn()
