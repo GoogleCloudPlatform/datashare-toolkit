@@ -19,6 +19,11 @@ const validContentTypes = [
 axios.interceptors.request.use(async function(reqConfig) {
   const projectId = config.projectId;
   if (projectId) {
+    const managedProjects = store.getters.managedProjects;
+    if (managedProjects.length > 0 && !managedProjects.includes(projectId)) {
+      console.error(`Invalid project called: ${projectId}`);
+      return Promise.reject(`Invalid projectId: ${projectId}`);
+    }
     reqConfig.headers['x-gcp-project-id'] = projectId;
   }
   if (store.getters.isLoggedIn) {
