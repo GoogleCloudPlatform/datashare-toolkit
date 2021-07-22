@@ -22,7 +22,8 @@ class AuthManager {
   async performLogin() {
     return Vue.GoogleAuth.then(auth2 => {
       if (auth2.isSignedIn.get() === true) {
-        return true;
+        const googleUser = auth2.currentUser.get();
+        return this.onAuthSuccess(googleUser, true);
       } else {
         return auth2
           .signIn()
@@ -36,7 +37,7 @@ class AuthManager {
     });
   }
 
-  async onAuthSuccess(googleUser) {
+  async onAuthSuccess(googleUser, reloadProjectConfigurationOnly) {
     console.log('auth success called');
     if (googleUser) {
       const profile = googleUser.getBasicProfile();
@@ -46,9 +47,15 @@ class AuthManager {
         photoURL: profile.getImageUrl()
       };
       return store.dispatch('fetchUser', user).then(() => {
-        config.reloadAllProjectConfigData().then(result => {
-          return true;
-        });
+        if (reloadProjectConfigurationOnly === true) {
+          return config.reloadProjectConfiguration().then(result => {
+            return true;
+          });
+        } else {
+          return config.reloadAllProjectConfigData().then(result => {
+            return true;
+          });
+        }
       });
     } else {
       return store.dispatch('fetchUser', null).then(() => {
