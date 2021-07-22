@@ -27,7 +27,7 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
       ux_mode: browserHelper.isBrowserChrome() ? 'redirect' : 'popup'
     });
 
-    let user = {};
+    let user = null;
     let signedIn = false;
     Vue.GoogleAuth.then(auth2 => {
       signedIn = auth2.isSignedIn.get();
@@ -39,12 +39,11 @@ fetch(process.env.BASE_URL + 'config/config.json').then(response => {
           email: profile.getEmail(),
           photoURL: profile.getImageUrl()
         };
-        return user;
       }
-      return;
+      return store.dispatch('fetchUser', user);
     })
-      .then(user => {
-        return store.dispatch('fetchUser', user);
+      .then(() => {
+        return config.reloadProjectConfiguration();
       })
       .then(() => {
         new Vue({

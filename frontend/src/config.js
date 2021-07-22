@@ -15,7 +15,7 @@
  */
 
 'use strict';
-const underscore = require('underscore');
+import Vue from 'vue';
 import store from './store';
 
 class Config {
@@ -151,6 +151,51 @@ class Config {
 
   get githubUrl() {
     return 'https://github.com/GoogleCloudPlatform/datashare-toolkit';
+  }
+
+  async reloadAllProjectConfigData() {
+    return this.reloadManagedProjects().then(() => {
+      return this.reloadProjectConfiguration();
+    });
+  }
+
+  async reloadProjectConfiguration() {
+    return Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get() === false) {
+        console.log('Cannot reload configuration, user not logged in');
+        return store.dispatch('setProjectConfiguration', null);
+      }
+      console.log('loading project configuration');
+      return store.dispatch('getProjectConfiguration').then(response => {
+        const _c = response.configuration;
+        const labels = _c.labels;
+        if (labels) {
+          this.update(labels);
+        }
+        return store.dispatch('setProjectConfiguration', _c);
+      });
+    });
+  }
+
+  async reloadManagedProjects() {
+    return Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get() === false) {
+        console.log('Cannot reload managed projects, user not logged in');
+        return store.dispatch('setManagedProjects', null);
+      }
+      console.log('loading managed projects');
+      return store.dispatch('getManagedProjects').then(response => {
+        if (response.success) {
+          const managedProjects = response.projects;
+          if (this.projectId === null) {
+            if (managedProjects.length > 0) {
+              this.projectId = managedProjects[0];
+            }
+          }
+          return store.dispatch('setManagedProjects', managedProjects);
+        }
+      });
+    });
   }
 }
 

@@ -29,7 +29,7 @@ export default {
           photoURL: profile.getImageUrl()
         };
         return this.$store.dispatch('fetchUser', user).then(() => {
-          this.reloadConfigData().then(result => {
+          config.reloadAllProjectConfigData().then(result => {
             return true;
           });
         });
@@ -55,48 +55,6 @@ export default {
           name: name
         });
       }
-    },
-    reloadConfigData() {
-      return this.reloadManagedProjects().then(() => {
-        return this.reloadConfiguration();
-      });
-    },
-    reloadConfiguration() {
-      return Vue.GoogleAuth.then(auth2 => {
-        if (auth2.isSignedIn.get() === false) {
-          console.log('Cannot reload configuration, user not logged in');
-          return this.$store.dispatch('setProjectConfiguration', null);
-        }
-        console.log('loading project configuration');
-        this.$store.dispatch('getProjectConfiguration').then(response => {
-          const _c = response.configuration;
-          const labels = _c.labels;
-          if (labels) {
-            config.update(labels);
-          }
-          return this.$store.dispatch('setProjectConfiguration', _c);
-        });
-      });
-    },
-    reloadManagedProjects() {
-      return Vue.GoogleAuth.then(auth2 => {
-        if (auth2.isSignedIn.get() === false) {
-          console.log('Cannot reload managed projects, user not logged in');
-          return this.$store.dispatch('setManagedProjects', null);
-        }
-        console.log('loading managed projects');
-        return this.$store.dispatch('getManagedProjects').then(response => {
-          if (response.success) {
-            const managedProjects = response.projects;
-            if (config.projectId === null) {
-              if (managedProjects.length > 0) {
-                config.projectId = managedProjects[0];
-              }
-            }
-            return this.$store.dispatch('setManagedProjects', managedProjects);
-          }
-        });
-      });
     }
   }
 };
