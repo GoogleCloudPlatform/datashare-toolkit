@@ -61,13 +61,6 @@ export default {
       <b>Activation Status: ${this.activated}</b>`;
     }
   },
-  /*created() {
-    // Check if override for projectId is set
-    const p = this.$route.query.projectId;
-    if (p) {
-      config.projectId = p;
-    }
-  },*/
   mounted() {
     const token = this.getCookie('gmt') || this.$route.query.gmt;
     if (token) {

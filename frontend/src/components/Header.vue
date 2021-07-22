@@ -235,9 +235,7 @@ export default {
       _config.projectId = this.projectId;
       if (reload === true) {
         this.$router.go();
-      } /*else {
-        _config.reloadProjectConfiguration();
-      }*/
+      }
     }
   },
   computed: {
