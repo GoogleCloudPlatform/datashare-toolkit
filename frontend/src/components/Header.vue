@@ -232,11 +232,8 @@ export default {
       }
     },
     projectIdChanged(reload) {
-      // TODO: No need to re-set if the project id has not changed
       _config.projectId = this.projectId;
       if (reload === true) {
-        // TODO: Reload the configuration and
-        // TODO: Reload the current route page instead
         this.$router.go();
       } else {
         this.reloadConfiguration();
