@@ -60,7 +60,7 @@ class RuntimeConfig {
     that the current account has access to
      */
     async getManagedProjects() {
-        // Cache this list
+        // Check if maanged projects exists in cache first
         let list = dsCache.get(managedProjectsCacheKey);
         if (list == undefined) {
             const { Resource } = require('@google-cloud/resource-manager');
