@@ -259,7 +259,7 @@ async function startPubSubListener() {
  * Initializes PubSub listener for entitlement auto approvals
  */
 async function initializePubSubListener() {
-    let projectId = await runtimeConfig.getCurrentProjectId();
+    const projectId = await runtimeConfig.getCurrentProjectId();
     if (!projectId) {
         console.log('Could not identify project, will not start up subscription');
         return;

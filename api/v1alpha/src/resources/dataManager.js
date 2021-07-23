@@ -28,9 +28,9 @@ const runtimeConfig = require('../lib/runtimeConfig');
  */
 async function getConfiguration(projectId, token) {
     let dict = {};
-    let commerce = await runtimeConfig.marketplaceIntegration(projectId);
-    let dataProducer = await isDataProducer(token);
-    let currentProjectId = await runtimeConfig.getCurrentProjectId();
+    const commerce = await runtimeConfig.marketplaceIntegration(projectId);
+    const dataProducer = await isDataProducer(token);
+    const currentProjectId = await runtimeConfig.getCurrentProjectId();
     dict.apiProjectId = currentProjectId;
 
     // If projectId is null, default to the current projectId

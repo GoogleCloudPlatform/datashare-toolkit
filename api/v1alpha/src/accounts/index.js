@@ -636,7 +636,8 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
 // Temporary for development
 // Backwards compatibility for marketplace
 accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], async (req, res) => {
-    let projectId = req.params.projectId || runtimeConfig.projectId;
+    const currentProjectId = await runtimeConfig.getCurrentProjectId();
+    let projectId = req.params.projectId || currentProjectId;
 
     // Check if override for projectId is set
     const p = req.query.projectId;
@@ -677,7 +678,7 @@ accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], as
             if (p) {
                 projectId = p;
             } else {
-                projectId = runtimeConfig.projectId;
+                projectId = await runtimeConfig.getCurrentProjectId();
             }
             const token = req.body['x-gcp-marketplace-token'];
             console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
