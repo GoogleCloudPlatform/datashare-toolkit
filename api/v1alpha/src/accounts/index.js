@@ -653,11 +653,9 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
     console.log(`Data: ${JSON.stringify(data)}`);
 
     if (data && data.success === false) {
-        // TODO: Remove cookie logic
         res.clearCookie(cfg.gcpMarketplaceTokenCookieName);
         res.redirect(cfg.uiBaseUrl + '/activationError');
-    } else {        
-        // TODO: Remove cookie logic
+    } else {
         const uiHost = commonUtil.extractHostname(cfg.uiBaseUrl);
         res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: uiHost });
         res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}&projectId=${projectId}`);
@@ -685,12 +683,9 @@ accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], as
             console.log(`Data: ${JSON.stringify(data)}`);
 
             if (data && data.success === false) {
-                // TODO: Remove cookie logic
                 res.clearCookie(cfg.gcpMarketplaceTokenCookieName);
-                
                 res.redirect(cfg.uiBaseUrl + '/activationError');
             } else {
-                // TODO: Remove cookie logic
                 const uiHost = commonUtil.extractHostname(cfg.uiBaseUrl);
                 res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: uiHost });
                 res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}&projectId=${projectId}`);
