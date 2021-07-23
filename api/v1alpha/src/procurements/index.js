@@ -274,10 +274,10 @@ procurements.get(['/projects/:projectId/procurements:myProducts', '/procurements
     console.log(`Data: ${JSON.stringify(data)}`);
 
     if (data && data.success === false) {
-        res.redirect(cfg.uiBaseUrl + '/myProducts');
+        res.redirect(cfg.uiBaseUrl + `/myProducts?${projectId}`);
     } else {
         console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
-        res.redirect(cfg.uiBaseUrl + '/myProducts');
+        res.redirect(cfg.uiBaseUrl + `/myProducts?${projectId}`);
     }
 });
 
