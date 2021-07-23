@@ -62,6 +62,8 @@ export default {
     }
   },
   mounted() {
+    console.debug(`Cookie is: ${this.getCookie('gmt')}`);
+    console.debug(`Route is: ${this.$route.query.gmt}`);
     const token = this.getCookie('gmt') || this.$route.query.gmt;
     if (token) {
       this.jwtToken = token;
