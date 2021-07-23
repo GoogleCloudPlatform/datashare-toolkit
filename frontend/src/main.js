@@ -27,7 +27,7 @@ function getQueryVariable(variable) {
       return decodeURIComponent(pair[1]);
     }
   }
-  // console.log('Query variable %s not found', variable);
+  console.log('Query variable %s not found', variable);
 }
 
 // If a projectId override is set in a query variable, set it before
@@ -40,13 +40,13 @@ if (projectId) {
   config.projectId = projectId;
   let url = window.location.href.split('?')[0];
 
-  // Keep the gmt variable if exists
+  // Retain the gmt variable if exists
   const gmt = getQueryVariable('gmt');
   if (gmt) {
     url += `?${gmt}`;
-  } else {
-    window.location = url;
   }
+
+  window.location = url;
 }
 
 // Fetch and load the store settings
