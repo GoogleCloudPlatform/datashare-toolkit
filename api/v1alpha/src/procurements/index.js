@@ -206,32 +206,7 @@ procurements.post('/procurements/approve', async (req, res) => {
  *         description: Redirect to My Products URL
  */
 // Backwards compatibility for marketplace
-procurements.post(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], async (req, res) => {
-    const currentProjectId = await runtimeConfig.getCurrentProjectId();
-    let projectId = req.params.projectId || currentProjectId;
-
-    // Check if override for projectId is set
-    const p = req.query.projectId;
-    if (p) {
-        projectId = p;
-    }
-
-    const host = commonUtil.extractHostname(req.headers.host);
-
-    const token = req.body['x-gcp-marketplace-token'];
-    console.log(`Dashboard called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
-
-    const accountManager = require('../accounts/dataManager');
-    const data = await accountManager.register(host, token);
-    console.log(`Data: ${JSON.stringify(data)}`);
-
-    if (data && data.success === false) {
-        res.redirect(cfg.uiBaseUrl + `/myProducts?${projectId}`);
-    } else {
-        console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
-        res.redirect(cfg.uiBaseUrl + `/myProducts?${projectId}`);
-    }
-});
+procurements.post(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], productsRedirectionHandler);
 
 /**
  * @swagger
@@ -254,7 +229,13 @@ procurements.post(['/projects/:projectId/procurements:myProducts', '/procurement
  *         description: Redirect to My Products URL
  */
 // Backwards compatibility for marketplace
-procurements.get(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], async (req, res) => {
+procurements.get(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], productsRedirectionHandler);
+
+/**
+ * @param  {} req
+ * @param  {} res
+ */
+async function productsRedirectionHandler(req, res) {
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
     let projectId = req.params.projectId || currentProjectId;
 
@@ -264,21 +245,7 @@ procurements.get(['/projects/:projectId/procurements:myProducts', '/procurements
         projectId = p;
     }
 
-    const host = commonUtil.extractHostname(req.headers.host);
-
-    const token = req.query['x-gcp-marketplace-token'];
-    console.log(`Dashboard called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
-
-    const accountManager = require('../accounts/dataManager');
-    const data = await accountManager.register(host, token);
-    console.log(`Data: ${JSON.stringify(data)}`);
-
-    if (data && data.success === false) {
-        res.redirect(cfg.uiBaseUrl + `/myProducts?${projectId}`);
-    } else {
-        console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
-        res.redirect(cfg.uiBaseUrl + `/myProducts?${projectId}`);
-    }
-});
+    res.redirect(cfg.uiBaseUrl + `/myProducts?${projectId}`);
+}
 
 module.exports = procurements;
