@@ -12,36 +12,35 @@ spec:
         methods:
         - GET
         paths:
-        - /v1alpha/projects/$PROJECT_ID/datasets?*
-        - /v1alpha/projects/$PROJECT_ID/procurements
-        - /v1alpha/projects/$PROJECT_ID/procurements?*
-        - /v1alpha/projects/$PROJECT_ID/views
+        - /v1alpha/datasets?*
+        - /v1alpha/procurements
+        - /v1alpha/procurements?*
+        - /v1alpha/views
     - operation:
         methods:
         - POST
         paths:
-        - /v1alpha/projects/$PROJECT_ID/accounts:reset
-        - /v1alpha/projects/$PROJECT_ID/accounts:syncMarketplace
-        - /v1alpha/projects/$PROJECT_ID/admin:initSchema
-        - /v1alpha/projects/$PROJECT_ID/admin:syncResources
-        - /v1alpha/projects/$PROJECT_ID/auth:isDataProducer
-        - /v1alpha/projects/$PROJECT_ID/datasets
-        - /v1alpha/projects/$PROJECT_ID/procurements/approve
+        - /v1alpha/accounts:reset
+        - /v1alpha/accounts:syncMarketplace
+        - /v1alpha/admin:initSchema
+        - /v1alpha/admin:syncResources
+        - /v1alpha/datasets
+        - /v1alpha/procurements/approve
     - operation:
         methods:
         - GET
         - POST
         paths:
-        - /v1alpha/projects/$PROJECT_ID/accounts
-        - /v1alpha/projects/$PROJECT_ID/policies
+        - /v1alpha/accounts
+        - /v1alpha/policies
     - operation:
         methods:
         - GET
         - PUT
         - DELETE
         paths:
-        - /v1alpha/projects/$PROJECT_ID/accounts/*
-        - /v1alpha/projects/$PROJECT_ID/policies/*
+        - /v1alpha/accounts/*
+        - /v1alpha/policies/*
     - operation:
         methods:
         - GET
@@ -49,7 +48,7 @@ spec:
         - PUT
         - DELETE
         paths:
-        - /v1alpha/projects/$PROJECT_ID/datasets/*
+        - /v1alpha/datasets/*
     when:
     - key: request.auth.claims[email]
       values: [$DATA_PRODUCERS]

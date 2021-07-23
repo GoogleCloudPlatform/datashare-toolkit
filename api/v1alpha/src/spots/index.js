@@ -222,7 +222,7 @@ var spots = express.Router();
  *                   items:
  *                     $ref: '#/definitions/SpotOptions'
  */
-spots.get('/projects/:projectId/spots::custom', async(req, res) => {
+spots.get('/spots::custom', async(req, res) => {
     var data;
     const options = {
         includeAvailableValues: req.query.includeAvailableValues ? req.query.includeAvailableValues === "true" : false,
@@ -293,7 +293,7 @@ spots.get('/projects/:projectId/spots::custom', async(req, res) => {
  *                   items:
  *                     $ref: '#/definitions/SpotResponseSchema'
  */
-spots.post('/projects/:projectId/spots', validateManager.spotParams, async(req, res) => {
+spots.post('/spots', validateManager.spotParams, async(req, res) => {
     const options = {
         config: dataManager.getSpotConfig(),
         ... req.body
@@ -384,7 +384,7 @@ spots.post('/projects/:projectId/spots', validateManager.spotParams, async(req, 
  *                   items:
  *                     type: string
  */
-spots.get('/projects/:projectId/spots/:requestId', async(req, res) => {
+spots.get('/spots/:requestId', async(req, res) => {
     const requestId = req.params.requestId;
     const bucketName = req.query.bucketName;
     const fileName = req.query.fileName;

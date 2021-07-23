@@ -44,7 +44,11 @@ class StorageUtil {
     async createFile(bucketName, fileName, contents, options) {
         const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
-        await file.save(contents, options).catch((err) => {
+        let opt =  {};
+        if (options) {
+            opt = options;
+        }
+        await file.save(contents, opt).catch((err) => {
             console.warn(err.message);
             throw err;
         });

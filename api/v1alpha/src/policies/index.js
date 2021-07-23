@@ -134,8 +134,8 @@ var policies = express.Router();
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-policies.get('/projects/:projectId/policies', async(req, res) => {
-    const projectId = req.params.projectId;
+policies.get('/policies', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const data = await dataManager.listPolicies(projectId);
     var code;
     if (data && data.success === false) {
@@ -149,8 +149,8 @@ policies.get('/projects/:projectId/policies', async(req, res) => {
     });
 });
 
-policies.get('/projects/:projectId/products', async(req, res) => {
-    const projectId = req.params.projectId;
+policies.get('/products', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const email = req.header('x-gcp-account')
     const data = await dataManager.listUserPolicies(projectId, email);
     var code;
@@ -224,8 +224,8 @@ policies.get('/projects/:projectId/products', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-policies.post('/projects/:projectId/policies', async(req, res) => {
-    const projectId = req.params.projectId;
+policies.post('/policies', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     if (!req.body.name) {
         return res.status(400).json({
             success: false,
@@ -325,8 +325,8 @@ policies.post('/projects/:projectId/policies', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-policies.get('/projects/:projectId/policies/:policyId', async(req, res) => {
-    const projectId = req.params.projectId;
+policies.get('/policies/:policyId', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const policyId = req.params.policyId;
     const data = await dataManager.getPolicy(projectId, policyId);
     var code;
@@ -406,8 +406,8 @@ policies.get('/projects/:projectId/policies/:policyId', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-policies.put('/projects/:projectId/policies/:policyId', async(req, res) => {
-    const projectId = req.params.projectId;
+policies.put('/policies/:policyId', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const policyId = req.params.policyId;
     if (!req.body.name) {
         return res.status(400).json({
@@ -526,8 +526,8 @@ policies.put('/projects/:projectId/policies/:policyId', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-policies.delete('/projects/:projectId/policies/:policyId', async(req, res) => {
-    const projectId = req.params.projectId;
+policies.delete('/policies/:policyId', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const policyId = req.params.policyId;
     const values = {
         rowId: req.body.rowId,
@@ -594,8 +594,8 @@ policies.delete('/projects/:projectId/policies/:policyId', async(req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-policies.get('/projects/:projectId/accounts/:accountId/policies', async(req, res) => {
-    const projectId = req.params.projectId;
+policies.get('/accounts/:accountId/policies', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const accountId = req.params.accountId;
     const data = await dataManager.listPolicies(projectId, null, accountId);
     var code;
@@ -658,8 +658,8 @@ policies.get('/projects/:projectId/accounts/:accountId/policies', async(req, res
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-policies.get('/projects/:projectId/datasets/:datasetId/policies', async(req, res) => {
-    const projectId = req.params.projectId;
+policies.get('/datasets/:datasetId/policies', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const data = await dataManager.listPolicies(projectId, datasetId);
     var code;

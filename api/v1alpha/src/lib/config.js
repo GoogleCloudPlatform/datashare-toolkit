@@ -16,11 +16,17 @@
 
 'use strict';
 
+const { CommonUtil } = require('cds-shared');
+const commonUtil = CommonUtil;
+
 var config = {};
 
 config.verboseMode = false;
 config.productName = 'Datashare';
+
+// TODO: Update through CI
 config.productVersion = '0.0.1';
+
 config.cdsManagedLabelKey = 'datashare_managed';
 config.cdsMetadataLabelKey = 'datashare_metadata';
 config.cdsExclusionLabels = [config.cdsMetadataLabelKey];
@@ -50,23 +56,35 @@ config.cdsAuthorizedViewTableFields = new Set(['rowId', 'authorizedViewId', 'nam
 
 config.cdsAuthorizedViewViewId = "currentAuthorizedView";
 config.cdsAuthorizedViewViewFields = new Set(['rowId', 'authorizedViewId', 'name', 'description',
-    'datasetId', 'source', 'custom', 'accessControl', 'expiration', 'createdBy', 'createdAt', 'viewSql', 
+    'datasetId', 'source', 'custom', 'accessControl', 'expiration', 'createdBy', 'createdAt', 'viewSql',
     'version', 'isDeleted']);
 
 config.cdsCurrentUserPermissionViewId = "currentUserPermission";
 
 config.permissionsDiffProcedureId = "permissionsDiff";
 
-if (process.env.ADMIN_USERS) {
-    config.adminUsers = process.env.ADMIN_USERS.split(',') || [];
+if (process.env.DATA_PRODUCERS) {
+    config.dataProducers = process.env.DATA_PRODUCERS.split(',') || [];
 }
 
 config.procurementJwksUri = process.env.PROCUREMENT_JWKS_URI || 'https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com';
 config.procurementIssuer = process.env.PROCUREMENT_ISSUER || 'https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com';
 
 config.uiBaseUrl = process.env.UI_BASE_URL || 'http://localhost:8080';
+
+// Only to be consumed by runtimeConfig, do not use this directly from anywhere else
 config.projectId = process.env.PROJECT_ID;
 
 config.gcpMarketplaceTokenCookieName = 'gmt';
-config.marketplaceIntegration = process.env.MARKETPLACE_INTEGRATION === 'false' ? false : true;
+
+console.log(`MANAGED_PROJECTS: ${process.env.MANAGED_PROJECTS}`);
+if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_PROJECTS)) {
+    config.managedProjects = JSON.parse(process.env.MANAGED_PROJECTS);
+} else {
+    console.log('MANAGED_PROJECTS invalid or does not exist');
+}
+
+// TODO: Remove hardcoded for testing
+config.oauthClientId = process.env.OAUTH_CLIENT_ID;
+
 module.exports = config;

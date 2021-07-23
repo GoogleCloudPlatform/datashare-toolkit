@@ -62,7 +62,7 @@ export default {
     }
   },
   mounted() {
-    const token = this.getCookie('gmt') || this.$route.query.gmt;
+    const token = this.$route.query.gmt || this.getCookie('gmt');
     if (token) {
       this.jwtToken = token;
       sessionStorage.setItem('gmt', token);

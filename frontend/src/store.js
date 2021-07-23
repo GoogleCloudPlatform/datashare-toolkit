@@ -32,6 +32,12 @@ const store = new Vuex.Store({
   state: {
     user: {
       data: null
+    },
+    project: {
+      data: null
+    },
+    managedProjects: {
+      data: null
     }
   },
 
@@ -49,16 +55,32 @@ const store = new Vuex.Store({
       return false;
     },
     isDataProducer: state => {
-      if (state.user && state.user.data && state.user.data.isDataProducer) {
-        return state.user.data.isDataProducer === true;
+      if (
+        state.project &&
+        state.project.data &&
+        state.project.data.isDataProducer
+      ) {
+        return state.project.data.isDataProducer === true;
       }
       return false;
+    },
+    managedProjects: state => {
+      if (state.managedProjects && state.managedProjects.data) {
+        return state.managedProjects.data;
+      }
+      return [];
     }
   },
 
   mutations: {
     setUser(state, data) {
       state.user.data = data;
+    },
+    setProjectConfiguration(state, data) {
+      state.project.data = data;
+    },
+    setManagedProjects(state, data) {
+      state.managedProjects.data = data;
     }
   },
 
@@ -68,11 +90,24 @@ const store = new Vuex.Store({
         commit('setUser', {
           displayName: user.displayName,
           email: user.email,
-          photoURL: user.photoURL,
-          isDataProducer: user.isDataProducer
+          photoURL: user.photoURL
         });
       } else {
         commit('setUser', null);
+      }
+    },
+    setProjectConfiguration({ commit }, configuration) {
+      if (configuration) {
+        commit('setProjectConfiguration', configuration);
+      } else {
+        commit('setProjectConfiguration', null);
+      }
+    },
+    setManagedProjects({ commit }, data) {
+      if (data) {
+        commit('setManagedProjects', data);
+      } else {
+        commit('setManagedProjects', null);
       }
     },
     // eslint-disable-next-line no-unused-vars
@@ -300,6 +335,18 @@ const store = new Vuex.Store({
         .catch(error => {
           return false;
         });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getManagedProjects({ commit }, payload) {
+      return client.getManagedProjects().catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getProjectConfiguration({ commit }, payload) {
+      return client.getProjectConfiguration().catch(error => {
+        notify(error);
+      });
     }
   }
 });

@@ -23,6 +23,7 @@ const procurementManager = require("./../procurements/dataManager");
 const cfg = require('../lib/config');
 
 const { CommonUtil } = require('cds-shared');
+const runtimeConfig = require('../lib/runtimeConfig');
 const commonUtil = CommonUtil;
 
 /************************************************************
@@ -138,8 +139,8 @@ var accounts = express.Router();
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.get('/projects/:projectId/accounts', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.get('/accounts', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const data = await dataManager.listAccounts(projectId);
     var code;
     if (data && data.success === false) {
@@ -212,8 +213,8 @@ accounts.get('/projects/:projectId/accounts', async (req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.post('/projects/:projectId/accounts', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.post('/accounts', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     if (!req.body.email) {
         return res.status(400).json({
             success: false,
@@ -297,8 +298,8 @@ accounts.post('/projects/:projectId/accounts', async (req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.get('/projects/:projectId/accounts/:accountId', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.get('/accounts/:accountId', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const accountId = req.params.accountId;
     const data = await dataManager.getAccount(projectId, accountId);
     const success = data !== null;
@@ -380,8 +381,8 @@ accounts.get('/projects/:projectId/accounts/:accountId', async (req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.put('/projects/:projectId/accounts/:accountId', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.put('/accounts/:accountId', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const accountId = req.params.accountId;
     if (!req.body.email) {
         return res.status(400).json({
@@ -484,8 +485,8 @@ accounts.put('/projects/:projectId/accounts/:accountId', async (req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.delete('/projects/:projectId/accounts/:accountId', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.delete('/accounts/:accountId', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const accountId = req.params.accountId;
     const values = {
         rowId: req.body.rowId,
@@ -552,8 +553,8 @@ accounts.delete('/projects/:projectId/accounts/:accountId', async (req, res) => 
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.get('/projects/:projectId/policies/:policyId/accounts', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.get('/policies/:policyId/accounts', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const policyId = req.params.policyId;
     const data = await dataManager.listAccounts(projectId, null, policyId);
     var code;
@@ -616,8 +617,8 @@ accounts.get('/projects/:projectId/policies/:policyId/accounts', async (req, res
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-accounts.get('/projects/:projectId/datasets/:datasetId/accounts', async (req, res) => {
-    const projectId = req.params.projectId;
+accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const data = await dataManager.listAccounts(projectId, datasetId);
     var code;
@@ -633,43 +634,61 @@ accounts.get('/projects/:projectId/datasets/:datasetId/accounts', async (req, re
 });
 
 // Temporary for development
-accounts.get('/projects/:projectId/accounts:register', async (req, res) => {
-    const projectId = req.params.projectId;
+// Backwards compatibility for marketplace
+accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], async (req, res) => {
+    const currentProjectId = await runtimeConfig.getCurrentProjectId();
+    let projectId = req.params.projectId || currentProjectId;
+
+    // Check if override for projectId is set
+    const p = req.query.projectId;
+    if (p) {
+        projectId = p;
+    }
+
     const token = req.query['x-gcp-marketplace-token'];
     console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
     const host = commonUtil.extractHostname(req.headers.host);
-    const data = await dataManager.register(projectId, host, token);
+    const data = await dataManager.register(host, token);
     console.log(`Data: ${JSON.stringify(data)}`);
 
     if (data && data.success === false) {
         res.clearCookie(cfg.gcpMarketplaceTokenCookieName);
         res.redirect(cfg.uiBaseUrl + '/activationError');
     } else {
-        const host = commonUtil.extractHostname(req.headers.host);
-        res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: host });
-        res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
+        const uiHost = commonUtil.extractHostname(cfg.uiBaseUrl);
+        res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: uiHost });
+        res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}&projectId=${projectId}`);
     }
 });
 
-accounts.post('/projects/:projectId/accounts::custom', async (req, res) => {
-    const projectId = req.params.projectId;
+// Backwards compatibility for marketplace
+accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], async (req, res) => {
+    let projectId = req.params.projectId || req.header('x-gcp-project-id');
     const host = commonUtil.extractHostname(req.headers.host);
+    console.log(`Host is: ${host}`);
     switch (req.params.custom) {
         case "register": {
+            // Check if override for projectId is set
+            const p = req.query.projectId;
+            if (p) {
+                projectId = p;
+            } else {
+                projectId = await runtimeConfig.getCurrentProjectId();
+            }
             const token = req.body['x-gcp-marketplace-token'];
             console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
-            const data = await dataManager.register(projectId, host, token);
+            const data = await dataManager.register(host, token);
             console.log(`Data: ${JSON.stringify(data)}`);
 
             if (data && data.success === false) {
                 res.clearCookie(cfg.gcpMarketplaceTokenCookieName);
                 res.redirect(cfg.uiBaseUrl + '/activationError');
             } else {
-                console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
-                res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: host });
-                res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}`);
+                const uiHost = commonUtil.extractHostname(cfg.uiBaseUrl);
+                res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: uiHost });
+                res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}&projectId=${projectId}`);
             }
             break;
         }

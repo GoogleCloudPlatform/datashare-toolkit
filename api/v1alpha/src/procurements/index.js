@@ -21,6 +21,7 @@ const dataManager = require("./dataManager");
 const { CommonUtil } = require('cds-shared');
 const commonUtil = CommonUtil;
 const cfg = require('../lib/config');
+const runtimeConfig = require('../lib/runtimeConfig');
 
 /************************************************************
   API Endpoints
@@ -109,8 +110,8 @@ var procurements = express.Router();
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-procurements.get('/projects/:projectId/procurements', async (req, res) => {
-    const projectId = req.params.projectId;
+procurements.get('/procurements', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     let stateFilter = null;
     if (req.query.stateFilter) {
         stateFilter = req.query.stateFilter.split(',');
@@ -166,8 +167,8 @@ procurements.get('/projects/:projectId/procurements', async (req, res) => {
  *             schema:
  *               $ref: '#/definitions/Error'
  */
-procurements.post('/projects/:projectId/procurements/approve', async (req, res) => {
-    const projectId = req.params.projectId;
+procurements.post('/procurements/approve', async (req, res) => {
+    const projectId = req.header('x-gcp-project-id');
     const name = req.body.name;
     const status = req.body.status;
     const reason = req.body.reason;
@@ -204,24 +205,8 @@ procurements.post('/projects/:projectId/procurements/approve', async (req, res) 
  *       301:
  *         description: Redirect to My Products URL
  */
-procurements.post('/projects/:projectId/procurements:myProducts', async (req, res) => {
-    const projectId = req.params.projectId;
-    const host = commonUtil.extractHostname(req.headers.host);
-
-    const token = req.body['x-gcp-marketplace-token'];
-    console.log(`Dashboard called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
-
-    const accountManager = require('../accounts/dataManager');
-    const data = await accountManager.register(projectId, host, token);
-    console.log(`Data: ${JSON.stringify(data)}`);
-
-    if (data && data.success === false) {
-        res.redirect(cfg.uiBaseUrl + '/myProducts');
-    } else {
-        console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
-        res.redirect(cfg.uiBaseUrl + '/myProducts');
-    }
-});
+// Backwards compatibility for marketplace
+procurements.post(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], productsRedirectionHandler);
 
 /**
  * @swagger
@@ -243,23 +228,24 @@ procurements.post('/projects/:projectId/procurements:myProducts', async (req, re
  *       301:
  *         description: Redirect to My Products URL
  */
-procurements.get('/projects/:projectId/procurements:myProducts', async (req, res) => {
-    const projectId = req.params.projectId;
-    const host = commonUtil.extractHostname(req.headers.host);
+// Backwards compatibility for marketplace
+procurements.get(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], productsRedirectionHandler);
 
-    const token = req.query['x-gcp-marketplace-token'];
-    console.log(`Dashboard called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
+/**
+ * @param  {} req
+ * @param  {} res
+ */
+async function productsRedirectionHandler(req, res) {
+    const currentProjectId = await runtimeConfig.getCurrentProjectId();
+    let projectId = req.params.projectId || currentProjectId;
 
-    const accountManager = require('../accounts/dataManager');
-    const data = await accountManager.register(projectId, host, token);
-    console.log(`Data: ${JSON.stringify(data)}`);
-
-    if (data && data.success === false) {
-        res.redirect(cfg.uiBaseUrl + '/myProducts');
-    } else {
-        console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
-        res.redirect(cfg.uiBaseUrl + '/myProducts');
+    // Check if override for projectId is set
+    const p = req.query.projectId;
+    if (p) {
+        projectId = p;
     }
-});
+
+    res.redirect(cfg.uiBaseUrl + `/myProducts?${projectId}`);
+}
 
 module.exports = procurements;

@@ -15,13 +15,28 @@
  */
 
 'use strict';
-const underscore = require('underscore');
+import Vue from 'vue';
+import store from './store';
 
 class Config {
+  /**
+   * @param  {} config
+  Used to initialize the config
+   */
   initialize(config) {
     this.config = config;
     if (!this.config) {
       this.config = {};
+    }
+  }
+
+  /**
+   * @param  {} source
+  Used to update config using the runtime source.
+   */
+  update(source) {
+    if (this.config && source) {
+      this.config = Object.assign(this.config, source);
     }
   }
 
@@ -60,8 +75,37 @@ class Config {
     return this.getConfigValue('VUE_APP_API_BASE_URL');
   }
 
+  /**
+   * @param  {} p
+  Set the sessionStorage projectId, and the localStorage projectId. The localStorage item is used for getting the last selected projectId when opening a new session/window/tab
+   */
+  set projectId(p) {
+    console.debug(`projectId set to: ${p}`);
+    sessionStorage.setItem('projectId', p);
+    localStorage.setItem('projectId', p);
+  }
+
+  /**
+  Get the session projectId if exists, then get the local projectId if exists, otherwise get the config projectId.
+   */
   get projectId() {
-    return this.getConfigValue('VUE_APP_PROJECT_ID');
+    const session = sessionStorage.getItem('projectId');
+    const local = localStorage.getItem('projectId');
+    if (session) {
+      return session;
+    } else if (local) {
+      return local;
+    } else {
+      console.debug('unknown projectId');
+      return null;
+    }
+  }
+
+  get apiProjectId() {
+    if (!store.state.project || !store.state.project.data) {
+      return false;
+    }
+    return store.state.project.data.apiProjectId;
   }
 
   get googleAppClientId() {
@@ -90,7 +134,10 @@ class Config {
   }
 
   get marketplaceIntegrationEnabled() {
-    const m = this.getConfigValue('VUE_APP_MARKETPLACE_INTEGRATION', false);
+    if (!store.state.project || !store.state.project.data) {
+      return false;
+    }
+    const m = store.state.project.data.isMarketplaceEnabled;
     if (m === undefined) {
       return true;
     } else {
@@ -99,12 +146,59 @@ class Config {
   }
 
   get userGuideUrl() {
-    return this.getConfigValue('VUE_APP_USER_GUIDE_URL', false);
+    return 'https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/frontend/README.md';
   }
 
   get githubUrl() {
-    return this.getConfigValue('VUE_APP_GITHUB_URL', false);
+    return 'https://github.com/GoogleCloudPlatform/datashare-toolkit';
+  }
+
+  async reloadAllProjectConfigData() {
+    return this.reloadManagedProjects().then(() => {
+      return this.reloadProjectConfiguration();
+    });
+  }
+
+  async reloadProjectConfiguration() {
+    return Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get() === false) {
+        console.debug('cannot reload configuration, user not logged in');
+        return store.dispatch('setProjectConfiguration', null);
+      }
+      console.debug('loading project configuration');
+      return store.dispatch('getProjectConfiguration').then(response => {
+        console.debug(`project configuration: ${JSON.stringify(response)}`);
+        const _c = response.configuration;
+        const labels = _c.labels;
+        if (labels) {
+          this.update(labels);
+        }
+        return store.dispatch('setProjectConfiguration', _c);
+      });
+    });
+  }
+
+  async reloadManagedProjects() {
+    return Vue.GoogleAuth.then(auth2 => {
+      if (auth2.isSignedIn.get() === false) {
+        console.debug('cannot reload managed projects, user not logged in');
+        return store.dispatch('setManagedProjects', null);
+      }
+      console.debug('loading managed projects');
+      return store.dispatch('getManagedProjects').then(response => {
+        console.debug(`managed projects: ${JSON.stringify(response)}`);
+        if (response.success) {
+          const managedProjects = response.projects;
+          if (this.projectId === null) {
+            if (managedProjects.length > 0) {
+              this.projectId = managedProjects[0];
+            }
+          }
+          return store.dispatch('setManagedProjects', managedProjects);
+        }
+      });
+    });
   }
 }
 
-module.exports = new Config();
+export default new Config();

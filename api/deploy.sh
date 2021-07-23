@@ -35,7 +35,7 @@ if [[ -z "${OAUTH_CLIENT_ID:=}" ]]; then
 fi
 
 if [[ -z "${DATA_PRODUCERS:=}" ]]; then
-    export DATA_PRODUCERS='"*@google.com"';
+    export DATA_PRODUCERS="*@google.com";
     echo "Defaulted DATA_PRODUCERS to '${DATA_PRODUCERS}'";
 fi
 
@@ -57,12 +57,26 @@ gcloud run deploy ds-api \
   --cluster $CLUSTER \
   --cluster-location $ZONE \
   --min-instances 1 \
+  --max-instances 10 \
   --namespace $NAMESPACE \
   --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
   --platform gke \
   --service-account ${SERVICE_ACCOUNT_NAME} \
-  --update-env-vars=PROJECT_ID="${PROJECT_ID}" \
+  --update-env-vars=OAUTH_CLIENT_ID="${OAUTH_CLIENT_ID}",DATA_PRODUCERS="${DATA_PRODUCERS}" \
+  --remove-env-vars=PROJECT_ID,MARKETPLACE_INTEGRATION \
   --no-use-http2
+
+if ! gcloud run services describe ds-api --cluster $CLUSTER --cluster-location $ZONE --namespace $NAMESPACE --platform gke | grep -q MANAGED_PROJECTS; then
+    echo "MANAGED_PROJECTS env variable not found, creating it"
+    MANAGED_PROJECTS='{ "'${PROJECT_ID}'": { "MARKETPLACE_INTEGRATION_ENABLED": false, "labels": { "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT": "", "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT": "", "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL": "" } } }'
+    echo ${MANAGED_PROJECTS}
+    gcloud run services update ds-api \
+        --platform gke \
+        --namespace $NAMESPACE \
+        --cluster $CLUSTER \
+        --cluster-location $ZONE \
+        --update-env-vars=^---^MANAGED_PROJECTS="${MANAGED_PROJECTS}"
+fi
 
 gcloud run services update-traffic ds-api \
     --cluster $CLUSTER \
@@ -73,6 +87,14 @@ gcloud run services update-traffic ds-api \
 
 gcloud container clusters get-credentials $CLUSTER
 kubectl config current-context
+
+# If '*' wildcard is used in the data producers, quote the full string as needed for YAML/applying the policy
+# https://stackoverflow.com/questions/19109912/yaml-do-i-need-quotes-for-strings-in-yaml
+if [[ ${DATA_PRODUCERS} == *"*"* ]]; then
+  echo "* found adding quotes"
+  export DATA_PRODUCERS='"'${DATA_PRODUCERS}'"'
+  echo ${DATA_PRODUCERS}
+fi
 
 # cat istio-manifests/1.4/authn/* | envsubst | kubectl delete -f -
 kubectl get policy.authentication.istio.io -n "$NAMESPACE"

@@ -19,9 +19,11 @@
 const { BigQueryUtil, PubSubUtil } = require('cds-shared');
 const underscore = require("underscore");
 const cfg = require('../lib/config');
+const runtimeConfig = require('../lib/runtimeConfig');
 const metaManager = require('../lib/metaManager');
 const datasetManager = require('../datasets/dataManager');
 const procurementManager = require('../procurements/dataManager');
+const resourceManager = require('../resources/dataManager');
 const fs = require('fs');
 const retry = require('async-retry');
 
@@ -59,12 +61,12 @@ async function syncResources(projectId, type) {
             views = true;
         } else if (type === 'MARKETPLACE') {
             console.log('Sync marketplace entitlements called');
-            marketplace = cfg.marketplaceIntegration;
+            marketplace = await runtimeConfig.marketplaceIntegration(projectId);
         } else if (type === 'ALL') {
             console.log('Sync all called');
             permissions = true;
             views = true;
-            marketplace = cfg.marketplaceIntegration;
+            marketplace = await runtimeConfig.marketplaceIntegration(projectId);
         }
 
         const labelKey = cfg.cdsManagedLabelKey;
@@ -257,28 +259,17 @@ async function startPubSubListener() {
  * Initializes PubSub listener for entitlement auto approvals
  */
 async function initializePubSubListener() {
-    if (cfg.marketplaceIntegration === false) {
+    const projectId = await runtimeConfig.getCurrentProjectId();
+    if (!projectId) {
+        console.log('Could not identify project, will not start up subscription');
+        return;
+    }
+
+    if (await runtimeConfig.marketplaceIntegration(projectId) === false) {
         console.log('Marketplace integration is disabled, PubSub listener will not be started');
         return;
     } else {
         console.log(`Initializing PubSub listener`);
-    }
-
-    let projectId = cfg.projectId;
-    if (!projectId) {
-        // If projectId is not available, attempt fallback using gcp-metadata
-        // https://github.com/googleapis/gcp-metadata
-        // https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata
-        const gcpMetadata = require('gcp-metadata');
-        const isAvailable = await gcpMetadata.isAvailable();
-        if (isAvailable === true) {
-            console.log('gcpMetadata is available, getting projectId');
-            projectId = await gcpMetadata.project('project-id');
-            console.log(`Project Id of running instance: ${projectId}`); // ...Project ID of the running instance
-        } else {
-            console.log('Could not identify project, will not start up subscription');
-            return;
-        }
     }
 
     const topicName = `projects/cloudcommerceproc-prod/topics/${projectId}`;

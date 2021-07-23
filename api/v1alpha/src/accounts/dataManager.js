@@ -20,6 +20,7 @@ const { BigQueryUtil, CommerceProcurementUtil } = require('cds-shared');
 const uuidv4 = require('uuid/v4');
 
 const cfg = require('../lib/config');
+const runtimeConfig = require('../lib/runtimeConfig');
 const metaManager = require('../lib/metaManager');
 
 const underscore = require("underscore");
@@ -199,7 +200,7 @@ async function checkProcurementEntitlement(projectId, account) {
  */
 async function checkProcurementEntitlements(projectId, accounts, accountFilter) {
     // Check if marketplace integration is enabled before making procurement calls.
-    if (cfg.marketplaceIntegration === false) {
+    if (await runtimeConfig.marketplaceIntegration(projectId) === false) {
         return accounts;
     }
 
@@ -512,11 +513,10 @@ async function deleteAccount(projectId, accountId, data) {
 }
 
 /**
- * @param  {} projectId
  * @param  {} host
  * @param  {} token
  */
-async function register(projectId, host, token) {
+async function register(host, token) {
     // https://cloud.google.com/marketplace/docs/partners/integrated-saas/frontend-integration#verify-jwt
     const jwt = require('jsonwebtoken');
 
@@ -587,7 +587,7 @@ async function activate(projectId, host, token, reason, email) {
     try {
         console.log(`Activate called for token: ${token} for email: ${email}`);
         const procurementUtil = new CommerceProcurementUtil(projectId);
-        const registration = await register(projectId, host, token);
+        const registration = await register(host, token);
         console.log(`registration: ${JSON.stringify(registration)}`);
         if (registration.success === true) {
             console.log('Registration success');

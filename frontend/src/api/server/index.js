@@ -16,20 +16,33 @@ const validContentTypes = [
   'application/json; charset=utf-8'
 ];
 
-axios.interceptors.request.use(async function(config) {
+axios.interceptors.request.use(async function(reqConfig) {
+  const projectId = config.projectId;
+  if (projectId) {
+    const managedProjects = store.getters.managedProjects;
+    if (
+      managedProjects &&
+      managedProjects.length > 0 &&
+      !managedProjects.includes(projectId)
+    ) {
+      console.error(`Invalid project called: ${projectId}`);
+      return Promise.reject(`Invalid projectId: ${projectId}`);
+    }
+    reqConfig.headers['x-gcp-project-id'] = projectId;
+  }
   if (store.getters.isLoggedIn) {
     const account = store.state.user.data.email;
     if (account) {
-      config.headers['x-gcp-account'] = account;
+      reqConfig.headers['x-gcp-account'] = account;
     }
     const googleUser = await Vue.GoogleAuth.then(auth2 => {
       return auth2.currentUser.get();
     });
     const token = googleUser.getAuthResponse().id_token;
-    config.headers.Authorization = `Bearer ${token}`;
-    return config;
+    reqConfig.headers.Authorization = `Bearer ${token}`;
+    return reqConfig;
   } else {
-    return config;
+    return reqConfig;
   }
 });
 
@@ -59,7 +72,7 @@ axios.interceptors.response.use(
 
 export default {
   _apiBaseUrl() {
-    return config.apiBaseUrl + '/projects/' + config.projectId;
+    return config.apiBaseUrl;
   },
   getDatasets(includeAll) {
     let queryAll = false;
@@ -295,6 +308,16 @@ export default {
   isDataProducer() {
     return axios
       .post(this._apiBaseUrl() + '/auth:isDataProducer')
+      .then(response => response);
+  },
+  getManagedProjects() {
+    return axios
+      .get(this._apiBaseUrl() + '/resources/projects')
+      .then(response => response);
+  },
+  getProjectConfiguration() {
+    return axios
+      .get(this._apiBaseUrl() + '/resources/configuration')
       .then(response => response);
   }
 };

@@ -1,11 +1,4 @@
 {
   "VUE_APP_API_BASE_URL": "http://localhost:5555/v1alpha",
-  "VUE_APP_PROJECT_ID": "",
-  "VUE_APP_GOOGLE_APP_CLIENT_ID": "",
-  "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT": "",
-  "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT": "",
-  "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL": "",
-  "VUE_APP_MARKETPLACE_INTEGRATION": true,
-  "VUE_APP_USER_GUIDE_URL": "https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/frontend/README.md",
-  "VUE_APP_GITHUB_URL": "https://github.com/GoogleCloudPlatform/datashare-toolkit"
+  "VUE_APP_GOOGLE_APP_CLIENT_ID": ""
 }

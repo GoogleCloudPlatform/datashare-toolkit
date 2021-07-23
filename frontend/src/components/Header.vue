@@ -54,10 +54,31 @@
         <span>Navigation menu</span>
       </v-tooltip>
       <v-toolbar-title>{{ toolbar.title }}</v-toolbar-title>
+      <v-spacer v-if="!projectSelectorEnabled"></v-spacer>
+      <v-divider
+        class="mx-4"
+        inset
+        vertical
+        v-if="projectSelectorEnabled"
+      ></v-divider>
+      <v-select
+        v-if="projectSelectorEnabled"
+        class="mt-7"
+        dense
+        style="maxWidth: 200px;"
+        :readonly="!projectSelectorChangeable"
+        v-model="projectId"
+        :items="managedProjects"
+        label="GCP Project ID"
+        required
+        @change="projectIdChanged(true)"
+        :loading="loading"
+      ></v-select>
       <v-spacer></v-spacer>
       <v-avatar :tile="true" height="25" width="25">
         <img :src="require('@/assets/datashare-alpha-24px.svg')" alt="logo" />
       </v-avatar>
+      <v-spacer></v-spacer>
       <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
@@ -169,8 +190,27 @@ export default {
     toolbar: {
       title: 'Datashare'
     },
-    params: {}
+    params: {},
+    projectId: null,
+    loading: false
   }),
+  created() {
+    this.loading = true;
+    // Loads the managed project list. If the user isn't signed in, the list will initially return as empty.
+    // Once the user signs in, the onAuthSuccess function will load this list.
+    _config.reloadManagedProjects().then(result => {
+      if (_config.projectId === null) {
+        if (this.managedProjects.length > 0) {
+          this.projectId = this.managedProjects[0];
+          this.projectIdChanged(false);
+        }
+      } else {
+        this.projectId = _config.projectId;
+        this.projectIdChanged(false);
+      }
+      this.loading = false;
+    });
+  },
   methods: {
     canAccessRoute(navItem) {
       let routes = this.$router.options.routes;
@@ -190,6 +230,12 @@ export default {
       } else {
         return true;
       }
+    },
+    projectIdChanged(reload) {
+      _config.projectId = this.projectId;
+      if (reload === true) {
+        this.$router.go();
+      }
     }
   },
   computed: {
@@ -197,10 +243,22 @@ export default {
     ...mapGetters({
       user: 'user',
       isLoggedIn: 'isLoggedIn',
-      isDataProducer: 'isDataProducer'
+      isDataProducer: 'isDataProducer',
+      managedProjects: 'managedProjects'
     }),
     config() {
       return _config;
+    },
+    projectSelectorEnabled() {
+      if (this.isLoggedIn === false) {
+        return false;
+      } else if (this.managedProjects) {
+        return this.managedProjects.length > 1;
+      }
+      return false;
+    },
+    projectSelectorChangeable() {
+      return this.projectSelectorEnabled && this.isDataProducer;
     },
     navigationItems() {
       let items = [
