@@ -38,7 +38,15 @@ function getQueryVariable(variable) {
 const projectId = getQueryVariable('projectId');
 if (projectId) {
   config.projectId = projectId;
-  window.location = window.location.href.split('?')[0];
+  let url = window.location.href.split('?')[0];
+
+  // Keep the gmt variable if exists
+  const gmt = getQueryVariable('gmt');
+  if (gmt) {
+    url += `?${gmt}`;
+  } else {
+    window.location = url;
+  }
 }
 
 // Fetch and load the store settings

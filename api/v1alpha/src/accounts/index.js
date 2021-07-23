@@ -671,6 +671,7 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
 accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], async (req, res) => {
     let projectId = req.params.projectId || req.header('x-gcp-project-id');
     const host = commonUtil.extractHostname(req.headers.host);
+    console.log(`Host is: ${host}`);
     switch (req.params.custom) {
         case "register": {
             // Check if override for projectId is set
@@ -692,9 +693,11 @@ accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], as
                 
                 res.redirect(cfg.uiBaseUrl + '/activationError');
             } else {
+                const uiHost = commonUtil.extractHostname(cfg.uiBaseUrl);
+
                 // TODO: Remove cookie logic
                 console.log(`Writing out cookie with token: ${token} for domain: ${host}`);
-                res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: host });
+                res.cookie(cfg.gcpMarketplaceTokenCookieName, token, { secure: host == 'localhost' ? false : true, expires: 0, domain: uiHost });
 
                 res.redirect(cfg.uiBaseUrl + `/activation?gmt=${token}&projectId=${projectId}`);
             }
