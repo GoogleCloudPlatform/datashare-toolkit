@@ -27,7 +27,7 @@ function getQueryVariable(variable) {
       return decodeURIComponent(pair[1]);
     }
   }
-  console.log('Query variable %s not found', variable);
+  // console.log('Query variable %s not found', variable);
 }
 
 // If a projectId override is set in a query variable, set it before
