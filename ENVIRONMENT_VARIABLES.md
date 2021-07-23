@@ -15,7 +15,7 @@ After changing environmental variables, you may have to re-apply the ISTIO polic
 | DATA_PRODUCERS | Yes | Users that should have administrative access to the Datashare UI. This value needs to remain in sync with the same value applied to the ISTIO policies. It should not be updated manually. | *@google.com |
 | OAUTH_CLIENT_ID | Yes | The OAuth Client Id. | 8xxxxxxxxxx-xxxxxxxxxxx.apps.googleusercontent.com |
 | PROJECT_ID | Yes | The deployed to GCP projectId | cds-demo-2e |
-| UI_BASE_URL | Yes | The base url for the ui. | https://datashare-demo-2e.fsi.joonix.net |
+| UI_BASE_URL | Yes (If marketplace integration is enabled) | The base url for the ui. | https://datashare-demo-2e.fsi.joonix.net |
 
 # Next
 [Apply ISTIO Policies](./APPLY_ISTIO_POLICIES.md)
