@@ -43,7 +43,7 @@ if (projectId) {
   // Retain the gmt variable if exists
   const gmt = getQueryVariable('gmt');
   if (gmt) {
-    url += `?${gmt}`;
+    url += `?gmt=${gmt}`;
   }
 
   window.location = url;
