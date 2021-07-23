@@ -222,7 +222,7 @@ procurements.post(['/projects/:projectId/procurements:myProducts', '/procurement
     console.log(`Dashboard called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
     const accountManager = require('../accounts/dataManager');
-    const data = await accountManager.register(projectId, host, token);
+    const data = await accountManager.register(host, token);
     console.log(`Data: ${JSON.stringify(data)}`);
 
     if (data && data.success === false) {
@@ -270,7 +270,7 @@ procurements.get(['/projects/:projectId/procurements:myProducts', '/procurements
     console.log(`Dashboard called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
     const accountManager = require('../accounts/dataManager');
-    const data = await accountManager.register(projectId, host, token);
+    const data = await accountManager.register(host, token);
     console.log(`Data: ${JSON.stringify(data)}`);
 
     if (data && data.success === false) {

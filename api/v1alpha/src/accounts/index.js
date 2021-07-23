@@ -649,7 +649,7 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
     console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
     const host = commonUtil.extractHostname(req.headers.host);
-    const data = await dataManager.register(projectId, host, token);
+    const data = await dataManager.register(host, token);
     console.log(`Data: ${JSON.stringify(data)}`);
 
     if (data && data.success === false) {
@@ -683,7 +683,7 @@ accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], as
             const token = req.body['x-gcp-marketplace-token'];
             console.log(`Register called for project ${projectId}, x-gcp-marketplace-token: ${token}, body: ${JSON.stringify(req.body)}`);
 
-            const data = await dataManager.register(projectId, host, token);
+            const data = await dataManager.register(host, token);
             console.log(`Data: ${JSON.stringify(data)}`);
 
             if (data && data.success === false) {
