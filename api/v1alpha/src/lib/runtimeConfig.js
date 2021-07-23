@@ -49,8 +49,10 @@ class RuntimeConfig {
                 console.log('Using projectId from env variable');
             }
 
-            // Set projectId to cache indefinitely
-            dsCache.set(projectIdCacheKey, projectId);
+            if (projectId) {
+                // Set projectId to cache indefinitely
+                dsCache.set(projectIdCacheKey, projectId);
+            }
         }
         return projectId;
     }
