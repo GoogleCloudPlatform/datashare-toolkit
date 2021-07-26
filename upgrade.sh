@@ -28,6 +28,7 @@ function finish {
 trap finish EXIT
 
 CUSTOM_ROLE_NAME=custom.ds.api.mgr;
+export MARKETPLACE_INTEGRATION_ENABLED=false;
 
 for i in "$@"; do
     case $i in
@@ -57,6 +58,10 @@ for i in "$@"; do
         ;;
     --tag=*)
         export TAG="${i#*=}"
+        shift # past argument=value
+        ;;
+    --marketplace-enabled=*)
+        export MARKETPLACE_INTEGRATION_ENABLED=true
         shift # past argument=value
         ;;
     *)

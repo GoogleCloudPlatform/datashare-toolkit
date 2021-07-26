@@ -107,14 +107,12 @@ kubectl get authorizationpolicy.security.istio.io -n "$NAMESPACE"
 kubectl delete authorizationpolicy.security.istio.io -n "$NAMESPACE" --all
 cat istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
 
-# TODO: Check for marketplace install flag
-gcloud run deploy "ds-listener-${PROJECT_ID}" \
-  --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
-  --region=${REGION} \
-  --platform managed \
-  --max-instances 1 \
-  --service-account ${SERVICE_ACCOUNT_NAME} \
-  --no-allow-unauthenticated
-
-# TODO: Otherwise delete?
-# gcloud run services delete
+if [[ ${MARKETPLACE_INTEGRATION_ENABLED} == "true"]]; then
+    gcloud run deploy "ds-listener-${PROJECT_ID}" \
+        --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
+        --region=${REGION} \
+        --platform managed \
+        --max-instances 1 \
+        --service-account ${SERVICE_ACCOUNT_NAME} \
+        --no-allow-unauthenticated
+fi
