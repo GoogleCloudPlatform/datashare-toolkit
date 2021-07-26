@@ -27,7 +27,7 @@ const app = express();
 /************************************************************
   Start server
  ************************************************************/
-  app.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log("Listening on port " + PORT + ". Press Ctrl+C to quit.");
 });
 
