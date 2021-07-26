@@ -115,3 +115,6 @@ gcloud run deploy "ds-listener-${PROJECT_ID}" \
   --max-instances 1 \
   --service-account ${SERVICE_ACCOUNT_NAME} \
   --no-allow-unauthenticated
+
+# TODO: Otherwise delete?
+# gcloud run services delete
