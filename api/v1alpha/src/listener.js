@@ -16,7 +16,19 @@
 
 'use strict';
 
+const express = require('express');
+const PORT = process.env.PORT || 5555;
 const adminMgr = require('./admin/dataManager');
+
 adminMgr.startPubSubListener();
 
-module.exports = adminMgr;
+const app = express();
+
+/************************************************************
+  Start server
+ ************************************************************/
+  app.listen(PORT, () => {
+    console.log("Listening on port " + PORT + ". Press Ctrl+C to quit.");
+});
+
+module.exports = app;

@@ -112,4 +112,5 @@ gcloud run deploy "ds-listener-${PROJECT_ID}" \
   --region=${REGION} \
   --platform managed \
   --max-instances 1 \
-  --service-account ${SERVICE_ACCOUNT_NAME}
+  --service-account ${SERVICE_ACCOUNT_NAME} \
+  --no-allow-unauthenticated
