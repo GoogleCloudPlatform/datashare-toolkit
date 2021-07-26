@@ -265,7 +265,8 @@ async function initializePubSubListener() {
         return;
     }
 
-    if (await runtimeConfig.marketplaceIntegration(projectId) === false) {
+    // TODO: If the service is enabled, we should just assume marketplace integration is enabled?
+    if (await runtimeConfig.commerceEnabled(projectId) === false) {
         console.log('Marketplace integration is disabled, PubSub listener will not be started');
         return;
     } else {
