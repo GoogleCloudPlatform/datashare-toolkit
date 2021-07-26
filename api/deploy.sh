@@ -44,7 +44,8 @@ cd "$(dirname "$0")"
 
 # Up to root
 cd ../
-gcloud builds submit --config api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
+gcloud builds submit --config api/v1alpha/api-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
+gcloud builds submit --config api/v1alpha/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 # Move to v1alpha
 cd api/v1alpha
@@ -105,3 +106,10 @@ cat istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -
 kubectl get authorizationpolicy.security.istio.io -n "$NAMESPACE"
 kubectl delete authorizationpolicy.security.istio.io -n "$NAMESPACE" --all
 cat istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
+
+gcloud run deploy "ds-listener-${PROJECT_ID}" \
+  --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
+  --region=${REGION} \
+  --platform managed \
+  --max-instances 1 \
+  --service-account ${SERVICE_ACCOUNT_NAME}

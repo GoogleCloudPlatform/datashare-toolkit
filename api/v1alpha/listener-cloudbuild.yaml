@@ -1,0 +1,9 @@
+steps:
+- name: "gcr.io/cloud-builders/docker"
+  args:
+  - build
+  - "--tag=gcr.io/$PROJECT_ID/ds-listener:$TAG_NAME"
+  - "--file=./api/v1alpha/Dockerfile.listener"
+  - .
+images:
+  - "gcr.io/$PROJECT_ID/ds-listener:$TAG_NAME"
