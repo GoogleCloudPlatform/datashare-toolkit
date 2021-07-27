@@ -46,7 +46,6 @@ cd "$(dirname "$0")"
 # Up to root
 cd ../
 gcloud builds submit --config api/v1alpha/api-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
-gcloud builds submit --config api/v1alpha/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 # Move to v1alpha
 cd api/v1alpha
@@ -65,8 +64,7 @@ gcloud run deploy ds-api \
     --platform gke \
     --service-account ${SERVICE_ACCOUNT_NAME} \
     --update-env-vars=OAUTH_CLIENT_ID="${OAUTH_CLIENT_ID}",DATA_PRODUCERS="${DATA_PRODUCERS}" \
-    --remove-env-vars=PROJECT_ID,MARKETPLACE_INTEGRATION \
-    --no-use-http2
+    --remove-env-vars=PROJECT_ID,MARKETPLACE_INTEGRATION
 
 if ! gcloud run services describe ds-api --cluster $CLUSTER --cluster-location $ZONE --namespace $NAMESPACE --platform gke | grep -q MANAGED_PROJECTS; then
     echo "MANAGED_PROJECTS env variable not found, creating it"
@@ -109,6 +107,9 @@ kubectl delete authorizationpolicy.security.istio.io -n "$NAMESPACE" --all
 cat istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
 
 if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
+    cd ../../
+    gcloud builds submit --config api/v1alpha/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
+
     gcloud run deploy "ds-listener-${PROJECT_ID}" \
         --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
         --region=${REGION} \
