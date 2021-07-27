@@ -108,7 +108,7 @@ kubectl get authorizationpolicy.security.istio.io -n "$NAMESPACE"
 kubectl delete authorizationpolicy.security.istio.io -n "$NAMESPACE" --all
 cat istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
 
-if [ ${MARKETPLACE_INTEGRATION_ENABLED} = "true" ]; then
+if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
     gcloud run deploy "ds-listener-${PROJECT_ID}" \
         --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
         --region=${REGION} \
