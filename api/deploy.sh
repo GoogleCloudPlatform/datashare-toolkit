@@ -110,11 +110,12 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
     cd ../../
     gcloud builds submit --config api/v1alpha/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
-    gcloud run deploy "ds-listener-${PROJECT_ID}" \
+    gcloud alpha run deploy "ds-listener-${PROJECT_ID}" \
         --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
         --region=${REGION} \
         --platform managed \
         --max-instances 1 \
         --service-account ${SERVICE_ACCOUNT_NAME} \
-        --no-allow-unauthenticated
+        --no-allow-unauthenticated \
+        --no-cpu-throttling
 fi
