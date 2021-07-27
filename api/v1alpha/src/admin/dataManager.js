@@ -23,7 +23,6 @@ const runtimeConfig = require('../lib/runtimeConfig');
 const metaManager = require('../lib/metaManager');
 const datasetManager = require('../datasets/dataManager');
 const procurementManager = require('../procurements/dataManager');
-const resourceManager = require('../resources/dataManager');
 const fs = require('fs');
 const retry = require('async-retry');
 
