@@ -26,7 +26,7 @@ This functionality so far is mainly to be used for non-marketplace integrated us
 - `OAUTH_CLIENT_ID` [environment variable](./ENVIRONMENT_VARIABLES.md) must be defined as an API environmental variable.
 - Marketplace integration is no longer enabled by default. It must be enabled through the configured `MANAGED_PROJECTS` [dictionary](./MANAGED_PROJECTS.md) in the API environmental variable. In addition to the environmental variable, there is also a runtime check made with the GCP service usage API to ensure the required API is enabled.
 
-## Enabling a new projectId for Datashare
+# Enabling a new projectId for Datashare
 1. Create Datashare Manager Role in the target project
 
     ```
