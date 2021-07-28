@@ -10,16 +10,21 @@ export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 echo $PROJECT_ID
 
 export TAG=dev
-export REGION=us-central1
+export NAMESPACE=datashare-apis
 export SERVICE_ACCOUNT_NAME=ds-api-mgr
+CLUSTER=datashare
+gcloud config set compute/zone $ZONE
 
 gcloud builds submit --config api/v1alpha/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 gcloud run deploy "ds-listener-${PROJECT_ID}" \
-    --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
-    --region=${REGION} \
-    --platform managed \
+    --cluster $CLUSTER \
+    --cluster-location $ZONE \
+    --min-instances 1 \
     --max-instances 1 \
+    --namespace $NAMESPACE \
+    --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
+    --platform gke \
     --service-account ${SERVICE_ACCOUNT_NAME} \
-    --no-allow-unauthenticated
+    --update-env-vars=PROJECT_ID="${PROJECT_ID}"
 ```
