@@ -249,7 +249,7 @@ Create a GKE cluster with the Cloud Run add-on:
 
     gcloud container clusters create $CLUSTER \
         --addons HorizontalPodAutoscaling,HttpLoadBalancing,CloudRun \
-        --cluster-version 1.17 \
+        --release-channel stable \
         --workload-pool=${PROJECT_ID}.svc.id.goog \
         --enable-ip-alias \
         --enable-stackdriver-kubernetes \
