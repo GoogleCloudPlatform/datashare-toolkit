@@ -110,12 +110,25 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
     cd ../../
     gcloud builds submit --config api/v1alpha/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
-    gcloud alpha run deploy "ds-listener-${PROJECT_ID}" \
-        --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
-        --region=${REGION} \
-        --platform managed \
+    # --no-cpu-throttling is not working through gcloud alpha
+    # gcloud alpha run deploy "ds-listener-${PROJECT_ID}" \
+    #     --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
+    #     --region=${REGION} \
+    #     --platform managed \
+    #     --max-instances 1 \
+    #     --service-account ${SERVICE_ACCOUNT_NAME} \
+    #     --no-allow-unauthenticated \
+    #     --cpu 1 \
+    #     --memory 2Gi \
+    #     --no-cpu-throttling
+
+    gcloud run "ds-listener-${PROJECT_ID}" \
+        --cluster $CLUSTER \
+        --cluster-location $ZONE \
+        --min-instances 1 \
         --max-instances 1 \
-        --service-account ${SERVICE_ACCOUNT_NAME} \
-        --no-allow-unauthenticated \
-        --no-cpu-throttling
+        --namespace $NAMESPACE \
+        --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
+        --platform gke \
+        --service-account ${SERVICE_ACCOUNT_NAME}
 fi
