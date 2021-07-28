@@ -110,6 +110,7 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
     cd ../../
     gcloud builds submit --config api/v1alpha/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
+    # TODO: Switch to Managed Cloud Run when this issue is resolved
     # --no-cpu-throttling is not working through gcloud alpha
     # ERROR: (gcloud.alpha.run.services.update) The annotation run.googleapis.com/cpu-throttling is not available
     # gcloud alpha run deploy "ds-listener-${PROJECT_ID}" \
@@ -123,7 +124,7 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
     #     --memory 2Gi \
     #     --no-cpu-throttling
 
-    gcloud run deploy "ds-listener-${PROJECT_ID}" \
+    gcloud run deploy "ds-listener" \
         --cluster $CLUSTER \
         --cluster-location $ZONE \
         --min-instances 1 \
