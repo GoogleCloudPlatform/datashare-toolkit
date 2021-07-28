@@ -111,6 +111,7 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
     gcloud builds submit --config api/v1alpha/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
     # --no-cpu-throttling is not working through gcloud alpha
+    # ERROR: (gcloud.alpha.run.services.update) The annotation run.googleapis.com/cpu-throttling is not available
     # gcloud alpha run deploy "ds-listener-${PROJECT_ID}" \
     #     --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
     #     --region=${REGION} \
