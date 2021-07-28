@@ -123,7 +123,7 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
     #     --memory 2Gi \
     #     --no-cpu-throttling
 
-    gcloud run "ds-listener-${PROJECT_ID}" \
+    gcloud run deploy "ds-listener-${PROJECT_ID}" \
         --cluster $CLUSTER \
         --cluster-location $ZONE \
         --min-instances 1 \
