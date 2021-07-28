@@ -249,11 +249,15 @@ Create a GKE cluster with the Cloud Run add-on:
 
     gcloud container clusters create $CLUSTER \
         --addons HorizontalPodAutoscaling,HttpLoadBalancing,CloudRun \
-        --cluster-version 1.16 \
+        --cluster-version 1.17 \
         --workload-pool=${PROJECT_ID}.svc.id.goog \
         --enable-ip-alias \
         --enable-stackdriver-kubernetes \
-        --machine-type e2-standard-2
+        --machine-type n2-standard-2 \
+        --max-surge-upgrade 2 \
+        --enable-autoscaling \
+        --max-nodes 8 \
+        --min-nodes 4
 
 This tutorial requires GKE version 1.15.11-gke.9 and later, 1.16.8-gke.7 and later, or 1.17.4-gke.5 and later.
 The **e2-standard-2** [compute machine type](https://cloud.google.com/compute/docs/machine-types#e2_standard_machine_types) requires the least amount of compute resources to run the service.
@@ -355,13 +359,13 @@ Label the **namespace** with `istio-injection=enabled` so that the Istio sidecar
 Deploy ths DS API service to Cloud Run for Anthos in the **NAMESPACE**:
 
     gcloud run deploy ds-api \
-      --cluster $CLUSTER \
-      --cluster-location $ZONE \
-      --min-instances 1 \
-      --namespace $NAMESPACE \
-      --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
-      --platform gke \
-      --service-account ${SERVICE_ACCOUNT_NAME}
+        --cluster $CLUSTER \
+        --cluster-location $ZONE \
+        --min-instances 1 \
+        --namespace $NAMESPACE \
+        --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
+        --platform gke \
+        --service-account ${SERVICE_ACCOUNT_NAME}
 
 This command creates a [Knative Serving service](https://github.com/knative/serving/blob/master/docs/spec/overview.md) object.
 The `--min-instances 1` option prevents timing conflicts between the Istio and Knative Serving sidecars, when scaling up from zero pods.
@@ -374,10 +378,10 @@ Check the status of the deployment: \
 You can also run the `glcoud run services describe` command to see the status:
 
     gcloud run services describe ds-api \
-      --cluster $CLUSTER \
-      --cluster-location $ZONE \
-      --namespace $NAMESPACE \
-      --platform gke
+        --cluster $CLUSTER \
+        --cluster-location $ZONE \
+        --namespace $NAMESPACE \
+        --platform gke
 
 Cloud Run for Anthos exposes services on the external IP address of the [Istio ingress gateway](https://archive.istio.io/v1.4/docs/concepts/traffic-management/#gateways). Retrieve the external IP address and store it in an environment variable:
 
@@ -443,11 +447,11 @@ Create a **FQDN** environment variable based off service name and subdomain abov
 Map your service to the custom FQDN:
 
     gcloud run domain-mappings create --service ds-api \
-      --domain $FQDN \
-      --cluster $CLUSTER \
-      --cluster-location $ZONE \
-      --namespace $NAMESPACE \
-      --platform gke
+        --domain $FQDN \
+        --cluster $CLUSTER \
+        --cluster-location $ZONE \
+        --namespace $NAMESPACE \
+        --platform gke
 
 Reserve the IP address attached to the Load Balancer for the Istio ingress gateway service as a static IP: \
 **Note**: Create a **REGION** environment variable based off the appropriate **ZONE** variable above:
@@ -468,10 +472,10 @@ Create a new DNS record transaction:
 Add the *A* record to the FQDN in the transaction:
 
     gcloud dns record-sets transaction add $GATEWAY_IP \
-      --name=$FQDN \
-      --ttl="30" \
-      --type="A" \
-      --zone=$DNS_ZONE_NAME
+        --name=$FQDN \
+        --ttl="30" \
+        --type="A" \
+        --zone=$DNS_ZONE_NAME
 
 Execute the DNS record transaction: \
 **Note**: It may take a minute or two for the DNS resolvers to propogate the new DNS record
@@ -493,22 +497,22 @@ Deploy with Cloud Run (Managed): \
 The GCP project's Cloud IAM policy, *constraints/iam.allowedPolicyMemberDomains* or *Domain Restricted Sharing* must be disabled to allow unauthenticated requests to reach Cloud Run services with the `--allow-unauthenticated` parameter. This policy is currently the default setting as described [here](https://cloud.google.com/resource-manager/docs/organization-policy/org-policy-constraints).
 
     gcloud run deploy ds-api \
-      --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
-      --region=us-central1 \
-      --allow-unauthenticated \
-      --platform managed \
-      --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+        --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
+        --region=us-central1 \
+        --allow-unauthenticated \
+        --platform managed \
+        --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
 
 Spot service environment:
 
     gcloud run deploy ds-api \
-      --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
-      --region=us-central1 \
-      --allow-unauthenticated \
-      --platform managed \
-      --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
-      --set-env-vars=SPOT_SERVICE_CONFIG_BUCKET_NAME=${BUCKET_NAME} \
-      --set-env-vars=SPOT_SERVICE_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID}
+        --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
+        --region=us-central1 \
+        --allow-unauthenticated \
+        --platform managed \
+        --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
+        --set-env-vars=SPOT_SERVICE_CONFIG_BUCKET_NAME=${BUCKET_NAME} \
+        --set-env-vars=SPOT_SERVICE_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID}
 
 Open the app URL in your browser. You can return the FQDN via:
 
@@ -593,11 +597,11 @@ Verify that the DNS record has gone into effect by running the command: \
 **Note**: You sould see HTTPS instead
 
     gcloud beta run domain-mappings describe \
-      --domain $FQDN \
-      --cluster $CLUSTER \
-      --cluster-location $ZONE \
-      --namespace $NAMESPACE \
-      --platform gke
+        --domain $FQDN \
+        --cluster $CLUSTER \
+        --cluster-location $ZONE \
+        --namespace $NAMESPACE \
+        --platform gke
 
 You should also be able to verify the DS API can communicate with GCP services via HTTPS:
 
@@ -692,7 +696,7 @@ Verify the DS API is accessible with a valid Bearer ID Token: \
 Verify the DS API preflight requests are accessible without a valid Bearer ID Token: \
 **Note**: The HTTP response code should be *200 OK*
 
-     curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" https://${FQDN}/v1alpha
+    curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" https://${FQDN}/v1alpha
 
 **Note**: You can debug HTTP 401/403 Istio [AuthN/AuthZ Errors](#authnauthz-errors) below in the [Troubleshooting](#troubleshooting) section.
 
