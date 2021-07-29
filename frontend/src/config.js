@@ -169,6 +169,10 @@ class Config {
       return store.dispatch('getProjectConfiguration').then(response => {
         console.debug(`project configuration: ${JSON.stringify(response)}`);
         const _c = response.configuration;
+        if (!this.projectId) {
+          // If projectId is not set, set it.
+          this.projectId = _c.projectId;
+        }
         const labels = _c.labels;
         if (labels) {
           this.update(labels);
