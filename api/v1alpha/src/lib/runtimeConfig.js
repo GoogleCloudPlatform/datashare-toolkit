@@ -81,8 +81,7 @@ class RuntimeConfig {
                         .localeCompare(b.toLowerCase());
                 });
             }
-            // Set managed projects to cache for 5 minutes
-            dsCache.set(managedProjectsCacheKey, list, 300);
+            dsCache.set(managedProjectsCacheKey, list);
         }
         return list;
     }
