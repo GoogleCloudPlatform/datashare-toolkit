@@ -23,7 +23,7 @@ const verifyProject = async (req, res, next) => {
         const managedProjects = await runtimeConfig.getManagedProjects();
         const isDefined = managedProjects != null && managedProjects.length > 0;
         if (isDefined === true && !managedProjects.includes(projectId)) {
-            console.warn(`Invalid project called: ${projectId}`);
+            console.warn(`Invalid unmanaged project called: ${projectId}`);
             return res
                 .status(401)
                 .send({ error: 'You are not authorized to make this project request' });
