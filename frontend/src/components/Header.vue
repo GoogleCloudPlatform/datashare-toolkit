@@ -137,6 +137,7 @@ import {
   mdiAccountCircle,
   mdiBell,
   mdiDatabase,
+  mdiDog,
   mdiDotsVertical,
   mdiHelpCircle,
   mdiLogin,
@@ -154,7 +155,8 @@ import {
   mdiShieldKey,
   mdiAccountMultipleCheck,
   mdiShopping,
-  mdiBriefcaseAccount
+  mdiBriefcaseAccount,
+  mdiBucketOutline
 } from '@mdi/js';
 
 import { mapGetters } from 'vuex';
@@ -176,6 +178,7 @@ export default {
       accountMultiple: mdiAccountMultiple,
       bell: mdiBell,
       database: mdiDatabase,
+      dog: mdiDog,
       import: mdiApplicationImport,
       helpCircle: mdiHelpCircle,
       home: mdiHome,
@@ -268,7 +271,7 @@ export default {
           icon: mdiHome
         },
         {
-          section: 'Batch',
+          section: 'Channels',
           name: 'datasets',
           title: 'Datasets',
           icon: mdiDatabase
@@ -277,6 +280,16 @@ export default {
           name: 'views',
           title: 'Authorized Views',
           icon: mdiViewGrid
+        },
+        {
+          name: 'topics',
+          title: 'Pub/Sub Topics',
+          icon: mdiDog
+        },
+        {
+          name: 'buckets',
+          title: 'Storage Buckets',
+          icon: mdiBucketOutline
         },
         {
           section: 'Entitlements',

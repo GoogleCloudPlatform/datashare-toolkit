@@ -118,6 +118,24 @@ const routerOptions = [
       requiresAuth: true,
       requiresDataProducer: true
     }
+  },
+  {
+    path: '/topics',
+    name: 'topics',
+    component: 'Topics',
+    meta: {
+      requiresAuth: true,
+      requiresDataProducer: true
+    }
+  },
+  {
+    path: '/buckets',
+    name: 'buckets',
+    component: 'Buckets',
+    meta: {
+      requiresAuth: true,
+      requiresDataProducer: true
+    }
   }
 ];
 
