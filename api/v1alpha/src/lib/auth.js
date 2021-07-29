@@ -18,9 +18,16 @@ const runtimeConfig = require('../lib/runtimeConfig');
 
 const verifyProject = async (req, res, next) => {
     const projectId = req.header('x-gcp-project-id');
+    const currentProjectId = await runtimeConfig.getCurrentProjectId();
     if (projectId) {
         const managedProjects = await runtimeConfig.getManagedProjects();
-        if (!managedProjects.includes(projectId)) {
+        const isDefined = managedProjects != null && managedProjects.length > 0;
+        if (isDefined === true && !managedProjects.includes(projectId)) {
+            console.warn(`Invalid project called: ${projectId}`);
+            return res
+                .status(401)
+                .send({ error: 'You are not authorized to make this project request' });
+        } else if (projectId !== currentProjectId) {
             console.warn(`Invalid project called: ${projectId}`);
             return res
                 .status(401)

@@ -65,21 +65,22 @@ class RuntimeConfig {
         // Check if maanged projects exists in cache first
         let list = dsCache.get(managedProjectsCacheKey);
         if (list == undefined) {
-            const { Resource } = require('@google-cloud/resource-manager');
-            const options = {
-                scopes: ['https://www.googleapis.com/auth/cloud-platform']
-            };
-            const resource = new Resource(options);
+            if (config.managedProjects && config.managedProjects.length > 0) {
+                const { Resource } = require('@google-cloud/resource-manager');
+                const options = {
+                    scopes: ['https://www.googleapis.com/auth/cloud-platform']
+                };
+                const resource = new Resource(options);
 
-            // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
-            const [projects] = await resource.getProjects();
-            const include = Object.keys(config.managedProjects);
-            list = projects.filter(project => include.includes(project.id)).map(project => project.id).sort(function (a, b) {
-                return a
-                    .toLowerCase()
-                    .localeCompare(b.toLowerCase());
-            });
-
+                // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
+                const [projects] = await resource.getProjects();
+                const include = Object.keys(config.managedProjects);
+                list = projects.filter(project => include.includes(project.id)).map(project => project.id).sort(function (a, b) {
+                    return a
+                        .toLowerCase()
+                        .localeCompare(b.toLowerCase());
+                });
+            }
             // Set managed projects to cache for 5 minutes
             dsCache.set(managedProjectsCacheKey, list, 300);
         }
