@@ -62,7 +62,7 @@ class RuntimeConfig {
     that the current account has access to
      */
     async getManagedProjects() {
-        // Check if maanged projects exists in cache first
+        // Check if managed projects exists in cache first
         let list = dsCache.get(managedProjectsCacheKey);
         if (list == undefined) {
             if (config.managedProjects) {
@@ -80,6 +80,13 @@ class RuntimeConfig {
                         .toLowerCase()
                         .localeCompare(b.toLowerCase());
                 });
+
+                const currentProject = await this.getCurrentProjectId();
+                if (include.includes(currentProject) && !list.includes(currentProject)) {
+                    // For the use case where the current project isn't returned from the resource manager call, append it to the list
+                    // It's safe to do so, as it's already included in the managed project list
+                    list.push(currentProject);
+                }
             }
             dsCache.set(managedProjectsCacheKey, list);
         }
