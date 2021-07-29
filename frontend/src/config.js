@@ -189,10 +189,12 @@ class Config {
         console.debug(`managed projects: ${JSON.stringify(response)}`);
         if (response.success) {
           const managedProjects = response.projects;
-          if (this.projectId === null) {
-            if (managedProjects.length > 0) {
-              this.projectId = managedProjects[0];
-            }
+          if (
+            this.projectId === null &&
+            managedProjects &&
+            managedProjects.length > 0
+          ) {
+            this.projectId = managedProjects[0];
           }
           return store.dispatch('setManagedProjects', managedProjects);
         }
