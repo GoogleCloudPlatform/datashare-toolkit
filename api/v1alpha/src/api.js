@@ -104,6 +104,10 @@ const admin = require('./admin/index');
 const procurements = require('./procurements/index');
 // Import the Datashare API Resources service router
 const resources = require('./resources/index');
+// Import the Datashare API PubSub service router
+const pubsub = require('./pubsub/index');
+// Import the Datashare API Cloud Storage service router
+const storage = require('./storage/index');
 
 /************************************************************
   API Endpoints
@@ -244,13 +248,15 @@ router.get(routes, function (req, res) {
 });
 
 // Import the other API routes before wildcard '*'
-router.use(spots);
-router.use(datasets);
-router.use(policies);
 router.use(accounts);
 router.use(admin);
+router.use(datasets);
+router.use(policies);
 router.use(procurements);
+router.use(pubsub);
 router.use(resources);
+router.use(spots);
+router.use(storage);
 
 /**
  * @swagger
