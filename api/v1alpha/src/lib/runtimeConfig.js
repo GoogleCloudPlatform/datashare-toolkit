@@ -65,7 +65,7 @@ class RuntimeConfig {
         // Check if maanged projects exists in cache first
         let list = dsCache.get(managedProjectsCacheKey);
         if (list == undefined) {
-            if (config.managedProjects && config.managedProjects.length > 0) {
+            if (config.managedProjects) {
                 const { Resource } = require('@google-cloud/resource-manager');
                 const options = {
                     scopes: ['https://www.googleapis.com/auth/cloud-platform']
