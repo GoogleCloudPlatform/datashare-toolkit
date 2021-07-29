@@ -6,20 +6,25 @@ In order to integrate with Marketplace, a Datashare listener service needs to be
 # Deploying a listener
 ```
 # Set the projectId to the current project, or to the projectId of the project for which you need to listener for marketplace events (if using with multiple projects).
-export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
-echo $PROJECT_ID
-
+export DEPLOYMENT_PROJECT_ID=$(gcloud config list --format 'value(core.project)')
+export PROJECT_ID="cds-demo-3"
+export ZONE=us-central1-a
+gcloud config set compute/zone $ZONE
 export TAG=dev
-export REGION=us-central1
+export NAMESPACE=datashare-apis
 export SERVICE_ACCOUNT_NAME=ds-api-mgr
+CLUSTER=datashare
 
 gcloud builds submit --config api/v1alpha/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 gcloud run deploy "ds-listener-${PROJECT_ID}" \
-    --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
-    --region=${REGION} \
-    --platform managed \
+    --cluster $CLUSTER \
+    --cluster-location $ZONE \
+    --min-instances 1 \
     --max-instances 1 \
+    --namespace $NAMESPACE \
+    --image gcr.io/${DEPLOYMENT_PROJECT_ID}/ds-listener:${TAG} \
+    --platform gke \
     --service-account ${SERVICE_ACCOUNT_NAME} \
-    --no-allow-unauthenticated
+    --update-env-vars=PROJECT_ID="${PROJECT_ID}"
 ```
