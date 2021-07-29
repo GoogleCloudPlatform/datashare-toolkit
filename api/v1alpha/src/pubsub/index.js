@@ -27,7 +27,6 @@ var router = express.Router();
 // methods that require multiple routes
 
 router.get('/pubsub/topics', async (req, res) => {
-    console.log('called');
     const projectId = req.header('x-gcp-project-id');
     const data = await dataManager.listTopics(projectId);
     var code;
