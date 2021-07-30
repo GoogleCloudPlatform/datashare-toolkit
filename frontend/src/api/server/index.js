@@ -86,7 +86,7 @@ export default {
       })
       .then(response => response);
   },
-  createDataset(projectId, datasetId, description) {
+  createDataset(datasetId, description) {
     return axios
       .post(this._apiBaseUrl() + '/datasets', {
         datasetId: datasetId,
@@ -94,14 +94,14 @@ export default {
       })
       .then(response => response);
   },
-  updateDataset(projectId, datasetId, description) {
+  updateDataset(datasetId, description) {
     return axios
       .put(this._apiBaseUrl() + `/datasets/${datasetId}`, {
         description: description
       })
       .then(response => response);
   },
-  deleteDataset(projectId, datasetId) {
+  deleteDataset(datasetId) {
     return axios
       .delete(this._apiBaseUrl() + `/datasets/${datasetId}`)
       .then(response => response);
@@ -193,12 +193,12 @@ export default {
       .get(this._apiBaseUrl() + `/datasets/${datasetId}/views/${viewId}`)
       .then(response => response);
   },
-  getTables(projectId, datasetId, labelKey) {
+  getTables(datasetId) {
     return axios
       .get(this._apiBaseUrl() + `/datasets/${datasetId}/tables`)
       .then(response => response);
   },
-  getTableColumns(projectId, datasetId, tableId) {
+  getTableColumns(datasetId, tableId) {
     return axios
       .get(
         this._apiBaseUrl() + `/datasets/${datasetId}/tables/${tableId}/columns`
@@ -291,7 +291,7 @@ export default {
       .get(this._apiBaseUrl() + '/products')
       .then(response => response);
   },
-  initSchema(payload) {
+  initSchema() {
     return axios
       .post(this._apiBaseUrl() + '/admin:initSchema')
       .then(response => response);
@@ -324,9 +324,33 @@ export default {
       .get(this._apiBaseUrl() + '/storage/buckets')
       .then(response => response);
   },
+  createBucket(name) {
+    return axios
+      .post(this._apiBaseUrl() + '/storage/buckets', {
+        name: name
+      })
+      .then(response => response);
+  },
+  deleteBucket(name) {
+    return axios
+      .delete(this._apiBaseUrl() + `/storage/buckets/${name}`)
+      .then(response => response);
+  },
   getTopics() {
     return axios
       .get(this._apiBaseUrl() + '/pubsub/topics')
+      .then(response => response);
+  },
+  createTopic(name) {
+    return axios
+      .post(this._apiBaseUrl() + '/pubsub/topics', {
+        name: name
+      })
+      .then(response => response);
+  },
+  deleteTopic(name) {
+    return axios
+      .delete(this._apiBaseUrl() + `/pubsub/topics/${name}`)
       .then(response => response);
   }
 };

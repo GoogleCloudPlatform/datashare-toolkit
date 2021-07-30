@@ -119,11 +119,7 @@ const store = new Vuex.Store({
     // eslint-disable-next-line no-unused-vars
     createDataset({ commit }, payload) {
       return client
-        .createDataset(
-          payload.projectId,
-          payload.datasetId,
-          payload.description
-        )
+        .createDataset(payload.datasetId, payload.description)
         .then(result => result)
         .catch(error => {
           notify(error);
@@ -132,11 +128,7 @@ const store = new Vuex.Store({
     // eslint-disable-next-line no-unused-vars
     updateDataset({ commit }, payload) {
       return client
-        .updateDataset(
-          payload.projectId,
-          payload.datasetId,
-          payload.description
-        )
+        .updateDataset(payload.datasetId, payload.description)
         .then(result => result)
         .catch(error => {
           notify(error);
@@ -144,11 +136,9 @@ const store = new Vuex.Store({
     },
     // eslint-disable-next-line no-unused-vars
     deleteDataset({ commit }, payload) {
-      return client
-        .deleteDataset(payload.projectId, payload.datasetId)
-        .catch(error => {
-          notify(error);
-        });
+      return client.deleteDataset(payload.datasetId).catch(error => {
+        notify(error);
+      });
     },
     // eslint-disable-next-line no-unused-vars
     getAccounts({ commit }, payload) {
@@ -227,16 +217,14 @@ const store = new Vuex.Store({
     },
     // eslint-disable-next-line no-unused-vars
     getTables({ commit }, payload) {
-      return client
-        .getTables(payload.projectId, payload.datasetId, payload.labelKey)
-        .catch(error => {
-          notify(error);
-        });
+      return client.getTables(payload.datasetId).catch(error => {
+        notify(error);
+      });
     },
     // eslint-disable-next-line no-unused-vars
     getTableColumns({ commit }, payload) {
       return client
-        .getTableColumns(payload.projectId, payload.datasetId, payload.tableId)
+        .getTableColumns(payload.datasetId, payload.tableId)
         .catch(error => {
           notify(error);
         });
