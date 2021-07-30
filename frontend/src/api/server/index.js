@@ -319,5 +319,15 @@ export default {
     return axios
       .get(this._apiBaseUrl() + '/resources/configuration')
       .then(response => response);
+  },
+  getBuckets() {
+    return axios
+      .get(this._apiBaseUrl() + '/storage/buckets')
+      .then(response => response);
+  },
+  getTopics() {
+    return axios
+      .get(this._apiBaseUrl() + '/pubsub/topics')
+      .then(response => response);
   }
 };

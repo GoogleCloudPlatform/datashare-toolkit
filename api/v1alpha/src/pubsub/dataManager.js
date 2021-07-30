@@ -31,7 +31,8 @@ async function listTopics(projectId) {
     for (const t of topics) {
         const labels = t.metadata.labels;
         if (labels.datashare_managed === 'true') {
-            list.push({ name: t.name });
+            const topicId = t.name.substring(t.name.lastIndexOf('/') + 1);
+            list.push({ name: t.name, id: topicId });
         }
     }
     return { success: true, data: list };

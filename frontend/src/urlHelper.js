@@ -13,8 +13,20 @@ function navigateToTable(projectId, datasetId, tableId) {
   window.open(url, '_blank');
 }
 
+function navigateToBucket(projectId, name) {
+  const url = `https://console.cloud.google.com/storage/browser/${name}?project=${projectId}`;
+  window.open(url, '_blank');
+}
+
+function navigateToTopic(projectId, name) {
+  const url = `https://console.cloud.google.com/cloudpubsub/topic/detail/${name}?project=${projectId}`;
+  window.open(url, '_blank');
+}
+
 export default {
   navigateToMarketplace,
   navigateToDataset,
-  navigateToTable
+  navigateToTable,
+  navigateToBucket,
+  navigateToTopic
 };

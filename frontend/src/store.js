@@ -347,6 +347,18 @@ const store = new Vuex.Store({
       return client.getProjectConfiguration().catch(error => {
         notify(error);
       });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getBuckets({ commit }, payload) {
+      return client.getBuckets().catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getTopics({ commit }, payload) {
+      return client.getTopics().catch(error => {
+        notify(error);
+      });
     }
   }
 });

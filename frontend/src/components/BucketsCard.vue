@@ -3,7 +3,7 @@
     <v-card-title>Buckets</v-card-title>
     <v-data-table
       :headers="headers"
-      :items="datasets"
+      :items="buckets"
       :search="search"
       :loading="loading"
     >
@@ -47,40 +47,26 @@
       ><template v-slot:item.viewAction="{ item }">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
-            <v-icon v-on="on" class="mr-2" @click="navigateToDataset(item)">
-              {{ icons.databaseSearch }}
+            <v-icon v-on="on" class="mr-2" @click="navigateToBucket(item)">
+              {{ icons.bucket }}
             </v-icon>
           </template>
-          <span>View in BigQuery</span>
+          <span>View in Cloud Storage</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.action="{ item }">
+      <template v-slot:item.action="{ item }" v-if="false">
         <v-menu bottom offset-y>
           <template v-slot:activator="{ on }">
             <v-icon v-on="on">{{ icons.dotsVertical }}</v-icon>
           </template>
           <v-list>
             <v-list-item key="edit" @click="presentDatasetDialog(item)">
-              <v-list-item-title>Edit Dataset</v-list-item-title>
+              <v-list-item-title>Edit Bucket</v-list-item-title>
             </v-list-item>
             <v-list-item key="delete" @click="presentDeleteDialog(item)">
               <v-list-item-title style="color:red"
-                >Delete Dataset</v-list-item-title
+                >Delete Bucket</v-list-item-title
               >
-            </v-list-item>
-            <v-divider></v-divider>
-            <v-list-item key="accounts" @click="showAccountsDialog(item)">
-              <v-list-item-title>Accounts</v-list-item-title>
-            </v-list-item>
-            <v-list-item
-              v-if="false"
-              key="ingestion"
-              @click="navigateIngestion(item.datasetId)"
-            >
-              <v-list-item-title>Ingestion</v-list-item-title>
-            </v-list-item>
-            <v-list-item key="views" @click="navigateView(item.datasetId)">
-              <v-list-item-title>Views</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -91,7 +77,7 @@
       v-model="showDialog"
       :title="deleteDialogTitle"
       :text="deleteDialogText"
-      v-on:confirmed="deleteDataset(selectedItem)"
+      v-on:confirmed="deleteBucket(selectedItem)"
       confirmButtonColor="red darken-1"
       confirmButtonText="Delete"
     />
@@ -112,7 +98,7 @@
       >
         <v-card>
           <v-card-title class="headline">{{
-            !this.dialogDataset.editing ? 'Create Dataset' : 'Edit Dataset'
+            !this.dialogDataset.editing ? 'Create Bucket' : 'Edit Bucket'
           }}</v-card-title>
           <ValidationObserver ref="observer" v-slot="{}">
             <v-form class="px-4">
@@ -224,13 +210,7 @@ extend('bigQueryTableIdRule', value => {
   return true;
 });
 
-import {
-  mdiDatabase,
-  mdiDatabaseSearch,
-  mdiDotsVertical,
-  mdiPencil,
-  mdiPlus
-} from '@mdi/js';
+import { mdiBucketOutline, mdiDotsVertical, mdiPencil, mdiPlus } from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 import AccountsCard from '@/components/AccountsCard.vue';
 import config from './../config';
@@ -246,32 +226,26 @@ export default {
     loading: false,
     componentKey: 0,
     showAccounts: false,
-    datasets: [],
+    buckets: [],
     showDialog: false,
     showError: false,
     showCreateDataset: false,
     dialogDataset: { editing: false },
     selectedItem: null,
     icons: {
-      database: mdiDatabase,
+      bucket: mdiBucketOutline,
       dotsVertical: mdiDotsVertical,
       pencil: mdiPencil,
-      plus: mdiPlus,
-      databaseSearch: mdiDatabaseSearch
+      plus: mdiPlus
     },
     search: '',
     itemsPerPageOptions: [20, 50, 100, 200],
     itemsPerPage: 50,
     headers: [
       {
-        text: 'Dataset Id',
-        value: 'datasetId',
-        tooltip: 'The BigQuery datasetId'
-      },
-      {
-        text: 'Description',
-        value: 'description',
-        tooltip: 'Description of the dataset'
+        text: 'Name',
+        value: 'name',
+        tooltip: 'The bucket name'
       },
       {
         text: 'Modified At',
@@ -279,27 +253,27 @@ export default {
         tooltip: 'The last modified time for the dataset'
       },
       {
-        text: 'View in BigQuery',
+        text: 'View in Cloud Storage',
         value: 'viewAction',
         sortable: false,
-        tooltip: 'View dataset in the BigQuery console'
+        tooltip: 'View bucket in the Cloud Storage console'
       },
       { text: '', value: 'action', sortable: false }
     ]
   }),
   computed: {
     deleteDialogTitle() {
-      return `Delete dataset '${this.selectedItem.datasetId}'?`;
+      return `Delete bucket '${this.selectedItem.name}'?`;
     },
     deleteDialogText() {
-      return `Please click 'Delete' to confirm that you want to delete dataset '${this.selectedItem.datasetId}'. Deleting the dataset will delete all child tables.`;
+      return `Please click 'Delete' to confirm that you want to delete bucket '${this.selectedItem.name}'. Deleting the bucket will delete all child objects.`;
     }
   },
   created() {
-    this.loadDatasets();
+    this.loadBuckets();
   },
   methods: {
-    presentDatasetDialog(selectedItem) {
+    presentBucketDialog(selectedItem) {
       this.dialogDataset = { editing: false };
       if (selectedItem) {
         this.dialogDataset.editing = true;
@@ -312,11 +286,11 @@ export default {
       this.selectedItem = item;
       this.showDialog = true;
     },
-    deleteDataset(item) {
+    deleteBucket(item) {
       this.showDialog = false;
       this.loading = true;
       this.$store
-        .dispatch('deleteDataset', {
+        .dispatch('deleteBucket', {
           projectId: config.projectId,
           datasetId: item.datasetId
         })
@@ -325,14 +299,14 @@ export default {
           this.loadDatasets();
         });
     },
-    saveDataset() {
+    saveBucket() {
       this.$refs.observer
         .validate()
         .then(result => {
           if (result) {
             if (this.dialogDataset.editing === false) {
               this.$store
-                .dispatch('createDataset', {
+                .dispatch('createBucket', {
                   projectId: config.projectId,
                   datasetId: this.dialogDataset.datasetId,
                   description: this.dialogDataset.description
@@ -341,19 +315,19 @@ export default {
                   this.loading = false;
                   if (!result.success) {
                     this.showError = true;
-                    this.errorDialogTitle = 'Error creating dataset';
+                    this.errorDialogTitle = 'Error creating bucket';
                     this.errorDialogText = result.errors.join(', ');
                   } else {
                     this.showCreateDataset = false;
-                    this.loadDatasets();
+                    this.loadBuckets();
                   }
                 })
                 .catch(error => {
-                  console.error(`Error creating dataset: ${error}`);
+                  console.error(`Error creating bucket: ${error}`);
                 });
             } else {
               this.$store
-                .dispatch('updateDataset', {
+                .dispatch('updateBucket', {
                   projectId: config.projectId,
                   datasetId: this.dialogDataset.datasetId,
                   description: this.dialogDataset.description
@@ -362,15 +336,15 @@ export default {
                   this.loading = false;
                   if (result.error) {
                     this.showError = true;
-                    this.errorDialogTitle = 'Error updating dataset';
+                    this.errorDialogTitle = 'Error updating bucket';
                     this.errorDialogText = result.error;
                   } else {
                     this.showCreateDataset = false;
-                    this.loadDatasets();
+                    this.loadBuckets();
                   }
                 })
                 .catch(error => {
-                  console.error(`Error updating dataset: ${error}`);
+                  console.error(`Error updating bucket: ${error}`);
                 });
             }
           }
@@ -378,9 +352,6 @@ export default {
         .catch(error => {
           alert(`Validation failed: ${error}`);
         });
-    },
-    navigateView(item) {
-      this.$router.push({ path: 'views', query: { datasetId: item } });
     },
     showAccountsDialog(item) {
       this.componentKey += 1;
@@ -391,31 +362,23 @@ export default {
       this.selectedItem = null;
       this.showAccounts = false;
     },
-    navigateIngestion(item) {
-      this.$router.push({ path: 'ingestion', query: { datasetId: item } });
-    },
-    loadDatasets() {
+    loadBuckets() {
       this.loading = true;
-      this.$store
-        .dispatch('getDatasets', {
-          projectId: config.projectId
-        })
-        .then(response => {
-          if (response.success) {
-            this.datasets = response.data;
-          } else {
-            this.datasets = [];
-          }
-          this.loading = false;
-        });
+      this.$store.dispatch('getBuckets', {}).then(response => {
+        if (response.success) {
+          this.buckets = response.data;
+        } else {
+          this.buckets = [];
+        }
+        this.loading = false;
+      });
     },
-    toLocalTime(epoch) {
-      let d = new Date(0);
-      d.setUTCMilliseconds(epoch);
+    toLocalTime(str) {
+      let d = new Date(str);
       return d.toLocaleString();
     },
-    navigateToDataset(item) {
-      UrlHelper.navigateToDataset(config.projectId, item.datasetId);
+    navigateToBucket(item) {
+      UrlHelper.navigateToBucket(config.projectId, item.name);
     }
   }
 };
