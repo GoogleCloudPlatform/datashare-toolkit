@@ -11,6 +11,9 @@
     "@google-cloud/pubsub": "^2.6.0",
     "ws": "~5.2.3"
   },
+  "scripts": {
+    "lint": "eslint ."
+  },
   "bin": {
     "pubsock": "index.js"
   },
