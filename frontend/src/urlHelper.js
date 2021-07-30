@@ -18,8 +18,8 @@ function navigateToBucket(projectId, name) {
   window.open(url, '_blank');
 }
 
-function navigateToTopic(projectId, name) {
-  const url = `https://console.cloud.google.com/cloudpubsub/topic/detail/${name}?project=${projectId}`;
+function navigateToTopic(projectId, topicId) {
+  const url = `https://console.cloud.google.com/cloudpubsub/topic/detail/${topicId}?project=${projectId}`;
   window.open(url, '_blank');
 }
 
