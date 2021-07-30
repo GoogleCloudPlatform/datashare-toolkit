@@ -14,6 +14,10 @@
   "scripts": {
     "lint": "eslint ."
   },
+  "devDependencies": {
+    "eslint": "^5.12.0",
+    "eslint-plugin-promise": "^4.2.1"
+  },
   "bin": {
     "pubsock": "index.js"
   },
