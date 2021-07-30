@@ -88,14 +88,14 @@
     />
     <v-row justify="center">
       <v-dialog
-        v-if="showCreateDataset"
-        v-model="showCreateDataset"
+        v-if="showCreateTopic"
+        v-model="showCreateTopic"
         persistent
         max-width="390"
       >
         <v-card>
           <v-card-title class="headline">{{
-            !this.dialogDataset.editing ? 'Create Topic' : 'Edit Topic'
+            !this.dialogTopic.editing ? 'Create Topic' : 'Edit Topic'
           }}</v-card-title>
           <ValidationObserver ref="observer" v-slot="{}">
             <v-form class="px-4">
@@ -105,8 +105,8 @@
                 rules="required|bigQueryTableIdRule"
               >
                 <v-text-field
-                  :readonly="dialogDataset.editing === true"
-                  v-model="dialogDataset.datasetId"
+                  :readonly="dialogTopic.editing === true"
+                  v-model="dialogTopic.datasetId"
                   :error-messages="errors"
                   :counter="1024"
                   label="Dataset Id"
@@ -119,7 +119,7 @@
                 rules="required|max:1024"
               >
                 <v-textarea
-                  v-model="dialogDataset.description"
+                  v-model="dialogTopic.description"
                   :error-messages="errors"
                   label="Description"
                   required
@@ -132,11 +132,11 @@
             <v-btn
               color="blue darken-1"
               text
-              @click.stop="showCreateDataset = false"
+              @click.stop="showCreateTopic = false"
               >Cancel</v-btn
             >
             <v-btn color="green darken-1" text @click.stop="saveDataset">{{
-              !this.dialogDataset.editing ? 'Create' : 'Update'
+              !this.dialogTopic.editing ? 'Create' : 'Update'
             }}</v-btn>
           </v-card-actions>
         </v-card>
@@ -232,8 +232,8 @@ export default {
     topics: [],
     showDialog: false,
     showError: false,
-    showCreateDataset: false,
-    dialogDataset: { editing: false },
+    showCreateTopic: false,
+    dialogTopic: { editing: false },
     selectedItem: null,
     icons: {
       bucket: mdiBucketOutline,
@@ -273,13 +273,13 @@ export default {
   },
   methods: {
     presentTopicDialog(selectedItem) {
-      this.dialogDataset = { editing: false };
+      this.dialogTopic = { editing: false };
       if (selectedItem) {
-        this.dialogDataset.editing = true;
-        this.dialogDataset.datasetId = selectedItem.datasetId;
-        this.dialogDataset.description = selectedItem.description;
+        this.dialogTopic.editing = true;
+        this.dialogTopic.datasetId = selectedItem.datasetId;
+        this.dialogTopic.description = selectedItem.description;
       }
-      this.showCreateDataset = true;
+      this.showCreateTopic = true;
     },
     presentDeleteDialog(item) {
       this.selectedItem = item;
@@ -290,8 +290,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('deleteTopic', {
-          projectId: config.projectId,
-          datasetId: item.datasetId
+          topicId: item.id
         })
         .then(() => {
           this.loading = false;
@@ -303,12 +302,12 @@ export default {
         .validate()
         .then(result => {
           if (result) {
-            if (this.dialogDataset.editing === false) {
+            if (this.dialogTopic.editing === false) {
               this.$store
                 .dispatch('createTopic', {
                   projectId: config.projectId,
-                  datasetId: this.dialogDataset.datasetId,
-                  description: this.dialogDataset.description
+                  datasetId: this.dialogTopic.datasetId,
+                  description: this.dialogTopic.description
                 })
                 .then(result => {
                   this.loading = false;
@@ -317,7 +316,7 @@ export default {
                     this.errorDialogTitle = 'Error creating topic';
                     this.errorDialogText = result.errors.join(', ');
                   } else {
-                    this.showCreateDataset = false;
+                    this.showCreateTopic = false;
                     this.loadTopics();
                   }
                 })
@@ -328,8 +327,8 @@ export default {
               this.$store
                 .dispatch('updateTopic', {
                   projectId: config.projectId,
-                  datasetId: this.dialogDataset.datasetId,
-                  description: this.dialogDataset.description
+                  datasetId: this.dialogTopic.datasetId,
+                  description: this.dialogTopic.description
                 })
                 .then(result => {
                   this.loading = false;
@@ -338,7 +337,7 @@ export default {
                     this.errorDialogTitle = 'Error updating topic';
                     this.errorDialogText = result.error;
                   } else {
-                    this.showCreateDataset = false;
+                    this.showCreateTopic = false;
                     this.loadBuckets();
                   }
                 })

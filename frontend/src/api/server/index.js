@@ -348,9 +348,9 @@ export default {
       })
       .then(response => response);
   },
-  deleteTopic(name) {
+  deleteTopic(topicId) {
     return axios
-      .delete(this._apiBaseUrl() + `/pubsub/topics/${name}`)
+      .delete(this._apiBaseUrl() + `/pubsub/topics/${topicId}`)
       .then(response => response);
   }
 };

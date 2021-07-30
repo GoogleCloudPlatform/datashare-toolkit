@@ -88,14 +88,14 @@
     />
     <v-row justify="center">
       <v-dialog
-        v-if="showCreateDataset"
-        v-model="showCreateDataset"
+        v-if="showCreateBucket"
+        v-model="showCreateBucket"
         persistent
         max-width="390"
       >
         <v-card>
           <v-card-title class="headline">{{
-            !this.dialogDataset.editing ? 'Create Bucket' : 'Edit Bucket'
+            !this.dialogBucket.editing ? 'Create Bucket' : 'Edit Bucket'
           }}</v-card-title>
           <ValidationObserver ref="observer" v-slot="{}">
             <v-form class="px-4">
@@ -105,8 +105,8 @@
                 rules="required|bigQueryTableIdRule"
               >
                 <v-text-field
-                  :readonly="dialogDataset.editing === true"
-                  v-model="dialogDataset.datasetId"
+                  :readonly="dialogBucket.editing === true"
+                  v-model="dialogBucket.datasetId"
                   :error-messages="errors"
                   :counter="1024"
                   label="Dataset Id"
@@ -119,7 +119,7 @@
                 rules="required|max:1024"
               >
                 <v-textarea
-                  v-model="dialogDataset.description"
+                  v-model="dialogBucket.description"
                   :error-messages="errors"
                   label="Description"
                   required
@@ -132,11 +132,11 @@
             <v-btn
               color="blue darken-1"
               text
-              @click.stop="showCreateDataset = false"
+              @click.stop="showCreateBucket = false"
               >Cancel</v-btn
             >
             <v-btn color="green darken-1" text @click.stop="saveDataset">{{
-              !this.dialogDataset.editing ? 'Create' : 'Update'
+              !this.dialogBucket.editing ? 'Create' : 'Update'
             }}</v-btn>
           </v-card-actions>
         </v-card>
@@ -226,8 +226,8 @@ export default {
     buckets: [],
     showDialog: false,
     showError: false,
-    showCreateDataset: false,
-    dialogDataset: { editing: false },
+    showCreateBucket: false,
+    dialogBucket: { editing: false },
     selectedItem: null,
     icons: {
       bucket: mdiBucketOutline,
@@ -271,13 +271,13 @@ export default {
   },
   methods: {
     presentBucketDialog(selectedItem) {
-      this.dialogDataset = { editing: false };
+      this.dialogBucket = { editing: false };
       if (selectedItem) {
-        this.dialogDataset.editing = true;
-        this.dialogDataset.datasetId = selectedItem.datasetId;
-        this.dialogDataset.description = selectedItem.description;
+        this.dialogBucket.editing = true;
+        this.dialogBucket.datasetId = selectedItem.datasetId;
+        this.dialogBucket.description = selectedItem.description;
       }
-      this.showCreateDataset = true;
+      this.showCreateBucket = true;
     },
     presentDeleteDialog(item) {
       this.selectedItem = item;
@@ -288,12 +288,11 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('deleteBucket', {
-          projectId: config.projectId,
-          datasetId: item.datasetId
+          name: item.name
         })
         .then(() => {
           this.loading = false;
-          this.loadDatasets();
+          this.loadBuckets();
         });
     },
     saveBucket() {
@@ -301,12 +300,12 @@ export default {
         .validate()
         .then(result => {
           if (result) {
-            if (this.dialogDataset.editing === false) {
+            if (this.dialogBucket.editing === false) {
               this.$store
                 .dispatch('createBucket', {
                   projectId: config.projectId,
-                  datasetId: this.dialogDataset.datasetId,
-                  description: this.dialogDataset.description
+                  datasetId: this.dialogBucket.datasetId,
+                  description: this.dialogBucket.description
                 })
                 .then(result => {
                   this.loading = false;
@@ -315,7 +314,7 @@ export default {
                     this.errorDialogTitle = 'Error creating bucket';
                     this.errorDialogText = result.errors.join(', ');
                   } else {
-                    this.showCreateDataset = false;
+                    this.showCreateBucket = false;
                     this.loadBuckets();
                   }
                 })
@@ -326,8 +325,8 @@ export default {
               this.$store
                 .dispatch('updateBucket', {
                   projectId: config.projectId,
-                  datasetId: this.dialogDataset.datasetId,
-                  description: this.dialogDataset.description
+                  datasetId: this.dialogBucket.datasetId,
+                  description: this.dialogBucket.description
                 })
                 .then(result => {
                   this.loading = false;
@@ -336,7 +335,7 @@ export default {
                     this.errorDialogTitle = 'Error updating bucket';
                     this.errorDialogText = result.error;
                   } else {
-                    this.showCreateDataset = false;
+                    this.showCreateBucket = false;
                     this.loadBuckets();
                   }
                 })

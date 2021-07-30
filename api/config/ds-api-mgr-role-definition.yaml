@@ -24,9 +24,11 @@ includedPermissions:
 - pubsub.subscriptions.create
 - pubsub.subscriptions.get
 - pubsub.topics.attachSubscription
+- pubsub.topics.delete
 - pubsub.topics.list
 - resourcemanager.projects.get
 - serviceusage.services.list
+- storage.buckets.delete
 - storage.buckets.get
 - storage.buckets.list
 - storage.objects.create

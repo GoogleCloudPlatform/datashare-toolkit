@@ -343,8 +343,38 @@ const store = new Vuex.Store({
       });
     },
     // eslint-disable-next-line no-unused-vars
+    createBucket({ commit }, payload) {
+      return client
+        .createBucket(payload.name)
+        .then(result => result)
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
+    deleteBucket({ commit }, payload) {
+      return client.deleteBucket(payload.name).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
     getTopics({ commit }, payload) {
       return client.getTopics().catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    createTopic({ commit }, payload) {
+      return client
+        .createTopic(payload.name)
+        .then(result => result)
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
+    deleteTopic({ commit }, payload) {
+      return client.deleteTopic(payload.topicId).catch(error => {
         notify(error);
       });
     }
