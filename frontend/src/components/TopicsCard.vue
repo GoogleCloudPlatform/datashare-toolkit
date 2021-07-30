@@ -54,15 +54,12 @@
           <span>View in Pub/Sub</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.action="{ item }" v-if="false">
+      <template v-slot:item.action="{ item }">
         <v-menu bottom offset-y>
           <template v-slot:activator="{ on }">
             <v-icon v-on="on">{{ icons.dotsVertical }}</v-icon>
           </template>
           <v-list>
-            <v-list-item key="edit" @click="presentTopicDialog(item)">
-              <v-list-item-title>Edit Topic</v-list-item-title>
-            </v-list-item>
             <v-list-item key="delete" @click="presentDeleteDialog(item)">
               <v-list-item-title style="color:red"
                 >Delete Topic</v-list-item-title

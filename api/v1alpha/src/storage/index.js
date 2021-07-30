@@ -41,4 +41,44 @@ router.get('/storage/buckets', async (req, res) => {
     });
 });
 
+router.post('/storage/buckets', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
+    const name = req.body.name;
+
+    if (!name) {
+        return res.status(400).json({
+            success: false,
+            code: 400,
+            errors: ['bucket name parameter is required']
+        });
+    }
+    const data = await dataManager.createBucket(projectId, name);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+router.delete('/storage/buckets/:name', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
+    const name = req.params.name;
+    const data = await dataManager.deleteBucket(projectId, name);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
 module.exports = router;

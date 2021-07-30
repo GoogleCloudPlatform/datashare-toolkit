@@ -38,6 +38,39 @@ async function listTopics(projectId) {
     return { success: true, data: list };
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} name
+ */
+async function createTopic(projectId, name) {
+    const pubsubUtil = new PubSubUtil(projectId);
+    await pubsubUtil.createTopic(name).catch(err => {
+        console.warn(err);
+        return { success: false, errors: [err.message] };
+    });
+    return {
+        success: true,
+        data: {
+            name: name
+        }
+    };
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} name
+ */
+async function deleteTopic(projectId, name) {
+    const pubsubUtil = new PubSubUtil(projectId);
+    await pubsubUtil.deleteTopic(name).catch(err => {
+        console.warn(err);
+        return { success: false, errors: [err.message] };
+    });
+    return { success: true };
+}
+
 module.exports = {
-    listTopics
+    listTopics,
+    createTopic,
+    deleteTopic
 };

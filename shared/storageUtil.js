@@ -87,11 +87,7 @@ class StorageUtil {
      * Creates a Cloud Storage bucket and returns true.
      */
     async createBucket(bucketName) {
-        await this.storage.createBucket(bucketName);
-        if (this.VERBOSE_MODE) {
-            console.log(`Storage bucket '${bucketName}' created.`);
-        }
-        return true;
+        return this.storage.createBucket(bucketName);
     }
     
     /**
@@ -106,11 +102,7 @@ class StorageUtil {
      * Delete a Cloud Storage bucket and return true.
      */
     async deleteBucket(bucketName) {
-        await this.storage.bucket(bucketName).delete();
-        if (this.VERBOSE_MODE) {
-            console.log(`Storage bucket '${bucketName}' deleted.`);
-        }
-        return true;
+        return this.storage.bucket(bucketName).delete();
     }
 
     /**

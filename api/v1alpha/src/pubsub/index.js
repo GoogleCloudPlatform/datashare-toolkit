@@ -41,4 +41,43 @@ router.get('/pubsub/topics', async (req, res) => {
     });
 });
 
+router.post('/pubsub/topics', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
+    const name = req.body.name;
+    if (!name) {
+        return res.status(400).json({
+            success: false,
+            code: 400,
+            errors: ['topic name parameter is required']
+        });
+    }
+    const data = await dataManager.createTopic(projectId, name);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
+router.delete('/pubsub/topics/:name', async(req, res) => {
+    const projectId = req.header('x-gcp-project-id');
+    const name = req.params.name;
+    const data = await dataManager.deleteTopic(projectId, name);
+    var code;
+    if (data && data.success === false) {
+        code = (data.code === undefined ) ? 500 : data.code;
+    } else {
+        code = (data.code === undefined ) ? 200 : data.code;
+    }
+    res.status(code).json({
+        code: code,
+        ... data
+    });
+});
+
 module.exports = router;

@@ -46,11 +46,7 @@ class PubSubUtil {
      * create topic by name and return true
      */
     async createTopic(topicName) {
-        await this.pubsub.createTopic(topicName);
-        if (this.VERBOSE_MODE) {
-            console.log(`Topic '${topicName}' created.`);
-        }
-        return true;
+        return this.pubsub.createTopic(topicName);
     }
 
     /**
@@ -58,11 +54,7 @@ class PubSubUtil {
      * delete topic by name and return true
      */
     async deleteTopic(topicName) {
-        await this.pubsub.topic(topicName).delete();
-        if (this.VERBOSE_MODE) {
-            console.log(`Topic '${topicName}' deleted.`);
-        }
-        return true;
+        return this.pubsub.topic(topicName).delete();
     }
 
     /**

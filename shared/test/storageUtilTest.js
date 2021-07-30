@@ -37,24 +37,13 @@ describe('StorageUtil', () => {
         context('createBucket with arguments', () => {
             it("should return true", async () => {
                 let uuid = uuidv4();
-                await storageUtil.createBucket(uuid).then((result) => {
-                    expect(result).to.be.a('boolean');
-                    expect(result).to.equal(true);
-                }).then(() => {
+                await storageUtil.createBucket(uuid).then(() => {
                     return storageUtil.deleteBucket(uuid);
                 }).catch((reason) => {
                     expect.fail(`Failed: ${reason}`);
                 });
             });
         });
-
-        /*
-        //context('createBucket without arguments', function() {
-            //it("should throw error", async () => {
-               //expect(storageUtil.createBucket()).to.be.rejectedWith(TypeError);
-            //});
-        //});
-        */
 
         describe('Bucket created/deleted in pre/post setup', () => {
 

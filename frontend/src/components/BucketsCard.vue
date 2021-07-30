@@ -54,15 +54,12 @@
           <span>View in Cloud Storage</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.action="{ item }" v-if="false">
+      <template v-slot:item.action="{ item }">
         <v-menu bottom offset-y>
           <template v-slot:activator="{ on }">
             <v-icon v-on="on">{{ icons.dotsVertical }}</v-icon>
           </template>
           <v-list>
-            <v-list-item key="edit" @click="presentDatasetDialog(item)">
-              <v-list-item-title>Edit Bucket</v-list-item-title>
-            </v-list-item>
             <v-list-item key="delete" @click="presentDeleteDialog(item)">
               <v-list-item-title style="color:red"
                 >Delete Bucket</v-list-item-title

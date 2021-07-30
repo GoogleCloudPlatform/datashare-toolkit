@@ -39,6 +39,39 @@ async function listBuckets(projectId) {
     return { success: true, data: list };
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} name
+ */
+async function createBucket(projectId, name) {
+    const storageUtil = new StorageUtil(projectId);
+    await storageUtil.createBucket(name).catch(err => {
+        console.warn(err);
+        return { success: false, errors: [err.message] };
+    });
+    return {
+        success: true,
+        data: {
+            name: name
+        }
+    };
+}
+
+/**
+ * @param  {} projectId
+ * @param  {} name
+ */
+async function deleteBucket(projectId, name) {
+    const storageUtil = new StorageUtil(projectId);
+    await storageUtil.deleteBucket(name).catch(err => {
+        console.warn(err);
+        return { success: false, errors: [err.message] };
+    });
+    return { success: true };
+}
+
 module.exports = {
-    listBuckets
+    listBuckets,
+    createBucket,
+    deleteBucket
 };
