@@ -22,7 +22,7 @@ jobs:
         npm test
       env:
         CI: true
-  ingestion:
+  ingestion-batch:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -39,5 +39,59 @@ jobs:
         npm install
         npm run lint
         npm test
+      env:
+        CI: true
+  ingestion-streaming:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: npm install and lint for processUpload
+      run: |
+        cd $GITHUB_WORKSPACE/ingestion/streaming
+        npm install
+        npm run lint
+      env:
+        CI: true
+  api:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 13.x]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: npm install, lint, and test for shared
+      run: |
+        cd $GITHUB_WORKSPACE/api/v1alpha
+        npm install
+        npm run lint
+      env:
+        CI: true
+  ui:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 13.x]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: npm install, lint, and test for shared
+      run: |
+        cd $GITHUB_WORKSPACE/frontend
+        npm install
+        npm run lint
       env:
         CI: true
