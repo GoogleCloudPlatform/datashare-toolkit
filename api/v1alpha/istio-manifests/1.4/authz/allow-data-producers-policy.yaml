@@ -16,6 +16,8 @@ spec:
         - /v1alpha/procurements
         - /v1alpha/procurements?*
         - /v1alpha/views
+        - /v1alpha/pubsub/topics
+        - /v1alpha/storage/buckets
     - operation:
         methods:
         - POST
