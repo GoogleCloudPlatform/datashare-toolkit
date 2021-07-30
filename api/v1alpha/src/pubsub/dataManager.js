@@ -16,14 +16,24 @@
 
 'use strict';
 
+const { BigQueryUtil, PubSubUtil } = require('cds-shared');
+const config = require('../lib/config');
+const NodeCache = require("node-cache");
+const dsCache = new NodeCache();
+
 /**
  * @param  {} projectId
  */
 async function listTopics(projectId) {
-    let list = [{
-        name: "test-1",
-        description: "test-1 description"
-    }];
+    const pubsubUtil = new PubSubUtil(projectId);
+    const topics = await pubsubUtil.getTopics();
+    let list = [];
+    for (const t of topics) {
+        const labels = t.metadata.labels;
+        if (labels.datashare_managed === 'true') {
+            list.push(t.name);
+        }
+    }
     return { success: true, data: list };
 }
 

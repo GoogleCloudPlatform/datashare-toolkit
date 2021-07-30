@@ -35,6 +35,13 @@ class PubSubUtil {
     }
 
     /**
+     */
+    async getTopics() {
+        const [topics] = await this.pubsub.getTopics();
+        return topics;
+    }
+
+    /**
      * @param  {string} topicName
      * create topic by name and return true
      */
