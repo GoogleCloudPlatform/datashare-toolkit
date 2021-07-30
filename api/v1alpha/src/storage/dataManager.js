@@ -16,14 +16,26 @@
 
 'use strict';
 
+const { BigQueryUtil, StorageUtil } = require('cds-shared');
+const config = require('../lib/config');
+const NodeCache = require("node-cache");
+const dsCache = new NodeCache();
+
 /**
  * @param  {} projectId
  */
 async function listBuckets(projectId) {
-    let list = [{
-        name: "test-1",
-        description: "test-1 description"
-    }];
+    const storageUtil = new StorageUtil(projectId);
+    const buckets = await storageUtil.getBuckets();
+    let list = [];
+    for (const b of buckets) {
+        // Cache the metadata so we don't have to make a call for each bucket with each call
+        // Store for 1-2 mins?
+        const [metadata] = await b.getMetadata(b.name);
+        if (metadata.labels && metadata.labels.datashare_managed === 'true') {
+            list.push(b.name);
+        }
+    }
     return { success: true, data: list };
 }
 

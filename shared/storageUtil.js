@@ -96,15 +96,9 @@ class StorageUtil {
     
     /**
      */
-    async listBuckets() {
+    async getBuckets() {
         const [buckets] = await this.storage.getBuckets();
-        if (this.VERBOSE_MODE) {
-            console.log('Buckets:');
-            buckets.forEach(bucket => {
-                console.log(bucket.name);
-            });
-        }
-        return buckets.map(b => b.name);
+        return buckets;
     }
 
     /**

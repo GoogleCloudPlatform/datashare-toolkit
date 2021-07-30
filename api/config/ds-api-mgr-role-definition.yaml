@@ -26,6 +26,7 @@ includedPermissions:
 - pubsub.topics.attachSubscription
 - resourcemanager.projects.get
 - serviceusage.services.list
+- storage.buckets.get
 - storage.buckets.list
 - storage.objects.create
 - storage.objects.get
