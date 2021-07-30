@@ -82,7 +82,7 @@ async function isDataProducer(token) {
     });
     const payload = ticket.getPayload();
     const userid = payload['email'];
-    const domain = payload['hd'];
+    // const domain = payload['hd'];
 
     let isProducer = false;
     for (const p of config.dataProducers) {

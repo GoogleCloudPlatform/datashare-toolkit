@@ -16,10 +16,7 @@
 
 'use strict';
 
-const { BigQueryUtil, PubSubUtil } = require('cds-shared');
-const config = require('../lib/config');
-const NodeCache = require("node-cache");
-const dsCache = new NodeCache();
+const { PubSubUtil } = require('cds-shared');
 
 /**
  * @param  {} projectId

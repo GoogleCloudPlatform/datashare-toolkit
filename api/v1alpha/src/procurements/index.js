@@ -18,8 +18,6 @@
 
 const express = require('express');
 const dataManager = require("./dataManager");
-const { CommonUtil } = require('cds-shared');
-const commonUtil = CommonUtil;
 const cfg = require('../lib/config');
 const runtimeConfig = require('../lib/runtimeConfig');
 

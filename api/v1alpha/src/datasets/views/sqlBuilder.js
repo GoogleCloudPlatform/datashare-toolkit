@@ -189,7 +189,7 @@ async function prependLines(inputText, prepend, occurences) {
     });
 
     function getOutput() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             rl.on('close', () => {
                 resolve(output);
             });
