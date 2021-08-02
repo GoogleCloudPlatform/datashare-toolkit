@@ -1,7 +1,7 @@
 [Back to Datashare](./README.md)
 
 # Overview
-In order to simplify test drive use-cases of Datashare, this release incorporates the ability to have one UI and API integrate with multiple GCP projects.
+Datashare 2.0 is a major release that incorporates new delivery channels for Cloud Storage and Pub/Sub topics. Additionally, it introduces new IAM roles used by Datashare for granting/sharing access to GCP objects.
 
 # Enhancements
 - Added Cloud Storage support to policies.
