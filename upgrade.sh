@@ -27,7 +27,7 @@ function finish {
 }
 trap finish EXIT
 
-CUSTOM_ROLE_NAME=custom.ds.api.mgr;
+CUSTOM_ROLE_NAME=datashare.api.manager;
 export MARKETPLACE_INTEGRATION_ENABLED="false";
 
 for i in "$@"; do
@@ -99,6 +99,12 @@ echo "Starting upgrade for $PROJECT_ID";
 npm run deploy
 cd ..
 gcloud iam roles update ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml --quiet
+
+# Subscriber custom roles
+gcloud iam roles update datashare.bigquery.dataViewer --project ${PROJECT_ID} --file config/ds-bigquery-data-viewer-definition.yaml --quiet
+gcloud iam roles update datashare.storage.objectViewer --project ${PROJECT_ID} --file config/ds-storage-viewer-definition --quiet
+gcloud iam roles update datashare.pubsub.subscriber --project ${PROJECT_ID} --file config/ds-pubsub-subscriber-definition.yaml --quiet
+
 cd ../frontend
 npm run deploy
 echo "Completed upgrade for $PROJECT_ID";

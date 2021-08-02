@@ -1,5 +1,5 @@
-title: "Datashare Subscriber Role"
-description: "Custom Datashare Subscriber role to interface with GCP services"
+title: "Datashare BigQuery Data Viewer Subscriber"
+description: "Datashare role for granting data viewer access to BigQuery objects"
 stage: "GA"
 includedPermissions:
 - bigquery.datasets.get
@@ -15,9 +15,4 @@ includedPermissions:
 - bigquery.tables.getData
 - bigquery.tables.getIamPolicy
 - bigquery.tables.list
-- pubsub.snapshots.seek
-- pubsub.subscriptions.consume
-- pubsub.topics.attachSubscription
 - resourcemanager.projects.get
-- storage.objects.get
-- storage.objects.list
