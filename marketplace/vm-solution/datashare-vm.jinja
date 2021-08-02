@@ -22,7 +22,7 @@ imports:
 {% set apiStaticIp = properties["input_apiStaticIp"] %}
 {% set apiServiceAccountName = "ds-api-mgr" %}
 {% set apiServiceAccountDescr = "DS API Manager" %}
-{% set apiCustomRole = "custom.ds.api.mgr" %}
+{% set apiCustomRole = "datashare.api.manager" %}
 {% set istioExcludeIpRanges = "169.254.169.254/32" %}
 
 {% set cloudBuildCustomSAFullPath = "projects/" + project + "/serviceAccounts/" + gceServiceAccountValue %}
@@ -160,7 +160,7 @@ resources:
     properties:
       serviceAccountName: {{ apiServiceAccountName }}
       #serviceAccountDesc: DS API Manager
-      #customRoleName: custom.ds.api.mgr
+      #customRoleName: datashare.api.manager
       cloudRunDeployName: ds-api
       containerTag: dev
       customCloudBuildSA: {{ cloudBuildCustomSAFullPath }}

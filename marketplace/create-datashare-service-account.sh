@@ -19,7 +19,7 @@
 # Variables
 SA_NAME="ds-api-mgr"
 SA_DISPLAY_NAME="ds-api-mgr"
-CUSTOM_ROLE_NAME="custom.ds.api.mgr"
+CUSTOM_ROLE_NAME="datashare.api.manager"
 
 export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 

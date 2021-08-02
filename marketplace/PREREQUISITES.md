@@ -43,7 +43,7 @@ You must complete this step to setup Datashare correctly.
 git clone https://github.com/GoogleCloudPlatform/datashare-toolkit.git
 ```
 
-2. Execute the `create-datashare-service-account.sh` script, which will create the `ds-api-mgr` service account and the new `custom.ds.api.mgr` role into your Google Cloud project.
+2. Execute the `create-datashare-service-account.sh` script, which will create the `ds-api-mgr` service account and the new `datashare.api.manager` role into your Google Cloud project.
 
 ```
 cd datashare-toolkit/marketplace/
