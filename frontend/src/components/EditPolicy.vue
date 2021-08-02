@@ -58,168 +58,194 @@
             ></v-checkbox>
           </v-row>
         </v-container>
-        <v-radio-group
-          v-show="policy.bigQueryEnabled"
-          v-model="policy.isTableBased"
-          row
-          @change="accessTypeChanged"
-        >
-          <v-radio label="Dataset-based Access" :value="false"></v-radio>
-          <v-radio label="View/Table-based Access" :value="true"></v-radio>
-        </v-radio-group>
-        <v-expansion-panels multiple v-model="panel">
-          <v-expansion-panel
-            v-if="!policy.isTableBased && policy.bigQueryEnabled"
-          >
-            <v-expansion-panel-header>Dataset Access</v-expansion-panel-header>
+        <v-expansion-panels v-model="panel">
+          <v-expansion-panel v-if="policy.bigQueryEnabled">
+            <v-expansion-panel-header>{{
+              bigQueryPanelTitle
+            }}</v-expansion-panel-header>
             <v-expansion-panel-content>
-              <v-data-table
-                dense
-                :headers="datasetHeaders"
-                :items="policy.datasets"
-                item-key="datasetId"
-                :search="datasetSearch"
-                :loading="loading"
+              <v-radio-group
+                v-show="policy.bigQueryEnabled"
+                v-model="policy.isTableBased"
+                row
+                @change="accessTypeChanged"
               >
-                <template v-slot:loading>
-                  <v-row justify="center" align="center">
-                    <div class="text-center ma-12">
-                      <v-progress-circular
-                        v-if="loading"
-                        indeterminate
-                        color="primary"
-                      ></v-progress-circular>
-                    </div>
-                  </v-row>
-                </template>
-                <template v-slot:top>
-                  <v-toolbar flat color="white">
-                    <v-text-field
-                      class="mb-4"
-                      width="40px"
-                      v-model="datasetSearch"
-                      append-icon="search"
-                      label="Search"
-                      single-line
-                      hide-details
-                    ></v-text-field>
-                    <v-divider class="mx-4" inset vertical></v-divider>
-                    <v-btn
-                      color="primary"
-                      dark
-                      class="mb-2"
-                      @click.stop="showAddDatasetDialog"
-                      >Add Dataset</v-btn
+                <v-radio label="Dataset-based Access" :value="false"></v-radio>
+                <v-radio
+                  label="View/Table-based Access"
+                  :value="true"
+                ></v-radio>
+              </v-radio-group>
+              <v-expansion-panels multiple v-model="bigQueryPanel">
+                <v-expansion-panel v-if="!policy.isTableBased">
+                  <v-expansion-panel-header
+                    >Dataset Access</v-expansion-panel-header
+                  >
+                  <v-expansion-panel-content>
+                    <v-data-table
+                      dense
+                      :headers="datasetHeaders"
+                      :items="policy.datasets"
+                      item-key="datasetId"
+                      :search="datasetSearch"
+                      :loading="loading"
                     >
-                  </v-toolbar>
-                </template>
-                <template v-slot:item.action="{ item }">
-                  <v-icon small @click="deleteDataset(item)">
-                    delete
-                  </v-icon>
-                </template>
-              </v-data-table>
+                      <template v-slot:loading>
+                        <v-row justify="center" align="center">
+                          <div class="text-center ma-12">
+                            <v-progress-circular
+                              v-if="loading"
+                              indeterminate
+                              color="primary"
+                            ></v-progress-circular>
+                          </div>
+                        </v-row>
+                      </template>
+                      <template v-slot:top>
+                        <v-toolbar flat color="white">
+                          <v-text-field
+                            class="mb-4"
+                            width="40px"
+                            v-model="datasetSearch"
+                            append-icon="search"
+                            label="Search"
+                            single-line
+                            hide-details
+                          ></v-text-field>
+                          <v-divider class="mx-4" inset vertical></v-divider>
+                          <v-btn
+                            color="primary"
+                            dark
+                            class="mb-2"
+                            @click.stop="showAddDatasetDialog"
+                            >Add Dataset</v-btn
+                          >
+                        </v-toolbar>
+                      </template>
+                      <template v-slot:item.action="{ item }">
+                        <v-icon small @click="deleteDataset(item)">
+                          delete
+                        </v-icon>
+                      </template>
+                    </v-data-table>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel v-else>
+                  <v-expansion-panel-header
+                    >Table Access</v-expansion-panel-header
+                  >
+                  <v-expansion-panel-content>
+                    <v-data-table
+                      dense
+                      :headers="tableHeaders"
+                      :items="formattedTables"
+                      :search="tableSearch"
+                      :loading="loading"
+                    >
+                      <template v-slot:loading>
+                        <v-row justify="center" align="center">
+                          <div class="text-center ma-12">
+                            <v-progress-circular
+                              v-if="loading"
+                              indeterminate
+                              color="primary"
+                            ></v-progress-circular>
+                          </div>
+                        </v-row>
+                      </template>
+                      <template v-slot:top>
+                        <v-toolbar flat color="white">
+                          <v-text-field
+                            class="mb-4"
+                            width="40px"
+                            v-model="tableSearch"
+                            append-icon="search"
+                            label="Search"
+                            single-line
+                            hide-details
+                          ></v-text-field>
+                          <v-divider class="mx-4" inset vertical></v-divider>
+                          <v-btn
+                            color="primary"
+                            dark
+                            class="mb-2"
+                            @click.stop="showAddTableDialog"
+                            >Add Table</v-btn
+                          >
+                        </v-toolbar>
+                      </template>
+                      <template v-slot:item.action="{ item }">
+                        <v-icon small @click="deleteTable(item)">
+                          delete
+                        </v-icon>
+                      </template>
+                    </v-data-table>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel>
+                  <v-expansion-panel-header
+                    >Row Access</v-expansion-panel-header
+                  >
+                  <v-expansion-panel-content>
+                    <v-data-table
+                      dense
+                      :headers="tagHeaders"
+                      :items="policy.rowAccessTags"
+                      :search="rowAccessSearch"
+                      :loading="loading"
+                    >
+                      <template v-slot:loading>
+                        <v-row justify="center" align="center">
+                          <div class="text-center ma-12">
+                            <v-progress-circular
+                              v-if="loading"
+                              indeterminate
+                              color="primary"
+                            ></v-progress-circular>
+                          </div>
+                        </v-row>
+                      </template>
+                      <template v-slot:top>
+                        <v-toolbar flat color="white">
+                          <v-text-field
+                            class="mb-4"
+                            width="40px"
+                            v-model="rowAccessSearch"
+                            append-icon="search"
+                            label="Search"
+                            single-line
+                            hide-details
+                          ></v-text-field>
+                          <v-divider class="mx-4" inset vertical></v-divider>
+                          <v-btn
+                            color="primary"
+                            dark
+                            class="mb-2"
+                            @click.stop="showAddRowTagDialog"
+                            >Add Row Tag</v-btn
+                          >
+                        </v-toolbar>
+                      </template>
+                      <template v-slot:item.action="{ item }">
+                        <v-icon small @click="deleteRowTag(item)">
+                          delete
+                        </v-icon>
+                      </template>
+                    </v-data-table>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-expansion-panel v-else-if="policy.bigQueryEnabled">
-            <v-expansion-panel-header>Table Access</v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-data-table
-                dense
-                :headers="tableHeaders"
-                :items="formattedTables"
-                :search="tableSearch"
-                :loading="loading"
-              >
-                <template v-slot:loading>
-                  <v-row justify="center" align="center">
-                    <div class="text-center ma-12">
-                      <v-progress-circular
-                        v-if="loading"
-                        indeterminate
-                        color="primary"
-                      ></v-progress-circular>
-                    </div>
-                  </v-row>
-                </template>
-                <template v-slot:top>
-                  <v-toolbar flat color="white">
-                    <v-text-field
-                      class="mb-4"
-                      width="40px"
-                      v-model="tableSearch"
-                      append-icon="search"
-                      label="Search"
-                      single-line
-                      hide-details
-                    ></v-text-field>
-                    <v-divider class="mx-4" inset vertical></v-divider>
-                    <v-btn
-                      color="primary"
-                      dark
-                      class="mb-2"
-                      @click.stop="showAddTableDialog"
-                      >Add Table</v-btn
-                    >
-                  </v-toolbar>
-                </template>
-                <template v-slot:item.action="{ item }">
-                  <v-icon small @click="deleteTable(item)">
-                    delete
-                  </v-icon>
-                </template>
-              </v-data-table>
-            </v-expansion-panel-content>
+          <v-expansion-panel v-if="policy.cloudStorageEnabled">
+            <v-expansion-panel-header
+              >Cloud Storage Buckets</v-expansion-panel-header
+            >
+            <v-expansion-panel-content> </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header>Row Access</v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-data-table
-                dense
-                :headers="tagHeaders"
-                :items="policy.rowAccessTags"
-                :search="rowAccessSearch"
-                :loading="loading"
-              >
-                <template v-slot:loading>
-                  <v-row justify="center" align="center">
-                    <div class="text-center ma-12">
-                      <v-progress-circular
-                        v-if="loading"
-                        indeterminate
-                        color="primary"
-                      ></v-progress-circular>
-                    </div>
-                  </v-row>
-                </template>
-                <template v-slot:top>
-                  <v-toolbar flat color="white">
-                    <v-text-field
-                      class="mb-4"
-                      width="40px"
-                      v-model="rowAccessSearch"
-                      append-icon="search"
-                      label="Search"
-                      single-line
-                      hide-details
-                    ></v-text-field>
-                    <v-divider class="mx-4" inset vertical></v-divider>
-                    <v-btn
-                      color="primary"
-                      dark
-                      class="mb-2"
-                      @click.stop="showAddRowTagDialog"
-                      >Add Row Tag</v-btn
-                    >
-                  </v-toolbar>
-                </template>
-                <template v-slot:item.action="{ item }">
-                  <v-icon small @click="deleteRowTag(item)">
-                    delete
-                  </v-icon>
-                </template>
-              </v-data-table>
-            </v-expansion-panel-content>
+          <v-expansion-panel v-if="policy.pubsubEnabled">
+            <v-expansion-panel-header>Pub/Sub Topics</v-expansion-panel-header>
+            <v-expansion-panel-content> </v-expansion-panel-content>
           </v-expansion-panel>
           <v-expansion-panel
             v-if="config.marketplaceIntegrationEnabled === true"
@@ -539,6 +565,7 @@ export default {
     newRowTag: null,
     showError: false,
     panel: [0],
+    bigQueryPanel: [0],
     id: null,
     accounts: [],
     policy: {
@@ -683,6 +710,16 @@ export default {
         d.push({ datasetId: dataset });
       });
       return d;
+    },
+    bigQueryPanelTitle() {
+      if (this.policy.bigQueryEnabled === true) {
+        if (this.policy.isTableBased) {
+          return 'BigQuery Views/Tables';
+        } else {
+          return 'BigQuery Datasets';
+        }
+      }
+      return '';
     }
   },
   methods: {
