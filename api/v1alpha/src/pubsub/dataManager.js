@@ -17,6 +17,7 @@
 'use strict';
 
 const { PubSubUtil } = require('cds-shared');
+const config = require('../lib/config');
 
 /**
  * @param  {} projectId
@@ -41,16 +42,26 @@ async function listTopics(projectId) {
  */
 async function createTopic(projectId, name) {
     const pubsubUtil = new PubSubUtil(projectId);
-    await pubsubUtil.createTopic(name).catch(err => {
-        console.warn(err);
+    return pubsubUtil.createTopic(name).then(topicResponse => {
+        console.error('at cont');
+        console.log(topicResponse);
+        const [topic, metadata] = topicResponse;
+        let dict = {};
+        dict.labels = { [config.cdsManagedLabelKey]: "true" };
+        return topic.setMetadata(dict).then((data) => {
+            const apiResponse = data[0];
+            console.debug(apiResponse);
+            return {
+                success: true,
+                data: {
+                    name: name
+                }
+            };
+        })
+    }).catch(err => {
+        console.error(`Error adding label to new topic name ${name} with error: ${err}`);
         return { success: false, errors: [err.message] };
-    });
-    return {
-        success: true,
-        data: {
-            name: name
-        }
-    };
+    });;
 }
 
 /**

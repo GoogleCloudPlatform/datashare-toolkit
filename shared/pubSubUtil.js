@@ -48,7 +48,7 @@ class PubSubUtil {
     async createTopic(topicName) {
         return this.pubsub.createTopic(topicName);
     }
-
+    
     /**
      * @param  {string} topicName
      * delete topic by name and return true

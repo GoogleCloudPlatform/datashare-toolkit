@@ -123,7 +123,7 @@
               @click.stop="showCreateTopic = false"
               >Cancel</v-btn
             >
-            <v-btn color="green darken-1" text @click.stop="saveDataset">{{
+            <v-btn color="green darken-1" text @click.stop="saveTopic">{{
               !this.dialogTopic.editing ? 'Create' : 'Update'
             }}</v-btn>
           </v-card-actions>
@@ -295,7 +295,7 @@ export default {
           this.loadTopics();
         });
     },
-    saveBucket() {
+    saveTopic() {
       this.$refs.observer
         .validate()
         .then(result => {
@@ -303,9 +303,7 @@ export default {
             if (this.dialogTopic.editing === false) {
               this.$store
                 .dispatch('createTopic', {
-                  projectId: config.projectId,
-                  datasetId: this.dialogTopic.datasetId,
-                  description: this.dialogTopic.description
+                  name: this.dialogTopic.name
                 })
                 .then(result => {
                   this.loading = false;
@@ -319,14 +317,12 @@ export default {
                   }
                 })
                 .catch(error => {
-                  console.error(`Error creating bucket: ${error}`);
+                  console.error(`Error creating topic: ${error}`);
                 });
             } else {
               this.$store
                 .dispatch('updateTopic', {
-                  projectId: config.projectId,
-                  datasetId: this.dialogTopic.datasetId,
-                  description: this.dialogTopic.description
+                  name: this.dialogTopic.name
                 })
                 .then(result => {
                   this.loading = false;
