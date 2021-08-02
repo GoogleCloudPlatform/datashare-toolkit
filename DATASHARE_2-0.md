@@ -4,8 +4,8 @@
 Datashare 2.0 is a major release that incorporates new delivery channels for Cloud Storage and Pub/Sub topics. Additionally, it introduces new IAM roles used by Datashare for granting/sharing access to GCP objects.
 
 # Enhancements
-- Added Cloud Storage support to policies.
-- Added Pub/Sub support to policies.
+- Added [Cloud Storage support](https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/504) to policies.
+- Added [Pub/Sub support](https://github.com/GoogleCloudPlatform/datashare-toolkit/issues/524) to policies.
 - The navigation sub-menu 'Batch' is renamed to 'Channels'.
 - Added [multi-project support](./MULTI_PROJECT_SUPPORT.md).
 
