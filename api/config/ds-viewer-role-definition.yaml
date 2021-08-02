@@ -1,0 +1,23 @@
+title: "Datashare Subscriber Role"
+description: "Custom Datashare Subscriber role to interface with GCP services"
+stage: "GA"
+includedPermissions:
+- bigquery.datasets.get
+- bigquery.datasets.getIamPolicy
+- bigquery.models.export
+- bigquery.models.getData
+- bigquery.models.getMetadata
+- bigquery.models.list
+- bigquery.routines.get
+- bigquery.routines.list
+- bigquery.tables.export
+- bigquery.tables.get
+- bigquery.tables.getData
+- bigquery.tables.getIamPolicy
+- bigquery.tables.list
+- pubsub.snapshots.seek
+- pubsub.subscriptions.consume
+- pubsub.topics.attachSubscription
+- resourcemanager.projects.get
+- storage.objects.get
+- storage.objects.list
