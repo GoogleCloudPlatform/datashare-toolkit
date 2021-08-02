@@ -121,9 +121,15 @@ Set the **CUSTOM\_ROLE\_NAME** environment variable(s):
 **Note**: We could use the the following roles, but it's better to follow the principle of least privilege. \
 _The permissions for the custom role are defined in [config/ds-api-mgr-role-definition.yaml](config/ds-api-mgr-role-definition.yaml)_
 
-Create custom DS API role:
+Create custom DS API roles:
 
+    # API manager role
     gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml
+
+    # Subscriber custom roles
+    gcloud iam roles update datashare.bigquery.dataViewer --project ${PROJECT_ID} --file config/ds-bigquery-data-viewer-definition.yaml
+    gcloud iam roles update datashare.storage.objectViewer --project ${PROJECT_ID} --file config/ds-storage-object-viewer-definition.yaml
+    gcloud iam roles update datashare.pubsub.subscriber --project ${PROJECT_ID} --file config/ds-pubsub-subscriber-definition.yaml
 
 Grant the new GCP service role to service account:
 
