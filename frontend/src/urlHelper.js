@@ -14,12 +14,16 @@ function navigateToTable(projectId, datasetId, tableId) {
 }
 
 function navigateToBucket(projectId, name) {
-  const url = `https://console.cloud.google.com/storage/browser/${name}?project=${projectId}`;
+  const url = `https://console.cloud.google.com/storage/browser/${encodeURIComponent(
+    name
+  )}?project=${projectId}`;
   window.open(url, '_blank');
 }
 
 function navigateToTopic(projectId, topicId) {
-  const url = `https://console.cloud.google.com/cloudpubsub/topic/detail/${topicId}?project=${projectId}`;
+  const url = `https://console.cloud.google.com/cloudpubsub/topic/detail/${encodeURIComponent(
+    topicId
+  )}?project=${projectId}`;
   window.open(url, '_blank');
 }
 

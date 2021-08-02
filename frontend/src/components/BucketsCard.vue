@@ -276,7 +276,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('deleteBucket', {
-          name: item.name
+          name: encodeURIComponent(item.name)
         })
         .then(() => {
           this.loading = false;

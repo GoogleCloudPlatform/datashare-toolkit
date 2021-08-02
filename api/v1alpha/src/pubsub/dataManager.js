@@ -57,7 +57,7 @@ async function createTopic(projectId, name) {
             };
         })
     }).catch(err => {
-        console.error(`Error adding label to new topic name ${name} with error: ${err}`);
+        console.error(`Error creating topic name ${name} with error: ${err}`);
         return { success: false, errors: [err.message] };
     });;
 }

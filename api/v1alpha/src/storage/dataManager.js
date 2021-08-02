@@ -17,6 +17,7 @@
 'use strict';
 
 const { StorageUtil } = require('cds-shared');
+const config = require('../lib/config');
 
 /**
  * @param  {} projectId
@@ -43,14 +44,18 @@ async function listBuckets(projectId) {
 async function createBucket(projectId, name) {
     const storageUtil = new StorageUtil(projectId);
     return storageUtil.createBucket(name).then(bucketResponse => {
-        return {
-            success: true,
-            data: {
-                name: name
-            }
-        };
+        const [bucket, metadata] = bucketResponse;
+        let labels = { [config.cdsManagedLabelKey]: "true" };
+        return bucket.setLabels(labels).then((data) => {
+            return {
+                success: true,
+                data: {
+                    name: name
+                }
+            };
+        });
     }).catch(err => {
-        console.warn(err);
+        console.error(`Error creating bucket name ${name} with error: ${err}`);
         return { success: false, errors: [err.message] };
     });
 }
