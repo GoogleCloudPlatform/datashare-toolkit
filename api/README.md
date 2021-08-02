@@ -110,13 +110,13 @@ Set the **SERVICE\_ACCOUNT\_DESC** environment variable(s):
 
     export SERVICE_ACCOUNT_DESC="DS API Manager";
 
-Create the custom DS API service-account:
+Create the custom Datashare API service-account:
 
     gcloud iam service-accounts create ${SERVICE_ACCOUNT_NAME} --display-name "${SERVICE_ACCOUNT_DESC}";
 
 Set the **CUSTOM\_ROLE\_NAME** environment variable(s):
 
-    export CUSTOM_ROLE_NAME=custom.ds.api.mgr;
+    export CUSTOM_ROLE_NAME=datashare.api.manager;
 
 **Note**: We could use the the following roles, but it's better to follow the principle of least privilege. \
 _The permissions for the custom role are defined in [config/ds-api-mgr-role-definition.yaml](config/ds-api-mgr-role-definition.yaml)_
