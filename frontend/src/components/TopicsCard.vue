@@ -154,7 +154,7 @@
           bottom
           right
           fab
-          @click="presentDatasetDialog()"
+          @click="presentTopicDialog()"
         >
           <v-icon>{{ icons.plus }}</v-icon>
         </v-btn>
@@ -288,7 +288,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('deleteTopic', {
-          topicId: item.id
+          topicId: encodeURIComponent(item.id)
         })
         .then(() => {
           this.loading = false;
