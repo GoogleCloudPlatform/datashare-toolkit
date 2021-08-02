@@ -29,7 +29,7 @@
             label="Search"
           ></v-text-field>
           <v-divider class="mx-4" inset vertical></v-divider>
-          <v-btn color="primary" dark @click.stop="presentDatasetDialog()"
+          <v-btn color="primary" dark @click.stop="presentBucketDialog()"
             >Create Bucket</v-btn
           >
         </v-toolbar>
@@ -101,29 +101,17 @@
             <v-form class="px-4">
               <ValidationProvider
                 v-slot="{ errors }"
-                name="Dataset Id"
-                rules="required|bigQueryTableIdRule"
+                name="Name"
+                rules="required|bucketNameRule"
               >
                 <v-text-field
                   :readonly="dialogBucket.editing === true"
-                  v-model="dialogBucket.datasetId"
+                  v-model="dialogBucket.name"
                   :error-messages="errors"
-                  :counter="1024"
-                  label="Dataset Id"
+                  :counter="222"
+                  label="Name"
                   required
                 ></v-text-field>
-              </ValidationProvider>
-              <ValidationProvider
-                v-slot="{ errors }"
-                name="Description"
-                rules="required|max:1024"
-              >
-                <v-textarea
-                  v-model="dialogBucket.description"
-                  :error-messages="errors"
-                  label="Description"
-                  required
-                ></v-textarea>
               </ValidationProvider>
             </v-form>
           </ValidationObserver>
@@ -135,7 +123,7 @@
               @click.stop="showCreateBucket = false"
               >Cancel</v-btn
             >
-            <v-btn color="green darken-1" text @click.stop="saveDataset">{{
+            <v-btn color="green darken-1" text @click.stop="saveBucket">{{
               !this.dialogBucket.editing ? 'Create' : 'Update'
             }}</v-btn>
           </v-card-actions>
@@ -166,7 +154,7 @@
           bottom
           right
           fab
-          @click="presentDatasetDialog()"
+          @click="presentBucketDialog()"
         >
           <v-icon>{{ icons.plus }}</v-icon>
         </v-btn>
@@ -198,11 +186,13 @@ extend('max', {
   message: '{_field_} may not be greater than {length} characters'
 });
 
-extend('bigQueryTableIdRule', value => {
-  if (value.length > 1024) {
-    return `DatasetId '${value}' exceeds maximum allowable length of 1024: ${value.length}}`;
-  } else if (!value.match(/^[A-Za-z0-9_]+$/g)) {
-    return `DatasetId '${value}' name is invalid. See https://cloud.google.com/bigquery/docs/datasets for further information.`;
+extend('bucketNameRule', value => {
+  if (value.length < 3) {
+    return `Bucket name '${value}' is smaller than minimum allowable length of 3: ${value.length}}`;
+  } else if (value.length > 222) {
+    return `Bucket '${value}' exceeds maximum allowable length of 222: ${value.length}}`;
+  } else if (!value.match(/^(?!goog)[a-z0-9]+[a-z0-9\-._]*$/g)) {
+    return `Bucket '${value}' name is invalid. Use only lowercase letters, numbers, hyphens (-), and underscores (_). Dots (.) may be used to form a valid domain name. See https://cloud.google.com/storage/docs/naming-buckets for further information.`;
   }
   return true;
 });
@@ -273,9 +263,7 @@ export default {
     presentBucketDialog(selectedItem) {
       this.dialogBucket = { editing: false };
       if (selectedItem) {
-        this.dialogBucket.editing = true;
-        this.dialogBucket.datasetId = selectedItem.datasetId;
-        this.dialogBucket.description = selectedItem.description;
+        this.dialogBucket.name = selectedItem.name;
       }
       this.showCreateBucket = true;
     },
@@ -303,9 +291,7 @@ export default {
             if (this.dialogBucket.editing === false) {
               this.$store
                 .dispatch('createBucket', {
-                  projectId: config.projectId,
-                  datasetId: this.dialogBucket.datasetId,
-                  description: this.dialogBucket.description
+                  name: this.dialogBucket.name
                 })
                 .then(result => {
                   this.loading = false;
@@ -324,9 +310,7 @@ export default {
             } else {
               this.$store
                 .dispatch('updateBucket', {
-                  projectId: config.projectId,
-                  datasetId: this.dialogBucket.datasetId,
-                  description: this.dialogBucket.description
+                  name: this.dialogBucket.name
                 })
                 .then(result => {
                   this.loading = false;

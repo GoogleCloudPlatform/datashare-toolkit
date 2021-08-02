@@ -30,6 +30,7 @@ includedPermissions:
 - pubsub.topics.update
 - resourcemanager.projects.get
 - serviceusage.services.list
+- storage.buckets.create
 - storage.buckets.delete
 - storage.buckets.get
 - storage.buckets.list

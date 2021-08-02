@@ -43,8 +43,6 @@ async function listTopics(projectId) {
 async function createTopic(projectId, name) {
     const pubsubUtil = new PubSubUtil(projectId);
     return pubsubUtil.createTopic(name).then(topicResponse => {
-        console.error('at cont');
-        console.log(topicResponse);
         const [topic, metadata] = topicResponse;
         let dict = {};
         dict.labels = { [config.cdsManagedLabelKey]: "true" };
@@ -70,11 +68,12 @@ async function createTopic(projectId, name) {
  */
 async function deleteTopic(projectId, name) {
     const pubsubUtil = new PubSubUtil(projectId);
-    await pubsubUtil.deleteTopic(name).catch(err => {
+    return pubsubUtil.deleteTopic(name).then(() => {
+        return { success: true };
+    }).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
-    return { success: true };
 }
 
 module.exports = {

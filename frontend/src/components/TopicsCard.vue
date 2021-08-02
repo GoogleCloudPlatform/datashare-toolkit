@@ -273,9 +273,7 @@ export default {
     presentTopicDialog(selectedItem) {
       this.dialogTopic = { editing: false };
       if (selectedItem) {
-        this.dialogTopic.editing = true;
-        this.dialogTopic.datasetId = selectedItem.datasetId;
-        this.dialogTopic.description = selectedItem.description;
+        this.dialogTopic.name = selectedItem.name;
       }
       this.showCreateTopic = true;
     },
