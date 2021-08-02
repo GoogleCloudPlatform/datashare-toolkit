@@ -247,6 +247,11 @@ export default {
     itemsPerPage: 50,
     headers: [
       {
+        text: 'Id',
+        value: 'id',
+        tooltip: 'The topic id'
+      },
+      {
         text: 'Name',
         value: 'name',
         tooltip: 'The bucket name'
