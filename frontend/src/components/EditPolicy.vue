@@ -48,13 +48,13 @@
             ></v-checkbox>
             <v-checkbox
               class="ml-6"
-              v-model="policy.pubsubEnabled"
-              label="Pub/Sub Topics"
+              v-model="policy.cloudStorageEnabled"
+              label="Cloud Storage Buckets"
             ></v-checkbox>
             <v-checkbox
               class="ml-6"
-              v-model="policy.cloudStorageEnabled"
-              label="Cloud Storage Buckets"
+              v-model="policy.pubsubEnabled"
+              label="Pub/Sub Topics"
             ></v-checkbox>
           </v-row>
         </v-container>
@@ -712,7 +712,7 @@ export default {
       return d;
     },
     bigQueryPanelTitle() {
-      if (this.policy.bigQueryEnabled === true) {
+      if (this.policy && this.policy.bigQueryEnabled === true) {
         if (this.policy.isTableBased) {
           return 'BigQuery Views/Tables';
         } else {
