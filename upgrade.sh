@@ -101,7 +101,7 @@ gcloud iam roles update datashare.api.manager --project ${PROJECT_ID} --file con
 
 # Subscriber custom roles
 gcloud iam roles update datashare.bigquery.dataViewer --project ${PROJECT_ID} --file config/ds-bigquery-data-viewer-definition.yaml --quiet
-gcloud iam roles update datashare.storage.objectViewer --project ${PROJECT_ID} --file config/ds-storage-viewer-definition --quiet
+gcloud iam roles update datashare.storage.objectViewer --project ${PROJECT_ID} --file config/ds-storage-object-viewer-definition.yaml --quiet
 gcloud iam roles update datashare.pubsub.subscriber --project ${PROJECT_ID} --file config/ds-pubsub-subscriber-definition.yaml --quiet
 
 cd ../frontend
