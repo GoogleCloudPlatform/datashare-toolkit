@@ -7,6 +7,7 @@ Datashare 2.0 is a major release that incorporates new delivery channels for Clo
 - Added Cloud Storage support to policies.
 - Added Pub/Sub support to policies.
 - The navigation sub-menu 'Batch' is renamed to 'Channels'.
+- Added [multi-project support](./MULTI_PROJECT_SUPPORT.md).
 
 # Breaking Changes
 - The Datashare API manager custom IAM role ID was renamed from `custom.ds.api.mgr` to `datashare.api.manager`.
