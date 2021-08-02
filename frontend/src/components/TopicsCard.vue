@@ -101,29 +101,17 @@
             <v-form class="px-4">
               <ValidationProvider
                 v-slot="{ errors }"
-                name="Dataset Id"
-                rules="required|bigQueryTableIdRule"
+                name="Name"
+                rules="required|pubSubNameRule"
               >
                 <v-text-field
                   :readonly="dialogTopic.editing === true"
-                  v-model="dialogTopic.datasetId"
+                  v-model="dialogTopic.name"
                   :error-messages="errors"
-                  :counter="1024"
-                  label="Dataset Id"
+                  :counter="255"
+                  label="Name"
                   required
                 ></v-text-field>
-              </ValidationProvider>
-              <ValidationProvider
-                v-slot="{ errors }"
-                name="Description"
-                rules="required|max:1024"
-              >
-                <v-textarea
-                  v-model="dialogTopic.description"
-                  :error-messages="errors"
-                  label="Description"
-                  required
-                ></v-textarea>
               </ValidationProvider>
             </v-form>
           </ValidationObserver>
@@ -198,11 +186,16 @@ extend('max', {
   message: '{_field_} may not be greater than {length} characters'
 });
 
-extend('bigQueryTableIdRule', value => {
-  if (value.length > 1024) {
-    return `DatasetId '${value}' exceeds maximum allowable length of 1024: ${value.length}}`;
-  } else if (!value.match(/^[A-Za-z0-9_]+$/g)) {
-    return `DatasetId '${value}' name is invalid. See https://cloud.google.com/bigquery/docs/datasets for further information.`;
+extend('pubSubNameRule', value => {
+  // Must be 3-255 characters, start with a letter, and contain only the following characters:
+  // letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or plus signs (+).
+  // Cannot start with goog.
+  if (value.length < 3) {
+    return `Topic name '${value}' is smaller than minimum allowable length of 3: ${value.length}}`;
+  } else if (value.length > 255) {
+    return `Topic name '${value}' exceeds maximum allowable length of 255: ${value.length}}`;
+  } else if (!value.match(/^(?!goog)[A-Za-z]+[A-Za-z0-9\-._~%+]*$/g)) {
+    return `Topic '${value}' name is invalid. Must be 3-255 characters, start with a letter, and contain only the following characters: letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or plus signs (+). Cannot start with goog.`;
   }
   return true;
 });
