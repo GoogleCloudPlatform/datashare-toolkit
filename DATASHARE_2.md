@@ -10,4 +10,4 @@ In order to simplify test drive use-cases of Datashare, this release incorporate
     - If performing a Datashare upgrade, you will need to manually revoke access for users granted access through Datashare to `bigquery.dataViewer`. Datashare will automatically sync existing users to the new `datashare.bigquery.dataViewer` role.
 
 # Open Items
-- The 'Accounts' expansion panel on the edit policy UI only supports BigQuery currently. Support will be added for Pub/Sub and Cloud Storage in a future update.
+
