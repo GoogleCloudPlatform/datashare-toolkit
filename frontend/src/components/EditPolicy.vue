@@ -35,7 +35,31 @@
             required
           ></v-textarea>
         </ValidationProvider>
+        <v-container fluid>
+          <v-row>
+            <div class="text-subtitle-2">
+              Share Types:
+            </div>
+          </v-row>
+          <v-row>
+            <v-checkbox
+              v-model="policy.bigQueryEnabled"
+              label="BigQuery"
+            ></v-checkbox>
+            <v-checkbox
+              class="ml-6"
+              v-model="policy.pubsubEnabled"
+              label="Pub/Sub Topics"
+            ></v-checkbox>
+            <v-checkbox
+              class="ml-6"
+              v-model="policy.cloudStorageEnabled"
+              label="Cloud Storage Buckets"
+            ></v-checkbox>
+          </v-row>
+        </v-container>
         <v-radio-group
+          v-show="policy.bigQueryEnabled"
           v-model="policy.isTableBased"
           row
           @change="accessTypeChanged"
@@ -44,7 +68,9 @@
           <v-radio label="View/Table-based Access" :value="true"></v-radio>
         </v-radio-group>
         <v-expansion-panels multiple v-model="panel">
-          <v-expansion-panel v-if="!policy.isTableBased">
+          <v-expansion-panel
+            v-if="!policy.isTableBased && policy.bigQueryEnabled"
+          >
             <v-expansion-panel-header>Dataset Access</v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-data-table
@@ -95,7 +121,7 @@
               </v-data-table>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-expansion-panel v-else>
+          <v-expansion-panel v-else-if="policy.bigQueryEnabled">
             <v-expansion-panel-header>Table Access</v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-data-table
@@ -525,7 +551,10 @@ export default {
       rowAccessTags: [],
       initialDatasets: [],
       initialRowAccessTags: [],
-      marketplace: { solutionId: null, planId: null, enableAutoApprove: false }
+      marketplace: { solutionId: null, planId: null, enableAutoApprove: false },
+      bigQueryEnabled: true,
+      pubsubEnabled: false,
+      cloudStorageEnabled: false
     },
     datasetSearch: '',
     tableSearch: '',
