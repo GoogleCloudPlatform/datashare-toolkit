@@ -641,6 +641,21 @@ export default {
       ];
       return h;
     },
+    bucketHeaders() {
+      let h = [
+        { text: 'Bucket Name', value: 'name' },
+        { text: '', value: 'action', sortable: false }
+      ];
+      return h;
+    },
+    topicHeaders() {
+      let h = [
+        { text: 'Topic Id', value: 'id' },
+        { text: 'Topic Name', value: 'name' },
+        { text: '', value: 'action', sortable: false }
+      ];
+      return h;
+    },
     formattedTables() {
       let result = [];
       if (this.policy.datasets && this.policy.datasets.length > 0) {
