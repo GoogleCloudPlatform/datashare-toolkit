@@ -213,8 +213,6 @@ async function performTableMetadataUpdate(projectId, datasetId, tableId, account
 
     if (isDirty === true) {
         try {
-            console.log('Attempting to set policy:');
-            console.log(tablePolicy);
             await bigqueryUtil.setTableIamPolicy(projectId, datasetId, tableId, tablePolicy, 'bindings');
             console.info(`Policy set successfully for table '${datasetId}'`);
         } catch (err) {
