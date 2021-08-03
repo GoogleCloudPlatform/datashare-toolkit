@@ -764,7 +764,7 @@ export default {
           this.loading = true;
           let data = {};
           if (!this.policyData) {
-            // New account
+            // New policy
             data = {
               name: this.policy.name,
               description: this.policy.description,
@@ -773,7 +773,7 @@ export default {
               rowAccessTags: this.policy.rowAccessTags.map(t => t.tag)
             };
           } else {
-            // Existing account
+            // Existing policy
             data = {
               rowId: this.policy.rowId,
               policyId: this.policy.policyId,
