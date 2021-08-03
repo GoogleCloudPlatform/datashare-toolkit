@@ -57,15 +57,15 @@
           <span v-if="header.tooltip">{{ header.tooltip }}</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.email="{ item }">
+      <template v-slot:[`item.email`]="{ item }">
         {{ item.email || item.account }}
       </template>
-      <template v-slot:item.createTime="{ item }">
+      <template v-slot:[`item.createTime`]="{ item }">
         {{ toLocalTime(item.createTime) }}
       </template>
-      <template v-slot:item.updateTime="{ item }">
+      <template v-slot:[`item.updateTime`]="{ item }">
         {{ toLocalTime(item.updateTime) }} </template
-      ><template v-slot:item.action="{ item }">
+      ><template v-slot:[`item.action`]="{ item }">
         <v-tooltip
           top
           v-if="

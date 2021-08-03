@@ -53,10 +53,10 @@
           <span v-if="header.tooltip">{{ header.tooltip }}</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.createdAt="{ item }">
+      <template v-slot:[`item.createdAt`]="{ item }">
         {{ toLocalTime(item.createdAt) }}
       </template>
-      <template v-slot:item.datasets="{ item }">
+      <template v-slot:[`item.datasets`]="{ item }">
         <v-chip-group
           v-if="item.datasets && item.datasets.length > 0"
           multiple
@@ -75,7 +75,7 @@
           </v-chip>
         </v-chip-group>
       </template>
-      <template v-slot:item.action="{ item }">
+      <template v-slot:[`item.action`]="{ item }">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
             <v-icon v-on="on" class="mr-2" @click="navigateToMarketplace(item)">
@@ -158,7 +158,7 @@
                         hide-details
                       ></v-text-field>
                     </template>
-                    <template v-slot:item.action="{ item }">
+                    <template v-slot:[`item.action`]="{ item }">
                       <v-tooltip top>
                         <template v-slot:activator="{ on }">
                           <v-icon
@@ -220,7 +220,7 @@
                         hide-details
                       ></v-text-field>
                     </template>
-                    <template v-slot:item.action="{ item }">
+                    <template v-slot:[`item.action`]="{ item }">
                       <v-tooltip top>
                         <template v-slot:activator="{ on }">
                           <v-icon
@@ -292,7 +292,7 @@
                         hide-details
                       ></v-text-field>
                     </template>
-                    <template v-slot:item.action="{ item }">
+                    <template v-slot:[`item.action`]="{ item }">
                       <v-icon small class="mr-2" @click="editItem(item)">
                         edit
                       </v-icon>

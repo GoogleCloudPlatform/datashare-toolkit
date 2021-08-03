@@ -43,10 +43,10 @@
           <span v-if="header.tooltip">{{ header.tooltip }}</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.createdAt="{ item }">
+      <template v-slot:[`item.createdAt`]="{ item }">
         {{ toLocalTime(item.createdAt) }}
       </template>
-      <template v-slot:item.viewAction="{ item }">
+      <template v-slot:[`item.viewAction`]="{ item }">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
             <v-icon v-on="on" class="mr-2" @click="navigateToTable(item)">
@@ -56,7 +56,7 @@
           <span>View in BigQuery</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.action="{ item }">
+      <template v-slot:[`item.action`]="{ item }">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
             <v-icon small v-on="on" class="mr-2" @click="editItem(item)">

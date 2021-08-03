@@ -123,7 +123,7 @@
                           >
                         </v-toolbar>
                       </template>
-                      <template v-slot:item.action="{ item }">
+                      <template v-slot:[`item.action`]="{ item }">
                         <v-icon small @click="deleteDataset(item)">
                           delete
                         </v-icon>
@@ -175,7 +175,7 @@
                           >
                         </v-toolbar>
                       </template>
-                      <template v-slot:item.action="{ item }">
+                      <template v-slot:[`item.action`]="{ item }">
                         <v-icon small @click="deleteTable(item)">
                           delete
                         </v-icon>
@@ -227,7 +227,7 @@
                           >
                         </v-toolbar>
                       </template>
-                      <template v-slot:item.action="{ item }">
+                      <template v-slot:[`item.action`]="{ item }">
                         <v-icon small @click="deleteRowTag(item)">
                           delete
                         </v-icon>
@@ -325,7 +325,7 @@
                     hide-details
                   ></v-text-field>
                 </template>
-                <template v-slot:item.action="{ item }">
+                <template v-slot:[`item.action`]="{ item }">
                   <v-icon small class="mr-2" @click="editItem(item)">
                     edit
                   </v-icon>
