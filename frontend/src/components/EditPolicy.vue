@@ -242,11 +242,105 @@
             <v-expansion-panel-header
               >Cloud Storage Buckets</v-expansion-panel-header
             >
-            <v-expansion-panel-content> </v-expansion-panel-content>
+            <v-expansion-panel-content>
+              <v-data-table
+                dense
+                :headers="bucketHeaders"
+                :items="policy.datasets"
+                item-key="datasetId"
+                :search="bucketSearch"
+                :loading="loading"
+              >
+                <template v-slot:loading>
+                  <v-row justify="center" align="center">
+                    <div class="text-center ma-12">
+                      <v-progress-circular
+                        v-if="loading"
+                        indeterminate
+                        color="primary"
+                      ></v-progress-circular>
+                    </div>
+                  </v-row>
+                </template>
+                <template v-slot:top>
+                  <v-toolbar flat color="white">
+                    <v-text-field
+                      class="mb-4"
+                      width="40px"
+                      v-model="bucketSearch"
+                      append-icon="search"
+                      label="Search"
+                      single-line
+                      hide-details
+                    ></v-text-field>
+                    <v-divider class="mx-4" inset vertical></v-divider>
+                    <v-btn
+                      color="primary"
+                      dark
+                      class="mb-2"
+                      @click.stop="showAddBucketDialog"
+                      >Add Bucket</v-btn
+                    >
+                  </v-toolbar>
+                </template>
+                <template v-slot:[`item.action`]="{ item }">
+                  <v-icon small @click="deleteBucket(item)">
+                    delete
+                  </v-icon>
+                </template>
+              </v-data-table>
+            </v-expansion-panel-content>
           </v-expansion-panel>
           <v-expansion-panel v-if="policy.pubsubEnabled">
             <v-expansion-panel-header>Pub/Sub Topics</v-expansion-panel-header>
-            <v-expansion-panel-content> </v-expansion-panel-content>
+            <v-expansion-panel-content>
+              <v-data-table
+                dense
+                :headers="topicHeaders"
+                :items="policy.datasets"
+                item-key="datasetId"
+                :search="topicSearch"
+                :loading="loading"
+              >
+                <template v-slot:loading>
+                  <v-row justify="center" align="center">
+                    <div class="text-center ma-12">
+                      <v-progress-circular
+                        v-if="loading"
+                        indeterminate
+                        color="primary"
+                      ></v-progress-circular>
+                    </div>
+                  </v-row>
+                </template>
+                <template v-slot:top>
+                  <v-toolbar flat color="white">
+                    <v-text-field
+                      class="mb-4"
+                      width="40px"
+                      v-model="topicSearch"
+                      append-icon="search"
+                      label="Search"
+                      single-line
+                      hide-details
+                    ></v-text-field>
+                    <v-divider class="mx-4" inset vertical></v-divider>
+                    <v-btn
+                      color="primary"
+                      dark
+                      class="mb-2"
+                      @click.stop="showAddTopicDialog"
+                      >Add Topic</v-btn
+                    >
+                  </v-toolbar>
+                </template>
+                <template v-slot:[`item.action`]="{ item }">
+                  <v-icon small @click="deleteTopic(item)">
+                    delete
+                  </v-icon>
+                </template>
+              </v-data-table>
+            </v-expansion-panel-content>
           </v-expansion-panel>
           <v-expansion-panel
             v-if="config.marketplaceIntegrationEnabled === true"
@@ -475,6 +569,82 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-dialog
+        v-show="showAddBucket"
+        v-model="showAddBucket"
+        persistent
+        max-width="390"
+      >
+        <v-card>
+          <v-card-title class="headline">Add Bucket</v-card-title>
+          <ValidationObserver ref="bucketFormObserver" v-slot="{}">
+            <v-form class="px-4">
+              <ValidationProvider
+                v-slot="{ errors }"
+                name="Bucket"
+                rules="required"
+              >
+                <v-select
+                  :items="nonSelectedBuckets"
+                  item-text="name"
+                  item-value="name"
+                  v-model="newBucketName"
+                  :error-messages="errors"
+                  label="Bucket"
+                  required
+                ></v-select>
+              </ValidationProvider>
+            </v-form>
+          </ValidationObserver>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click.stop="cancelBucket"
+              >Cancel</v-btn
+            >
+            <v-btn color="green darken-1" text @click.stop="addBucket"
+              >Add</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog
+        v-show="showAddTopic"
+        v-model="showAddTopic"
+        persistent
+        max-width="390"
+      >
+        <v-card>
+          <v-card-title class="headline">Add Topic</v-card-title>
+          <ValidationObserver ref="topicFormObserver" v-slot="{}">
+            <v-form class="px-4">
+              <ValidationProvider
+                v-slot="{ errors }"
+                name="Topic"
+                rules="required"
+              >
+                <v-select
+                  :items="nonSelectedBuckets"
+                  item-text="name"
+                  item-value="id"
+                  v-model="newTopicId"
+                  :error-messages="errors"
+                  label="Topic"
+                  required
+                ></v-select>
+              </ValidationProvider>
+            </v-form>
+          </ValidationObserver>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click.stop="cancelTopic"
+              >Cancel</v-btn
+            >
+            <v-btn color="green darken-1" text @click.stop="addTopic"
+              >Add</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-row>
     <Dialog
       v-if="showError"
@@ -488,11 +658,12 @@
 </template>
 
 <script>
-import Vue from 'vue';
 import _config from './../config';
 import UrlHelper from '../urlHelper';
+import Dialog from '@/components/Dialog.vue';
+import { mdiShopping } from '@mdi/js';
 
-import { required, max } from 'vee-validate/dist/rules';
+import { required } from 'vee-validate/dist/rules';
 import {
   extend,
   ValidationObserver,
@@ -537,9 +708,6 @@ function isPopulated(value) {
   return value !== null && value !== undefined && value.trim() !== '';
 }
 
-import Dialog from '@/components/Dialog.vue';
-import { mdiShopping } from '@mdi/js';
-
 Array.prototype.diff = function(a, key) {
   return this.filter(function(i) {
     // return a.indexOf(i) < 0;
@@ -567,7 +735,7 @@ export default {
     newTableId: null,
     newRowTag: null,
     newBucketName: null,
-    newTopicName: null,
+    newTopicId: null,
     showError: false,
     panel: [0],
     bigQueryPanel: [0],
@@ -746,6 +914,38 @@ export default {
         }
       }
       return '';
+    },
+    nonSelectedBuckets() {
+      let d = [];
+      this.referenceData.datasets.forEach(item => {
+        const found = this.policy.datasets.find(
+          element => element.datasetId === item.datasetId
+        );
+        if (!found) {
+          d.push(item);
+        }
+      });
+      return d.sort(function(a, b) {
+        return a.datasetId
+          .toLowerCase()
+          .localeCompare(b.datasetId.toLowerCase());
+      });
+    },
+    nonSelectedTopics() {
+      let d = [];
+      this.referenceData.datasets.forEach(item => {
+        const found = this.policy.datasets.find(
+          element => element.datasetId === item.datasetId
+        );
+        if (!found) {
+          d.push(item);
+        }
+      });
+      return d.sort(function(a, b) {
+        return a.datasetId
+          .toLowerCase()
+          .localeCompare(b.datasetId.toLowerCase());
+      });
     }
   },
   methods: {
@@ -1057,6 +1257,56 @@ export default {
         this.config.projectId,
         item.marketplace.solutionId
       );
+    },
+    showAddBucketDialog() {
+      this.componentKey += 1;
+      this.showAddBucket = true;
+    },
+    addBucket() {
+      this.$refs.bucketFormObserver.validate().then(result => {
+        if (result) {
+          /*this.policy.datasets.push({
+            datasetId: this.newDatasetId
+          });*/
+          this.showAddBucket = false;
+          this.newBucketName = null;
+        }
+      });
+    },
+    cancelBucket() {
+      this.showAddBucket = false;
+      this.newBucketName = null;
+    },
+    deleteBucket(item) {
+      /*const index = this.policy.datasets.indexOf(item);
+      if (index > -1) {
+        this.policy.datasets.splice(index, 1);
+      }*/
+    },
+    showAddTopicDialog() {
+      this.componentKey += 1;
+      this.showAddTopic = true;
+    },
+    addTopic() {
+      this.$refs.bucketFormObserver.validate().then(result => {
+        if (result) {
+          /*this.policy.datasets.push({
+            datasetId: this.newDatasetId
+          });*/
+          this.showAddTopic = false;
+          this.newTopicId = null;
+        }
+      });
+    },
+    cancelTopic() {
+      this.showAddTopic = false;
+      this.newTopicId = null;
+    },
+    deleteTopic(item) {
+      /*const index = this.policy.datasets.indexOf(item);
+      if (index > -1) {
+        this.policy.datasets.splice(index, 1);
+      }*/
     }
   }
 };
