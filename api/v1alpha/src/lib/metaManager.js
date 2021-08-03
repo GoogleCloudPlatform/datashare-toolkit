@@ -166,7 +166,6 @@ async function performTableMetadataUpdate(projectId, datasetId, tableId, account
     const viewerRole = await runtimeConfig.bigQueryDataViewerRole(projectId);
     let isDirty = false;
     const tablePolicy = await bigqueryUtil.getTableIamPolicy(projectId, datasetId, tableId);
-    console.log(tablePolicy);
     let readBinding = {};
     let bindingExists = false;
     if (tablePolicy.bindings) {
