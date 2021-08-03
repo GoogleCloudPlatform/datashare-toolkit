@@ -33,6 +33,7 @@
             :error-messages="errors"
             label="Description"
             required
+            auto-grow
           ></v-textarea>
         </ValidationProvider>
         <v-container fluid>
