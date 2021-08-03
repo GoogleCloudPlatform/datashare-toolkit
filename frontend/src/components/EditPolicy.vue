@@ -33,7 +33,6 @@
             :error-messages="errors"
             label="Description"
             required
-            auto-grow
           ></v-textarea>
         </ValidationProvider>
         <v-container fluid>
@@ -432,220 +431,210 @@
           </v-expansion-panel>
         </v-expansion-panels>
       </ValidationObserver>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text color="blue darken-1" @click.stop="cancel">Cancel</v-btn>
+        <v-btn text color="green darken-1" class="mr-4" @click.stop="submit"
+          >Save</v-btn
+        >
+      </v-card-actions>
     </form>
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn text color="blue darken-1" @click.stop="cancel">Cancel</v-btn>
-      <v-btn text color="green darken-1" class="mr-4" @click.stop="submit"
-        >Save</v-btn
-      >
-    </v-card-actions>
-    <v-row justify="center">
-      <v-dialog
-        v-show="showAddDataset"
-        v-model="showAddDataset"
-        persistent
-        max-width="390"
-      >
-        <v-card>
-          <v-card-title class="headline">Add Dataset</v-card-title>
-          <ValidationObserver ref="datasetFormObserver" v-slot="{}">
-            <v-form class="px-4">
-              <ValidationProvider
-                v-slot="{ errors }"
-                name="Dataset Id"
-                rules="required"
-              >
-                <v-select
-                  :items="nonSelectedDatasets"
-                  item-text="datasetId"
-                  item-value="datasetId"
-                  v-model="newDatasetId"
-                  :error-messages="errors"
-                  label="Dataset Id"
-                  required
-                ></v-select>
-              </ValidationProvider>
-            </v-form>
-          </ValidationObserver>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click.stop="cancelDataset"
-              >Cancel</v-btn
+    <v-dialog
+      v-show="showAddDataset"
+      v-model="showAddDataset"
+      persistent
+      max-width="390"
+    >
+      <v-card>
+        <v-card-title class="headline">Add Dataset</v-card-title>
+        <ValidationObserver ref="datasetFormObserver" v-slot="{}">
+          <v-form class="px-4">
+            <ValidationProvider
+              v-slot="{ errors }"
+              name="Dataset Id"
+              rules="required"
             >
-            <v-btn color="green darken-1" text @click.stop="addDataset"
-              >Add</v-btn
+              <v-select
+                :items="nonSelectedDatasets"
+                item-text="datasetId"
+                item-value="datasetId"
+                v-model="newDatasetId"
+                :error-messages="errors"
+                label="Dataset Id"
+                required
+              ></v-select>
+            </ValidationProvider>
+          </v-form>
+        </ValidationObserver>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click.stop="cancelDataset"
+            >Cancel</v-btn
+          >
+          <v-btn color="green darken-1" text @click.stop="addDataset"
+            >Add</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      v-show="showAddTable"
+      v-model="showAddTable"
+      persistent
+      max-width="390"
+    >
+      <v-card>
+        <v-card-title class="headline">Add Table</v-card-title>
+        <ValidationObserver ref="tableFormObserver" v-slot="{}">
+          <v-form class="px-4">
+            <ValidationProvider
+              v-slot="{ errors }"
+              name="Dataset Id"
+              rules="required"
             >
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-dialog
-        v-show="showAddTable"
-        v-model="showAddTable"
-        persistent
-        max-width="390"
-      >
-        <v-card>
-          <v-card-title class="headline">Add Table</v-card-title>
-          <ValidationObserver ref="tableFormObserver" v-slot="{}">
-            <v-form class="px-4">
-              <ValidationProvider
-                v-slot="{ errors }"
-                name="Dataset Id"
-                rules="required"
-              >
-                <v-select
-                  :items="datasetsForTables"
-                  item-text="datasetId"
-                  item-value="datasetId"
-                  v-model="newDatasetId"
-                  :error-messages="errors"
-                  label="Dataset Id"
-                  required
-                  @change="sourceDatasetChanged"
-                ></v-select>
-              </ValidationProvider>
-              <ValidationProvider
-                v-slot="{ errors }"
-                name="Table Id"
-                rules="required"
-              >
-                <v-select
-                  :items="nonSelectedTables"
-                  item-text="tableId"
-                  item-value="tableId"
-                  v-model="newTableId"
-                  :error-messages="errors"
-                  label="Table Id"
-                  required
-                ></v-select>
-              </ValidationProvider>
-            </v-form>
-          </ValidationObserver>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click.stop="cancelTable"
-              >Cancel</v-btn
+              <v-select
+                :items="datasetsForTables"
+                item-text="datasetId"
+                item-value="datasetId"
+                v-model="newDatasetId"
+                :error-messages="errors"
+                label="Dataset Id"
+                required
+                @change="sourceDatasetChanged"
+              ></v-select>
+            </ValidationProvider>
+            <ValidationProvider
+              v-slot="{ errors }"
+              name="Table Id"
+              rules="required"
             >
-            <v-btn color="green darken-1" text @click.stop="addTable"
-              >Add</v-btn
+              <v-select
+                :items="nonSelectedTables"
+                item-text="tableId"
+                item-value="tableId"
+                v-model="newTableId"
+                :error-messages="errors"
+                label="Table Id"
+                required
+              ></v-select>
+            </ValidationProvider>
+          </v-form>
+        </ValidationObserver>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click.stop="cancelTable"
+            >Cancel</v-btn
+          >
+          <v-btn color="green darken-1" text @click.stop="addTable">Add</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      ref="addRowTagForm"
+      v-show="showAddRowTag"
+      v-model="showAddRowTag"
+      persistent
+      max-width="390"
+    >
+      <v-card>
+        <v-card-title class="headline">Add Row Access Tag</v-card-title>
+        <ValidationObserver ref="rowAccessTagFormObserver" v-slot="{}">
+          <v-form class="px-4">
+            <ValidationProvider
+              v-slot="{ errors }"
+              name="Row Tag"
+              rules="required"
             >
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-dialog
-        ref="addRowTagForm"
-        v-show="showAddRowTag"
-        v-model="showAddRowTag"
-        persistent
-        max-width="390"
-      >
-        <v-card>
-          <v-card-title class="headline">Add Row Access Tag</v-card-title>
-          <ValidationObserver ref="rowAccessTagFormObserver" v-slot="{}">
-            <v-form class="px-4">
-              <ValidationProvider
-                v-slot="{ errors }"
-                name="Row Tag"
-                rules="required"
-              >
-                <v-text-field
-                  v-model="newRowTag"
-                  :error-messages="errors"
-                  label="Row Tag"
-                  required
-                ></v-text-field>
-              </ValidationProvider>
-            </v-form>
-          </ValidationObserver>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click.stop="cancelRowTag"
-              >Cancel</v-btn
+              <v-text-field
+                v-model="newRowTag"
+                :error-messages="errors"
+                label="Row Tag"
+                required
+              ></v-text-field>
+            </ValidationProvider>
+          </v-form>
+        </ValidationObserver>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click.stop="cancelRowTag"
+            >Cancel</v-btn
+          >
+          <v-btn color="green darken-1" text @click.stop="addRowTag">Add</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      v-show="showAddBucket"
+      v-model="showAddBucket"
+      persistent
+      max-width="390"
+    >
+      <v-card>
+        <v-card-title class="headline">Add Bucket</v-card-title>
+        <ValidationObserver ref="bucketFormObserver" v-slot="{}">
+          <v-form class="px-4">
+            <ValidationProvider
+              v-slot="{ errors }"
+              name="Bucket"
+              rules="required"
             >
-            <v-btn color="green darken-1" text @click.stop="addRowTag"
-              >Add</v-btn
+              <v-select
+                :items="nonSelectedBuckets"
+                item-text="name"
+                item-value="name"
+                v-model="newBucketName"
+                :error-messages="errors"
+                label="Bucket"
+                required
+              ></v-select>
+            </ValidationProvider>
+          </v-form>
+        </ValidationObserver>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click.stop="cancelBucket"
+            >Cancel</v-btn
+          >
+          <v-btn color="green darken-1" text @click.stop="addBucket">Add</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      v-show="showAddTopic"
+      v-model="showAddTopic"
+      persistent
+      max-width="390"
+    >
+      <v-card>
+        <v-card-title class="headline">Add Topic</v-card-title>
+        <ValidationObserver ref="topicFormObserver" v-slot="{}">
+          <v-form class="px-4">
+            <ValidationProvider
+              v-slot="{ errors }"
+              name="Topic"
+              rules="required"
             >
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-dialog
-        v-show="showAddBucket"
-        v-model="showAddBucket"
-        persistent
-        max-width="390"
-      >
-        <v-card>
-          <v-card-title class="headline">Add Bucket</v-card-title>
-          <ValidationObserver ref="bucketFormObserver" v-slot="{}">
-            <v-form class="px-4">
-              <ValidationProvider
-                v-slot="{ errors }"
-                name="Bucket"
-                rules="required"
-              >
-                <v-select
-                  :items="nonSelectedBuckets"
-                  item-text="name"
-                  item-value="name"
-                  v-model="newBucketName"
-                  :error-messages="errors"
-                  label="Bucket"
-                  required
-                ></v-select>
-              </ValidationProvider>
-            </v-form>
-          </ValidationObserver>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click.stop="cancelBucket"
-              >Cancel</v-btn
-            >
-            <v-btn color="green darken-1" text @click.stop="addBucket"
-              >Add</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-dialog
-        v-show="showAddTopic"
-        v-model="showAddTopic"
-        persistent
-        max-width="390"
-      >
-        <v-card>
-          <v-card-title class="headline">Add Topic</v-card-title>
-          <ValidationObserver ref="topicFormObserver" v-slot="{}">
-            <v-form class="px-4">
-              <ValidationProvider
-                v-slot="{ errors }"
-                name="Topic"
-                rules="required"
-              >
-                <v-select
-                  :items="nonSelectedBuckets"
-                  item-text="name"
-                  item-value="id"
-                  v-model="newTopicId"
-                  :error-messages="errors"
-                  label="Topic"
-                  required
-                ></v-select>
-              </ValidationProvider>
-            </v-form>
-          </ValidationObserver>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click.stop="cancelTopic"
-              >Cancel</v-btn
-            >
-            <v-btn color="green darken-1" text @click.stop="addTopic"
-              >Add</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-row>
+              <v-select
+                :items="nonSelectedBuckets"
+                item-text="name"
+                item-value="id"
+                v-model="newTopicId"
+                :error-messages="errors"
+                label="Topic"
+                required
+              ></v-select>
+            </ValidationProvider>
+          </v-form>
+        </ValidationObserver>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click.stop="cancelTopic"
+            >Cancel</v-btn
+          >
+          <v-btn color="green darken-1" text @click.stop="addTopic">Add</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <Dialog
       v-if="showError"
       v-model="showError"
