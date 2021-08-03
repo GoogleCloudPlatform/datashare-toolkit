@@ -560,9 +560,13 @@ export default {
     showAddDataset: false,
     showAddTable: false,
     showAddRowTag: false,
+    showAddBucket: false,
+    showAddTopic: false,
     newDatasetId: null,
     newTableId: null,
     newRowTag: null,
+    newBucketName: null,
+    newTopicName: null,
     showError: false,
     panel: [0],
     bigQueryPanel: [0],
@@ -587,10 +591,14 @@ export default {
     tableSearch: '',
     accountSearch: '',
     rowAccessSearch: '',
+    bucketSearch: '',
+    topicSearch: '',
     componentKey: 0,
     referenceData: {
       datasets: [],
-      tables: []
+      tables: [],
+      buckets: [],
+      topics: []
     },
     loading: false,
     icons: {
