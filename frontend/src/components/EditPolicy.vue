@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card class="px-4 py-4">
     <v-card-title v-if="policy.policyId">
       Edit Policy
     </v-card-title>
@@ -9,7 +9,7 @@
     <v-card-subtitle v-if="policy.policyId">{{
       policy.policyId
     }}</v-card-subtitle>
-    <form class="px-4">
+    <form>
       <ValidationObserver ref="policyFormObserver" v-slot="{}">
         <ValidationProvider
           v-slot="{ errors }"
@@ -608,6 +608,8 @@ export default {
   }),
   created() {
     this.loadDatasets();
+    this.loadBuckets();
+    this.loadTopics();
     if (this.policyData) {
       this.editMode = true;
       this.policy.policyId = this.policyData.policyId;
@@ -843,6 +845,28 @@ export default {
           this.referenceData.datasets = response.data;
         } else {
           this.referenceData.datasets = [];
+        }
+        this.loading = false;
+      });
+    },
+    loadBuckets() {
+      this.loading = true;
+      this.$store.dispatch('getBuckets', {}).then(response => {
+        if (response.success) {
+          this.referenceData.buckets = response.data;
+        } else {
+          this.referenceData.buckets = [];
+        }
+        this.loading = false;
+      });
+    },
+    loadTopics() {
+      this.loading = true;
+      this.$store.dispatch('getTopics', {}).then(response => {
+        if (response.success) {
+          this.referenceData.topics = response.data;
+        } else {
+          this.referenceData.topics = [];
         }
         this.loading = false;
       });
