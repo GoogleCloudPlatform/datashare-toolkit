@@ -22,6 +22,7 @@ const uuidv4 = require('uuid/v4');
 const ConfigValidator = require('./views/configValidator');
 const sqlBuilder = require('./views/sqlBuilder');
 const cfg = require('../lib/config');
+const runtimeConfig = require('../lib/runtimeConfig');
 const underscore = require("underscore");
 
 /**
@@ -58,7 +59,8 @@ async function listDatasets(projectId, includeAll) {
         labelKey = cfg.cdsManagedLabelKey;
     }
     const bigqueryUtil = new BigQueryUtil(projectId);
-    const datasets = await bigqueryUtil.getDatasetsByLabel(labelKey).catch(err => {
+    const role = await runtimeConfig.bigQueryDataViewerRole(projectId);
+    const datasets = await bigqueryUtil.getDatasetsByLabel(labelKey, role).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -252,7 +254,7 @@ async function deleteDataset(projectId, datasetId, createdBy) {
 async function listTables(projectId, datasetId, labelKey) {
     const bigqueryUtil = new BigQueryUtil(projectId);
     try {
-        let tables = await bigqueryUtil.getTablesByLabel(projectId, datasetId, labelKey);
+        let tables = await bigqueryUtil.getTablesByLabel(datasetId, labelKey);
         return { success: true, data: tables }
     } catch (err) {
         return { success: false, errors: ['Failed to retrieve tables', err] };

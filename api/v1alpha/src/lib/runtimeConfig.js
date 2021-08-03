@@ -142,6 +142,13 @@ class RuntimeConfig {
         }
         return commerceEnabled;
     }
+    
+    /**
+     * @param  {} projectId
+     */
+    async bigQueryDataViewerRole(projectId) {
+        return `projects/${projectId}/roles/${config.bigQueryDataViewerRole}`;
+    }
 }
 
 module.exports = new RuntimeConfig();

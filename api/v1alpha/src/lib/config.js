@@ -83,5 +83,6 @@ if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_
 
 // TODO: Remove hardcoded for testing
 config.oauthClientId = process.env.OAUTH_CLIENT_ID;
+config.bigQueryDataViewerRole = 'datashare.bigquery.dataViewer';
 
 module.exports = config;

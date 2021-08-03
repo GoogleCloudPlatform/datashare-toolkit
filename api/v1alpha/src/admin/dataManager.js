@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2020-2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,10 +80,11 @@ async function syncResources(projectId, type) {
             const viewResult = await datasetManager.listDatasetViews(projectId, null, true);
             if (viewResult.success) {
                 const viewList = viewResult.data;
-                const datasets = await bigqueryUtil.getDatasetsByLabel(labelKey);
+                const role = await runtimeConfig.bigQueryDataViewerRole(projectId);
+                const datasets = await bigqueryUtil.getDatasetsByLabel(labelKey, role);
 
                 for (const dataset of datasets) {
-                    const tables = await bigqueryUtil.getTablesByLabel(projectId, dataset.datasetId, labelKey);
+                    const tables = await bigqueryUtil.getTablesByLabel(dataset.datasetId, labelKey);
                     if (tables.length > 0) {
                         const views = underscore.where(tables, { type: 'VIEW' });
                         if (views.length > 0) {
@@ -128,7 +129,7 @@ async function syncResources(projectId, type) {
  */
 function sqlReplacements(projectId, text) {
     const bigqueryUtil = new BigQueryUtil(projectId);
-    
+
     let sql = text;
     sql = sql.replace(/\$\{projectId\}/g, projectId);
 
@@ -263,7 +264,7 @@ async function initializePubSubListener() {
         console.log('Could not identify project, will not start up subscription');
         return;
     }
-    
+
     if (await runtimeConfig.commerceEnabled(projectId) === false) {
         console.log('Marketplace integration is disabled, PubSub listener will not be started');
         return;

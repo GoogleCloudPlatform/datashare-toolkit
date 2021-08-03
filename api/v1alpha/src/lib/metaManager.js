@@ -19,6 +19,7 @@
 const { BigQueryUtil } = require('cds-shared');
 const underscore = require("underscore");
 const cfg = require('./config');
+const runtimeConfig = require('./runtimeConfig');
 
 /**
  * @param  {} bqDatasetAccessType
@@ -55,6 +56,7 @@ function getBqDatasetAccessType(datashareDatasetAccessType) {
  * @param  {} accounts
  */
 async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
+    const datashareReaderRole = await runtimeConfig.bigQueryDataViewerRole(projectId);
     console.log(`Begin metadata update for dataset: '${datasetId}'`);
     const bigqueryUtil = new BigQueryUtil(projectId);
     const exists = await bigqueryUtil.datasetExists(datasetId);
@@ -87,8 +89,8 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
                 isDirty = true;
             }
         }
-        else if (a.role === 'READER') {
-            // Remove all 'READER' userByEmail and groupByEmail accounts that should not have access
+        else if (a.role === datashareReaderRole) {
+            // Remove all 'datashare.bigquery.dataViewer' userByEmail and groupByEmail accounts that should not have access
             const aKeys = Object.keys(a);
             if (aKeys.length === 2) {
                 const accessType = aKeys[1];
@@ -118,8 +120,7 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
         // a single item at zero index with attributes having all null values.
         if (account.email && account.emailType) {
             const bqAccessType = getBqDatasetAccessType(account.emailType);
-            let a = { role: 'READER', };
-            a["role"] = 'READER';
+            let a = { role: datashareReaderRole };
             a[bqAccessType] = account.email;
             const accessRecordExists = underscore.findWhere(metadata.access, a);
             if (!accessRecordExists) {
@@ -162,14 +163,16 @@ async function performTableMetadataUpdate(projectId, datasetId, tableId, account
         return false;
     }
     const accessTypes = ["user", "group", "serviceAccount"];
-    const viewerRole = 'roles/bigquery.dataViewer';
+    const viewerRole = await runtimeConfig.bigQueryDataViewerRole(projectId);
     let isDirty = false;
     const tablePolicy = await bigqueryUtil.getTableIamPolicy(projectId, datasetId, tableId);
+    console.log(tablePolicy);
     let readBinding = {};
     let bindingExists = false;
     if (tablePolicy.bindings) {
-        readBinding = underscore.findWhere(tablePolicy.bindings, { role: viewerRole });
-        if (readBinding) {
+        const viewerRoleBinding = underscore.findWhere(tablePolicy.bindings, { role: viewerRole });
+        if (viewerRoleBinding) {
+            readBinding = viewerRoleBinding;
             bindingExists = true;
             let i = readBinding.members.length;
             while (i--) {
@@ -211,6 +214,8 @@ async function performTableMetadataUpdate(projectId, datasetId, tableId, account
 
     if (isDirty === true) {
         try {
+            console.log('Attempting to set policy:');
+            console.log(tablePolicy);
             await bigqueryUtil.setTableIamPolicy(projectId, datasetId, tableId, tablePolicy, 'bindings');
             console.info(`Policy set successfully for table '${datasetId}'`);
         } catch (err) {
@@ -250,7 +255,8 @@ async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
 
     if (fullRefresh === true) {
         // Update all managed datasets and tables
-        const datasets = await bigqueryUtil.getDatasetsByLabel(labelKey);
+        const role = await runtimeConfig.bigQueryDataViewerRole(projectId);
+        const datasets = await bigqueryUtil.getDatasetsByLabel(labelKey, role);
         for (const dataset of datasets) {
             const datasetId = dataset.datasetId;
             let dsPolicyRecord = underscore.findWhere(rows, { datasetId: datasetId, isTableBased: false });
@@ -260,7 +266,7 @@ async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
             }
             await performDatasetMetadataUpdate(projectId, datasetId, accounts);
 
-            const tables = await bigqueryUtil.getTablesByLabel(projectId, datasetId, labelKey);
+            const tables = await bigqueryUtil.getTablesByLabel(datasetId, labelKey);
             for (const table of tables) {
                 const tableId = table.tableId;
                 let tbPolicyRecord = underscore.findWhere(rows, { datasetId: datasetId, tableId: tableId, isTableBased: true });
