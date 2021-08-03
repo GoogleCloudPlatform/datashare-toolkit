@@ -44,9 +44,9 @@ async function listBuckets(projectId) {
 async function createBucket(projectId, name) {
     const storageUtil = new StorageUtil(projectId);
     return storageUtil.createBucket(name).then(bucketResponse => {
-        const [bucket, metadata] = bucketResponse;
+        const [bucket] = bucketResponse;
         let labels = { [config.cdsManagedLabelKey]: "true" };
-        return bucket.setLabels(labels).then((data) => {
+        return bucket.setLabels(labels).then(() => {
             return {
                 success: true,
                 data: {
