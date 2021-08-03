@@ -47,7 +47,6 @@ async function createTopic(projectId, name) {
         let dict = {};
         dict.labels = { [config.cdsManagedLabelKey]: "true" };
         return topic.setMetadata(dict).then((data) => {
-            const apiResponse = data[0];
             return {
                 success: true,
                 data: {
