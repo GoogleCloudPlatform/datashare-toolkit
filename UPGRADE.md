@@ -15,6 +15,7 @@ You must have the values for the following variables:
 | --tag | No | The container image tag. | dev | dev |
 | --region | No | The GCP region for the deployments. | us-central1 | us-central1 |
 | --zone | No | The GCP zone for the deployments. | us-central1-a | us-central1-a |
+| --marketplace-enabled | No | Flag indicating that marketplace integration should be enabled | Not Applicable | Not Applicable |
 
 # Upgrading
 1. Clone the GitHub repo.
