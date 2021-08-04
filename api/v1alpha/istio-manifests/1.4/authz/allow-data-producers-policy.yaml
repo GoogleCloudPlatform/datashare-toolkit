@@ -16,8 +16,6 @@ spec:
         - /v1alpha/procurements
         - /v1alpha/procurements?*
         - /v1alpha/views
-        - /v1alpha/pubsub/topics
-        - /v1alpha/storage/buckets
     - operation:
         methods:
         - POST
@@ -30,11 +28,19 @@ spec:
         - /v1alpha/procurements/approve
     - operation:
         methods:
+        - DELETE
+        paths:
+        - /v1alpha/pubsub/topics/*
+        - /v1alpha/storage/buckets/*
+    - operation:
+        methods:
         - GET
         - POST
         paths:
         - /v1alpha/accounts
         - /v1alpha/policies
+        - /v1alpha/pubsub/topics
+        - /v1alpha/storage/buckets
     - operation:
         methods:
         - GET
