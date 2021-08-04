@@ -109,7 +109,7 @@
                   v-model="dialogBucket.bucketName"
                   :error-messages="errors"
                   :counter="222"
-                  label="Name"
+                  label="Bucket Name"
                   required
                 ></v-text-field>
               </ValidationProvider>

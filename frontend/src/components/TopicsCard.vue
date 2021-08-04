@@ -106,10 +106,10 @@
               >
                 <v-text-field
                   :readonly="dialogTopic.editing === true"
-                  v-model="dialogTopic.topicName"
+                  v-model="dialogTopic.topicId"
                   :error-messages="errors"
                   :counter="255"
-                  label="Name"
+                  label="Topic Id"
                   required
                 ></v-text-field>
               </ValidationProvider>
@@ -260,10 +260,10 @@ export default {
   }),
   computed: {
     deleteDialogTitle() {
-      return `Delete topic '${this.selectedItem.topicName}'?`;
+      return `Delete topic '${this.selectedItem.topicId}'?`;
     },
     deleteDialogText() {
-      return `Please click 'Delete' to confirm that you want to delete topic '${this.selectedItem.topicName}'.`;
+      return `Please click 'Delete' to confirm that you want to delete topic '${this.selectedItem.topicId}'.`;
     }
   },
   created() {
@@ -273,7 +273,7 @@ export default {
     presentTopicDialog(selectedItem) {
       this.dialogTopic = { editing: false };
       if (selectedItem) {
-        this.dialogTopic.topicName = selectedItem.topicName;
+        this.dialogTopic.topicId = selectedItem.topicId;
       }
       this.showCreateTopic = true;
     },
@@ -301,7 +301,7 @@ export default {
             if (this.dialogTopic.editing === false) {
               this.$store
                 .dispatch('createTopic', {
-                  name: this.dialogTopic.topicName
+                  name: this.dialogTopic.topicId
                 })
                 .then(result => {
                   this.loading = false;
@@ -320,7 +320,7 @@ export default {
             } else {
               this.$store
                 .dispatch('updateTopic', {
-                  name: this.dialogTopic.topicName
+                  name: this.dialogTopic.topicId
                 })
                 .then(result => {
                   this.loading = false;
