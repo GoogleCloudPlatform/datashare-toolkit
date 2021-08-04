@@ -580,8 +580,8 @@
             >
               <v-select
                 :items="nonSelectedBuckets"
-                item-text="name"
-                item-value="name"
+                item-text="bucketName"
+                item-value="bucketName"
                 v-model="newBucketName"
                 :error-messages="errors"
                 label="Bucket"
@@ -616,8 +616,8 @@
             >
               <v-select
                 :items="nonSelectedTopics"
-                item-text="name"
-                item-value="id"
+                item-text="topicId"
+                item-value="topicId"
                 v-model="newTopicId"
                 :error-messages="errors"
                 label="Topic"
@@ -741,7 +741,7 @@ export default {
       initialDatasets: [],
       initialRowAccessTags: [],
       marketplace: { solutionId: null, planId: null, enableAutoApprove: false },
-      bigQueryEnabled: true,
+      bigQueryEnabled: false,
       pubsubEnabled: false,
       storageEnabled: false,
       topics: [],
@@ -908,34 +908,33 @@ export default {
     },
     nonSelectedBuckets() {
       let d = [];
-      this.referenceData.datasets.forEach(item => {
-        const found = this.policy.datasets.find(
-          element => element.datasetId === item.datasetId
+      this.referenceData.buckets.forEach(item => {
+        const found = this.policy.buckets.find(
+          element => element.bucketName === item.bucketName
         );
         if (!found) {
           d.push(item);
         }
       });
+      console.log(d);
       return d.sort(function(a, b) {
-        return a.datasetId
+        return a.bucketName
           .toLowerCase()
-          .localeCompare(b.datasetId.toLowerCase());
+          .localeCompare(b.bucketName.toLowerCase());
       });
     },
     nonSelectedTopics() {
       let d = [];
-      this.referenceData.datasets.forEach(item => {
-        const found = this.policy.datasets.find(
-          element => element.datasetId === item.datasetId
+      this.referenceData.topics.forEach(item => {
+        const found = this.policy.topics.find(
+          element => element.topicId === item.topicId
         );
         if (!found) {
           d.push(item);
         }
       });
       return d.sort(function(a, b) {
-        return a.datasetId
-          .toLowerCase()
-          .localeCompare(b.datasetId.toLowerCase());
+        return a.topicId.toLowerCase().localeCompare(b.topicId.toLowerCase());
       });
     }
   },
@@ -987,7 +986,12 @@ export default {
               description: this.policy.description,
               isTableBased: this.policy.isTableBased,
               datasets: this.policy.datasets,
-              rowAccessTags: this.policy.rowAccessTags.map(t => t.tag)
+              rowAccessTags: this.policy.rowAccessTags.map(t => t.tag),
+              bigQueryEnabled: this.policy.bigQueryEnabled,
+              pubsubEnabled: this.policy.pubsubEnabled,
+              storageEnabled: this.policy.storageEnabled,
+              buckets: this.policy.buckets,
+              topics: this.policy.topics
             };
           } else {
             // Existing policy
@@ -998,7 +1002,12 @@ export default {
               description: this.policy.description,
               isTableBased: this.policy.isTableBased,
               datasets: this.policy.datasets,
-              rowAccessTags: this.policy.rowAccessTags.map(t => t.tag)
+              rowAccessTags: this.policy.rowAccessTags.map(t => t.tag),
+              bigQueryEnabled: this.policy.bigQueryEnabled,
+              pubsubEnabled: this.policy.pubsubEnabled,
+              storageEnabled: this.policy.storageEnabled,
+              buckets: this.policy.buckets,
+              topics: this.policy.topics
             };
           }
 
@@ -1099,6 +1108,11 @@ export default {
             this.policy.rowAccessTags = p.rowAccessTags;
             this.policy.initialDatasets = p.datasets;
             this.policy.initialRowAccessTags = p.rowAccessTags;
+            this.policy.bigQueryEnabled = p.bigQueryEnabled;
+            this.policy.pubsubEnabled = p.pubsubEnabled;
+            this.policy.storageEnabled = p.storageEnabled;
+            this.policy.topics = p.topics;
+            this.policy.buckets = p.buckets;
 
             if (p.marketplace) {
               this.policy.marketplace = p.marketplace;
@@ -1254,11 +1268,13 @@ export default {
       this.showAddBucket = true;
     },
     addBucket() {
+      console.log('addBucket called');
       this.$refs.bucketFormObserver.validate().then(result => {
+        console.log(this.newBucketName);
         if (result) {
-          /*this.policy.datasets.push({
-            datasetId: this.newDatasetId
-          });*/
+          this.policy.buckets.push({
+            name: this.newBucketName
+          });
           this.showAddBucket = false;
           this.newBucketName = null;
         }
@@ -1269,21 +1285,23 @@ export default {
       this.newBucketName = null;
     },
     deleteBucket(item) {
-      /*const index = this.policy.datasets.indexOf(item);
+      const index = this.policy.buckets.indexOf(item);
       if (index > -1) {
-        this.policy.datasets.splice(index, 1);
-      }*/
+        this.policy.buckets.splice(index, 1);
+      }
     },
     showAddTopicDialog() {
       this.componentKey += 1;
       this.showAddTopic = true;
     },
     addTopic() {
-      this.$refs.bucketFormObserver.validate().then(result => {
+      console.log('add topic called');
+      this.$refs.topicFormObserver.validate().then(result => {
+        console.log(this.newTopicId);
         if (result) {
-          /*this.policy.datasets.push({
-            datasetId: this.newDatasetId
-          });*/
+          this.policy.topics.push({
+            topicId: this.newTopicId
+          });
           this.showAddTopic = false;
           this.newTopicId = null;
         }
@@ -1294,10 +1312,10 @@ export default {
       this.newTopicId = null;
     },
     deleteTopic(item) {
-      /*const index = this.policy.datasets.indexOf(item);
+      const index = this.policy.topics.indexOf(item);
       if (index > -1) {
-        this.policy.datasets.splice(index, 1);
-      }*/
+        this.policy.topics.splice(index, 1);
+      }
     }
   }
 };

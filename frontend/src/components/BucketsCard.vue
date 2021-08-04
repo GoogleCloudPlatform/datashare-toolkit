@@ -106,7 +106,7 @@
               >
                 <v-text-field
                   :readonly="dialogBucket.editing === true"
-                  v-model="dialogBucket.name"
+                  v-model="dialogBucket.bucketName"
                   :error-messages="errors"
                   :counter="222"
                   label="Name"
@@ -231,7 +231,7 @@ export default {
     headers: [
       {
         text: 'Name',
-        value: 'name',
+        value: 'bucketName',
         tooltip: 'The bucket name'
       },
       {
@@ -250,10 +250,10 @@ export default {
   }),
   computed: {
     deleteDialogTitle() {
-      return `Delete bucket '${this.selectedItem.name}'?`;
+      return `Delete bucket '${this.selectedItem.bucketName}'?`;
     },
     deleteDialogText() {
-      return `Please click 'Delete' to confirm that you want to delete bucket '${this.selectedItem.name}'. Deleting the bucket will delete all child objects.`;
+      return `Please click 'Delete' to confirm that you want to delete bucket '${this.selectedItem.bucketName}'. Deleting the bucket will delete all child objects.`;
     }
   },
   created() {
@@ -263,7 +263,7 @@ export default {
     presentBucketDialog(selectedItem) {
       this.dialogBucket = { editing: false };
       if (selectedItem) {
-        this.dialogBucket.name = selectedItem.name;
+        this.dialogBucket.bucketName = selectedItem.bucketName;
       }
       this.showCreateBucket = true;
     },
@@ -276,7 +276,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('deleteBucket', {
-          name: encodeURIComponent(item.name)
+          name: encodeURIComponent(item.bucketName)
         })
         .then(() => {
           this.loading = false;
@@ -291,7 +291,7 @@ export default {
             if (this.dialogBucket.editing === false) {
               this.$store
                 .dispatch('createBucket', {
-                  name: this.dialogBucket.name
+                  name: this.dialogBucket.bucketName
                 })
                 .then(result => {
                   this.loading = false;
@@ -310,7 +310,7 @@ export default {
             } else {
               this.$store
                 .dispatch('updateBucket', {
-                  name: this.dialogBucket.name
+                  name: this.dialogBucket.bucketName
                 })
                 .then(result => {
                   this.loading = false;
@@ -358,7 +358,7 @@ export default {
       return d.toLocaleString();
     },
     navigateToBucket(item) {
-      UrlHelper.navigateToBucket(config.projectId, item.name);
+      UrlHelper.navigateToBucket(config.projectId, item.bucketName);
     }
   }
 };

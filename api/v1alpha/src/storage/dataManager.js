@@ -31,7 +31,7 @@ async function listBuckets(projectId) {
         // Store for 1-2 mins?
         const [metadata] = await b.getMetadata(b.name);
         if (metadata.labels && metadata.labels.datashare_managed === 'true') {
-            list.push({ name: b.name, modifiedAt: metadata.updated });
+            list.push({ bucketName: b.name, modifiedAt: metadata.updated });
         }
     }
     return { success: true, data: list };

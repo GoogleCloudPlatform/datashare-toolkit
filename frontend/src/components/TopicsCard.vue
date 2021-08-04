@@ -106,7 +106,7 @@
               >
                 <v-text-field
                   :readonly="dialogTopic.editing === true"
-                  v-model="dialogTopic.name"
+                  v-model="dialogTopic.topicName"
                   :error-messages="errors"
                   :counter="255"
                   label="Name"
@@ -241,12 +241,12 @@ export default {
     headers: [
       {
         text: 'Id',
-        value: 'id',
+        value: 'topicId',
         tooltip: 'The topic id'
       },
       {
         text: 'Name',
-        value: 'name',
+        value: 'topicName',
         tooltip: 'The bucket name'
       },
       {
@@ -260,10 +260,10 @@ export default {
   }),
   computed: {
     deleteDialogTitle() {
-      return `Delete topic '${this.selectedItem.name}'?`;
+      return `Delete topic '${this.selectedItem.topicName}'?`;
     },
     deleteDialogText() {
-      return `Please click 'Delete' to confirm that you want to delete topic '${this.selectedItem.name}'.`;
+      return `Please click 'Delete' to confirm that you want to delete topic '${this.selectedItem.topicName}'.`;
     }
   },
   created() {
@@ -273,7 +273,7 @@ export default {
     presentTopicDialog(selectedItem) {
       this.dialogTopic = { editing: false };
       if (selectedItem) {
-        this.dialogTopic.name = selectedItem.name;
+        this.dialogTopic.topicName = selectedItem.topicName;
       }
       this.showCreateTopic = true;
     },
@@ -301,7 +301,7 @@ export default {
             if (this.dialogTopic.editing === false) {
               this.$store
                 .dispatch('createTopic', {
-                  name: this.dialogTopic.name
+                  name: this.dialogTopic.topicName
                 })
                 .then(result => {
                   this.loading = false;
@@ -320,7 +320,7 @@ export default {
             } else {
               this.$store
                 .dispatch('updateTopic', {
-                  name: this.dialogTopic.name
+                  name: this.dialogTopic.topicName
                 })
                 .then(result => {
                   this.loading = false;

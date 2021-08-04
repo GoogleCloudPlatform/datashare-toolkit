@@ -42,12 +42,12 @@ config.cdsAccountViewFields = new Set(['rowId', 'accountId', 'email', 'emailType
     'accountType', 'createdBy', 'policies', 'marketplace', 'createdAt', 'version', 'isDeleted']);
 
 config.cdsPolicyTableId = "policy";
-config.cdsPolicyTableFields = new Set(['rowId', 'policyId', 'name', 'description', 'isTableBased',
-    'datasets', 'rowAccessTags', 'marketplace', 'createdBy', 'createdAt', 'isDeleted']);
+config.cdsPolicyTableFields = new Set(['rowId', 'policyId', 'name', 'description', 'bigQueryEnabled', 'pubsubEnabled', 'storageEnabled',
+    'buckets', 'topics', 'isTableBased', 'datasets', 'rowAccessTags', 'marketplace', 'createdBy', 'createdAt', 'isDeleted']);
 
 config.cdsPolicyViewId = "currentPolicy";
-config.cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description', 'isTableBased',
-    'datasets', 'rowAccessTags', 'marketplace', 'createdBy', 'createdAt', 'version',
+config.cdsPolicyViewFields = new Set(['rowId', 'policyId', 'name', 'description', 'bigQueryEnabled', 'pubsubEnabled', 'storageEnabled',
+    'buckets', 'topics', 'isTableBased', 'datasets', 'rowAccessTags', 'marketplace', 'createdBy', 'createdAt', 'version',
     'isDeleted']);
 
 config.cdsAuthorizedViewTableId = "authorizedView";
