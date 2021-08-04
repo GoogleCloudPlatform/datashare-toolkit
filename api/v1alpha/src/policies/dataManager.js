@@ -31,7 +31,7 @@ const metaManager = require('../lib/metaManager');
  */
 async function _insertData(projectId, fields, values, data) {
     const bigqueryUtil = new BigQueryUtil(projectId);
-    return await bigqueryUtil.insertRows(cfg.cdsDatasetId, cfg.cdsPolicyTableId, data);
+    return bigqueryUtil.insertRows(cfg.cdsDatasetId, cfg.cdsPolicyTableId, data);
 }
 
 /**
