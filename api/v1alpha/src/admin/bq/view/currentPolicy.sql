@@ -10,9 +10,12 @@ rowIdentifiers AS (
   WHERE r.rank = (SELECT max(r2.rank) FROM RANKED r2 WHERE r2.policyId = r.policyId)
 )
 SELECT
- * EXCEPT(rank, createdAt, isTableBased, isDeleted),
+ * EXCEPT(rank, createdAt, bigQueryEnabled, pubsubEnabled, storageEnabled, isTableBased, isDeleted),
  UNIX_MILLIS(createdAt) AS createdAt,
  rank AS version,
+ IFNULL(bigQueryEnabled, false) AS bigQueryEnabled,
+ IFNULL(pubsubEnabled, false) AS pubsubEnabled,
+ IFNULL(storageEnabled, false) AS storageEnabled,
  IFNULL(isTableBased, false) AS isTableBased,
  IFNULL(isDeleted, false) AS isDeleted
 FROM ranked t
