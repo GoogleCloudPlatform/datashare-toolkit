@@ -245,7 +245,7 @@
               <v-data-table
                 dense
                 :headers="bucketHeaders"
-                :items="policy.datasets"
+                :items="policy.buckets"
                 item-key="datasetId"
                 :search="bucketSearch"
                 :loading="loading"
@@ -296,7 +296,7 @@
               <v-data-table
                 dense
                 :headers="topicHeaders"
-                :items="policy.datasets"
+                :items="policy.topics"
                 item-key="datasetId"
                 :search="topicSearch"
                 :loading="loading"
@@ -804,15 +804,15 @@ export default {
     },
     bucketHeaders() {
       let h = [
-        { text: 'Bucket Name', value: 'name' },
+        { text: 'Bucket Name', value: 'bucketName' },
         { text: '', value: 'action', sortable: false }
       ];
       return h;
     },
     topicHeaders() {
       let h = [
-        { text: 'Topic Id', value: 'id' },
-        { text: 'Topic Name', value: 'name' },
+        { text: 'Topic Id', value: 'topicId' },
+        { text: 'Topic Name', value: 'topicName' },
         { text: '', value: 'action', sortable: false }
       ];
       return h;
@@ -916,7 +916,6 @@ export default {
           d.push(item);
         }
       });
-      console.log(d);
       return d.sort(function(a, b) {
         return a.bucketName
           .toLowerCase()
@@ -1268,12 +1267,10 @@ export default {
       this.showAddBucket = true;
     },
     addBucket() {
-      console.log('addBucket called');
       this.$refs.bucketFormObserver.validate().then(result => {
-        console.log(this.newBucketName);
         if (result) {
           this.policy.buckets.push({
-            name: this.newBucketName
+            bucketName: this.newBucketName
           });
           this.showAddBucket = false;
           this.newBucketName = null;
@@ -1295,9 +1292,7 @@ export default {
       this.showAddTopic = true;
     },
     addTopic() {
-      console.log('add topic called');
       this.$refs.topicFormObserver.validate().then(result => {
-        console.log(this.newTopicId);
         if (result) {
           this.policy.topics.push({
             topicId: this.newTopicId

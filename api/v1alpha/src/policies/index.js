@@ -262,7 +262,12 @@ policies.post('/policies', async(req, res) => {
         createdBy: req.header('x-gcp-account'),
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags,
-        marketplace: req.body.marketplace
+        marketplace: req.body.marketplace,
+        bigQueryEnabled: req.body.bigQueryEnabled,
+        pubsubEnabled: req.body.pubsubEnabled,
+        storageEnabled: req.body.storageEnabled,
+        topics: req.body.topics,
+        buckets: req.body.buckets
     };
     const data = await dataManager.createOrUpdatePolicy(projectId, null, values);
     var code;
@@ -446,7 +451,12 @@ policies.put('/policies/:policyId', async(req, res) => {
         createdBy: req.header('x-gcp-account'),
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags,
-        marketplace: req.body.marketplace
+        marketplace: req.body.marketplace,
+        bigQueryEnabled: req.body.bigQueryEnabled,
+        pubsubEnabled: req.body.pubsubEnabled,
+        storageEnabled: req.body.storageEnabled,
+        topics: req.body.topics,
+        buckets: req.body.buckets
     };
     const data = await dataManager.createOrUpdatePolicy(projectId, policyId, values);
     var code;

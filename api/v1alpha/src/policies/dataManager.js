@@ -240,7 +240,31 @@ async function createOrUpdatePolicy(projectId, policyId, data) {
         }
     }
 
-    // reformat datasets object for saving
+    // reformat buckets object for saving
+    let buckets = data.buckets;
+    if (buckets.length === 0) {
+        // If there are no supplied buckets, remove buckets column field and value from insert statement.
+        delete data.buckets;
+        const index = fields.indexOf('buckets');
+        if (index > -1) {
+            fields.splice(index, 1);
+            values.splice(index, 1);
+        }
+    }
+
+    // reformat topics object for saving
+    let topics = data.topics;
+    if (topics.length === 0) {
+        // If there are no supplied topics, remove topics column field and value from insert statement.
+        delete data.topics;
+        const index = fields.indexOf('topics');
+        if (index > -1) {
+            fields.splice(index, 1);
+            values.splice(index, 1);
+        }
+    }
+
+    // reformat rowAccessTags object for saving
     let rowAccessTags = data.rowAccessTags;
     if (rowAccessTags.length === 0) {
         // If there are no supplied rowAccessTags, remove rowAccessTags column field and value from insert statement.
