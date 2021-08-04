@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="loading" class="px-4">
+  <v-card class="px-4" :loading="loading">
     <v-card-title v-if="view.authorizedViewId">
       Edit Authorized View
     </v-card-title>

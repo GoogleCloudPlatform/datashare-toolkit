@@ -1,5 +1,5 @@
 <template>
-  <v-card class="px-4 py-4">
+  <v-card class="px-4" :loading="loading">
     <v-card-title v-if="policy.policyId">
       Edit Policy
     </v-card-title>
@@ -575,7 +575,7 @@
           <v-form class="px-4">
             <ValidationProvider
               v-slot="{ errors }"
-              name="Bucket"
+              name="Bucket Name"
               rules="required"
             >
               <v-select
@@ -584,7 +584,7 @@
                 item-value="bucketName"
                 v-model="newBucketName"
                 :error-messages="errors"
-                label="Bucket"
+                label="Bucket Name"
                 required
               ></v-select>
             </ValidationProvider>
@@ -611,7 +611,7 @@
           <v-form class="px-4">
             <ValidationProvider
               v-slot="{ errors }"
-              name="Topic"
+              name="Topic Id"
               rules="required"
             >
               <v-select
@@ -620,7 +620,7 @@
                 item-value="topicId"
                 v-model="newTopicId"
                 :error-messages="errors"
-                label="Topic"
+                label="Topic Id"
                 required
               ></v-select>
             </ValidationProvider>

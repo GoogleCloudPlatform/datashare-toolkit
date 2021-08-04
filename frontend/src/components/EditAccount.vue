@@ -1,5 +1,5 @@
 <template>
-  <v-card class="px-4 py-4">
+  <v-card class="px-4" :loading="loading">
     <v-card-title v-if="userData">
       Edit Account
     </v-card-title>
