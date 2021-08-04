@@ -286,7 +286,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('deleteTopic', {
-          topicId: encodeURIComponent(item.id)
+          topicId: encodeURIComponent(item.topicId)
         })
         .then(() => {
           this.loading = false;
@@ -368,7 +368,7 @@ export default {
       return d.toLocaleString();
     },
     navigateToTopic(item) {
-      UrlHelper.navigateToTopic(config.projectId, item.id);
+      UrlHelper.navigateToTopic(config.projectId, item.topicId);
     }
   }
 };
