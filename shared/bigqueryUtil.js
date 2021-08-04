@@ -28,7 +28,7 @@ class BigQueryUtil {
     constructor(projectId) {
         this.projectId = projectId;
         const options = {
-            scopes:['https://www.googleapis.com/auth/cloud-platform']
+            scopes: ['https://www.googleapis.com/auth/cloud-platform']
         };
         if (projectId) {
             options.projectId = projectId;
@@ -906,6 +906,18 @@ class BigQueryUtil {
      */
     getTableFqdn(projectId, datasetId, tableId) {
         return `${projectId}.${datasetId}.${tableId}`;
+    }
+
+    /**
+     * @param  {} datasetId
+     * @param  {} tableId
+     * @param  {} schema
+     */
+    async patchTableSchema(datasetId, tableId, schema) {
+        const table = this.bigqueryClient.dataset(datasetId).table(tableId);
+        const [metadata] = await table.getMetadata();
+        metadata.schema = schema;
+        const [result] = await table.setMetadata(metadata);
     }
 }
 

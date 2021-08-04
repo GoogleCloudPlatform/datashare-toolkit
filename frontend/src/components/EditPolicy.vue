@@ -48,7 +48,7 @@
             ></v-checkbox>
             <v-checkbox
               class="ml-6"
-              v-model="policy.cloudStorageEnabled"
+              v-model="policy.storageEnabled"
               label="Cloud Storage Buckets"
             ></v-checkbox>
             <v-checkbox
@@ -237,7 +237,7 @@
               </v-expansion-panels>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-expansion-panel v-if="policy.cloudStorageEnabled">
+          <v-expansion-panel v-if="policy.storageEnabled">
             <v-expansion-panel-header
               >Cloud Storage Buckets</v-expansion-panel-header
             >
@@ -743,7 +743,7 @@ export default {
       marketplace: { solutionId: null, planId: null, enableAutoApprove: false },
       bigQueryEnabled: true,
       pubsubEnabled: false,
-      cloudStorageEnabled: false
+      storageEnabled: false
     },
     datasetSearch: '',
     tableSearch: '',

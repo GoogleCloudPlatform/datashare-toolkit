@@ -26,6 +26,24 @@
             "description": "Description for the policy"
         },
         {
+            "name": "bigQueryEnabled",
+            "type": "BOOLEAN",
+            "mode": "NULLABLE",
+            "description": "Indicates if BigQuery sharing is enabled"
+        },
+        {
+            "name": "pubsubEnabled",
+            "type": "BOOLEAN",
+            "mode": "NULLABLE",
+            "description": "Indicates if Pub/Sub Topic sharing is enabled"
+        },
+        {
+            "name": "storageEnabled",
+            "type": "BOOLEAN",
+            "mode": "NULLABLE",
+            "description": "Indicates if Cloud Storage bucket sharing is enabled"
+        },
+        {
             "mode": "NULLABLE",
             "name": "isTableBased",
             "type": "BOOLEAN",
@@ -74,27 +92,58 @@
             "description": "List of row access tag(s) associations for a policy"
         },
         {
-            "mode": "NULLABLE",
-            "name": "marketplace",
-            "type": "RECORD",
+            "description": "List of topic(s) associations for a policy",
             "fields": [
                 {
+                    "description": "Topic identifier of topic that policy will grant access to",
+                    "mode": "NULLABLE",
+                    "name": "topicId",
+                    "type": "STRING"
+                }
+            ],
+            "mode": "REPEATED",
+            "name": "topics",
+            "type": "RECORD"
+        },
+        {
+            "description": "List of bucket(s) associations for a policy",
+            "fields": [
+                {
+                    "description": "Bucket name bucket that policy will grant access to",
+                    "mode": "NULLABLE",
+                    "name": "bucketName",
+                    "type": "STRING"
+                }
+            ],
+            "mode": "REPEATED",
+            "name": "buckets",
+            "type": "RECORD"
+        },
+        {
+            "description": "Marketplace integration data",
+            "fields": [
+                {
+                    "description": "The solutionId to associate to the policy",
                     "mode": "REQUIRED",
                     "name": "solutionId",
                     "type": "STRING"
                 },
                 {
+                    "description": "The planId to associate to the policy",
                     "mode": "REQUIRED",
                     "name": "planId",
                     "type": "STRING"
                 },
                 {
+                    "description": "The flag indicates if the purchase through Marketplace should be auto-approved and entitled for the subscriber.",
                     "mode": "REQUIRED",
                     "name": "enableAutoApprove",
-                    "type": "BOOLEAN",
-                    "description": "The flag indicates if the purchase through Marketplace should be auto-approved and entitled for the subscriber."
+                    "type": "BOOLEAN"
                 }
-            ]
+            ],
+            "mode": "NULLABLE",
+            "name": "marketplace",
+            "type": "RECORD"
         },
         {
             "mode": "REQUIRED",
