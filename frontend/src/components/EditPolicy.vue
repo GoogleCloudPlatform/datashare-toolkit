@@ -615,7 +615,7 @@
               rules="required"
             >
               <v-select
-                :items="nonSelectedBuckets"
+                :items="nonSelectedTopics"
                 item-text="name"
                 item-value="id"
                 v-model="newTopicId"
@@ -743,7 +743,9 @@ export default {
       marketplace: { solutionId: null, planId: null, enableAutoApprove: false },
       bigQueryEnabled: true,
       pubsubEnabled: false,
-      storageEnabled: false
+      storageEnabled: false,
+      topics: [],
+      buckets: []
     },
     datasetSearch: '',
     tableSearch: '',
