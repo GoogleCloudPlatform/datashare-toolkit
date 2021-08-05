@@ -13,13 +13,32 @@
         <v-btn
           :disabled="loading"
           color="primary"
-          @click.stop="sync('PERMISSIONS')"
+          @click.stop="sync('BIGQUERY_PERMISSIONS')"
           >Sync BigQuery Permissions</v-btn
         >
       </div>
       <div class="my-2">
-        <v-btn :disabled="loading" color="primary" @click.stop="sync('VIEWS')"
+        <v-btn
+          :disabled="loading"
+          color="primary"
+          @click.stop="sync('BIGQUERY_VIEWS')"
           >Sync BigQuery Views</v-btn
+        >
+      </div>
+      <div class="my-2">
+        <v-btn
+          :disabled="loading"
+          color="primary"
+          @click.stop="sync('STORAGE_BUCKET_PERMISSIONS')"
+          >Sync Storage Bucket Permissions</v-btn
+        >
+      </div>
+      <div class="my-2">
+        <v-btn
+          :disabled="loading"
+          color="primary"
+          @click.stop="sync('TOPIC_PERMISSIONS')"
+          >Sync PubSub Topic Permissions</v-btn
         >
       </div>
       <div
@@ -105,22 +124,32 @@ export default {
         console.log('Sync all clicked');
         this.dialogTitle = 'Sync All?';
         this.dialogText =
-          'Are you sure you want sync all BigQuery objects from Datashare?';
-      } else if (type === 'PERMISSIONS') {
-        console.log('Sync permissions clicked');
+          'Are you sure you want sync all Datashare managed objects?';
+      } else if (type === 'BIGQUERY_PERMISSIONS') {
+        console.log('Sync BigQuery permissions clicked');
         this.dialogTitle = 'Sync BigQuery Permissions?';
         this.dialogText =
-          'Are you sure you want to sync all BigQuery permissions from Datashare?';
-      } else if (type === 'VIEWS') {
-        console.log('Sync views clicked');
+          'Are you sure you want to sync all BigQuery permissions managed by Datashare?';
+      } else if (type === 'BIGQUERY_VIEWS') {
+        console.log('Sync BigQuery views clicked');
         this.dialogTitle = 'Sync BigQuery Views?';
         this.dialogText =
-          'Are you sure you want to sync all BigQuery views from Datashare?';
+          'Are you sure you want to sync all BigQuery views managed by Datashare?';
+      } else if (type === 'STORAGE_BUCKET_PERMISSIONS') {
+        console.log('Sync Storage Bucket permissions clicked');
+        this.dialogTitle = 'Sync Storage Bucket Permissions?';
+        this.dialogText =
+          'Are you sure you want to sync all Storage Bucket permissions managed by Datashare?';
+      } else if (type === 'TOPIC_PERMISSIONS') {
+        console.log('Sync Pub/Sub Topic permissions clicked');
+        this.dialogTitle = 'Sync Pub/Sub Topic Permissions?';
+        this.dialogText =
+          'Are you sure you want to sync all Pub/Sub Topic permissions managed by Datashare?';
       } else if (type === 'MARKETPLACE') {
         console.log('Sync marketplace entitlements clicked');
         this.dialogTitle = 'Sync Marketplace Entitlements?';
         this.dialogText =
-          'Are you sure you want to sync all Marketplace Entitlements?';
+          'Are you sure you want to sync all Marketplace entitlements managed by Datashare?';
       }
       this.showDialog = true;
     },
@@ -137,12 +166,12 @@ export default {
             if (object.syncType === 'ALL') {
               this.dialogTitle = 'Sync All';
               this.dialogText = 'Sync all has completed.';
-            } else if (object.syncType === 'PERMISSIONS') {
-              this.dialogTitle = 'Sync Permissions';
-              this.dialogText = 'Sync all permissions has completed.';
-            } else if (object.syncType === 'VIEWS') {
-              this.dialogTitle = 'Sync Views';
-              this.dialogText = 'Sync all views completed.';
+            } else if (object.syncType === 'BIGQUERY_PERMISSIONS') {
+              this.dialogTitle = 'Sync BigQuery Permissions';
+              this.dialogText = 'Sync all BigQuery permissions has completed.';
+            } else if (object.syncType === 'BIGQUERY_VIEWS') {
+              this.dialogTitle = 'Sync BigQuery Views';
+              this.dialogText = 'Sync all BigQuery views completed.';
             } else if (object.syncType === 'MARKETPLACE') {
               this.dialogTitle = 'Sync Marketplace Entitlements';
               this.dialogText = 'Sync Marketplace Entitlements completed.';

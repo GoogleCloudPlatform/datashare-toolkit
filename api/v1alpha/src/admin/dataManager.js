@@ -48,14 +48,14 @@ async function initializeSchema(projectId) {
  */
 async function syncResources(projectId, type) {
     const bigqueryUtil = new BigQueryUtil(projectId);
-    let permissions = false;
+    let bigQueryPermissions = false;
     let views = false;
     let marketplace = false;
     try {
-        if (type === 'PERMISSIONS') {
-            console.log('Sync permissions called');
-            permissions = true;
-        } else if (type === 'VIEWS') {
+        if (type === 'BIGQUERY_PERMISSIONS') {
+            console.log('Sync BigQuery permissions called');
+            bigQueryPermissions = true;
+        } else if (type === 'BIGQUERY_VIEWS') {
             console.log('Sync views called');
             views = true;
         } else if (type === 'MARKETPLACE') {
@@ -63,7 +63,7 @@ async function syncResources(projectId, type) {
             marketplace = await runtimeConfig.marketplaceIntegration(projectId);
         } else if (type === 'ALL') {
             console.log('Sync all called');
-            permissions = true;
+            bigQueryPermissions = true;
             views = true;
             marketplace = await runtimeConfig.marketplaceIntegration(projectId);
         }
@@ -72,7 +72,7 @@ async function syncResources(projectId, type) {
         if (marketplace) {
             await procurementManager.syncAllAccountEntitlements(projectId);
         }
-        if (permissions) {
+        if (bigQueryPermissions) {
             await metaManager.performPolicyUpdates(projectId, null, true);
         }
         if (views) {
