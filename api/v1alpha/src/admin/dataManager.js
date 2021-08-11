@@ -23,7 +23,6 @@ const runtimeConfig = require('../lib/runtimeConfig');
 const metaManager = require('../lib/metaManager');
 const datasetManager = require('../datasets/dataManager');
 const procurementManager = require('../procurements/dataManager');
-const resourceManager = require('../resources/dataManager');
 const fs = require('fs');
 const retry = require('async-retry');
 
@@ -264,8 +263,8 @@ async function initializePubSubListener() {
         console.log('Could not identify project, will not start up subscription');
         return;
     }
-
-    if (await runtimeConfig.marketplaceIntegration(projectId) === false) {
+    
+    if (await runtimeConfig.commerceEnabled(projectId) === false) {
         console.log('Marketplace integration is disabled, PubSub listener will not be started');
         return;
     } else {

@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [ "$#" -ne 7 ]; then
-    echo "Usage: $0 [ --project-id ] [ --oauth-client-id ] [ --fqdn ] [ --data-producers ] [ --region ] [ --zone] [ --tag ]" >&2
+if [ "$#" -lt 7 ]; then
+    echo "Usage: $0 [ --project-id ] [ --oauth-client-id ] [ --fqdn ] [ --data-producers ] [ --region ] [ --zone] [ --tag ] [ --marketplace-enabled ]" >&2
     exit 1
 fi
 
@@ -28,6 +28,7 @@ function finish {
 trap finish EXIT
 
 CUSTOM_ROLE_NAME=custom.ds.api.mgr;
+export MARKETPLACE_INTEGRATION_ENABLED="false";
 
 for i in "$@"; do
     case $i in
@@ -57,6 +58,10 @@ for i in "$@"; do
         ;;
     --tag=*)
         export TAG="${i#*=}"
+        shift # past argument=value
+        ;;
+    --marketplace-enabled)
+        export MARKETPLACE_INTEGRATION_ENABLED="true"
         shift # past argument=value
         ;;
     *)

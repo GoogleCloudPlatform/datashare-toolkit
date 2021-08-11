@@ -1,6 +1,6 @@
 {
     "name": "cds-api",
-    "description": "Datashare API service",
+    "description": "Datashare API Service",
     "version": "0.7.3",
     "license": "Apache-2.0",
     "dependencies": {
@@ -29,7 +29,8 @@
         "uuid": "^3.3.3"
     },
     "scripts": {
-        "dev": "nodemon src/index.js",
+        "api": "nodemon src/api.js",
+        "listener": "nodemon src/listener.js",
         "start": "functions-framework --target=processEvent",
         "deploy": "../deploy.sh",
         "lint": "eslint src",

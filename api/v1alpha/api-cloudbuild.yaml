@@ -3,8 +3,7 @@ steps:
   args:
   - build
   - "--tag=gcr.io/$PROJECT_ID/ds-api:$TAG_NAME"
-  - "--file=./api/v1alpha/Dockerfile"
+  - "--file=./api/v1alpha/Dockerfile.api"
   - .
 images:
   - "gcr.io/$PROJECT_ID/ds-api:$TAG_NAME"
-

@@ -62,26 +62,33 @@ class RuntimeConfig {
     that the current account has access to
      */
     async getManagedProjects() {
-        // Check if maanged projects exists in cache first
+        // Check if managed projects exists in cache first
         let list = dsCache.get(managedProjectsCacheKey);
         if (list == undefined) {
-            const { Resource } = require('@google-cloud/resource-manager');
-            const options = {
-                scopes: ['https://www.googleapis.com/auth/cloud-platform']
-            };
-            const resource = new Resource(options);
+            if (config.managedProjects) {
+                const { Resource } = require('@google-cloud/resource-manager');
+                const options = {
+                    scopes: ['https://www.googleapis.com/auth/cloud-platform']
+                };
+                const resource = new Resource(options);
 
-            // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
-            const [projects] = await resource.getProjects();
-            const include = Object.keys(config.managedProjects);
-            list = projects.filter(project => include.includes(project.id)).map(project => project.id).sort(function (a, b) {
-                return a
-                    .toLowerCase()
-                    .localeCompare(b.toLowerCase());
-            });
+                // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
+                const [projects] = await resource.getProjects();
+                const include = Object.keys(config.managedProjects);
+                list = projects.filter(project => include.includes(project.id)).map(project => project.id).sort(function (a, b) {
+                    return a
+                        .toLowerCase()
+                        .localeCompare(b.toLowerCase());
+                });
 
-            // Set managed projects to cache for 5 minutes
-            dsCache.set(managedProjectsCacheKey, list, 300);
+                const currentProject = await this.getCurrentProjectId();
+                if (include.includes(currentProject) && !list.includes(currentProject)) {
+                    // For the use case where the current project isn't returned from the resource manager call, append it to the list
+                    // It's safe to do so, as it's already included in the managed project list
+                    list.push(currentProject);
+                }
+            }
+            dsCache.set(managedProjectsCacheKey, list);
         }
         return list;
     }

@@ -18,8 +18,8 @@
 # Using official node runtime base apline image
 FROM node:12.6-alpine as base
 
-# Set the file maintainer (your name - the file's author)
-MAINTAINER Chris Page <chrispage@google.com>
+# Set the file maintainers
+LABEL org.opencontainers.image.authors="Chris Page <chrispage@google.com>, Mark Servidio <mservidio@google.com"
 
 # Set the application directory
 RUN mkdir -p /app
@@ -63,4 +63,4 @@ COPY --from=dependencies /app/package.json ./
 RUN npm install --only=production
 COPY --from=build /app ./
 EXPOSE 5555
-CMD ["node", "index.js"]
+CMD ["node", "api.js"]

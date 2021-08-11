@@ -169,6 +169,10 @@ class Config {
       return store.dispatch('getProjectConfiguration').then(response => {
         console.debug(`project configuration: ${JSON.stringify(response)}`);
         const _c = response.configuration;
+        if (!this.projectId) {
+          // If projectId is not set, set it.
+          this.projectId = _c.projectId;
+        }
         const labels = _c.labels;
         if (labels) {
           this.update(labels);
@@ -189,10 +193,12 @@ class Config {
         console.debug(`managed projects: ${JSON.stringify(response)}`);
         if (response.success) {
           const managedProjects = response.projects;
-          if (this.projectId === null) {
-            if (managedProjects.length > 0) {
-              this.projectId = managedProjects[0];
-            }
+          if (
+            this.projectId === null &&
+            managedProjects &&
+            managedProjects.length > 0
+          ) {
+            this.projectId = managedProjects[0];
           }
           return store.dispatch('setManagedProjects', managedProjects);
         }
