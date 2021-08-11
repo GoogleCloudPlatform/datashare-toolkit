@@ -1,6 +1,6 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
-## 0.7.1 Release Notes
+## 0.7.2 Release Notes
 * Build - 8/10/2021
 
 ### Datashare
