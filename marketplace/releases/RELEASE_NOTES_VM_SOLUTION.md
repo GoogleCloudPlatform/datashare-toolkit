@@ -1,6 +1,21 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
 ## 0.7.1 Release Notes
+* Build - 8/10/2021
+
+### Datashare
+* Datashare release version is 0.7.2
+* Kubernetes cluster version is 1.18
+
+### Marketplace Release Updates  
+* Updated GKE cluster to the following
+  * minimum 4 nodes n2-standard-2 notes
+  * auto expands up to 8 nodes
+  * GKE version from stable channel
+  * GKE auto upgrades
+  * Set max surge to 2 for upgrading the cluster
+
+## 0.7.1 Release Notes
 * Build - 6/11/2021
 
 ### Datashare
