@@ -105,6 +105,7 @@ var accounts = express.Router();
  *   get:
  *     summary: List Account based off request parameters
  *     description: Returns the PolicyList response
+ *     operationId: listAccounts
  *     tags:
  *       - accounts
  *     parameters:
@@ -159,6 +160,7 @@ accounts.get('/accounts', async (req, res) => {
  *   post:
  *     summary: Create Account based off request body
  *     description: Returns the Datset response
+ *     operationId: createAccount
  *     tags:
  *       - accounts
  *     parameters:
@@ -246,6 +248,7 @@ accounts.post('/accounts', async (req, res) => {
  *   get:
  *     summary: Get Account based off accountId
  *     description: Returns the Datset response
+ *     operationId: getAccountByAccountId
  *     tags:
  *       - accounts
  *     parameters:
@@ -308,6 +311,7 @@ accounts.get('/accounts/:accountId', async (req, res) => {
  *   put:
  *     summary: Update Account based off account ID and request body
  *     description: Returns the Account response
+ *     operationId: updateAccountByAccountId
  *     tags:
  *       - accounts
  *     parameters:
@@ -404,6 +408,7 @@ accounts.put('/accounts/:accountId', async (req, res) => {
  *   delete:
  *     summary: Delete Account based off account ID and request body
  *     description: Returns the Account response
+ *     operationId: deleteAccountByAccountId
  *     tags:
  *       - accounts
  *     parameters:
@@ -481,6 +486,7 @@ accounts.delete('/accounts/:accountId', async (req, res) => {
  *   get:
  *     summary: List Accounts of policy based off policyId and request parameters
  *     description: Returns the Account list response
+ *     operationId: listAccountsByPolicyId
  *     tags:
  *       - policies
  *     parameters:
@@ -541,6 +547,7 @@ accounts.get('/policies/:policyId/accounts', async (req, res) => {
  *   get:
  *     summary: List Accounts based off datasetId and request parameters
  *     description: Returns the AccountList response
+ *     operationId: listAccountsByDatasetId
  *     tags:
  *       - datasets
  *     parameters:

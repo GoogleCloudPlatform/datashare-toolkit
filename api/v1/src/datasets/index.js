@@ -49,6 +49,7 @@ var datasets = express.Router();
  *   get:
  *     summary: List Dataset based off request parameters
  *     description: Returns the DatsetList response
+ *     operationId: listDatasets
  *     tags:
  *       - datasets
  *     parameters:
@@ -104,6 +105,7 @@ datasets.get('/datasets', async(req, res) => {
  *   post:
  *     summary: Create Dataset based off request body
  *     description: Returns the Dataset response
+ *     operationId: createDataset
  *     tags:
  *       - datasets
  *     parameters:
@@ -181,6 +183,7 @@ datasets.post('/datasets', async(req, res) => {
  *   put:
  *     summary: Update Dataset based off request body
  *     description: Returns the Dataset response
+ *     operationId: updateDataset
  *     tags:
  *       - datasets
  *     parameters:
@@ -251,6 +254,7 @@ datasets.put('/datasets/:datasetId', async(req, res) => {
  *   get:
  *     summary: Get Dataset based off datasetId
  *     description: Returns the Datset response
+ *     operationId: getDatasetByDatasetId
  *     tags:
  *       - datasets
  *     parameters:
@@ -311,6 +315,7 @@ datasets.get('/datasets/:datasetId', async(req, res) => {
  *   delete:
  *     summary: Delete Dataset based off dataset ID and request body
  *     description: Returns the Account response
+ *     operationId: deleteDatasetByDatasetId
  *     tags:
  *       - accounts
  *     parameters:

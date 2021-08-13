@@ -153,6 +153,7 @@ var spots = express.Router();
  *   get:
  *     summary: Spot API service environment configuration
  *     description: Returns the Spot API service configuration
+ *     operationId: getSpotConfig
  *     tags:
  *       - spots
  *     parameters:
@@ -185,6 +186,7 @@ var spots = express.Router();
  *   get:
  *     summary: Spot query options (entitlement) for the Spot API service
  *     description: Returns the Spot query options for the Spot API service
+ *     operationId: getSpotOptions
  *     tags:
  *       - spots
  *     parameters:
@@ -256,6 +258,7 @@ spots.get('/spots::custom', async(req, res) => {
  *   post:
  *     summary: Create Spot based off request parameters
  *     description: Returns the Spot response
+ *     operationId: createSpotRequest
  *     tags:
  *       - spots
  *     parameters:
@@ -313,6 +316,7 @@ spots.post('/spots', validateManager.spotParams, async(req, res) => {
  *   get:
  *     summary: Check Spot status based off Request ID
  *     description: Returns the Spot Status response
+ *     operationId: getSpotRequestByRequestId
  *     tags:
  *       - spots
  *     parameters:

@@ -72,6 +72,7 @@ var admin = express.Router();
  *   post:
  *     summary: Initialize the Datashare schema creation
  *     description: Returns the schema creation response
+ *     operationId: initSchema
  *     tags:
  *       - admin
  *     parameters:
@@ -112,6 +113,7 @@ var admin = express.Router();
  *   post:
  *     summary: Syncronize the Datashare resources and metadata
  *     description: Returns the syncronize resources response
+ *     operationId: syncResources
  *     tags:
  *       - admin
  *     parameters:
