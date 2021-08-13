@@ -48,6 +48,21 @@ var admin = express.Router();
  *         description: Syncronize Resources Type
  *         $ref: '#/definitions/SyncronizeResourcesType'
  *
+ *   Error:
+ *     type: object
+ *     description: Error object
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: Success of the request
+ *       code:
+ *         type: integer
+ *         description: HTTP status code
+ *       errors:
+ *         type: array
+ *         items:
+ *           type: string
+ *
  */
 
 /**
@@ -62,38 +77,33 @@ var admin = express.Router();
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the init schema request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: initSchema response
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 /**
  * @swagger
@@ -107,45 +117,39 @@ var admin = express.Router();
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the syncronize resources request
- *     requestBody:
+ *     - in: body
+ *       name: syncronize_resources
  *       description: Request parameters for Syncronize Resources
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/SyncronizeResourcesRequest'
+ *       schema:
+ *         $ref: '#/definitions/SyncronizeResourcesRequest'
  *       required: true
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Syncronize resources response
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 admin.post('/admin::custom', async (req, res) => {
     const projectId = req.header('x-gcp-project-id');

@@ -39,6 +39,7 @@ var datasets = express.Router();
  *       datasetId:
  *         type: string
  *         description: Dataset ID
+ *
  */
 
 /**
@@ -53,35 +54,32 @@ var datasets = express.Router();
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the Dataset request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Dataset list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: array
- *                   items:
- *                      $ref: '#/definitions/Dataset'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               items:
+ *                  $ref: '#/definitions/Dataset'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 datasets.get('/datasets', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -111,52 +109,45 @@ datasets.get('/datasets', async(req, res) => {
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the Dataset request
  *     - in: header
  *       name: x-gcp-account
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: GCP account name of the calling user
- *     requestBody:
+ *     - in: body
+ *       name: dataset
  *       description: Request parameters for Dataset
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/Dataset'
+ *       schema:
+ *         $ref: '#/definitions/Dataset'
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Dataset
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Dataset'
+ *               items:
+ *                 $ref: '#/definitions/Dataset'
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 datasets.post('/datasets', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -195,52 +186,45 @@ datasets.post('/datasets', async(req, res) => {
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the Dataset request
  *     - in: header
  *       name: x-gcp-account
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: GCP account name of the calling user
- *     requestBody:
+ *     - in: body
+ *       name: dataset
  *       description: Request parameters for Dataset
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/Dataset'
+ *       schema:
+ *         $ref: '#/definitions/Dataset'
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Dataset
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Dataset'
+ *               items:
+ *                 $ref: '#/definitions/Dataset'
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 datasets.put('/datasets/:datasetId', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -272,41 +256,37 @@ datasets.put('/datasets/:datasetId', async(req, res) => {
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the Dataset request
  *     - in: path
  *       name: datasetId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Dataset Id of the Dataset request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Dataset
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                      $ref: '#/definitions/Dataset'
+ *               items:
+ *                  $ref: '#/definitions/Dataset'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 datasets.get('/datasets/:datasetId', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -336,58 +316,50 @@ datasets.get('/datasets/:datasetId', async(req, res) => {
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the Dataset request
  *     - in: path
  *       name: datasetId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Dataset Id of the Dataset request
  *     - in: header
  *       name: x-gcp-account
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: GCP account name of the calling user
- *     requestBody:
+ *     - in: body
+ *       name: dataset
  *       description: Request parameters for Dataset
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/Dataset'
+ *       schema:
+ *         $ref: '#/definitions/Dataset'
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Dataset
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Dataset'
+ *               items:
+ *                 $ref: '#/definitions/Dataset'
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 datasets.delete('/datasets/:datasetId', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');

@@ -76,7 +76,7 @@ var policies = express.Router();
  *       tag:
  *         type: string
  *         description: Row Access Tag
- * 
+ *
  *   Marketplace:
  *     type: object
  *     description: Marketplace object
@@ -90,6 +90,7 @@ var policies = express.Router();
  *       enableAutoApprove:
  *         type: boolean
  *         description: Indicates if the purchasing account should automatically be added to the policy
+ *
  */
 
 /**
@@ -104,35 +105,32 @@ var policies = express.Router();
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the Policy request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Policy list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: array
- *                   items:
- *                      $ref: '#/definitions/Policy'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               items:
+ *                  $ref: '#/definitions/Policy'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.get('/policies', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -177,52 +175,45 @@ policies.get('/products', async(req, res) => {
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the Policy request
  *     - in: header
  *       name: x-gcp-account
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: GCP account name of the calling user
- *     requestBody:
+ *     - in: body
+ *       name: policy
  *       description: Request parameters for Policy
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/Policy'
+ *       schema:
+ *         $ref: '#/definitions/Policy'
+ *     produces:
+ *       - application/json
  *     responses:
  *       201:
  *         description: Policy
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Policy'
+ *               items:
+ *                 $ref: '#/definitions/Policy'
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.post('/policies', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -246,13 +237,13 @@ policies.post('/policies', async(req, res) => {
                 success: false,
                 code: 400,
                 errors: ['planId must be provided when a marketplace solutionId is provided']
-            }); 
+            });
         } else if (!req.body.marketplace.solutionId && req.body.marketplace.planId) {
             return res.status(400).json({
                 success: false,
                 code: 400,
                 errors: ['solutionId must be provided when a marketplace planId is provided']
-            }); 
+            });
         }
     }
     const values = {
@@ -294,41 +285,37 @@ policies.post('/policies', async(req, res) => {
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the Policy request
  *     - in: path
  *       name: policyId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Policy
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                      $ref: '#/definitions/Policy'
+ *               items:
+ *                  $ref: '#/definitions/Policy'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.get('/policies/:policyId', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -358,58 +345,50 @@ policies.get('/policies/:policyId', async(req, res) => {
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the Policy request
  *     - in: path
  *       name: policyId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
  *     - in: header
  *       name: x-gcp-account
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: GCP account name of the calling user
- *     requestBody:
+ *     - in: body
+ *       name: policy
  *       description: Request parameters for Policy
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/Policy'
+ *       schema:
+ *         $ref: '#/definitions/Policy'
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Policy
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Policy'
+ *               items:
+ *                 $ref: '#/definitions/Policy'
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.put('/policies/:policyId', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -434,13 +413,13 @@ policies.put('/policies/:policyId', async(req, res) => {
                 success: false,
                 code: 400,
                 errors: ['planId must be provided when a marketplace solutionId is provided']
-            }); 
+            });
         } else if (!req.body.marketplace.solutionId && req.body.marketplace.planId) {
             return res.status(400).json({
                 success: false,
                 code: 400,
                 errors: ['solutionId must be provided when a marketplace planId is provided']
-            }); 
+            });
         }
     }
     const values = {
@@ -483,58 +462,50 @@ policies.put('/policies/:policyId', async(req, res) => {
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the Policy request
  *     - in: path
  *       name: policyId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
  *     - in: header
  *       name: x-gcp-account
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: GCP account name of the calling user
- *     requestBody:
+ *     - in: body
+ *       name: policy
  *       description: Request parameters for Policy
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/Policy'
+ *       schema:
+ *         $ref: '#/definitions/Policy'
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Policy
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Policy'
+ *               items:
+ *                 $ref: '#/definitions/Policy'
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.delete('/policies/:policyId', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -568,41 +539,37 @@ policies.delete('/policies/:policyId', async(req, res) => {
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the Policy request
  *     - in: path
  *       name: accountId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Account Id of the Policy request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Policy list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: array
- *                   items:
- *                      $ref: '#/definitions/Policy'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               items:
+ *                  $ref: '#/definitions/Policy'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.get('/accounts/:accountId/policies', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -632,41 +599,37 @@ policies.get('/accounts/:accountId/policies', async(req, res) => {
  *     parameters:
  *     - in: path
  *       name: projectId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Project Id of the Policy request
  *     - in: path
  *       name: datasetId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Dataset Id of the Policy request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Policy list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: array
- *                   items:
- *                      $ref: '#/definitions/Policy'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               items:
+ *                  $ref: '#/definitions/Policy'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.get('/datasets/:datasetId/policies', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
