@@ -269,9 +269,7 @@ class StorageUtil {
                 const apiResponse = data[1];
                 return policy;
             }).catch((err) => {
-                if (this.VERBOSE_MODE) {
-                    console.warn(err);
-                }
+                console.error(err);
                 throw err;
             });
     }
@@ -289,9 +287,7 @@ class StorageUtil {
             const apiResponse = data[1];
             return policy;
         }).catch((err) => {
-            if (this.VERBOSE_MODE) {
-                console.warn(err);
-            }
+            console.error(err);
             throw err;
         });
     }
