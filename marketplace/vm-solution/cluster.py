@@ -27,7 +27,8 @@ def GenerateConfig(context):
   cluster_version = '' + str(cluster_version_num) + ''
   is_private_gke_cluster = context.properties['isPrivateGkeCluster']
   workload_pool = context.env['project'] + '.svc.id.goog'
-  machine_type = 'e2-standard-2'
+  machine_type = 'n2-standard-2'
+  initial_node_count = 4
   network = context.properties['network']
   subnetwork = context.properties['subnetwork']
   ## TODO add control statement to add PrivateClusterConfig if user selects true;
@@ -44,10 +45,43 @@ def GenerateConfig(context):
               'cluster': {
                   'name': acutal_cluster_name,
                   'initialClusterVersion': '' + cluster_version + '',
-                  'initialNodeCount': 3,
                   'ipAllocationPolicy': {
                       'useIpAliases': True,
                   },
+                  "releaseChannel" : {
+                      "channel": 'STABLE'
+                  },
+                  "nodePools": [
+                      {
+                          "name": "default-pool",
+                          "initial_node_count": initial_node_count,
+                          "autoscaling": {
+                              "enabled": True,
+                              "minNodeCount": initial_node_count, 
+                              "maxNodeCount": 8
+
+                          },   
+                          "management": {
+                              "autoUpgrade": True,
+                              "autoRepair": True
+                          },
+                          "upgradeSettings": {
+                            "maxSurge": 2
+                          },
+                          "config": {
+                            'machineType': machine_type,
+                            'oauthScopes': [
+                                'https://www.googleapis.com/auth/' + s
+                                    for s in [
+                                    'compute',
+                                    'devstorage.read_only',
+                                    'logging.write',
+                                    'monitoring'
+                                 ]
+                            ]
+                          } 
+                      }
+                  ],
                   'network': network,
                   'subnetwork': subnetwork,
                   'workloadIdentityConfig': {
@@ -63,18 +97,6 @@ def GenerateConfig(context):
                     'cloudRunConfig': {
                         'disabled': False,
                     }
-                  },
-                  'nodeConfig': {
-                      'machineType': machine_type,
-                      'oauthScopes': [
-                          'https://www.googleapis.com/auth/' + s
-                          for s in [
-                              'compute',
-                              'devstorage.read_only',
-                              'logging.write',
-                              'monitoring'
-                          ]
-                      ]
                   }
               }
           }

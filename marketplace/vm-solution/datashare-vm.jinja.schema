@@ -168,11 +168,11 @@ properties:
         #- roles/iam.serviceAccounts.create causes an error during deployment as it is not allowed.
   input_datashareGithubReleaseVersion:
     type: string
-    default: v0.7.0
+    default: v0.7.2
     enum:
       - 'master'
-      - 'v0.7.0'
-      - 'v0.6.9'
+      - 'v0.7.2'
+      - 'v0.7.1'
   input_cloudFunctionRegion:
     type: string
     default: us-central1
