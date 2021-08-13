@@ -44,7 +44,7 @@ class StorageUtil {
     async createFile(bucketName, fileName, contents, options) {
         const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
-        let opt =  {};
+        let opt = {};
         if (options) {
             opt = options;
         }
@@ -89,7 +89,7 @@ class StorageUtil {
     async createBucket(bucketName) {
         return this.storage.createBucket(bucketName);
     }
-    
+
     /**
      */
     async getBuckets() {
@@ -233,7 +233,7 @@ class StorageUtil {
             return url[0];
         }
     }
-    
+
     /**
      * @param  {} bucketName
      * @param  {} options
@@ -254,6 +254,46 @@ class StorageUtil {
             });
         }
         return files.map(f => f.name);
+    }
+
+    /**
+     * @param  {} bucketName
+     * https://googleapis.dev/nodejs/storage/latest/Iam.html#getPolicy
+     * https://github.com/googleapis/nodejs-storage/blob/master/samples/viewBucketIamMembers.js
+     */
+    async getBucketIamPolicy(bucketName) {
+        const bucket = this.storage.bucket(bucketName);
+        return bucket.iam.getPolicy({ requestedPolicyVersion: 3 })
+            .then(function (data) {
+                const policy = data[0];
+                const apiResponse = data[1];
+                return policy;
+            }).catch((err) => {
+                if (this.VERBOSE_MODE) {
+                    console.warn(err);
+                }
+                throw err;
+            });
+    }
+
+    /**
+     * @param  {} bucketName
+     * @param  {} policy
+     * https://googleapis.dev/nodejs/storage/latest/Iam.html#setPolicy
+     * https://github.com/googleapis/nodejs-storage/blob/master/samples/addBucketIamMember.js
+     */
+    async setBucketIamPolicy(bucketName, policy) {
+        const bucket = this.storage.bucket(bucketName);
+        return bucket.iam.setPolicy(policy).then(function (data) {
+            const policy = data[0];
+            const apiResponse = data[1];
+            return policy;
+        }).catch((err) => {
+            if (this.VERBOSE_MODE) {
+                console.warn(err);
+            }
+            throw err;
+        });
     }
 }
 
