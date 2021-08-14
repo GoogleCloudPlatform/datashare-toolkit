@@ -1,4 +1,6 @@
-CREATE OR REPLACE PROCEDURE `${permissionsDiffProcedure}`(policyFilter ARRAY<STRING>)
+DROP PROCEDURE IF EXISTS `${permissionsDiffProcedure}`;
+
+CREATE OR REPLACE PROCEDURE `${bigQueryPermissionDiffProcedure}`(policyFilter ARRAY<STRING>)
 BEGIN
 WITH ranked AS (
   -- Rank all of the policies by date descending. The latest record will be 1.
@@ -10,10 +12,11 @@ WITH ranked AS (
 rowIdentifiers AS (
   -- Take only the last 2 modified records and set defaults/current record flags.
   SELECT
-    * EXCEPT(isTableBased, isDeleted),
-    CASE WHEN r.rank = 1 THEN true ELSE false END AS isCurrent,
-   IFNULL(isTableBased, false) AS isTableBased,
-   IFNULL(isDeleted, false) AS isDeleted
+    * EXCEPT(bigQueryEnabled, isTableBased, isDeleted),
+    CASE WHEN r.rank = 1 THEN TRUE ELSE FALSE END AS isCurrent,
+    IFNULL(bigQueryEnabled, FALSE) AS bigQueryEnabled,
+    IFNULL(isTableBased, FALSE) AS isTableBased,
+    IFNULL(isDeleted, FALSE) AS isDeleted
   FROM RANKED r
   WHERE r.rank IN (1,2)
 ),
@@ -25,7 +28,7 @@ userPolicies AS (
     p.policyId
   FROM `${accountView}` ca
   CROSS JOIN unnest(ca.policies) AS p
-  WHERE ca.isDeleted IS false
+  WHERE ca.isDeleted IS FALSE
 ),
 policyData AS (
   -- Join up all policy data with entitled accounts.
@@ -43,7 +46,7 @@ policyData AS (
   LEFT JOIN UNNEST(r.datasets) d
   LEFT JOIN UNNEST(d.tables) t
   LEFT JOIN userPolicies p ON r.policyId = p.policyId
-  WHERE d.datasetId IS NOT NULL
+  WHERE d.datasetId IS NOT NULL AND r.bigQueryEnabled IS TRUE
 ),
 uniqueIdentifiers as (
   -- This returns the list of all identifiers/datasetId's/tableId's that are affected by the changed policies or all if full refresh.
@@ -59,9 +62,9 @@ uniqueIdentifiers as (
 SELECT
   u.datasetId,
   u.tableId,
-  CASE WHEN u.tableId IS NOT NULL THEN true ELSE false END AS isTableBased,
+  CASE WHEN u.tableId IS NOT NULL THEN TRUE ELSE FALSE END AS isTableBased,
   ARRAY_AGG(STRUCT<email STRING, emailType STRING>(p.email, p.emailType)) AS accounts
 FROM uniqueIdentifiers u
-LEFT JOIN policyData p ON u.identifier = p.identifier AND p.isCurrent IS true AND p.isDeleted IS false
-GROUP BY u.datasetId, u.tableId, p.isTableBased, p.isCurrent, p.isDeleted;
+LEFT JOIN policyData p ON u.identifier = p.identifier AND p.isCurrent IS TRUE AND p.isDeleted IS FALSE
+GROUP BY u.datasetId, u.tableId, p.isTableBased;
 END;

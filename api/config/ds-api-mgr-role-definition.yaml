@@ -8,6 +8,7 @@ includedPermissions:
 - bigquery.datasets.update
 - bigquery.jobs.create
 - bigquery.routines.create
+- bigquery.routines.delete
 - bigquery.routines.get
 - bigquery.routines.update
 - bigquery.tables.create

@@ -150,6 +150,15 @@ function sqlReplacements(projectId, text) {
 
     const permissionsDiffProcedure = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.permissionsDiffProcedureId);
     sql = sql.replace(/\$\{permissionsDiffProcedure\}/g, permissionsDiffProcedure);
+    
+    const bigQueryPermissionDiffProcedure = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.bigQueryPermissionDiffProcedureId);
+    sql = sql.replace(/\$\{bigQueryPermissionDiffProcedure\}/g, bigQueryPermissionDiffProcedure);
+
+    const bucketPermissionDiffProcedure = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.bucketPermissionDiffProcedureId);
+    sql = sql.replace(/\$\{bucketPermissionDiffProcedure\}/g, bucketPermissionDiffProcedure);
+
+    const topicPermissionDiffProcedure = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.topicPermissionDiffProcedureId);
+    sql = sql.replace(/\$\{topicPermissionDiffProcedure\}/g, topicPermissionDiffProcedure);
 
     return sql;
 }
@@ -233,7 +242,7 @@ async function setupDatasharePrerequisites(projectId) {
     }
 
     console.log("Creating permissionsDiff procedure");
-    const permissionsProcSql = sqlReplacements(projectId, require('./bq/procedure/permissionsDiff.sql'));
+    const permissionsProcSql = sqlReplacements(projectId, require('./bq/procedure/bigQueryPermissionDiff.sql'));
     await bigqueryUtil.executeQuerySync({
         query: permissionsProcSql
     });

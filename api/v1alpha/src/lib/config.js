@@ -62,6 +62,9 @@ config.cdsAuthorizedViewViewFields = new Set(['rowId', 'authorizedViewId', 'name
 config.cdsCurrentUserPermissionViewId = "currentUserPermission";
 
 config.permissionsDiffProcedureId = "permissionsDiff";
+config.bigQueryPermissionDiffProcedureId = "bigQueryPermissionDiff";
+config.bucketPermissionDiffProcedureId = "bucketPermissionDiff";
+config.topicPermissionDiffProcedureId = "topicPermissionDiff";
 
 if (process.env.DATA_PRODUCERS) {
     config.dataProducers = process.env.DATA_PRODUCERS.split(',') || [];
