@@ -235,18 +235,20 @@ async function performTableMetadataUpdate(projectId, datasetId, tableId, account
 async function performPolicyUpdates(projectId, policyIds, fullRefresh) {
     const labelKey = cfg.cdsManagedLabelKey;
     let options = {};
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const bigQueryPermissionDiffProcedure = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.bigQueryPermissionDiffProcedureId);
+    
     if (!fullRefresh && policyIds && policyIds.length > 0) {
         options = {
-            query: `CALL \`${projectId}.datashare.permissionsDiff\`(@policyIds)`,
+            query: `CALL \`${bigQueryPermissionDiffProcedure}\`(@policyIds)`,
             params: { policyIds: policyIds }
         };
     } else {
         options = {
-            query: `CALL \`${projectId}.datashare.permissionsDiff\`(null)`
+            query: `CALL \`${bigQueryPermissionDiffProcedure}\`(null)`
         };
     }
 
-    const bigqueryUtil = new BigQueryUtil(projectId);
     const [rows] = await bigqueryUtil.executeQuery(options);
     console.log(`Permission Diff Result: ${JSON.stringify(rows, null, 3)}`);
 
