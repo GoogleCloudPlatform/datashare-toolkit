@@ -247,6 +247,12 @@ async function setupDatasharePrerequisites(projectId) {
         query: bigQueryPermissionDiffProcSql
     });
 
+    console.log("Creating bucketPermissionDiff procedure");
+    const bucketPermissionDiffProcSql = sqlReplacements(projectId, require('./bq/procedure/bucketPermissionDiff.sql'));
+    await bigqueryUtil.executeQuerySync({
+        query: bucketPermissionDiffProcSql
+    });
+
     console.log("Creating topicPermissionDiff procedure");
     const topicPermissionDiffProcSql = sqlReplacements(projectId, require('./bq/procedure/topicPermissionDiff.sql'));
     await bigqueryUtil.executeQuerySync({

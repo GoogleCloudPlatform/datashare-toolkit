@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE `${topicPermissionDiffProcedure}`(policyFilter ARRAY<STRING>)
+CREATE OR REPLACE PROCEDURE `${bucketPermissionDiffProcedure}`(policyFilter ARRAY<STRING>)
 BEGIN
 WITH ranked AS (
   -- Rank all of the policies by date descending. The latest record will be 1.
@@ -10,9 +10,9 @@ WITH ranked AS (
 rowIdentifiers AS (
   -- Take only the last 2 modified records and set defaults/current record flags.
   SELECT
-    * EXCEPT(pubsubEnabled, isDeleted),
+    * EXCEPT(storageEnabled, isDeleted),
     CASE WHEN r.rank = 1 THEN TRUE ELSE FALSE END AS isCurrent,
-    IFNULL(pubsubEnabled, FALSE) AS pubsubEnabled,
+    IFNULL(storageEnabled, FALSE) AS storageEnabled,
     IFNULL(isDeleted, FALSE) AS isDeleted
   FROM RANKED r
   WHERE r.rank IN (1,2)
@@ -31,29 +31,29 @@ policyData AS (
   -- Join up all policy data with entitled accounts.
   SELECT
     r.policyId,
-    t.topicId,
+    b.bucketName,
     r.isCurrent,
     r.isDeleted,
     p.email,
     p.emailType
   FROM rowIdentifiers r
-  LEFT JOIN UNNEST(r.topics) t
+  LEFT JOIN UNNEST(r.buckets) b
   LEFT JOIN userPolicies p ON r.policyId = p.policyId
-  WHERE t.topicId IS NOT NULL AND r.pubsubEnabled IS TRUE
+  WHERE b.bucketName IS NOT NULL AND r.storageEnabled IS TRUE
 ),
 uniqueIdentifiers as (
-  -- This returns the list of all topicId's that are affected by the changed policies or all if full refresh.
-  -- When a policy is changed, we need to get the list of unique 'topicIds' that are impacted, and update all topicId's impacted across many policies.
+  -- This returns the list of all bucketName's that are affected by the changed policies or all if full refresh.
+  -- When a policy is changed, we need to get the list of unique 'bucketName' that are impacted, and update all topicId's impacted across many policies.
   SELECT DISTINCT
-    topicId
+    bucketName
   FROM policyData p
   WHERE (policyFilter IS NULL OR ARRAY_LENGTH(policyFilter) = 0 OR p.policyId IN UNNEST(policyFilter))
 )
 -- Select all data rolling up the policy data for all impacted policies.
 SELECT
-  u.topicId,
+  u.bucketName,
   ARRAY_AGG(STRUCT<email STRING, emailType STRING>(p.email, p.emailType)) AS accounts
 FROM uniqueIdentifiers u
-LEFT JOIN policyData p ON u.topicId = p.topicId AND p.isCurrent IS TRUE AND p.isDeleted IS FALSE
-GROUP BY u.topicId;
-END;
+LEFT JOIN policyData p ON u.bucketName = p.bucketName AND p.isCurrent IS TRUE AND p.isDeleted IS FALSE
+GROUP BY u.bucketName;
+END
