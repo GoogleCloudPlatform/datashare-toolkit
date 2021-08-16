@@ -155,4 +155,26 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
         --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
         --platform gke \
         --service-account ${SERVICE_ACCOUNT_NAME}
+
+    # Delete old revisions
+    DELETE_REVISIONS=`gcloud run revisions list \
+        --service ds-listener \
+        --cluster $CLUSTER \
+        --cluster-location $ZONE \
+        --namespace $NAMESPACE \
+        --platform gke \
+        | awk 'NR > 4 {print $2}'`;
+
+    if [ ! -z "$DELETE_REVISIONS" ]; then
+        for revision in $DELETE_REVISIONS
+        do
+            gcloud run revisions delete $revision \
+                --cluster $CLUSTER \
+                --cluster-location $ZONE \
+                --namespace $NAMESPACE \
+                --platform gke \
+                --async \
+                --quiet
+        done
+    fi
 fi
