@@ -54,12 +54,8 @@ var accounts = express.Router();
  *         type: string
  *         description: Account email address
  *       emailType:
- *         type: string
- *         description: Account email type string
  *         $ref: '#/definitions/EmailType'
  *       accountType:
- *         type: string
- *         description: Account type string
  *         $ref: '#/definitions/AccountType'
  *       createdBy:
  *         type: string

@@ -70,21 +70,26 @@ const options = {
             description: 'Find out more about Datashare Toolkit',
             url: 'https://github.com/GoogleCloudPlatform/datashare-toolkit'
         },
-        // APi GW Integration
+        // API GW Integration
         'x-google-backend': {
             address: 'DS_API_URL'
         },
         security: [{
-            'apiKeyAuth': [],
-            'accounts.google.com': []
+            // ## OAuth scopes are currenty ignored by API Gateway [here](https://cloud.google.com/endpoints/docs/openapi/openapi-limitations#scopes_ignored)
+            'google': []}, {
+            'google2': []}, {
+            'firebase': []}, {
+            'marketplace': []
         }],
         securityDefinitions: {
+            // ## API Key Auth is for development only
             'apiKeyAuth': {
                 'type': 'apiKey',
                 'name': 'x-api-key',
                 'in': 'header'
             },
-            'accounts.google.com': {
+            // ## Google Identity Provider
+            'google': {
                 'type': 'oauth2',
                 'authorizationUrl': 'https://accounts.google.com/o/oauth2/v2/auth',
                 'flow': 'implicit',
@@ -93,8 +98,11 @@ const options = {
                 },
                 'x-google-issuer': 'https://accounts.google.com',
                 'x-google-jwks_uri': 'https://www.googleapis.com/oauth2/v3/certs',
+                // ## x-google-audiences should be set to $abc.com, $DS_API_URL if not specified
+                'x-google-audiences': 'CLIENT_ID'
             },
-            'accounts.google.com2': {
+            // ## Google Identity Provider
+            'google2': {
                 'type': 'oauth2',
                 'authorizationUrl': 'https://accounts.google.com/o/oauth2/v2/auth',
                 'flow': 'implicit',
@@ -103,18 +111,24 @@ const options = {
                 },
                 'x-google-issuer': 'accounts.google.com',
                 'x-google-jwks_uri': 'https://www.googleapis.com/oauth2/v3/certs',
+                // ## x-google-audiences should be set to $abc.com, $DS_API_URL if not specified
+                'x-google-audiences': 'CLIENT_ID'
             },
-            'securetoken.google.com': {
+            // ## Firebase Identity Provider
+            'firebase': {
                 'type': 'oauth2',
                 'flow': 'application',
                 'tokenUrl': 'https://oauth2.googleapis.com/token',
                 'scopes': {
                     'https://www.googleapis.com/auth/cloud-platform': 'default',
                 },
-                'x-google-issuer': 'https://securetoken.google.com/$PROJECT_ID',
+                'x-google-issuer': 'https://securetoken.google.com/PROJECT_ID',
                 'x-google-jwks_uri': 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com',
+                // ## Firebase requires $PROJECT_ID for the JWT audience [here](https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_a_third-party_jwt_library)
+                'x-google-audiences': 'PROJECT_ID'
             },
-            'cloud-commerce-partner': {
+            // ## Marketplace Identity Provider
+            'marketplace': {
                 'type': 'oauth2',
                 'flow': 'application',
                 'tokenUrl': 'https://oauth2.googleapis.com/token',
@@ -123,6 +137,8 @@ const options = {
                 },
                 'x-google-issuer': 'https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com',
                 'x-google-jwks_uri': 'https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com',
+                // ## Marketplace requires the domain name for your DS_API, eg. $DS_API_URL [here](https://cloud.google.com/marketplace/docs/partners/integrated-saas/frontend-integration?hl=en#verify-jwt)
+                'x-google-audiences': 'DS_API_URL'
             },
         },
     },

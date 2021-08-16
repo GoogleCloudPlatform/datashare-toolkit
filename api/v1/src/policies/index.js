@@ -65,7 +65,6 @@ var policies = express.Router();
  *           $ref: '#/definitions/RowAccessTag'
  *       marketplace:
  *         $ref: '#/definitions/Marketplace'
- *         description: Associated Marketplace solution information
  *     required:
  *       - name
  *

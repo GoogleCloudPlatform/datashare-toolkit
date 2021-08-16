@@ -44,8 +44,6 @@ var admin = express.Router();
  *     description: Syncronize Resources Request object
  *     properties:
  *       type:
- *         type: string
- *         description: Syncronize Resources Type
  *         $ref: '#/definitions/SyncronizeResourcesType'
  *
  *   Error:
