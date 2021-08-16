@@ -118,6 +118,11 @@ const routerOptions = [
       requiresAuth: true,
       requiresDataProducer: true
     }
+  },
+  {
+    path: '/404',
+    name: '404',
+    component: '404'
   }
 ];
 
@@ -138,6 +143,10 @@ let router = new Router({
 
 // https://github.com/christiannwamba/vuex-auth-jwt/blob/master/src/router.js
 router.beforeEach((to, from, next) => {
+  if (to.matched.length === 0) {
+    next({ path: '/404' });
+    return;
+  }
   if (to.matched.some(record => record.meta.requiresDataProducer)) {
     if (store.getters.isLoggedIn && store.getters.isDataProducer) {
       next();
