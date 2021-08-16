@@ -43,7 +43,7 @@ policyData AS (
 ),
 uniqueIdentifiers as (
   -- This returns the list of all topicId's that are affected by the changed policies or all if full refresh.
-  -- When a policy is changed, we need to get the list of unique 'topicIds' that are impacted, and update all topicId's impacted across many policies.
+  -- When a policy is changed, we need to get the list of unique 'topicId' that are impacted, and update all topicId's impacted across many policies.
   SELECT DISTINCT
     topicId
   FROM policyData p
