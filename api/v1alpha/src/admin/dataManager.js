@@ -241,10 +241,16 @@ async function setupDatasharePrerequisites(projectId) {
         console.log('Current user dataset view already exists');
     }
 
-    console.log("Creating permissionsDiff procedure");
-    const permissionsProcSql = sqlReplacements(projectId, require('./bq/procedure/bigQueryPermissionDiff.sql'));
+    console.log("Creating bigQueryPermissionDiff procedure");
+    const bigQueryPermissionDiffProcSql = sqlReplacements(projectId, require('./bq/procedure/bigQueryPermissionDiff.sql'));
     await bigqueryUtil.executeQuerySync({
-        query: permissionsProcSql
+        query: bigQueryPermissionDiffProcSql
+    });
+
+    console.log("Creating topicPermissionDiff procedure");
+    const topicPermissionDiffProcSql = sqlReplacements(projectId, require('./bq/procedure/topicPermissionDiff.sql'));
+    await bigqueryUtil.executeQuerySync({
+        query: topicPermissionDiffProcSql
     });
 }
 
