@@ -35,3 +35,21 @@ gcloud run deploy ds-frontend-ui \
   --platform managed \
   --max-instances 10 \
   --remove-env-vars=VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT,VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT,VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL,VUE_APP_PROJECT_ID,VUE_APP_MARKETPLACE_INTEGRATION
+
+# Delete old revisions
+DELETE_REVISIONS=`gcloud run revisions list \
+    --service ds-frontend-ui \
+    --region ${REGION} \
+    --platform managed \
+    | awk 'NR > 4 {print $2}'`;
+
+if [ ! -z "$DELETE_REVISIONS" ]; then
+    for revision in $DELETE_REVISIONS
+    do
+        gcloud run revisions delete $revision \
+            --region ${REGION} \
+            --platform managed \
+            --async \
+            --quiet
+    done
+fi
