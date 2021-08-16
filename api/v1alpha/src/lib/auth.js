@@ -27,7 +27,7 @@ const verifyProject = async (req, res, next) => {
             return res
                 .status(401)
                 .send({ error: 'You are not authorized to make this project request' });
-        } else if (projectId !== currentProjectId) {
+        } else if (isDefined === false && projectId !== currentProjectId) {
             console.warn(`Invalid project called: ${projectId}, currentProjectId: ${currentProjectId}`);
             return res
                 .status(401)
