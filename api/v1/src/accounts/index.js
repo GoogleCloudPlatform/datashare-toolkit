@@ -97,18 +97,12 @@ var accounts = express.Router();
 /**
  * @swagger
  *
- * /projects/{projectId}/accounts:
+ * /accounts:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsAccounts
  *     security: [] # no security for preflight requests
- *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     produces:
  *       - application/json
  *     responses:
@@ -128,11 +122,10 @@ var accounts = express.Router();
  *     tags:
  *       - accounts
  *     parameters:
- *     - in: path
- *       name: projectId
+ *     - in: header
+ *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *       description: Project Id of the Account request
  *     produces:
  *       - application/json
  *     responses:
@@ -175,7 +168,7 @@ accounts.get('/accounts', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/accounts:
+ * /accounts:
  *   post:
  *     summary: Create Account based off request body
  *     description: Returns the Datset response
@@ -183,11 +176,10 @@ accounts.get('/accounts', async (req, res) => {
  *     tags:
  *       - accounts
  *     parameters:
- *     - in: path
- *       name: projectId
+ *     - in: header
+ *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *       description: Project Id of the Account request
  *     - in: header
  *       name: x-gcp-account
  *       type: string
@@ -263,18 +255,13 @@ accounts.post('/accounts', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/accounts/{accountId}:
+ * /accounts/{accountId}:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsAccountByAccountId
  *     security: [] # no security for preflight requests
  *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     - in: path
  *       name: accountId
  *       type: string
@@ -299,11 +286,6 @@ accounts.post('/accounts', async (req, res) => {
  *     tags:
  *       - accounts
  *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     - in: path
  *       name: accountId
  *       type: string
@@ -354,7 +336,7 @@ accounts.get('/accounts/:accountId', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/accounts/{accountId}:
+ * /accounts/{accountId}:
  *   put:
  *     summary: Update Account based off account ID and request body
  *     description: Returns the Account response
@@ -363,15 +345,14 @@ accounts.get('/accounts/:accountId', async (req, res) => {
  *       - accounts
  *     parameters:
  *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
- *     - in: path
  *       name: accountId
  *       type: string
  *       required: true
  *       description: Account Id of the Account request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     - in: header
  *       name: x-gcp-account
  *       type: string
@@ -451,7 +432,7 @@ accounts.put('/accounts/:accountId', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/accounts/{accountId}:
+ * /accounts/{accountId}:
  *   delete:
  *     summary: Delete Account based off account ID and request body
  *     description: Returns the Account response
@@ -460,15 +441,14 @@ accounts.put('/accounts/:accountId', async (req, res) => {
  *       - accounts
  *     parameters:
  *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
- *     - in: path
  *       name: accountId
  *       type: string
  *       required: true
  *       description: Account Id of the Account request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     - in: header
  *       name: x-gcp-account
  *       type: string
@@ -529,18 +509,13 @@ accounts.delete('/accounts/:accountId', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/policies/{policyId}/accounts:
+ * /policies/{policyId}/accounts:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsAccountByPolicyId
  *     security: [] # no security for preflight requests
  *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     - in: path
  *       name: policyId
  *       type: string
@@ -565,11 +540,6 @@ accounts.delete('/accounts/:accountId', async (req, res) => {
  *     tags:
  *       - policies
  *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Policy request
  *     - in: path
  *       name: policyId
  *       type: string
@@ -618,7 +588,7 @@ accounts.get('/policies/:policyId/accounts', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/datasets/{datasetId}/accounts:
+ * /datasets/{datasetId}/accounts:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
@@ -626,15 +596,10 @@ accounts.get('/policies/:policyId/accounts', async (req, res) => {
  *     security: [] # no security for preflight requests
  *     parameters:
  *     - in: path
- *       name: projectId
+ *       name: datasetId
  *       type: string
  *       required: true
- *       description: Project Id of the Account request
- *     - in: path
- *       name: policyId
- *       type: string
- *       required: true
- *       description: Policy Id of the Policy request
+ *       description: Dataset Id of the Account request
  *     produces:
  *       - application/json
  *     responses:
@@ -655,15 +620,14 @@ accounts.get('/policies/:policyId/accounts', async (req, res) => {
  *       - datasets
  *     parameters:
  *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Policy request
- *     - in: path
  *       name: datasetId
  *       type: string
  *       required: true
  *       description: Dataset Id of the Policy request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     produces:
  *       - application/json
  *     responses:

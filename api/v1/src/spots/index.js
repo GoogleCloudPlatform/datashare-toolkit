@@ -149,18 +149,12 @@ var spots = express.Router();
 /**
  * @swagger
  *
- * /projects/{projectId}/spots:config:
+ * /spots:config:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsSpotsConfig
  *     security: [] # no security for preflight requests
- *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     responses:
  *       200:
  *         description: Default response for CORS method
@@ -175,14 +169,13 @@ var spots = express.Router();
  *     summary: Spot API service environment configuration
  *     description: Returns the Spot API service configuration
  *     operationId: getSpotConfig
- *     tags:
- *       - spots
  *     parameters:
- *     - in: path
- *       name: projectId
+ *     - in: header
+ *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *       description: Project Id of the Spot request
+ *     tags:
+ *       - spots
  *     produces:
  *       - application/json
  *     responses:
@@ -203,7 +196,22 @@ var spots = express.Router();
 /**
  * @swagger
  *
- * /projects/{projectId}/spots:options:
+ * /spots:options:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsGetSpotOptions
+ *     security: [] # no security for preflight requests
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: Spot query options (entitlement) for the Spot API service
  *     description: Returns the Spot query options for the Spot API service
@@ -211,16 +219,15 @@ var spots = express.Router();
  *     tags:
  *       - spots
  *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Spot request
  *     - in: query
  *       name: includeAvailableValues
  *       type: boolean
  *       required: false
  *       description: Include available values in options response
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     produces:
  *       - application/json
  *     responses:
@@ -275,7 +282,7 @@ spots.get('/spots::custom', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/spots:
+ * /spots:
  *   post:
  *     summary: Create Spot based off request parameters
  *     description: Returns the Spot response
@@ -283,11 +290,10 @@ spots.get('/spots::custom', async(req, res) => {
  *     tags:
  *       - spots
  *     parameters:
- *     - in: path
- *       name: projectId
+ *     - in: header
+ *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *       description: Project Id of the Spot request
  *     - in: body
  *       name: spot
  *       description: Request parameters for Spot
@@ -333,7 +339,7 @@ spots.post('/spots', validateManager.spotParams, async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/spots/{requestId}:
+ * /spots/{requestId}:
  *   get:
  *     summary: Check Spot status based off Request ID
  *     description: Returns the Spot Status response
@@ -341,11 +347,6 @@ spots.post('/spots', validateManager.spotParams, async(req, res) => {
  *     tags:
  *       - spots
  *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Spot request
  *     - in: path
  *       name: requestId
  *       type: string
@@ -361,6 +362,10 @@ spots.post('/spots', validateManager.spotParams, async(req, res) => {
  *       type: string
  *       required: true
  *       description: File Name from the Spot Request Id
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     produces:
  *       - application/json
  *     responses:

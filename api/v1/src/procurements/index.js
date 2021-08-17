@@ -67,18 +67,12 @@ var procurements = express.Router();
 /**
  * @swagger
  *
- * /projects/{projectId}/procurements:
+ * /procurements:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsProcurements
  *     security: [] # no security for preflight requests
- *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     produces:
  *       - application/json
  *     responses:
@@ -95,14 +89,13 @@ var procurements = express.Router();
  *     summary: List Procurements based off request parameters
  *     description: Returns the ProcurementList response
  *     operationId: listProcurements
- *     tags:
- *       - procurements
  *     parameters:
- *     - in: path
- *       name: projectId
+ *     - in: header
+ *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *       description: Project Id of the Procurement request
+ *     tags:
+ *       - procurements
  *     produces:
  *       - application/json
  *     responses:
@@ -149,18 +142,12 @@ procurements.get('/procurements', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/procurements/approve:
+ * /procurements/approve:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsApproveProcument
  *     security: [] # no security for preflight requests
- *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     produces:
  *       - application/json
  *     responses:
@@ -177,14 +164,13 @@ procurements.get('/procurements', async (req, res) => {
  *     summary: Change the marketplace entititlement approval status based off request parameters
  *     description: Returns a response indicating if successful
  *     operationId: approveProcurement
- *     tags:
- *       - procurements
  *     parameters:
- *     - in: path
- *       name: projectId
+ *     - in: header
+ *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *       description: Project Id of the Procurement request
+ *     tags:
+ *       - procurements
  *     produces:
  *       - application/json
  *     responses:
@@ -226,18 +212,12 @@ procurements.post('/procurements/approve', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/procurements:myProducts:
+ * /procurements:myProducts:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsRedirectMyProducts
  *     security: [] # no security for preflight requests
- *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     produces:
  *       - application/json
  *     responses:
@@ -256,12 +236,6 @@ procurements.post('/procurements/approve', async (req, res) => {
  *     operationId: redirectMyProducts
  *     tags:
  *       - procurements
- *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Procurement request
  *     responses:
  *       301:
  *         description: Redirect to My Products URL

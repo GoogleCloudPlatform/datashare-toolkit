@@ -66,18 +66,12 @@ var admin = express.Router();
 /**
  * @swagger
  *
- * /projects/{projectId}/admin:initSchema:
+ * /admin:initSchema:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsInitSchema
  *     security: [] # no security for preflight requests
- *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     produces:
  *       - application/json
  *     responses:
@@ -96,12 +90,6 @@ var admin = express.Router();
  *     operationId: initSchema
  *     tags:
  *       - admin
- *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the init schema request
  *     produces:
  *       - application/json
  *     responses:
@@ -130,18 +118,12 @@ var admin = express.Router();
 /**
  * @swagger
  *
- * /projects/{projectId}/admin:syncResources:
+ * /admin:syncResources:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsSyncResources
  *     security: [] # no security for preflight requests
- *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     produces:
  *       - application/json
  *     responses:
@@ -161,11 +143,10 @@ var admin = express.Router();
  *     tags:
  *       - admin
  *     parameters:
- *     - in: path
- *       name: projectId
+ *     - in: header
+ *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *       description: Project Id of the syncronize resources request
  *     - in: body
  *       name: syncronize_resources
  *       description: Request parameters for Syncronize Resources

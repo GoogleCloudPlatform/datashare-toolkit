@@ -95,18 +95,12 @@ var policies = express.Router();
 /**
  * @swagger
  *
- * /projects/{projectId}/policies:
+ * /policies:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsPolicies
  *     security: [] # no security for preflight requests
- *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     produces:
  *       - application/json
  *     responses:
@@ -123,14 +117,13 @@ var policies = express.Router();
  *     summary: List Policy based off request parameters
  *     description: Returns the DatsetList response
  *     operationId: listPolicies
- *     tags:
- *       - policies
  *     parameters:
- *     - in: path
- *       name: projectId
+ *     - in: header
+ *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *       description: Project Id of the Policy request
+ *     tags:
+ *       - policies
  *     produces:
  *       - application/json
  *     responses:
@@ -170,6 +163,62 @@ policies.get('/policies', async(req, res) => {
     });
 });
 
+/**
+ * @swagger
+ *
+ * /products:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsListProducts
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   get:
+ *     summary: List Products based off request parameters
+ *     description: Returns the Product list response
+ *     operationId: listProducts
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     tags:
+ *       - products
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Product list
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               items:
+ *                  $ref: '#/definitions/Policy'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
 policies.get('/products', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
     const email = req.header('x-gcp-account')
@@ -189,7 +238,7 @@ policies.get('/products', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/policies:
+ * /policies:
  *   post:
  *     summary: Create Policy based off request body
  *     description: Returns the Datset response
@@ -197,16 +246,15 @@ policies.get('/products', async(req, res) => {
  *     tags:
  *       - policies
  *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Policy request
  *     - in: header
  *       name: x-gcp-account
  *       type: string
  *       required: true
  *       description: GCP account name of the calling user
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     - in: body
  *       name: policy
  *       description: Request parameters for Policy
@@ -300,18 +348,13 @@ policies.post('/policies', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/policies/{policyId}:
+ * /policies/{policyId}:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsPolicyByPolicyId
  *     security: [] # no security for preflight requests
  *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     - in: path
  *       name: policyId
  *       type: string
@@ -337,15 +380,14 @@ policies.post('/policies', async(req, res) => {
  *       - policies
  *     parameters:
  *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Policy request
- *     - in: path
  *       name: policyId
  *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     produces:
  *       - application/json
  *     responses:
@@ -389,7 +431,7 @@ policies.get('/policies/:policyId', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/policies/{policyId}:
+ * /policies/{policyId}:
  *   put:
  *     summary: Update Policy based off policy ID and request body
  *     description: Returns the Policy response
@@ -397,11 +439,6 @@ policies.get('/policies/:policyId', async(req, res) => {
  *     tags:
  *       - policies
  *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Policy request
  *     - in: path
  *       name: policyId
  *       type: string
@@ -507,7 +544,7 @@ policies.put('/policies/:policyId', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/policies/{policyId}:
+ * /policies/{policyId}:
  *   delete:
  *     summary: Delete Policy based off policy ID and request body
  *     description: Returns the Policy response
@@ -515,11 +552,6 @@ policies.put('/policies/:policyId', async(req, res) => {
  *     tags:
  *       - policies
  *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Policy request
  *     - in: path
  *       name: policyId
  *       type: string
@@ -530,6 +562,10 @@ policies.put('/policies/:policyId', async(req, res) => {
  *       type: string
  *       required: true
  *       description: GCP account name of the calling user
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     - in: body
  *       name: policy
  *       description: Request parameters for Policy
@@ -585,18 +621,13 @@ policies.delete('/policies/:policyId', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/accounts/{accountId}/policies:
+ * /accounts/{accountId}/policies:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsPolicyByAccountId
  *     security: [] # no security for preflight requests
  *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     - in: path
  *       name: accountId
  *       type: string
@@ -622,15 +653,14 @@ policies.delete('/policies/:policyId', async(req, res) => {
  *       - accounts
  *     parameters:
  *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Policy request
- *     - in: path
  *       name: accountId
  *       type: string
  *       required: true
  *       description: Account Id of the Policy request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     produces:
  *       - application/json
  *     responses:
@@ -674,18 +704,13 @@ policies.get('/accounts/:accountId/policies', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/datasets/{datasetId}/policies:
+ * /datasets/{datasetId}/policies:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsPolicyByDatasetId
  *     security: [] # no security for preflight requests
  *     parameters:
- *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Account request
  *     - in: path
  *       name: datasetId
  *       type: string
@@ -711,15 +736,14 @@ policies.get('/accounts/:accountId/policies', async(req, res) => {
  *       - datasets
  *     parameters:
  *     - in: path
- *       name: projectId
- *       type: string
- *       required: true
- *       description: Project Id of the Policy request
- *     - in: path
  *       name: datasetId
  *       type: string
  *       required: true
  *       description: Dataset Id of the Policy request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     produces:
  *       - application/json
  *     responses:
