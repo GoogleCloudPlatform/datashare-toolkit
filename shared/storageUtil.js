@@ -112,7 +112,7 @@ class StorageUtil {
     async bucketExists(bucketName) {
         const bucket = this.storage.bucket(bucketName);
         const exists = await bucket.exists().catch((err) => {
-            console.warn(err.message);
+            console.error(err.message);
             throw err;
         });
         return exists[0];
@@ -146,12 +146,9 @@ class StorageUtil {
         const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
         const exists = await file.exists().catch((err) => {
-            console.warn(err.message);
+            console.error(err.message);
             throw err;
         });
-        if (this.VERBOSE_MODE) {
-            console.log(`Storage bucket file '${fileName}' exists: '${exists[0]}'.`);
-        }
         return exists[0];
     }
 

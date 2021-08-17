@@ -100,6 +100,18 @@ class PubSubUtil {
     }
 
     /**
+     * @param  {} topicName
+     */
+    async topicExists(topicName) {
+        const topic = this.pubsub.topic(topicName);
+        const exists = await topic.exists().catch((err) => {
+            console.error(err.message);
+            throw err;
+        });
+        return exists[0];
+    }
+
+    /**
      * @param  {} subscriptionName
      * @param  {} subscriberOptions
      */

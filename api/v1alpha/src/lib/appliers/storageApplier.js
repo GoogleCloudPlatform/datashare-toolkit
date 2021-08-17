@@ -72,6 +72,8 @@ async function applyPolicies(projectId, policyIds, fullRefresh) {
  * @param  {} projectId
  * @param  {} bucketName
  * @param  {} accounts
+ * BigQuery, Cloud Storage Buckets, and Pub/Sub all use the same IAM style access.
+ * This function can be re-factored consolidated to handle all three to simplify code maintenance.
  */
 async function performBucketUpdate(projectId, bucketName, accounts) {
     console.log(`Begin IAM update for bucket: ${bucketName}`);
