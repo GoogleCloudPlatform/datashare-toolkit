@@ -172,6 +172,14 @@ export default {
             } else if (object.syncType === 'BIGQUERY_VIEWS') {
               this.dialogTitle = 'Sync BigQuery Views';
               this.dialogText = 'Sync all BigQuery views completed.';
+            } else if (object.syncType === 'STORAGE_BUCKET_PERMISSIONS') {
+              this.dialogTitle = 'Sync Storage Bucket Permissions';
+              this.dialogText =
+                'Sync all Storage Bucket permissions has completed.';
+            } else if (object.syncType === 'TOPIC_PERMISSIONS') {
+              this.dialogTitle = 'Sync Pub/Sub Topic Permissions';
+              this.dialogText =
+                'Sync all Pub/Sub Topic permissions has completed.';
             } else if (object.syncType === 'MARKETPLACE') {
               this.dialogTitle = 'Sync Marketplace Entitlements';
               this.dialogText = 'Sync Marketplace Entitlements completed.';

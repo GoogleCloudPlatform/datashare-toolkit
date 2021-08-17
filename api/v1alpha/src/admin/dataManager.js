@@ -73,7 +73,7 @@ async function syncResources(projectId, type) {
             await procurementManager.syncAllAccountEntitlements(projectId);
         }
         if (bigQueryPermissions) {
-            await metaManager.performPolicyUpdates(projectId, null, true);
+            await metaManager.performPolicyUpdates(projectId, null, true, metaManager.filters.BIG_QUERY);
         }
         if (views) {
             // Get list of configured views
