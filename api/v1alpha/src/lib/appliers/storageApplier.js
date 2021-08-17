@@ -45,7 +45,22 @@ async function applyPolicies(projectId, policyIds, fullRefresh) {
 
     const [rows] = await bigqueryUtil.executeQuery(options);
     console.log(`Permission Diff Result: ${JSON.stringify(rows, null, 3)}`);
-    return;
+
+    const storageUtil = new StorageUtil(projectId);
+
+    if (fullRefresh === true) {
+        const buckets = await storageUtil.getBuckets();
+        buckets.forEach(b => {
+            if (underscore.has(b.metadata.labels, labelKey)) {
+                console.log(b.name);
+            }
+        });
+    } else {
+        for (const bucket of rows) {
+            const name = bucket.bucketName;
+            const accounts = bucket.accounts || [];
+        }
+    }
 }
 
 module.exports = {
