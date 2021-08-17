@@ -73,7 +73,7 @@ async function createSpot(options) {
     }
 
     var exists;
-    exists = await storageUtil.checkIfFileExists(bucketName, fileName).catch(err => {
+    exists = await storageUtil.fileExists(bucketName, fileName).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });
@@ -151,7 +151,7 @@ async function getSpot(requestId, bucketName, fileName) {
         fileName: fileName
     }
 
-    const exists = await storageUtil.checkIfFileExists(bucketName, fileName).catch(err => {
+    const exists = await storageUtil.fileExists(bucketName, fileName).catch(err => {
         console.warn(err);
         return { success: false, errors: [err.message] };
     });

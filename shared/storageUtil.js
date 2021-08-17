@@ -109,15 +109,12 @@ class StorageUtil {
      * @param  {string} bucketName
      * Check if a bucket exists and return true/false.
      */
-    async checkIfBucketExists(bucketName) {
+    async bucketExists(bucketName) {
         const bucket = this.storage.bucket(bucketName);
         const exists = await bucket.exists().catch((err) => {
             console.warn(err.message);
             throw err;
         });
-        if (this.VERBOSE_MODE) {
-            console.log(`Storage bucket '${bucketName}' exists: '${exists[0]}'.`);
-        }
         return exists[0];
     }
 
@@ -145,7 +142,7 @@ class StorageUtil {
      * @param  {string} fileName
      * Check if a file exists and return true/false.
      */
-    async checkIfFileExists(bucketName, fileName) {
+    async fileExists(bucketName, fileName) {
         const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
         const exists = await file.exists().catch((err) => {
@@ -204,7 +201,7 @@ class StorageUtil {
     async fetchFileContent(bucketName, fileName) {
         const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
-        const exists = await this.checkIfFileExists(bucketName, fileName);
+        const exists = await this.fileExists(bucketName, fileName);
         const buf = await file.download();
         const content = buf.toString('utf-8');
         if (this.VERBOSE_MODE) {

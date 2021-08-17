@@ -149,6 +149,20 @@ class RuntimeConfig {
     async bigQueryDataViewerRole(projectId) {
         return `projects/${projectId}/roles/${config.bigQueryDataViewerRole}`;
     }
+
+    /**
+     * @param  {} projectId
+     */
+    async storageObjectViewerRole(projectId) {
+        return `projects/${projectId}/roles/${config.storageObjectViewerRole}`;
+    }
+    
+    /**
+     * @param  {} projectId
+     */
+    async pubsubSubscriberRole(projectId) {
+        return `projects/${projectId}/roles/${config.pubsubSubscriberRole}`;
+    }
 }
 
 module.exports = new RuntimeConfig();

@@ -58,9 +58,9 @@ describe('StorageUtil', () => {
             const buf = Buffer.from(jsonString);
             const options = { gzip: true };
 
-            context('checkIfBucketExists with arguments', () => {
+            context('bucketExists with arguments', () => {
                 it("should return true", async () => {
-                    await storageUtil.checkIfBucketExists(uuid).then((result) => {
+                    await storageUtil.bucketExists(uuid).then((result) => {
                         expect(result).to.be.a('boolean');
                         expect(result).to.equal(true);
                     }).catch((reason) => {
@@ -102,9 +102,9 @@ describe('StorageUtil', () => {
             const buf = Buffer.from(jsonString);
             const options = { gzip: true };
 
-            context('checkIfFileExists with arguments', () => {
+            context('fileExists with arguments', () => {
                 it("should return true", async () => {
-                    await storageUtil.checkIfFileExists(uuid, uuid).then((result) => {
+                    await storageUtil.fileExists(uuid, uuid).then((result) => {
                         expect(result).to.be.a('boolean');
                         expect(result).to.equal(true);
                     }).catch((reason) => {

@@ -93,8 +93,8 @@ async function validateOptions(options, validateStorage) {
                     // Check for existence of a schema.json transform.sql file. If they don't exist, return warnings
                     const schemaConfig = attributes.schemaPath;
                     const transformConfig = attributes.transformPath;
-                    const schemaConfigExists = await storageUtil.checkIfFileExists(options.bucketName, attributes.schemaPath);
-                    const transformConfigExists = await storageUtil.checkIfFileExists(options.bucketName, attributes.transformPath);
+                    const schemaConfigExists = await storageUtil.fileExists(options.bucketName, attributes.schemaPath);
+                    const transformConfigExists = await storageUtil.fileExists(options.bucketName, attributes.transformPath);
 
                     if (schemaConfigExists) {
                         info.push(`Schema configuration found at '${schemaConfig}' in bucket: ${options.bucketName}`);
@@ -111,7 +111,7 @@ async function validateOptions(options, validateStorage) {
                 }
 
                 if (options.bucketName) {
-                    const exists = await storageUtil.checkIfFileExists(options.bucketName, options.fileName);
+                    const exists = await storageUtil.fileExists(options.bucketName, options.fileName);
                     if (!exists) {
                         errors.push(`File '${options.fileName}' not found in bucket: ${options.bucketName}`);
                     }
@@ -201,7 +201,7 @@ async function getConfiguration(options) {
     const attributes = parseDerivedFileAttributes(options);
     let config = {};
 
-    const schemaExists = await storageUtil.checkIfFileExists(options.bucketName, attributes.schemaPath);
+    const schemaExists = await storageUtil.fileExists(options.bucketName, attributes.schemaPath);
     if (schemaExists === true) {
         const schemaConfig = await storageUtil.fetchFileContent(options.bucketName, attributes.schemaPath);
         if (schemaConfig) {

@@ -50,18 +50,34 @@ async function applyPolicies(projectId, policyIds, fullRefresh) {
 
     if (fullRefresh === true) {
         const buckets = await storageUtil.getBuckets();
-        buckets.forEach(b => {
-            if (underscore.has(b.metadata.labels, labelKey)) {
-                console.log(b.name);
+        for (const bucket of buckets) {
+            console.log(bucket.metadata);
+            if (underscore.has(bucket.metadata.labels, labelKey)) {
+                console.log(bucket.name);
+                await performBucketUpdate(projectId, bucket.name, null);
             }
-        });
+        }
     } else {
         for (const bucket of rows) {
             const name = bucket.bucketName;
             const accounts = bucket.accounts || [];
+            await performBucketUpdate(projectId, bucket.name, null);
         }
     }
 }
+
+/*
+bindings: [
+    {
+      role: 'projects/cds-demo-3/roles/datashare.storage.objectViewer',
+      members: [Array]
+    },
+    { role: 'roles/storage.legacyBucketOwner', members: [Array] },
+    { role: 'roles/storage.legacyBucketReader', members: [Array] },
+    { role: 'roles/storage.legacyObjectOwner', members: [Array] },
+    { role: 'roles/storage.legacyObjectReader', members: [Array] }
+  ]
+*/
 
 /**
  * @param  {} projectId
@@ -69,7 +85,38 @@ async function applyPolicies(projectId, policyIds, fullRefresh) {
  * @param  {} accounts
  */
 async function performBucketUpdate(projectId, bucketName, accounts) {
-    return;
+    console.log(`Begin IAM update for bucket: ${bucketName}`);
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const storageUtil = new StorageUtil(projectId);
+    const exists = await storageUtil.bucketExists(bucketName);
+    if (!exists) {
+        console.warn(`Skipping IAM update for non-existant bucket: ${bucketName}`);
+        return false;
+    }
+    const viewerRole = await runtimeConfig.storageObjectViewerRole(projectId);
+    let isDirty = false;
+    const bucketPolicy = await storageUtil.getBucketIamPolicy(bucketName);
+    console.log(bucketPolicy);
+    let readBinding = {};
+    let bindingExists = false;
+    if (bucketPolicy.bindings) {
+        const viewerRoleBinding = underscore.findWhere(bucketPolicy.bindings, { role: viewerRole });
+    }
+
+    if (isDirty === true) {
+        try {
+            await storageUtil.setBucketIamPolicy(bucketName, bucketPolicy);
+            console.info(`Policy set successfully for bucket '${bucketName}'`);
+        } catch (err) {
+            console.error(`Failed to set policy for bucket '${bucketName}' with error '${err}' and payload: ${JSON.stringify(bucketPolicy)}`);
+            throw err;
+        }
+    } else {
+        console.info(`Metadata is already up to date for bucket: '${bucketName}'`);
+    }
+
+    console.log(`End IAM update for bucket: ${bucketName}`);
+    return isDirty;
 }
 
 module.exports = {

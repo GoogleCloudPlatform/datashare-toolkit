@@ -158,7 +158,7 @@ async function spotConfig(req, res, next) {
     var bucketName = (req.params.bucketName === undefined) ? SPOT_SERVICE_CONFIG.bucketName : req.params.bucketName;
     var configFileName = (req.query.configFileName === undefined) ? SPOT_SERVICE_CONFIG.fileName : req.query.configFileName;
 
-    let result = await storageUtil.checkIfFileExists(bucketName, configFileName).catch(err => {
+    let result = await storageUtil.fileExists(bucketName, configFileName).catch(err => {
         errors.push(err.message);
     });
     if (result && result.success === false) {
