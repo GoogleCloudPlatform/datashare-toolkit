@@ -122,7 +122,8 @@
             <v-expansion-panels v-model="panel">
               <v-expansion-panel
                 v-if="
-                  this.selectedItem.datasets &&
+                  this.selectedItem.bigQueryEnabled === true &&
+                    this.selectedItem.datasets &&
                     this.selectedItem.datasets.length > 0 &&
                     this.selectedItem.isTableBased === false
                 "
@@ -188,7 +189,12 @@
                   </v-data-table>
                 </v-expansion-panel-content>
               </v-expansion-panel>
-              <v-expansion-panel v-if="this.selectedItem.isTableBased === true">
+              <v-expansion-panel
+                v-if="
+                  this.selectedItem.bigQueryEnabled === true &&
+                    this.selectedItem.isTableBased === true
+                "
+              >
                 <v-expansion-panel-header
                   >Available BigQuery Tables</v-expansion-panel-header
                 >
@@ -254,7 +260,9 @@
                   </v-data-table>
                 </v-expansion-panel-content>
               </v-expansion-panel>
-              <v-expansion-panel v-if="true === true">
+              <v-expansion-panel
+                v-if="this.selectedItem.storageEnabled === true"
+              >
                 <v-expansion-panel-header
                   >Available Cloud Storage Buckets</v-expansion-panel-header
                 >
@@ -320,7 +328,9 @@
                   </v-data-table>
                 </v-expansion-panel-content>
               </v-expansion-panel>
-              <v-expansion-panel v-if="true === true">
+              <v-expansion-panel
+                v-if="this.selectedItem.pubsubEnabled === true"
+              >
                 <v-expansion-panel-header
                   >Available Pub/Sub Topics</v-expansion-panel-header
                 >
@@ -512,6 +522,8 @@ export default {
       datasetSearch: '',
       tableSearch: '',
       rowAccessSearch: '',
+      storageSearch: '',
+      topicSearch: '',
       moreInformationText: '',
       moreInformationButtonText: '',
       moreInformationButtonUrl: ''

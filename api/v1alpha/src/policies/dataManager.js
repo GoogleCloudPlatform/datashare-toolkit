@@ -77,11 +77,14 @@ async function listUserPolicies(projectId, email) {
         (ca.isDeleted IS FALSE OR ca.isDeleted IS NULL)
 )
 SELECT
+    bigQueryEnabled,
+    storageEnabled,
+    pubsubEnabled,
     CASE WHEN bigQueryEnabled IS TRUE THEN datasets ELSE NULL END as datasets,
-    CASE WHEN storageEnabled IS TRUE THEN buckets ELSE NULL END as buckets,
-    CASE WHEN pubsubEnabled IS TRUE THEN topics ELSE NULL END as topics,
     CASE WHEN bigQueryEnabled IS TRUE THEN rowAccessTags ELSE NULL END as rowAccessTags,
     CASE WHEN bigQueryEnabled IS TRUE THEN isTableBased ELSE NULL END as isTableBased,
+    CASE WHEN storageEnabled IS TRUE THEN buckets ELSE NULL END as buckets,
+    CASE WHEN pubsubEnabled IS TRUE THEN topics ELSE NULL END as topics,
     marketplace
 FROM \`${table}\` cp
 JOIN currentAccount ca ON ca.policyId = cp.policyId
