@@ -162,7 +162,6 @@ async function performTableMetadataUpdate(projectId, datasetId, tableId, account
         console.warn(`Skipping metadata update for non-existant table: ${datasetId}.${tableId}`);
         return false;
     }
-    const accessTypes = ["user", "group", "serviceAccount"];
     const viewerRole = await runtimeConfig.bigQueryDataViewerRole(projectId);
     let isDirty = false;
     const tablePolicy = await bigqueryUtil.getTableIamPolicy(projectId, datasetId, tableId);
@@ -179,7 +178,7 @@ async function performTableMetadataUpdate(projectId, datasetId, tableId, account
                 let arr = member.split(':');
                 let type = arr[0];
                 let email = arr[1];
-                if (accessTypes.includes(type)) {
+                if (cfg.managedIamAccessTypes.includes(type)) {
                     const shouldHaveAccess = underscore.findWhere(accounts, { email: email, emailType: type });
                     if (!shouldHaveAccess) {
                         console.log(`Deleting user: ${type}:${email} from table: ${datasetId}.${tableId}`);
@@ -277,7 +276,7 @@ async function applyPolicies(projectId, policyIds, fullRefresh) {
             }
         }
     } else {
-        // Differential update, iterate over result based on the policyId filter only.
+        // Differential update, iterate over result based on the policyId filter only
         // No need to apply an additional filter.
         for (const row of rows) {
             const datasetId = row.datasetId;

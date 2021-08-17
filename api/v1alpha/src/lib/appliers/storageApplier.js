@@ -47,35 +47,26 @@ async function applyPolicies(projectId, policyIds, fullRefresh) {
     console.log(`Permission Diff Result: ${JSON.stringify(rows, null, 3)}`);
 
     const storageUtil = new StorageUtil(projectId);
-
     if (fullRefresh === true) {
+        // Update all managed buckets
         const buckets = await storageUtil.getBuckets();
         for (const bucket of buckets) {
             if (underscore.has(bucket.metadata.labels, labelKey)) {
-                await performBucketUpdate(projectId, bucket.name, null);
+                let bucketPolicyRecord = underscore.findWhere(rows, { bucketName: bucket.name });
+                let accounts = [];
+                if (bucketPolicyRecord) {
+                    accounts = bucketPolicyRecord.accounts;
+                }
+                await performBucketUpdate(projectId, bucket.name, accounts);
             }
         }
     } else {
+        // Differential update, iterate over result based on the policyId filter only 
         for (const bucket of rows) {
-            const name = bucket.bucketName;
-            const accounts = bucket.accounts || [];
-            await performBucketUpdate(projectId, bucket.name, null);
+            await performBucketUpdate(projectId, bucket.name, bucket.accounts);
         }
     }
 }
-
-/*
-bindings: [
-    {
-      role: 'projects/cds-demo-3/roles/datashare.storage.objectViewer',
-      members: [Array]
-    },
-    { role: 'roles/storage.legacyBucketOwner', members: [Array] },
-    { role: 'roles/storage.legacyBucketReader', members: [Array] },
-    { role: 'roles/storage.legacyObjectOwner', members: [Array] },
-    { role: 'roles/storage.legacyObjectReader', members: [Array] }
-  ]
-*/
 
 /**
  * @param  {} projectId
@@ -84,18 +75,15 @@ bindings: [
  */
 async function performBucketUpdate(projectId, bucketName, accounts) {
     console.log(`Begin IAM update for bucket: ${bucketName}`);
-    const bigqueryUtil = new BigQueryUtil(projectId);
     const storageUtil = new StorageUtil(projectId);
     const exists = await storageUtil.bucketExists(bucketName);
     if (!exists) {
         console.warn(`Skipping IAM update for non-existant bucket: ${bucketName}`);
         return false;
     }
-    const accessTypes = ["user", "group", "serviceAccount"];
     const viewerRole = await runtimeConfig.storageObjectViewerRole(projectId);
     let isDirty = false;
     const bucketPolicy = await storageUtil.getBucketIamPolicy(bucketName);
-    console.log(JSON.stringify(bucketPolicy.bindings, null, 3));
     let readBinding = {};
     let bindingExists = false;
     if (bucketPolicy.bindings) {
@@ -109,7 +97,7 @@ async function performBucketUpdate(projectId, bucketName, accounts) {
                 let arr = member.split(':');
                 let type = arr[0];
                 let email = arr[1];
-                if (accessTypes.includes(type)) {
+                if (cfg.managedIamAccessTypes.includes(type)) {
                     const shouldHaveAccess = underscore.findWhere(accounts, { email: email, emailType: type });
                     if (!shouldHaveAccess) {
                         console.log(`Deleting user: ${type}:${email} from bucket: ${bucketName}`);
@@ -120,7 +108,7 @@ async function performBucketUpdate(projectId, bucketName, accounts) {
             }
         }
     } else {
-        tablePolicy.bindings = [];
+        bucketPolicy.bindings = [];
     }
 
     if (!bindingExists) {
