@@ -185,8 +185,7 @@ router.beforeEach((to, from, next) => {
   if (to.matched.length === 0) {
     next({ path: '/404' });
     return;
-  }
-  else if (
+  } else if (
     to.matched.some(record => record.meta.requiresMarketplaceIntegration) &&
     config.marketplaceIntegrationEnabled === false
   ) {
