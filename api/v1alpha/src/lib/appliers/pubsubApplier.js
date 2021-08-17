@@ -16,10 +16,10 @@
 
 'use strict';
 
-const { BigQueryUtil, PubSubUtil } = require('cds-shared');
-const underscore = require("underscore");
-const cfg = require('../config');
-const runtimeConfig = require('../runtimeConfig');
+// const { BigQueryUtil, PubSubUtil } = require('cds-shared');
+// const underscore = require("underscore");
+// const cfg = require('../config');
+// const runtimeConfig = require('../runtimeConfig');
 
 /**
  * @param  {} projectId
