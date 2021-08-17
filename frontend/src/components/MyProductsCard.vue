@@ -260,9 +260,9 @@
                 >
                 <v-expansion-panel-content>
                   <v-data-table
-                    :headers="tableHeaders"
+                    :headers="storageHeaders"
                     :items="this.availableTables"
-                    :search="tableSearch"
+                    :search="storageSearch"
                     :loading="loading"
                   >
                     <template v-slot:loading>
@@ -279,7 +279,7 @@
                     <template v-slot:top>
                       <v-text-field
                         class="mb-4"
-                        v-model="tableSearch"
+                        v-model="storageSearch"
                         append-icon="search"
                         label="Search"
                         single-line
@@ -326,9 +326,9 @@
                 >
                 <v-expansion-panel-content>
                   <v-data-table
-                    :headers="tableHeaders"
+                    :headers="topicHeaders"
                     :items="this.availableTables"
-                    :search="tableSearch"
+                    :search="topicSearch"
                     :loading="loading"
                   >
                     <template v-slot:loading>
@@ -345,7 +345,7 @@
                     <template v-slot:top>
                       <v-text-field
                         class="mb-4"
-                        v-model="tableSearch"
+                        v-model="topicSearch"
                         append-icon="search"
                         label="Search"
                         single-line
@@ -557,6 +557,21 @@ export default {
     },
     rowAccessHeaders() {
       let h = [{ text: 'Tag', value: 'tag' }];
+      return h;
+    },
+    storageHeaders() {
+      let h = [
+        { text: 'Bucket Name', value: 'bucketName' },
+        { text: '', value: 'action', sortable: false }
+      ];
+      return h;
+    },
+    topicHeaders() {
+      let h = [
+        { text: 'Topic Id', value: 'topicId' },
+        { text: 'Topic Name', value: 'topicName' },
+        { text: '', value: 'action', sortable: false }
+      ];
       return h;
     },
     availableTables() {

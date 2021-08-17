@@ -247,13 +247,13 @@ export default {
       {
         text: 'Name',
         value: 'topicName',
-        tooltip: 'The bucket name'
+        tooltip: 'The topic name'
       },
       {
         text: 'View in Pub/Sub',
         value: 'viewAction',
         sortable: false,
-        tooltip: 'View bucket in the Pub/Sub console'
+        tooltip: 'View topic in the Pub/Sub console'
       },
       { text: '', value: 'action', sortable: false }
     ]
