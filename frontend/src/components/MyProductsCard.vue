@@ -119,7 +119,7 @@
           </v-card-title>
           <v-card-text v-html="selectedItemSummary"></v-card-text>
           <form class="px-4">
-            <v-expansion-panels multiple v-model="panel">
+            <v-expansion-panels v-model="panel">
               <v-expansion-panel
                 v-if="
                   this.selectedItem.datasets &&
@@ -128,7 +128,7 @@
                 "
               >
                 <v-expansion-panel-header
-                  >Available Datasets</v-expansion-panel-header
+                  >Available BigQuery Datasets</v-expansion-panel-header
                 >
                 <v-expansion-panel-content>
                   <v-data-table
@@ -190,7 +190,139 @@
               </v-expansion-panel>
               <v-expansion-panel v-if="this.selectedItem.isTableBased === true">
                 <v-expansion-panel-header
-                  >Available Tables</v-expansion-panel-header
+                  >Available BigQuery Tables</v-expansion-panel-header
+                >
+                <v-expansion-panel-content>
+                  <v-data-table
+                    :headers="tableHeaders"
+                    :items="this.availableTables"
+                    :search="tableSearch"
+                    :loading="loading"
+                  >
+                    <template v-slot:loading>
+                      <v-row justify="center" align="center">
+                        <div class="text-center ma-12">
+                          <v-progress-circular
+                            v-if="loading"
+                            indeterminate
+                            color="primary"
+                          ></v-progress-circular>
+                        </div>
+                      </v-row>
+                    </template>
+                    <template v-slot:top>
+                      <v-text-field
+                        class="mb-4"
+                        v-model="tableSearch"
+                        append-icon="search"
+                        label="Search"
+                        single-line
+                        hide-details
+                      ></v-text-field>
+                    </template>
+                    <template v-slot:[`item.action`]="{ item }">
+                      <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                          <v-icon
+                            v-on="on"
+                            class="mr-2"
+                            @click="
+                              navigateToTable(item.datasetId, item.tableId)
+                            "
+                          >
+                            {{ icons.tableHeadersEye }}
+                          </v-icon>
+                        </template>
+                        <span>Navigate to Table</span>
+                      </v-tooltip>
+                      <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                          <v-icon
+                            v-on="on"
+                            small
+                            class="mr-2"
+                            @click="
+                              copyQueryToClipboard(item.datasetId, item.tableId)
+                            "
+                          >
+                            {{ icons.contentCopy }}
+                          </v-icon>
+                        </template>
+                        <span>Copy Query to Clipboard</span>
+                      </v-tooltip>
+                    </template>
+                  </v-data-table>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+              <v-expansion-panel v-if="true === true">
+                <v-expansion-panel-header
+                  >Available Cloud Storage Buckets</v-expansion-panel-header
+                >
+                <v-expansion-panel-content>
+                  <v-data-table
+                    :headers="tableHeaders"
+                    :items="this.availableTables"
+                    :search="tableSearch"
+                    :loading="loading"
+                  >
+                    <template v-slot:loading>
+                      <v-row justify="center" align="center">
+                        <div class="text-center ma-12">
+                          <v-progress-circular
+                            v-if="loading"
+                            indeterminate
+                            color="primary"
+                          ></v-progress-circular>
+                        </div>
+                      </v-row>
+                    </template>
+                    <template v-slot:top>
+                      <v-text-field
+                        class="mb-4"
+                        v-model="tableSearch"
+                        append-icon="search"
+                        label="Search"
+                        single-line
+                        hide-details
+                      ></v-text-field>
+                    </template>
+                    <template v-slot:[`item.action`]="{ item }">
+                      <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                          <v-icon
+                            v-on="on"
+                            class="mr-2"
+                            @click="
+                              navigateToTable(item.datasetId, item.tableId)
+                            "
+                          >
+                            {{ icons.tableHeadersEye }}
+                          </v-icon>
+                        </template>
+                        <span>Navigate to Table</span>
+                      </v-tooltip>
+                      <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                          <v-icon
+                            v-on="on"
+                            small
+                            class="mr-2"
+                            @click="
+                              copyQueryToClipboard(item.datasetId, item.tableId)
+                            "
+                          >
+                            {{ icons.contentCopy }}
+                          </v-icon>
+                        </template>
+                        <span>Copy Query to Clipboard</span>
+                      </v-tooltip>
+                    </template>
+                  </v-data-table>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+              <v-expansion-panel v-if="true === true">
+                <v-expansion-panel-header
+                  >Available Pub/Sub Topics</v-expansion-panel-header
                 >
                 <v-expansion-panel-content>
                   <v-data-table
