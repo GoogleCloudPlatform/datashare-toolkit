@@ -51,9 +51,7 @@ async function applyPolicies(projectId, policyIds, fullRefresh) {
     if (fullRefresh === true) {
         const buckets = await storageUtil.getBuckets();
         for (const bucket of buckets) {
-            console.log(bucket.metadata);
             if (underscore.has(bucket.metadata.labels, labelKey)) {
-                console.log(bucket.name);
                 await performBucketUpdate(projectId, bucket.name, null);
             }
         }
@@ -93,15 +91,55 @@ async function performBucketUpdate(projectId, bucketName, accounts) {
         console.warn(`Skipping IAM update for non-existant bucket: ${bucketName}`);
         return false;
     }
+    const accessTypes = ["user", "group", "serviceAccount"];
     const viewerRole = await runtimeConfig.storageObjectViewerRole(projectId);
     let isDirty = false;
     const bucketPolicy = await storageUtil.getBucketIamPolicy(bucketName);
-    console.log(bucketPolicy);
+    console.log(JSON.stringify(bucketPolicy.bindings, null, 3));
     let readBinding = {};
     let bindingExists = false;
     if (bucketPolicy.bindings) {
         const viewerRoleBinding = underscore.findWhere(bucketPolicy.bindings, { role: viewerRole });
+        if (viewerRoleBinding) {
+            readBinding = viewerRoleBinding;
+            bindingExists = true;
+            let i = readBinding.members.length;
+            while (i--) {
+                let member = readBinding.members[i];
+                let arr = member.split(':');
+                let type = arr[0];
+                let email = arr[1];
+                if (accessTypes.includes(type)) {
+                    const shouldHaveAccess = underscore.findWhere(accounts, { email: email, emailType: type });
+                    if (!shouldHaveAccess) {
+                        console.log(`Deleting user: ${type}:${email} from bucket: ${bucketName}`);
+                        readBinding.members.splice(i, 1);
+                        isDirty = true;
+                    }
+                }
+            }
+        }
+    } else {
+        tablePolicy.bindings = [];
     }
+
+    if (!bindingExists) {
+        readBinding.role = viewerRole;
+        readBinding.members = [];
+        bucketPolicy.bindings.push(readBinding);
+    }
+
+    accounts.forEach(account => {
+        if (account.email && account.emailType) {
+            const identifier = `${account.emailType}:${account.email}`;
+            const accessRecordExists = readBinding.members.includes(identifier);
+            if (!accessRecordExists) {
+                readBinding.members.push(identifier);
+                isDirty = true;
+                console.log(`Adding access record to bucket: ${bucketName}: ${JSON.stringify(account)}`);
+            }
+        }
+    });
 
     if (isDirty === true) {
         try {
