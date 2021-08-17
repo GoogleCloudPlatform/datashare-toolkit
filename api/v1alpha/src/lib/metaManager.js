@@ -16,7 +16,9 @@
 
 'use strict';
 
-const bigQueryApplyer = require('./appliers/bigQueryApplier');
+const bigQueryApplier = require('./appliers/bigQueryApplier');
+const storageApplier = require('./appliers/storageApplier');
+const pubsubApplier = require('./appliers/pubsubApplier');
 
 const filters = {
     BIG_QUERY: "BIG_QUERY",
@@ -34,6 +36,7 @@ async function performPolicyUpdates(projectId, policyIds, fullRefresh, filter) {
     let bq = false;
     let cs = false;
     let ps = false;
+
     if (filter == null) {
         // Apply all
         bq = true;
@@ -48,7 +51,13 @@ async function performPolicyUpdates(projectId, policyIds, fullRefresh, filter) {
     }
 
     if (bq === true) {
-        await bigQueryApplyer.applyPolicies(projectId, policyIds, fullRefresh);
+        await bigQueryApplier.applyPolicies(projectId, policyIds, fullRefresh);
+    }
+    if (cs === true) {
+        await storageApplier.applyPolicies(projectId, policyIds, fullRefresh);
+    }
+    if (ps === true) {
+        await pubsubApplier.applyPolicies(projectId, policyIds, fullRefresh);
     }
 }
 
