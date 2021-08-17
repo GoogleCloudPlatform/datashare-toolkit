@@ -49,12 +49,20 @@ async function initializeSchema(projectId) {
 async function syncResources(projectId, type) {
     const bigqueryUtil = new BigQueryUtil(projectId);
     let bigQueryPermissions = false;
+    let topicPermissions = false;
+    let bucketPermissions = false;
     let views = false;
     let marketplace = false;
     try {
         if (type === 'BIGQUERY_PERMISSIONS') {
             console.log('Sync BigQuery permissions called');
             bigQueryPermissions = true;
+        } else if (type === 'STORAGE_BUCKET_PERMISSIONS') {
+            console.log('Sync storage bucket permissions called');
+            bucketPermissions = true;
+        } else if (type === 'TOPIC_PERMISSIONS') {
+            console.log('Sync pubsub topic permissions called');
+            topicPermissions = true;
         } else if (type === 'BIGQUERY_VIEWS') {
             console.log('Sync views called');
             views = true;
@@ -64,6 +72,8 @@ async function syncResources(projectId, type) {
         } else if (type === 'ALL') {
             console.log('Sync all called');
             bigQueryPermissions = true;
+            topicPermissions = true;
+            bucketPermissions = true;
             views = true;
             marketplace = await runtimeConfig.marketplaceIntegration(projectId);
         }
@@ -74,6 +84,12 @@ async function syncResources(projectId, type) {
         }
         if (bigQueryPermissions) {
             await metaManager.performPolicyUpdates(projectId, null, true, metaManager.filters.BIG_QUERY);
+        }
+        if (topicPermissions) {
+            await metaManager.performPolicyUpdates(projectId, null, true, metaManager.filters.PUB_SUB);
+        }
+        if (bucketPermissions) {
+            await metaManager.performPolicyUpdates(projectId, null, true, metaManager.filters.CLOUD_STORAGE);
         }
         if (views) {
             // Get list of configured views
@@ -150,7 +166,7 @@ function sqlReplacements(projectId, text) {
 
     const permissionsDiffProcedure = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.permissionsDiffProcedureId);
     sql = sql.replace(/\$\{permissionsDiffProcedure\}/g, permissionsDiffProcedure);
-    
+
     const bigQueryPermissionDiffProcedure = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.bigQueryPermissionDiffProcedureId);
     sql = sql.replace(/\$\{bigQueryPermissionDiffProcedure\}/g, bigQueryPermissionDiffProcedure);
 

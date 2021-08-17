@@ -27,6 +27,24 @@ const runtimeConfig = require('../runtimeConfig');
  * @param  {} fullRefresh
  */
 async function applyPolicies(projectId, policyIds, fullRefresh) {
+    const labelKey = cfg.cdsManagedLabelKey;
+    let options = {};
+    const bigqueryUtil = new BigQueryUtil(projectId);
+    const bucketPermissionDiffProcedure = bigqueryUtil.getTableFqdn(projectId, cfg.cdsDatasetId, cfg.bucketPermissionDiffProcedureId);
+
+    if (!fullRefresh && policyIds && policyIds.length > 0) {
+        options = {
+            query: `CALL \`${bucketPermissionDiffProcedure}\`(@policyIds)`,
+            params: { policyIds: policyIds }
+        };
+    } else {
+        options = {
+            query: `CALL \`${bucketPermissionDiffProcedure}\`(null)`
+        };
+    }
+
+    const [rows] = await bigqueryUtil.executeQuery(options);
+    console.log(`Permission Diff Result: ${JSON.stringify(rows, null, 3)}`);
     return;
 }
 
