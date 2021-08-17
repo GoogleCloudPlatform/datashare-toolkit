@@ -148,12 +148,8 @@ import {
   mdiViewGrid,
   mdiApplicationImport,
   mdiHubspot,
-  mdiBookOpen,
   mdiBadgeAccount,
-  mdiPoliceBadge,
-  mdiAccount,
   mdiShieldKey,
-  mdiAccountMultipleCheck,
   mdiShopping,
   mdiBriefcaseAccount,
   mdiBucketOutline
