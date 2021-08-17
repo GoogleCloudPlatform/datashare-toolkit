@@ -46,6 +46,29 @@ var datasets = express.Router();
  * @swagger
  *
  * /projects/{projectId}/datasets:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsDatasets
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Dataset based off request parameters
  *     description: Returns the DatsetList response
@@ -251,6 +274,34 @@ datasets.put('/datasets/:datasetId', async(req, res) => {
  * @swagger
  *
  * /projects/{projectId}/datasets/{datasetId}:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsDatasetByDatasetId
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     - in: path
+ *       name: datasetId
+ *       type: string
+ *       required: true
+ *       description: Dataset Id of the Dataset request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: Get Dataset based off datasetId
  *     description: Returns the Datset response

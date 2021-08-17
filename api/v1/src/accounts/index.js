@@ -98,6 +98,29 @@ var accounts = express.Router();
  * @swagger
  *
  * /projects/{projectId}/accounts:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsAccounts
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Account based off request parameters
  *     description: Returns the PolicyList response
@@ -241,6 +264,34 @@ accounts.post('/accounts', async (req, res) => {
  * @swagger
  *
  * /projects/{projectId}/accounts/{accountId}:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsAccountByAccountId
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     - in: path
+ *       name: accountId
+ *       type: string
+ *       required: true
+ *       description: Account Id of the Account request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: Get Account based off accountId
  *     description: Returns the Datset response
@@ -479,6 +530,34 @@ accounts.delete('/accounts/:accountId', async (req, res) => {
  * @swagger
  *
  * /projects/{projectId}/policies/{policyId}/accounts:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsAccountByPolicyId
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     - in: path
+ *       name: policyId
+ *       type: string
+ *       required: true
+ *       description: Policy Id of the Policy request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Accounts of policy based off policyId and request parameters
  *     description: Returns the Account list response
@@ -540,6 +619,34 @@ accounts.get('/policies/:policyId/accounts', async (req, res) => {
  * @swagger
  *
  * /projects/{projectId}/datasets/{datasetId}/accounts:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsAccountByDatasetId
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     - in: path
+ *       name: policyId
+ *       type: string
+ *       required: true
+ *       description: Policy Id of the Policy request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Accounts based off datasetId and request parameters
  *     description: Returns the AccountList response

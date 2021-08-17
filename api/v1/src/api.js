@@ -248,6 +248,23 @@ router.all('*', cors(), verifyProject);
  * @swagger
  *
  * '/welcome':
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsWelcome
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: Welcome message status
  *     description: Returns a welcome message for the API
@@ -271,6 +288,7 @@ router.all('*', cors(), verifyProject);
  *             message:
  *               type: string
  *               description: Status message
+ *
  */
 router.get('/welcome', function (req, res) {
     res.status(200).json({
@@ -288,6 +306,7 @@ router.get('/welcome', function (req, res) {
  *     summary: Swagger UI for Datashare API OpenAPI Specification
  *     description: Returns the Swagger UI with the OpenAPI specification for the Datashare API services
  *     operationId: getDocs
+ *     security: [] # no security for Swagger docs
  *     tags:
  *       - docs
  *     produces:
@@ -309,6 +328,7 @@ router.get(['/docs', '/api-docs'], swaggerUi.setup(openapiSpec, swaggerOptions))
  *     summary: Datashare API OpenAPI Specification
  *     description: Returns the OpenAPI specification for the Datashare API services
  *     operationId: getOpenapiSpec
+ *     security: [] # no security for Swagger docs
  *     tags:
  *       - docs
  *     produces:

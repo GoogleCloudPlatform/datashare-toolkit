@@ -67,6 +67,29 @@ var admin = express.Router();
  * @swagger
  *
  * /projects/{projectId}/admin:initSchema:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsInitSchema
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   post:
  *     summary: Initialize the Datashare schema creation
  *     description: Returns the schema creation response
@@ -108,6 +131,29 @@ var admin = express.Router();
  * @swagger
  *
  * /projects/{projectId}/admin:syncResources:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsSyncResources
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   post:
  *     summary: Syncronize the Datashare resources and metadata
  *     description: Returns the syncronize resources response

@@ -68,6 +68,29 @@ var procurements = express.Router();
  * @swagger
  *
  * /projects/{projectId}/procurements:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsProcurements
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Procurements based off request parameters
  *     description: Returns the ProcurementList response
@@ -127,6 +150,29 @@ procurements.get('/procurements', async (req, res) => {
  * @swagger
  *
  * /projects/{projectId}/procurements/approve:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsApproveProcument
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   post:
  *     summary: Change the marketplace entititlement approval status based off request parameters
  *     description: Returns a response indicating if successful
@@ -181,6 +227,29 @@ procurements.post('/procurements/approve', async (req, res) => {
  * @swagger
  *
  * /projects/{projectId}/procurements:myProducts:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsRedirectMyProducts
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: Performs redirect to the Datashare My Products UI page.
  *     description: Returns a 301 redirect response

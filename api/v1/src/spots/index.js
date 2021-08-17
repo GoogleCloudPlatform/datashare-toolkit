@@ -150,6 +150,27 @@ var spots = express.Router();
  * @swagger
  *
  * /projects/{projectId}/spots:config:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsSpotsConfig
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: Spot API service environment configuration
  *     description: Returns the Spot API service configuration

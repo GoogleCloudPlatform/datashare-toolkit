@@ -96,6 +96,29 @@ var policies = express.Router();
  * @swagger
  *
  * /projects/{projectId}/policies:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsPolicies
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Policy based off request parameters
  *     description: Returns the DatsetList response
@@ -278,6 +301,34 @@ policies.post('/policies', async(req, res) => {
  * @swagger
  *
  * /projects/{projectId}/policies/{policyId}:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsPolicyByPolicyId
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     - in: path
+ *       name: policyId
+ *       type: string
+ *       required: true
+ *       description: Policy Id of the Policy request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: Get Policy based off policyId
  *     description: Returns the Datset response
@@ -535,6 +586,34 @@ policies.delete('/policies/:policyId', async(req, res) => {
  * @swagger
  *
  * /projects/{projectId}/accounts/{accountId}/policies:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsPolicyByAccountId
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     - in: path
+ *       name: accountId
+ *       type: string
+ *       required: true
+ *       description: Account Id of the Account request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Policy based off accountId and request parameters
  *     description: Returns the PolicyList response
@@ -596,6 +675,34 @@ policies.get('/accounts/:accountId/policies', async(req, res) => {
  * @swagger
  *
  * /projects/{projectId}/datasets/{datasetId}/policies:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsPolicyByDatasetId
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: projectId
+ *       type: string
+ *       required: true
+ *       description: Project Id of the Account request
+ *     - in: path
+ *       name: datasetId
+ *       type: string
+ *       required: true
+ *       description: Dataset Id of the Policy request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Policy based off datasetId and request parameters
  *     description: Returns the PolicyList response
