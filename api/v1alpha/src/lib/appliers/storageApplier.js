@@ -63,6 +63,15 @@ async function applyPolicies(projectId, policyIds, fullRefresh) {
     }
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} bucketName
+ * @param  {} accounts
+ */
+async function performBucketUpdate(projectId, bucketName, accounts) {
+    return;
+}
+
 module.exports = {
     applyPolicies
 };
