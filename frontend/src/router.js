@@ -19,6 +19,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import store from './store';
+import config from './config';
 
 const routerOptions = [
   {
@@ -109,7 +110,8 @@ const routerOptions = [
     component: 'Procurements',
     meta: {
       requiresAuth: true,
-      requiresDataProducer: true
+      requiresDataProducer: true,
+      requiresMarketplaceIntegration: true
     }
   },
   {
@@ -125,7 +127,8 @@ const routerOptions = [
     name: 'myProducts',
     component: 'MyProducts',
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresMarketplaceIntegration: true
     }
   },
   {
@@ -174,12 +177,19 @@ let router = new Router({
 
 // https://github.com/christiannwamba/vuex-auth-jwt/blob/master/src/router.js
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresDataProducer)) {
+  if (
+    to.matched.some(record => record.meta.requiresMarketplaceIntegration) &&
+    config.marketplaceIntegrationEnabled === false
+  ) {
+    next({ path: '/restricted' });
+    return;
+  } else if (to.matched.some(record => record.meta.requiresDataProducer)) {
     if (store.getters.isLoggedIn && store.getters.isDataProducer) {
       next();
       return;
     } else {
-      router.replace('/restricted');
+      next({ path: '/restricted' });
+      return;
     }
   } else if (to.matched.some(record => record.meta.requiresAuth)) {
     if (store.getters.isLoggedIn) {
@@ -189,10 +199,12 @@ router.beforeEach((to, from, next) => {
       next();
       return;
     } else {
-      router.replace('/restricted');
+      next({ path: '/restricted' });
+      return;
     }
   } else {
     next();
+    return;
   }
 });
 
