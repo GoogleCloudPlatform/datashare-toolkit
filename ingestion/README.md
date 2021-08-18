@@ -3,7 +3,7 @@
 # Ingestion Cloud Function for batch data uploads
 
 ## **Breaking Changes in v0.2.0.**
-The dataset and table names were previously inferred from the name of the file placed into the `/cds` directory, IE: `mydataset.mytable.upload.1.csv`. This has been changed and the dataset and table names are now inferred from the file path. IE: `/cds/mydataset/mytable/data/upload.1.csv`. The ingestion function will only process files from the path starting with `/cds` where the subsequent two path components are dataset and table respectively, followed by `data`. Data files to be processed should always be delivered into the dataset and table names respective `data` directory.
+The dataset and table names were previously inferred from the name of the file placed into the `/datashare` directory, IE: `mydataset.mytable.upload.1.csv`. This has been changed and the dataset and table names are now inferred from the file path. IE: `/datashare/mydataset/mytable/data/upload.1.csv`. The ingestion function will only process files from the path starting with `/datashare` where the subsequent two path components are dataset and table respectively, followed by `data`. Data files to be processed should always be delivered into the dataset and table names respective `data` directory.
 
 ## Synopsis
 
@@ -18,12 +18,12 @@ A summary of the logic within the function is:
 
 1. If the file extension is of a recognized file type ->
 2. Extract the dataset and table names from the bucket's inbound file
-   `data` path, determined by the second and third path components of the file name e.g. `/cds/mydataset/mytable/data/upload.1.csv`.
+   `data` path, determined by the second and third path components of the file name e.g. `/datashare/mydataset/mytable/data/upload.1.csv`.
 3. Determine whether the dataset exists and, if not, create it.
-4. Look for `schema.json` under the bucket's `/cds/mydataset/mytable/config/` directory to get the delimiter, field definitions, and write disposition for the upload. If these do not exist, instruct the BigQuery job to [auto-detect](https://cloud.google.com/bigquery/docs/schema-detect) the schema and delimiter, and apply `WRITE_APPEND` as the write disposition.
+4. Look for `schema.json` under the bucket's `/datashare/mydataset/mytable/config/` directory to get the delimiter, field definitions, and write disposition for the upload. If these do not exist, instruct the BigQuery job to [auto-detect](https://cloud.google.com/bigquery/docs/schema-detect) the schema and delimiter, and apply `WRITE_APPEND` as the write disposition.
 5. Execute a BigQuery job to load the file's contents into a temporary table
 6. Execute SQL that uses the `SELECT` clause specified
-   in `/cds/mydataset/mytable/config/transform.sql` (or the null transform `*`), and save the results (creating or appending, depending on the write disposition chosen) into the specified destination table.
+   in `/datashare/mydataset/mytable/config/transform.sql` (or the null transform `*`), and save the results (creating or appending, depending on the write disposition chosen) into the specified destination table.
 7. Delete the temporary table after a successful transformation stage (temporary tables otherwise expire in 2 days).
    
 ## Ingestion architecture
@@ -51,8 +51,8 @@ dataset and table in which to load the data. For example, if you wish
 to target dataset ```shareddataset``` and table ```EXAMPLE```, files uploaded to
 your storage bucket (```gs://example-bucket/```) are placed into the following paths:
 
-- ```gs://example-bucket/cds/shareddataset/EXAMPLE/data/data.csv``` (if uncompressed).
-- ```gs://example-bucket/cds/shareddataset/EXAMPLE/data/data.csv.gz``` (if compressed).
+- ```gs://example-bucket/datashare/shareddataset/EXAMPLE/data/data.csv``` (if uncompressed).
+- ```gs://example-bucket/datashare/shareddataset/EXAMPLE/data/data.csv.gz``` (if compressed).
 
 The Cloud Function will time out after *540* seconds of execution. Depending on the size of your files, it may not be possible to completely ingest very large files completely before this timeout threshold is crossed. If you encounter this condition, consider splitting up large files into smaller
 ones (each no larger than 1-1.5G) to upload and process individually.
@@ -66,7 +66,7 @@ files stored in the same Cloud Storage bucket as the data being
 uploaded.
 
 The first stage uses a file named according to the convention
-`gs://bucket/cds/<dataset-name>/<table-name>/schema.json`. For `schema.json`, this file specifies the field definitions corresponding to the file
+`gs://bucket/datashare/<dataset-name>/<table-name>/schema.json`. For `schema.json`, this file specifies the field definitions corresponding to the file
 being uploaded, as well as the [write disposition](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/WriteDisposition)
 to be used in ingesting the file.
 
@@ -86,7 +86,7 @@ The content within ```schema.json``` is a JSON object representation. The
 ```metadata``` property is identical in format to BigQuery's JSON-based
 [JobConfigurationLoad](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad). The ```fieldDelimiter``` property specifies the single character
 used to delimit columns in each row of the CSV file. An example
-```/cds/shareddataset/EXAMPLE/config/schema.json```  might resemble:
+```/datashare/shareddataset/EXAMPLE/config/schema.json```  might resemble:
 
 ```
 {
@@ -106,7 +106,7 @@ For a `WRITE_APPEND` disposition, simply omit `truncate: "true"` from
 the configuration.
 
 A file using this schema, and being uploaded into dataset `DS` and
-table `EXAMPLE` data in ```/cds/shareddataset/EXAMPLE/data/20201102.csv``` might resemble:
+table `EXAMPLE` data in ```/datashare/shareddataset/EXAMPLE/data/20201102.csv``` might resemble:
 
 
 |ts_ms|object|weight|unit_of_measurement|
@@ -126,7 +126,7 @@ Provided that you ultimately want the data represented as a DATE type,
 the source data destined for ```shareddataset.EXAMPLE``` requires transformation from
 the original data file schemas. These per-column transformations are
 specified in ```transform.sql``` (stored witin the source
-bucket's ```/cds/shareddataset/EXAMPLE/config/` subdirectory).
+bucket's ```/datashare/shareddataset/EXAMPLE/config/` subdirectory).
 
 The format of ```transform.sql``` is simply a SQL fragment
 that queries the original schema, either auto-detected or defined by
@@ -163,11 +163,11 @@ contents of ```transform.sql``` and not explicitly as it is
 for the temporary table staging the CSV file.
 
 Configuration files are placed in the
-```/cds/\<dataset-name\>/\<table-name\>/config/` subdirectory of the source
+```/datashare/\<dataset-name\>/\<table-name\>/config/` subdirectory of the source
 bucket. They are recognized by the Cloud Function as special, so it
 won't treat them as normal data files to process. They can be copied to the source bucket with this command:
 
-```gsutil cp schema.json transform.sql gs://${BUCKET}/cds/<dataset-name>/<table-name>/config/```
+```gsutil cp schema.json transform.sql gs://${BUCKET}/datashare/<dataset-name>/<table-name>/config/```
 
 ## Transformation options
 
