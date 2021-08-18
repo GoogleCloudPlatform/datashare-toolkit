@@ -118,7 +118,7 @@ if [ $EXIT_CODE -eq 1 ]; then
     # https://cloud.google.com/sdk/gcloud/reference/projects/remove-iam-policy-binding
     gcloud projects remove-iam-policy-binding ${PROJECT_ID} \
         --member serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
-        --role="projects/${PROJECT_ID}/roles/custom.ds.api.mgr"
+        --role="projects/${PROJECT_ID}/roles/custom.ds.api.mgr" || EXIT_CODE=$?
 else
     gcloud iam roles update datashare.api.manager --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml --quiet
 fi
