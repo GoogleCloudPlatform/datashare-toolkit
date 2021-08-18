@@ -101,7 +101,7 @@ cd ..
 EXIT_CODE=0
 gcloud iam roles describe custom.ds.api.mgr --project ${PROJECT_ID} || EXIT_CODE=$?
 if [ $EXIT_CODE -eq 0 ]; then
-    gcloud iam roles delete custom.ds.api.mgr --project ${PROJECT_ID} 
+    gcloud iam roles delete custom.ds.api.mgr --project ${PROJECT_ID} EXIT_CODE=$?
 fi
 
 EXIT_CODE=0
