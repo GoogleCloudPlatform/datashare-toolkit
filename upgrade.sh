@@ -99,6 +99,12 @@ npm run deploy
 cd ..
 
 EXIT_CODE=0
+gcloud iam roles describe custom.ds.api.mgr --project ${PROJECT_ID} || EXIT_CODE=$?
+if [ $EXIT_CODE -eq 0 ]; then
+    gcloud iam roles delete custom.ds.api.mgr --project ${PROJECT_ID} 
+fi
+
+EXIT_CODE=0
 gcloud iam roles describe datashare.api.manager --project ${PROJECT_ID} || EXIT_CODE=$?
 if [ $EXIT_CODE -eq 1 ]; then
     gcloud iam roles create datashare.api.manager --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml --quiet
