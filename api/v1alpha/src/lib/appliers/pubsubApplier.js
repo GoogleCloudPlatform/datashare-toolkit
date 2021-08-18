@@ -58,14 +58,13 @@ async function applyPolicies(projectId, policyIds, fullRefresh) {
                 if (topicPolicyRecord) {
                     accounts = topicPolicyRecord.accounts;
                 }
-                console.log(topicId);
                 await performTopicUpdate(projectId, topicId, accounts);
             }
         }
     } else {
         // Differential update, iterate over result based on the policyId filter only 
-        for (const topic of rows) {
-            await performTopicUpdate(projectId, topic.topicId, topic.accounts);
+        for (const row of rows) {
+            await performTopicUpdate(projectId, row.topicId, row.accounts);
         }
     }
 }

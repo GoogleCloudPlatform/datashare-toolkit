@@ -62,8 +62,8 @@ async function applyPolicies(projectId, policyIds, fullRefresh) {
         }
     } else {
         // Differential update, iterate over result based on the policyId filter only 
-        for (const bucket of rows) {
-            await performBucketUpdate(projectId, bucket.name, bucket.accounts);
+        for (const row of rows) {
+            await performBucketUpdate(projectId, row.bucketName, row.accounts);
         }
     }
 }
