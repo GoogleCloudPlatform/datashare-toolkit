@@ -9,13 +9,13 @@ description:
   tagline: Ingest, entitle, share large volumes of data.
   title: Datashare
   url: https://github.com/GoogleCloudPlatform/datashare-toolkit/tree/master#datashare-toolkit
-  version: '0.7.2'
+  version: '0.7.3'
   eulaUrl: https://raw.githubusercontent.com/GoogleCloudPlatform/datashare-toolkit/ecada698551d3022ed12afbabba5e5eae43dfb03/LICENSE.txt
   softwareGroups:
   - type: SOFTWARE_GROUP_OS
     software:
     - title: Debian
-      version: v20200714 LTS
+      version: 20210817 LTS
   - software:
     - title: Datashare
       version: 0.7.2
@@ -63,7 +63,7 @@ input:
     - name: sourceImage
       title: Image version
       enumLabels:
-        '0': 'gcp-financial-services-debian-datashare-20200920'
+        '0': 'gcp-financial-services-debian-datashare-20210817'
     - name: zone
       title: Zone
     - name: machineType
@@ -105,7 +105,7 @@ input:
       title: Google Cloud Platform Cloud Function region
       subtext: <a href="https://cloud.google.com/compute/docs/regions-zones#available">Valid Google Cloud Platform regions</a>
       tooltip: Deploys the Cloud Function to this region; default is us-central1.
-      placeholder: us-central1      
+      placeholder: us-central1
     - name: input_gcpRegion
       title: Google Cloud Platform Region
       subtext: <a href="https://cloud.google.com/compute/docs/regions-zones#available">Valid Google Cloud Platform regions</a>
@@ -128,7 +128,7 @@ input:
     #- name: isPrivateGkeCluster
     #  title: Create private GKE Cluster
     #  tooltip: This creates a<a href="https://cloud.google.com/run/docs/gke/setup">private GKE</a>.
-    #  subtext: Ensures the nodes in the GKE cluster are private (i.e. do not have external IP addresses).      
+    #  subtext: Ensures the nodes in the GKE cluster are private (i.e. do not have external IP addresses).
     - name: gceServiceAccount
       title: GCP Service Account
       tooltip: Create a <a href="https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/marketplace/PREREQUISITES.md#update-service-account-from-google-cloud-console">new permissions to other service accounts</a> to install all Datashare components.
@@ -294,6 +294,6 @@ runtime:
 
 annotations:
   autogenSpecType: 'SINGLE_VM'
-  vmImage0: https://www.googleapis.com/compute/v1/projects/gcp-financial-services-public/global/images/gcp-financial-services-debian-datashare-20200920
+  vmImage0: https://www.googleapis.com/compute/v1/projects/gcp-financial-services-public/global/images/gcp-financial-services-debian-datashare-20210817
 
 metadata_version: v1

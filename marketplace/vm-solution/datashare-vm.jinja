@@ -61,7 +61,7 @@ imports:
 {% set canIpForwardValue = properties["canIpForward"] == "On" %}
 
 {% set imageProjects = [project] %}
-{% set imageNames = ["gcp-financial-services-debian-datashare-20200920"] %}
+{% set imageNames = ["gcp-financial-services-debian-datashare-20210817"] %}
 {% set selectedImageIndex = properties["sourceImage"]|int %}
 
 resources:
@@ -329,7 +329,8 @@ resources:
               {% endraw %}
 
               if [ "$USE_RUNTIME_CONFIG_WAITER" = "true" ]; then
-                sudo apt-get -y update
+                curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+                sudo apt -y update
 
                 echo "Using Runtime Config Waiter to install Datashare prerequisites..."
                 export CONFIG_NAME=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/configName -H "Metadata-Flavor: Google"`
