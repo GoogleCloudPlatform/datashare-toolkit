@@ -200,12 +200,12 @@ async function setupDatasharePrerequisites(projectId) {
 
     if (await bigqueryUtil.tableExists(cfg.cdsDatasetId, cfg.cdsPolicyTableId) === false) {
         console.log("Creating policy table");
-        const schema = require('./bq/schema/policy.json');
-        await bigqueryUtil.createTable(cfg.cdsDatasetId, cfg.cdsPolicyTableId, schema);
+        const options = require('./bq/schema/policy.json');
+        await bigqueryUtil.createTable(cfg.cdsDatasetId, cfg.cdsPolicyTableId, options);
     } else {
         // Patch the schema
         const options = require('./bq/schema/policy.json');
-        await bigqueryUtil.patchTableSchema(cfg.cdsDatasetId, cfg.cdsPolicyTableId, options)
+        await bigqueryUtil.patchTableSchema(cfg.cdsDatasetId, cfg.cdsPolicyTableId, options.schema)
         console.log('Policy table already exists');
     }
 

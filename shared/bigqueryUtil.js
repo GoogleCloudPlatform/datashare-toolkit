@@ -911,12 +911,12 @@ class BigQueryUtil {
     /**
      * @param  {} datasetId
      * @param  {} tableId
-     * @param  {} schema
+     * @param  {} fields
      */
-    async patchTableSchema(datasetId, tableId, schema) {
+    async patchTableSchema(datasetId, tableId, fields) {
         const table = this.bigqueryClient.dataset(datasetId).table(tableId);
         const [metadata] = await table.getMetadata();
-        metadata.schema = schema;
+        metadata.schema.fields = fields;
         const [result] = await table.setMetadata(metadata);
     }
 }
