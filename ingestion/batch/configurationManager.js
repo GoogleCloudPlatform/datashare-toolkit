@@ -155,7 +155,7 @@ async function validateOptions(options, validateStorage) {
         return { isValid: true, isDataFile: true, info: info, warn: warn, hasException: false };
     }
     else {
-        console.log(`Options validation failed: ${errors.join(", ")}`);
+        console.log(`Options validation failed: ${errors.join(", ")}. If this is a data file, ensure that you place it within the proper path. IE: '/datashare/[dataset]/[table]/data/file.csv'`);
         return { isValid: false, errors: errors, info: info, warn: warn, hasException: true };
     }
 }
