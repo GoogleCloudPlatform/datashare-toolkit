@@ -129,7 +129,7 @@
                 "
               >
                 <v-expansion-panel-header
-                  >Available BigQuery Datasets</v-expansion-panel-header
+                  >BigQuery Datasets</v-expansion-panel-header
                 >
                 <v-expansion-panel-content>
                   <v-data-table
@@ -196,7 +196,7 @@
                 "
               >
                 <v-expansion-panel-header
-                  >Available BigQuery Tables</v-expansion-panel-header
+                  >BigQuery Tables</v-expansion-panel-header
                 >
                 <v-expansion-panel-content>
                   <v-data-table
@@ -264,12 +264,12 @@
                 v-if="this.selectedItem.storageEnabled === true"
               >
                 <v-expansion-panel-header
-                  >Available Cloud Storage Buckets</v-expansion-panel-header
+                  >Cloud Storage Buckets</v-expansion-panel-header
                 >
                 <v-expansion-panel-content>
                   <v-data-table
                     :headers="storageHeaders"
-                    :items="this.availableTables"
+                    :items="this.selectedItem.buckets"
                     :search="storageSearch"
                     :loading="loading"
                   >
@@ -332,12 +332,12 @@
                 v-if="this.selectedItem.pubsubEnabled === true"
               >
                 <v-expansion-panel-header
-                  >Available Pub/Sub Topics</v-expansion-panel-header
+                  >Pub/Sub Topics</v-expansion-panel-header
                 >
                 <v-expansion-panel-content>
                   <v-data-table
                     :headers="topicHeaders"
-                    :items="this.availableTables"
+                    :items="this.selectedItem.topics"
                     :search="topicSearch"
                     :loading="loading"
                   >
@@ -402,9 +402,7 @@
                     this.selectedItem.rowAccessTags.length > 0
                 "
               >
-                <v-expansion-panel-header
-                  >Available Row Filters</v-expansion-panel-header
-                >
+                <v-expansion-panel-header>Row Filters</v-expansion-panel-header>
                 <v-expansion-panel-content>
                   <v-data-table
                     dense
@@ -607,6 +605,15 @@ export default {
   methods: {
     showDetails(item) {
       this.selectedItem = item;
+      if (
+        this.selectedItem.pubsubEnabled === true &&
+        this.selectedItem.topics.length > 0
+      ) {
+        this.selectedItem.topics.forEach(t => {
+          // Create the topicName so it's available for searching more easily rather then a template field
+          t.topicName = this.topicName(t.topicId);
+        });
+      }
       this.showProductDetail = true;
     },
     closeDetailDialog(refresh) {
@@ -658,6 +665,9 @@ export default {
       } else {
         console.warn('Unable to copy, clipboard not available');
       }
+    },
+    topicName(topicId) {
+      return `projects/${config.projectId}/topics/${topicId}`;
     }
   }
 };
