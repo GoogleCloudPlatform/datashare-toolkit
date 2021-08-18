@@ -545,19 +545,14 @@ async function createView(view, overrideSql) {
             }
 
             const currentExpiryTime = viewMetadata.expirationTime;
-            console.log(`expirationTime for view '${view.name}' is ${currentExpiryTime}`);
+            console.log(`configuredExpirationTime is ${configuredExpirationTime}, expirationTime for view '${view.name}' is ${currentExpiryTime}`);
 
             // Update expirationTime for view
             // Deleting the property doesn't remove it from metadata, setting it to null removes it
-            if (configuredExpirationTime !== currentExpiryTime) {
+            if (configuredExpirationTime != currentExpiryTime) {
                 console.log(`Configured expirationTime is different than the value for view '${view.name}'`);
                 viewMetadata.expirationTime = configuredExpirationTime;
                 await bigqueryUtil.setTableMetadata(view.datasetId, view.name, viewMetadata);
-            }
-            else {
-                if (cfg.verboseMode) {
-                    console.log(`expirationTime for view '${view.name}' is in-sync`);
-                }
             }
         }
         else {
