@@ -3,11 +3,11 @@
 
 This folder contains the assets required to create the Marketplace VM solution and package the assets into a single zip file.
 
-Currently, it only contains the `vm-solution` folder, which contains all the VM solution assets. Eventually we will create a Kubernetes solution folder for customers that 
+Currently, it only contains the `vm-solution` folder, which contains all the VM solution assets. Eventually we will create a Kubernetes solution folder for customers that
 would like to deploy Datashare to a Kubernetes based environment.  
 
 ## Releases
-View the [releases](releases/RELEASE_NOTES_VM_SOLUTION.md) page for details. 
+View the [releases](releases/RELEASE_NOTES_VM_SOLUTION.md) page for details.
 
 ## Requirements
 The Cloud Function must zipped, named `datashare-toolkit-cloud-function.zip` and uploaded to a Google Cloud Storage bucket.
@@ -23,7 +23,7 @@ The following APIs are enabled during the Marketplace solution launch.
 * Cloud Commerce Procurement - `cloudcommerceprocurement.googleapis.com`
 
 ## New roles added to Service Accounts
-The following service account are modified with additional roles as shown below. 
+The following service account are modified with additional roles as shown below.
 * Compute Engine Service Account (`project-number-compute@developer.gserviceaccount.com`)
   * Security IAM Role [`iam.securityAdmin`](https://cloud.google.com/iam/docs/understanding-roles#iam-roles)
   * Added by the user as a prerequisite.
@@ -47,25 +47,32 @@ The following service account are modified with additional roles as shown below.
 
 
 ## <a name="deploy_from_cli">Deploy Datashare from command line</a>
-This section outlines how to deploy Datashare from the command line. 
+This section outlines how to deploy Datashare from the command line.
 
 1. Make sure to complete the [prerequistes](https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/marketplace/PREREQUISITES.md).
 
-2. Clone this repository and then cd into the folder below. 
+2. Clone this repository and then cd into the folder below.
 ```
 cd datashare-toolkit/marketplace/releases
 ```
 
-3. Unzip the `datashare-marketplace-vm-solution-v0.7.2` file and cd into the unzipped folder. 
+3. Unzip the `datashare-marketplace-vm-solution-v0.7.3` file and cd into the unzipped folder.
 ```
-unzip datashare-marketplace-vm-solution-v0.7.2.zip
+unzip datashare-marketplace-vm-solution-v0.7.3.zip
 
 cd vm-solution
 ```
 
-4. Update the `test_config.yaml` file and replace `YOUR_GCP_SERVICE_ACCOUNT` with the service account that you created in the prerequisites step. 
+4. Update the `test_config.yaml` file and replace `gcp-financial-services@cloud-launcher-verifier-prd.iam.gserviceaccount.com` with the service account that you created in the prerequisites step.
+* `gceServiceAccount`
+* `input_oauthClientId`
+* `input_dataProducers`
+* `input_uiDomainName`
+* `input_apiDomainName`
+* `serviceAccounts`
+  * `- email`
 
-5. Execute the following commands. 
+5. Execute the following commands.
 
 ```
 gcloud config set project YOUR_PROJECT
@@ -76,7 +83,7 @@ gcloud deployment-manager deployments create datashare --config=test_config.yaml
 After a few minutes you will see the Deployment Manager job executing in the Google Cloud console.  
 
 ## Remove Elevated Service Account permissions
-To remove the elevated Service Account permissions follow the steps outline below. 
+To remove the elevated Service Account permissions follow the steps outline below.
 
 1. From your Google Cloud Console, active Google Cloud Shell (top right corner).
 
@@ -98,7 +105,7 @@ cd datashare-toolkit/marketplace
 ```
 
 ## Shell scripts
-The `marketplace` folder includes several files to help with deployment and testing. 
+The `marketplace` folder includes several files to help with deployment and testing.
 
 ### create-vm-solution-package.sh
 This shell script will build the the Cloud Marketplace VM solution package, which should be upload to Google Cloud Marketplace.
@@ -114,8 +121,8 @@ It **does NOT** delete the following bucket because the customer may have upload
 * [PROJECT]-cds-bucket
 
 Use this script to delete all Datashare components from your GCP project, with the exception of the bucket listed above.  The reason we need this script
-is that the Deployment Manager will only delete resources that it manages.  At this time it does not support Cloud Run deployments; therefore, 
-the Datashare API and UI will not be deleted when you delete the Deployment Manager configuration file. 
+is that the Deployment Manager will only delete resources that it manages.  At this time it does not support Cloud Run deployments; therefore,
+the Datashare API and UI will not be deleted when you delete the Deployment Manager configuration file.
 
 Execute the following commands from Google Cloud Shell.
 ```
@@ -123,16 +130,16 @@ cd datashare-toolkit/marketplace
 ./delete-vm-solution-components-from-gcp.sh
 ```
 ### install-datashare-prerequisites.sh
-Enables Google Cloud APIs that are required to run the Datashare toolkit in you GCP project. It also creates a 
+Enables Google Cloud APIs that are required to run the Datashare toolkit in you GCP project. It also creates a
 storage bucket named * [PROJECT]-install-bucket and uploads the Datashare Cloud Function source code to that bucket.
-When the Cloud Function is deployed it uses the source code located in this storage bucket. 
+When the Cloud Function is deployed it uses the source code located in this storage bucket.
 
 ### reset-gcp-project-for-testing.sh
 This is a helper script that allows the developer/maintainer of the package to disable the GCP APIs
 and remove the [RuntimeConfig beta](https://cloud.google.com/deployment-manager/runtime-configurator/create-and-delete-runtimeconfig-resources) resources if they were used.  
 
 ### update-compute-service-account-with-securityadmin-role.sh
-This script will either `add` or `remove` the `IAM Security Admin` role to the Compute Engine service account. 
+This script will either `add` or `remove` the `IAM Security Admin` role to the Compute Engine service account.
 
 #### Add the IAM security role
 ```
@@ -145,7 +152,7 @@ This script will either `add` or `remove` the `IAM Security Admin` role to the C
 ```
 
 ## Create the VM Solution Package
-Execute the following command to create the VM solution package, which will zip the `vm-solution` folder and copy the Deployment Manager scripts from the 
+Execute the following command to create the VM solution package, which will zip the `vm-solution` folder and copy the Deployment Manager scripts from the
 `api` and `frontend` folders.  You can then use this zip file as the VM solution package and upload it to Google Cloud Marketplace.  
 
 ```
@@ -162,7 +169,7 @@ There are two ways to install/deploy the Datashare prerequisites - execute the `
 checkbox on the Datashare launch page.
 
 ### Deploy prerequisties with install-datashare-prerequisites.sh
-Before a user can click the `Launch` button, then you must execute the prerequisite script. 
+Before a user can click the `Launch` button, then you must execute the prerequisite script.
 You only need to execute this script if you don't select the **Use Google RuntimeConfig Waiter to install prereqs** checkbox from the Launch page.
 
 ```
@@ -170,15 +177,15 @@ You only need to execute this script if you don't select the **Use Google Runtim
 ```
 
 ### Deploy prerequisites with RuntimeConfig Beta Feature
-There is a checkbox on the VM solution launch page - "Use Google RuntimeConfig Waiter to install prereqs" - that will use the 
-[Runtime Config beta](https://cloud.google.com/deployment-manager/runtime-configurator/create-and-delete-runtimeconfig-resources) 
+There is a checkbox on the VM solution launch page - "Use Google RuntimeConfig Waiter to install prereqs" - that will use the
+[Runtime Config beta](https://cloud.google.com/deployment-manager/runtime-configurator/create-and-delete-runtimeconfig-resources)
 release and the [Waiter resource](https://cloud.google.com/deployment-manager/runtime-configurator/creating-a-waiter) to wait
 for the VM startup script to finish executing before it deploys the Cloud Function, Datashare UI and API.  
 
 The VM startup script performs the following tasks only if the checkbox is True/selected:
 * Enables specific Google Cloud APIs that are necessary to run the Datashare components
 * Notifies the Waiter that the VM has executed successfully
-* Packages the Cloud Function into a zip and uploads it to Google Cloud Storage; 
+* Packages the Cloud Function into a zip and uploads it to Google Cloud Storage;
   * The Cloud Function Deployment Manager script uses the uploaded zip file to deploy the Cloud Function.
 
 #### Testing/Debugging
@@ -198,11 +205,11 @@ gcloud beta runtime-config configs variables unset /success/my-instance --config
 
 ##### Delete the Waiter
 ```
-gcloud beta runtime-config configs waiters delete cds-vm-1-startup-waiter --config-name cds-vm-1-startup-config 
+gcloud beta runtime-config configs waiters delete cds-vm-1-startup-waiter --config-name cds-vm-1-startup-config
 ```
 
 ##### Delete the Runtime Config
-Deleting the config should delete all the items above. 
+Deleting the config should delete all the items above.
 ```
 gcloud beta runtime-config configs delete cds-vm-1-startup-config
 ```
@@ -217,4 +224,3 @@ cd marketplace
 
 ./delete-vm-solution-components-from-gcp.sh
 ```
-
