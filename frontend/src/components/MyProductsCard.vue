@@ -169,7 +169,7 @@
                           {{ icons.databaseSearch }}
                         </v-icon>
                       </template>
-                      <span>Navigate to Dataset</span>
+                      <span>Navigate to dataset</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
@@ -182,7 +182,7 @@
                           {{ icons.contentCopy }}
                         </v-icon>
                       </template>
-                      <span>Copy Query to Clipboard</span>
+                      <span>Copy query to clipboard</span>
                     </v-tooltip>
                   </template>
                 </v-data-table>
@@ -236,7 +236,7 @@
                           {{ icons.tableHeadersEye }}
                         </v-icon>
                       </template>
-                      <span>Navigate to Table</span>
+                      <span>Navigate to table</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
@@ -251,7 +251,7 @@
                           {{ icons.contentCopy }}
                         </v-icon>
                       </template>
-                      <span>Copy Query to Clipboard</span>
+                      <span>Copy query to clipboard</span>
                     </v-tooltip>
                   </template>
                 </v-data-table>
@@ -295,27 +295,12 @@
                         <v-icon
                           v-on="on"
                           class="mr-2"
-                          @click="navigateToTable(item.datasetId, item.tableId)"
+                          @click="navigateToBucket(item.bucketName)"
                         >
-                          {{ icons.tableHeadersEye }}
+                          {{ icons.bucketOutline }}
                         </v-icon>
                       </template>
-                      <span>Navigate to Table</span>
-                    </v-tooltip>
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <v-icon
-                          v-on="on"
-                          small
-                          class="mr-2"
-                          @click="
-                            copyQueryToClipboard(item.datasetId, item.tableId)
-                          "
-                        >
-                          {{ icons.contentCopy }}
-                        </v-icon>
-                      </template>
-                      <span>Copy Query to Clipboard</span>
+                      <span>Navigate to Bucket</span>
                     </v-tooltip>
                   </template>
                 </v-data-table>
@@ -359,12 +344,12 @@
                         <v-icon
                           v-on="on"
                           class="mr-2"
-                          @click="navigateToTable(item.datasetId, item.tableId)"
+                          @click="navigateToCreateSubscription()"
                         >
-                          {{ icons.tableHeadersEye }}
+                          {{ icons.newspaperVariantMultiple }}
                         </v-icon>
                       </template>
-                      <span>Navigate to Table</span>
+                      <span>Navigate to create a subscription</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
@@ -372,14 +357,15 @@
                           v-on="on"
                           small
                           class="mr-2"
-                          @click="
-                            copyQueryToClipboard(item.datasetId, item.tableId)
-                          "
+                          @click="copyTopicNameToClipboard(item.topicId)"
                         >
                           {{ icons.contentCopy }}
                         </v-icon>
                       </template>
-                      <span>Copy Query to Clipboard</span>
+                      <span
+                        >Copy full resource id of the topic to the clipboard to
+                        be used for creating a new subscription</span
+                      >
                     </v-tooltip>
                   </template>
                 </v-data-table>
@@ -450,9 +436,12 @@ import {
   mdiShopping,
   mdiCardSearch,
   mdiDatabaseSearch,
+  mdiDog,
   mdiTableHeadersEye,
   mdiInformation,
-  mdiContentCopy
+  mdiContentCopy,
+  mdiBucketOutline,
+  mdiNewspaperVariantMultiple
 } from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 import UrlHelper from '../urlHelper';
@@ -495,12 +484,15 @@ export default {
         { text: '', value: 'action', sortable: false }
       ],
       icons: {
+        bucketOutline: mdiBucketOutline,
         contentCopy: mdiContentCopy,
+        dog: mdiDog,
         information: mdiInformation,
         search: mdiCardSearch,
         marketplace: mdiShopping,
         databaseSearch: mdiDatabaseSearch,
-        tableHeadersEye: mdiTableHeadersEye
+        tableHeadersEye: mdiTableHeadersEye,
+        newspaperVariantMultiple: mdiNewspaperVariantMultiple
       },
       showError: false,
       showProductDetail: false,
@@ -659,6 +651,14 @@ export default {
       }\` LIMIT 10`;
       if (navigator && navigator.clipboard) {
         navigator.clipboard.writeText(query);
+      } else {
+        console.warn('Unable to copy, clipboard not available');
+      }
+    },
+    copyTopicNameToClipboard(topicId) {
+      const topicName = this.topicName(topicId);
+      if (navigator && navigator.clipboard) {
+        navigator.clipboard.writeText(topicName);
       } else {
         console.warn('Unable to copy, clipboard not available');
       }
