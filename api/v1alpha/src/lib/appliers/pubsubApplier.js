@@ -47,29 +47,104 @@ async function applyPolicies(projectId, policyIds, fullRefresh) {
     console.log(`Permission Diff Result: ${JSON.stringify(rows, null, 3)}`);
 
     const pubsubUtil = new PubSubUtil(projectId);
-
     if (fullRefresh === true) {
+        // Update all managed buckets
         const topics = await pubsubUtil.getTopics();
-        topics.forEach(b => {
-            if (underscore.has(b.metadata.labels, labelKey)) {
-                console.log(b.name);
+        for (const topic of topics) {
+            if (underscore.has(topic.metadata.labels, labelKey)) {
+                const topicId = topic.name.substring(topic.name.lastIndexOf('/') + 1);
+                let topicPolicyRecord = underscore.findWhere(rows, { topicId: topicId });
+                let accounts = [];
+                if (topicPolicyRecord) {
+                    accounts = topicPolicyRecord.accounts;
+                }
+                console.log(topicId);
+                await performTopicUpdate(projectId, topicId, accounts);
             }
-        });
+        }
     } else {
+        // Differential update, iterate over result based on the policyId filter only 
         for (const topic of rows) {
-            const topicId = topic.topicId;
-            const accounts = bucket.accounts || [];
+            await performTopicUpdate(projectId, topic.topicId, topic.accounts);
         }
     }
 }
 
 /**
  * @param  {} projectId
- * @param  {} topicId
+ * @param  {} topicName
  * @param  {} accounts
  */
-async function performTopicUpdate(projectId, topicId, accounts) {
-    return;
+async function performTopicUpdate(projectId, topicName, accounts) {
+    console.log(`Begin IAM update for topic: ${topicName}`);
+    const pubsubUtil = new PubSubUtil(projectId);
+    const exists = await pubsubUtil.topicExists(topicName);
+    if (!exists) {
+        console.warn(`Skipping IAM update for non-existant topic: ${topicName}`);
+        return false;
+    }
+    const viewerRole = await runtimeConfig.pubsubSubscriberRole(projectId);
+    let isDirty = false;
+    const topicPolicy = await pubsubUtil.getTopicIamPolicy(topicName);
+    let readBinding = {};
+    let bindingExists = false;
+    if (topicPolicy.bindings) {
+        const viewerRoleBinding = underscore.findWhere(topicPolicy.bindings, { role: viewerRole });
+        if (viewerRoleBinding) {
+            readBinding = viewerRoleBinding;
+            bindingExists = true;
+            let i = readBinding.members.length;
+            while (i--) {
+                let member = readBinding.members[i];
+                let arr = member.split(':');
+                let type = arr[0];
+                let email = arr[1];
+                if (cfg.managedIamAccessTypes.includes(type)) {
+                    const shouldHaveAccess = underscore.findWhere(accounts, { email: email, emailType: type });
+                    if (!shouldHaveAccess) {
+                        console.log(`Deleting user: ${type}:${email} from topic: ${topicName}`);
+                        readBinding.members.splice(i, 1);
+                        isDirty = true;
+                    }
+                }
+            }
+        }
+    } else {
+        topicPolicy.bindings = [];
+    }
+
+    if (!bindingExists) {
+        readBinding.role = viewerRole;
+        readBinding.members = [];
+        topicPolicy.bindings.push(readBinding);
+    }
+
+    accounts.forEach(account => {
+        if (account.email && account.emailType) {
+            const identifier = `${account.emailType}:${account.email}`;
+            const accessRecordExists = readBinding.members.includes(identifier);
+            if (!accessRecordExists) {
+                readBinding.members.push(identifier);
+                isDirty = true;
+                console.log(`Adding access record to topic: ${topicName}: ${JSON.stringify(account)}`);
+            }
+        }
+    });
+
+    if (isDirty === true) {
+        try {
+            await pubsubUtil.setTopicIamPolicy(topicName, topicPolicy);
+            console.info(`Policy set successfully for topic '${topicName}'`);
+        } catch (err) {
+            console.error(`Failed to set policy for topic '${topicName}' with error '${err}' and payload: ${JSON.stringify(topicPolicy)}`);
+            throw err;
+        }
+    } else {
+        console.info(`Metadata is already up to date for topic: '${topicName}'`);
+    }
+
+    console.log(`End IAM update for topic: ${topicName}`);
+    return isDirty;
 }
 
 module.exports = {

@@ -29,7 +29,10 @@ includedPermissions:
 - pubsub.topics.attachSubscription
 - pubsub.topics.create
 - pubsub.topics.delete
+- pubsub.topics.get
+- pubsub.topics.getIamPolicy
 - pubsub.topics.list
+- pubsub.topics.setIamPolicy
 - pubsub.topics.update
 - resourcemanager.projects.get
 - serviceusage.services.list
