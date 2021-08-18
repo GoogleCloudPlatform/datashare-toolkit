@@ -72,7 +72,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: npm install, lint, and test for shared
       run: |
-        cd $GITHUB_WORKSPACE/api/v1alpha
+        cd $GITHUB_WORKSPACE/api/v1
         npm install
         npm run lint
       env:

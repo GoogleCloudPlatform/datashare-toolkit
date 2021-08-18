@@ -45,10 +45,10 @@ cd "$(dirname "$0")"
 
 # Up to root
 cd ../
-gcloud builds submit --config api/v1alpha/api-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
+gcloud builds submit --config api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
-# Move to v1alpha
-cd api/v1alpha
+# Move to v1
+cd api/v1
 export NAMESPACE=datashare-apis
 export SERVICE_ACCOUNT_NAME=ds-api-mgr
 CLUSTER=datashare
@@ -130,7 +130,7 @@ cat istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
 
 if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
     cd ../../
-    gcloud builds submit --config api/v1alpha/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
+    gcloud builds submit --config api/v1/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
     # TODO: Switch to Managed Cloud Run when this issue is resolved
     # --no-cpu-throttling is not working through gcloud alpha

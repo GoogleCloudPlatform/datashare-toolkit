@@ -12,15 +12,15 @@ spec:
         methods:
         - GET
         paths: 
-        - /v1alpha/products
-        - /v1alpha/resources/configuration
-        - /v1alpha/resources/projects
+        - /v1/products
+        - /v1/resources/configuration
+        - /v1/resources/projects
     - operation:
         methods:
         - GET
         - POST
         paths: 
-        - /v1alpha/accounts:activate
+        - /v1/accounts:activate
     when:
     - key: request.auth.claims[aud]
       values:

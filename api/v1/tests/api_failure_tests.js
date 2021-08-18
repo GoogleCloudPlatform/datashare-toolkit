@@ -18,7 +18,7 @@ var app = require('../src/index.js');
 var chai = require('chai');
 var request = require('supertest');
 
-const apiVersion = 'v1alpha';
+const apiVersion = 'v1';
 const bucketId = 'chrispage-dev-cds-test';
 var expect = chai.expect;
 

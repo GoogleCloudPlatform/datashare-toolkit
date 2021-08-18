@@ -81,7 +81,7 @@ def GenerateConfig(context):
           ]
   # if a user includes the UI domain name then include it as an environment variable
   domain_protocol = 'https://'
-  base_path = '/v1alpha'
+  base_path = '/v1'
   environment_variables = ""
   if api_domain_name is not "":
       if domain_has_protocol(api_domain_name):

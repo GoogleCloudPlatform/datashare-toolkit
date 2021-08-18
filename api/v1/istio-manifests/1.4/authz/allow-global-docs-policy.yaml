@@ -12,5 +12,5 @@ spec:
         methods:
         - GET
         paths:
-        - /v1alpha/docs
-        - /v1alpha/docs/*
+        - /v1/docs
+        - /v1/docs/*

@@ -68,7 +68,7 @@ def GenerateConfig(context):
             'dir': 'ds/datashare-toolkit',
             'entrypoint': 'bash',
             'args': ['-c', 'if ! gcloud container images describe gcr.io/$PROJECT_ID/ds-api:dev; then ' +
-                     'gcloud builds submit . --config=api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=' + container_tag +
+                     'gcloud builds submit . --config=api/v1/cloudbuild.yaml --substitutions=TAG_NAME=' + container_tag +
                      '; else exit 0; fi'
                      ]
         },

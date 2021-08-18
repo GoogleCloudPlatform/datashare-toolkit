@@ -25,7 +25,7 @@ const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const { verifyProject } = require('./lib/auth');
 
-const apiVersion = "v1alpha";
+const apiVersion = "v1";
 const PORT = process.env.PORT || 5555;
 /************************************************************
   OpenAPI Definition

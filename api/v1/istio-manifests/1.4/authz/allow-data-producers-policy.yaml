@@ -12,43 +12,43 @@ spec:
         methods:
         - GET
         paths:
-        - /v1alpha/datasets?*
-        - /v1alpha/procurements
-        - /v1alpha/procurements?*
-        - /v1alpha/views
+        - /v1/datasets?*
+        - /v1/procurements
+        - /v1/procurements?*
+        - /v1/views
     - operation:
         methods:
         - POST
         paths:
-        - /v1alpha/accounts:reset
-        - /v1alpha/accounts:syncMarketplace
-        - /v1alpha/admin:initSchema
-        - /v1alpha/admin:syncResources
-        - /v1alpha/datasets
-        - /v1alpha/procurements/approve
+        - /v1/accounts:reset
+        - /v1/accounts:syncMarketplace
+        - /v1/admin:initSchema
+        - /v1/admin:syncResources
+        - /v1/datasets
+        - /v1/procurements/approve
     - operation:
         methods:
         - DELETE
         paths:
-        - /v1alpha/pubsub/topics/*
-        - /v1alpha/storage/buckets/*
+        - /v1/pubsub/topics/*
+        - /v1/storage/buckets/*
     - operation:
         methods:
         - GET
         - POST
         paths:
-        - /v1alpha/accounts
-        - /v1alpha/policies
-        - /v1alpha/pubsub/topics
-        - /v1alpha/storage/buckets
+        - /v1/accounts
+        - /v1/policies
+        - /v1/pubsub/topics
+        - /v1/storage/buckets
     - operation:
         methods:
         - GET
         - PUT
         - DELETE
         paths:
-        - /v1alpha/accounts/*
-        - /v1alpha/policies/*
+        - /v1/accounts/*
+        - /v1/policies/*
     - operation:
         methods:
         - GET
@@ -56,7 +56,7 @@ spec:
         - PUT
         - DELETE
         paths:
-        - /v1alpha/datasets/*
+        - /v1/datasets/*
     when:
     - key: request.auth.claims[email]
       values: [$DATA_PRODUCERS]

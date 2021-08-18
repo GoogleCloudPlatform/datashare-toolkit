@@ -15,7 +15,7 @@ export NAMESPACE=datashare-apis
 export SERVICE_ACCOUNT_NAME=ds-api-mgr
 CLUSTER=datashare
 
-gcloud builds submit --config api/v1alpha/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
+gcloud builds submit --config api/v1/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 gcloud run deploy "ds-listener-${PROJECT_ID}" \
     --cluster $CLUSTER \

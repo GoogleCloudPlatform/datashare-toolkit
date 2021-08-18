@@ -56,7 +56,7 @@ There are configuration settings for Entitlements and Fulfillment services. Curr
 ### Documentation
 _OpenAPI Specification_
 
-The DS API service(s) utilize the open standard for API documentation, [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) (OAS) for documenting the API's resources, parameters, responses, etc. The OAS definitions and paths are rendered via [swagger-jsdoc](https://www.npmjs.com/package/swagger-jsdoc) in the route comments of [index](v1alpha/index.js)
+The DS API service(s) utilize the open standard for API documentation, [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) (OAS) for documenting the API's resources, parameters, responses, etc. The OAS definitions and paths are rendered via [swagger-jsdoc](https://www.npmjs.com/package/swagger-jsdoc) in the route comments of [index](v1/index.js)
 
 You can access the OAS directly via:
 
@@ -212,7 +212,7 @@ Export the image/build *TAG* environment variable:
 
 Change directories into the current working API version:
 
-    cd v1alpha
+    cd v1
 
 ### Cloud Run Prerequisites
 
@@ -224,7 +224,7 @@ Build with Cloud Build and TAG:
 **Note**: Cloud Build needs to run from parent directory for build context and the [shared](../shared) directory
 
     cd ../../
-    gcloud builds submit --config api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
+    gcloud builds submit --config api/v1/cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 [Enable the APIs](https://console.cloud.google.com/flows/enableapi?apiid=cloudapis.googleapis.com,container.googleapis.com,run.googleapis.com) before beginning
 
@@ -396,11 +396,11 @@ Cloud Run for Anthos exposes services on the external IP address of the [Istio i
 Verify the DS API is running based off the active version url: \
 **Note**: The service external fqdn will be `'<service>.<namespace>.<domain>'` and **example.com** is the default knative domain.
 
-    curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+    curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1
 
 You should also be able to verify the DS API can communicate with GCP services:
 
-    curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha/projects/${PROJECT_ID}/datasets
+    curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1/projects/${PROJECT_ID}/datasets
 
 
 #### Change the default Knative serving domain
@@ -423,11 +423,11 @@ Create a **XIP_FQDN** for the full service FQDN with the **GATEWAY_IP_DOMAIN**:
 
 Verify the DS API is running based off the active version url:
 
-    curl -i http://${XIP_FQDN}/v1alpha
+    curl -i http://${XIP_FQDN}/v1
 
 You should also be able to verify the DS API can communicate with GCP services:
 
-    curl -i http://${XIP_FQDN}/v1alpha/projects/${PROJECT_ID}/datasets
+    curl -i http://${XIP_FQDN}/v1/projects/${PROJECT_ID}/datasets
 
 
 #### Domain mapping
@@ -494,7 +494,7 @@ Very the new record propagated to the local DNS resolvers:
 
 You should also be able to verify the DS API can communicate with GCP services:
 
-    curl -i http://${FQDN}/v1alpha/projects/${PROJECT_ID}/datasets
+    curl -i http://${FQDN}/v1/projects/${PROJECT_ID}/datasets
 
 
 ### Deploy Cloud Run Managed
@@ -576,7 +576,7 @@ The DS API runs as a trusted application that communicates to GCP services in a 
 
 Clients of the DS API will include end-users (data producers/admins and data consumers) from the DS UI application and service accounts from [Google Cloud Marketplace](https://cloud.google.com/marketplace) integration and/or other trusted applications (e.g POS systems).
 
-All clients and applications will be authenticated by the Identity Providers provided in the Istio [JWT Policies](https://archive.istio.io/v1.4/docs/reference/config/security/istio.authentication.v1alpha1/) configurations [here](istio-manifests/1.4/authn/). The only unauthented requests to the DS API will be for clients that required [CORS](https://www.w3.org/wiki/CORS) preflight fetch or *OPTIONS* requests e.g. [XMLHttpRequest (XHR)](https://www.w3.org/TR/XMLHttpRequest/). These requests will still have strict [Authorization](#authorization) rules enforced.
+All clients and applications will be authenticated by the Identity Providers provided in the Istio [JWT Policies](https://archive.istio.io/v1.4/docs/reference/config/security/istio.authentication.v11/) configurations [here](istio-manifests/1.4/authn/). The only unauthented requests to the DS API will be for clients that required [CORS](https://www.w3.org/wiki/CORS) preflight fetch or *OPTIONS* requests e.g. [XMLHttpRequest (XHR)](https://www.w3.org/TR/XMLHttpRequest/). These requests will still have strict [Authorization](#authorization) rules enforced.
 
 ### Encryption
 
@@ -611,7 +611,7 @@ Verify that the DNS record has gone into effect by running the command: \
 
 You should also be able to verify the DS API can communicate with GCP services via HTTPS:
 
-    curl -i https://${FQDN}/v1alpha/projects/${PROJECT_ID}/datasets
+    curl -i https://${FQDN}/v1/projects/${PROJECT_ID}/datasets
 
 
 ### Authentication
@@ -630,17 +630,17 @@ Apply the authN policies: \
 Verify the DS API is not accessible: \
 **Note**: The HTTP response code should be *401 Unauthorized*
 
-    curl -i https://${FQDN}/v1alpha
+    curl -i https://${FQDN}/v1
 
 Verify the DS API is accessible with a valid Bearer ID Token: \
 **Note**: The HTTP response code should be *200 OK*
 
-    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://${FQDN}/v1alpha
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://${FQDN}/v1
 
 Verify the DS API preflight requests are accessible without a valid Bearer ID Token: \
 **Note**: The HTTP response code should be *200 OK*
 
-     curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" https://${FQDN}/v1alpha
+     curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" https://${FQDN}/v1
 
 **Note**: You can debug HTTP 401/403 Istio [AuthN/AuthZ Errors](#authnauthz-errors) below in the [Troubleshooting](#troubleshooting) section.
 
@@ -692,17 +692,17 @@ Apply the authZ policies: \
  Verify the DS API is not accessible: \
 **Note**: The HTTP response code should be *401 Unauthorized*
 
-    curl -i https://${FQDN}/v1alpha
+    curl -i https://${FQDN}/v1
 
 Verify the DS API is accessible with a valid Bearer ID Token: \
 **Note**: The HTTP response code should be *200 OK*
 
-    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://${FQDN}/v1alpha
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://${FQDN}/v1
 
 Verify the DS API preflight requests are accessible without a valid Bearer ID Token: \
 **Note**: The HTTP response code should be *200 OK*
 
-    curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" https://${FQDN}/v1alpha
+    curl -i -X OPTIONS -H "Origin: http://ds-ui.a.run.app" -H "Access-Control-Request-Method: POST" https://${FQDN}/v1
 
 **Note**: You can debug HTTP 401/403 Istio [AuthN/AuthZ Errors](#authnauthz-errors) below in the [Troubleshooting](#troubleshooting) section.
 
@@ -710,7 +710,7 @@ You now have [authorization](#authorization) enabled for all endpoints and metho
 
 ## Development
 
-Navigate to the API version directory (*v1alpha*, *v1*, etc.).
+Navigate to the API version directory (*v1*, *v1*, etc.).
 
 Install Node 12.6
 

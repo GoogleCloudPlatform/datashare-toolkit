@@ -93,7 +93,7 @@ if [ -z "$DATA_PRODUCERS" ]; then
     exit 4
 fi
 
-cd api/v1alpha
+cd api/v1
 
 echo "Starting upgrade for $PROJECT_ID";
 npm run deploy

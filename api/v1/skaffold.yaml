@@ -20,7 +20,7 @@ build:
   - image: cds-api
     context: ../../.
     docker:
-      dockerfile: api/v1alpha/Dockerfile
+      dockerfile: api/v1/Dockerfile
 deploy:
   kubectl:
     manifests:

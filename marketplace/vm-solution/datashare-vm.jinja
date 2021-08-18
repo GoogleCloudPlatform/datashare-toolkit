@@ -520,8 +520,8 @@ resources:
                     # Apply Authentication policy
                     echo "Istio - Applying Authentication policies."
                     export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
-                    cat /opt/datashare-toolkit/api/v1alpha/istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -
-                    check_if_command_succeeded $? "cat /opt/datashare-toolkit/api/v1alpha/istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -"
+                    cat /opt/datashare-toolkit/api/v1/istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -
+                    check_if_command_succeeded $? "cat /opt/datashare-toolkit/api/v1/istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -"
                     export DATA_PRODUCERS_RAW=`curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/dataProducers -H "Metadata-Flavor: Google"`
                     export DATA_PRODUCERS=`format_data_producers_field $DATA_PRODUCERS_RAW`
                     # echo "DATA_PRODUCERS=$DATA_PRODUCERS"
@@ -529,8 +529,8 @@ resources:
                     # echo "OAUTH_CLIENT_ID=$OAUTH_CLIENT_ID"
                     # Apply Authorization policy
                     echo "Istio - Applying Authorization policies."
-                    cat /opt/datashare-toolkit/api/v1alpha/istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
-                    check_if_command_succeeded $? "cat /opt/datashare-toolkit/api/v1alpha/istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -"
+                    cat /opt/datashare-toolkit/api/v1/istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
+                    check_if_command_succeeded $? "cat /opt/datashare-toolkit/api/v1/istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -"
 
                     echo "GKE setup complete."
                 fi

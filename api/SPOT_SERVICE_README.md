@@ -38,7 +38,7 @@ The DS API Spot service configuration overview and definition is [here](docs/CON
 ### Documentation
 _OpenAPI Specification_
 
-The DS API Spot service utilizes the open standard for API documentation, [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) (OAS) for documenting the API's resources, parameters, responses, etc. The OAS definitions and paths are rendered via [swagger-jsdoc](https://www.npmjs.com/package/swagger-jsdoc) in the route comments of [index](v1alpha/index.js)
+The DS API Spot service utilizes the open standard for API documentation, [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) (OAS) for documenting the API's resources, parameters, responses, etc. The OAS definitions and paths are rendered via [swagger-jsdoc](https://www.npmjs.com/package/swagger-jsdoc) in the route comments of [index](v1/index.js)
 
 You can access the OAS directly via:
 
@@ -202,7 +202,7 @@ Export the image/build *TAG* environment variable:
 
 Change directories into the current working API version:
 
-    cd v1alpha
+    cd v1
 
 ### Deploy Cloud Run
 
@@ -213,7 +213,7 @@ Build with Cloud Build and TAG:
 _Cloud Build needs to run from parent directory for build context_
 
     cd ../../
-    gcloud builds submit --config api/v1alpha/cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
+    gcloud builds submit --config api/v1/cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 Deploy with Cloud Run Beta:
 _Note_ - There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--set-env-vars) provides details for how they are set.
@@ -278,7 +278,7 @@ TODO - should we provide steps or a script to delete all the assets after they h
 
 ## Development
 
-Navigate to the API version directory (*v1alpha*, *v1*, etc.).
+Navigate to the API version directory (*v1*, etc.).
 
 Install Node 12.6
 
