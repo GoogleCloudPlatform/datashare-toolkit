@@ -44,7 +44,7 @@ async function applyPolicies(projectId, policyIds, fullRefresh) {
     }
 
     const [rows] = await bigqueryUtil.executeQuery(options);
-    console.log(`Permission Diff Result: ${JSON.stringify(rows, null, 3)}`);
+    console.log(`Pub/Sub Topic Permission Diff Result: ${JSON.stringify(rows, null, 3)}`);
 
     const pubsubUtil = new PubSubUtil(projectId);
     if (fullRefresh === true) {
