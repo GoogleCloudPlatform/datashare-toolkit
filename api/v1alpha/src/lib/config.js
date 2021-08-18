@@ -92,4 +92,6 @@ config.bigQueryDataViewerRole = 'datashare.bigquery.dataViewer';
 config.pubsubSubscriberRole = 'datashare.pubsub.subscriber';
 config.storageObjectViewerRole = 'datashare.storage.objectViewer';
 
+config.managedIamAccessTypes = ["user", "group", "serviceAccount"];
+
 module.exports = config;
