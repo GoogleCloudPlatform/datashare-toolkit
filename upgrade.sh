@@ -28,6 +28,7 @@ function finish {
 trap finish EXIT
 
 export MARKETPLACE_INTEGRATION_ENABLED="false";
+export SERVICE_ACCOUNT_NAME=ds-api-mgr;
 
 for i in "$@"; do
     case $i in
@@ -108,6 +109,16 @@ EXIT_CODE=0
 gcloud iam roles describe datashare.api.manager --project ${PROJECT_ID} || EXIT_CODE=$?
 if [ $EXIT_CODE -eq 1 ]; then
     gcloud iam roles create datashare.api.manager --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml --quiet
+
+    # https://cloud.google.com/sdk/gcloud/reference/projects/add-iam-policy-binding
+    gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+        --member serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
+        --role="projects/${PROJECT_ID}/roles/datashare.api.manager"
+
+    # https://cloud.google.com/sdk/gcloud/reference/projects/remove-iam-policy-binding
+    gcloud projects remove-iam-policy-binding ${PROJECT_ID} \
+        --member serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
+        --role="projects/${PROJECT_ID}/roles/custom.ds.api.mgr"
 else
     gcloud iam roles update datashare.api.manager --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml --quiet
 fi
