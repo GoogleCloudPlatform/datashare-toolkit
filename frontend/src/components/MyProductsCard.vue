@@ -629,6 +629,9 @@ export default {
       let d = new Date(epoch);
       return d.toLocaleString();
     },
+    topicName(topicId) {
+      return `projects/${config.projectId}/topics/${topicId}`;
+    },
     navigateToMarketplace(item) {
       UrlHelper.navigateToMarketplace(
         config.projectId,
@@ -644,6 +647,12 @@ export default {
     navigateToMoreInformation() {
       window.open(this.moreInformationButtonUrl, '_blank');
     },
+    navigateToBucket(bucketName) {
+      UrlHelper.navigateToBucket(config.projectId, bucketName);
+    },
+    navigateToCreateSubscription() {
+      UrlHelper.navigateToCreateSubscription();
+    },
     copyQueryToClipboard(datasetId, tableId) {
       const query = `SELECT * FROM \`${config.projectId}.${datasetId}.${
         tableId ? tableId : '[TABLE NAME HERE]'
@@ -653,9 +662,6 @@ export default {
       } else {
         console.warn('Unable to copy, clipboard not available');
       }
-    },
-    topicName(topicId) {
-      return `projects/${config.projectId}/topics/${topicId}`;
     }
   }
 };
