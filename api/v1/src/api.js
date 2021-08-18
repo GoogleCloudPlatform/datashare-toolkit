@@ -249,7 +249,7 @@ router.all('*', cors(), verifyProject);
 /**
  * @swagger
  *
- * '/welcome':
+ * /welcome:
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
@@ -309,6 +309,26 @@ router.get('/welcome', function (req, res) {
  *     description: Returns the Swagger UI with the OpenAPI specification for the Datashare API services
  *     operationId: getDocs
  *     security: [] # no security for Swagger docs
+ *     tags:
+ *       - docs
+ *     produces:
+ *       - text/html
+ *     responses:
+ *       200:
+ *         description: Welcome Message Response
+ *         schema:
+ *           type: object
+ * /docs/{content}:
+ *   get:
+ *     summary: Swagger UI for Datashare API OpenAPI Specification
+ *     description: Returns the Swagger UI with the OpenAPI specification for the Datashare API services
+ *     operationId: getDocsContent
+ *     security: [] # no security for Swagger docs
+ *     parameters:
+ *      - in: path
+ *        name: content
+ *        type: string
+ *        required: true
  *     tags:
  *       - docs
  *     produces:

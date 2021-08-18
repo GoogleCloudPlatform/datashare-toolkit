@@ -120,6 +120,26 @@ paths:
           description: Welcome Message Response
           schema:
             type: object
+  /docs/{content}:
+    get:
+      summary: Swagger UI for Datashare API OpenAPI Specification
+      description: Returns the Swagger UI with the OpenAPI specification for the Datashare API services
+      operationId: getDocsContent
+      security: []
+      parameters:
+        - in: path
+          name: content
+          type: string
+          required: true
+      tags:
+        - docs
+      produces:
+        - text/html
+      responses:
+        '200':
+          description: Welcome Message Response
+          schema:
+            type: object
   /docs/openapi_spec:
     get:
       summary: Datashare API OpenAPI Specification
@@ -1982,6 +2002,112 @@ paths:
       responses:
         '301':
           description: Redirect to My Products URL
+  /resources/projects:
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      operationId: optionsGetResourceProjects
+      security: []
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Methods:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+    get:
+      summary: Get Project Resources
+      description: Returns the Project Resource response
+      operationId: getProjectResources
+      tags:
+        - resources
+      parameters:
+        - in: header
+          name: x-gcp-project-id
+          type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Project Resource
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                description: Success of the request
+              code:
+                type: integer
+                default: 200
+                description: HTTP status code
+              data:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Success of the request
+                  projects:
+                    $ref: '#/definitions/ProjectResource'
+        '500':
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+  /resources/configuration:
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      operationId: optionsGetResourceConfiguration
+      security: []
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Methods:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+    get:
+      summary: Get Configuration Resources
+      description: Returns the Configuration Resource response
+      operationId: getProjectResourceConfiguration
+      tags:
+        - resources
+      parameters:
+        - in: header
+          name: x-gcp-project-id
+          type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Configuration Resource
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                description: Success of the request
+              code:
+                type: integer
+                default: 200
+                description: HTTP status code
+              data:
+                $ref: '#/definitions/ConfigurationResource'
+        '500':
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
   /spots:config:
     options:
       summary: CORS support
@@ -2362,6 +2488,22 @@ definitions:
         description: Entitlement Id of the purchased SKU
     required:
       - eventType
+  ProjectResource:
+    type: object
+    description: Project Resource object
+    properties:
+      projectId:
+        type: string
+        readOnly: true
+        description: Project ID
+  ConfigurationResource:
+    type: object
+    description: Configuration Resource object
+    properties:
+      projectId:
+        type: string
+        readOnly: true
+        description: Project ID
   SpotApiServiceConfig:
     type: object
     description: Spot API service config
