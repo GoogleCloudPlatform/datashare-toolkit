@@ -97,12 +97,35 @@ cd api/v1alpha
 echo "Starting upgrade for $PROJECT_ID";
 npm run deploy
 cd ..
-gcloud iam roles update datashare.api.manager --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml --quiet
+
+gcloud iam roles describe datashare.api.manager --project ${PROJECT_ID}
+if [ $? -eq 1 ]; then
+    gcloud iam roles create datashare.api.manager --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml
+else
+    gcloud iam roles update datashare.api.manager --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml
+fi
 
 # Subscriber custom roles
-gcloud iam roles update datashare.bigquery.dataViewer --project ${PROJECT_ID} --file config/ds-bigquery-data-viewer-definition.yaml --quiet
-gcloud iam roles update datashare.storage.objectViewer --project ${PROJECT_ID} --file config/ds-storage-object-viewer-definition.yaml --quiet
-gcloud iam roles update datashare.pubsub.subscriber --project ${PROJECT_ID} --file config/ds-pubsub-subscriber-definition.yaml --quiet
+gcloud iam roles describe datashare.bigquery.dataViewer --project ${PROJECT_ID}
+if [ $? -eq 1 ]; then
+    gcloud iam roles create datashare.bigquery.dataViewer --project ${PROJECT_ID} --file config/ds-bigquery-data-viewer-definition.yaml
+else
+    gcloud iam roles update datashare.bigquery.dataViewer --project ${PROJECT_ID} --file config/ds-bigquery-data-viewer-definition.yaml
+fi
+
+gcloud iam roles describe datashare.storage.objectViewer --project ${PROJECT_ID}
+if [ $? -eq 1 ]; then
+    gcloud iam roles create datashare.storage.objectViewer --project ${PROJECT_ID} --file config/ds-storage-object-viewer-definition.yaml
+else
+    gcloud iam roles update datashare.storage.objectViewer --project ${PROJECT_ID} --file config/ds-storage-object-viewer-definition.yaml
+fi
+
+gcloud iam roles describe datashare.pubsub.subscriber --project ${PROJECT_ID}
+if [ $? -eq 1 ]; then
+    gcloud iam roles create datashare.pubsub.subscriber --project ${PROJECT_ID} --file config/ds-pubsub-subscriber-definition.yaml
+else
+    gcloud iam roles update datashare.pubsub.subscriber --project ${PROJECT_ID} --file config/ds-pubsub-subscriber-definition.yaml
+fi
 
 cd ../frontend
 npm run deploy

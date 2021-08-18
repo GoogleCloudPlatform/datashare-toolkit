@@ -66,10 +66,18 @@ function navigateToTopic(projectId, topicId) {
   window.open(url, '_blank');
 }
 
+/**
+ */
+function navigateToCreateSubscription() {
+  const url = `https://console.cloud.google.com/cloudpubsub/subscription/create`;
+  window.open(url, '_blank');
+}
+
 export default {
   navigateToMarketplace,
   navigateToDataset,
   navigateToTable,
   navigateToBucket,
-  navigateToTopic
+  navigateToTopic,
+  navigateToCreateSubscription
 };
