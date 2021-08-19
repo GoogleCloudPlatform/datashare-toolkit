@@ -315,7 +315,7 @@ export default {
       .then(response => response);
   },
   syncResources(type) {
-    console.log(`Performing sync for type: ${type}`);
+    console.debug(`Performing sync for type: ${type}`);
     return axios
       .post(this._apiBaseUrl() + `/admin:syncResources`, {
         type: type
