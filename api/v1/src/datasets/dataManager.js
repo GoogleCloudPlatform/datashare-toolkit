@@ -191,7 +191,7 @@ async function deleteDataset(projectId, datasetId, createdBy) {
         await bigqueryUtil.executeQuery(viewOptions);
 
         // Updated related policies to remove the deleted dataset
-        const policyStatement = `INSERT INTO \`datashare.policy\` (rowId, policyId, name, description, isTableBased, datasets, rowAccessTags, createdBy, createdAt, isDeleted)
+        const policyStatement = `INSERT INTO \`datashare.policy\` (rowId, policyId, name, description, isTableBased, datasets, rowAccessTags, createdBy, createdAt, isDeleted, bigQueryEnabled, pubsubEnabled, storageEnabled, buckets, topics)
     WITH datasetRows as (
       SELECT rowId
       FROM \`datashare.currentPolicy\` cp
@@ -225,7 +225,12 @@ async function deleteDataset(projectId, datasetId, createdBy) {
       rowAccessTags,
       @createdBy,
       CURRENT_TIMESTAMP() as createdAt,
-      isDeleted
+      isDeleted,
+      cp.bigQueryEnabled,
+      cp.pubsubEnabled,
+      cp.storageEnabled,
+      cp.buckets,
+      cp.topics
     FROM datasetRows dr
     JOIN \`datashare.currentPolicy\` cp on dr.rowId = cp.rowId
     LEFT JOIN policyDatasets pd on cp.rowId = pd.rowId;`;
@@ -620,7 +625,7 @@ async function deleteDatasetView(projectId, datasetId, viewId, data) {
         await bigqueryUtil.deleteTable(currentView.data.datasetId, currentView.data.name, false);
 
         // Updated related policies to remove the deleted table/view
-        const policyStatement = `INSERT INTO \`datashare.policy\` (rowId, policyId, name, description, isTableBased, datasets, rowAccessTags, createdBy, createdAt, isDeleted)
+        const policyStatement = `INSERT INTO \`datashare.policy\` (rowId, policyId, name, description, isTableBased, datasets, rowAccessTags, createdBy, createdAt, isDeleted, bigQueryEnabled, pubsubEnabled, storageEnabled, buckets, topics)
     WITH datasetRows as (
       SELECT rowId
       FROM \`datashare.currentPolicy\` cp
@@ -658,7 +663,12 @@ async function deleteDatasetView(projectId, datasetId, viewId, data) {
       rowAccessTags,
       @createdBy,
       CURRENT_TIMESTAMP() as createdAt,
-      isDeleted
+      isDeleted,
+      cp.bigQueryEnabled,
+      cp.pubsubEnabled,
+      cp.storageEnabled,
+      cp.buckets,
+      cp.topics
     FROM datasetRows dr
     JOIN \`datashare.currentPolicy\` cp on dr.rowId = cp.rowId
     LEFT JOIN policyDatasets pd on cp.rowId = pd.rowId;`;

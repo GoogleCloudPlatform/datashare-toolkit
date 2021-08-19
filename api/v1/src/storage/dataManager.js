@@ -63,6 +63,7 @@ async function createBucket(projectId, name) {
 /**
  * @param  {} projectId
  * @param  {} name
+ * TODO: Delete bucket from any associated policies
  */
 async function deleteBucket(projectId, name) {
     const storageUtil = new StorageUtil(projectId);

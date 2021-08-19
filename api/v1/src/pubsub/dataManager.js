@@ -63,6 +63,7 @@ async function createTopic(projectId, name) {
 /**
  * @param  {} projectId
  * @param  {} name
+ * TODO: Delete topic from any associated policies
  */
 async function deleteTopic(projectId, name) {
     const pubsubUtil = new PubSubUtil(projectId);
