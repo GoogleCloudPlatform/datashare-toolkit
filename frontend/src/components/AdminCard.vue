@@ -106,7 +106,7 @@ export default {
   methods: {
     initSchema() {
       this.dialogObject = { type: 'initSchema' };
-      console.log('Init schema clicked');
+      console.debug('Init schema clicked');
       this.dialogButtonConfirmText = 'Yes, Proceed';
       this.dialogButtonCancelText = 'No, Cancel';
       this.dialogCancelButtonEnabled = true;
@@ -121,32 +121,32 @@ export default {
       this.dialogButtonCancelText = 'No, Cancel';
       this.dialogCancelButtonEnabled = true;
       if (type === 'ALL') {
-        console.log('Sync all clicked');
+        console.debug('Sync all clicked');
         this.dialogTitle = 'Sync All?';
         this.dialogText =
           'Are you sure you want sync all Datashare managed objects?';
       } else if (type === 'BIGQUERY_PERMISSIONS') {
-        console.log('Sync BigQuery permissions clicked');
+        console.debug('Sync BigQuery permissions clicked');
         this.dialogTitle = 'Sync BigQuery Permissions?';
         this.dialogText =
           'Are you sure you want to sync all BigQuery permissions managed by Datashare?';
       } else if (type === 'BIGQUERY_VIEWS') {
-        console.log('Sync BigQuery views clicked');
+        console.debug('Sync BigQuery views clicked');
         this.dialogTitle = 'Sync BigQuery Views?';
         this.dialogText =
           'Are you sure you want to sync all BigQuery views managed by Datashare?';
       } else if (type === 'STORAGE_BUCKET_PERMISSIONS') {
-        console.log('Sync Storage Bucket permissions clicked');
+        console.debug('Sync Storage Bucket permissions clicked');
         this.dialogTitle = 'Sync Storage Bucket Permissions?';
         this.dialogText =
           'Are you sure you want to sync all Storage Bucket permissions managed by Datashare?';
       } else if (type === 'TOPIC_PERMISSIONS') {
-        console.log('Sync Pub/Sub Topic permissions clicked');
+        console.debug('Sync Pub/Sub Topic permissions clicked');
         this.dialogTitle = 'Sync Pub/Sub Topic Permissions?';
         this.dialogText =
           'Are you sure you want to sync all Pub/Sub Topic permissions managed by Datashare?';
       } else if (type === 'MARKETPLACE') {
-        console.log('Sync marketplace entitlements clicked');
+        console.debug('Sync marketplace entitlements clicked');
         this.dialogTitle = 'Sync Marketplace Entitlements?';
         this.dialogText =
           'Are you sure you want to sync all Marketplace entitlements managed by Datashare?';
@@ -154,7 +154,7 @@ export default {
       this.showDialog = true;
     },
     dialogConfirmed(object) {
-      console.log(`object returned from dialog is ${JSON.stringify(object)}`);
+      console.debug(`object returned from dialog is ${JSON.stringify(object)}`);
       if (object.type === 'sync') {
         this.loading = true;
         this.$store
@@ -214,7 +214,7 @@ export default {
       }
     },
     dialogCanceled(object) {
-      console.log(
+      console.debug(
         `cancel clicked for dialog object: ${JSON.stringify(object)}`
       );
     }
