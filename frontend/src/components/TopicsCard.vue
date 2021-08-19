@@ -19,7 +19,7 @@
         </v-row>
       </template>
       <template v-slot:top>
-        <v-toolbar flat color="white" class="mb-1">
+        <v-toolbar flat class="mb-1">
           <v-text-field
             v-model="search"
             clearable

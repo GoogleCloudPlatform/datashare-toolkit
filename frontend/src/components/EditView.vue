@@ -254,7 +254,7 @@
                   </v-row>
                 </template>
                 <template v-slot:top>
-                  <v-toolbar flat color="white">
+                  <v-toolbar flat>
                     <v-text-field
                       class="mb-4"
                       width="40px"

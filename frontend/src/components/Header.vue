@@ -82,6 +82,14 @@
       <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
+          <v-btn icon dark v-on="on" @click="toggleLightDarkMode">
+            <v-icon>{{ icons.themeLightDark }}</v-icon>
+          </v-btn>
+        </template>
+        <span>Toggle Light/Dark Mode</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
           <v-btn
             icon
             dark
@@ -152,7 +160,8 @@ import {
   mdiShieldKey,
   mdiShopping,
   mdiBriefcaseAccount,
-  mdiBucketOutline
+  mdiBucketOutline,
+  mdiThemeLightDark
 } from '@mdi/js';
 
 import { mapGetters } from 'vuex';
@@ -180,6 +189,7 @@ export default {
       home: mdiHome,
       hubSpot: mdiHubspot,
       settings: mdiCog,
+      themeLightDark: mdiThemeLightDark,
       verticalDots: mdiDotsVertical,
       viewGrid: mdiViewGrid,
       login: mdiLogin,
@@ -235,6 +245,9 @@ export default {
       if (reload === true) {
         this.$router.go();
       }
+    },
+    toggleLightDarkMode() {
+      this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
     }
   },
   computed: {
