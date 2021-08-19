@@ -204,6 +204,7 @@ export default {
     loading: false
   }),
   created() {
+    this.initLightDarkMode();
     this.loading = true;
     // Loads the managed project list. If the user isn't signed in, the list will initially return as empty.
     // Once the user signs in, the onAuthSuccess function will load this list.
@@ -246,8 +247,13 @@ export default {
         this.$router.go();
       }
     },
+    initLightDarkMode() {
+      const dark = localStorage.getItem('darkMode') === 'true';
+      this.$vuetify.theme.dark = dark;
+    },
     toggleLightDarkMode() {
       this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
+      localStorage.setItem('darkMode', this.$vuetify.theme.dark);
     }
   },
   computed: {
