@@ -1,5 +1,25 @@
 # Google Cloud Platform Release Notes for Marketplace VM Solution
 
+## 0.7.3 Release Notes
+* Build - 8/17/2021
+
+### Datashare
+* Datashare release version is 0.7.2
+* Kubernetes cluster version is 1.18
+
+### Marketplace Release Updates  
+* Updated the Debian VM base image to Debian 10
+* Updated VM startup script to update the GPG keys
+
+### Bug Fixes
+* Resolved the Ubuntu Repository errors.
+```
+Repository 'http://security.debian.org/debian-security buster/updates InRelease' changed its 'Suite' value from 'stable' to 'oldstable'
+Repository 'http://deb.debian.org/debian buster InRelease' changed its 'Version' value from '10.4' to '10.10'
+Repository 'http://deb.debian.org/debian buster InRelease' changed its 'Suite' value from 'stable' to 'oldstable'
+Repository 'http://deb.debian.org/debian buster-updates InRelease' changed its 'Suite' value from 'stable-updates' to 'oldstable-updates' 
+```
+
 ## 0.7.2 Release Notes
 * Build - 8/10/2021
 
@@ -32,7 +52,7 @@
 * Build - 6/3/2021
 
 ### Datashare
-* Kubernetes cluster version is 1.18 
+* Kubernetes cluster version is 1.18
   * https://cloud.google.com/kubernetes-engine/docs/release-notes
 
 ### Updates  
