@@ -34,7 +34,7 @@ gcloud run deploy ds-frontend-ui \
   --allow-unauthenticated \
   --platform managed \
   --max-instances 10 \
-  --update-env-vars=VUE_APP_GOOGLE_APP_CLIENT_ID="${OAUTH_CLIENT_ID}",VUE_APP_API_BASE_URL="https://${FQDN}/v1" \
+  --update-env-vars=VUE_APP_API_BASE_URL="https://${FQDN}/v1",VUE_APP_GOOGLE_APP_CLIENT_ID="${OAUTH_CLIENT_ID}" \
   --remove-env-vars=VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT,VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT,VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL,VUE_APP_PROJECT_ID,VUE_APP_MARKETPLACE_INTEGRATION
 
 # Delete old revisions
