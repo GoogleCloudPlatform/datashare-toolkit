@@ -243,7 +243,7 @@ async function productsRedirectionHandler(req, res) {
         projectId = p;
     }
 
-    res.redirect(cfg.uiBaseUrl + `/myProducts?${projectId}`);
+    res.redirect(cfg.uiBaseUrl + `/myProducts?projectId=${projectId}`);
 }
 
 module.exports = procurements;
