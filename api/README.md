@@ -730,7 +730,7 @@ Spot service environment:
     export SPOT_SERVICE_CONFIG_BUCKET_NAME=${BUCKET_NAME};
     export SPOT_SERVICE_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID};
 
-    npm run dev
+    npm run api
 
 
 ## Testing
