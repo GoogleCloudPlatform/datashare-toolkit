@@ -680,9 +680,9 @@ Before you apply the AuthZ policies, export the **DATA_PRODUCERS** environment v
     export DATA_PRODUCERS='"*@google.com"';
     export DATA_PRODUCERS="abc@xyz.com,my-trusted-app@my-gcp-project.iam.gserviceaccount.com"
 
-Additionally, export the **OAUTH_CLIENT_ID** environment variable that you created for the UI.
+Additionally, export the **OAUTH_CLIENT_ID** environment variable that you created for the UI during [CREDENTIAL_SETUP](https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/CREDENTIAL_SETUP.md#setting-up-oauth-credential) aka **VUE_APP_GOOGLE_APP_CLIENT_ID**
 
-    export OAUTH_CLIENT_ID="abc123..."
+    export OAUTH_CLIENT_ID=$VUE_APP_GOOGLE_APP_CLIENT_ID;
 
 Apply the authZ policies: \
 **Note**: `envsubst` will read the **PROJECT_ID**, **OAUTH_CLIENT_ID**, and **DATA_PRODUCERS** environment variable(s), substitute it in the template, then `kubectl` to apply the config:
@@ -710,25 +710,31 @@ You now have [authorization](#authorization) enabled for all endpoints and metho
 
 ## Development
 
-Navigate to the API version directory (*v1*, *v1*, etc.).
+Navigate to the API version directory (*v1*, etc.).
 
-Install Node 12.6
+Install Node 13.13
 
-    nvm install 12.6
+    nvm install 13.13
 
 Install the Node modules
 
     npm install
 
-Start the service.\
-**Note**: There are a few environment variables that need to be set before the application starts (see below). [Nodemon](https://nodemon.io/) is leveraged to read file changes and reload automatically.
+Set the environment variables\
+**Note**: There are a few environment variables that need to be set before the application starts (see below). These are added during the production deployment methods above (e.g. GCR, Deployment Manager)
 
+    export PROJECT_ID=`gcloud config list --format 'value(core.project)'`;
+    export OAUTH_CLIENT_ID=$VUE_APP_GOOGLE_APP_CLIENT_ID;
+    export DATA_PRODUCERS="*@google.com";
     export GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS};
 
-Spot service environment:
+Spot service environment variables
 
     export SPOT_SERVICE_CONFIG_BUCKET_NAME=${BUCKET_NAME};
     export SPOT_SERVICE_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID};
+
+Start the service\
+**Note**: [Nodemon](https://nodemon.io/) is leveraged to read file changes and reload automatically.
 
     npm run api
 
