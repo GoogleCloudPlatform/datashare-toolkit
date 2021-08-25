@@ -19,7 +19,7 @@ Datashare 2.0 is a major release that incorporates new delivery channels for Clo
 
 # Migrating
 - Run the [upgrade script](./UPGRADE.md)
-- Initialize database schema to perform table patches. Execute following scripts:
+- Initialize database schema to perform table patches. Execute the following scripts through the BigQuery command line or through the BigQuery [Console](https://console.cloud.google.com/bigquery). Ensure that you have the proper projectId selected before running.
     ```
     UPDATE `datashare.policy` set bigQueryEnabled = true WHERE isDeleted IS FALSE
     ```
