@@ -37,3 +37,9 @@ cd datashare-toolkit
 ```
 
 4. Go to the admin page https://datashare.your-domain.com/admin, and click 'INITIALIZE SCHEMA'.
+
+5. If you're upgrading to [Datashare 2.0](./DATASHARE_2-0.md) for the first time, you must also update the policy table, but running the following script.
+
+    ```
+    UPDATE `datashare.policy` set bigQueryEnabled = true WHERE isDeleted IS FALSE
+    ```
