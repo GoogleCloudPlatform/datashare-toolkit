@@ -63,6 +63,10 @@ export default {
         href: config.githubUrl
       },
       {
+        text: 'Datashare Overview',
+        href: 'https://cloud.google.com/solutions/financial-services/datashare'
+      },
+      {
         text: 'Consumer use-case',
         href:
           'https://cloud.google.com/blog/topics/financial-services/announcing-the-general-availability-of-datashare'
