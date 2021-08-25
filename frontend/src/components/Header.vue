@@ -79,7 +79,6 @@
         <img :src="require('@/assets/datashare-alpha-24px.svg')" alt="logo" />
       </v-avatar>
       <v-spacer></v-spacer>
-      <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
           <v-btn icon dark v-on="on" @click="toggleLightDarkMode">
