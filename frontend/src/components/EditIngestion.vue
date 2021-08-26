@@ -215,9 +215,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getTables', {
-          projectId: config.projectId,
-          datasetId: this.config.datasetId,
-          labelKey: 'cds_ingestion_managed'
+          datasetId: this.config.datasetId
         })
         .then(tables => {
           this.tables = tables;

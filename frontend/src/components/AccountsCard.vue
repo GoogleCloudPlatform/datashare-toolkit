@@ -22,7 +22,7 @@
         </v-row>
       </template>
       <template v-slot:top>
-        <v-toolbar flat color="white" class="mb-1">
+        <v-toolbar flat class="mb-1">
           <v-text-field
             v-model="search"
             clearable
@@ -54,10 +54,10 @@
           <span v-if="header.tooltip">{{ header.tooltip }}</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.createdAt="{ item }">
+      <template v-slot:[`item.createdAt`]="{ item }">
         {{ toLocalTime(item.createdAt) }}
       </template>
-      <template v-slot:item.policies="{ item }">
+      <template v-slot:[`item.policies`]="{ item }">
         <v-chip-group max="0" multiple column active-class="primary--text">
           <v-chip
             v-for="policy in item.policies.slice(0, 4)"
@@ -78,7 +78,10 @@
           </v-chip>
         </v-chip-group>
       </template>
-      <template v-if="this.showAddAccountButton" v-slot:item.action="{ item }">
+      <template
+        v-if="this.showAddAccountButton"
+        v-slot:[`item.action`]="{ item }"
+      >
         <v-tooltip top>
           <template v-slot:activator="{ on }">
             <v-icon v-on="on" small class="mr-2" @click="editItem(item)">
@@ -316,6 +319,7 @@ export default {
     if (this.selectedDataset) {
       this.showAddAccountButton = false;
     } else if (this.$route.query.datasetId) {
+      // eslint-disable-next-line vue/no-mutating-props
       this.selectedDataset = { datasetId: this.$route.query.datasetId };
     }
     this.loadAccounts();

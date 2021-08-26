@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 #
-# Copyright 2020 Google LLC
+# Copyright 2020-2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,10 +45,10 @@ cd "$(dirname "$0")"
 
 # Up to root
 cd ../
-gcloud builds submit --config api/v1alpha/api-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
+gcloud builds submit --config api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
-# Move to v1alpha
-cd api/v1alpha
+# Move to v1
+cd api/v1
 export NAMESPACE=datashare-apis
 export SERVICE_ACCOUNT_NAME=ds-api-mgr
 CLUSTER=datashare
@@ -85,6 +85,28 @@ gcloud run services update-traffic ds-api \
     --namespace $NAMESPACE \
     --platform gke
 
+# Delete old revisions
+DELETE_REVISIONS=`gcloud run revisions list \
+    --service ds-api \
+    --cluster $CLUSTER \
+    --cluster-location $ZONE \
+    --namespace $NAMESPACE \
+    --platform gke \
+    | awk 'NR > 4 {print $2}'`;
+
+if [ ! -z "$DELETE_REVISIONS" ]; then
+    for revision in $DELETE_REVISIONS
+    do
+        gcloud run revisions delete $revision \
+            --cluster $CLUSTER \
+            --cluster-location $ZONE \
+            --namespace $NAMESPACE \
+            --platform gke \
+            --async \
+            --quiet
+    done
+fi
+
 gcloud container clusters get-credentials $CLUSTER
 kubectl config current-context
 
@@ -108,7 +130,7 @@ cat istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
 
 if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
     cd ../../
-    gcloud builds submit --config api/v1alpha/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
+    gcloud builds submit --config api/v1/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
     # TODO: Switch to Managed Cloud Run when this issue is resolved
     # --no-cpu-throttling is not working through gcloud alpha
@@ -133,4 +155,26 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
         --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
         --platform gke \
         --service-account ${SERVICE_ACCOUNT_NAME}
+
+    # Delete old revisions
+    DELETE_REVISIONS=`gcloud run revisions list \
+        --service ds-listener \
+        --cluster $CLUSTER \
+        --cluster-location $ZONE \
+        --namespace $NAMESPACE \
+        --platform gke \
+        | awk 'NR > 4 {print $2}'`;
+
+    if [ ! -z "$DELETE_REVISIONS" ]; then
+        for revision in $DELETE_REVISIONS
+        do
+            gcloud run revisions delete $revision \
+                --cluster $CLUSTER \
+                --cluster-location $ZONE \
+                --namespace $NAMESPACE \
+                --platform gke \
+                --async \
+                --quiet
+        done
+    fi
 fi

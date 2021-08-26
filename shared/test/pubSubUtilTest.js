@@ -37,10 +37,7 @@ describe('PubSubUtil', () => {
 
         context('createTopic with arguments', () => {
             it("should return true", async () => {
-                await pubSubUtil.createTopic(uuid).then((result) => {
-                    expect(result).to.be.a('boolean');
-                    expect(result).to.equal(true);
-                }).then(() => {
+                await pubSubUtil.createTopic(uuid).then(() => {
                     return pubSubUtil.deleteTopic(uuid);
                 }).catch((reason) => {
                     expect.fail(`Failed: ${reason}`);

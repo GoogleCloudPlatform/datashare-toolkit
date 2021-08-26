@@ -19,7 +19,7 @@
         </v-row>
       </template>
       <template v-slot:top>
-        <v-toolbar flat color="white" class="mb-1">
+        <v-toolbar flat class="mb-1">
           <v-text-field
             v-model="search"
             clearable
@@ -42,9 +42,9 @@
           <span v-if="header.tooltip">{{ header.tooltip }}</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.modifiedAt="{ item }">
+      <template v-slot:[`item.modifiedAt`]="{ item }">
         {{ toLocalTime(item.modifiedAt) }} </template
-      ><template v-slot:item.viewAction="{ item }">
+      ><template v-slot:[`item.viewAction`]="{ item }">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
             <v-icon v-on="on" class="mr-2" @click="navigateToDataset(item)">
@@ -54,7 +54,7 @@
           <span>View in BigQuery</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.action="{ item }">
+      <template v-slot:[`item.action`]="{ item }">
         <v-menu bottom offset-y>
           <template v-slot:activator="{ on }">
             <v-icon v-on="on">{{ icons.dotsVertical }}</v-icon>

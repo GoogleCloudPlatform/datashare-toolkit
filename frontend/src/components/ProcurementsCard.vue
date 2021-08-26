@@ -21,7 +21,7 @@
         </v-row>
       </template>
       <template v-slot:top>
-        <v-toolbar flat color="white" class="mb-1">
+        <v-toolbar flat class="mb-1">
           <v-text-field
             v-model="search"
             clearable
@@ -57,15 +57,15 @@
           <span v-if="header.tooltip">{{ header.tooltip }}</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.email="{ item }">
+      <template v-slot:[`item.email`]="{ item }">
         {{ item.email || item.account }}
       </template>
-      <template v-slot:item.createTime="{ item }">
+      <template v-slot:[`item.createTime`]="{ item }">
         {{ toLocalTime(item.createTime) }}
       </template>
-      <template v-slot:item.updateTime="{ item }">
+      <template v-slot:[`item.updateTime`]="{ item }">
         {{ toLocalTime(item.updateTime) }} </template
-      ><template v-slot:item.action="{ item }">
+      ><template v-slot:[`item.action`]="{ item }">
         <v-tooltip
           top
           v-if="
@@ -128,86 +128,79 @@
       :cancelButtonEnabled="false"
       v-on:confirmed="showError = false"
     />
-    <v-row justify="center">
-      <v-dialog
-        v-if="showReviewProcurement"
-        v-model="showReviewProcurement"
-        persistent
-        max-width="450"
-      >
-        <v-card>
-          <v-card-title class="headline"
-            >Review Procurement Request</v-card-title
-          >
-          <v-card-text v-html="selectedItemSummary"></v-card-text>
-          <ValidationObserver ref="observer" v-slot="{}">
-            <v-form class="px-4">
-              <v-radio-group
-                v-model="approvalDialogData.approvalStatus"
-                :mandatory="false"
-              >
-                <v-radio
-                  v-if="selectedItem.state !== 'ENTITLEMENT_CANCELLED'"
-                  label="Reject"
-                  value="reject"
-                  color="red"
-                ></v-radio>
-                <v-radio
-                  v-if="
-                    selectedItem.state !== 'ENTITLEMENT_CANCELLED' &&
-                      selectedItem.state !==
-                        'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'
-                  "
-                  label="Comment"
-                  value="comment"
-                  color="amber"
-                ></v-radio>
-                <v-radio
-                  v-if="
-                    selectedItem.activated === true &&
-                      (selectedItem.state ===
-                        'ENTITLEMENT_ACTIVATION_REQUESTED' ||
-                        selectedItem.state ===
-                          'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL')
-                  "
-                  label="Approve"
-                  value="approve"
-                  color="green"
-                ></v-radio>
-              </v-radio-group>
-              <ValidationProvider
-                v-slot="{ errors }"
-                name="Comment"
-                rules="required"
+    <v-dialog
+      v-if="showReviewProcurement"
+      v-model="showReviewProcurement"
+      persistent
+      max-width="450"
+    >
+      <v-card>
+        <v-card-title class="headline">Review Procurement Request</v-card-title>
+        <v-card-text v-html="selectedItemSummary"></v-card-text>
+        <ValidationObserver ref="observer" v-slot="{}">
+          <v-form class="px-4">
+            <v-radio-group
+              v-model="approvalDialogData.approvalStatus"
+              :mandatory="false"
+            >
+              <v-radio
+                v-if="selectedItem.state !== 'ENTITLEMENT_CANCELLED'"
+                label="Reject"
+                value="reject"
+                color="red"
+              ></v-radio>
+              <v-radio
                 v-if="
-                  approvalDialogData.approvalStatus == 'comment' ||
-                    approvalDialogData.approvalStatus == 'reject'
+                  selectedItem.state !== 'ENTITLEMENT_CANCELLED' &&
+                    selectedItem.state !==
+                      'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL'
                 "
-              >
-                <v-textarea
-                  v-model="approvalDialogData.comment"
-                  :error-messages="errors"
-                  label="Comment"
-                  required
-                ></v-textarea>
-              </ValidationProvider>
-            </v-form>
-          </ValidationObserver>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="blue darken-1"
-              text
-              @click.stop="closeApprovalDialog()"
-              >Cancel</v-btn
+                label="Comment"
+                value="comment"
+                color="amber"
+              ></v-radio>
+              <v-radio
+                v-if="
+                  selectedItem.activated === true &&
+                    (selectedItem.state ===
+                      'ENTITLEMENT_ACTIVATION_REQUESTED' ||
+                      selectedItem.state ===
+                        'ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL')
+                "
+                label="Approve"
+                value="approve"
+                color="green"
+              ></v-radio>
+            </v-radio-group>
+            <ValidationProvider
+              v-slot="{ errors }"
+              name="Comment"
+              rules="required"
+              v-if="
+                approvalDialogData.approvalStatus == 'comment' ||
+                  approvalDialogData.approvalStatus == 'reject'
+              "
             >
-            <v-btn color="green darken-1" text @click.stop="submitApproval"
-              >Submit</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-row>
+              <v-textarea
+                v-model="approvalDialogData.comment"
+                :error-messages="errors"
+                label="Comment"
+                required
+              ></v-textarea>
+            </ValidationProvider>
+          </v-form>
+        </ValidationObserver>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click.stop="closeApprovalDialog()"
+            >Cancel</v-btn
+          >
+          <v-btn color="green darken-1" text @click.stop="submitApproval"
+            >Submit</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 

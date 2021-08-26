@@ -1,0 +1,18 @@
+title: "Datashare BigQuery Data Viewer Subscriber"
+description: "Datashare role for granting data viewer access to BigQuery objects"
+stage: "GA"
+includedPermissions:
+- bigquery.datasets.get
+- bigquery.datasets.getIamPolicy
+- bigquery.models.export
+- bigquery.models.getData
+- bigquery.models.getMetadata
+- bigquery.models.list
+- bigquery.routines.get
+- bigquery.routines.list
+- bigquery.tables.export
+- bigquery.tables.get
+- bigquery.tables.getData
+- bigquery.tables.getIamPolicy
+- bigquery.tables.list
+- resourcemanager.projects.get

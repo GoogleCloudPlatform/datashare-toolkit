@@ -21,7 +21,7 @@ const pubsub = require('@google-cloud/pubsub');
 class PubSubUtil {
     constructor(projectId) {
         const options = {
-            scopes:['https://www.googleapis.com/auth/cloud-platform']
+            scopes: ['https://www.googleapis.com/auth/cloud-platform']
         };
         if (projectId) {
             options.projectId = projectId;
@@ -35,15 +35,18 @@ class PubSubUtil {
     }
 
     /**
+     */
+    async getTopics() {
+        const [topics] = await this.pubsub.getTopics();
+        return topics;
+    }
+
+    /**
      * @param  {string} topicName
      * create topic by name and return true
      */
     async createTopic(topicName) {
-        await this.pubsub.createTopic(topicName);
-        if (this.VERBOSE_MODE) {
-            console.log(`Topic '${topicName}' created.`);
-        }
-        return true;
+        return this.pubsub.createTopic(topicName);
     }
 
     /**
@@ -51,11 +54,7 @@ class PubSubUtil {
      * delete topic by name and return true
      */
     async deleteTopic(topicName) {
-        await this.pubsub.topic(topicName).delete();
-        if (this.VERBOSE_MODE) {
-            console.log(`Topic '${topicName}' deleted.`);
-        }
-        return true;
+        return this.pubsub.topic(topicName).delete();
     }
 
     /**
@@ -98,6 +97,18 @@ class PubSubUtil {
         const response = await subscription.exists();
         const exists = response[0];
         return exists;
+    }
+
+    /**
+     * @param  {} topicName
+     */
+    async topicExists(topicName) {
+        const topic = this.pubsub.topic(topicName);
+        const exists = await topic.exists().catch((err) => {
+            console.error(err.message);
+            throw err;
+        });
+        return exists[0];
     }
 
     /**
@@ -159,6 +170,42 @@ class PubSubUtil {
             console.log(`Message '${messageId}' published to '${topicName}'.`);
         }
         return messageId;
+    }
+
+    /**
+     * @param  {} topicName
+     * https://googleapis.dev/nodejs/pubsub/latest/IAM.html#getPolicy
+     * https://github.com/googleapis/nodejs-pubsub/blob/master/samples/getTopicPolicy.js
+     */
+    async getTopicIamPolicy(topicName) {
+        const topic = this.pubsub.topic(topicName);
+        return topic.iam.getPolicy()
+            .then(function (data) {
+                const policy = data[0];
+                const apiResponse = data[1];
+                return policy;
+            }).catch((err) => {
+                console.error(err);
+                throw err;
+            });
+    }
+
+    /**
+     * @param  {} topicName
+     * @param  {} policy
+     * https://googleapis.dev/nodejs/pubsub/latest/IAM.html#setPolicy
+     * https://github.com/googleapis/nodejs-pubsub/blob/master/samples/setTopicPolicy.js
+     */
+    async setTopicIamPolicy(topicName, policy) {
+        const topic = this.pubsub.topic(topicName);
+        return topic.iam.setPolicy(policy).then(function (data) {
+            const policy = data[0];
+            const apiResponse = data[1];
+            return policy;
+        }).catch((err) => {
+            console.error(err);
+            throw err;
+        });
     }
 }
 

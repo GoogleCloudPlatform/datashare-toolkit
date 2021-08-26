@@ -15,6 +15,7 @@ You must have the values for the following variables:
 | --tag | No | The container image tag. | dev | dev |
 | --region | No | The GCP region for the deployments. | us-central1 | us-central1 |
 | --zone | No | The GCP zone for the deployments. | us-central1-a | us-central1-a |
+| --marketplace-enabled | No | Flag indicating that marketplace integration should be enabled | Not Applicable | Not Applicable |
 
 # Upgrading
 1. Clone the GitHub repo.
@@ -36,3 +37,9 @@ cd datashare-toolkit
 ```
 
 4. Go to the admin page https://datashare.your-domain.com/admin, and click 'INITIALIZE SCHEMA'.
+
+5. If you're upgrading to [Datashare 2.0](./DATASHARE_2-0.md) for the first time, you must also update the policy table, but running the following script.
+
+    ```
+    UPDATE `datashare.policy` set bigQueryEnabled = true WHERE isDeleted IS FALSE
+    ```

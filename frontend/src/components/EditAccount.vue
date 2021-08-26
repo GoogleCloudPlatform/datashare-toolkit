@@ -1,5 +1,5 @@
 <template>
-  <v-card class="px-4 py-4">
+  <v-card class="px-4" :loading="loading">
     <v-card-title v-if="userData">
       Edit Account
     </v-card-title>
@@ -181,9 +181,9 @@ export default {
       );
       const _userPolicies = JSON.parse(JSON.stringify(this.user.policies));
 
-      console.log(this.user.policies);
-      console.log(_initialSelectedPolicies);
-      console.log(_userPolicies);
+      console.debug(this.user.policies);
+      console.debug(_initialSelectedPolicies);
+      console.debug(_userPolicies);
 
       let added = [];
       let removed = [];
@@ -194,10 +194,10 @@ export default {
         // New record, handle all as added
         added = _userPolicies;
       }
-      console.log(`Added: ${JSON.stringify(added)}`);
-      console.log(`Removed: ${JSON.stringify(removed)}`);
+      console.debug(`Added: ${JSON.stringify(added)}`);
+      console.debug(`Removed: ${JSON.stringify(removed)}`);
       if (this.user.accountId && added.length === 0 && removed.length === 0) {
-        console.log('No policy changes made');
+        console.debug('No policy changes made');
         return false;
       } else {
         return true;

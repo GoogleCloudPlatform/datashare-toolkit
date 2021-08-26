@@ -44,7 +44,7 @@ class StorageUtil {
     async createFile(bucketName, fileName, contents, options) {
         const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
-        let opt =  {};
+        let opt = {};
         if (options) {
             opt = options;
         }
@@ -87,24 +87,14 @@ class StorageUtil {
      * Creates a Cloud Storage bucket and returns true.
      */
     async createBucket(bucketName) {
-        await this.storage.createBucket(bucketName);
-        if (this.VERBOSE_MODE) {
-            console.log(`Storage bucket '${bucketName}' created.`);
-        }
-        return true;
+        return this.storage.createBucket(bucketName);
     }
-    
+
     /**
      */
-    async listBuckets() {
+    async getBuckets() {
         const [buckets] = await this.storage.getBuckets();
-        if (this.VERBOSE_MODE) {
-            console.log('Buckets:');
-            buckets.forEach(bucket => {
-                console.log(bucket.name);
-            });
-        }
-        return buckets.map(b => b.name);
+        return buckets;
     }
 
     /**
@@ -112,26 +102,19 @@ class StorageUtil {
      * Delete a Cloud Storage bucket and return true.
      */
     async deleteBucket(bucketName) {
-        await this.storage.bucket(bucketName).delete();
-        if (this.VERBOSE_MODE) {
-            console.log(`Storage bucket '${bucketName}' deleted.`);
-        }
-        return true;
+        return this.storage.bucket(bucketName).delete();
     }
 
     /**
      * @param  {string} bucketName
      * Check if a bucket exists and return true/false.
      */
-    async checkIfBucketExists(bucketName) {
+    async bucketExists(bucketName) {
         const bucket = this.storage.bucket(bucketName);
         const exists = await bucket.exists().catch((err) => {
-            console.warn(err.message);
+            console.error(err.message);
             throw err;
         });
-        if (this.VERBOSE_MODE) {
-            console.log(`Storage bucket '${bucketName}' exists: '${exists[0]}'.`);
-        }
         return exists[0];
     }
 
@@ -159,16 +142,13 @@ class StorageUtil {
      * @param  {string} fileName
      * Check if a file exists and return true/false.
      */
-    async checkIfFileExists(bucketName, fileName) {
+    async fileExists(bucketName, fileName) {
         const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
         const exists = await file.exists().catch((err) => {
-            console.warn(err.message);
+            console.error(err.message);
             throw err;
         });
-        if (this.VERBOSE_MODE) {
-            console.log(`Storage bucket file '${fileName}' exists: '${exists[0]}'.`);
-        }
         return exists[0];
     }
 
@@ -218,7 +198,7 @@ class StorageUtil {
     async fetchFileContent(bucketName, fileName) {
         const bucket = this.storage.bucket(bucketName);
         const file = bucket.file(fileName);
-        const exists = await this.checkIfFileExists(bucketName, fileName);
+        const exists = await this.fileExists(bucketName, fileName);
         const buf = await file.download();
         const content = buf.toString('utf-8');
         if (this.VERBOSE_MODE) {
@@ -247,7 +227,7 @@ class StorageUtil {
             return url[0];
         }
     }
-    
+
     /**
      * @param  {} bucketName
      * @param  {} options
@@ -268,6 +248,42 @@ class StorageUtil {
             });
         }
         return files.map(f => f.name);
+    }
+
+    /**
+     * @param  {} bucketName
+     * https://googleapis.dev/nodejs/storage/latest/Iam.html#getPolicy
+     * https://github.com/googleapis/nodejs-storage/blob/master/samples/viewBucketIamMembers.js
+     */
+    async getBucketIamPolicy(bucketName) {
+        const bucket = this.storage.bucket(bucketName);
+        return bucket.iam.getPolicy({ requestedPolicyVersion: 3 })
+            .then(function (data) {
+                const policy = data[0];
+                const apiResponse = data[1];
+                return policy;
+            }).catch((err) => {
+                console.error(err);
+                throw err;
+            });
+    }
+
+    /**
+     * @param  {} bucketName
+     * @param  {} policy
+     * https://googleapis.dev/nodejs/storage/latest/Iam.html#setPolicy
+     * https://github.com/googleapis/nodejs-storage/blob/master/samples/addBucketIamMember.js
+     */
+    async setBucketIamPolicy(bucketName, policy) {
+        const bucket = this.storage.bucket(bucketName);
+        return bucket.iam.setPolicy(policy).then(function (data) {
+            const policy = data[0];
+            const apiResponse = data[1];
+            return policy;
+        }).catch((err) => {
+            console.error(err);
+            throw err;
+        });
     }
 }
 

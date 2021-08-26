@@ -32,8 +32,7 @@ This functionality so far is mainly to be used for non-marketplace integrated us
     ```
     cd api
     export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
-    CUSTOM_ROLE_NAME=custom.ds.api.mgr;
-    gcloud iam roles create ${CUSTOM_ROLE_NAME} --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml
+    gcloud iam roles create datashare.api.manager --project ${PROJECT_ID} --file config/ds-api-mgr-role-definition.yaml
     ```
 
-2. Grant access for role custom.ds.api.mgr to the service account running the main API and UI Cloud Run Services.
+2. Grant access for role datashare.api.manager to the service account running the main API and UI Cloud Run Services.

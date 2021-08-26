@@ -39,10 +39,10 @@ In order to create a data solution in Google Cloud Marketplace and sell it, foll
     * If you do not yet want to make your solution public in Google Cloud Marketplace, ensure the 'Hide solution from end users' checkbox is checked.
 5. Go to edit for 'SOLUTION DETAILS' and fill in the required information and click 'Save'.
 6. Go to edit for 'PLANS & FEATURES'. For more information on this section see [Plans & Features](#plans_and_features).
-    * For the Signup URL, use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/accounts:register```
+    * For the Signup URL, use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1/projects/[YOUR_GCP_PROJECT]/accounts:register```
     * Leave the Account Recovery URL empty.
     * Leave SSO Login disabled.
-    * For the Dashboard URL, use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/procurements:myProducts```
+    * For the Dashboard URL, use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1/projects/[YOUR_GCP_PROJECT]/procurements:myProducts```
     * Add your [service features](#service_features). Service features can be included in multiple plans.
     * Configure your [service plans](#service_plans). Service plans can encompass multiple features.
 7. (TODO: This is incomplete) Complete the billing on-boarding spreadsheet here - TBD. The billing setup process will take up to two weeks to complete. Reach out to the GCP Marketing Partner team for more information.

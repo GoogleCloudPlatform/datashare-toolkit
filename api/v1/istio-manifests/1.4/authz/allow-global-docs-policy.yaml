@@ -1,0 +1,16 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-docs-requests
+  namespace: datashare-apis
+spec:
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        methods:
+        - GET
+        paths:
+        - /v1/docs
+        - /v1/docs/*

@@ -232,13 +232,13 @@ runtime:
       description: Execute the following commands from Cloud Shell.  This confirms that the API is running.
       showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
-        curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha
+        curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1
 
     - heading: Test access to the Datashare API datasets
       description: Execute the following commands from Cloud Shell. This confirms the UI will be able to access the API.
       showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
-        curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1alpha/projects/gcp-financial-services-dev/datasets
+        curl -i -H "Host: ds-api.datashare-apis.example.com" ${GATEWAY_IP}/v1/projects/gcp-financial-services-dev/datasets
 
     - heading: Do you want to add your domain name to the GKE cluster?
       description: You must verify that you own the domain first. Execute the following from Cloud Shell.
@@ -274,13 +274,13 @@ runtime:
       description: Execute the following commands from Cloud Shell.  This confirms that the API is running.
       showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
-        curl -i https://YOUR_FQDN/v1alpha
+        curl -i https://YOUR_FQDN/v1
 
     - heading: Test access to the Datashare API datasets with your domain
       description: Execute the following commands from Cloud Shell. This confirms the UI will be able to access the API.
       showIf: '{{ properties().deployApiToGke }}'
       snippet: >-
-        curl -i -H https://YOUR_FQDN/v1alpha/projects/gcp-financial-services-dev/datasets
+        curl -i -H https://YOUR_FQDN/v1/projects/gcp-financial-services-dev/datasets
 
     - heading: Deployed with RuntimeConfig beta
       description: Datashare was deployed using the Google Cloud Platform RuntimeConfig beta release to install dependencies.

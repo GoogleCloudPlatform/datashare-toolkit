@@ -1,0 +1,62 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-data-producers
+  namespace: datashare-apis
+spec:
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        methods:
+        - GET
+        paths:
+        - /v1/datasets?*
+        - /v1/procurements
+        - /v1/procurements?*
+        - /v1/views
+    - operation:
+        methods:
+        - POST
+        paths:
+        - /v1/accounts:reset
+        - /v1/accounts:syncMarketplace
+        - /v1/admin:initSchema
+        - /v1/admin:syncResources
+        - /v1/datasets
+        - /v1/procurements/approve
+    - operation:
+        methods:
+        - DELETE
+        paths:
+        - /v1/pubsub/topics/*
+        - /v1/storage/buckets/*
+    - operation:
+        methods:
+        - GET
+        - POST
+        paths:
+        - /v1/accounts
+        - /v1/policies
+        - /v1/pubsub/topics
+        - /v1/storage/buckets
+    - operation:
+        methods:
+        - GET
+        - PUT
+        - DELETE
+        paths:
+        - /v1/accounts/*
+        - /v1/policies/*
+    - operation:
+        methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        paths:
+        - /v1/datasets/*
+    when:
+    - key: request.auth.claims[email]
+      values: [$DATA_PRODUCERS]

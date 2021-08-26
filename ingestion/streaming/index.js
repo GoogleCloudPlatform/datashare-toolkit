@@ -33,52 +33,50 @@ if (process.argv.length < 4) {
 const socketUrl = process.argv[2];
 const topicName = process.argv[3];
 const WebSocket = require('ws');
-const {PubSub} = require('@google-cloud/pubsub');
+const { PubSub } = require('@google-cloud/pubsub');
 const pubsub = new PubSub();
 const ws = new WebSocket(socketUrl);
 let topic = undefined;
 
-const publishMessages = function() {
+const publishMessages = function () {
     let topic = pubsub.topic(topicName);
     ws.on('open', open);
     ws.on('message', inbound);
     ws.on('close', close);
-}
+};
 
-const open = function() {
+const open = function () {
     console.error('Web socket connection opened');
-}
+};
 
 const inbound = function (data) {
     try {
         let payload = Buffer.from(data);
-        topic.publisher.publish(payload,
-                                { origin: socketUrl },
-                                function(err, messageId) {
-             if (err) {
-                 console.error(`error in publish callback: ${err}`);
-             }
-         });
-     } catch(error) {
-         console.error(`caught error publishing message: ${error}`);
-     }
- }
+        topic.publisher.publish(payload, { origin: socketUrl }, (err, messageID) => {
+            if (err) {
+                console.error(`error in publish callback: ${err}`);
+            }
+        });
+    } catch (error) {
+        console.error(`caught error publishing message: ${error}`);
+    }
+};
 
-const close = function() {
+const close = function () {
     console.error('Web socket connection closed');
     process.exit(1);
-}
+};
 
 try {
     topic = pubsub.topic(topicName);
-    topic.exists(function(err, exists) {
+    topic.exists((err, exists) => {
         if (err) {
             console.error(`Error looking for specified topic ${topicName}: ${error}`);
             process.exit(1);
         } else {
             if (!exists) {
                 console.error(`Topic ${topicName} not found, creating...`);
-                topic.create(function (err, topic, apiResponse) {
+                topic.create((err, topic, apiResponse) => {
                     if (err) {
                         console.error(`Could not create non-existent topic ${topicName}: ${apiResponse} ${err}`);
                         process.exit(1);
@@ -86,13 +84,13 @@ try {
                         console.error(`Created topic ${topicName}`);
                         publishMessages();
                     }
-                }); 
+                });
             } else {
                 publishMessages();
             }
         }
     });
-} catch(error) {
+} catch (error) {
     console.error(`Error: ${error}`);
     process.exit(1);
 }

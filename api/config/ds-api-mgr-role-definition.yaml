@@ -1,5 +1,5 @@
-title: "Datashare Manager Role"
-description: "Custom Datashare API role to interface with GCP services"
+title: "Datashare API Manager Role"
+description: "Datashare API role to interface with GCP services"
 stage: "GA"
 includedPermissions:
 - bigquery.datasets.create
@@ -7,7 +7,10 @@ includedPermissions:
 - bigquery.datasets.get
 - bigquery.datasets.update
 - bigquery.jobs.create
+- bigquery.routines.create
+- bigquery.routines.delete
 - bigquery.routines.get
+- bigquery.routines.update
 - bigquery.tables.create
 - bigquery.tables.delete
 - bigquery.tables.export
@@ -24,9 +27,22 @@ includedPermissions:
 - pubsub.subscriptions.create
 - pubsub.subscriptions.get
 - pubsub.topics.attachSubscription
+- pubsub.topics.create
+- pubsub.topics.delete
+- pubsub.topics.get
+- pubsub.topics.getIamPolicy
+- pubsub.topics.list
+- pubsub.topics.setIamPolicy
+- pubsub.topics.update
 - resourcemanager.projects.get
 - serviceusage.services.list
+- storage.buckets.create
+- storage.buckets.delete
+- storage.buckets.get
+- storage.buckets.getIamPolicy
 - storage.buckets.list
+- storage.buckets.setIamPolicy
+- storage.buckets.update
 - storage.objects.create
 - storage.objects.get
 - storage.objects.list

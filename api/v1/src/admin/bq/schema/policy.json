@@ -1,0 +1,167 @@
+{
+    "description": "Datashare Policy Table",
+    "schema": [
+        {
+            "mode": "REQUIRED",
+            "name": "rowId",
+            "type": "STRING",
+            "description": "Unique row identifier"
+        },
+        {
+            "mode": "REQUIRED",
+            "name": "policyId",
+            "type": "STRING",
+            "description": "Unique policy identifier"
+        },
+        {
+            "mode": "REQUIRED",
+            "name": "name",
+            "type": "STRING",
+            "description": "Display name for policy"
+        },
+        {
+            "mode": "REQUIRED",
+            "name": "description",
+            "type": "STRING",
+            "description": "Description for the policy"
+        },
+        {
+            "name": "bigQueryEnabled",
+            "type": "BOOLEAN",
+            "mode": "NULLABLE",
+            "description": "Indicates if BigQuery sharing is enabled"
+        },
+        {
+            "name": "pubsubEnabled",
+            "type": "BOOLEAN",
+            "mode": "NULLABLE",
+            "description": "Indicates if Pub/Sub Topic sharing is enabled"
+        },
+        {
+            "name": "storageEnabled",
+            "type": "BOOLEAN",
+            "mode": "NULLABLE",
+            "description": "Indicates if Cloud Storage bucket sharing is enabled"
+        },
+        {
+            "mode": "NULLABLE",
+            "name": "isTableBased",
+            "type": "BOOLEAN",
+            "description": "The flag to indicate if the policy is table-based otherwise dataset-based"
+        },
+        {
+            "fields": [
+                {
+                    "mode": "REQUIRED",
+                    "name": "datasetId",
+                    "type": "STRING",
+                    "description": "Dataset identifier of dataset that policy will grant access to"
+                },
+                {
+                    "name": "tables",
+                    "type": "RECORD",
+                    "mode": "REPEATED",
+                    "description": "List of table(s) associations for a policy",
+                    "fields": [
+                        {
+                            "name": "tableId",
+                            "type": "STRING",
+                            "mode": "REQUIRED",
+                            "description": "Table identifier of table that policy will grant access to"
+                        }
+                    ]
+                }
+            ],
+            "mode": "REPEATED",
+            "name": "datasets",
+            "type": "RECORD",
+            "description": "List of dataset(s) associations for a policy"
+        },
+        {
+            "fields": [
+                {
+                    "mode": "REQUIRED",
+                    "name": "tag",
+                    "type": "STRING",
+                    "description": "Row Access Tag name"
+                }
+            ],
+            "mode": "REPEATED",
+            "name": "rowAccessTags",
+            "type": "RECORD",
+            "description": "List of row access tag(s) associations for a policy"
+        },
+        {
+            "description": "List of topic(s) associations for a policy",
+            "fields": [
+                {
+                    "description": "Topic identifier of topic that policy will grant access to",
+                    "mode": "NULLABLE",
+                    "name": "topicId",
+                    "type": "STRING"
+                }
+            ],
+            "mode": "REPEATED",
+            "name": "topics",
+            "type": "RECORD"
+        },
+        {
+            "description": "List of bucket(s) associations for a policy",
+            "fields": [
+                {
+                    "description": "Bucket name bucket that policy will grant access to",
+                    "mode": "NULLABLE",
+                    "name": "bucketName",
+                    "type": "STRING"
+                }
+            ],
+            "mode": "REPEATED",
+            "name": "buckets",
+            "type": "RECORD"
+        },
+        {
+            "description": "Marketplace integration data",
+            "fields": [
+                {
+                    "description": "The solutionId to associate to the policy",
+                    "mode": "REQUIRED",
+                    "name": "solutionId",
+                    "type": "STRING"
+                },
+                {
+                    "description": "The planId to associate to the policy",
+                    "mode": "REQUIRED",
+                    "name": "planId",
+                    "type": "STRING"
+                },
+                {
+                    "description": "The flag indicates if the purchase through Marketplace should be auto-approved and entitled for the subscriber.",
+                    "mode": "REQUIRED",
+                    "name": "enableAutoApprove",
+                    "type": "BOOLEAN"
+                }
+            ],
+            "mode": "NULLABLE",
+            "name": "marketplace",
+            "type": "RECORD"
+        },
+        {
+            "mode": "REQUIRED",
+            "name": "createdBy",
+            "type": "STRING",
+            "description": "The email address the policy row entry was created by"
+        },
+        {
+            "mode": "REQUIRED",
+            "name": "createdAt",
+            "type": "TIMESTAMP",
+            "description": "The timestamp the policy row entry was created at"
+        },
+        {
+            "mode": "NULLABLE",
+            "name": "isDeleted",
+            "type": "BOOLEAN",
+            "description": "The flag to indicate the policy was deleted"
+        }
+    ]
+}

@@ -1,0 +1,7 @@
+title: "Datashare Storage Object Viewer Subscriber"
+description: "Datashare role for granting object viewer access to Cloud Storage objects"
+stage: "GA"
+includedPermissions:
+- resourcemanager.projects.get
+- storage.objects.get
+- storage.objects.list

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+'use strict';
+
 import Vue from 'vue';
 import config from '../config';
 import store from '../store';

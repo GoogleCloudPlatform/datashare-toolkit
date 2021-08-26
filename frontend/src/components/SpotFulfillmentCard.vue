@@ -161,9 +161,7 @@ export default {
       this.loading = true;
       this.$store
         .dispatch('getTables', {
-          projectId: config.projectId,
-          datasetId: this.$route.query.datasetId,
-          labelKey: 'datashare_managed'
+          datasetId: this.$route.query.datasetId
         })
         .then(tables => {
           this.views = tables;

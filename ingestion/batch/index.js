@@ -138,7 +138,7 @@ async function processFile(options, throws) {
  * Executes the SQL transformation.
  */
 async function transform(config) {
-    const transformExists = await storageUtil.checkIfFileExists(config.bucket, config.bucketPath.transform);
+    const transformExists = await storageUtil.fileExists(config.bucket, config.bucketPath.transform);
 
     let transformQuery = "*";
     if (transformExists === true) {

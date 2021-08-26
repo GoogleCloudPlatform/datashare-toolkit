@@ -79,7 +79,14 @@
         <img :src="require('@/assets/datashare-alpha-24px.svg')" alt="logo" />
       </v-avatar>
       <v-spacer></v-spacer>
-      <v-spacer></v-spacer>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-btn icon dark v-on="on" @click="toggleLightDarkMode">
+            <v-icon>{{ icons.themeLightDark }}</v-icon>
+          </v-btn>
+        </template>
+        <span>Toggle Light/Dark Mode</span>
+      </v-tooltip>
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
           <v-btn
@@ -137,6 +144,7 @@ import {
   mdiAccountCircle,
   mdiBell,
   mdiDatabase,
+  mdiDog,
   mdiDotsVertical,
   mdiHelpCircle,
   mdiLogin,
@@ -147,14 +155,12 @@ import {
   mdiViewGrid,
   mdiApplicationImport,
   mdiHubspot,
-  mdiBookOpen,
   mdiBadgeAccount,
-  mdiPoliceBadge,
-  mdiAccount,
   mdiShieldKey,
-  mdiAccountMultipleCheck,
   mdiShopping,
-  mdiBriefcaseAccount
+  mdiBriefcaseAccount,
+  mdiBucketOutline,
+  mdiThemeLightDark
 } from '@mdi/js';
 
 import { mapGetters } from 'vuex';
@@ -176,11 +182,13 @@ export default {
       accountMultiple: mdiAccountMultiple,
       bell: mdiBell,
       database: mdiDatabase,
+      dog: mdiDog,
       import: mdiApplicationImport,
       helpCircle: mdiHelpCircle,
       home: mdiHome,
       hubSpot: mdiHubspot,
       settings: mdiCog,
+      themeLightDark: mdiThemeLightDark,
       verticalDots: mdiDotsVertical,
       viewGrid: mdiViewGrid,
       login: mdiLogin,
@@ -195,6 +203,7 @@ export default {
     loading: false
   }),
   created() {
+    this.initLightDarkMode();
     this.loading = true;
     // Loads the managed project list. If the user isn't signed in, the list will initially return as empty.
     // Once the user signs in, the onAuthSuccess function will load this list.
@@ -236,6 +245,28 @@ export default {
       if (reload === true) {
         this.$router.go();
       }
+    },
+    initLightDarkMode() {
+      const dark = localStorage.getItem('darkMode') === 'true';
+      this.$vuetify.theme.dark = dark;
+
+      const _vm = this;
+      window
+        .matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', event => {
+          if (event.matches) {
+            // dark mode
+            _vm.$vuetify.theme.dark = true;
+          } else {
+            // light mode
+            _vm.$vuetify.theme.dark = false;
+          }
+          localStorage.setItem('darkMode', _vm.$vuetify.theme.dark);
+        });
+    },
+    toggleLightDarkMode() {
+      this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
+      localStorage.setItem('darkMode', this.$vuetify.theme.dark);
     }
   },
   computed: {
@@ -268,7 +299,7 @@ export default {
           icon: mdiHome
         },
         {
-          section: 'Batch',
+          section: 'Channels',
           name: 'datasets',
           title: 'Datasets',
           icon: mdiDatabase
@@ -277,6 +308,16 @@ export default {
           name: 'views',
           title: 'Authorized Views',
           icon: mdiViewGrid
+        },
+        {
+          name: 'topics',
+          title: 'Pub/Sub Topics',
+          icon: mdiDog
+        },
+        {
+          name: 'buckets',
+          title: 'Storage Buckets',
+          icon: mdiBucketOutline
         },
         {
           section: 'Entitlements',

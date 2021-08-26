@@ -20,7 +20,7 @@
         </v-row>
       </template>
       <template v-slot:top>
-        <v-toolbar flat color="white" class="mb-1">
+        <v-toolbar flat class="mb-1">
           <v-text-field
             v-model="search"
             clearable
@@ -35,13 +35,13 @@
           >
         </v-toolbar>
       </template>
-      <template v-slot:item.schemaFileFound="{ item }">
+      <template v-slot:[`item.schemaFileFound`]="{ item }">
         {{ item.schemaFileFound ? item.schemaFileFound : false }}
       </template>
-      <template v-slot:item.transformFileFound="{ item }">
+      <template v-slot:[`item.transformFileFound`]="{ item }">
         {{ item.transformFileFound ? item.transformFileFound : false }}
       </template>
-      <template v-slot:item.action="{ item }">
+      <template v-slot:[`item.action`]="{ item }">
         <v-icon small class="mr-2" @click="navigateEditIngestion(item)">
           edit
         </v-icon>

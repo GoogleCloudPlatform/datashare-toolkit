@@ -45,8 +45,8 @@ In order to create a data solution in Google Cloud Marketplace and sell it, foll
 11. Click 'SUBMIT'.
 12. Go to the 'Technical integration' menu item.
 13. Link the Datashare service account for both the 'Partner Procurement API integration' and the 'Cloud Pub/Sub integration'. IE: ds-api-mgr@[YOUR_PROJECT_ID].iam.gserviceaccount.com. Click 'NEXT'.
-14. For the Sign up URL, use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/accounts:register```
-15. Leave SSO Login disabled, for the 'Login URL', use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1alpha/projects/[YOUR_GCP_PROJECT]/procurements:myProducts```, and click 'SUBMIT'.
+14. For the Sign up URL, use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1/projects/[YOUR_GCP_PROJECT]/accounts:register```
+15. Leave SSO Login disabled, for the 'Login URL', use the following: ```https://[YOUR_DATASHARE_API_DOMAIN]/v1/projects/[YOUR_GCP_PROJECT]/procurements:myProducts```, and click 'SUBMIT'.
 
 ### <a name="producer_portal_link_policy">Link Datashare Policy</a>
 In order Marketplace purchases to work, you need to associate marketplace pricing plans to Datashare policies. There are two fields within the Datashare policy form to link a Marketplace solution, they are Solution Id and Plan Id.

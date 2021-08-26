@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 #
-# Copyright 2020 Google LLC
+# Copyright 2020-2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,5 +34,23 @@ gcloud run deploy ds-frontend-ui \
   --allow-unauthenticated \
   --platform managed \
   --max-instances 10 \
-  --update-env-vars=VUE_APP_GOOGLE_APP_CLIENT_ID="${OAUTH_CLIENT_ID}",VUE_APP_API_BASE_URL="https://${FQDN}/v1alpha" \
+  --update-env-vars=VUE_APP_API_BASE_URL="https://${FQDN}/v1",VUE_APP_GOOGLE_APP_CLIENT_ID="${OAUTH_CLIENT_ID}" \
   --remove-env-vars=VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT,VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT,VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL,VUE_APP_PROJECT_ID,VUE_APP_MARKETPLACE_INTEGRATION
+
+# Delete old revisions
+DELETE_REVISIONS=`gcloud run revisions list \
+    --service ds-frontend-ui \
+    --region ${REGION} \
+    --platform managed \
+    | awk 'NR > 4 {print $2}'`;
+
+if [ ! -z "$DELETE_REVISIONS" ]; then
+    for revision in $DELETE_REVISIONS
+    do
+        gcloud run revisions delete $revision \
+            --region ${REGION} \
+            --platform managed \
+            --async \
+            --quiet
+    done
+fi

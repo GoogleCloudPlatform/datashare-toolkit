@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="loading" class="px-4">
+  <v-card class="px-4" :loading="loading">
     <v-card-title v-if="view.authorizedViewId">
       Edit Authorized View
     </v-card-title>
@@ -254,7 +254,7 @@
                   </v-row>
                 </template>
                 <template v-slot:top>
-                  <v-toolbar flat color="white">
+                  <v-toolbar flat>
                     <v-text-field
                       class="mb-4"
                       width="40px"
@@ -274,7 +274,7 @@
                     >
                   </v-toolbar>
                 </template>
-                <template v-slot:item.action="{ item }">
+                <template v-slot:[`item.action`]="{ item }">
                   <v-icon small @click="deleteDataset(item)">
                     delete
                   </v-icon>

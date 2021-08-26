@@ -1,0 +1,7 @@
+title: "Datashare Pub/Sub Topic Subscriber"
+description: "Datashare role for granting attach subscription access to Pub/Sub topics"
+stage: "GA"
+includedPermissions:
+- pubsub.snapshots.seek
+- pubsub.subscriptions.consume
+- pubsub.topics.attachSubscription

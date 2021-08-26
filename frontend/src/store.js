@@ -1,3 +1,21 @@
+/**
+ * Copyright 2020-2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+'use strict';
+
 import Vue from 'vue';
 import Vuex from 'vuex';
 import client from 'api-client';
@@ -119,11 +137,7 @@ const store = new Vuex.Store({
     // eslint-disable-next-line no-unused-vars
     createDataset({ commit }, payload) {
       return client
-        .createDataset(
-          payload.projectId,
-          payload.datasetId,
-          payload.description
-        )
+        .createDataset(payload.datasetId, payload.description)
         .then(result => result)
         .catch(error => {
           notify(error);
@@ -132,11 +146,7 @@ const store = new Vuex.Store({
     // eslint-disable-next-line no-unused-vars
     updateDataset({ commit }, payload) {
       return client
-        .updateDataset(
-          payload.projectId,
-          payload.datasetId,
-          payload.description
-        )
+        .updateDataset(payload.datasetId, payload.description)
         .then(result => result)
         .catch(error => {
           notify(error);
@@ -144,11 +154,9 @@ const store = new Vuex.Store({
     },
     // eslint-disable-next-line no-unused-vars
     deleteDataset({ commit }, payload) {
-      return client
-        .deleteDataset(payload.projectId, payload.datasetId)
-        .catch(error => {
-          notify(error);
-        });
+      return client.deleteDataset(payload.datasetId).catch(error => {
+        notify(error);
+      });
     },
     // eslint-disable-next-line no-unused-vars
     getAccounts({ commit }, payload) {
@@ -227,16 +235,14 @@ const store = new Vuex.Store({
     },
     // eslint-disable-next-line no-unused-vars
     getTables({ commit }, payload) {
-      return client
-        .getTables(payload.projectId, payload.datasetId, payload.labelKey)
-        .catch(error => {
-          notify(error);
-        });
+      return client.getTables(payload.datasetId).catch(error => {
+        notify(error);
+      });
     },
     // eslint-disable-next-line no-unused-vars
     getTableColumns({ commit }, payload) {
       return client
-        .getTableColumns(payload.projectId, payload.datasetId, payload.tableId)
+        .getTableColumns(payload.datasetId, payload.tableId)
         .catch(error => {
           notify(error);
         });
@@ -345,6 +351,48 @@ const store = new Vuex.Store({
     // eslint-disable-next-line no-unused-vars
     getProjectConfiguration({ commit }, payload) {
       return client.getProjectConfiguration().catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getBuckets({ commit }, payload) {
+      return client.getBuckets().catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    createBucket({ commit }, payload) {
+      return client
+        .createBucket(payload.name)
+        .then(result => result)
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
+    deleteBucket({ commit }, payload) {
+      return client.deleteBucket(payload.name).catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getTopics({ commit }, payload) {
+      return client.getTopics().catch(error => {
+        notify(error);
+      });
+    },
+    // eslint-disable-next-line no-unused-vars
+    createTopic({ commit }, payload) {
+      return client
+        .createTopic(payload.name)
+        .then(result => result)
+        .catch(error => {
+          notify(error);
+        });
+    },
+    // eslint-disable-next-line no-unused-vars
+    deleteTopic({ commit }, payload) {
+      return client.deleteTopic(payload.topicId).catch(error => {
         notify(error);
       });
     }

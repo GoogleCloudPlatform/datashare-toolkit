@@ -19,7 +19,7 @@
         </v-row>
       </template>
       <template v-slot:top>
-        <v-toolbar flat color="white" class="mb-1">
+        <v-toolbar flat class="mb-1">
           <v-text-field
             v-model="search"
             clearable
@@ -42,17 +42,17 @@
           <span v-if="header.tooltip">{{ header.tooltip }}</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.createdAt="{ item }">
+      <template v-slot:[`item.createdAt`]="{ item }">
         {{ toLocalTime(item.createdAt) }}
       </template>
-      <template v-slot:item.datasetAccess="{ item }">
+      <template v-slot:[`item.datasetAccess`]="{ item }">
         <v-chip-group multiple column active-class="primary--text">
           <v-chip v-for="tag in item.datasetAccess" :key="tag">
             {{ tag }}
           </v-chip>
         </v-chip-group>
       </template>
-      <template v-slot:item.action="{ item }">
+      <template v-slot:[`item.action`]="{ item }">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
             <v-icon small v-on="on" class="mr-2" @click="editItem(item)">

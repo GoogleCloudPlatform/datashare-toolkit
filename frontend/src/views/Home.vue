@@ -1,11 +1,11 @@
 <template>
   <div id="welcome">
     <v-img
-      :src="require('../assets/ds-architecture.png')"
+      :src="require('../assets/datashare-colored36px.svg')"
       contain
       height="300"
     ></v-img>
-    <Welcome msg="Welcome to the Datashare UI" />
+    <Welcome msg="Welcome to Datashare" />
   </div>
 </template>
 
