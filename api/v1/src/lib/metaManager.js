@@ -32,12 +32,22 @@ const filters = {
  * @param  {} fullRefresh
  * @param  {} filter
  */
-async function performPolicyUpdates(projectId, policyIds, fullRefresh, filter) {
+async function performPolicyUpdates(projectId, policyIds, fullRefresh, filter, options) {
     let bq = false;
     let cs = false;
     let ps = false;
 
-    if (filter == null) {
+    if (options) {
+        if (options.refreshBigQuery === true) {
+            bq = true;
+        }
+        if (options.refreshCloudStorage === true) {
+            cs = true;
+        }
+        if (options.refreshPubSubTopics === true) {
+            ps = true;
+        }
+    } else if (filter == null) {
         // Apply all
         bq = true;
         cs = true;
