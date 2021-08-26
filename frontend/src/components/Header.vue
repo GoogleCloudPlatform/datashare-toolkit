@@ -249,6 +249,20 @@ export default {
     initLightDarkMode() {
       const dark = localStorage.getItem('darkMode') === 'true';
       this.$vuetify.theme.dark = dark;
+
+      const _vm = this;
+      window
+        .matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', event => {
+          if (event.matches) {
+            // dark mode
+            _vm.$vuetify.theme.dark = true;
+          } else {
+            // light mode
+            _vm.$vuetify.theme.dark = false;
+          }
+          localStorage.setItem('darkMode', _vm.$vuetify.theme.dark);
+        });
     },
     toggleLightDarkMode() {
       this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
