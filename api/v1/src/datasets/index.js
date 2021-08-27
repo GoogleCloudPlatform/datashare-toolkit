@@ -159,7 +159,7 @@ datasets.get('/datasets', async(req, res) => {
  *     produces:
  *       - application/json
  *     responses:
- *       200:
+ *       201:
  *         description: Dataset
  *         schema:
  *           type: object
@@ -975,7 +975,7 @@ datasets.post('/datasets/:datasetId/views:validate', async(req, res) => {
  *     produces:
  *       - application/json
  *     responses:
- *       200:
+ *       201:
  *         description: View
  *         schema:
  *           type: object

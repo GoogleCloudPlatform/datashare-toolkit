@@ -90,6 +90,11 @@ var admin = express.Router();
  *     operationId: initSchema
  *     tags:
  *       - admin
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     produces:
  *       - application/json
  *     responses:

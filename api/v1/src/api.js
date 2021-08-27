@@ -37,7 +37,7 @@ const options = {
         info: {
             description: 'This is the Datashare API service that provides data producers the ability to expose subsets of their datasets programatically.',
             title: 'Datashare API Service', // Title (required)
-            version: '0.0.1', // Version (required)
+            version: '1.0.0', // Version (required)
             contact: {
                 email: 'no-reply@google.com'
             },
@@ -46,22 +46,6 @@ const options = {
                 url: 'https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/LICENSE.txt'
             }
         },
-        // OAS v3
-        /*
-        servers: [{
-            url: '{serverUrl}/{basePath}',
-            variables: {
-                serverUrl: {
-                    default: 'http://localhost:' + PORT,
-                    description: 'Customer provided serverUrl (protocol://hostname:port) for the service'
-                },
-                basePath: {
-                    default: apiVersion,
-                    description: 'Customer provided basePath for the service'
-                }
-            }
-        }],
-        */
         // Swagger 2.0
         // host: 'localhost:' + PORT / This defaults to the host url of the content
         basePath: '/' + apiVersion,
@@ -72,7 +56,7 @@ const options = {
         },
         // API GW Integration
         'x-google-backend': {
-            address: 'DS_API_URL'
+            address: 'https://' + 'FQDN'
         },
         security: [{
             // ## OAuth scopes are currenty ignored by API Gateway [here](https://cloud.google.com/endpoints/docs/openapi/openapi-limitations#scopes_ignored)
@@ -98,8 +82,8 @@ const options = {
                 },
                 'x-google-issuer': 'https://accounts.google.com',
                 'x-google-jwks_uri': 'https://www.googleapis.com/oauth2/v3/certs',
-                // ## x-google-audiences should be set to $abc.com, $DS_API_URL if not specified
-                'x-google-audiences': 'CLIENT_ID'
+                // ## x-google-audiences should be set to $abc.com, https://FQDNif not specified
+                'x-google-audiences': 'OAUTH_CLIENT_ID'
             },
             // ## Google Identity Provider
             'google2': {
@@ -111,8 +95,8 @@ const options = {
                 },
                 'x-google-issuer': 'accounts.google.com',
                 'x-google-jwks_uri': 'https://www.googleapis.com/oauth2/v3/certs',
-                // ## x-google-audiences should be set to $abc.com, $DS_API_URL if not specified
-                'x-google-audiences': 'CLIENT_ID'
+                // ## x-google-audiences should be set to $abc.com, $FQDN if not specified
+                'x-google-audiences': 'OAUTH_CLIENT_ID'
             },
             // ## Firebase Identity Provider
             'firebase': {
@@ -137,13 +121,25 @@ const options = {
                 },
                 'x-google-issuer': 'https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com',
                 'x-google-jwks_uri': 'https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com',
-                // ## Marketplace requires the domain name for your DS_API, eg. $DS_API_URL [here](https://cloud.google.com/marketplace/docs/partners/integrated-saas/frontend-integration?hl=en#verify-jwt)
-                'x-google-audiences': 'DS_API_URL'
+                // ## Marketplace requires the domain name for your DS API, eg. abc.com, $FQDN, etc. [here](https://cloud.google.com/marketplace/docs/partners/integrated-saas/frontend-integration?hl=en#verify-jwt)
+                'x-google-audiences': 'FQDN'
             },
         },
     },
     // Path to the API docs
-    apis: ['./api.js', './src/index.js', './*/index.js', './src/*/index.js']
+    apis: [
+        './api.js',
+        './src/api.js',
+        './src/accounts/index.js',
+        './src/admin/index.js',
+        './src/datasets/index.js',
+        './src/policies/index.js',
+        './src/procurements/index.js',
+        './src/pubsub/index.js',
+        './src/resources/index.js',
+        './src/spots/index.js',
+        './src/storage/index.js',
+    ]
 };
 
 const swaggerOptions = {
