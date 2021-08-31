@@ -41,7 +41,7 @@
         "eslint": "^5.16.0",
         "eslint-plugin-promise": "^4.2.1",
         "mocha": "^6.1.4",
-        "nodemon": "^1.19",
+        "nodemon": "^2.0.12",
         "supertest": "^4.0.2"
     },
     "repository": {
