@@ -2,13 +2,13 @@ swagger: '2.0'
 info:
   description: This is the Datashare API service that provides data producers the ability to expose subsets of their datasets programatically.
   title: Datashare API Service
-  version: 0.0.1
+  version: 1.0.0
   contact:
     email: no-reply@google.com
   license:
     name: Apache 2.0
     url: https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/LICENSE.txt
-basePath: /v1alpha
+basePath: /v1
 schemes:
   - http
   - https
@@ -16,7 +16,7 @@ externalDocs:
   description: Find out more about Datashare Toolkit
   url: https://github.com/GoogleCloudPlatform/datashare-toolkit
 x-google-backend:
-  address: DS_API_URL
+  address: https://FQDN
 security:
   - google: []
   - google2: []
@@ -35,7 +35,7 @@ securityDefinitions:
       https://www.googleapis.com/auth/cloud-platform: default
     x-google-issuer: https://accounts.google.com
     x-google-jwks_uri: https://www.googleapis.com/oauth2/v3/certs
-    x-google-audiences: CLIENT_ID
+    x-google-audiences: OAUTH_CLIENT_ID
   google2:
     type: oauth2
     authorizationUrl: https://accounts.google.com/o/oauth2/v2/auth
@@ -44,7 +44,7 @@ securityDefinitions:
       https://www.googleapis.com/auth/cloud-platform: default
     x-google-issuer: accounts.google.com
     x-google-jwks_uri: https://www.googleapis.com/oauth2/v3/certs
-    x-google-audiences: CLIENT_ID
+    x-google-audiences: OAUTH_CLIENT_ID
   firebase:
     type: oauth2
     flow: application
@@ -62,7 +62,7 @@ securityDefinitions:
       https://www.googleapis.com/auth/cloud-platform: default
     x-google-issuer: https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com
     x-google-jwks_uri: https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com
-    x-google-audiences: DS_API_URL
+    x-google-audiences: FQDN
 paths:
   /welcome:
     options:
@@ -586,6 +586,11 @@ paths:
       operationId: initSchema
       tags:
         - admin
+      parameters:
+        - in: header
+          name: x-gcp-project-id
+          type: string
+          required: true
       produces:
         - application/json
       responses:
@@ -741,7 +746,7 @@ paths:
       produces:
         - application/json
       responses:
-        '200':
+        '201':
           description: Dataset
           schema:
             type: object
@@ -1201,7 +1206,7 @@ paths:
       produces:
         - application/json
       responses:
-        '200':
+        '201':
           description: View
           schema:
             type: object
@@ -2002,6 +2007,164 @@ paths:
       responses:
         '301':
           description: Redirect to My Products URL
+  /pubsub/topics:
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      operationId: optionsPubSubTopics
+      security: []
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Methods:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+    get:
+      summary: List PubSub Topics based
+      description: Returns the PubSub Topic response
+      operationId: listPubSubTopics
+      tags:
+        - pubsub
+      parameters:
+        - in: header
+          name: x-gcp-project-id
+          type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: PubSub Topic Response
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                description: Success of the request
+              code:
+                type: integer
+                default: 200
+                description: HTTP status code
+              data:
+                type: object
+                items:
+                  $ref: '#/definitions/PubSubTopic'
+        '500':
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create PubSub Topic based off PubSubTopic Object
+      description: Returns the PubSub Topic response
+      operationId: createPubSubTopic
+      tags:
+        - pubsub
+      parameters:
+        - in: header
+          name: x-gcp-project-id
+          type: string
+          required: true
+        - in: body
+          name: pubsubtopic
+          description: Request parameters for PubSub Topic
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: PubSub Topic Name
+      produces:
+        - application/json
+      responses:
+        '201':
+          description: PubSub Topic Response
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                description: Success of the request
+              code:
+                type: integer
+                default: 200
+                description: HTTP status code
+              data:
+                type: object
+                items:
+                  $ref: '#/definitions/PubSubTopic'
+        '500':
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+  /pubsub/topics/{name}:
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      operationId: optionsDeletePubSubTopicByName
+      security: []
+      parameters:
+        - in: path
+          name: name
+          type: string
+          required: true
+          description: PubSub Topic Name of the request
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Methods:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+    delete:
+      summary: Delete PubSub Topic based off PubSub Topic Name
+      description: Returns the PubSub Topic response
+      operationId: deletePubSubTopicByName
+      tags:
+        - pubsub
+      parameters:
+        - in: path
+          name: name
+          type: string
+          required: true
+          description: PubSub Topic Name of the request
+        - in: header
+          name: x-gcp-project-id
+          type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: PubSub Topic Response
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                description: Success of the request
+              code:
+                type: integer
+                default: 200
+                description: HTTP status code
+              data:
+                type: object
+                items:
+                  $ref: '#/definitions/PubSubTopic'
+        '500':
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
   /resources/projects:
     options:
       summary: CORS support
@@ -2298,6 +2461,164 @@ paths:
                 description: list of Spot errors
                 items:
                   type: string
+  /storage/buckets:
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      operationId: optionsStorageBuckets
+      security: []
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Methods:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+    get:
+      summary: List Storage Buckets based
+      description: Returns the Storage Bucket response
+      operationId: listStorageBuckets
+      tags:
+        - storage
+      parameters:
+        - in: header
+          name: x-gcp-project-id
+          type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Storage Bucket Response
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                description: Success of the request
+              code:
+                type: integer
+                default: 200
+                description: HTTP status code
+              data:
+                type: object
+                items:
+                  $ref: '#/definitions/StorageBucket'
+        '500':
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create Storage Bucket based off StorageBucket Object
+      description: Returns the Storage Bucket response
+      operationId: createStorageBucket
+      tags:
+        - storage
+      parameters:
+        - in: header
+          name: x-gcp-project-id
+          type: string
+          required: true
+        - in: body
+          name: storagebuckets
+          description: Request parameters for Storage Bucket
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Storage Bucket Name
+      produces:
+        - application/json
+      responses:
+        '201':
+          description: Storage Bucket Response
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                description: Success of the request
+              code:
+                type: integer
+                default: 200
+                description: HTTP status code
+              data:
+                type: object
+                items:
+                  $ref: '#/definitions/StorageBucket'
+        '500':
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+  /storage/buckets/{name}:
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      operationId: optionsDeleteStorageBucketByName
+      security: []
+      parameters:
+        - in: path
+          name: name
+          type: string
+          required: true
+          description: Storage Bucket Name of the request
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Methods:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+    delete:
+      summary: Delete Storage Bucket based off Storage Bucket Name
+      description: Returns the Storage Bucket response
+      operationId: deleteStorageBucketByName
+      tags:
+        - storage
+      parameters:
+        - in: path
+          name: name
+          type: string
+          required: true
+          description: Storage Bucket Name of the request
+        - in: header
+          name: x-gcp-project-id
+          type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Storage Bucket Response
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                description: Success of the request
+              code:
+                type: integer
+                default: 200
+                description: HTTP status code
+              data:
+                type: object
+                items:
+                  $ref: '#/definitions/StorageBucket'
+        '500':
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
   Error:
     type: object
@@ -2488,6 +2809,16 @@ definitions:
         description: Entitlement Id of the purchased SKU
     required:
       - eventType
+  PubSubTopic:
+    type: object
+    description: PubSub Topic object
+    properties:
+      topicId:
+        type: string
+        description: Topic ID
+      topicName:
+        type: string
+        description: Topic Name
   ProjectResource:
     type: object
     description: Project Resource object
@@ -2607,6 +2938,16 @@ definitions:
       - bucketName
       - fileName
       - signedUrl
+  StorageBucket:
+    type: object
+    description: Storage Bucket object
+    properties:
+      bucketId:
+        type: string
+        description: Bucket ID
+      bucketName:
+        type: string
+        description: Bucket Name
 responses: {}
 parameters: {}
 tags:

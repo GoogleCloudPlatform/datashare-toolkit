@@ -13,8 +13,8 @@
   * [Deploy to Cloud Run](#deploy-to-cloud-run)
 * [Deployment](#deployment)
   * [Deploy Cloud Run](#deploy-cloud-run)
-    * [Deploy Cloud Run Anthos](#deploy-cloud-run-anthos)
     * [Deploy Cloud Run Managed](#deploy-cloud-run-managed)
+    * [Deploy Cloud Run Anthos](#deploy-cloud-run-anthos)
   * [Deploy Kubernetes](#deploy-kubernetes)
   * [Deploy App Engine](#deploy-app-engine)
 * [Security](#security)
@@ -198,7 +198,11 @@ You can deploy the API service via various methods below based off developer pre
   * [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/) via [Skaffold](https://github.com/GoogleContainerTools/skaffold)
   * [Google Cloud App Engine](https://cloud.google.com/appengine/) via [Deployment Manager](https://cloud.google.com/deployment-manager/) and gcloud - TODO
 
-[Deploy Cloud Run](#deploy-cloud-run) on [Anthos](https://cloud.google.com/run/docs/choosing-a-platform#cloud-run-for-anthos) is the _required_ method to enabled fine-grained authorization with [Istio](http://istio.io/). [Managed](https://cloud.google.com/run/docs/choosing-a-platform#cloud-run-fully-managed)is the _preferred_ method to quickly host the DS API Service content and generate a unique URL for consumption.
+[Deploy Cloud Run](#deploy-cloud-run) has two options [Deploy Cloud Run - Managed](#deploy-cloud-run-managed) and [Deploy Cloud Run - Anthos](#deploy-cloud-run-anthos).
+
+* The [Managed](https://cloud.google.com/run/docs/choosing-a-platform#cloud-run-fully-managed) is the _preferred_ technology to deploy, host, and generate a unique URL for consumption. The [API Gateway](https://cloud.google.com/api-gateway) is leverage for fine-grained authorization and security enforcement for the DS API service on Cloud Run Managed.
+
+* [Anthos](https://cloud.google.com/run/docs/choosing-a-platform#cloud-run-for-anthos) is the self-managed Cloud Run deployment on GKE that leverages [Istio](http://istio.io/) for the fine-grained authorization and security enforcement.
 
 There are some environment variables that need to be set for all build and deployment options.
 
@@ -224,9 +228,164 @@ Build with Cloud Build and TAG:
 **Note**: Cloud Build needs to run from parent directory for build context and the [shared](../shared) directory
 
     cd ../../
-    gcloud builds submit --config api/v1/cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
+    gcloud builds submit --config api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 [Enable the APIs](https://console.cloud.google.com/flows/enableapi?apiid=cloudapis.googleapis.com,container.googleapis.com,run.googleapis.com) before beginning
+
+
+### Deploy Cloud Run Managed
+
+Deploy with Cloud Run (Managed): \
+**Note**: There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--set-env-vars) provides details for how they are set.
+
+* Deploy the service
+* Setup API Gateway
+* Create API Gateway Config
+* Create the API Gateway
+* Map custom domain to the service (optional)
+
+Set REGION and ZONE environmental variables
+
+    REGION=us-central1
+    ZONE=us-central1-a
+    gcloud config set compute/zone $ZONE
+
+#### Deploy the service
+
+Deploy the DS API service in Cloud Run (managed)
+
+    gcloud run deploy ds-api \
+        --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
+        --region=$REGION \
+        --no-allow-unauthenticated \
+        --platform managed \
+        --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+
+Open the app URL in your browser. You can return the FQDN via:
+
+    gcloud run services describe ds-api --platform managed --region $REGION --format="value(status.url)"
+
+#### Setup API Gateway
+
+The [Cloud API Gateway](https://cloud.google.com/api-gateway) is preferred AuthN/AuthZ technology for security the Datashare API when deployed via Cloud Run (managed). The following steps will configure an API Gateway and the approriate IAM controls for securing access to the Datashare API.
+
+Enable APIs
+
+These are the GCP project APIs that require the API Gateway service(s) access.
+
+    gcloud services enable apigateway.googleapis.com
+    gcloud services enable servicemanagement.googleapis.com
+    gcloud services enable servicecontrol.googleapis.com
+
+#### Service Account
+
+Create a new SA for securing communication from the API Gateway to the DS API service in Cloud Run (managed)
+
+Set your PROJECT_ID if you have not already:
+
+    export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
+
+Set the API_GW_SERVICE_ACCOUNT_NAME environment variable(s):
+
+    export API_GW_SERVICE_ACCOUNT_NAME=api-gw-ds-api;
+
+Set the SERVICE_ACCOUNT_DESC environment variable(s):
+
+    export API_GW_SERVICE_ACCOUNT_DESC="API GW Datashare API";
+
+Create the custom API GW Datashare API service-account:
+
+    gcloud iam service-accounts create ${API_GW_SERVICE_ACCOUNT_NAME} --display-name "${API_GW_SERVICE_ACCOUNT_DESC}";
+
+Bind the *roles/run.invoker* the API GW SA to the DS API service in the same region ${API_GW_SERVICE_ACCOUNT_NAME}
+
+    gcloud run services add-iam-policy-binding ds-api \
+      --member=serviceAccount:${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
+      --role=roles/run.invoker \
+      --region=$REGION
+
+#### Validate API via Impersontation
+
+This step is optional, but you can validate a SA permissions by imperonsting the SA and make an authorized API call to the GW.
+
+Set the ACCOUNT_EMAIL environment variable:
+
+    export ACCOUNT_EMAIL=`gcloud config list account --format "value(core.account)"`; echo $ACCOUNT_EMAIL
+
+Bind the *roles/iam.serviceAccountTokenCreator* role to ACCOUNT_EMAIL and the API_GW_SERVICE_ACCOUNT_NAME
+
+    gcloud iam service-accounts add-iam-policy-binding ${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com  \
+        --member user:${ACCOUNT_EMAIL} --role="roles/iam.serviceAccountTokenCreator"
+
+Get an Impersonated Access token:
+
+    TOKEN=`gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email`; echo $TOKEN
+
+Set the DS_API_URL environment variable:
+
+    export DS_API_URL=`gcloud run services describe ds-api --platform managed --region=$REGION --format="value(status.url)"`; echo $DS_API_URL
+
+Verify 403 response (w/o Auth header)
+
+    curl -i $DS_API_URL/v1/welcome
+
+Verify 200 with Auth header
+
+    curl -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email)" -i $DS_API_URL/v1/welcome
+
+#### Create API Gateway Config
+The API Gateway requires an OpenAPI specification for creating the API Gateway Config. Currently, it only supports OpenAPI v2 spec (aka Swagger). You can can use the latest OAS YAML [here](./config/openapi_spec.v2.yaml.tmpl) or dynamically generate JSON via `http://{HOSTNAME}/{API_VERSION}/docs/openapi_spec`, but will need to convert from JSON to YAML. e.g.
+
+    curl -H "Authorization: Bearer $TOKEN" $DS_API_URL/v1/docs/openapi_spec -o temp/ds-api_oas.json
+
+Copy the OAS v2 template:
+
+    cp ./config/openapi_spec.v2.yaml.tmpl ds-api_oas.yaml
+
+You need to modify the FQDN, PROJECT_ID, and OAUTH_CLIENT_ID variables for the `x-google-backend` parameter to the open api spec with the following environment variables. \
+**Note** The FQDN is either the API domain configured or the DS_API_URL withouth the 'https://' prefix. e.g `export FQDN=$(echo $DS_API_URL | sed 's!https://!!'); echo $FQDN`
+
+    sed -i.bak "s|FQDN|$FQDN|" ds-api_oas.yaml
+
+    sed -i.bak "s|PROJECT_ID|$PROJECT_ID|" ds-api_oas.yaml
+
+    sed -i.bak "s|OAUTH_CLIENT_ID|$VUE_APP_GOOGLE_APP_CLIENT_ID|" ds-api_oas.yaml
+
+Create a new API config from the yaml file. Add the API GW SA as the `--backend-auth-service-account`.
+
+    gcloud api-gateway api-configs create api-gw-ds-api --api=api-gw-ds-api --openapi-spec=ds-api_oas.yaml --backend-auth-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+
+List the API GW's API Config
+
+    gcloud api-gateway api-configs list
+
+#### Create API Gateway
+
+Create the API Gateway in the same region as the DS API service
+
+    gcloud api-gateway gateways create api-gw-ds-api --api=api-gw-ds-api --api-config=api-gw-ds-api --location $REGION
+
+Check status
+
+    gcloud api-gateway gateways describe api-gw-ds-api --location $REGION
+
+Get the URL
+
+    export API_GW_URL=`gcloud api-gateway gateways describe api-gw-ds-api --location $REGION --format "value(defaultHostname)"`; echo $API_GW_URL
+
+#### Validate API Gateway
+
+Check that CORS requests work (w/o Authorization header)
+
+    curl -i -X OPTIONS https://$API_GW_URL/v1/welcome
+
+To test the Google Identity Provider, *https://accounts.google.com*, you can leverage `gcloud` but can only add custom '--audiences' with the `gcloud auth print-identity-token` command using a SA. This can be any service account you have the *roles/iam.serviceAccountTokenCreator* role applied to it.
+
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$VUE_APP_GOOGLE_APP_CLIENT_ID)" https://$API_GW_URL/v1/welcome
+
+To test the other Google Identity Provider (without https://), *accounts.google.com*, you need to generate an ID Token from the google-auth-login library. i.e. Test the API_GW_URL in the DS Frontend UI
+
+
 
 ### Deploy Cloud Run Anthos
 Deploy with Cloud Run (Anthos) requires the following GKE [setup](https://cloud.google.com/run/docs/gke/setup) configuration items to be completed before deploying.
@@ -496,33 +655,6 @@ You should also be able to verify the DS API can communicate with GCP services:
 
     curl -i http://${FQDN}/v1/projects/${PROJECT_ID}/datasets
 
-
-### Deploy Cloud Run Managed
-Deploy with Cloud Run (Managed): \
-**Note**: There are a few environment variables that need to be set before the application starts (see below). [gcloud run deploy](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--set-env-vars) provides details for how they are set.\
-The GCP project's Cloud IAM policy, *constraints/iam.allowedPolicyMemberDomains* or *Domain Restricted Sharing* must be disabled to allow unauthenticated requests to reach Cloud Run services with the `--allow-unauthenticated` parameter. This policy is currently the default setting as described [here](https://cloud.google.com/resource-manager/docs/organization-policy/org-policy-constraints).
-
-    gcloud run deploy ds-api \
-        --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
-        --region=us-central1 \
-        --allow-unauthenticated \
-        --platform managed \
-        --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
-
-Spot service environment:
-
-    gcloud run deploy ds-api \
-        --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
-        --region=us-central1 \
-        --allow-unauthenticated \
-        --platform managed \
-        --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
-        --set-env-vars=SPOT_SERVICE_CONFIG_BUCKET_NAME=${BUCKET_NAME} \
-        --set-env-vars=SPOT_SERVICE_CONFIG_DESTINATION_PROJECT_ID=${PROJECT_ID}
-
-Open the app URL in your browser. You can return the FQDN via:
-
-    gcloud run services describe ds-api --platform managed --format="value(status.url)"
 
 #### Confirm your API is running
 
