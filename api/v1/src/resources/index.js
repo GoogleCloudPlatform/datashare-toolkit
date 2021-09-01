@@ -33,13 +33,19 @@ var resources = express.Router();
  * @param  {} res
  */
 resources.get('/resources/projects', async (req, res) => {
-    const code = 200;
-    // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
-    const list = await runtimeConfig.getManagedProjects();
-    const data = { success: true, projects: list };
-    res.status(code).json({
-        ...data
-    });
+    try {
+        const code = 200;
+        // https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
+        const list = await runtimeConfig.getManagedProjects();
+        const data = { success: true, projects: list };
+        res.status(code).json({
+            ...data
+        });
+    } catch (err) {
+        console.error(err);
+        const data = { success: false, code: 500, errors: ['Unable to retrieve managed projects.'] };
+        res.status(500).json(data);
+    }
 });
 
 /**
@@ -48,15 +54,21 @@ resources.get('/resources/projects', async (req, res) => {
  * @param  {} res
  */
 resources.get('/resources/configuration', async (req, res) => {
-    const projectId = req.header('x-gcp-project-id');
-    let token = req.header('Authorization');
-    token = token.split(" ")[1];
-    const c = await dataManager.getConfiguration(projectId, token);
-    const data = { success: true, configuration: c };
-    const code = 200;
-    res.status(code).json({
-        ...data
-    });
+    try {
+        const projectId = req.header('x-gcp-project-id');
+        let token = req.header('Authorization');
+        token = token.split(" ")[1];
+        const c = await dataManager.getConfiguration(projectId, token);
+        const data = { success: true, configuration: c };
+        const code = 200;
+        res.status(code).json({
+            ...data
+        });
+    } catch (err) {
+        console.error(err);
+        const data = { success: false, code: 500, errors: ['Unable to retrieve configuration. Ensure that a proper JWT token is passed in the Authorization header and that the OAuth Client Id is properly configured on the backend.'] };
+        res.status(500).json(data);
+    }
 });
 
 module.exports = resources;
