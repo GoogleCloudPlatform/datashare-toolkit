@@ -195,6 +195,12 @@ router.post('/pubsub/topics', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsDeletePubSubTopicByName
  *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: name
+ *       type: string
+ *       required: true
+ *       description: PubSub Topic Name of the request
  *     produces:
  *       - application/json
  *     responses:

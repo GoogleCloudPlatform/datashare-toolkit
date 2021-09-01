@@ -196,6 +196,12 @@ router.post('/storage/buckets', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsDeleteStorageBucketByName
  *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: name
+ *       type: string
+ *       required: true
+ *       description: Storage Bucket Name of the request
  *     produces:
  *       - application/json
  *     responses:

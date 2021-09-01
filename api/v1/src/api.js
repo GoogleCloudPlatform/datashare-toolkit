@@ -236,9 +236,11 @@ router.all('*', cors(), verifyProject);
  *       errors:
  *         type: array
  *         items:
- *           type: string
+ *           type: object
  *           properties:
- *             message: message string
+ *             message:
+ *               type: string
+ *               description: message string
  *
  */
 
