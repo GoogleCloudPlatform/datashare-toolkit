@@ -16,7 +16,7 @@ externalDocs:
   description: Find out more about Datashare Toolkit
   url: https://github.com/GoogleCloudPlatform/datashare-toolkit
 x-google-backend:
-  address: https://FQDN
+  address: https://DS_API_FQDN
 security:
   - google: []
   - google2: []
@@ -62,7 +62,7 @@ securityDefinitions:
       https://www.googleapis.com/auth/cloud-platform: default
     x-google-issuer: https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com
     x-google-jwks_uri: https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com
-    x-google-audiences: FQDN
+    x-google-audiences: DS_API_FQDN
 paths:
   /welcome:
     options:

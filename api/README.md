@@ -259,9 +259,12 @@ Deploy the DS API service in Cloud Run (managed)
         --region=$REGION \
         --no-allow-unauthenticated \
         --platform managed \
-        --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+        --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
+        --update-env-vars=OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID},DATA_PRODUCERS=${DATA_PRODUCERS} \
+        --remove-env-vars=PROJECT_ID,MARKETPLACE_INTEGRATION
 
-Open the app URL in your browser. You can return the FQDN via:
+
+Open the app URL in your browser. You can return the DS API FQDN via:
 
     gcloud run services describe ds-api --platform managed --region $REGION --format="value(status.url)"
 
@@ -333,6 +336,10 @@ Verify 200 with Auth header
 
     curl -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email)" -i $DS_API_URL/v1/welcome
 
+Verify 200 with Auth header and JWT aud
+
+    curl -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$VUE_APP_GOOGLE_APP_CLIENT_ID)" -i $DS_API_URL/v1/resources/configuration
+
 #### Create API Gateway Config
 The API Gateway requires an OpenAPI specification for creating the API Gateway Config. Currently, it only supports OpenAPI v2 spec (aka Swagger). You can can use the latest OAS YAML [here](./config/openapi_spec.v2.yaml.tmpl) or dynamically generate JSON via `http://{HOSTNAME}/{API_VERSION}/docs/openapi_spec`, but will need to convert from JSON to YAML. e.g.
 
@@ -342,10 +349,10 @@ Copy the OAS v2 template:
 
     cp ./config/openapi_spec.v2.yaml.tmpl ds-api_oas.yaml
 
-You need to modify the FQDN, PROJECT_ID, and OAUTH_CLIENT_ID variables for the `x-google-backend` parameter to the open api spec with the following environment variables. \
-**Note** The FQDN is either the API domain configured or the DS_API_URL withouth the 'https://' prefix. e.g `export FQDN=$(echo $DS_API_URL | sed 's!https://!!'); echo $FQDN`
+You need to modify the DS_API_FQDN, PROJECT_ID, and OAUTH_CLIENT_ID variables for the `x-google-backend` parameter to the open api spec with the following environment variables. \
+**Note** The DS_API_FQDN is either the API domain configured or the DS_API_URL withouth the 'https://' prefix. e.g `export DS_API_FQDN=$(echo $DS_API_URL | sed 's!https://!!'); echo $DS_API_FQDN`
 
-    sed -i.bak "s|FQDN|$FQDN|" ds-api_oas.yaml
+    sed -i.bak "s|DS_API_FQDN|$DS_API_FQDN|" ds-api_oas.yaml
 
     sed -i.bak "s|PROJECT_ID|$PROJECT_ID|" ds-api_oas.yaml
 
@@ -381,9 +388,42 @@ Check that CORS requests work (w/o Authorization header)
 
 To test the Google Identity Provider, *https://accounts.google.com*, you can leverage `gcloud` but can only add custom '--audiences' with the `gcloud auth print-identity-token` command using a SA. This can be any service account you have the *roles/iam.serviceAccountTokenCreator* role applied to it.
 
-    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$VUE_APP_GOOGLE_APP_CLIENT_ID)" https://$API_GW_URL/v1/welcome
+Verify 200 with Auth header
+
+    curl -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email)" -i $API_GW_URL/v1/welcome
+
+Verify 200 with Auth header and JWT aud
+
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$VUE_APP_GOOGLE_APP_CLIENT_ID)" https://$API_GW_URL/v1/resources/configuration
 
 To test the other Google Identity Provider (without https://), *accounts.google.com*, you need to generate an ID Token from the google-auth-login library. i.e. Test the API_GW_URL in the DS Frontend UI
+
+**Development**
+
+Change directories to [frontend](../frontend)
+
+    cd ../frontend
+
+Set the VUE_APP_API_BASE_URL environment variable
+
+    export VUE_APP_API_BASE_URL=https://$API_GW_URL/v1
+
+Start the service\
+**Note**: [Nodemon](https://nodemon.io/) is leveraged to read file changes and reload automatically.
+
+    npm run serve
+
+**Production**
+
+Set the VUE_APP_API_BASE_URL environment variable
+
+    export VUE_APP_API_BASE_URL=https://$API_GW_URL/v1
+
+Update the UI Cloud Run instance
+
+    gcloud run services update ds-frontend-ui --region=$REGION  --platform=managed --update-env-vars VUE_APP_API_BASE_URL=$VUE_APP_API_BASE_URL
+
+Login to UI and verify no 401 errors
 
 
 
