@@ -75,10 +75,6 @@
         :loading="loading"
       ></v-select>
       <v-spacer></v-spacer>
-      <v-avatar :tile="true" height="25" width="25">
-        <img :src="require('@/assets/datashare-alpha-24px.svg')" alt="logo" />
-      </v-avatar>
-      <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
           <v-btn icon dark v-on="on" @click="toggleLightDarkMode">
@@ -160,7 +156,9 @@ import {
   mdiShopping,
   mdiBriefcaseAccount,
   mdiBucketOutline,
-  mdiThemeLightDark
+  mdiThemeLightDark,
+  mdiLifebuoy,
+  mdiViewDashboardOutline
 } from '@mdi/js';
 
 import { mapGetters } from 'vuex';
@@ -294,9 +292,9 @@ export default {
     navigationItems() {
       let items = [
         {
-          name: 'home',
-          title: 'Home',
-          icon: mdiHome
+          name: 'dashboard',
+          title: 'Dashboard',
+          icon: mdiViewDashboardOutline
         },
         {
           section: 'Channels',
@@ -352,6 +350,11 @@ export default {
           name: 'admin',
           title: 'Admin',
           icon: mdiShieldKey
+        },
+        {
+          name: 'links',
+          title: 'Links',
+          icon: mdiLifebuoy
         }
       ];
       // https://router.vuejs.org/api/#to

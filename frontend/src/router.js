@@ -24,8 +24,8 @@ import config from './config';
 const routerOptions = [
   {
     path: '/',
-    name: 'home',
-    component: 'Home'
+    name: 'dashboard',
+    component: 'Dashboard'
   },
   {
     path: '/restricted',
@@ -162,6 +162,11 @@ const routerOptions = [
     path: '/404',
     name: '404',
     component: '404'
+  },
+  {
+    path: '/links',
+    name: 'links',
+    component: 'Links'
   }
 ];
 

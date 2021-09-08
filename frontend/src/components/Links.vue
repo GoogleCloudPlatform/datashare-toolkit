@@ -9,7 +9,6 @@
         below
       </p>
     </v-flex>
-
     <v-flex xs12 mb-5>
       <h2 class="headline font-weight-bold mb-2">Documentation</h2>
       <v-layout justify-center>
@@ -24,7 +23,6 @@
         </a>
       </v-layout>
     </v-flex>
-
     <v-flex xs12 mb-5>
       <h2 class="headline font-weight-bold mb-2">Important Links</h2>
       <v-layout justify-center>
@@ -46,7 +44,7 @@
 import config from './../config';
 
 export default {
-  name: 'welcome',
+  name: 'links',
   props: {
     msg: String
   },

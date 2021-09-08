@@ -38,7 +38,7 @@ export default {
       });
     },
     redirectHome() {
-      const name = 'home';
+      const name = 'dashboard';
       if (this.$route.name !== name) {
         this.$router.replace({
           name: name
