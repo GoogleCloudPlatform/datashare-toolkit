@@ -336,9 +336,11 @@ Verify 200 with Auth header
 
     curl -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email)" -i $DS_API_URL/v1/welcome
 
-Verify 200 with Auth header and JWT aud
+Verify 200 with Auth header and JWT aud.
 
-    curl -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$VUE_APP_GOOGLE_APP_CLIENT_ID)" -i $DS_API_URL/v1/resources/configuration
+**Note** Cloud Run will remove the Authorization header JWT signature for backend services to prevent ID token replays (details [here](https://cloud.google.com/run/docs/troubleshooting#signature-removed)). Since the API Gateway will pass the initial Authorization header via 'X-Forwarded-Authorization', we can test accordingly.
+
+    curl -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$DS_API_URL)" -H "X-Forwarded-Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$VUE_APP_GOOGLE_APP_CLIENT_ID)" -i $DS_API_URL/v1/resources/configuration
 
 #### Create API Gateway Config
 The API Gateway requires an OpenAPI specification for creating the API Gateway Config. Currently, it only supports OpenAPI v2 spec (aka Swagger). You can can use the latest OAS YAML [here](./config/openapi_spec.v2.yaml.tmpl) or dynamically generate JSON via `http://{HOSTNAME}/{API_VERSION}/docs/openapi_spec`, but will need to convert from JSON to YAML. e.g.
@@ -393,6 +395,8 @@ Verify 200 with Auth header
     curl -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email)" -i $API_GW_URL/v1/welcome
 
 Verify 200 with Auth header and JWT aud
+
+**Note** Cloud Run will remove the Authorization header JWT signature for backend services to prevent ID token replays (details [here](https://cloud.google.com/run/docs/troubleshooting#signature-removed)). Since the API Gateway will pass the initial Authorization header via 'X-Forwarded-Authorization', we can test accordingly.
 
     curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$VUE_APP_GOOGLE_APP_CLIENT_ID)" https://$API_GW_URL/v1/resources/configuration
 

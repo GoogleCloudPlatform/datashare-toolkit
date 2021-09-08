@@ -195,8 +195,18 @@ resources.get('/resources/projects', async (req, res) => {
 resources.get('/resources/configuration', async (req, res) => {
     try {
         const projectId = req.header('x-gcp-project-id');
-        let token = req.header('Authorization');
-        token = token.split(" ")[1];
+        let token;
+        // 'X-Forwarded-Authorization' takes precedence over 'Authorization'
+        for (let name of ['X-Forwarded-Authorization', 'Authorization']) {
+            if (req.header(name) !== undefined) {
+                token = req.header(name)
+                token = token.split(" ")[1];
+                break;
+            }
+        }
+        if (token === undefined) {
+            return res.status(401).json({ code: 401, success: false, errors: [{ message: "Authorization Header is required"}] });
+        };
         const c = await dataManager.getConfiguration(projectId, token);
         const data = { success: true, configuration: c };
         const code = 200;
