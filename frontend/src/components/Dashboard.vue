@@ -4,37 +4,39 @@
     <v-container fluid fill-height>
       <v-col>
         <v-row justify="center" align="center">
-          <v-card
+          <v-hover
             v-for="card in cards"
             :key="card.title"
-            class="mx-2 my-2"
-            width="300"
+            v-slot="{ hover }"
+            open-delay="200"
           >
-            <v-img
-              :src="card.src"
-              class="white--text align-end"
-              gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-              height="200px"
-            >
-              <v-card-title v-text="card.title"></v-card-title>
-            </v-img>
+            <v-card :elevation="hover ? 16 : 2" class="mx-3 my-3" width="300">
+              <v-img
+                :src="card.src"
+                class="white--text align-end"
+                gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
+                height="200px"
+              >
+                <v-card-title v-text="card.title"></v-card-title>
+              </v-img>
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
+              <v-card-actions>
+                <v-spacer></v-spacer>
 
-              <v-btn icon>
-                <v-icon>mdi-heart</v-icon>
-              </v-btn>
+                <v-btn icon>
+                  <v-icon>mdi-heart</v-icon>
+                </v-btn>
 
-              <v-btn icon>
-                <v-icon>mdi-bookmark</v-icon>
-              </v-btn>
+                <v-btn icon>
+                  <v-icon>mdi-bookmark</v-icon>
+                </v-btn>
 
-              <v-btn icon>
-                <v-icon>mdi-share-variant</v-icon>
-              </v-btn>
-            </v-card-actions>
-          </v-card>
+                <v-btn icon>
+                  <v-icon>mdi-share-variant</v-icon>
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-hover>
         </v-row>
       </v-col>
     </v-container>
