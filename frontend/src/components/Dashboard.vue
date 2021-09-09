@@ -18,7 +18,7 @@
               height="250"
             >
               <v-row justify="center" align="center">
-                <v-icon class="my-3" size="45">{{ card.icon }}</v-icon>
+                <v-icon class="my-3" size="40">{{ card.icon }}</v-icon>
                 <v-card-title
                   v-text="card.title"
                   justify="center"
@@ -56,7 +56,8 @@ import {
   mdiViewGrid,
   mdiArrowRightBoldCircleOutline,
   mdiShopping,
-  mdiBriefcaseAccount
+  mdiBriefcaseAccount,
+  mdiLifebuoy
 } from '@mdi/js';
 
 export default {
@@ -124,6 +125,12 @@ export default {
         path: 'myProducts',
         description:
           'View Datashare products that you have purchased through GCP Marketplace.'
+      },
+      {
+        title: 'Links',
+        icon: mdiLifebuoy,
+        path: 'links',
+        description: 'Find helpful Datashare links.'
       }
     ]
   })
