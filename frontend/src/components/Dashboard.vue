@@ -54,7 +54,9 @@ import {
   mdiDatabase,
   mdiDog,
   mdiViewGrid,
-  mdiArrowRightBoldCircleOutline
+  mdiArrowRightBoldCircleOutline,
+  mdiShopping,
+  mdiBriefcaseAccount
 } from '@mdi/js';
 
 export default {
@@ -120,6 +122,24 @@ export default {
         path: 'policies',
         description:
           'Policies allow data publishers to manage groupings of Datasets/Tables/PubSub Topics/Cloud Storage Buckets.'
+      },
+      {
+        title: 'Procurement Requests',
+        src: 'https://cdn.vuetifyjs.com/images/cards/plane.jpg',
+        flex: 6,
+        icon: mdiShopping,
+        path: 'procurements',
+        description:
+          'Manage procurements purchased through the GCP Marketplace.'
+      },
+      {
+        title: 'My Products',
+        src: 'https://cdn.vuetifyjs.com/images/cards/plane.jpg',
+        flex: 6,
+        icon: mdiBriefcaseAccount,
+        path: 'myProducts',
+        description:
+          'View Datashare products that you have purchased through GCP Marketplace.'
       }
     ]
   })
