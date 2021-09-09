@@ -60,79 +60,113 @@ import {
   mdiLifebuoy
 } from '@mdi/js';
 
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'welcome',
   props: {
     msg: String
   },
+  methods: {
+    canAccessRoute(navItem) {
+      let routes = this.$router.options.routes;
+      let route = routes.filter(item => {
+        if (navItem.path === item.name) {
+          return true;
+        }
+      });
+      if (route === undefined || route.length === 0) {
+        return true;
+      } else if (route[0].meta && route[0].meta.requiresAuth === true) {
+        if (route[0].meta.requiresDataProducer === true) {
+          return this.isLoggedIn && this.isDataProducer;
+        } else {
+          return this.isLoggedIn;
+        }
+      } else {
+        return true;
+      }
+    }
+  },
   data: () => ({
     icons: {
       arrowRight: mdiArrowRightBoldCircleOutline
-    },
-    cards: [
-      {
-        title: 'Datasets',
-        icon: mdiDatabase,
-        path: 'datasets',
-        description:
-          'Datasets are top-level containers that are used to organize and control access to your tables and views.'
-      },
-      {
-        title: 'Authorized Views',
-        icon: mdiViewGrid,
-        path: 'views',
-        description:
-          'An authorized view lets you share query results with particular users and groups without giving them access to the underlying tables.'
-      },
-      {
-        title: 'Pub/Sub Topics',
-        icon: mdiDog,
-        path: 'topics',
-        description:
-          'A named resource to which messages are sent by publishers.'
-      },
-      {
-        title: 'Storage Buckets',
-        icon: mdiBucketOutline,
-        path: 'buckets',
-        description:
-          'The Buckets resource represents a bucket in Cloud Storage.'
-      },
-      {
-        title: 'Accounts',
-        icon: mdiAccountMultiple,
-        path: 'accounts',
-        description:
-          'Managed accounts that are provisioned access to GCP resources through Datashare policies.'
-      },
-      {
-        title: 'Policies',
-        icon: mdiBadgeAccount,
-        path: 'policies',
-        description:
-          'Policies allow data publishers to manage groupings of Datasets/Tables/PubSub Topics/Cloud Storage Buckets.'
-      },
-      {
-        title: 'Procurement Requests',
-        icon: mdiShopping,
-        path: 'procurements',
-        description:
-          'Manage procurements purchased through the GCP Marketplace.'
-      },
-      {
-        title: 'My Products',
-        icon: mdiBriefcaseAccount,
-        path: 'myProducts',
-        description:
-          'View Datashare products that you have purchased through GCP Marketplace.'
-      },
-      {
-        title: 'Links',
-        icon: mdiLifebuoy,
-        path: 'links',
-        description: 'Find helpful Datashare links.'
-      }
-    ]
-  })
+    }
+  }),
+  computed: {
+    ...mapGetters({
+      isLoggedIn: 'isLoggedIn',
+      isDataProducer: 'isDataProducer'
+    }),
+    cards() {
+      let items = [
+        {
+          title: 'Datasets',
+          icon: mdiDatabase,
+          path: 'datasets',
+          description:
+            'Datasets are top-level containers that are used to organize and control access to your tables and views.'
+        },
+        {
+          title: 'Authorized Views',
+          icon: mdiViewGrid,
+          path: 'views',
+          description:
+            'An authorized view lets you share query results with particular users and groups without giving them access to the underlying tables.'
+        },
+        {
+          title: 'Pub/Sub Topics',
+          icon: mdiDog,
+          path: 'topics',
+          description:
+            'A named resource to which messages are sent by publishers.'
+        },
+        {
+          title: 'Storage Buckets',
+          icon: mdiBucketOutline,
+          path: 'buckets',
+          description:
+            'The Buckets resource represents a bucket in Cloud Storage.'
+        },
+        {
+          title: 'Accounts',
+          icon: mdiAccountMultiple,
+          path: 'accounts',
+          description:
+            'Managed accounts that are provisioned access to GCP resources through Datashare policies.'
+        },
+        {
+          title: 'Policies',
+          icon: mdiBadgeAccount,
+          path: 'policies',
+          description:
+            'Policies allow data publishers to manage groupings of Datasets/Tables/PubSub Topics/Cloud Storage Buckets.'
+        },
+        {
+          title: 'Procurement Requests',
+          icon: mdiShopping,
+          path: 'procurements',
+          description:
+            'Manage procurements purchased through the GCP Marketplace.'
+        },
+        {
+          title: 'My Products',
+          icon: mdiBriefcaseAccount,
+          path: 'myProducts',
+          description:
+            'View Datashare products that you have purchased through GCP Marketplace.'
+        },
+        {
+          title: 'Links',
+          icon: mdiLifebuoy,
+          path: 'links',
+          description: 'Find helpful Datashare links.'
+        }
+      ];
+      return items.filter(item => {
+        return this.canAccessRoute(item);
+      });
+    }
+  }
 };
 </script>

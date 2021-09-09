@@ -100,7 +100,24 @@ async function isDataProducer(token) {
     return isProducer;
 }
 
+/**
+ * @param  {} projectId
+ */
+async function getDashboardCounts(projectId) {
+    return {
+        dashboard: 20,
+        authorizedViews: 30,
+        topics: 10,
+        buckets: 8,
+        accounts: 13,
+        policies: 19,
+        procurementRequests: 4,
+        myProducts: 2
+    };
+}
+
 module.exports = {
-    getConfiguration
+    getConfiguration,
+    getDashboardCounts
 };
 
