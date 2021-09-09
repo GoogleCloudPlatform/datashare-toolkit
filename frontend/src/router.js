@@ -21,6 +21,18 @@ import Router from 'vue-router';
 import store from './store';
 import config from './config';
 
+import {
+  mdiAccountMultiple,
+  mdiBadgeAccount,
+  mdiBriefcaseAccount,
+  mdiBucketOutline,
+  mdiDatabase,
+  mdiDog,
+  mdiLifebuoy,
+  mdiShopping,
+  mdiViewGrid
+} from '@mdi/js';
+
 const routerOptions = [
   {
     path: '/',
@@ -38,7 +50,15 @@ const routerOptions = [
     component: 'Datasets',
     meta: {
       requiresAuth: true,
-      requiresDataProducer: true
+      requiresDataProducer: true,
+      icon: mdiDatabase,
+      dashboard: {
+        title: 'Datasets',
+        description:
+          'Datasets are top-level containers that are used to organize and control access to your tables and views.',
+        enabled: true,
+        order: 1
+      }
     }
   },
   {
@@ -47,7 +67,49 @@ const routerOptions = [
     component: 'Views',
     meta: {
       requiresAuth: true,
-      requiresDataProducer: true
+      requiresDataProducer: true,
+      icon: mdiViewGrid,
+      dashboard: {
+        title: 'Authorized Views',
+        description:
+          'An authorized view lets you share query results with particular users and groups without giving them access to the underlying tables.',
+        enabled: true,
+        order: 2
+      }
+    }
+  },
+  {
+    path: '/topics',
+    name: 'topics',
+    component: 'Topics',
+    meta: {
+      requiresAuth: true,
+      requiresDataProducer: true,
+      icon: mdiDog,
+      dashboard: {
+        title: 'Pub/Sub Topics',
+        description:
+          'A named resource to which messages are sent by publishers.',
+        enabled: true,
+        order: 3
+      }
+    }
+  },
+  {
+    path: '/buckets',
+    name: 'buckets',
+    component: 'Buckets',
+    meta: {
+      requiresAuth: true,
+      requiresDataProducer: true,
+      icon: mdiBucketOutline,
+      dashboard: {
+        title: 'Storage Buckets',
+        description:
+          'The Buckets resource represents a bucket in Cloud Storage.',
+        enabled: true,
+        order: 4
+      }
     }
   },
   {
@@ -56,7 +118,81 @@ const routerOptions = [
     component: 'Accounts',
     meta: {
       requiresAuth: true,
-      requiresDataProducer: true
+      requiresDataProducer: true,
+      icon: mdiAccountMultiple,
+      dashboard: {
+        title: 'Accounts',
+        description:
+          'Managed accounts that are provisioned access to GCP resources through Datashare policies.',
+        enabled: true,
+        order: 5
+      }
+    }
+  },
+  {
+    path: '/policies',
+    name: 'policies',
+    component: 'Policies',
+    meta: {
+      requiresAuth: true,
+      requiresDataProducer: true,
+      icon: mdiBadgeAccount,
+      dashboard: {
+        title: 'Policies',
+        description:
+          'Policies allow data publishers to manage groupings of Datasets/Tables/PubSub Topics/Cloud Storage Buckets.',
+        enabled: true,
+        order: 6
+      }
+    }
+  },
+  {
+    path: '/procurements',
+    name: 'procurements',
+    component: 'Procurements',
+    meta: {
+      requiresAuth: true,
+      requiresDataProducer: true,
+      requiresMarketplaceIntegration: true,
+      icon: mdiShopping,
+      dashboard: {
+        title: 'Procurement Requests',
+        description:
+          'Manage procurements purchased through the GCP Marketplace.',
+        enabled: true,
+        order: 7
+      }
+    }
+  },
+  {
+    path: '/myProducts',
+    name: 'myProducts',
+    component: 'MyProducts',
+    meta: {
+      requiresAuth: true,
+      requiresMarketplaceIntegration: true,
+      icon: mdiBriefcaseAccount,
+      dashboard: {
+        title: 'My Products',
+        description:
+          'View Datashare products that you have purchased through GCP Marketplace.',
+        enabled: true,
+        order: 8
+      }
+    }
+  },
+  {
+    path: '/links',
+    name: 'links',
+    component: 'Links',
+    meta: {
+      icon: mdiLifebuoy,
+      dashboard: {
+        title: 'Links',
+        description: 'Find helpful Datashare links.',
+        enabled: true,
+        order: 9
+      }
     }
   },
   {
@@ -87,15 +223,6 @@ const routerOptions = [
     }
   },
   {
-    path: '/policies',
-    name: 'policies',
-    component: 'Policies',
-    meta: {
-      requiresAuth: true,
-      requiresDataProducer: true
-    }
-  },
-  {
     path: '/editPolicy',
     name: 'editPolicy',
     component: 'EditPolicy',
@@ -105,30 +232,11 @@ const routerOptions = [
     }
   },
   {
-    path: '/procurements',
-    name: 'procurements',
-    component: 'Procurements',
-    meta: {
-      requiresAuth: true,
-      requiresDataProducer: true,
-      requiresMarketplaceIntegration: true
-    }
-  },
-  {
     path: '/activation',
     name: 'activation',
     component: 'Activation',
     meta: {
       requiresAuth: true
-    }
-  },
-  {
-    path: '/myProducts',
-    name: 'myProducts',
-    component: 'MyProducts',
-    meta: {
-      requiresAuth: true,
-      requiresMarketplaceIntegration: true
     }
   },
   {
@@ -141,32 +249,9 @@ const routerOptions = [
     }
   },
   {
-    path: '/topics',
-    name: 'topics',
-    component: 'Topics',
-    meta: {
-      requiresAuth: true,
-      requiresDataProducer: true
-    }
-  },
-  {
-    path: '/buckets',
-    name: 'buckets',
-    component: 'Buckets',
-    meta: {
-      requiresAuth: true,
-      requiresDataProducer: true
-    }
-  },
-  {
     path: '/404',
     name: '404',
     component: '404'
-  },
-  {
-    path: '/links',
-    name: 'links',
-    component: 'Links'
   }
 ];
 
@@ -220,5 +305,25 @@ router.beforeEach((to, from, next) => {
     return;
   }
 });
+
+Router.prototype.canAccessRoute = function(name) {
+  let routes = this.options.routes;
+  let route = routes.filter(item => {
+    if (name === item.name) {
+      return true;
+    }
+  });
+  if (route === undefined || route.length === 0) {
+    return true;
+  } else if (route[0].meta && route[0].meta.requiresAuth === true) {
+    if (route[0].meta.requiresDataProducer === true) {
+      return store.getters.isLoggedIn && store.getters.isDataProducer;
+    } else {
+      return store.getters.isLoggedIn;
+    }
+  } else {
+    return true;
+  }
+};
 
 export default router;

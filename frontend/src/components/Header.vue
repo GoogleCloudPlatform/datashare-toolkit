@@ -219,25 +219,6 @@ export default {
     });
   },
   methods: {
-    canAccessRoute(navItem) {
-      let routes = this.$router.options.routes;
-      let route = routes.filter(item => {
-        if (navItem.name === item.name) {
-          return true;
-        }
-      });
-      if (route === undefined || route.length === 0) {
-        return true;
-      } else if (route[0].meta && route[0].meta.requiresAuth === true) {
-        if (route[0].meta.requiresDataProducer === true) {
-          return this.isLoggedIn && this.isDataProducer;
-        } else {
-          return this.isLoggedIn;
-        }
-      } else {
-        return true;
-      }
-    },
     projectIdChanged(reload) {
       _config.projectId = this.projectId;
       if (reload === true) {
@@ -361,7 +342,7 @@ export default {
       // https://vuetifyjs.com/en/components/lists
       // Add a to variable to pass this instead so we can use the same views for certain things.
       return items.filter(item => {
-        return this.canAccessRoute(item) && !item.hidden;
+        return this.$router.canAccessRoute(item) && !item.hidden;
       });
     }
   },
