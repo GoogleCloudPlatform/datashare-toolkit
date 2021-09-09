@@ -10,9 +10,15 @@
             v-slot="{ hover }"
             open-delay="200"
           >
-            <v-card :elevation="hover ? 16 : 2" class="mx-3 my-3" width="300">
-              <v-icon class="my-3" size="45">{{ card.icon }}</v-icon>
+            <v-card
+              :elevation="hover ? 16 : 2"
+              xclass="mx-3 my-3"
+              class="d-flex flex-column mx-3 my-3"
+              width="300"
+              height="250"
+            >
               <v-row justify="center" align="center">
+                <v-icon class="my-3" size="45">{{ card.icon }}</v-icon>
                 <v-card-title
                   v-text="card.title"
                   justify="center"
@@ -20,11 +26,11 @@
                 ></v-card-title>
                 <v-card-subtitle
                   v-text="card.description"
-                  class="grey--text"
+                  class="grey--text mx-6"
                 ></v-card-subtitle>
               </v-row>
-              <v-card-actions>
-                <div class="black--text ms-4">
+              <v-card-actions class="mb-2">
+                <div class="dark--text ms-4">
                   23
                 </div>
                 <v-spacer></v-spacer>
@@ -67,7 +73,8 @@ export default {
         flex: 12,
         icon: mdiDatabase,
         path: 'datasets',
-        description: 'the description goes here sdfdsf sdf  '
+        description:
+          'Datasets are top-level containers that are used to organize and control access to your tables and views.'
       },
       {
         title: 'Authorized Views',
@@ -75,7 +82,8 @@ export default {
         flex: 6,
         icon: mdiViewGrid,
         path: 'views',
-        description: 'the description goes heresdf dsf sdf '
+        description:
+          'An authorized view lets you share query results with particular users and groups without giving them access to the underlying tables.'
       },
       {
         title: 'Pub/Sub Topics',
@@ -83,7 +91,8 @@ export default {
         flex: 6,
         icon: mdiDog,
         path: 'topics',
-        description: 'the description goes here sdf sdf sdf '
+        description:
+          'A named resource to which messages are sent by publishers.'
       },
       {
         title: 'Storage Buckets',
@@ -91,7 +100,8 @@ export default {
         flex: 6,
         icon: mdiBucketOutline,
         path: 'buckets',
-        description: 'the description goes here sdfd sdf  dfsdfdsf sfddf'
+        description:
+          'The Buckets resource represents a bucket in Cloud Storage.'
       },
       {
         title: 'Accounts',
@@ -99,7 +109,8 @@ export default {
         flex: 6,
         icon: mdiAccountMultiple,
         path: 'accounts',
-        description: 'the description goes here sdf sdf dfd df'
+        description:
+          'Managed accounts that are provisioned access to GCP resources through Datashare policies.'
       },
       {
         title: 'Policies',
@@ -107,7 +118,8 @@ export default {
         flex: 6,
         icon: mdiBadgeAccount,
         path: 'policies',
-        description: 'the description goes here sdfds dsf sdf '
+        description:
+          'Policies allow data publishers to manage groupings of Datasets/Tables/PubSub Topics/Cloud Storage Buckets.'
       }
     ]
   })
