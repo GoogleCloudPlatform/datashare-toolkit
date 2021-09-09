@@ -71,8 +71,6 @@ export default {
     cards: [
       {
         title: 'Datasets',
-        src: 'https://cdn.vuetifyjs.com/images/cards/house.jpg',
-        flex: 12,
         icon: mdiDatabase,
         path: 'datasets',
         description:
@@ -80,8 +78,6 @@ export default {
       },
       {
         title: 'Authorized Views',
-        src: 'https://cdn.vuetifyjs.com/images/cards/road.jpg',
-        flex: 6,
         icon: mdiViewGrid,
         path: 'views',
         description:
@@ -89,8 +85,6 @@ export default {
       },
       {
         title: 'Pub/Sub Topics',
-        src: 'https://cdn.vuetifyjs.com/images/cards/plane.jpg',
-        flex: 6,
         icon: mdiDog,
         path: 'topics',
         description:
@@ -98,8 +92,6 @@ export default {
       },
       {
         title: 'Storage Buckets',
-        src: 'https://cdn.vuetifyjs.com/images/cards/plane.jpg',
-        flex: 6,
         icon: mdiBucketOutline,
         path: 'buckets',
         description:
@@ -107,8 +99,6 @@ export default {
       },
       {
         title: 'Accounts',
-        src: 'https://cdn.vuetifyjs.com/images/cards/plane.jpg',
-        flex: 6,
         icon: mdiAccountMultiple,
         path: 'accounts',
         description:
@@ -116,8 +106,6 @@ export default {
       },
       {
         title: 'Policies',
-        src: 'https://cdn.vuetifyjs.com/images/cards/plane.jpg',
-        flex: 6,
         icon: mdiBadgeAccount,
         path: 'policies',
         description:
@@ -125,8 +113,6 @@ export default {
       },
       {
         title: 'Procurement Requests',
-        src: 'https://cdn.vuetifyjs.com/images/cards/plane.jpg',
-        flex: 6,
         icon: mdiShopping,
         path: 'procurements',
         description:
@@ -134,8 +120,6 @@ export default {
       },
       {
         title: 'My Products',
-        src: 'https://cdn.vuetifyjs.com/images/cards/plane.jpg',
-        flex: 6,
         icon: mdiBriefcaseAccount,
         path: 'myProducts',
         description:
