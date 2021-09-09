@@ -32,6 +32,26 @@ var resources = express.Router();
  * @param  {} async(req
  * @param  {} res
  */
+ resources.get('/resources/dashboard', async (req, res) => {
+    try {
+        const code = 200;
+        const list = [];
+        const data = { success: true, projects: list };
+        res.status(code).json({
+            ...data
+        });
+    } catch (err) {
+        console.error(err);
+        const data = { success: false, code: 500, errors: ['Unable to retrieve dashboard data.'] };
+        res.status(500).json(data);
+    }
+});
+
+/**
+ * @param  {} '/resources/projects'
+ * @param  {} async(req
+ * @param  {} res
+ */
 resources.get('/resources/projects', async (req, res) => {
     try {
         const code = 200;
