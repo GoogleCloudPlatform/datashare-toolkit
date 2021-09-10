@@ -47,10 +47,7 @@
 </template>
 
 <script>
-import { mdiArrowRightBoldCircleOutline, mdiLifebuoy } from '@mdi/js';
-
-import underscore from 'underscore';
-import _config from '../config';
+import { mdiArrowRightBoldCircleOutline } from '@mdi/js';
 
 export default {
   name: 'welcome',
@@ -64,36 +61,8 @@ export default {
   }),
   computed: {
     cards() {
-      let routes = this.$router.options.routes;
-      let filtered = underscore.filter(routes, function(route) {
-        if (
-          route.meta &&
-          route.meta.dashboard &&
-          route.meta.dashboard.enabled === true
-        ) {
-          if (
-            route.meta.requiresMarketplaceIntegration === true &&
-            _config.marketplaceIntegrationEnabled === false
-          ) {
-            return false;
-          }
-          return true;
-        }
-      });
-      let sorted = underscore.sortBy(filtered, function(route) {
-        return route.meta.dashboard.order;
-      });
-      let items = sorted.map(route => {
-        return {
-          title: route.meta.dashboard.title,
-          icon: route.meta.icon,
-          path: route.name,
-          description: route.meta.dashboard.description
-        };
-      });
-      return items.filter(item => {
-        return this.$router.canAccessRoute(item);
-      });
+      const list = this.$router.userDashboardCards();
+      return list;
     }
   }
 };

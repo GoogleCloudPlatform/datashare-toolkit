@@ -20,6 +20,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import store from './store';
 import config from './config';
+import underscore from 'underscore';
 
 import {
   mdiAccountMultiple,
@@ -324,6 +325,48 @@ Router.prototype.canAccessRoute = function(name) {
   } else {
     return true;
   }
+};
+
+Router.prototype.userNavigableRoutes = function() {
+  let routes = this.options.routes;
+  let list = routes.filter(route => {
+    if (route.meta) {
+      if (
+        route.meta.requiresMarketplaceIntegration === true &&
+        config.marketplaceIntegrationEnabled === false
+      ) {
+        return false;
+      }
+      return this.canAccessRoute(route.name);
+    }
+    return false;
+  });
+  return list;
+};
+
+Router.prototype.userDashboardCards = function() {
+  let routes = this.userNavigableRoutes();
+  let filtered = routes.filter(route => {
+    if (
+      route.meta &&
+      route.meta.dashboard &&
+      route.meta.dashboard.enabled === true
+    ) {
+      return true;
+    }
+  });
+  let sorted = underscore.sortBy(filtered, function(route) {
+    return route.meta.dashboard.order;
+  });
+  let items = sorted.map(route => {
+    return {
+      title: route.meta.dashboard.title,
+      icon: route.meta.icon,
+      path: route.name,
+      description: route.meta.dashboard.description
+    };
+  });
+  return items;
 };
 
 export default router;
