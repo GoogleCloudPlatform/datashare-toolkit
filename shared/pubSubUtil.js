@@ -180,7 +180,7 @@ class PubSubUtil {
     async getTopicIamPolicy(topicName) {
         const topic = this.pubsub.topic(topicName);
         return topic.iam.getPolicy()
-            .then(function (data) {
+            .then(data => {
                 const policy = data[0];
                 const apiResponse = data[1];
                 return policy;
@@ -198,7 +198,7 @@ class PubSubUtil {
      */
     async setTopicIamPolicy(topicName, policy) {
         const topic = this.pubsub.topic(topicName);
-        return topic.iam.setPolicy(policy).then(function (data) {
+        return topic.iam.setPolicy(policy).then(data => {
             const policy = data[0];
             const apiResponse = data[1];
             return policy;
