@@ -260,8 +260,7 @@ Deploy the DS API service in Cloud Run (managed)
         --no-allow-unauthenticated \
         --platform managed \
         --service-account ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
-        --update-env-vars=OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID},DATA_PRODUCERS=${DATA_PRODUCERS} \
-        --remove-env-vars=PROJECT_ID,MARKETPLACE_INTEGRATION
+        --update-env-vars=OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID},DATA_PRODUCERS=${DATA_PRODUCERS}
 
 
 Open the app URL in your browser. You can return the DS API FQDN via:
