@@ -151,14 +151,8 @@ import {
   mdiViewGrid,
   mdiApplicationImport,
   mdiHubspot,
-  mdiBadgeAccount,
   mdiShieldKey,
-  mdiShopping,
-  mdiBriefcaseAccount,
-  mdiBucketOutline,
-  mdiThemeLightDark,
-  mdiLifebuoy,
-  mdiViewDashboardOutline
+  mdiThemeLightDark
 } from '@mdi/js';
 
 import { mapGetters } from 'vuex';
@@ -271,79 +265,7 @@ export default {
       return this.projectSelectorEnabled && this.isDataProducer;
     },
     navigationItems() {
-      let items = [
-        {
-          name: 'dashboard',
-          title: 'Dashboard',
-          icon: mdiViewDashboardOutline
-        },
-        {
-          section: 'Channels',
-          name: 'datasets',
-          title: 'Datasets',
-          icon: mdiDatabase
-        },
-        {
-          name: 'views',
-          title: 'Authorized Views',
-          icon: mdiViewGrid
-        },
-        {
-          name: 'topics',
-          title: 'Pub/Sub Topics',
-          icon: mdiDog
-        },
-        {
-          name: 'buckets',
-          title: 'Storage Buckets',
-          icon: mdiBucketOutline
-        },
-        {
-          section: 'Entitlements',
-          name: 'accounts',
-          title: 'Accounts',
-          icon: mdiAccountMultiple
-        },
-        {
-          name: 'policies',
-          title: 'Policies',
-          icon: mdiBadgeAccount
-        },
-        {
-          section: 'Marketplace',
-          hidden: _config.marketplaceIntegrationEnabled === false
-        },
-        {
-          name: 'procurements',
-          title: 'Procurement Requests',
-          icon: mdiShopping,
-          hidden: _config.marketplaceIntegrationEnabled === false
-        },
-        {
-          name: 'myProducts',
-          title: 'My Products',
-          icon: mdiBriefcaseAccount,
-          hidden: _config.marketplaceIntegrationEnabled === false
-        },
-        {
-          section: 'Application',
-          subheader: 'Admin',
-          name: 'admin',
-          title: 'Admin',
-          icon: mdiShieldKey
-        },
-        {
-          name: 'links',
-          title: 'Links',
-          icon: mdiLifebuoy
-        }
-      ];
-      // https://router.vuejs.org/api/#to
-      // https://vuetifyjs.com/en/components/lists
-      // Add a to variable to pass this instead so we can use the same views for certain things.
-      return items.filter(item => {
-        return this.$router.canAccessRoute(item) && !item.hidden;
-      });
+      return this.$router.userMenuItems();
     }
   },
   props: {

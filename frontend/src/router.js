@@ -30,7 +30,9 @@ import {
   mdiDatabase,
   mdiDog,
   mdiLifebuoy,
+  mdiShieldKey,
   mdiShopping,
+  mdiViewDashboardOutline,
   mdiViewGrid
 } from '@mdi/js';
 
@@ -38,7 +40,14 @@ const routerOptions = [
   {
     path: '/',
     name: 'dashboard',
-    component: 'Dashboard'
+    component: 'Dashboard',
+    meta: {
+      icon: mdiViewDashboardOutline,
+      title: 'Dashboard',
+      menu: {
+        order: 1
+      }
+    }
   },
   {
     path: '/restricted',
@@ -53,11 +62,14 @@ const routerOptions = [
       requiresAuth: true,
       requiresDataProducer: true,
       icon: mdiDatabase,
+      title: 'Datasets',
+      menu: {
+        order: 2,
+        section: 'Channels'
+      },
       dashboard: {
-        title: 'Datasets',
         description:
           'Datasets are top-level containers that are used to organize and control access to your tables and views.',
-        enabled: true,
         order: 1
       }
     }
@@ -70,11 +82,13 @@ const routerOptions = [
       requiresAuth: true,
       requiresDataProducer: true,
       icon: mdiViewGrid,
+      title: 'Authorized Views',
+      menu: {
+        order: 3
+      },
       dashboard: {
-        title: 'Authorized Views',
         description:
           'An authorized view lets you share query results with particular users and groups without giving them access to the underlying tables.',
-        enabled: true,
         order: 2
       }
     }
@@ -87,11 +101,13 @@ const routerOptions = [
       requiresAuth: true,
       requiresDataProducer: true,
       icon: mdiDog,
+      title: 'Pub/Sub Topics',
+      menu: {
+        order: 4
+      },
       dashboard: {
-        title: 'Pub/Sub Topics',
         description:
           'A named resource to which messages are sent by publishers.',
-        enabled: true,
         order: 3
       }
     }
@@ -104,11 +120,13 @@ const routerOptions = [
       requiresAuth: true,
       requiresDataProducer: true,
       icon: mdiBucketOutline,
+      title: 'Storage Buckets',
+      menu: {
+        order: 5
+      },
       dashboard: {
-        title: 'Storage Buckets',
         description:
           'The Buckets resource represents a bucket in Cloud Storage.',
-        enabled: true,
         order: 4
       }
     }
@@ -121,11 +139,14 @@ const routerOptions = [
       requiresAuth: true,
       requiresDataProducer: true,
       icon: mdiAccountMultiple,
+      title: 'Accounts',
+      menu: {
+        order: 6,
+        section: 'Entitlements'
+      },
       dashboard: {
-        title: 'Accounts',
         description:
           'Managed accounts that are provisioned access to GCP resources through Datashare policies.',
-        enabled: true,
         order: 5
       }
     }
@@ -138,11 +159,13 @@ const routerOptions = [
       requiresAuth: true,
       requiresDataProducer: true,
       icon: mdiBadgeAccount,
+      title: 'Policies',
+      menu: {
+        order: 7
+      },
       dashboard: {
-        title: 'Policies',
         description:
           'Policies allow data publishers to manage groupings of Datasets/Tables/PubSub Topics/Cloud Storage Buckets.',
-        enabled: true,
         order: 6
       }
     }
@@ -156,11 +179,14 @@ const routerOptions = [
       requiresDataProducer: true,
       requiresMarketplaceIntegration: true,
       icon: mdiShopping,
+      title: 'Procurement Requests',
+      menu: {
+        order: 8,
+        section: 'Marketplace'
+      },
       dashboard: {
-        title: 'Procurement Requests',
         description:
           'Manage procurements purchased through the GCP Marketplace.',
-        enabled: true,
         order: 7
       }
     }
@@ -173,12 +199,30 @@ const routerOptions = [
       requiresAuth: true,
       requiresMarketplaceIntegration: true,
       icon: mdiBriefcaseAccount,
+      title: 'My Products',
+      menu: {
+        order: 9
+      },
       dashboard: {
-        title: 'My Products',
         description:
           'View Datashare products that you have purchased through GCP Marketplace.',
-        enabled: true,
         order: 8
+      }
+    }
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: 'Admin',
+    meta: {
+      requiresAuth: true,
+      requiresDataProducer: true,
+      icon: mdiShieldKey,
+      title: 'Admin',
+      menu: {
+        order: 10,
+        section: 'Application',
+        subheader: 'Admin'
       }
     }
   },
@@ -188,10 +232,12 @@ const routerOptions = [
     component: 'Links',
     meta: {
       icon: mdiLifebuoy,
+      title: 'Links',
+      menu: {
+        order: 11
+      },
       dashboard: {
-        title: 'Links',
         description: 'Find helpful Datashare links.',
-        enabled: true,
         order: 9
       }
     }
@@ -238,15 +284,6 @@ const routerOptions = [
     component: 'Activation',
     meta: {
       requiresAuth: true
-    }
-  },
-  {
-    path: '/admin',
-    name: 'admin',
-    component: 'Admin',
-    meta: {
-      requiresAuth: true,
-      requiresDataProducer: true
     }
   },
   {
@@ -344,23 +381,34 @@ Router.prototype.userNavigableRoutes = function() {
   return list;
 };
 
+Router.prototype.userMenuItems = function() {
+  let items = this.userNavigableRoutes()
+    .filter(route => {
+      return route.meta && route.meta.menu;
+    })
+    .map(route => {
+      return {
+        name: route.name,
+        title: route.meta.menu.title || route.meta.title,
+        icon: route.meta.icon,
+        section: route.meta.menu.section,
+        subheader: route.meta.menu.subheader
+      };
+    });
+  return items;
+};
+
 Router.prototype.userDashboardCards = function() {
   let routes = this.userNavigableRoutes();
   let filtered = routes.filter(route => {
-    if (
-      route.meta &&
-      route.meta.dashboard &&
-      route.meta.dashboard.enabled === true
-    ) {
-      return true;
-    }
+    return route.meta && route.meta.dashboard;
   });
   let sorted = underscore.sortBy(filtered, function(route) {
     return route.meta.dashboard.order;
   });
   let items = sorted.map(route => {
     return {
-      title: route.meta.dashboard.title,
+      title: route.meta.dashboard.title || route.meta.title,
       icon: route.meta.icon,
       path: route.name,
       description: route.meta.dashboard.description
