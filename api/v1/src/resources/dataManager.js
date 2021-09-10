@@ -103,7 +103,7 @@ async function isDataProducer(token) {
 /**
  * @param  {} projectId
  */
-async function getDashboardCounts(_projectId) {
+async function getDashboardCounts_projectId) {
     return {
         dashboard: 20,
         authorizedViews: 30,
