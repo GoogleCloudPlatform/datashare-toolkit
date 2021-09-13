@@ -11,8 +11,8 @@
             open-delay="200"
           >
             <v-card
+              :loading="loading"
               :elevation="hover ? 16 : 2"
-              xclass="mx-3 my-3"
               class="d-flex flex-column mx-3 my-3"
               width="300"
               height="250"
@@ -31,10 +31,10 @@
               </v-row>
               <v-card-actions class="mb-2">
                 <div class="dark--text ms-4">
-                  23
+                  {{ card.count }}
                 </div>
                 <v-spacer></v-spacer>
-                <v-btn icon :to="{ path: card.path }">
+                <v-btn icon :to="{ path: card.name }">
                   <v-icon>{{ icons.arrowRight }} </v-icon>
                 </v-btn>
               </v-card-actions>
@@ -54,14 +54,34 @@ export default {
   props: {
     msg: String
   },
+  created() {
+    this.loading = true;
+    this.$store.dispatch('getDashboard').then(response => {
+      if (response.success) {
+        const data = response.data;
+        this.counts = data;
+      }
+      this.loading = false;
+    });
+  },
   data: () => ({
+    loading: false,
     icons: {
       arrowRight: mdiArrowRightBoldCircleOutline
-    }
+    },
+    counts: {}
   }),
   computed: {
     cards() {
-      const list = this.$router.userDashboardCards();
+      let list = this.$router.userDashboardCards();
+      if (this.counts && Object.keys(this.counts).length > 0) {
+        list.forEach(c => {
+          console.log(c);
+          if (c.name in this.counts) {
+            c.count = this.counts[c.name];
+          }
+        });
+      }
       return list;
     }
   }

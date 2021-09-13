@@ -37,7 +37,7 @@ var resources = express.Router();
         const projectId = req.header('x-gcp-project-id');
         const code = 200;
         const list = await dataManager.getDashboardCounts(projectId);
-        const data = { success: true, projects: list };
+        const data = { success: true, data: list };
         res.status(code).json({
             ...data
         });

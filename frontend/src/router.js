@@ -412,7 +412,7 @@ Router.prototype.userDashboardCards = function() {
     return {
       title: route.meta.dashboard.title || route.meta.title,
       icon: route.meta.icon,
-      path: route.name,
+      name: route.name,
       description: route.meta.dashboard.description
     };
   });

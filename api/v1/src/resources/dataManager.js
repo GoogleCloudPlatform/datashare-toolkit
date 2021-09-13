@@ -107,6 +107,8 @@ async function getDashboardCounts(projectId) {
     console.log(projectId);
     return {
         dashboard: 20,
+        datasets: 12,
+        views: 13,
         authorizedViews: 30,
         topics: 10,
         buckets: 8,
