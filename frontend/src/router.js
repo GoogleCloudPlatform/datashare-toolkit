@@ -382,19 +382,21 @@ Router.prototype.userNavigableRoutes = function() {
 };
 
 Router.prototype.userMenuItems = function() {
-  let items = this.userNavigableRoutes()
-    .filter(route => {
-      return route.meta && route.meta.menu;
-    })
-    .map(route => {
-      return {
-        name: route.name,
-        title: route.meta.menu.title || route.meta.title,
-        icon: route.meta.icon,
-        section: route.meta.menu.section,
-        subheader: route.meta.menu.subheader
-      };
-    });
+  let filtered = this.userNavigableRoutes().filter(route => {
+    return route.meta && route.meta.menu;
+  });
+  let sorted = underscore.sortBy(filtered, function(route) {
+    return route.meta.menu.order;
+  });
+  let items = sorted.map(route => {
+    return {
+      name: route.name,
+      title: route.meta.menu.title || route.meta.title,
+      icon: route.meta.icon,
+      section: route.meta.menu.section,
+      subheader: route.meta.menu.subheader
+    };
+  });
   return items;
 };
 
