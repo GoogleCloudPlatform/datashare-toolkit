@@ -142,6 +142,12 @@ async function getDashboardCounts(projectId) {
             }
         });
 
+        // TODO
+        // Accounts: accounts
+        // Policies: policies
+        // Procurement Requests: procurements
+        // My Products: myProducts
+
         if (counts) {
             dsCache.set(dashboardCacheKey, counts, 60);
         }
