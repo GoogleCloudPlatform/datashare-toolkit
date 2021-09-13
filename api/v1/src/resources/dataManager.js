@@ -17,11 +17,15 @@
 'use strict';
 
 const config = require('../lib/config');
-
+const NodeCache = require("node-cache");
+const dsCache = new NodeCache();
+const dashboardCacheKey = 'dashboardCounts';
 const { CommonUtil } = require('cds-shared');
 const commonUtil = CommonUtil;
 const runtimeConfig = require('../lib/runtimeConfig');
-
+const datasetManager = require('../datasets/dataManager');
+const pubsubManager = require('../pubsub/dataManager');
+const storageManager = require('../storage/dataManager');
 /**
  * @param  {} projectId
  * @param  {} token
@@ -38,7 +42,7 @@ async function getConfiguration(projectId, token) {
         dict.projectId = projectId;
     } else {
         dict.projectId = currentProjectId;
-    }    
+    }
 
     dict.isDataProducer = dataProducer;
     dict.isMarketplaceEnabled = commerce;
@@ -54,7 +58,7 @@ async function getConfiguration(projectId, token) {
     }
 
     if (!dict.labels) {
-        dict.labels = { };
+        dict.labels = {};
     }
 
     return dict;
@@ -104,19 +108,45 @@ async function isDataProducer(token) {
  * @param  {} projectId
  */
 async function getDashboardCounts(projectId) {
-    console.log(projectId);
-    return {
-        dashboard: 20,
-        datasets: 12,
-        views: 13,
-        authorizedViews: 30,
-        topics: 10,
-        buckets: 8,
-        accounts: 13,
-        policies: 19,
-        procurementRequests: 4,
-        myProducts: 2
-    };
+    let counts = dsCache.get(dashboardCacheKey);
+    if (counts == undefined) {
+        counts = {
+            dashboard: 0,
+            datasets: 0,
+            views: 0,
+            topics: 0,
+            buckets: 0,
+            accounts: 0,
+            policies: 0,
+            procurementRequests: 0,
+            myProducts: 0
+        };
+        await datasetManager.listDatasets(projectId).then(result => {
+            if (result.success === true) {
+                counts.datasets = result.data.length;
+            }
+        });
+        await datasetManager.listDatasetViews(projectId).then(result => {
+            if (result.success === true) {
+                counts.views = result.data.length;
+            }
+        });
+        await pubsubManager.listTopics(projectId).then(result => {
+            if (result.success === true) {
+                counts.topics = result.data.length;
+            }
+        });
+        await storageManager.listBuckets(projectId).then(result => {
+            if (result.success === true) {
+                counts.buckets = result.data.length;
+            }
+        });
+
+        if (counts) {
+            dsCache.set(dashboardCacheKey, counts, 60);
+        }
+    }
+    return counts;
 }
 
 module.exports = {

@@ -76,7 +76,6 @@ export default {
       let list = this.$router.userDashboardCards();
       if (this.counts && Object.keys(this.counts).length > 0) {
         list.forEach(c => {
-          console.log(c);
           if (c.name in this.counts) {
             c.count = this.counts[c.name];
           }
