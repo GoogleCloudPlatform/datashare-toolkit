@@ -25,4 +25,5 @@ steps:
   args: ['run', 'cloudtest']
   env:
   - 'PROJECT_ID=$PROJECT_ID'
-
+options:
+ logging: GCS_ONLY
