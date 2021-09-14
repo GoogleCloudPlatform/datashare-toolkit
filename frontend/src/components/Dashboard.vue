@@ -2,6 +2,15 @@
   <v-layout text-xs-center wrap>
     <!--https://stackoverflow.com/questions/52343526/center-content-vertically-on-vuetify-->
     <v-container fluid fill-height>
+      <v-row justify="center" align="center">
+        <v-container style="width: 80px;">
+          <v-progress-linear
+            rounded
+            indeterminate
+            :active="loading"
+          ></v-progress-linear>
+        </v-container>
+      </v-row>
       <v-col>
         <v-row justify="center" align="center">
           <v-hover
@@ -11,7 +20,6 @@
             open-delay="200"
           >
             <v-card
-              :loading="loading"
               :elevation="hover ? 16 : 2"
               class="d-flex flex-column mx-3 my-3"
               width="300"
@@ -50,7 +58,7 @@
 import { mdiArrowRightBoldCircleOutline } from '@mdi/js';
 
 export default {
-  name: 'welcome',
+  name: 'dashboard',
   props: {
     msg: String
   },
