@@ -115,17 +115,7 @@ async function isDataProducer(token) {
 async function getDashboardCounts(projectId, email) {
     let counts = dsCache.get(dashboardCacheKey);
     if (counts == undefined) {
-        counts = {
-            dashboard: 0,
-            datasets: 0,
-            views: 0,
-            topics: 0,
-            buckets: 0,
-            accounts: 0,
-            policies: 0,
-            procurementRequests: 0,
-            myProducts: 0
-        };
+        counts = {};
         await datasetManager.listDatasets(projectId).then(result => {
             if (result.success === true) {
                 counts.datasets = result.data.length;
