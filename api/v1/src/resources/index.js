@@ -35,8 +35,9 @@ var resources = express.Router();
  resources.get('/resources/dashboard', async (req, res) => {
     try {
         const projectId = req.header('x-gcp-project-id');
+        const email = req.header('x-gcp-account')
         const code = 200;
-        const list = await dataManager.getDashboardCounts(projectId);
+        const list = await dataManager.getDashboardCounts(projectId, email);
         const data = { success: true, data: list };
         res.status(code).json({
             ...data

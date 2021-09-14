@@ -26,6 +26,10 @@ const runtimeConfig = require('../lib/runtimeConfig');
 const datasetManager = require('../datasets/dataManager');
 const pubsubManager = require('../pubsub/dataManager');
 const storageManager = require('../storage/dataManager');
+const accountManager = require('../accounts/dataManager');
+const policyManager = require('../policies/dataManager');
+const procurementManager = require('../procurements/dataManager');
+
 /**
  * @param  {} projectId
  * @param  {} token
@@ -106,8 +110,9 @@ async function isDataProducer(token) {
 
 /**
  * @param  {} projectId
+ * @param  {} email
  */
-async function getDashboardCounts(projectId) {
+async function getDashboardCounts(projectId, email) {
     let counts = dsCache.get(dashboardCacheKey);
     if (counts == undefined) {
         counts = {
@@ -141,16 +146,36 @@ async function getDashboardCounts(projectId) {
                 counts.buckets = result.data.length;
             }
         });
+        await accountManager.listAccounts(projectId).then(result => {
+            if (result.success === true) {
+                counts.accounts = result.data.length;
+            }
+        });
+        await policyManager.listPolicies(projectId).then(result => {
+            if (result.success === true) {
+                counts.policies = result.data.length;
+            }
+        });
 
-        // TODO
-        // Accounts: accounts
-        // Policies: policies
-        // Procurement Requests: procurements
-        // My Products: myProducts
+        if (await runtimeConfig.marketplaceIntegration(projectId) === false) {
+            await procurementManager.listProcurements(projectId, ['ENTITLEMENT_ACTIVATION_REQUESTED']).then(result => {
+                if (result.success === true) {
+                    counts.procurements = result.data.length;
+                }
+            });
+        }
 
         if (counts) {
             dsCache.set(dashboardCacheKey, counts, 60);
         }
+    }
+
+    if (await runtimeConfig.marketplaceIntegration(projectId) === false) {
+        await policyManager.listUserPolicies(projectId, email).then(result => {
+            if (result.success === true) {
+                counts.myProducts = result.data.length;
+            }
+        });
     }
     return counts;
 }

@@ -77,7 +77,10 @@ export default {
       if (this.counts && Object.keys(this.counts).length > 0) {
         list.forEach(c => {
           if (c.name in this.counts) {
-            c.count = this.counts[c.name];
+            const num = this.counts[c.name];
+            if (num !== 0) {
+              c.count = this.counts[c.name];
+            }
           }
         });
       }
