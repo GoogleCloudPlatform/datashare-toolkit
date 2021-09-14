@@ -11,8 +11,6 @@ steps:
   args: ['install']
   env:
   - 'PROJECT_ID=$PROJECT_ID'
-- name: gcr.io/cloud-builders/gcloud
-  dir: 'shared'
 - name: 'node:12.11.1'
   dir: 'shared'
   entrypoint: 'npm'
