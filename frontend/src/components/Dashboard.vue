@@ -5,7 +5,7 @@
       <v-row
         justify="center"
         align="center"
-        v-if="this.$store.getters.isLoggedIn === false"
+        v-if="this.$store.getters.isLoggedIn === true"
       >
         <v-container style="width: 80px;">
           <v-progress-linear
