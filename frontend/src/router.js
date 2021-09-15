@@ -70,7 +70,8 @@ const routerOptions = [
       dashboard: {
         description:
           'Datasets are top-level containers that are used to organize and control access to your tables and views.',
-        order: 1
+        order: 1,
+        iconColor: 'light-blue'
       }
     }
   },
@@ -89,7 +90,8 @@ const routerOptions = [
       dashboard: {
         description:
           'An authorized view lets you share query results with particular users and groups without giving them access to the underlying tables.',
-        order: 2
+        order: 2,
+        iconColor: 'light-blue'
       }
     }
   },
@@ -108,7 +110,8 @@ const routerOptions = [
       dashboard: {
         description:
           'A named resource to which messages are sent by publishers.',
-        order: 3
+        order: 3,
+        iconColor: 'light-blue'
       }
     }
   },
@@ -127,7 +130,8 @@ const routerOptions = [
       dashboard: {
         description:
           'The Buckets resource represents a bucket in Cloud Storage.',
-        order: 4
+        order: 4,
+        iconColor: 'light-blue'
       }
     }
   },
@@ -147,7 +151,8 @@ const routerOptions = [
       dashboard: {
         description:
           'Managed accounts that are provisioned access to GCP resources through Datashare policies.',
-        order: 5
+        order: 5,
+        iconColor: 'red lighten-1'
       }
     }
   },
@@ -166,7 +171,8 @@ const routerOptions = [
       dashboard: {
         description:
           'Policies allow data publishers to manage groupings of Datasets/Tables/PubSub Topics/Cloud Storage Buckets.',
-        order: 6
+        order: 6,
+        iconColor: 'red lighten-1'
       }
     }
   },
@@ -187,7 +193,8 @@ const routerOptions = [
       dashboard: {
         description:
           'Manage procurements purchased through the GCP Marketplace.',
-        order: 7
+        order: 7,
+        iconColor: 'green lighten-1'
       }
     }
   },
@@ -206,7 +213,8 @@ const routerOptions = [
       dashboard: {
         description:
           'View Datashare products that you have purchased through GCP Marketplace.',
-        order: 8
+        order: 8,
+        iconColor: 'green lighten-1'
       }
     }
   },
@@ -408,6 +416,7 @@ Router.prototype.userDashboardCards = function() {
     return {
       title: route.meta.dashboard.title || route.meta.title,
       icon: route.meta.icon,
+      iconColor: route.meta.dashboard.iconColor,
       name: route.name,
       description: route.meta.dashboard.description
     };
