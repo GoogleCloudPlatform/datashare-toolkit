@@ -5,18 +5,18 @@
       contain
       height="200"
     ></v-img>
-    <Links msg="Welcome to Datashare" />
+    <Documentation msg="Datashare Documentation" />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import Links from '@/components/Links';
+import Documentation from '@/components/Documentation';
 
 export default {
-  name: 'links',
+  name: 'documentation',
   components: {
-    Links
+    Documentation
   }
 };
 </script>

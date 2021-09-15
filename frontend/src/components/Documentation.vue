@@ -10,7 +10,7 @@
       </p>
     </v-flex>
     <v-flex xs12 mb-5>
-      <h2 class="headline font-weight-bold mb-2">Documentation</h2>
+      <h2 class="headline font-weight-bold mb-2">User Guide</h2>
       <v-layout justify-center>
         <a
           v-for="(doc, i) in documentation"
@@ -44,7 +44,7 @@
 import config from './../config';
 
 export default {
-  name: 'links',
+  name: 'documentation',
   props: {
     msg: String
   },

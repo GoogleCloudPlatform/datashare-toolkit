@@ -227,17 +227,17 @@ const routerOptions = [
     }
   },
   {
-    path: '/links',
-    name: 'links',
-    component: 'Links',
+    path: '/documentation',
+    name: 'documentation',
+    component: 'Documentation',
     meta: {
       icon: mdiLifebuoy,
-      title: 'Links',
+      title: 'Documentation',
       menu: {
         order: 11
       },
       dashboard: {
-        description: 'Find helpful Datashare links.',
+        description: 'Find helpful Datashare documentation.',
         order: 9
       }
     }
