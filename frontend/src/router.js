@@ -235,10 +235,6 @@ const routerOptions = [
       title: 'Documentation',
       menu: {
         order: 11
-      },
-      dashboard: {
-        description: 'Find helpful Datashare documentation.',
-        order: 9
       }
     }
   },
@@ -383,7 +379,7 @@ Router.prototype.userNavigableRoutes = function() {
 
 Router.prototype.userMenuItems = function() {
   let filtered = this.userNavigableRoutes().filter(route => {
-    return route.meta && route.meta.menu;
+    return route.meta && route.meta.menu && route.meta.menu.order;
   });
   let sorted = underscore.sortBy(filtered, function(route) {
     return route.meta.menu.order;
@@ -403,7 +399,7 @@ Router.prototype.userMenuItems = function() {
 Router.prototype.userDashboardCards = function() {
   let routes = this.userNavigableRoutes();
   let filtered = routes.filter(route => {
-    return route.meta && route.meta.dashboard;
+    return route.meta && route.meta.dashboard && route.meta.dashboard.order;
   });
   let sorted = underscore.sortBy(filtered, function(route) {
     return route.meta.dashboard.order;
