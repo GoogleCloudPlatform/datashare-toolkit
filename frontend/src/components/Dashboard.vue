@@ -2,7 +2,11 @@
   <v-layout text-xs-center wrap>
     <!--https://stackoverflow.com/questions/52343526/center-content-vertically-on-vuetify-->
     <v-container fluid fill-height>
-      <v-row justify="center" align="center">
+      <v-row
+        justify="center"
+        align="center"
+        v-if="this.$store.getters.isLoggedIn === false"
+      >
         <v-container style="width: 80px;">
           <v-progress-linear
             rounded
@@ -61,18 +65,17 @@ import { mdiArrowRightBoldCircleOutline } from '@mdi/js';
 
 export default {
   name: 'dashboard',
-  props: {
-    msg: String
-  },
   created() {
-    this.loading = true;
-    this.$store.dispatch('getDashboard').then(response => {
-      if (response.success) {
-        const data = response.data;
-        this.counts = data;
-      }
-      this.loading = false;
-    });
+    if (this.$store.getters.isLoggedIn) {
+      this.loading = true;
+      this.$store.dispatch('getDashboard').then(response => {
+        if (response.success) {
+          const data = response.data;
+          this.counts = data;
+        }
+        this.loading = false;
+      });
+    }
   },
   data: () => ({
     loading: false,

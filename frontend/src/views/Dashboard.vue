@@ -5,18 +5,21 @@
       contain
       height="40"
     ></v-img>
-    <Dashboard msg="Welcome to Datashare" />
+    <Dashboard />
+    <Documentation />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import Dashboard from '@/components/Dashboard';
+import Documentation from '@/components/Documentation';
 
 export default {
   name: 'dashboard',
   components: {
-    Dashboard
+    Dashboard,
+    Documentation
   }
 };
 </script>

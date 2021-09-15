@@ -1,8 +1,8 @@
 <template>
   <v-layout text-xs-center wrap>
-    <v-flex my-5>
+    <v-flex my-5 v-if="this.$store.getters.isLoggedIn === false">
       <h1 class="display-5 font-weight-bold mb-3">
-        {{ msg }}
+        Welcome to Datashare
       </h1>
       <p class="subheading font-weight-regular">
         For a guides on how to use this interface, please reference the links
@@ -45,9 +45,6 @@ import config from './../config';
 
 export default {
   name: 'documentation',
-  props: {
-    msg: String
-  },
   data: () => ({
     documentation: [
       {

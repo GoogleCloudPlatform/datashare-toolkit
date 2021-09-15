@@ -29,7 +29,6 @@ import {
   mdiBucketOutline,
   mdiDatabase,
   mdiDog,
-  mdiLifebuoy,
   mdiShieldKey,
   mdiShopping,
   mdiViewDashboardOutline,
@@ -231,18 +230,6 @@ const routerOptions = [
         order: 10,
         section: 'Application',
         subheader: 'Admin'
-      }
-    }
-  },
-  {
-    path: '/documentation',
-    name: 'documentation',
-    component: 'Documentation',
-    meta: {
-      icon: mdiLifebuoy,
-      title: 'Documentation',
-      menu: {
-        order: 11
       }
     }
   },
