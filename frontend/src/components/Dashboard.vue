@@ -26,7 +26,9 @@
               height="250"
             >
               <v-row justify="center" align="center">
-                <v-icon class="my-3" size="40">{{ card.icon }}</v-icon>
+                <v-icon class="my-3" size="40" :color="card.iconColor">{{
+                  card.icon
+                }}</v-icon>
                 <v-card-title
                   v-text="card.title"
                   justify="center"
