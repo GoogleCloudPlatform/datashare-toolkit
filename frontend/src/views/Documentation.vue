@@ -5,7 +5,7 @@
       contain
       height="200"
     ></v-img>
-    <Documentation msg="Datashare Documentation" />
+    <Documentation msg="Datashare" />
   </div>
 </template>
 
