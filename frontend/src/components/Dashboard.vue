@@ -23,9 +23,11 @@
             v-slot="{ hover }"
             open-delay="200"
           >
+            <!--https://github.com/vuetifyjs/vuetify/pull/12216/files-->
             <v-card
               :elevation="hover ? 16 : 2"
               class="d-flex flex-column mx-3 my-3"
+              :class="{ 'on-hover': hover }"
               width="300"
               height="250"
             >
@@ -59,6 +61,13 @@
     </v-container>
   </v-layout>
 </template>
+
+<style lang="sass" scoped>
+.v-card.on-hover.theme--dark
+  background-color: rgba(#FFF, 0.1)
+  >.v-card__text
+    color: #000
+</style>
 
 <script>
 import { mdiArrowRightBoldCircleOutline } from '@mdi/js';
