@@ -25,6 +25,45 @@
           >
             <!--https://github.com/vuetifyjs/vuetify/pull/12216/files-->
             <v-card
+              v-if="true === false"
+              :elevation="hover ? 16 : 2"
+              class="d-flex flex-column mx-3 my-3"
+              :class="{ 'on-hover': hover }"
+              width="300"
+              height="200"
+              :to="card.name"
+            >
+              <v-container>
+                <v-row>
+                  <v-column>
+                    <v-row no-gutters>
+                      <v-icon
+                        class="ml-4 mt-5"
+                        size="40"
+                        :color="card.iconColor"
+                        >{{ card.icon }}</v-icon
+                      >
+                      <v-card-title
+                        class="mt-2"
+                        v-text="card.title"
+                      ></v-card-title>
+                      <v-spacer></v-spacer>
+                      <v-card-subtitle class="dark--text mr-2 mt-3">
+                        {{ card.count }}
+                      </v-card-subtitle>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-card-subtitle
+                        v-text="card.description"
+                        class="grey--text mx-6"
+                      ></v-card-subtitle>
+                    </v-row>
+                  </v-column>
+                </v-row>
+              </v-container>
+            </v-card>
+            <v-card
+              v-else
               :elevation="hover ? 16 : 2"
               class="d-flex flex-column mx-3 my-3"
               :class="{ 'on-hover': hover }"
