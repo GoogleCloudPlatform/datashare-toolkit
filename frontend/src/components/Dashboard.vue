@@ -46,9 +46,7 @@
                 ></v-card-subtitle>
               </v-row>
               <v-card-actions class="mb-2">
-                <div class="dark--text ms-4">
-                  {{ card.count }}
-                </div>
+                <div class="dark--text ms-4">{{ card.count }}</div>
                 <v-spacer></v-spacer>
                 <v-btn icon :to="{ path: card.name }">
                   <v-icon>{{ icons.arrowRight }} </v-icon>
