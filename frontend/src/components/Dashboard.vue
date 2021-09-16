@@ -30,7 +30,7 @@
               class="d-flex flex-column mx-3 my-3"
               :class="{ 'on-hover': hover }"
               width="300"
-              height="200"
+              height="250"
               :to="card.name"
             >
               <v-container>
@@ -61,6 +61,13 @@
                   </v-column>
                 </v-row>
               </v-container>
+              <v-spacer></v-spacer>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn class="mb-2 mr-2" icon :to="{ path: card.name }">
+                  <v-icon>{{ icons.arrowRight }} </v-icon>
+                </v-btn>
+              </v-card-actions>
             </v-card>
             <v-card
               v-else
