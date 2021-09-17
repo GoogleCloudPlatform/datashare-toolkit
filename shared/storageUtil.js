@@ -258,7 +258,7 @@ class StorageUtil {
     async getBucketIamPolicy(bucketName) {
         const bucket = this.storage.bucket(bucketName);
         return bucket.iam.getPolicy({ requestedPolicyVersion: 3 })
-            .then(function (data) {
+            .then(data => {
                 const policy = data[0];
                 const apiResponse = data[1];
                 return policy;
@@ -276,7 +276,7 @@ class StorageUtil {
      */
     async setBucketIamPolicy(bucketName, policy) {
         const bucket = this.storage.bucket(bucketName);
-        return bucket.iam.setPolicy(policy).then(function (data) {
+        return bucket.iam.setPolicy(policy).then(data => {
             const policy = data[0];
             const apiResponse = data[1];
             return policy;

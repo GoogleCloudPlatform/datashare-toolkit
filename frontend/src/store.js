@@ -395,6 +395,12 @@ const store = new Vuex.Store({
       return client.deleteTopic(payload.topicId).catch(error => {
         notify(error);
       });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getDashboard({ commit }, payload) {
+      return client.getDashboard().catch(error => {
+        notify(error);
+      });
     }
   }
 });

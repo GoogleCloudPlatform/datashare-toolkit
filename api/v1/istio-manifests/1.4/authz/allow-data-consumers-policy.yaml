@@ -14,6 +14,7 @@ spec:
         paths: 
         - /v1/products
         - /v1/resources/configuration
+        - /v1/resources/dashboard
         - /v1/resources/projects
     - operation:
         methods:
