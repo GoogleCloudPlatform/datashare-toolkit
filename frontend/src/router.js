@@ -184,7 +184,7 @@ const routerOptions = [
       requiresDataProducer: true,
       requiresMarketplaceIntegration: true,
       icon: mdiShopping,
-      title: 'Procurement Requests',
+      title: 'Procurements',
       menu: {
         order: 8,
         section: 'Marketplace'
