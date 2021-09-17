@@ -370,5 +370,10 @@ export default {
     return axios
       .delete(this._apiBaseUrl() + `/pubsub/topics/${topicId}`)
       .then(response => response);
+  },
+  getDashboard() {
+    return axios
+      .get(this._apiBaseUrl() + '/resources/dashboard')
+      .then(response => response);
   }
 };

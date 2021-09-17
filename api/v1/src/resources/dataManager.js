@@ -17,10 +17,18 @@
 'use strict';
 
 const config = require('../lib/config');
-
+const NodeCache = require("node-cache");
+const dsCache = new NodeCache();
+const dashboardCacheKey = 'dashboardCounts';
 const { CommonUtil } = require('cds-shared');
 const commonUtil = CommonUtil;
 const runtimeConfig = require('../lib/runtimeConfig');
+const datasetManager = require('../datasets/dataManager');
+const pubsubManager = require('../pubsub/dataManager');
+const storageManager = require('../storage/dataManager');
+const accountManager = require('../accounts/dataManager');
+const policyManager = require('../policies/dataManager');
+const procurementManager = require('../procurements/dataManager');
 
 /**
  * @param  {} projectId
@@ -38,7 +46,7 @@ async function getConfiguration(projectId, token) {
         dict.projectId = projectId;
     } else {
         dict.projectId = currentProjectId;
-    }    
+    }
 
     dict.isDataProducer = dataProducer;
     dict.isMarketplaceEnabled = commerce;
@@ -54,7 +62,7 @@ async function getConfiguration(projectId, token) {
     }
 
     if (!dict.labels) {
-        dict.labels = { };
+        dict.labels = {};
     }
 
     return dict;
@@ -100,7 +108,70 @@ async function isDataProducer(token) {
     return isProducer;
 }
 
+/**
+ * @param  {} projectId
+ * @param  {} email
+ */
+async function getDashboardCounts(projectId, email) {
+    let counts = dsCache.get(dashboardCacheKey);
+    if (counts == undefined) {
+        counts = {};
+        await datasetManager.listDatasets(projectId).then(result => {
+            if (result.success === true) {
+                counts.datasets = result.data.length;
+            }
+        });
+        await datasetManager.listDatasetViews(projectId).then(result => {
+            if (result.success === true) {
+                counts.views = result.data.length;
+            }
+        });
+        await pubsubManager.listTopics(projectId).then(result => {
+            if (result.success === true) {
+                counts.topics = result.data.length;
+            }
+        });
+        await storageManager.listBuckets(projectId).then(result => {
+            if (result.success === true) {
+                counts.buckets = result.data.length;
+            }
+        });
+        await accountManager.listAccounts(projectId).then(result => {
+            if (result.success === true) {
+                counts.accounts = result.data.length;
+            }
+        });
+        await policyManager.listPolicies(projectId).then(result => {
+            if (result.success === true) {
+                counts.policies = result.data.length;
+            }
+        });
+
+        if (await runtimeConfig.marketplaceIntegration(projectId) === true) {
+            await procurementManager.listProcurements(projectId, ['ENTITLEMENT_ACTIVATION_REQUESTED']).then(result => {
+                if (result.success === true) {
+                    counts.procurements = result.data.length;
+                }
+            });
+        }
+
+        if (counts) {
+            dsCache.set(dashboardCacheKey, counts, 60);
+        }
+    }
+
+    if (await runtimeConfig.marketplaceIntegration(projectId) === true) {
+        await policyManager.listUserPolicies(projectId, email).then(result => {
+            if (result.success === true) {
+                counts.myProducts = result.data.length;
+            }
+        });
+    }
+    return counts;
+}
+
 module.exports = {
-    getConfiguration
+    getConfiguration,
+    getDashboardCounts
 };
 

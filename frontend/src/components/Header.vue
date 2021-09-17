@@ -75,10 +75,6 @@
         :loading="loading"
       ></v-select>
       <v-spacer></v-spacer>
-      <v-avatar :tile="true" height="25" width="25">
-        <img :src="require('@/assets/datashare-alpha-24px.svg')" alt="logo" />
-      </v-avatar>
-      <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
           <v-btn icon dark v-on="on" @click="toggleLightDarkMode">
@@ -155,11 +151,7 @@ import {
   mdiViewGrid,
   mdiApplicationImport,
   mdiHubspot,
-  mdiBadgeAccount,
   mdiShieldKey,
-  mdiShopping,
-  mdiBriefcaseAccount,
-  mdiBucketOutline,
   mdiThemeLightDark
 } from '@mdi/js';
 
@@ -221,25 +213,6 @@ export default {
     });
   },
   methods: {
-    canAccessRoute(navItem) {
-      let routes = this.$router.options.routes;
-      let route = routes.filter(item => {
-        if (navItem.name === item.name) {
-          return true;
-        }
-      });
-      if (route === undefined || route.length === 0) {
-        return true;
-      } else if (route[0].meta && route[0].meta.requiresAuth === true) {
-        if (route[0].meta.requiresDataProducer === true) {
-          return this.isLoggedIn && this.isDataProducer;
-        } else {
-          return this.isLoggedIn;
-        }
-      } else {
-        return true;
-      }
-    },
     projectIdChanged(reload) {
       _config.projectId = this.projectId;
       if (reload === true) {
@@ -292,74 +265,7 @@ export default {
       return this.projectSelectorEnabled && this.isDataProducer;
     },
     navigationItems() {
-      let items = [
-        {
-          name: 'home',
-          title: 'Home',
-          icon: mdiHome
-        },
-        {
-          section: 'Channels',
-          name: 'datasets',
-          title: 'Datasets',
-          icon: mdiDatabase
-        },
-        {
-          name: 'views',
-          title: 'Authorized Views',
-          icon: mdiViewGrid
-        },
-        {
-          name: 'topics',
-          title: 'Pub/Sub Topics',
-          icon: mdiDog
-        },
-        {
-          name: 'buckets',
-          title: 'Storage Buckets',
-          icon: mdiBucketOutline
-        },
-        {
-          section: 'Entitlements',
-          name: 'accounts',
-          title: 'Accounts',
-          icon: mdiAccountMultiple
-        },
-        {
-          name: 'policies',
-          title: 'Policies',
-          icon: mdiBadgeAccount
-        },
-        {
-          section: 'Marketplace',
-          hidden: _config.marketplaceIntegrationEnabled === false
-        },
-        {
-          name: 'procurements',
-          title: 'Procurement Requests',
-          icon: mdiShopping,
-          hidden: _config.marketplaceIntegrationEnabled === false
-        },
-        {
-          name: 'myProducts',
-          title: 'My Products',
-          icon: mdiBriefcaseAccount,
-          hidden: _config.marketplaceIntegrationEnabled === false
-        },
-        {
-          section: 'Application',
-          subheader: 'Admin',
-          name: 'admin',
-          title: 'Admin',
-          icon: mdiShieldKey
-        }
-      ];
-      // https://router.vuejs.org/api/#to
-      // https://vuetifyjs.com/en/components/lists
-      // Add a to variable to pass this instead so we can use the same views for certain things.
-      return items.filter(item => {
-        return this.canAccessRoute(item) && !item.hidden;
-      });
+      return this.$router.userMenuItems();
     }
   },
   props: {

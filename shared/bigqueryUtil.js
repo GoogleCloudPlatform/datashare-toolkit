@@ -265,7 +265,9 @@ class BigQueryUtil {
 
         return { metadata, exists, datasetExists, tableExists, error, errorMessage };
     }
-
+    
+    /**
+     */
     async getClient() {
         const auth = new google.auth.GoogleAuth({
             scopes: 'https://www.googleapis.com/auth/cloud-platform'
@@ -863,7 +865,10 @@ class BigQueryUtil {
         }
         return access;
     }
-
+    
+    /**
+     * @param  {} name
+     */
     isValidDatasetName(name) {
         let errors = [];
         if (name) {
@@ -880,7 +885,10 @@ class BigQueryUtil {
         let isValid = errors.length === 0;
         return { isValid, errors };
     }
-
+    
+    /**
+     * @param  {} name
+     */
     isValidTableName(name) {
         let errors = [];
         if (name) {

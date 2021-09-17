@@ -3,20 +3,23 @@
     <v-img
       :src="require('../assets/datashare-colored36px.svg')"
       contain
-      height="300"
+      height="40"
     ></v-img>
-    <Welcome msg="Welcome to Datashare" />
+    <Dashboard />
+    <Documentation />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import Welcome from '@/components/Welcome';
+import Dashboard from '@/components/Dashboard';
+import Documentation from '@/components/Documentation';
 
 export default {
-  name: 'home',
+  name: 'dashboard',
   components: {
-    Welcome
+    Dashboard,
+    Documentation
   }
 };
 </script>
