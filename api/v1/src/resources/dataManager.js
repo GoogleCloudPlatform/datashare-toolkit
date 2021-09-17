@@ -147,7 +147,7 @@ async function getDashboardCounts(projectId, email) {
             }
         });
 
-        if (await runtimeConfig.marketplaceIntegration(projectId) === false) {
+        if (await runtimeConfig.marketplaceIntegration(projectId) === true) {
             await procurementManager.listProcurements(projectId, ['ENTITLEMENT_ACTIVATION_REQUESTED']).then(result => {
                 if (result.success === true) {
                     counts.procurements = result.data.length;
@@ -160,7 +160,7 @@ async function getDashboardCounts(projectId, email) {
         }
     }
 
-    if (await runtimeConfig.marketplaceIntegration(projectId) === false) {
+    if (await runtimeConfig.marketplaceIntegration(projectId) === true) {
         await policyManager.listUserPolicies(projectId, email).then(result => {
             if (result.success === true) {
                 counts.myProducts = result.data.length;
