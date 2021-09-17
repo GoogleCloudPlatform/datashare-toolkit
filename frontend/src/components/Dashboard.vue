@@ -25,7 +25,7 @@
           >
             <!--https://github.com/vuetifyjs/vuetify/pull/12216/files-->
             <v-card
-              v-if="true === false"
+              v-if="true === true"
               :elevation="hover ? 16 : 2"
               class="d-flex flex-column mx-3 my-3"
               :class="{ 'on-hover': hover }"
