@@ -5,21 +5,30 @@
     <v-avatar :tile="true" height="25" width="25">
       <img :src="require('@/assets/datashare-alpha-24px.svg')" alt="logo" />
     </v-avatar>
-    <v-spacer></v-spacer>
-    {{ apiProjectLabel }}
+    v{{ appVersion }} | {{ projectLabel }} | {{ apiProjectLabel }}
   </v-footer>
 </template>
 
 <script>
 import config from './../config';
+import { version } from '../../package';
 export default {
+  data: () => ({
+    appVersion: version
+  }),
   computed: {
     projectId() {
       return config.apiProjectId;
     },
     apiProjectLabel() {
       if (this.projectId) {
-        return `api project: ${this.projectId}`;
+        return `api projectId: ${this.projectId}`;
+      }
+      return null;
+    },
+    projectLabel() {
+      if (config.projectId) {
+        return `projectId: ${config.projectId}`;
       }
       return null;
     }

@@ -1,7 +1,7 @@
 {
     "name": "cds-api",
     "description": "Datashare API Service",
-    "version": "0.7.3",
+    "version": "2.0.0",
     "license": "Apache-2.0",
     "dependencies": {
         "@google-cloud/resource-manager": "^2.0.0",
