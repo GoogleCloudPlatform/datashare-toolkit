@@ -92,6 +92,7 @@ DELETE_REVISIONS=`gcloud run revisions list \
     --cluster-location $ZONE \
     --namespace $NAMESPACE \
     --platform gke \
+    | grep REVISION: \
     | awk 'NR > 4 {print $2}'`;
 
 if [ ! -z "$DELETE_REVISIONS" ]; then
