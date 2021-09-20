@@ -78,12 +78,12 @@ if ! gcloud run services describe ds-api --cluster $CLUSTER --cluster-location $
         --update-env-vars=^---^MANAGED_PROJECTS="${MANAGED_PROJECTS}"
 fi
 
-# gcloud run services update-traffic ds-api \
-#     --cluster $CLUSTER \
-#     --cluster-location $ZONE \
-#     --to-latest \
-#     --namespace $NAMESPACE \
-#     --platform gke
+gcloud run services update-traffic ds-api \
+    --cluster $CLUSTER \
+    --cluster-location $ZONE \
+    --to-latest \
+    --namespace $NAMESPACE \
+    --platform gke
 
 # Delete old revisions
 DELETE_REVISIONS=`gcloud run revisions list \
