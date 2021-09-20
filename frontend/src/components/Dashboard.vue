@@ -35,7 +35,7 @@
             >
               <v-container>
                 <v-row>
-                  <v-column>
+                  <div>
                     <v-row no-gutters>
                       <v-icon
                         class="ml-4 mt-5"
@@ -58,7 +58,7 @@
                         class="grey--text mx-6"
                       ></v-card-subtitle>
                     </v-row>
-                  </v-column>
+                  </div>
                 </v-row>
               </v-container>
               <v-spacer></v-spacer>

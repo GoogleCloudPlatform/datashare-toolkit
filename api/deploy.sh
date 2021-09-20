@@ -78,12 +78,12 @@ if ! gcloud run services describe ds-api --cluster $CLUSTER --cluster-location $
         --update-env-vars=^---^MANAGED_PROJECTS="${MANAGED_PROJECTS}"
 fi
 
-gcloud run services update-traffic ds-api \
-    --cluster $CLUSTER \
-    --cluster-location $ZONE \
-    --to-latest \
-    --namespace $NAMESPACE \
-    --platform gke
+# gcloud run services update-traffic ds-api \
+#     --cluster $CLUSTER \
+#     --cluster-location $ZONE \
+#     --to-latest \
+#     --namespace $NAMESPACE \
+#     --platform gke
 
 # Delete old revisions
 DELETE_REVISIONS=`gcloud run revisions list \
@@ -92,6 +92,7 @@ DELETE_REVISIONS=`gcloud run revisions list \
     --cluster-location $ZONE \
     --namespace $NAMESPACE \
     --platform gke \
+    | grep REVISION: \
     | awk 'NR > 4 {print $2}'`;
 
 if [ ! -z "$DELETE_REVISIONS" ]; then
@@ -163,6 +164,7 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
         --cluster-location $ZONE \
         --namespace $NAMESPACE \
         --platform gke \
+        | grep REVISION: \
         | awk 'NR > 4 {print $2}'`;
 
     if [ ! -z "$DELETE_REVISIONS" ]; then
