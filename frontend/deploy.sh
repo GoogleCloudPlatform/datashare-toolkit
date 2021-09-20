@@ -42,6 +42,7 @@ DELETE_REVISIONS=`gcloud run revisions list \
     --service ds-frontend-ui \
     --region ${REGION} \
     --platform managed \
+    | grep REVISION: \
     | awk 'NR > 4 {print $2}'`;
 
 if [ ! -z "$DELETE_REVISIONS" ]; then
