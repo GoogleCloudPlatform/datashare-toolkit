@@ -164,6 +164,7 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
         --cluster-location $ZONE \
         --namespace $NAMESPACE \
         --platform gke \
+        | grep REVISION: \
         | awk 'NR > 4 {print $2}'`;
 
     if [ ! -z "$DELETE_REVISIONS" ]; then
