@@ -300,10 +300,12 @@ Set the ACCOUNT_EMAIL environment variable:
 
     export ACCOUNT_EMAIL=`gcloud config list account --format "value(core.account)"`; echo $ACCOUNT_EMAIL
 
-Bind the *roles/iam.serviceAccountTokenCreator* role to ACCOUNT_EMAIL and the API_GW_SERVICE_ACCOUNT_NAME
+Bind the *roles/iam.serviceAccountTokenCreator* role to ACCOUNT_EMAIL and the API_GW_SERVICE_ACCOUNT_NAME.
 
     gcloud iam service-accounts add-iam-policy-binding ${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com  \
         --member user:${ACCOUNT_EMAIL} --role="roles/iam.serviceAccountTokenCreator"
+
+You may need to wait for the permission to propagate before executing the next command.
 
 Get an Impersonated Access token:
 
@@ -325,7 +327,7 @@ Verify 200 with Auth header and JWT aud.
 
 **Note** Cloud Run will remove the Authorization header JWT signature for backend services to prevent ID token replays (details [here](https://cloud.google.com/run/docs/troubleshooting#signature-removed)). Since the API Gateway will pass the initial Authorization header via 'X-Forwarded-Authorization', we can test accordingly.
 
-    curl -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$DS_API_URL)" -H "X-Forwarded-Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$VUE_APP_GOOGLE_APP_CLIENT_ID)" -i $DS_API_URL/v1/resources/configuration
+    curl -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$DS_API_URL)" -H "X-Forwarded-Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$OAUTH_CLIENT_ID)" -i $DS_API_URL/v1/resources/configuration
 
 #### Create API Gateway Config
 The API Gateway requires an OpenAPI specification for creating the API Gateway Config. Currently, it only supports OpenAPI v2 spec (aka Swagger). You can can use the latest OAS YAML [here](./config/openapi_spec.v2.yaml.tmpl) or dynamically generate JSON via `http://{HOSTNAME}/{API_VERSION}/docs/openapi_spec`, but will need to convert from JSON to YAML. e.g.
