@@ -374,7 +374,7 @@ Get the URL
 Verify the DS API is not accessible: \
 **Note**: The HTTP response code should be *401 Unauthorized*
 
-    curl -i https://$API_GW_URL/v1
+    curl -i https://$API_GW_URL/v1/welcome
 
 Check that CORS pre-flight requests work (w/o Authorization header): \
 **Note**: The HTTP response code should be *204 No Content*
