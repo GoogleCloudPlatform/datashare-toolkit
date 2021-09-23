@@ -339,7 +339,7 @@ Copy the OAS v2 template:
     cp ./api/config/openapi_spec.v2.yaml.tmpl ds-api_oas.yaml
 
 You need to modify the DS_API_FQDN, PROJECT_ID, and OAUTH_CLIENT_ID variables for the `x-google-backend` parameter to the open api spec with the following environment variables. \
-**Note** The DS_API_FQDN is either the API domain configured or the DS_API_URL withouth the 'https://' prefix. e.g `export DS_API_FQDN=$(echo $DS_API_URL | sed 's!https://!!'); echo $DS_API_FQDN`
+**Note** The DS_API_FQDN is either the API domain configured or the DS_API_URL without the 'https://' prefix. e.g `export DS_API_FQDN=$(echo $DS_API_URL | sed 's!https://!!'); echo $DS_API_FQDN`
 
     sed -i.bak "s|DS_API_FQDN|$DS_API_FQDN|" ds-api_oas.yaml
 
