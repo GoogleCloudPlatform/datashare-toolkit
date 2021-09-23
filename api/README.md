@@ -386,7 +386,7 @@ To test the Google Identity Provider, *https://accounts.google.com*, you can lev
 Verify the DS API is accessible with a valid Bearer ID Token: \
 **Note**: The HTTP response code should be *200 Ok*
 
-    curl -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email)" -i https://$API_GW_URL/v1/welcome
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$OAUTH_CLIENT_ID)" https://$API_GW_URL/v1/welcome
 
 To test the application authorization, we need to change the JWT audience to be the OAUTH_CLIENT_ID that was configured for the API Gateway Config. Cloud Run will remove the default Authorization header JWT signature for backend services to prevent ID token replays (details [here](https://cloud.google.com/run/docs/troubleshooting#signature-removed)). Since the API Gateway will pass the initial Authorization header via 'X-Forwarded-Authorization', we can test accordingly.
 
