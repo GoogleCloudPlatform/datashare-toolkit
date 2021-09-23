@@ -393,7 +393,7 @@ To test the application authorization, we need to change the JWT audience to be 
 Verify the DS API is accessible with a valid Bearer ID Token and JWT audience: \
 **Note**: The HTTP response code should be *200 Ok*
 
-    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$VUE_APP_GOOGLE_APP_CLIENT_ID)" https://$API_GW_URL/v1/resources/configuration
+    curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email --audiences=$OAUTH_CLIENT_ID)" https://$API_GW_URL/v1/resources/configuration
 
 To test the other Google Identity Provider (without https://), *accounts.google.com*, you need to generate an ID Token from the google-auth-login library. i.e. Test the API_GW_URL in the DS Frontend UI
 
