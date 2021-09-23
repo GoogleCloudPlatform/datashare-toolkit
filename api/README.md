@@ -332,11 +332,11 @@ Verify 200 with Auth header and JWT aud.
 #### Create API Gateway Config
 The API Gateway requires an OpenAPI specification for creating the API Gateway Config. Currently, it only supports OpenAPI v2 spec (aka Swagger). You can can use the latest OAS YAML [here](./config/openapi_spec.v2.yaml.tmpl) or dynamically generate JSON via `http://{HOSTNAME}/{API_VERSION}/docs/openapi_spec`, but will need to convert from JSON to YAML. e.g.
 
-    curl -H "Authorization: Bearer $TOKEN" $DS_API_URL/v1/docs/openapi_spec -o temp/ds-api_oas.json
+    curl -H "Authorization: Bearer $TOKEN" $DS_API_URL/v1/docs/openapi_spec -o ds-api_oas.json
 
 Copy the OAS v2 template:
 
-    cp ./config/openapi_spec.v2.yaml.tmpl ds-api_oas.yaml
+    cp ./api/config/openapi_spec.v2.yaml.tmpl ds-api_oas.yaml
 
 You need to modify the DS_API_FQDN, PROJECT_ID, and OAUTH_CLIENT_ID variables for the `x-google-backend` parameter to the open api spec with the following environment variables. \
 **Note** The DS_API_FQDN is either the API domain configured or the DS_API_URL withouth the 'https://' prefix. e.g `export DS_API_FQDN=$(echo $DS_API_URL | sed 's!https://!!'); echo $DS_API_FQDN`
