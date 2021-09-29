@@ -200,10 +200,6 @@ Export the image/build *TAG* environment variable:
 
     export TAG=dev;
 
-Change directories into the current working API version:
-
-    ./api/v1
-
 ### Cloud Run Prerequisites
 
 Deploy with Cloud Run allows stateless HTTP containers on a fully [managed](https://cloud.google.com/run/docs/choosing-a-platform#cloud-run-fully-managed) environment. If you do not have a pre-built image, [Cloud Build](https://cloud.google.com/run/docs/quickstarts/build-and-deploy#containerizing) packages the Docker image into your Google Container repository.
@@ -213,7 +209,6 @@ Build with Cloud Build and TAG:
 
 **Note**: Cloud Build needs to run from parent directory for build context and the [shared](../shared) directory
 
-    cd ../../
     gcloud builds submit --config api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 [Enable the APIs](https://console.cloud.google.com/flows/enableapi?apiid=cloudapis.googleapis.com,container.googleapis.com,run.googleapis.com) before beginning
