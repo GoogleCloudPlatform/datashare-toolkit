@@ -300,7 +300,7 @@ Bind the *roles/iam.serviceAccountTokenCreator* role to ACCOUNT_EMAIL and the AP
     gcloud iam service-accounts add-iam-policy-binding ${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com  \
         --member user:${ACCOUNT_EMAIL} --role="roles/iam.serviceAccountTokenCreator"
 
-You may need to wait for the permission to propagate before executing the next command.
+'''You may need to wait for the permission to propagate before executing the next command.'''
 
 Get an Impersonated Access token:
 
