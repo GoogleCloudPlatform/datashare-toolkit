@@ -400,7 +400,7 @@ Change directories to [frontend](../frontend)
 
 Set the VUE_APP_API_BASE_URL environment variable
 
-    export VUE_APP_API_BASE_URL=https://$API_GW_URL/v1
+    export VUE_APP_API_BASE_URL=https://$API_GW_URL/v1; echo $VUE_APP_API_BASE_URL
 
 Start the service\
 **Note**: [Nodemon](https://nodemon.io/) is leveraged to read file changes and reload automatically.
