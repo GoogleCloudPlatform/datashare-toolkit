@@ -202,7 +202,7 @@ Export the image/build *TAG* environment variable:
 
 Change directories into the current working API version:
 
-    cd v1
+    ./api/v1
 
 ### Cloud Run Prerequisites
 
