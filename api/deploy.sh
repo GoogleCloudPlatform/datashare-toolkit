@@ -81,10 +81,8 @@ gcloud run services update-traffic ds-api \
 # Delete old revisions
 DELETE_REVISIONS=`gcloud run revisions list \
     --service ds-api \
-    --cluster $CLUSTER \
-    --cluster-location $ZONE \
-    --namespace $NAMESPACE \
-    --platform gke \
+    --region=$REGION \
+    --platform managed \
     | grep REVISION: \
     | awk 'NR > 4 {print $2}'`;
 
@@ -92,10 +90,8 @@ if [ ! -z "$DELETE_REVISIONS" ]; then
     for revision in $DELETE_REVISIONS
     do
         gcloud run revisions delete $revision \
-            --cluster $CLUSTER \
-            --cluster-location $ZONE \
-            --namespace $NAMESPACE \
-            --platform gke \
+            --region=$REGION \
+            --platform managed \
             --async \
             --quiet
     done
