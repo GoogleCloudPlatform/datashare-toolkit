@@ -97,27 +97,6 @@ if [ ! -z "$DELETE_REVISIONS" ]; then
     done
 fi
 
-gcloud container clusters get-credentials $CLUSTER
-kubectl config current-context
-
-# If '*' wildcard is used in the data producers, quote the full string as needed for YAML/applying the policy
-# https://stackoverflow.com/questions/19109912/yaml-do-i-need-quotes-for-strings-in-yaml
-if [[ ${DATA_PRODUCERS} == *"*"* ]]; then
-    echo "* found adding quotes"
-    export DATA_PRODUCERS='"'${DATA_PRODUCERS}'"'
-    echo ${DATA_PRODUCERS}
-fi
-
-# cat istio-manifests/1.4/authn/* | envsubst | kubectl delete -f -
-kubectl get policy.authentication.istio.io -n "$NAMESPACE"
-kubectl delete policy.authentication.istio.io -n "$NAMESPACE" --all
-cat istio-manifests/1.4/authn/* | envsubst | kubectl apply -f -
-
-# cat istio-manifests/1.4/authz/* | envsubst | kubectl delete -f -
-kubectl get authorizationpolicy.security.istio.io -n "$NAMESPACE"
-kubectl delete authorizationpolicy.security.istio.io -n "$NAMESPACE" --all
-cat istio-manifests/1.4/authz/* | envsubst | kubectl apply -f -
-
 if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
     cd ../../
     gcloud builds submit --config api/v1/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
