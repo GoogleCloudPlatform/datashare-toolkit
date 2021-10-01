@@ -28,6 +28,90 @@ var resources = express.Router();
 // methods that require multiple routes
 
 /**
+ * @swagger
+ *
+ * definitions:
+ *   ProjectResource:
+ *     type: object
+ *     description: Project Resource object
+ *     properties:
+ *       projectId:
+ *         type: string
+ *         readOnly: true
+ *         description: Project ID
+ *
+ *   ConfigurationResource:
+ *     type: object
+ *     description: Configuration Resource object
+ *     properties:
+ *       projectId:
+ *         type: string
+ *         readOnly: true
+ *         description: Project ID
+ */
+
+/**
+ * @swagger
+ *
+ * /resources/projects:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsGetResourceProjects
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   get:
+ *     summary: Get Project Resources
+ *     description: Returns the Project Resource response
+ *     operationId: getProjectResources
+ *     tags:
+ *       - resources
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Project Resource
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 projects:
+ *                   $ref: '#/definitions/ProjectResource'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
+
+/**
  * @param  {} '/resources/projects'
  * @param  {} async(req
  * @param  {} res
@@ -71,6 +155,61 @@ resources.get('/resources/projects', async (req, res) => {
 });
 
 /**
+ * @swagger
+ *
+ * /resources/configuration:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsGetResourceConfiguration
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   get:
+ *     summary: Get Configuration Resources
+ *     description: Returns the Configuration Resource response
+ *     operationId: getProjectResourceConfiguration
+ *     tags:
+ *       - resources
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Configuration Resource
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               $ref: '#/definitions/ConfigurationResource'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
+
+/**
  * @param  {} '/resources/configuration'
  * @param  {} async(req
  * @param  {} res
@@ -78,8 +217,18 @@ resources.get('/resources/projects', async (req, res) => {
 resources.get('/resources/configuration', async (req, res) => {
     try {
         const projectId = req.header('x-gcp-project-id');
-        let token = req.header('Authorization');
-        token = token.split(" ")[1];
+        let token;
+        // 'X-Forwarded-Authorization' takes precedence over 'Authorization'
+        for (let name of ['X-Forwarded-Authorization', 'Authorization']) {
+            if (req.header(name) !== undefined) {
+                token = req.header(name)
+                token = token.split(" ")[1];
+                break;
+            }
+        }
+        if (token === undefined) {
+            return res.status(401).json({ code: 401, success: false, errors: [{ message: "Authorization Header is required"}] });
+        }
         const c = await dataManager.getConfiguration(projectId, token);
         const data = { success: true, configuration: c };
         const code = 200;

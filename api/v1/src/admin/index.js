@@ -44,108 +44,144 @@ var admin = express.Router();
  *     description: Syncronize Resources Request object
  *     properties:
  *       type:
- *         type: string
- *         description: Syncronize Resources Type
  *         $ref: '#/definitions/SyncronizeResourcesType'
+ *
+ *   Error:
+ *     type: object
+ *     description: Error object
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: Success of the request
+ *       code:
+ *         type: integer
+ *         description: HTTP status code
+ *       errors:
+ *         type: array
+ *         items:
+ *           type: string
  *
  */
 
 /**
  * @swagger
  *
- * /projects/{projectId}/admin:initSchema:
+ * /admin:initSchema:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsInitSchema
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   post:
  *     summary: Initialize the Datashare schema creation
  *     description: Returns the schema creation response
+ *     operationId: initSchema
  *     tags:
  *       - admin
  *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
  *       required: true
- *       description: Project Id of the init schema request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: initSchema response
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 /**
  * @swagger
  *
- * /projects/{projectId}/admin:syncResources:
+ * /admin:syncResources:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsSyncResources
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   post:
  *     summary: Syncronize the Datashare resources and metadata
  *     description: Returns the syncronize resources response
+ *     operationId: syncResources
  *     tags:
  *       - admin
  *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
  *       required: true
- *       description: Project Id of the syncronize resources request
- *     requestBody:
+ *     - in: body
+ *       name: syncronize_resources
  *       description: Request parameters for Syncronize Resources
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/SyncronizeResourcesRequest'
+ *       schema:
+ *         $ref: '#/definitions/SyncronizeResourcesRequest'
  *       required: true
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Syncronize resources response
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 admin.post('/admin::custom', async (req, res) => {
     const projectId = req.header('x-gcp-project-id');

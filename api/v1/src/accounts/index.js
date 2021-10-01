@@ -54,12 +54,8 @@ var accounts = express.Router();
  *         type: string
  *         description: Account email address
  *       emailType:
- *         type: string
- *         description: Account email type string
  *         $ref: '#/definitions/EmailType'
  *       accountType:
- *         type: string
- *         description: Account type string
  *         $ref: '#/definitions/AccountType'
  *       createdBy:
  *         type: string
@@ -95,49 +91,64 @@ var accounts = express.Router();
  *     enum:
  *       - consumer
  *       - producer
+ *
  */
 
 /**
  * @swagger
  *
- * /projects/{projectId}/accounts:
+ * /accounts:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsAccounts
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Account based off request parameters
  *     description: Returns the PolicyList response
+ *     operationId: listAccounts
  *     tags:
  *       - accounts
  *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
  *       required: true
- *       description: Project Id of the Account request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Account list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: array
- *                   items:
- *                      $ref: '#/definitions/Account'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               items:
+ *                  $ref: '#/definitions/Account'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 accounts.get('/accounts', async (req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -157,61 +168,52 @@ accounts.get('/accounts', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/accounts:
+ * /accounts:
  *   post:
  *     summary: Create Account based off request body
  *     description: Returns the Datset response
+ *     operationId: createAccount
  *     tags:
  *       - accounts
  *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
  *       required: true
- *       description: Project Id of the Account request
  *     - in: header
  *       name: x-gcp-account
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: GCP account name of the calling user
- *     requestBody:
+ *     - in: body
+ *       name: account
  *       description: Request parameters for Account
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/Account'
+ *       schema:
+ *         $ref: '#/definitions/Account'
  *     responses:
  *       201:
  *         description: Account
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Account'
+ *               items:
+ *                 $ref: '#/definitions/Account'
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 accounts.post('/accounts', async (req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -253,50 +255,65 @@ accounts.post('/accounts', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/accounts/{accountId}:
+ * /accounts/{accountId}:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsAccountByAccountId
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: accountId
+ *       type: string
+ *       required: true
+ *       description: Account Id of the Account request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: Get Account based off accountId
  *     description: Returns the Datset response
+ *     operationId: getAccountByAccountId
  *     tags:
  *       - accounts
  *     parameters:
  *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Account request
- *     - in: path
  *       name: accountId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Account Id of the Account request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Account
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                      $ref: '#/definitions/Account'
+ *               items:
+ *                  $ref: '#/definitions/Account'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 accounts.get('/accounts/:accountId', async (req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -319,67 +336,59 @@ accounts.get('/accounts/:accountId', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/accounts/{accountId}:
+ * /accounts/{accountId}:
  *   put:
  *     summary: Update Account based off account ID and request body
  *     description: Returns the Account response
+ *     operationId: updateAccountByAccountId
  *     tags:
  *       - accounts
  *     parameters:
  *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Account request
- *     - in: path
  *       name: accountId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Account Id of the Account request
  *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: header
  *       name: x-gcp-account
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: GCP account name of the calling user
- *     requestBody:
+ *     - in: body
+ *       name: account
  *       description: Request parameters for Account
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/Account'
+ *       schema:
+ *         $ref: '#/definitions/Account'
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Account
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Account'
+ *               items:
+ *                 $ref: '#/definitions/Account'
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 accounts.put('/accounts/:accountId', async (req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -423,67 +432,59 @@ accounts.put('/accounts/:accountId', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/accounts/{accountId}:
+ * /accounts/{accountId}:
  *   delete:
  *     summary: Delete Account based off account ID and request body
  *     description: Returns the Account response
+ *     operationId: deleteAccountByAccountId
  *     tags:
  *       - accounts
  *     parameters:
  *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Account request
- *     - in: path
  *       name: accountId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Account Id of the Account request
  *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: header
  *       name: x-gcp-account
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: GCP account name of the calling user
- *     requestBody:
+ *     - in: body
+ *       name: account
  *       description: Request parameters for Account
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/Account'
+ *       schema:
+ *         $ref: '#/definitions/Account'
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Account
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Account'
+ *               items:
+ *                 $ref: '#/definitions/Account'
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 accounts.delete('/accounts/:accountId', async (req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -508,50 +509,65 @@ accounts.delete('/accounts/:accountId', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/policies/{policyId}/accounts:
+ * /policies/{policyId}/accounts:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsAccountByPolicyId
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: policyId
+ *       type: string
+ *       required: true
+ *       description: Policy Id of the Policy request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Accounts of policy based off policyId and request parameters
  *     description: Returns the Account list response
+ *     operationId: listAccountsByPolicyId
  *     tags:
  *       - policies
  *     parameters:
  *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Policy request
- *     - in: path
  *       name: policyId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Account list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: array
- *                   items:
- *                      $ref: '#/definitions/Account'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               items:
+ *                  $ref: '#/definitions/Account'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 accounts.get('/policies/:policyId/accounts', async (req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -572,50 +588,69 @@ accounts.get('/policies/:policyId/accounts', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/datasets/{datasetId}/accounts:
+ * /datasets/{datasetId}/accounts:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsAccountByDatasetId
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: datasetId
+ *       type: string
+ *       required: true
+ *       description: Dataset Id of the Account request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Accounts based off datasetId and request parameters
  *     description: Returns the AccountList response
+ *     operationId: listAccountsByDatasetId
  *     tags:
  *       - datasets
  *     parameters:
  *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Policy request
- *     - in: path
  *       name: datasetId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Dataset Id of the Policy request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Account list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: array
- *                   items:
- *                      $ref: '#/definitions/Account'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               items:
+ *                  $ref: '#/definitions/Account'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
     const projectId = req.header('x-gcp-project-id');

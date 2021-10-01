@@ -78,16 +78,17 @@ var spots = express.Router();
  *     properties:
  *       bucketName:
  *         type: string
- *         required: true
  *         description: Spot destination storage bucket name
  *       fileName:
  *         type: string
- *         required: false
  *         description: Spot destination storage file name
  *       projectId:
  *         type: string
- *         required: true
  *         description: Spot destination GCP project ID
+ *     required:
+ *       - bucketName
+ *       - fileName
+ *       - projectId
  *
  *   SpotSchema:
  *     type: object
@@ -95,12 +96,12 @@ var spots = express.Router();
  *     properties:
  *       dataId:
  *         type: string
- *         required: true
  *       parameters:
  *         type: object
- *         required: false
  *       destination:
  *         $ref: '#/definitions/SpotDestination'
+ *     required:
+ *       - dataId
  *
  *   SpotResponseSchema:
  *     type: object
@@ -108,19 +109,19 @@ var spots = express.Router();
  *     properties:
  *       requestId:
  *         type: string
- *         required: true
  *       query:
  *         type: string
- *         required: true
  *       bucketName:
  *         type: string
- *         required: true
  *       fileName:
  *         type: string
- *         required: true
  *       signedUrl:
  *         type: string
- *         required: false
+ *     required:
+ *       - requestId
+ *       - query
+ *       - bucketName
+ *       - fileName
  *
  *   SpotStatusResponseSchema:
  *     type: object
@@ -128,99 +129,124 @@ var spots = express.Router();
  *     properties:
  *       requestId:
  *         type: string
- *         required: true
  *       query:
  *         type: string
- *         required: true
  *       bucketName:
  *         type: string
- *         required: true
  *       fileName:
  *         type: string
- *         required: true
  *       signedUrl:
  *         type: string
- *         required: true
+ *     required:
+ *       - requestId
+ *       - query
+ *       - bucketName
+ *       - fileName
+ *       - signedUrl
  *
  */
 
 /**
  * @swagger
  *
- * /projects/{projectId}/spots:config:
+ * /spots:config:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsSpotsConfig
+ *     security: [] # no security for preflight requests
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: Spot API service environment configuration
  *     description: Returns the Spot API service configuration
+ *     operationId: getSpotConfig
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     tags:
  *       - spots
- *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Spot request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Spot API service configuration
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   description: Spot API service config
- *                   properties:
- *                     $ref: '#/definitions/SpotApiServiceConfig'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
+ *               $ref: '#/definitions/SpotApiServiceConfig'
  */
 /**
  * @swagger
  *
- * /projects/{projectId}/spots:options:
+ * /spots:options:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsGetSpotOptions
+ *     security: [] # no security for preflight requests
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: Spot query options (entitlement) for the Spot API service
  *     description: Returns the Spot query options for the Spot API service
+ *     operationId: getSpotOptions
  *     tags:
  *       - spots
  *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Spot request
  *     - in: query
  *       name: includeAvailableValues
- *       schema:
- *          type: boolean
+ *       type: boolean
  *       required: false
  *       description: Include available values in options response
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Spot query options 200 response
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: array
- *                   description: list of Spot API entitlements query options
- *                   items:
- *                     $ref: '#/definitions/SpotOptions'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               description: list of Spot API entitlements query options
+ *               items:
+ *                 $ref: '#/definitions/SpotOptions'
  */
 spots.get('/spots::custom', async(req, res) => {
     var data;
@@ -256,42 +282,40 @@ spots.get('/spots::custom', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/spots:
+ * /spots:
  *   post:
  *     summary: Create Spot based off request parameters
  *     description: Returns the Spot response
+ *     operationId: createSpotRequest
  *     tags:
  *       - spots
  *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
  *       required: true
- *       description: Project Id of the Spot request
- *     requestBody:
+ *     - in: body
+ *       name: spot
  *       description: Request parameters for Spot
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/SpotSchema'
+ *       schema:
+ *         $ref: '#/definitions/SpotSchema'
+ *     produces:
+ *       - application/json
  *     responses:
  *       201:
  *         description: Spot Configuration
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   items:
- *                     $ref: '#/definitions/SpotResponseSchema'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
+ *               items:
+ *                 $ref: '#/definitions/SpotResponseSchema'
  */
 spots.post('/spots', validateManager.spotParams, async(req, res) => {
     const options = {
@@ -315,74 +339,68 @@ spots.post('/spots', validateManager.spotParams, async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/spots/{requestId}:
+ * /spots/{requestId}:
  *   get:
  *     summary: Check Spot status based off Request ID
  *     description: Returns the Spot Status response
+ *     operationId: getSpotRequestByRequestId
  *     tags:
  *       - spots
  *     parameters:
  *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Spot request
- *     - in: path
  *       name: requestId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Request Id of the Spot request
  *     - in: query
  *       name: bucketName
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Bucket Name from the Spot Request Id
  *     - in: query
  *       name: fileName
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: File Name from the Spot Request Id
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Spot Status 200 Response
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   $ref: '#/definitions/SpotStatusResponseSchema'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               $ref: '#/definitions/SpotStatusResponseSchema'
  *       400:
  *         description: Spot Status 400 Response
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   default: false
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 400
- *                   description: HTTP status code
- *                 errors:
- *                   type: array
- *                   description: list of Spot errors
- *                   items:
- *                     type: string
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               default: false
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 400
+ *               description: HTTP status code
+ *             errors:
+ *               type: array
+ *               description: list of Spot errors
+ *               items:
+ *                 type: string
  */
 spots.get('/spots/:requestId', async(req, res) => {
     const requestId = req.params.requestId;

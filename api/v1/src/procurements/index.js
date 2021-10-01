@@ -33,7 +33,7 @@ var procurements = express.Router();
  *
  *
  * definitions:
- *   Policy:
+ *   Procurement:
  *     type: object
  *     description: Procurement object
  *     properties:
@@ -61,52 +61,64 @@ var procurements = express.Router();
  *         type: string
  *         description: Entitlement Id of the purchased SKU
  *     required:
- *       - rowId
- *       - eventId
  *       - eventType
  */
 
 /**
  * @swagger
  *
- * /projects/{projectId}/procurements:
+ * /procurements:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsProcurements
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Procurements based off request parameters
  *     description: Returns the ProcurementList response
+ *     operationId: listProcurements
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     tags:
  *       - procurements
- *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Procurement request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Procurement list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: array
- *                   items:
- *                      $ref: '#/definitions/Procurement'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               items:
+ *                  $ref: '#/definitions/Procurement'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 procurements.get('/procurements', async (req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -130,40 +142,54 @@ procurements.get('/procurements', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/procurements/approve:
+ * /procurements/approve:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsApproveProcument
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   post:
  *     summary: Change the marketplace entititlement approval status based off request parameters
  *     description: Returns a response indicating if successful
+ *     operationId: approveProcurement
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     tags:
  *       - procurements
- *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Procurement request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Procurement list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 procurements.post('/procurements/approve', async (req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -186,42 +212,30 @@ procurements.post('/procurements/approve', async (req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/procurements:myProducts:
- *   post:
- *     summary: Performs redirect to the Datashare My Products UI page.
- *     description: Returns a 301 redirect response
- *     tags:
- *       - procurements
- *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Procurement request
+ * /procurements:myProducts:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsRedirectMyProducts
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
  *     responses:
- *       301:
- *         description: Redirect to My Products URL
- */
-// Backwards compatibility for marketplace
-procurements.post(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], productsRedirectionHandler);
-
-/**
- * @swagger
- *
- * /projects/{projectId}/procurements:myProducts:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: Performs redirect to the Datashare My Products UI page.
  *     description: Returns a 301 redirect response
+ *     operationId: redirectMyProducts
  *     tags:
  *       - procurements
- *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Procurement request
  *     responses:
  *       301:
  *         description: Redirect to My Products URL

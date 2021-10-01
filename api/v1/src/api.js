@@ -33,11 +33,11 @@ const PORT = process.env.PORT || 5555;
  ************************************************************/
 const options = {
     definition: {
-        openapi: '3.0.0', // Specification (optional, defaults to swagger: '2.0')
+        swagger: '2.0', // Specification (optional, defaults to swagger: '2.0')
         info: {
             description: 'This is the Datashare API service that provides data producers the ability to expose subsets of their datasets programatically.',
             title: 'Datashare API Service', // Title (required)
-            version: '0.0.1', // Version (required)
+            version: '1.0.0', // Version (required)
             contact: {
                 email: 'no-reply@google.com'
             },
@@ -46,26 +46,100 @@ const options = {
                 url: 'https://github.com/GoogleCloudPlatform/datashare-toolkit/blob/master/LICENSE.txt'
             }
         },
-        servers: [{
-            url: '{serverUrl}/{basePath}',
-            variables: {
-                serverUrl: {
-                    default: 'http://localhost:' + PORT,
-                    description: 'Customer provided serverUrl (protocol://hostname:port) for the service'
-                },
-                basePath: {
-                    default: apiVersion,
-                    description: 'Customer provided basePath for the service'
-                }
-            }
-        }],
+        // Swagger 2.0
+        // host: 'localhost:' + PORT / This defaults to the host url of the content
+        basePath: '/' + apiVersion,
+        schemes: ["http", "https"],
         externalDocs: {
             description: 'Find out more about Datashare Toolkit',
             url: 'https://github.com/GoogleCloudPlatform/datashare-toolkit'
-        }
+        },
+        // API GW Integration
+        'x-google-backend': {
+            address: 'https://' + 'FQDN'
+        },
+        security: [{
+            // ## OAuth scopes are currenty ignored by API Gateway [here](https://cloud.google.com/endpoints/docs/openapi/openapi-limitations#scopes_ignored)
+            'google': []}, {
+            'google2': []}, {
+            'firebase': []}, {
+            'marketplace': []
+        }],
+        securityDefinitions: {
+            // ## API Key Auth is for development only
+            'apiKeyAuth': {
+                'type': 'apiKey',
+                'name': 'x-api-key',
+                'in': 'header'
+            },
+            // ## Google Identity Provider
+            'google': {
+                'type': 'oauth2',
+                'authorizationUrl': 'https://accounts.google.com/o/oauth2/v2/auth',
+                'flow': 'implicit',
+                'scopes': {
+                    'https://www.googleapis.com/auth/cloud-platform': 'default',
+                },
+                'x-google-issuer': 'https://accounts.google.com',
+                'x-google-jwks_uri': 'https://www.googleapis.com/oauth2/v3/certs',
+                // ## x-google-audiences should be set to $abc.com, https://FQDNif not specified
+                'x-google-audiences': 'OAUTH_CLIENT_ID'
+            },
+            // ## Google Identity Provider
+            'google2': {
+                'type': 'oauth2',
+                'authorizationUrl': 'https://accounts.google.com/o/oauth2/v2/auth',
+                'flow': 'implicit',
+                'scopes': {
+                    'https://www.googleapis.com/auth/cloud-platform': 'default',
+                },
+                'x-google-issuer': 'accounts.google.com',
+                'x-google-jwks_uri': 'https://www.googleapis.com/oauth2/v3/certs',
+                // ## x-google-audiences should be set to $abc.com, $FQDN if not specified
+                'x-google-audiences': 'OAUTH_CLIENT_ID'
+            },
+            // ## Firebase Identity Provider
+            'firebase': {
+                'type': 'oauth2',
+                'flow': 'application',
+                'tokenUrl': 'https://oauth2.googleapis.com/token',
+                'scopes': {
+                    'https://www.googleapis.com/auth/cloud-platform': 'default',
+                },
+                'x-google-issuer': 'https://securetoken.google.com/PROJECT_ID',
+                'x-google-jwks_uri': 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com',
+                // ## Firebase requires $PROJECT_ID for the JWT audience [here](https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_a_third-party_jwt_library)
+                'x-google-audiences': 'PROJECT_ID'
+            },
+            // ## Marketplace Identity Provider
+            'marketplace': {
+                'type': 'oauth2',
+                'flow': 'application',
+                'tokenUrl': 'https://oauth2.googleapis.com/token',
+                'scopes': {
+                    'https://www.googleapis.com/auth/cloud-platform': 'default',
+                },
+                'x-google-issuer': 'https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com',
+                'x-google-jwks_uri': 'https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com',
+                // ## Marketplace requires the domain name for your DS API, eg. abc.com, $FQDN, etc. [here](https://cloud.google.com/marketplace/docs/partners/integrated-saas/frontend-integration?hl=en#verify-jwt)
+                'x-google-audiences': 'FQDN'
+            },
+        },
     },
     // Path to the API docs
-    apis: ['./index.js', './src/index.js', './*/index.js', './src/*/index.js']
+    apis: [
+        './api.js',
+        './src/api.js',
+        './src/accounts/index.js',
+        './src/admin/index.js',
+        './src/datasets/index.js',
+        './src/policies/index.js',
+        './src/procurements/index.js',
+        './src/pubsub/index.js',
+        './src/resources/index.js',
+        './src/spots/index.js',
+        './src/storage/index.js',
+    ]
 };
 
 const swaggerOptions = {
@@ -133,6 +207,8 @@ router.all('*', cors(), verifyProject);
  *     description: The Datashare API Policy Services
  *   - name: procurements
  *     description: The Datashare API Procurements Services
+ *   - name: products
+ *     description: The Datashare API Products Services
  *   - name: accounts
  *     description: The Datashare API Account Services
  *   - name: spots
@@ -160,40 +236,61 @@ router.all('*', cors(), verifyProject);
  *       errors:
  *         type: array
  *         items:
- *           type: string
+ *           type: object
  *           properties:
- *             message: message string
+ *             message:
+ *               type: string
+ *               description: message string
  *
  */
 
 /**
  * @swagger
  *
- * /:
+ * /welcome:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsWelcome
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: Welcome message status
  *     description: Returns a welcome message for the API
+ *     operationId: getRoot
  *     tags:
  *       - welcome
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Welcome Message Response
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 message:
- *                   type: string
- *                   description: Status message
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             message:
+ *               type: string
+ *               description: Status message
+ *
  */
-router.get('/', function (req, res) {
+router.get('/welcome', function (req, res) {
     res.status(200).json({
         success: true,
         code: 200,
@@ -208,15 +305,37 @@ router.get('/', function (req, res) {
  *   get:
  *     summary: Swagger UI for Datashare API OpenAPI Specification
  *     description: Returns the Swagger UI with the OpenAPI specification for the Datashare API services
+ *     operationId: getDocs
+ *     security: [] # no security for Swagger docs
  *     tags:
  *       - docs
+ *     produces:
+ *       - text/html
  *     responses:
  *       200:
  *         description: Welcome Message Response
- *         content:
- *           text/html:
- *              schema:
- *                type: object
+ *         schema:
+ *           type: object
+ * /docs/{content}:
+ *   get:
+ *     summary: Swagger UI for Datashare API OpenAPI Specification
+ *     description: Returns the Swagger UI with the OpenAPI specification for the Datashare API services
+ *     operationId: getDocsContent
+ *     security: [] # no security for Swagger docs
+ *     parameters:
+ *      - in: path
+ *        name: content
+ *        type: string
+ *        required: true
+ *     tags:
+ *       - docs
+ *     produces:
+ *       - text/html
+ *     responses:
+ *       200:
+ *         description: Welcome Message Response
+ *         schema:
+ *           type: object
  */
 router.use(['/docs', '/api-docs'], swaggerUi.serve);
 router.get(['/docs', '/api-docs'], swaggerUi.setup(openapiSpec, swaggerOptions));
@@ -228,15 +347,17 @@ router.get(['/docs', '/api-docs'], swaggerUi.setup(openapiSpec, swaggerOptions))
  *   get:
  *     summary: Datashare API OpenAPI Specification
  *     description: Returns the OpenAPI specification for the Datashare API services
+ *     operationId: getOpenapiSpec
+ *     security: [] # no security for Swagger docs
  *     tags:
  *       - docs
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Welcome Message Response
- *         content:
- *           application/json:
- *             schema:
- *               type: object
+ *         schema:
+ *           type: object
  */
 routes = [
     '/docs/openapi_spec',
@@ -266,26 +387,27 @@ router.use(storage);
  *   get:
  *     summary: Default 404 Response
  *     description: Returns the default 404 response after all other routes exhausted
+ *     operationId: getAll
  *     tags:
  *       - default
+ *     produces:
+ *       - application/json
  *     responses:
  *       404:
  *         description: Default 404 Response
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   default: true
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 message:
- *                   type: string
- *                   description: Status message
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               default: true
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             message:
+ *               type: string
+ *               description: Status message
  */
 router.get('*', function (req, res) {
     res.status(404).json({
@@ -303,7 +425,7 @@ app.use('/' + legacyApiVersion, router);
 
 // default app route redirects to current API version for now
 app.get('/', function (req, res) {
-    res.redirect('/' + apiVersion);
+    res.redirect('/' + apiVersion + '/welcome');
 });
 
 /************************************************************

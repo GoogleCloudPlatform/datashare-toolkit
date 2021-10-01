@@ -26,6 +26,80 @@ const dataManager = require("./dataManager");
 var router = express.Router();
 // methods that require multiple routes
 
+/**
+ * @swagger
+ *
+ *
+ * definitions:
+ *   StorageBucket:
+ *     type: object
+ *     description: Storage Bucket object
+ *     properties:
+ *       bucketId:
+ *         type: string
+ *         description: Bucket ID
+ *       bucketName:
+ *         type: string
+ *         description: Bucket Name
+ *
+ */
+
+/**
+ * @swagger
+ *
+ * /storage/buckets:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsStorageBuckets
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   get:
+ *     summary: List Storage Buckets based
+ *     description: Returns the Storage Bucket response
+ *     operationId: listStorageBuckets
+ *     tags:
+ *       - storage
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Storage Bucket Response
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                  $ref: '#/definitions/StorageBucket'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
 router.get('/storage/buckets', async (req, res) => {
     const projectId = req.header('x-gcp-project-id');
     const data = await dataManager.listBuckets(projectId);
@@ -41,6 +115,54 @@ router.get('/storage/buckets', async (req, res) => {
     });
 });
 
+/**
+ * @swagger
+ *
+ * /storage/buckets:
+ *   post:
+ *     summary: Create Storage Bucket based off StorageBucket Object
+ *     description: Returns the Storage Bucket response
+ *     operationId: createStorageBucket
+ *     tags:
+ *       - storage
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: storagebuckets
+ *       description: Request parameters for Storage Bucket
+ *       schema:
+ *         type: object
+ *         properties:
+ *           name:
+ *             type: string
+ *             description: Storage Bucket Name
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       201:
+ *         description: Storage Bucket Response
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                  $ref: '#/definitions/StorageBucket'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
 router.post('/storage/buckets', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
     const name = req.body.name;
@@ -65,6 +187,73 @@ router.post('/storage/buckets', async(req, res) => {
     });
 });
 
+/**
+ * @swagger
+ *
+ * /storage/buckets/{name}:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsDeleteStorageBucketByName
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: name
+ *       type: string
+ *       required: true
+ *       description: Storage Bucket Name of the request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   delete:
+ *     summary: Delete Storage Bucket based off Storage Bucket Name
+ *     description: Returns the Storage Bucket response
+ *     operationId: deleteStorageBucketByName
+ *     tags:
+ *       - storage
+ *     parameters:
+ *     - in: path
+ *       name: name
+ *       type: string
+ *       required: true
+ *       description: Storage Bucket Name of the request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Storage Bucket Response
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                  $ref: '#/definitions/StorageBucket'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
 router.delete('/storage/buckets/:name', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
     const name = req.params.name;

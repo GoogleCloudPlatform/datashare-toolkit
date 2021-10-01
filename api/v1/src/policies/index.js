@@ -65,7 +65,6 @@ var policies = express.Router();
  *           $ref: '#/definitions/RowAccessTag'
  *       marketplace:
  *         $ref: '#/definitions/Marketplace'
- *         description: Associated Marketplace solution information
  *     required:
  *       - name
  *
@@ -76,7 +75,7 @@ var policies = express.Router();
  *       tag:
  *         type: string
  *         description: Row Access Tag
- * 
+ *
  *   Marketplace:
  *     type: object
  *     description: Marketplace object
@@ -90,49 +89,64 @@ var policies = express.Router();
  *       enableAutoApprove:
  *         type: boolean
  *         description: Indicates if the purchasing account should automatically be added to the policy
+ *
  */
 
 /**
  * @swagger
  *
- * /projects/{projectId}/policies:
+ * /policies:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsPolicies
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Policy based off request parameters
  *     description: Returns the DatsetList response
+ *     operationId: listPolicies
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     tags:
  *       - policies
- *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Policy request
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Policy list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: array
- *                   items:
- *                      $ref: '#/definitions/Policy'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               items:
+ *                  $ref: '#/definitions/Policy'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.get('/policies', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -149,6 +163,62 @@ policies.get('/policies', async(req, res) => {
     });
 });
 
+/**
+ * @swagger
+ *
+ * /products:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsListProducts
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   get:
+ *     summary: List Products based off request parameters
+ *     description: Returns the Product list response
+ *     operationId: listProducts
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     tags:
+ *       - products
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Product list
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               items:
+ *                  $ref: '#/definitions/Policy'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
 policies.get('/products', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
     const email = req.header('x-gcp-account')
@@ -168,61 +238,54 @@ policies.get('/products', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/policies:
+ * /policies:
  *   post:
  *     summary: Create Policy based off request body
  *     description: Returns the Datset response
+ *     operationId: createPolicy
  *     tags:
  *       - policies
  *     parameters:
- *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Policy request
  *     - in: header
  *       name: x-gcp-account
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: GCP account name of the calling user
- *     requestBody:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: policy
  *       description: Request parameters for Policy
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/Policy'
+ *       schema:
+ *         $ref: '#/definitions/Policy'
+ *     produces:
+ *       - application/json
  *     responses:
  *       201:
  *         description: Policy
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Policy'
+ *               items:
+ *                 $ref: '#/definitions/Policy'
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.post('/policies', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -246,13 +309,13 @@ policies.post('/policies', async(req, res) => {
                 success: false,
                 code: 400,
                 errors: ['planId must be provided when a marketplace solutionId is provided']
-            }); 
+            });
         } else if (!req.body.marketplace.solutionId && req.body.marketplace.planId) {
             return res.status(400).json({
                 success: false,
                 code: 400,
                 errors: ['solutionId must be provided when a marketplace planId is provided']
-            }); 
+            });
         }
     }
     const values = {
@@ -285,50 +348,69 @@ policies.post('/policies', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/policies/{policyId}:
+ * /policies/{policyId}:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsPolicyByPolicyId
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: policyId
+ *       type: string
+ *       required: true
+ *       description: Policy Id of the Policy request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: Get Policy based off policyId
  *     description: Returns the Datset response
+ *     operationId: getPolicyByPolicyId
  *     tags:
  *       - policies
  *     parameters:
  *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Policy request
- *     - in: path
  *       name: policyId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Policy
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                      $ref: '#/definitions/Policy'
+ *               items:
+ *                  $ref: '#/definitions/Policy'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.get('/policies/:policyId', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -349,67 +431,55 @@ policies.get('/policies/:policyId', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/policies/{policyId}:
+ * /policies/{policyId}:
  *   put:
  *     summary: Update Policy based off policy ID and request body
  *     description: Returns the Policy response
+ *     operationId: updatePolicyByPolicyId
  *     tags:
  *       - policies
  *     parameters:
  *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Policy request
- *     - in: path
  *       name: policyId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
  *     - in: header
  *       name: x-gcp-account
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: GCP account name of the calling user
- *     requestBody:
+ *     - in: body
+ *       name: policy
  *       description: Request parameters for Policy
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/Policy'
+ *       schema:
+ *         $ref: '#/definitions/Policy'
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Policy
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Policy'
+ *               items:
+ *                 $ref: '#/definitions/Policy'
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.put('/policies/:policyId', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -434,13 +504,13 @@ policies.put('/policies/:policyId', async(req, res) => {
                 success: false,
                 code: 400,
                 errors: ['planId must be provided when a marketplace solutionId is provided']
-            }); 
+            });
         } else if (!req.body.marketplace.solutionId && req.body.marketplace.planId) {
             return res.status(400).json({
                 success: false,
                 code: 400,
                 errors: ['solutionId must be provided when a marketplace planId is provided']
-            }); 
+            });
         }
     }
     const values = {
@@ -474,67 +544,59 @@ policies.put('/policies/:policyId', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/policies/{policyId}:
+ * /policies/{policyId}:
  *   delete:
  *     summary: Delete Policy based off policy ID and request body
  *     description: Returns the Policy response
+ *     operationId: deletePolicyByPolicyId
  *     tags:
  *       - policies
  *     parameters:
  *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Policy request
- *     - in: path
  *       name: policyId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
  *     - in: header
  *       name: x-gcp-account
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: GCP account name of the calling user
- *     requestBody:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: policy
  *       description: Request parameters for Policy
- *       content:
- *        application/json:
- *          schema:
- *            $ref: '#/definitions/Policy'
+ *       schema:
+ *         $ref: '#/definitions/Policy'
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Policy
- *         content:
- *           application/json:
- *             schema:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
  *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   description: HTTP status code
- *                 data:
- *                   type: object
- *                   items:
- *                     $ref: '#/definitions/Policy'
+ *               items:
+ *                 $ref: '#/definitions/Policy'
  *       404:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.delete('/policies/:policyId', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -559,50 +621,69 @@ policies.delete('/policies/:policyId', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/accounts/{accountId}/policies:
+ * /accounts/{accountId}/policies:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsPolicyByAccountId
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: accountId
+ *       type: string
+ *       required: true
+ *       description: Account Id of the Account request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Policy based off accountId and request parameters
  *     description: Returns the PolicyList response
+ *     operationId: listPoliciesByAccountId
  *     tags:
  *       - accounts
  *     parameters:
  *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Policy request
- *     - in: path
  *       name: accountId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Account Id of the Policy request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Policy list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: array
- *                   items:
- *                      $ref: '#/definitions/Policy'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               items:
+ *                  $ref: '#/definitions/Policy'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.get('/accounts/:accountId/policies', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
@@ -623,50 +704,69 @@ policies.get('/accounts/:accountId/policies', async(req, res) => {
 /**
  * @swagger
  *
- * /projects/{projectId}/datasets/{datasetId}/policies:
+ * /datasets/{datasetId}/policies:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsPolicyByDatasetId
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: datasetId
+ *       type: string
+ *       required: true
+ *       description: Dataset Id of the Policy request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   get:
  *     summary: List Policy based off datasetId and request parameters
  *     description: Returns the PolicyList response
+ *     operationId: listPoliciesByDatasetId
  *     tags:
  *       - datasets
  *     parameters:
  *     - in: path
- *       name: projectId
- *       schema:
- *          type: string
- *       required: true
- *       description: Project Id of the Policy request
- *     - in: path
  *       name: datasetId
- *       schema:
- *          type: string
+ *       type: string
  *       required: true
  *       description: Dataset Id of the Policy request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
  *     responses:
  *       200:
  *         description: Policy list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 code:
- *                   type: integer
- *                   default: 200
- *                   description: HTTP status code
- *                 data:
- *                   type: array
- *                   items:
- *                      $ref: '#/definitions/Policy'
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: array
+ *               items:
+ *                  $ref: '#/definitions/Policy'
  *       500:
  *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Error'
+ *         schema:
+ *           $ref: '#/definitions/Error'
  */
 policies.get('/datasets/:datasetId/policies', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');

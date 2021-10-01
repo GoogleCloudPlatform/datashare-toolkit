@@ -26,6 +26,80 @@ const dataManager = require("./dataManager");
 var router = express.Router();
 // methods that require multiple routes
 
+/**
+ * @swagger
+ *
+ *
+ * definitions:
+ *   PubSubTopic:
+ *     type: object
+ *     description: PubSub Topic object
+ *     properties:
+ *       topicId:
+ *         type: string
+ *         description: Topic ID
+ *       topicName:
+ *         type: string
+ *         description: Topic Name
+ *
+ */
+
+/**
+ * @swagger
+ *
+ * /pubsub/topics:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsPubSubTopics
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   get:
+ *     summary: List PubSub Topics based
+ *     description: Returns the PubSub Topic response
+ *     operationId: listPubSubTopics
+ *     tags:
+ *       - pubsub
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: PubSub Topic Response
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                  $ref: '#/definitions/PubSubTopic'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
 router.get('/pubsub/topics', async (req, res) => {
     const projectId = req.header('x-gcp-project-id');
     const data = await dataManager.listTopics(projectId);
@@ -41,6 +115,54 @@ router.get('/pubsub/topics', async (req, res) => {
     });
 });
 
+/**
+ * @swagger
+ *
+ * /pubsub/topics:
+ *   post:
+ *     summary: Create PubSub Topic based off PubSubTopic Object
+ *     description: Returns the PubSub Topic response
+ *     operationId: createPubSubTopic
+ *     tags:
+ *       - pubsub
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: pubsubtopic
+ *       description: Request parameters for PubSub Topic
+ *       schema:
+ *         type: object
+ *         properties:
+ *           name:
+ *             type: string
+ *             description: PubSub Topic Name
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       201:
+ *         description: PubSub Topic Response
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                  $ref: '#/definitions/PubSubTopic'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
 router.post('/pubsub/topics', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
     const name = req.body.name;
@@ -56,7 +178,7 @@ router.post('/pubsub/topics', async(req, res) => {
     if (data && data.success === false) {
         code = (data.code === undefined ) ? 500 : data.code;
     } else {
-        code = (data.code === undefined ) ? 200 : data.code;
+        code = (data.code === undefined ) ? 201 : data.code;
     }
     res.status(code).json({
         code: code,
@@ -64,6 +186,73 @@ router.post('/pubsub/topics', async(req, res) => {
     });
 });
 
+/**
+ * @swagger
+ *
+ * /pubsub/topics/{name}:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsDeletePubSubTopicByName
+ *     security: [] # no security for preflight requests
+ *     parameters:
+ *     - in: path
+ *       name: name
+ *       type: string
+ *       required: true
+ *       description: PubSub Topic Name of the request
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   delete:
+ *     summary: Delete PubSub Topic based off PubSub Topic Name
+ *     description: Returns the PubSub Topic response
+ *     operationId: deletePubSubTopicByName
+ *     tags:
+ *       - pubsub
+ *     parameters:
+ *     - in: path
+ *       name: name
+ *       type: string
+ *       required: true
+ *       description: PubSub Topic Name of the request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: PubSub Topic Response
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                  $ref: '#/definitions/PubSubTopic'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
 router.delete('/pubsub/topics/:name', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
     const name = req.params.name;
