@@ -68,10 +68,8 @@ if ! gcloud run services describe ds-api --cluster $CLUSTER --cluster-location $
     MANAGED_PROJECTS='{ "'${PROJECT_ID}'": { "MARKETPLACE_INTEGRATION_ENABLED": false, "labels": { "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT": "", "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT": "", "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL": "" } } }'
     echo ${MANAGED_PROJECTS}
     gcloud run services update ds-api \
-        --platform gke \
-        --namespace $NAMESPACE \
-        --cluster $CLUSTER \
-        --cluster-location $ZONE \
+        --region=$REGION \
+        --platform managed \
         --update-env-vars=^---^MANAGED_PROJECTS="${MANAGED_PROJECTS}"
 fi
 
