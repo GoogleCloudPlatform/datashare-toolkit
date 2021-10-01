@@ -55,13 +55,10 @@ CLUSTER=datashare
 gcloud config set compute/zone $ZONE
 
 gcloud run deploy ds-api \
-    --cluster $CLUSTER \
-    --cluster-location $ZONE \
-    --min-instances 1 \
-    --max-instances 10 \
-    --namespace $NAMESPACE \
     --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
-    --platform gke \
+    --region=$REGION \
+    --no-allow-unauthenticated \
+    --platform managed \
     --service-account ${SERVICE_ACCOUNT_NAME} \
     --update-env-vars=OAUTH_CLIENT_ID="${OAUTH_CLIENT_ID}",DATA_PRODUCERS="${DATA_PRODUCERS}" \
     --remove-env-vars=PROJECT_ID,MARKETPLACE_INTEGRATION
