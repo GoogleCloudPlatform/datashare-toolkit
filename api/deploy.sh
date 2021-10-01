@@ -74,11 +74,9 @@ if ! gcloud run services describe ds-api --cluster $CLUSTER --cluster-location $
 fi
 
 gcloud run services update-traffic ds-api \
-    --cluster $CLUSTER \
-    --cluster-location $ZONE \
-    --to-latest \
-    --namespace $NAMESPACE \
-    --platform gke
+    --region=$REGION \
+    --platform managed \
+    --to-latest
 
 # Delete old revisions
 DELETE_REVISIONS=`gcloud run revisions list \
