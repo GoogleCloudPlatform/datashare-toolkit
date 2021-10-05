@@ -45,15 +45,6 @@ securityDefinitions:
     x-google-issuer: accounts.google.com
     x-google-jwks_uri: https://www.googleapis.com/oauth2/v3/certs
     x-google-audiences: OAUTH_CLIENT_ID
-  firebase:
-    type: oauth2
-    flow: application
-    tokenUrl: https://oauth2.googleapis.com/token
-    scopes:
-      https://www.googleapis.com/auth/cloud-platform: default
-    x-google-issuer: https://securetoken.google.com/PROJECT_ID
-    x-google-jwks_uri: https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com
-    x-google-audiences: PROJECT_ID
   marketplace:
     type: oauth2
     flow: application

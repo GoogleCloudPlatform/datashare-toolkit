@@ -98,19 +98,6 @@ const options = {
                 // ## x-google-audiences should be set to $abc.com, $FQDN if not specified
                 'x-google-audiences': 'OAUTH_CLIENT_ID'
             },
-            // ## Firebase Identity Provider
-            'firebase': {
-                'type': 'oauth2',
-                'flow': 'application',
-                'tokenUrl': 'https://oauth2.googleapis.com/token',
-                'scopes': {
-                    'https://www.googleapis.com/auth/cloud-platform': 'default',
-                },
-                'x-google-issuer': 'https://securetoken.google.com/PROJECT_ID',
-                'x-google-jwks_uri': 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com',
-                // ## Firebase requires $PROJECT_ID for the JWT audience [here](https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_a_third-party_jwt_library)
-                'x-google-audiences': 'PROJECT_ID'
-            },
             // ## Marketplace Identity Provider
             'marketplace': {
                 'type': 'oauth2',
