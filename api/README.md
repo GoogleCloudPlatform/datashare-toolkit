@@ -339,7 +339,6 @@ You need to modify the DS_API_FQDN, PROJECT_ID, and OAUTH_CLIENT_ID variables fo
     export DS_API_FQDN=$(echo $DS_API_URL | sed 's!https://!!'); echo $DS_API_FQDN
 
     sed -i.bak "s|DS_API_FQDN|$DS_API_FQDN|" ds-api_oas.yaml
-    sed -i.bak "s|PROJECT_ID|$PROJECT_ID|" ds-api_oas.yaml
     sed -i.bak "s|OAUTH_CLIENT_ID|$OAUTH_CLIENT_ID|" ds-api_oas.yaml
 
 Create a new API config from the yaml file. Add the API GW SA as the `--backend-auth-service-account`.
