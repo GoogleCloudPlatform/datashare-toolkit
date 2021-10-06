@@ -20,6 +20,7 @@ const pubSubUtil = require("./pubSubUtil");
 const storageUtil = require("./storageUtil");
 const commonUtil = require("./commonUtil");
 const commerceProcurementUtil = require("./commerceProcurementUtil");
+const analyticsHubUtil = require("./analyticsHubUtil");
 
 module.exports = {
     BigQueryUtil: bigqueryUtil,
@@ -27,5 +28,6 @@ module.exports = {
     PubSubUtil: pubSubUtil,
     StorageUtil: storageUtil,
     CommonUtil: commonUtil,
-    CommerceProcurementUtil: commerceProcurementUtil
+    CommerceProcurementUtil: commerceProcurementUtil,
+    AnalyticsHubUtil: analyticsHubUtil
 };
