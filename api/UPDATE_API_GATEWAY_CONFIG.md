@@ -4,7 +4,8 @@ API gateway AuthZ is based-on the OAS v2 spec comments compiled from the API inl
 
 # Executing from CLI
 ```
-OAUTH_CLIENT_ID=114619800218-p5v4os5f1i88m4rffuctt9m7su7p445q.apps.googleusercontent.com
+# Working directory is the datashare-toolkit root directory
+OAUTH_CLIENT_ID="your_oauth-client-id"
 API_GW_SERVICE_ACCOUNT_NAME=api-gw-ds-api
 REGION=us-central1
 PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID

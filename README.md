@@ -34,7 +34,7 @@ Then get started, see the [User Guide](./frontend/README.md) for usage informati
 ## Updating Datashare
 - [Perform Datashare version upgrade](./UPGRADE.md) - Update the API and UI software versions.
 - [Update Data Producers](./UPDATE_DATA_PRODUCERS.md) - Modify the administrators for the Datashare UI.
-- [Updating API Gateway Configuration](./UPDATE_API_GATEWAY_CONFIG.md) - Modify the API Gateway configuration to apply the latest defined security policies.
+- [Updating API Gateway Configuration](./api/UPDATE_API_GATEWAY_CONFIG.md) - Modify the API Gateway configuration to apply the latest defined security policies.
 
 ## Requirements
 
