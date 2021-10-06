@@ -21,11 +21,14 @@ sed -i.bak "s|OAUTH_CLIENT_ID|$OAUTH_CLIENT_ID|" ds-api_oas.yaml
 
 gcloud api-gateway api-configs list
 
-# Create a version number or a temp name and use/delete
-gcloud api-gateway api-configs create api-gw-ds-api-v2 --api=api-gw-ds-api --openapi-spec=ds-api_oas.yaml --backend-auth-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+TIMESTAMP=$( date +%Y%m%d-%H%M%S )
+NEW_CONFIG_NAME=api-gw-ds-api-$TIMESTAMP
 
-gcloud api-gateway api-configs list
+# Create a version number or a temp name and use/delete
+gcloud api-gateway api-configs create $NEW_CONFIG_NAME --api=api-gw-ds-api --openapi-spec=ds-api_oas.yaml --backend-auth-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
 
 # Modify the gateway to use the new config and rename
-gcloud api-gateway gateways update api-gw-ds-api
+gcloud api-gateway gateways update api-gw-ds-api --api=api-gw-ds-api --api-config=$NEW_CONFIG_NAME --location $REGION
+
+gcloud api-gateway api-configs list
 ```
