@@ -114,13 +114,10 @@ sed -i.bak "s|PROJECT_ID|$PROJECT_ID|" ds-api_oas.yaml
 sed -i.bak "s|OAUTH_CLIENT_ID|$OAUTH_CLIENT_ID|" ds-api_oas.yaml
 
 TIMESTAMP=$( date +%Y%m%d-%H%M%S )
-NEW_CONFIG_NAME=api-gw-ds-api-$TIMESTAMP
+NEW_CONFIG_ID=api-gw-ds-api-$TIMESTAMP
 
-# Create a version number or a temp name and use/delete
-gcloud api-gateway api-configs create $NEW_CONFIG_NAME --api=api-gw-ds-api --openapi-spec=ds-api_oas.yaml --backend-auth-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
-
-# Modify the gateway to use the new config and rename
-gcloud api-gateway gateways update api-gw-ds-api --api=api-gw-ds-api --api-config=$NEW_CONFIG_NAME --location $REGION
+gcloud api-gateway api-configs create $NEW_CONFIG_ID --api=api-gw-ds-api --openapi-spec=ds-api_oas.yaml --backend-auth-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --display-name=$API_GW_SERVICE_ACCOUNT_NAME
+gcloud api-gateway gateways update api-gw-ds-api --api=api-gw-ds-api --api-config=$NEW_CONFIG_ID --location $REGION
 
 if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
     gcloud builds submit --config api/v1/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
