@@ -33,7 +33,6 @@ Vue.use(VueForm);
 
 import config from './config';
 import authManager from './mixins/authManager';
-import { initializeApp } from 'firebase/app';
 
 function getQueryVariable(variable) {
   var query = window.location.search.substring(1);
@@ -65,14 +64,6 @@ if (projectId) {
 
   window.location = url;
 }
-
-// Initialize Identity Platform
-const idpConfig = {
-  apiKey: 'AIzaSyAIg7AUkAoZ3f_Ney3DBojzfCnfjIHAaXU',
-  authDomain: 'cds-demo-2.firebaseapp.com'
-};
-const app = initializeApp(idpConfig);
-console.log(app);
 
 // Fetch and load the store settings
 fetch(process.env.BASE_URL + 'config/config.json').then(response => {

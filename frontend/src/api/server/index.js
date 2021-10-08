@@ -21,8 +21,8 @@ import axios from 'axios';
 
 import router from './../../router';
 
-import Vue from 'vue';
 import config from './../../config';
+import authManager from '../../mixins/authManager';
 
 // set the default Accept header to application/json
 axios.defaults.headers.common['Accept'] = 'application/json';
@@ -52,10 +52,7 @@ axios.interceptors.request.use(async function(reqConfig) {
     if (account) {
       reqConfig.headers['x-gcp-account'] = account;
     }
-    const googleUser = await Vue.GoogleAuth.then(auth2 => {
-      return auth2.currentUser.get();
-    });
-    const token = googleUser.getAuthResponse().id_token;
+    const token = await authManager.currentUser.getIdToken();
     reqConfig.headers.Authorization = `Bearer ${token}`;
 
     return reqConfig;

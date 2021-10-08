@@ -32,8 +32,9 @@ const provider = new GoogleAuthProvider();
 
 class AuthManager {
   async init() {
+    // Initialize Identity Platform
     const idpConfig = {
-      apiKey: 'AIzaSyAIg7AUkAoZ3f_Ney3DBojzfCnfjIHAaXU',
+      apiKey: 'AIzaSyAfYvXPhuW6IgUkEcLuxLwBmdLAPCVZBt4',
       authDomain: 'cds-demo-2.firebaseapp.com'
     };
     const app = initializeApp(idpConfig);
@@ -60,14 +61,7 @@ class AuthManager {
   }
 
   async login() {
-    const idpConfig = {
-      apiKey: 'AIzaSyAIg7AUkAoZ3f_Ney3DBojzfCnfjIHAaXU',
-      authDomain: 'cds-demo-2.firebaseapp.com'
-    };
-    const app = initializeApp(idpConfig);
     const auth = getAuth();
-    console.log('App is:');
-    console.log(app);
     if (auth.currentUser) {
       return true;
     }
