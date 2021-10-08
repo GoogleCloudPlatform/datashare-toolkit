@@ -73,7 +73,6 @@ class AuthManager {
         const token = credential.accessToken;
         // The signed-in user info.
         const user = result.user;
-        // ...
         return this.onAuthSuccess(user);
       })
       .catch(error => {
@@ -85,7 +84,6 @@ class AuthManager {
         const email = error.email;
         // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
         return this.onAuthFailure(error);
       });
   }
@@ -107,11 +105,10 @@ class AuthManager {
   async onAuthSuccess(googleUser, reloadProjectConfigurationOnly) {
     console.debug('auth success called');
     if (googleUser) {
-      const profile = googleUser.getBasicProfile();
       const user = {
-        displayName: profile.getName(),
-        email: profile.getEmail(),
-        photoURL: profile.getImageUrl()
+        displayName: googleUser.displayName,
+        email: googleUser.email,
+        photoURL: googleUser.photoURL
       };
       return store.dispatch('fetchUser', user).then(() => {
         if (reloadProjectConfigurationOnly === true) {
