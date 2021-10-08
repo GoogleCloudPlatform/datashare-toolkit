@@ -14,6 +14,7 @@
         "cookie-parser": "^1.4.5",
         "cors": "^2.8.5",
         "express": "^4.17.1",
+        "firebase-admin": "^9.12.0",
         "gcp-metadata": "^4.2.1",
         "google-auth-library": "^7.2.0",
         "jsonschema": "^1.2.6",

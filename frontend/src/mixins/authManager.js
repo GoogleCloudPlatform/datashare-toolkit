@@ -16,35 +16,98 @@
 
 'use strict';
 
-import Vue from 'vue';
 import config from '../config';
 import store from '../store';
 
+import { initializeApp } from 'firebase/app';
+import {
+  getAuth,
+  signInWithPopup,
+  signOut,
+  GoogleAuthProvider
+} from 'firebase/auth';
+const provider = new GoogleAuthProvider();
+
+// https://firebase.google.com/docs/auth/web/google-signin#web-version-9
+
 class AuthManager {
   async init() {
-    return Vue.GoogleAuth.then(auth2 => {
-      if (auth2.isSignedIn.get() === true) {
-        const googleUser = auth2.currentUser.get();
-        return this.onAuthSuccess(googleUser, true);
-      }
-    });
+    const idpConfig = {
+      apiKey: 'AIzaSyAIg7AUkAoZ3f_Ney3DBojzfCnfjIHAaXU',
+      authDomain: 'cds-demo-2.firebaseapp.com'
+    };
+    const app = initializeApp(idpConfig);
+
+    const auth = getAuth();
+    if (auth.currentUser) {
+      const googleUser = auth.currentUser;
+      return this.onAuthSuccess(googleUser, true);
+    }
+    return;
   }
 
-  async performLogin() {
-    return Vue.GoogleAuth.then(auth2 => {
-      if (auth2.isSignedIn.get() === true) {
+  async isSignedIn() {
+    const auth = getAuth();
+    if (auth.currentUser) {
+      return true;
+    }
+    return false;
+  }
+
+  async currentUser() {
+    const auth = getAuth();
+    return auth.currentUser;
+  }
+
+  async login() {
+    const idpConfig = {
+      apiKey: 'AIzaSyAIg7AUkAoZ3f_Ney3DBojzfCnfjIHAaXU',
+      authDomain: 'cds-demo-2.firebaseapp.com'
+    };
+    const app = initializeApp(idpConfig);
+    const auth = getAuth();
+    console.log('App is:');
+    console.log(app);
+    if (auth.currentUser) {
+      return true;
+    }
+    return signInWithPopup(auth, provider)
+      .then(result => {
+        console.log(result);
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        // The signed-in user info.
+        const user = result.user;
+        // ...
+        return this.onAuthSuccess(user);
+      })
+      .catch(error => {
+        console.error(error);
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
+        return this.onAuthFailure(error);
+      });
+  }
+
+  async logout() {
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {
+        // Sign-out successful.
         return true;
-      } else {
-        return auth2
-          .signIn()
-          .then(result => {
-            return this.onAuthSuccess(result);
-          })
-          .catch(err => {
-            return this.onAuthFailure(err);
-          });
-      }
-    });
+      })
+      .catch(error => {
+        // An error happened.
+        console.error(error);
+        return false;
+      });
   }
 
   async onAuthSuccess(googleUser, reloadProjectConfigurationOnly) {

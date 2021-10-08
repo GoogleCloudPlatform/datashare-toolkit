@@ -31,10 +31,9 @@ Vue.config.productionTip = false;
 // Enable vue-form
 Vue.use(VueForm);
 
-import { LoaderPlugin } from 'vue-google-login';
 import config from './config';
-import browserHelper from './browserHelper';
 import authManager from './mixins/authManager';
+import { initializeApp } from 'firebase/app';
 
 function getQueryVariable(variable) {
   var query = window.location.search.substring(1);
@@ -67,16 +66,18 @@ if (projectId) {
   window.location = url;
 }
 
+// Initialize Identity Platform
+const idpConfig = {
+  apiKey: 'AIzaSyAIg7AUkAoZ3f_Ney3DBojzfCnfjIHAaXU',
+  authDomain: 'cds-demo-2.firebaseapp.com'
+};
+const app = initializeApp(idpConfig);
+console.log(app);
+
 // Fetch and load the store settings
 fetch(process.env.BASE_URL + 'config/config.json').then(response => {
   response.json().then(json => {
     config.initialize(json);
-
-    Vue.use(LoaderPlugin, {
-      client_id: config.googleAppClientId,
-      ux_mode: browserHelper.isBrowserChrome() ? 'redirect' : 'popup'
-    });
-
     authManager.init().then(() => {
       new Vue({
         vuetify,

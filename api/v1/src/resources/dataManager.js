@@ -30,6 +30,19 @@ const accountManager = require('../accounts/dataManager');
 const policyManager = require('../policies/dataManager');
 const procurementManager = require('../procurements/dataManager');
 
+// https://cloud.google.com/identity-platform/docs/install-admin-sdk#node.js_2
+var fbAdmin = require('firebase-admin');
+
+var fbConfig = {
+    apiKey: "AIzaSyAIg7AUkAoZ3f_Ney3DBojzfCnfjIHAaXU",
+    authDomain: "datashare-demo-2.fsi.joonix.net",
+};
+
+// Initialize the default app
+var fbApp = fbAdmin.initializeApp(fbConfig);
+
+// Claims: https://cloud.google.com/identity-platform/docs/how-to-configure-custom-claims
+
 /**
  * @param  {} projectId
  * @param  {} token
@@ -38,6 +51,15 @@ async function getConfiguration(projectId, token) {
     let dict = {};
     const commerce = await runtimeConfig.marketplaceIntegration(projectId);
     const dataProducer = await isDataProducer(token);
+
+    // Verify the ID token first.
+    fbAdmin.auth().verifyIdToken(token).then((claims) => {
+        console.log(claims);
+        if (claims.admin === true) {
+            // Allow access to requested admin resource.
+        }
+    });
+
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
     dict.apiProjectId = currentProjectId;
 

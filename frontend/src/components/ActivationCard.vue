@@ -71,7 +71,7 @@ export default {
       sessionStorage.removeItem('gmt');
     }
 
-    this.performLogin().then(result => {
+    this.login().then(result => {
       if (result) {
         this.user = {
           email: this.$store.state.user.data.email,

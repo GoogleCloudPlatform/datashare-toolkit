@@ -20,8 +20,11 @@ import authManager from './authManager';
 
 export default {
   methods: {
-    performLogin() {
-      return authManager.performLogin();
+    login() {
+      return authManager.login();
+    },
+    logout() {
+      return authManager.logout();
     },
     onAuthSuccess(googleUser) {
       return authManager.onAuthSuccess(googleUser).then(result => {

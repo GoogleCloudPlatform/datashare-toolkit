@@ -17,6 +17,7 @@
 'use strict';
 
 import Vue from 'vue';
+import authManager from './mixins/authManager';
 import store from './store';
 
 class Config {
@@ -161,49 +162,45 @@ class Config {
   }
 
   async reloadProjectConfiguration() {
-    return Vue.GoogleAuth.then(auth2 => {
-      if (auth2.isSignedIn.get() === false) {
-        console.debug('cannot reload configuration, user not logged in');
-        return store.dispatch('setProjectConfiguration', null);
+    if ((await authManager.isSignedIn()) === false) {
+      console.debug('cannot reload configuration, user not logged in');
+      return store.dispatch('setProjectConfiguration', null);
+    }
+    console.debug('loading project configuration');
+    return store.dispatch('getProjectConfiguration').then(response => {
+      console.debug(`project configuration: ${JSON.stringify(response)}`);
+      const _c = response.configuration;
+      if (!this.projectId) {
+        // If projectId is not set, set it.
+        this.projectId = _c.projectId;
       }
-      console.debug('loading project configuration');
-      return store.dispatch('getProjectConfiguration').then(response => {
-        console.debug(`project configuration: ${JSON.stringify(response)}`);
-        const _c = response.configuration;
-        if (!this.projectId) {
-          // If projectId is not set, set it.
-          this.projectId = _c.projectId;
-        }
-        const labels = _c.labels;
-        if (labels) {
-          this.update(labels);
-        }
-        return store.dispatch('setProjectConfiguration', _c);
-      });
+      const labels = _c.labels;
+      if (labels) {
+        this.update(labels);
+      }
+      return store.dispatch('setProjectConfiguration', _c);
     });
   }
 
   async reloadManagedProjects() {
-    return Vue.GoogleAuth.then(auth2 => {
-      if (auth2.isSignedIn.get() === false) {
-        console.debug('cannot reload managed projects, user not logged in');
-        return store.dispatch('setManagedProjects', null);
-      }
-      console.debug('loading managed projects');
-      return store.dispatch('getManagedProjects').then(response => {
-        console.debug(`managed projects: ${JSON.stringify(response)}`);
-        if (response.success) {
-          const managedProjects = response.projects;
-          if (
-            this.projectId === null &&
-            managedProjects &&
-            managedProjects.length > 0
-          ) {
-            this.projectId = managedProjects[0];
-          }
-          return store.dispatch('setManagedProjects', managedProjects);
+    if ((await authManager.isSignedIn()) === false) {
+      console.debug('cannot reload configuration, user not logged in');
+      return store.dispatch('setProjectConfiguration', null);
+    }
+    console.debug('loading managed projects');
+    return store.dispatch('getManagedProjects').then(response => {
+      console.debug(`managed projects: ${JSON.stringify(response)}`);
+      if (response.success) {
+        const managedProjects = response.projects;
+        if (
+          this.projectId === null &&
+          managedProjects &&
+          managedProjects.length > 0
+        ) {
+          this.projectId = managedProjects[0];
         }
-      });
+        return store.dispatch('setManagedProjects', managedProjects);
+      }
     });
   }
 }

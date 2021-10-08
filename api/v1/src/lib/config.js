@@ -85,7 +85,7 @@ if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_
 }
 
 // TODO: Remove hardcoded for testing
-config.oauthClientId = process.env.OAUTH_CLIENT_ID;
+config.oauthClientId = process.env.OAUTH_CLIENT_ID || "863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com"
 
 // Datashare subscriber IAM roles
 config.bigQueryDataViewerRole = 'datashare.bigquery.dataViewer';

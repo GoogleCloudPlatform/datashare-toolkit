@@ -508,7 +508,7 @@ export default {
     };
   },
   mounted() {
-    this.performLogin().then(result => {
+    this.login().then(result => {
       if (result) {
         this.loadProducts();
       }

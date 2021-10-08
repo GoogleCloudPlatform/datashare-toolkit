@@ -1,4 +1,4 @@
 {
   "VUE_APP_API_BASE_URL": "http://localhost:5555/v1",
-  "VUE_APP_GOOGLE_APP_CLIENT_ID": ""
+  "VUE_APP_GOOGLE_APP_CLIENT_ID": "863461568634-mjhsbfk81u5pognae6p19jjn5uph5rqn.apps.googleusercontent.com"
 }

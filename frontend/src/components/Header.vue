@@ -99,27 +99,16 @@
       </v-tooltip>
       <v-tooltip bottom v-if="this.isLoggedIn === false">
         <template v-slot:activator="{ on }">
-          <v-btn icon dark v-on="on">
-            <GoogleLogin
-              :params="params"
-              :onSuccess="onAuthSuccess"
-              :onFailure="onAuthFailure"
-              ><v-icon title="login">{{ icons.login }}</v-icon></GoogleLogin
-            >
+          <v-btn icon dark v-on="on" @click="login">
+            <v-icon title="login">{{ icons.login }}</v-icon>
           </v-btn>
         </template>
         <span>Login</span>
       </v-tooltip>
       <v-tooltip bottom v-if="this.isLoggedIn === true">
         <template v-slot:activator="{ on }">
-          <v-btn icon dark v-on="on">
-            <GoogleLogin
-              :params="params"
-              :logoutButton="true"
-              :onSuccess="onAuthSuccess"
-              :onFailure="onAuthFailure"
-              ><v-icon title="logout">{{ icons.logout }}</v-icon></GoogleLogin
-            >
+          <v-btn icon dark v-on="on" @click="logout">
+            <v-icon title="logout">{{ icons.logout }}</v-icon>
           </v-btn>
         </template>
         <span>Logout</span>
@@ -157,15 +146,11 @@ import {
 
 import { mapGetters } from 'vuex';
 import _config from '../config';
-import GoogleLogin from 'vue-google-login';
 import authMixin from '../mixins/authMixin';
 
 export default {
   name: 'app-header',
   mixins: [authMixin],
-  components: {
-    GoogleLogin
-  },
   data: () => ({
     drawer: false,
     mini: true,
