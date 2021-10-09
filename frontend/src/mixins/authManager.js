@@ -133,7 +133,6 @@ class AuthManager {
       });
     } else {
       return store.dispatch('fetchUser', null).then(() => {
-        // False indicates to return to home
         this.redirectHome();
         return false;
       });
@@ -142,7 +141,6 @@ class AuthManager {
 
   async onAuthFailure(error) {
     return store.dispatch('fetchUser', null).then(() => {
-      // False indicates to return to home
       this.redirectHome();
       return false;
     });
