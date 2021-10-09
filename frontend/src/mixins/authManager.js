@@ -32,6 +32,7 @@ const provider = new GoogleAuthProvider();
 
 class AuthManager {
   async init() {
+    console.debug('authManager.init invoked');
     // Initialize Identity Platform
     const idpConfig = {
       apiKey: 'AIzaSyAfYvXPhuW6IgUkEcLuxLwBmdLAPCVZBt4',
@@ -39,12 +40,17 @@ class AuthManager {
     };
     const app = initializeApp(idpConfig);
     const auth = getAuth();
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        return this.onAuthSuccess(user, true);
-      } else {
-        return this.onAuthFailure();
-      }
+    const _vm = this;
+    return new Promise(function(resolve, reject) {
+      const unsubscribe = auth.onAuthStateChanged(user => {
+        unsubscribe();
+        console.debug('authManager.init resolving promise');
+        if (user) {
+          resolve(_vm.onAuthSuccess(user, true));
+        } else {
+          resolve();
+        }
+      });
     });
   }
 
@@ -77,7 +83,7 @@ class AuthManager {
         const token = credential.accessToken;
         // The signed-in user info.
         const user = result.user;
-        return true;
+        return this.onAuthSuccess(user);
       })
       .catch(error => {
         console.error(error);
@@ -88,7 +94,7 @@ class AuthManager {
         const email = error.email;
         // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
-        return false;
+        return this.onAuthFailure(error);
       });
   }
 
@@ -97,12 +103,12 @@ class AuthManager {
     return signOut(auth)
       .then(() => {
         // Sign-out successful.
-        return true;
+        return this.onAuthFailure();
       })
       .catch(error => {
         // An error happened.
         console.error(error);
-        return false;
+        return this.onAuthFailure(error);
       });
   }
 
