@@ -60,6 +60,11 @@ class AuthManager {
     return auth.currentUser;
   }
 
+  async getIdToken() {
+    return this.currentUser().then(user => {
+      return user.getIdToken();
+    });
+  }
   async login() {
     const auth = getAuth();
     if (auth.currentUser) {
