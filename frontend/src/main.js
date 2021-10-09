@@ -69,9 +69,9 @@ if (projectId) {
 fetch(process.env.BASE_URL + 'config/config.json').then(response => {
   response.json().then(json => {
     config.initialize(json);
-    console.debug('main: authManager.init called');
+    console.debug('main.authManager.init called');
     authManager.init().then(() => {
-      console.debug('main: authManager.init completed');
+      console.debug('main.authManager.init completed');
       // Project configuration has to be set first
       new Vue({
         vuetify,
