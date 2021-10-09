@@ -18,7 +18,7 @@
 
 import config from '../config';
 import store from '../store';
-
+import router from '../router';
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
@@ -38,16 +38,17 @@ class AuthManager {
       authDomain: 'cds-demo-2.firebaseapp.com'
     };
     const app = initializeApp(idpConfig);
-
     const auth = getAuth();
-    if (auth.currentUser) {
-      const googleUser = auth.currentUser;
-      return this.onAuthSuccess(googleUser, true);
-    }
-    return;
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        return this.onAuthSuccess(user, true);
+      } else {
+        return this.onAuthFailure();
+      }
+    });
   }
 
-  async isSignedIn() {
+  isSignedIn() {
     const auth = getAuth();
     if (auth.currentUser) {
       return true;
@@ -55,16 +56,15 @@ class AuthManager {
     return false;
   }
 
-  async currentUser() {
+  currentUser() {
     const auth = getAuth();
     return auth.currentUser;
   }
 
   async getIdToken() {
-    return this.currentUser().then(user => {
-      return user.getIdToken();
-    });
+    return this.currentUser().getIdToken();
   }
+
   async login() {
     const auth = getAuth();
     if (auth.currentUser) {
@@ -72,13 +72,12 @@ class AuthManager {
     }
     return signInWithPopup(auth, provider)
       .then(result => {
-        console.log(result);
         // This gives you a Google Access Token. You can use it to access the Google API.
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const token = credential.accessToken;
         // The signed-in user info.
         const user = result.user;
-        return this.onAuthSuccess(user);
+        return true;
       })
       .catch(error => {
         console.error(error);
@@ -89,13 +88,13 @@ class AuthManager {
         const email = error.email;
         // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
-        return this.onAuthFailure(error);
+        return false;
       });
   }
 
   async logout() {
     const auth = getAuth();
-    signOut(auth)
+    return signOut(auth)
       .then(() => {
         // Sign-out successful.
         return true;
@@ -129,18 +128,27 @@ class AuthManager {
     } else {
       return store.dispatch('fetchUser', null).then(() => {
         // False indicates to return to home
+        this.redirectHome();
         return false;
       });
     }
   }
 
   async onAuthFailure(error) {
-    console.log('auth failed called');
-    console.error(error);
     return store.dispatch('fetchUser', null).then(() => {
       // False indicates to return to home
+      this.redirectHome();
       return false;
     });
+  }
+
+  redirectHome() {
+    const name = 'dashboard';
+    if (router.history.current.name !== name) {
+      router.replace({
+        name: name
+      });
+    }
   }
 }
 

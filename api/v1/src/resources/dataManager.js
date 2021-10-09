@@ -29,17 +29,10 @@ const storageManager = require('../storage/dataManager');
 const accountManager = require('../accounts/dataManager');
 const policyManager = require('../policies/dataManager');
 const procurementManager = require('../procurements/dataManager');
-
-// https://cloud.google.com/identity-platform/docs/install-admin-sdk#node.js_2
-var fbAdmin = require('firebase-admin');
-
-var fbConfig = {
-    apiKey: "AIzaSyAIg7AUkAoZ3f_Ney3DBojzfCnfjIHAaXU",
-    authDomain: "datashare-demo-2.fsi.joonix.net",
-};
+const fbAdmin = require('firebase-admin');
 
 // Initialize the default app
-var fbApp = fbAdmin.initializeApp(fbConfig);
+fbAdmin.initializeApp(config.idpConfiguration);
 
 // Claims: https://cloud.google.com/identity-platform/docs/how-to-configure-custom-claims
 
@@ -51,14 +44,6 @@ async function getConfiguration(projectId, token) {
     let dict = {};
     const commerce = await runtimeConfig.marketplaceIntegration(projectId);
     const dataProducer = await isDataProducer(token);
-
-    // Verify the ID token first.
-    fbAdmin.auth().verifyIdToken(token).then((claims) => {
-        console.log(claims);
-        if (claims.admin === true) {
-            // Allow access to requested admin resource.
-        }
-    });
 
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
     dict.apiProjectId = currentProjectId;
@@ -99,20 +84,8 @@ async function isDataProducer(token) {
         return false;
     }
 
-    // https://github.com/googleapis/google-auth-library-nodejs#oauth2
-    const { OAuth2Client } = require('google-auth-library');
-    const CLIENT_ID = config.oauthClientId;
-    const client = new OAuth2Client(CLIENT_ID);
-
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
-        // Or, if multiple clients access the backend:
-        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
-    });
-    const payload = ticket.getPayload();
-    const userid = payload['email'];
-    // const domain = payload['hd'];
+    const result = await fbAdmin.auth().verifyIdToken(token);
+    const userid = result.email;
 
     let isProducer = false;
     for (const p of config.dataProducers) {

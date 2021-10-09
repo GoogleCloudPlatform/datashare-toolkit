@@ -146,11 +146,10 @@ import {
 
 import { mapGetters } from 'vuex';
 import _config from '../config';
-import authMixin from '../mixins/authMixin';
+import authManager from '../mixins/authManager';
 
 export default {
   name: 'app-header',
-  mixins: [authMixin],
   data: () => ({
     drawer: false,
     mini: true,
@@ -198,6 +197,12 @@ export default {
     });
   },
   methods: {
+    login() {
+      return authManager.login();
+    },
+    logout() {
+      return authManager.logout();
+    },
     projectIdChanged(reload) {
       _config.projectId = this.projectId;
       if (reload === true) {

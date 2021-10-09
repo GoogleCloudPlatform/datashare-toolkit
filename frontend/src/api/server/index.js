@@ -47,8 +47,8 @@ axios.interceptors.request.use(async function(reqConfig) {
     }
     reqConfig.headers['x-gcp-project-id'] = projectId;
   }
-  if (store.getters.isLoggedIn) {
-    const account = store.state.user.data.email;
+  if (authManager.isSignedIn()) {
+    const account = authManager.currentUser().email;
     if (account) {
       reqConfig.headers['x-gcp-account'] = account;
     }

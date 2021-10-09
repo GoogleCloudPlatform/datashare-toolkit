@@ -94,4 +94,9 @@ config.storageObjectViewerRole = 'datashare.storage.objectViewer';
 
 config.managedIamAccessTypes = ["user", "group", "serviceAccount"];
 
+config.idpConfiguration = {
+    apiKey: "AIzaSyAIg7AUkAoZ3f_Ney3DBojzfCnfjIHAaXU",
+    authDomain: "datashare-demo-2.fsi.joonix.net",
+};
+
 module.exports = config;

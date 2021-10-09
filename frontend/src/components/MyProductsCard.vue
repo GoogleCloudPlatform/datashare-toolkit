@@ -445,11 +445,10 @@ import {
 } from '@mdi/js';
 import Dialog from '@/components/Dialog.vue';
 import UrlHelper from '../urlHelper';
-import authMixin from '../mixins/authMixin';
+import authManager from '../mixins/authManager';
 import config from './../config';
 
 export default {
-  mixins: [authMixin],
   components: {
     Dialog
   },
@@ -508,7 +507,7 @@ export default {
     };
   },
   mounted() {
-    this.login().then(result => {
+    authManager.login().then(result => {
       if (result) {
         this.loadProducts();
       }
