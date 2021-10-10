@@ -36,8 +36,12 @@ for i in "$@"; do
         export PROJECT_ID="${i#*=}"
         shift # past argument=value
         ;;
-    --oauth-client-id=*)
-        export OAUTH_CLIENT_ID="${i#*=}"
+    --api-key=*)
+        export API_KEY="${i#*=}"
+        shift # past argument=value
+        ;;
+    --auth-domain=*)
+        export AUTH_DOMAIN="${i#*=}"
         shift # past argument=value
         ;;
     --fqdn=*)
@@ -78,19 +82,24 @@ else
     gcloud config set project "$PROJECT_ID"
 fi
 
-if [ -z "$OAUTH_CLIENT_ID" ]; then
-    echo "--oauth-client-id must be supplied"
+if [ -z "$API_KEY" ]; then
+    echo "--api-key must be supplied"
     exit 2
+fi
+
+if [ -z "$AUTH_DOMAIN" ]; then
+    echo "--auth-domain must be supplied"
+    exit 3
 fi
 
 if [ -z "$FQDN" ]; then
     echo "--fqdn must be supplied"
-    exit 3
+    exit 4
 fi
 
 if [ -z "$DATA_PRODUCERS" ]; then
     echo "--data-producers must be supplied"
-    exit 4
+    exit 5
 fi
 
 cd api/v1
