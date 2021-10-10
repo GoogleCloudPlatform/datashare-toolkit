@@ -21,9 +21,10 @@ This functionality so far is mainly to be used for non-marketplace integrated us
   - VUE_APP_MARKETPLACE_INTEGRATION
   - VUE_APP_USER_GUIDE_URL
   - VUE_APP_GITHUB_URL
+  - VUE_APP_GOOGLE_APP_CLIENT_ID
 
 ## API
-- `OAUTH_CLIENT_ID` [environment variable](./ENVIRONMENT_VARIABLES.md) must be defined as an API environmental variable.
+- `API_KEY` and `AUTH_DOMAIN` [environment variables](./ENVIRONMENT_VARIABLES.md) must be defined as API environmental variables.
 - Marketplace integration is no longer enabled by default. It must be enabled through the configured `MANAGED_PROJECTS` [dictionary](./MANAGED_PROJECTS.md) in the API environmental variable. In addition to the environmental variable, there is also a runtime check made with the GCP service usage API to ensure the required API is enabled.
 
 # Enabling a new projectId for Datashare

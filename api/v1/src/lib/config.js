@@ -84,9 +84,6 @@ if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_
     config.managedProjects = JSON.parse(process.env.MANAGED_PROJECTS);
 }
 
-// TODO: Remove hardcoded for testing
-config.oauthClientId = process.env.OAUTH_CLIENT_ID;
-
 // Datashare subscriber IAM roles
 config.bigQueryDataViewerRole = 'datashare.bigquery.dataViewer';
 config.pubsubSubscriberRole = 'datashare.pubsub.subscriber';
@@ -95,8 +92,8 @@ config.storageObjectViewerRole = 'datashare.storage.objectViewer';
 config.managedIamAccessTypes = ["user", "group", "serviceAccount"];
 
 config.idpConfiguration = {
-    apiKey: "AIzaSyAIg7AUkAoZ3f_Ney3DBojzfCnfjIHAaXU",
-    authDomain: "datashare-demo-2.fsi.joonix.net",
+    apiKey: process.env.API_KEY || "AIzaSyAfYvXPhuW6IgUkEcLuxLwBmdLAPCVZBt4",
+    authDomain: process.env.AUTH_DOMAIN || "cds-demo-2.firebaseapp.com",
 };
 
 module.exports = config;

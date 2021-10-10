@@ -46,7 +46,8 @@ class Config {
     try {
       this.apiBaseUrl;
       this.projectId;
-      this.googleAppClientId;
+      this.apiKey;
+      this.authDomain;
       return true;
     } catch {
       return false;
@@ -110,8 +111,12 @@ class Config {
     return store.state.project.data.apiProjectId;
   }
 
-  get googleAppClientId() {
-    return this.getConfigValue('VUE_APP_GOOGLE_APP_CLIENT_ID');
+  get apiKey() {
+    return this.getConfigValue('VUE_APP_API_KEY');
+  }
+
+  get authDomain() {
+    return this.getConfigValue('VUE_APP_AUTH_DOMAIN');
   }
 
   get myProductsMoreInformationText() {

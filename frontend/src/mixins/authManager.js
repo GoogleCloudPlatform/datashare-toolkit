@@ -33,18 +33,22 @@ const provider = new GoogleAuthProvider();
 class AuthManager {
   async init() {
     console.debug('authManager.init invoked');
-    // Initialize Identity Platform
     const idpConfig = {
-      apiKey: 'AIzaSyAfYvXPhuW6IgUkEcLuxLwBmdLAPCVZBt4',
-      authDomain: 'cds-demo-2.firebaseapp.com'
+      apiKey: config.apiKey,
+      authDomain: config.authDomain
     };
+    // Initialize Identity Platform
     const app = initializeApp(idpConfig);
     const auth = getAuth();
     const _vm = this;
+    // Wait for the initial auth state to become available before calling back and initializing the app
+    // This ensures that the auth context is pre-set for already authenticated users when the Vue app is loaded
+    // in order that API calls can retrieve a userId and idToken.
     return new Promise(function(resolve, reject) {
       const unsubscribe = auth.onAuthStateChanged(user => {
         unsubscribe();
         console.debug('authManager.init resolving promise');
+        // Only handle logged in case. For non-logged in case user must click login button or go through the activation/registration flow
         if (user) {
           resolve(_vm.onAuthSuccess(user, true));
         } else {
