@@ -44,7 +44,6 @@ async function getConfiguration(projectId, token) {
     let dict = {};
     const commerce = await runtimeConfig.marketplaceIntegration(projectId);
     const dataProducer = await isDataProducer(token);
-
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
     dict.apiProjectId = currentProjectId;
 
