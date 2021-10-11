@@ -1,5 +1,5 @@
 {
   "VUE_APP_API_BASE_URL": "http://localhost:5555/v1",
-  "VUE_APP_API_KEY": "AIzaSyCa_5cEp9oOMkMr5tS4a0BGaoiaQPZ82to",
-  "VUE_APP_AUTH_DOMAIN": "cds-demo-1-271622.firebaseapp.com"
+  "VUE_APP_API_KEY": "",
+  "VUE_APP_AUTH_DOMAIN": ""
 }
