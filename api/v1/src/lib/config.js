@@ -92,8 +92,8 @@ config.storageObjectViewerRole = 'datashare.storage.objectViewer';
 config.managedIamAccessTypes = ["user", "group", "serviceAccount"];
 
 config.idpConfiguration = {
-    apiKey: process.env.API_KEY || "AIzaSyCa_5cEp9oOMkMr5tS4a0BGaoiaQPZ82to",
-    authDomain: process.env.AUTH_DOMAIN || "cds-demo-1-271622.firebaseapp.com",
+    apiKey: process.env.API_KEY,
+    authDomain: process.env.AUTH_DOMAIN
 };
 
 module.exports = config;
