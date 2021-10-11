@@ -28,7 +28,6 @@ const { verifyProject } = require('./lib/auth');
 const legacyApiVersion = "v1alpha";
 const apiVersion = "v1";
 const PORT = process.env.PORT || 5555;
-
 /************************************************************
   OpenAPI Definition
  ************************************************************/
