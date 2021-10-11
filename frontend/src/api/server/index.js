@@ -54,7 +54,6 @@ axios.interceptors.request.use(async function(reqConfig) {
     }
     const token = await authManager.getIdToken();
     reqConfig.headers.Authorization = `Bearer ${token}`;
-
     return reqConfig;
   } else {
     return reqConfig;
