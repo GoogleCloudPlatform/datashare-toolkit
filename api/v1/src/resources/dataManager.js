@@ -34,8 +34,6 @@ const fbAdmin = require('firebase-admin');
 // Initialize the default app
 fbAdmin.initializeApp(config.idpConfiguration);
 
-// Claims: https://cloud.google.com/identity-platform/docs/how-to-configure-custom-claims
-
 /**
  * @param  {} projectId
  * @param  {} token
