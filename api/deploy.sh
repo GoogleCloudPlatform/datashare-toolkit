@@ -39,6 +39,11 @@ if [[ -z "${AUTH_DOMAIN:=}" ]]; then
     echo "Defaulted AUTH_DOMAIN to '${AUTH_DOMAIN}'"
 fi
 
+if [[ -z "${OAUTH_CLIENT_ID:=}" ]]; then
+    export OAUTH_CLIENT_ID="[change-me]"
+    echo "Defaulted OAUTH_CLIENT_ID to '${OAUTH_CLIENT_ID}'"
+fi
+
 if [[ -z "${DATA_PRODUCERS:=}" ]]; then
     export DATA_PRODUCERS="*@google.com"
     echo "Defaulted DATA_PRODUCERS to '${DATA_PRODUCERS}'"
