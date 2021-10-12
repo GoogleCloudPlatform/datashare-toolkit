@@ -66,7 +66,7 @@ var resources = express.Router();
  *   options:
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
- *     operationId: optionsGetResourceProjects
+ *     operationId: optionsGetResourceDashboard
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
