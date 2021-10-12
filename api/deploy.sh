@@ -73,7 +73,7 @@ gcloud run deploy ds-api \
     --update-env-vars=API_KEY="${API_KEY}",AUTH_DOMAIN="${AUTH_DOMAIN}",DATA_PRODUCERS="${DATA_PRODUCERS}" \
     --remove-env-vars=PROJECT_ID,MARKETPLACE_INTEGRATION,OAUTH_CLIENT_ID
 
-if ! gcloud run services describe ds-api --cluster $CLUSTER --cluster-location $ZONE --namespace $NAMESPACE --platform gke | grep -q MANAGED_PROJECTS; then
+if ! gcloud run services describe ds-api --region=$REGION --platform managed | grep -q MANAGED_PROJECTS; then
     echo "MANAGED_PROJECTS env variable not found, creating it"
     MANAGED_PROJECTS='{ "'${PROJECT_ID}'": { "MARKETPLACE_INTEGRATION_ENABLED": false, "labels": { "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT": "", "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT": "", "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL": "" } } }'
     echo ${MANAGED_PROJECTS}
