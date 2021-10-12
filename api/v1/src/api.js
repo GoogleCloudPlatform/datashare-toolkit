@@ -56,7 +56,7 @@ const options = {
         },
         // API GW Integration
         'x-google-backend': {
-            address: 'https://' + 'FQDN'
+            address: 'https://' + 'DS_API_FQDN'
         },
         security: [{
             // ## OAuth scopes are currenty ignored by API Gateway [here](https://cloud.google.com/endpoints/docs/openapi/openapi-limitations#scopes_ignored)
@@ -108,7 +108,7 @@ const options = {
                 'x-google-issuer': 'https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com',
                 'x-google-jwks_uri': 'https://www.googleapis.com/robot/v1/metadata/jwk/cloud-commerce-partner@system.gserviceaccount.com',
                 // ## Marketplace requires the domain name for your DS API, eg. abc.com, $FQDN, etc. [here](https://cloud.google.com/marketplace/docs/partners/integrated-saas/frontend-integration?hl=en#verify-jwt)
-                'x-google-audiences': 'FQDN'
+                'x-google-audiences': 'DS_API_FQDN'
             },
         },
     },
