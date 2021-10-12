@@ -48,7 +48,103 @@ var resources = express.Router();
  *         type: string
  *         readOnly: true
  *         description: Project ID
+ *
+ *   DashboardResource:
+ *     type: object
+ *     description: Dashboard Resource object
+ *     properties:
+ *       projectId:
+ *         type: string
+ *         readOnly: true
+ *         description: Project ID
  */
+
+/**
+ * @swagger
+ *
+ * /resources/dashboard:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsGetResourceProjects
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   get:
+ *     summary: Get Dashboard Counts
+ *     description: Returns the Dashbord Counts response
+ *     operationId: getDashboardCounts
+ *     tags:
+ *       - resources
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: header
+ *       name: x-gcp-account
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Dashboard Counts
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 projects:
+ *                   $ref: '#/definitions/DashboardResource'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
+
+/**
+ * @param  {} '/resources/projects'
+ * @param  {} async(req
+ * @param  {} res
+ */
+ resources.get('/resources/dashboard', async (req, res) => {
+    try {
+        const projectId = req.header('x-gcp-project-id');
+        const email = req.header('x-gcp-account')
+        const code = 200;
+        const list = await dataManager.getDashboardCounts(projectId, email);
+        const data = { success: true, data: list };
+        res.status(code).json({
+            ...data
+        });
+    } catch (err) {
+        console.error(err);
+        const data = { success: false, code: 500, errors: ['Unable to retrieve dashboard data.'] };
+        res.status(500).json(data);
+    }
+});
 
 /**
  * @swagger
@@ -110,28 +206,6 @@ var resources = express.Router();
  *         schema:
  *           $ref: '#/definitions/Error'
  */
-
-/**
- * @param  {} '/resources/projects'
- * @param  {} async(req
- * @param  {} res
- */
- resources.get('/resources/dashboard', async (req, res) => {
-    try {
-        const projectId = req.header('x-gcp-project-id');
-        const email = req.header('x-gcp-account')
-        const code = 200;
-        const list = await dataManager.getDashboardCounts(projectId, email);
-        const data = { success: true, data: list };
-        res.status(code).json({
-            ...data
-        });
-    } catch (err) {
-        console.error(err);
-        const data = { success: false, code: 500, errors: ['Unable to retrieve dashboard data.'] };
-        res.status(500).json(data);
-    }
-});
 
 /**
  * @param  {} '/resources/projects'
