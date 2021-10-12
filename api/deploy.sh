@@ -29,9 +29,14 @@ if [[ -z "${ZONE:=}" ]]; then
     echo "Defaulted ZONE to '${ZONE}'"
 fi
 
-if [[ -z "${OAUTH_CLIENT_ID:=}" ]]; then
-    export OAUTH_CLIENT_ID="[change-me]"
-    echo "Defaulted OAUTH_CLIENT_ID to '${OAUTH_CLIENT_ID}'"
+if [[ -z "${API_KEY:=}" ]]; then
+    export API_KEY="[change-me]"
+    echo "Defaulted API_KEY to '${API_KEY}'"
+fi
+
+if [[ -z "${AUTH_DOMAIN:=}" ]]; then
+    export AUTH_DOMAIN="[change-me]"
+    echo "Defaulted AUTH_DOMAIN to '${AUTH_DOMAIN}'"
 fi
 
 if [[ -z "${DATA_PRODUCERS:=}" ]]; then
@@ -60,8 +65,8 @@ gcloud run deploy ds-api \
     --no-allow-unauthenticated \
     --platform managed \
     --service-account ${SERVICE_ACCOUNT_NAME} \
-    --update-env-vars=OAUTH_CLIENT_ID="${OAUTH_CLIENT_ID}",DATA_PRODUCERS="${DATA_PRODUCERS}" \
-    --remove-env-vars=PROJECT_ID,MARKETPLACE_INTEGRATION
+    --update-env-vars=API_KEY="${API_KEY}",AUTH_DOMAIN="${AUTH_DOMAIN}",DATA_PRODUCERS="${DATA_PRODUCERS}" \
+    --remove-env-vars=PROJECT_ID,MARKETPLACE_INTEGRATION,OAUTH_CLIENT_ID
 
 if ! gcloud run services describe ds-api --cluster $CLUSTER --cluster-location $ZONE --namespace $NAMESPACE --platform gke | grep -q MANAGED_PROJECTS; then
     echo "MANAGED_PROJECTS env variable not found, creating it"

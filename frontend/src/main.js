@@ -31,9 +31,7 @@ Vue.config.productionTip = false;
 // Enable vue-form
 Vue.use(VueForm);
 
-import { LoaderPlugin } from 'vue-google-login';
 import config from './config';
-import browserHelper from './browserHelper';
 import authManager from './mixins/authManager';
 
 function getQueryVariable(variable) {
@@ -71,13 +69,10 @@ if (projectId) {
 fetch(process.env.BASE_URL + 'config/config.json').then(response => {
   response.json().then(json => {
     config.initialize(json);
-
-    Vue.use(LoaderPlugin, {
-      client_id: config.googleAppClientId,
-      ux_mode: browserHelper.isBrowserChrome() ? 'redirect' : 'popup'
-    });
-
+    console.debug('main.authManager.init called');
     authManager.init().then(() => {
+      console.debug('main.authManager.init completed');
+      // Project configuration has to be set first
       new Vue({
         vuetify,
         router,

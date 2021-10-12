@@ -119,15 +119,8 @@ import { mdiArrowRightBoldCircleOutline } from '@mdi/js';
 export default {
   name: 'dashboard',
   created() {
-    if (this.$store.getters.isLoggedIn) {
-      this.loading = true;
-      this.$store.dispatch('getDashboard').then(response => {
-        if (response.success) {
-          const data = response.data;
-          this.counts = data;
-        }
-        this.loading = false;
-      });
+    if (this.isLoggedIn) {
+      this.loadCounts();
     }
   },
   data: () => ({
@@ -148,6 +141,30 @@ export default {
         });
       }
       return list;
+    },
+    isLoggedIn() {
+      return this.$store.getters.isLoggedIn;
+    }
+  },
+  watch: {
+    isLoggedIn(newValue, oldValue) {
+      if (newValue === true) {
+        this.loadCounts();
+      } else {
+        this.counts = {};
+      }
+    }
+  },
+  methods: {
+    loadCounts() {
+      this.loading = true;
+      this.$store.dispatch('getDashboard').then(response => {
+        if (response.success) {
+          const data = response.data;
+          this.counts = data;
+        }
+        this.loading = false;
+      });
     }
   }
 };

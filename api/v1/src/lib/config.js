@@ -84,14 +84,16 @@ if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_
     config.managedProjects = JSON.parse(process.env.MANAGED_PROJECTS);
 }
 
-// TODO: Remove hardcoded for testing
-config.oauthClientId = process.env.OAUTH_CLIENT_ID;
-
 // Datashare subscriber IAM roles
 config.bigQueryDataViewerRole = 'datashare.bigquery.dataViewer';
 config.pubsubSubscriberRole = 'datashare.pubsub.subscriber';
 config.storageObjectViewerRole = 'datashare.storage.objectViewer';
 
 config.managedIamAccessTypes = ["user", "group", "serviceAccount"];
+
+config.idpConfiguration = {
+    apiKey: process.env.API_KEY,
+    authDomain: process.env.AUTH_DOMAIN
+};
 
 module.exports = config;

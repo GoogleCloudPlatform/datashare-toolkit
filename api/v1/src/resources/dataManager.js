@@ -29,6 +29,10 @@ const storageManager = require('../storage/dataManager');
 const accountManager = require('../accounts/dataManager');
 const policyManager = require('../policies/dataManager');
 const procurementManager = require('../procurements/dataManager');
+const fbAdmin = require('firebase-admin');
+
+// Initialize the default app
+fbAdmin.initializeApp(config.idpConfiguration);
 
 /**
  * @param  {} projectId
@@ -77,20 +81,8 @@ async function isDataProducer(token) {
         return false;
     }
 
-    // https://github.com/googleapis/google-auth-library-nodejs#oauth2
-    const { OAuth2Client } = require('google-auth-library');
-    const CLIENT_ID = config.oauthClientId;
-    const client = new OAuth2Client(CLIENT_ID);
-
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
-        // Or, if multiple clients access the backend:
-        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
-    });
-    const payload = ticket.getPayload();
-    const userid = payload['email'];
-    // const domain = payload['hd'];
+    const result = await fbAdmin.auth().verifyIdToken(token);
+    const userid = result.email;
 
     let isProducer = false;
     for (const p of config.dataProducers) {

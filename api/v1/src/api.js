@@ -61,7 +61,6 @@ const options = {
         security: [{
             // ## OAuth scopes are currenty ignored by API Gateway [here](https://cloud.google.com/endpoints/docs/openapi/openapi-limitations#scopes_ignored)
             'google': []}, {
-            'google2': []}, {
             'firebase': []}, {
             'marketplace': []
         }],
@@ -83,19 +82,6 @@ const options = {
                 'x-google-issuer': 'https://accounts.google.com',
                 'x-google-jwks_uri': 'https://www.googleapis.com/oauth2/v3/certs',
                 // ## x-google-audiences should be set to $abc.com, https://FQDNif not specified
-                'x-google-audiences': 'OAUTH_CLIENT_ID'
-            },
-            // ## Google Identity Provider
-            'google2': {
-                'type': 'oauth2',
-                'authorizationUrl': 'https://accounts.google.com/o/oauth2/v2/auth',
-                'flow': 'implicit',
-                'scopes': {
-                    'https://www.googleapis.com/auth/cloud-platform': 'default',
-                },
-                'x-google-issuer': 'accounts.google.com',
-                'x-google-jwks_uri': 'https://www.googleapis.com/oauth2/v3/certs',
-                // ## x-google-audiences should be set to $abc.com, $FQDN if not specified
                 'x-google-audiences': 'OAUTH_CLIENT_ID'
             },
             // ## Firebase Identity Provider

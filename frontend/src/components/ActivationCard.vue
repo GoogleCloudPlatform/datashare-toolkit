@@ -7,12 +7,11 @@
 </template>
 
 <script>
-import authMixin from '../mixins/authMixin';
+import authManager from '../mixins/authManager';
 import config from './../config';
 
 export default {
   name: 'activation',
-  mixins: [authMixin],
   props: {
     msg: String
   },
@@ -71,7 +70,7 @@ export default {
       sessionStorage.removeItem('gmt');
     }
 
-    this.performLogin().then(result => {
+    authManager.login().then(result => {
       if (result) {
         this.user = {
           email: this.$store.state.user.data.email,
