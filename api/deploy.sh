@@ -102,8 +102,29 @@ if [ ! -z "$DELETE_REVISIONS" ]; then
     done
 fi
 
+# Up to root
+cd ../../
+
+# Update the API Gateway config
+API_GW_SERVICE_ACCOUNT_NAME=api-gw-ds-api
+DS_API_URL=`gcloud run services describe ds-api --platform managed --region=$REGION --format="value(status.url)"`; echo $DS_API_URL
+
+cp ./api/config/openapi_spec.v2.yaml.tmpl ds-api_oas.yaml
+
+curl -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email)" $DS_API_URL/v1/docs/openapi_spec -o ds-api_oas.json
+
+DS_API_FQDN=$(echo $DS_API_URL | sed 's!https://!!'); echo $DS_API_FQDN
+sed -i.bak "s|DS_API_FQDN|$DS_API_FQDN|" ds-api_oas.yaml
+sed -i.bak "s|PROJECT_ID|$PROJECT_ID|" ds-api_oas.yaml
+sed -i.bak "s|OAUTH_CLIENT_ID|$OAUTH_CLIENT_ID|" ds-api_oas.yaml
+
+TIMESTAMP=$( date +%Y%m%d-%H%M%S )
+NEW_CONFIG_ID=api-gw-ds-api-$TIMESTAMP
+
+gcloud api-gateway api-configs create $NEW_CONFIG_ID --api=api-gw-ds-api --openapi-spec=ds-api_oas.yaml --backend-auth-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --display-name=$API_GW_SERVICE_ACCOUNT_NAME
+gcloud api-gateway gateways update api-gw-ds-api --api=api-gw-ds-api --api-config=$NEW_CONFIG_ID --location $REGION
+
 if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
-    cd ../../
     gcloud builds submit --config api/v1/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
     # TODO: Switch to Managed Cloud Run when this issue is resolved
