@@ -111,12 +111,15 @@ fi
 cd ../../
 
 # Update the API Gateway config
+npm i -g json2yaml
+
 API_GW_SERVICE_ACCOUNT_NAME=api-gw-ds-api
 DS_API_URL=`gcloud run services describe ds-api --platform managed --region=$REGION --format="value(status.url)"`; echo $DS_API_URL
 
-cp ./api/config/openapi_spec.v2.yaml.tmpl ds-api_oas.yaml
+# cp ./api/config/openapi_spec.v2.yaml.tmpl ds-api_oas.yaml
 
 curl -H "Authorization: Bearer $(gcloud auth print-identity-token --impersonate-service-account=${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com --include-email)" $DS_API_URL/v1/docs/openapi_spec -o ds-api_oas.json
+json2yaml ./ds-api_oas.json > ./ds-api_oas.yaml
 
 DS_API_FQDN=$(echo $DS_API_URL | sed 's!https://!!'); echo $DS_API_FQDN
 sed -i.bak "s|DS_API_FQDN|$DS_API_FQDN|" ds-api_oas.yaml
