@@ -114,17 +114,16 @@ const options = {
     },
     // Path to the API docs
     apis: [
-        './api.js',
-        './src/api.js',
-        './src/accounts/index.js',
-        './src/admin/index.js',
-        './src/datasets/index.js',
-        './src/policies/index.js',
-        './src/procurements/index.js',
-        './src/pubsub/index.js',
-        './src/resources/index.js',
-        './src/spots/index.js',
-        './src/storage/index.js',
+        `${__dirname}/api.js`,
+        `${__dirname}/accounts/index.js`,
+        `${__dirname}/admin/index.js`,
+        `${__dirname}/datasets/index.js`,
+        `${__dirname}/policies/index.js`,
+        `${__dirname}/procurements/index.js`,
+        `${__dirname}/pubsub/index.js`,
+        `${__dirname}/resources/index.js`,
+        `${__dirname}/spots/index.js`,
+        `${__dirname}/storage/index.js`,
     ]
 };
 
