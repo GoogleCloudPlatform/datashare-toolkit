@@ -19,7 +19,6 @@ x-google-backend:
   address: https://DS_API_FQDN
 security:
   - google: []
-  - google2: []
   - firebase: []
   - marketplace: []
 securityDefinitions:
@@ -34,15 +33,6 @@ securityDefinitions:
     scopes:
       https://www.googleapis.com/auth/cloud-platform: default
     x-google-issuer: https://accounts.google.com
-    x-google-jwks_uri: https://www.googleapis.com/oauth2/v3/certs
-    x-google-audiences: OAUTH_CLIENT_ID
-  google2:
-    type: oauth2
-    authorizationUrl: https://accounts.google.com/o/oauth2/v2/auth
-    flow: implicit
-    scopes:
-      https://www.googleapis.com/auth/cloud-platform: default
-    x-google-issuer: accounts.google.com
     x-google-jwks_uri: https://www.googleapis.com/oauth2/v3/certs
     x-google-audiences: OAUTH_CLIENT_ID
   firebase:
