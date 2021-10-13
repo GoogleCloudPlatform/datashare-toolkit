@@ -71,7 +71,7 @@
       v-on:canceled="dialogCanceled"
     />
     <v-card-title primary-title>
-      Application Users
+      Authenticated Users
     </v-card-title>
     <v-data-table
       :headers="headers"
