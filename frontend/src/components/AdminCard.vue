@@ -70,18 +70,69 @@
       v-on:confirmed="dialogConfirmed"
       v-on:canceled="dialogCanceled"
     />
+    <v-card-title primary-title>
+      Application Users
+    </v-card-title>
+    <v-data-table
+      :headers="headers"
+      :items="applicationUsers"
+      :search="search"
+      :loading="loading"
+    >
+      <template v-slot:loading>
+        <v-row justify="center" align="center">
+          <div class="text-center ma-12">
+            <v-progress-circular
+              v-if="loading"
+              indeterminate
+              color="primary"
+            ></v-progress-circular>
+          </div>
+        </v-row>
+      </template>
+      <template v-slot:top>
+        <v-toolbar flat class="mb-1">
+          <v-text-field
+            v-model="search"
+            clearable
+            flat
+            hide-details
+            prepend-inner-icon="search"
+            label="Search"
+          ></v-text-field>
+        </v-toolbar>
+      </template>
+      <template v-for="h in headers" v-slot:[`header.${h.value}`]="{ header }">
+        <v-tooltip bottom v-bind:key="h.value">
+          <template v-slot:activator="{ on }">
+            <span v-on="on">{{ h.text }}</span>
+          </template>
+          <span v-if="header.tooltip">{{ header.tooltip }}</span>
+        </v-tooltip>
+      </template>
+      <template v-slot:[`item.photoURL`]="{ item }">
+        <v-avatar color="primary" size="40" rounded>
+          <v-img :src="item.photoURL"></v-img>
+        </v-avatar>
+      </template>
+      <template v-slot:[`item.customClaims`]="{ item }">
+        <v-chip-group max="0" multiple column active-class="primary--text">
+          <!--, index-->
+          <v-chip v-for="(value, key) in item.customClaims" :key="key">
+            {{ key }}: {{ value }}
+          </v-chip>
+        </v-chip-group>
+      </template>
+    </v-data-table>
   </v-card>
 </template>
 
 <script>
-import Vue from 'vue';
 import _config from './../config';
-
 import { setInteractionMode } from 'vee-validate';
+import Dialog from '@/components/Dialog.vue';
 
 setInteractionMode('eager');
-
-import Dialog from '@/components/Dialog.vue';
 
 export default {
   components: {
@@ -96,8 +147,55 @@ export default {
     dialogButtonCancelText: '',
     dialogCancelButtonEnabled: true,
     dialogObject: {},
-    showError: false
+    showError: false,
+    applicationUsers: [],
+    search: '',
+    headers: [
+      {
+        text: 'UID',
+        value: 'uid',
+        tooltip: 'The IDP uid'
+      },
+      {
+        text: 'Email',
+        value: 'email',
+        tooltip: 'The account email address'
+      },
+      {
+        text: 'Email Verified',
+        value: 'emailVerified',
+        tooltip: 'Denotes if the email address is verified'
+      },
+      {
+        text: 'Disabled',
+        value: 'disabled',
+        tooltip: 'Indicates if the account is disabled'
+      },
+      {
+        text: 'Custom Claims',
+        value: 'customClaims',
+        tooltip: 'The account custom claims'
+      },
+      {
+        text: 'Last Sign In Time',
+        value: 'lastSignInTime',
+        tooltip: 'The last sign in time for the account'
+      },
+      {
+        text: 'Creation Time',
+        value: 'creationTime',
+        tooltip: 'The creation time for the account'
+      },
+      {
+        text: 'Photo URL',
+        value: 'photoURL',
+        tooltip: 'The account photo url'
+      }
+    ]
   }),
+  mounted() {
+    this.loadApplicationUsers();
+  },
   computed: {
     config() {
       return _config;
@@ -217,6 +315,17 @@ export default {
       console.debug(
         `cancel clicked for dialog object: ${JSON.stringify(object)}`
       );
+    },
+    loadApplicationUsers() {
+      this.loading = true;
+      this.$store.dispatch('getApplicationUsers').then(response => {
+        if (response.success) {
+          this.applicationUsers = response.data;
+        } else {
+          this.applicationUsers = [];
+        }
+        this.loading = false;
+      });
     }
   }
 };

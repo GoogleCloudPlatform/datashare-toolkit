@@ -426,7 +426,7 @@ async function listApplicationUsers() {
             };
             const claims = user.customClaims;
             if (claims) {
-                user.customClaims = claims;
+                r.customClaims = claims;
             }
             const meta = user.metadata;
             if (meta) {

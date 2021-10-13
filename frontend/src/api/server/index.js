@@ -372,5 +372,10 @@ export default {
     return axios
       .get(this._apiBaseUrl() + '/resources/dashboard')
       .then(response => response);
+  },
+  getApplicationUsers() {
+    return axios
+      .get(this._apiBaseUrl() + '/admin/applicationUsers')
+      .then(response => response);
   }
 };
