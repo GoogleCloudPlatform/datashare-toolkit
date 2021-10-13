@@ -31,9 +31,6 @@ const policyManager = require('../policies/dataManager');
 const procurementManager = require('../procurements/dataManager');
 const fbAdmin = require('firebase-admin');
 
-// Initialize the default app
-fbAdmin.initializeApp(config.idpConfiguration);
-
 /**
  * @param  {} projectId
  * @param  {} token
