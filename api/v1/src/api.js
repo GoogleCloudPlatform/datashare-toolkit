@@ -194,8 +194,8 @@ const corsOptions = {
 router.all(
     '*',
     cors(corsOptions),
-    verifyProject,
     isAuthenticated,
+    verifyProject,
     setCustomUserClaims);
 
 /**
