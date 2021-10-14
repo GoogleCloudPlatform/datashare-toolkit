@@ -22,8 +22,16 @@ includedPermissions:
 - bigquery.tables.update
 - bigquery.tables.updateData
 - compute.projects.get
+- firebaseauth.configs.create
 - firebaseauth.configs.get
+- firebaseauth.configs.getHashConfig
+- firebaseauth.configs.update
+- firebaseauth.users.create
+- firebaseauth.users.createSession
+- firebaseauth.users.delete
 - firebaseauth.users.get
+- firebaseauth.users.sendEmail
+- firebaseauth.users.update
 - iam.serviceAccounts.signBlob
 - pubsub.subscriptions.consume
 - pubsub.subscriptions.create
