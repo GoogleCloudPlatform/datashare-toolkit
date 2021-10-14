@@ -94,8 +94,8 @@ class AuthManager {
     return auth.currentUser;
   }
 
-  async getIdToken() {
-    return this.currentUser().getIdToken();
+  async getIdToken(forceRefresh) {
+    return this.currentUser().getIdToken(forceRefresh);
   }
 
   async login() {

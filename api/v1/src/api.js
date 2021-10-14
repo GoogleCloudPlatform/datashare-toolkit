@@ -23,7 +23,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const { verifyProject } = require('./lib/auth');
+const { verifyProject, isAuthenticated, setCustomUserClaims } = require('./lib/auth');
 const config = require('./lib/config');
 
 const legacyApiVersion = "v1alpha";
@@ -186,8 +186,17 @@ var router = express.Router();
 // methods that require multiple routes
 var routes = [];
 
+const corsOptions = {
+    exposedHeaders: 'x-gcp-needs-token-refresh',
+};
+
 // CORS will be controlled by the API GW layer
-router.all('*', cors(), verifyProject);
+router.all(
+    '*',
+    cors(corsOptions),
+    verifyProject,
+    isAuthenticated,
+    setCustomUserClaims);
 
 /**
  * @swagger
