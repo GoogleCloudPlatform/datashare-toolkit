@@ -134,7 +134,8 @@ var resources = express.Router();
         const projectId = req.header('x-gcp-project-id');
         const email = req.header('x-gcp-account')
         const code = 200;
-        const list = await dataManager.getDashboardCounts(projectId, email);
+        const { role } = res.locals;
+        const list = await dataManager.getDashboardCounts(projectId, email, role);
         const data = { success: true, data: list };
         res.status(code).json({
             ...data

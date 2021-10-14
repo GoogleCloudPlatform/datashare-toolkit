@@ -45,21 +45,22 @@ async function verifyProject(req, res, next) {
  * @param  {} next
  */
 async function isAuthenticated(req, res, next) {
-    // console.log(req.path);
-    // console.log(req.method);
     const { authorization } = req.headers
 
-    if (!authorization)
+    if (!authorization) {
         return res.status(401).send({ message: 'Unauthorized' });
+    }
 
-    if (!authorization.startsWith('Bearer'))
+    if (!authorization.startsWith('Bearer')) {
         return res.status(401).send({ message: 'Unauthorized' });
+    }
 
     const split = authorization.split('Bearer ')
-    if (split.length !== 2)
+    if (split.length !== 2) {
         return res.status(401).send({ message: 'Unauthorized' });
+    }
 
-    const token = split[1]
+    const token = split[1];
 
     try {
         const decodedToken = await fbAdmin.auth().verifyIdToken(token);
@@ -127,8 +128,65 @@ function isAuthorized(opts) {
     }
 }
 
+async function authzCheck(req, res, next) {
+    const { role } = res.locals;    
+    const projectId = await runtimeConfig.getCurrentProjectId();
+    const method = req.method;
+    const path = req.path;
+    // console.log(`AuthZ check for method ${method} and path ${path}`);
+    // console.log(role);
+    const consumerAccess = {
+        'GET': [
+            '/products',
+            '/resources/configuration',
+            '/resources/dashboard',
+            '/resources/projects',
+            '/accounts:activate',
+            // BEGIN: Backwards compatibility for marketplace
+            `/projects/${projectId}/procurements:myProducts`,
+            `/projects/${projectId}/procurements:myProducts?*`,
+            // END: Backwards compatibility for marketplace
+            '/procurements:myProducts',
+            '/procurements:myProducts?*'
+        ],
+        'POST': [
+            '/accounts:activate',
+            // BEGIN: Backwards compatibility for marketplace
+            `/projects/${projectId}/accounts:register`,
+            `/projects/${projectId}/accounts:register?*`,
+            `/projects/${projectId}/procurements:myProducts`,
+            `/projects/${projectId}/procurements:myProducts?*`,
+            // END: Backwards compatibility for marketplace
+            '/accounts:register',
+            '/accounts:register?*',
+            '/procurements:myProducts',
+            '/procurements:myProducts?*'
+        ]
+    }
+
+    if (role === 'admin') {
+        return next();
+    } else if (role === 'consumer') {
+        if (req.method in consumerAccess) {
+            const available = consumerAccess[req.method];
+            const found = available.filter(i => {
+                if (i.endsWith('*')) {
+                    return req.path.startsWith(i.slice(0, -1));
+                } else {
+                    return i === req.path
+                }
+            });
+            if (found) {
+                return next();
+            }
+        }
+    }
+    return res.status(401).send({ message: 'Unauthorized' });
+}
+
 module.exports = {
-    verifyProject,   
+    verifyProject,
     isAuthenticated,
-    setCustomUserClaims
+    setCustomUserClaims,
+    authzCheck
 };

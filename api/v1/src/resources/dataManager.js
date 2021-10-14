@@ -100,53 +100,60 @@ async function isDataProducer(token) {
 /**
  * @param  {} projectId
  * @param  {} email
+ * @param  {} role
  */
-async function getDashboardCounts(projectId, email) {
+async function getDashboardCounts(projectId, email, role) {
     let counts = dsCache.get(dashboardCacheKey);
     if (counts == undefined) {
         counts = {};
-        await datasetManager.listDatasets(projectId).then(result => {
-            if (result.success === true) {
-                counts.datasets = result.data.length;
-            }
-        });
-        await datasetManager.listDatasetViews(projectId).then(result => {
-            if (result.success === true) {
-                counts.views = result.data.length;
-            }
-        });
-        await pubsubManager.listTopics(projectId).then(result => {
-            if (result.success === true) {
-                counts.topics = result.data.length;
-            }
-        });
-        await storageManager.listBuckets(projectId).then(result => {
-            if (result.success === true) {
-                counts.buckets = result.data.length;
-            }
-        });
-        await accountManager.listAccounts(projectId).then(result => {
-            if (result.success === true) {
-                counts.accounts = result.data.length;
-            }
-        });
-        await policyManager.listPolicies(projectId).then(result => {
-            if (result.success === true) {
-                counts.policies = result.data.length;
-            }
-        });
-
-        if (await runtimeConfig.marketplaceIntegration(projectId) === true) {
-            await procurementManager.listProcurements(projectId, ['ENTITLEMENT_ACTIVATION_REQUESTED']).then(result => {
+        if (role === 'admin') {
+            await datasetManager.listDatasets(projectId).then(result => {
                 if (result.success === true) {
-                    counts.procurements = result.data.length;
+                    counts.datasets = result.data.length;
                 }
             });
-        }
+            await datasetManager.listDatasetViews(projectId).then(result => {
+                if (result.success === true) {
+                    counts.views = result.data.length;
+                }
+            });
+            await pubsubManager.listTopics(projectId).then(result => {
+                if (result.success === true) {
+                    counts.topics = result.data.length;
+                }
+            });
+            await storageManager.listBuckets(projectId).then(result => {
+                if (result.success === true) {
+                    counts.buckets = result.data.length;
+                }
+            });
+            await accountManager.listAccounts(projectId).then(result => {
+                if (result.success === true) {
+                    counts.accounts = result.data.length;
+                }
+            });
+            await policyManager.listPolicies(projectId).then(result => {
+                if (result.success === true) {
+                    counts.policies = result.data.length;
+                }
+            });
 
-        if (counts) {
-            dsCache.set(dashboardCacheKey, counts, 60);
+            if (await runtimeConfig.marketplaceIntegration(projectId) === true) {
+                await procurementManager.listProcurements(projectId, ['ENTITLEMENT_ACTIVATION_REQUESTED']).then(result => {
+                    if (result.success === true) {
+                        counts.procurements = result.data.length;
+                    }
+                });
+            }
+
+            if (counts) {
+                dsCache.set(dashboardCacheKey, counts, 60);
+            }
         }
+    }
+
+    if (counts == undefined) {
+        counts = {};
     }
 
     if (await runtimeConfig.marketplaceIntegration(projectId) === true) {

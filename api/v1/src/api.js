@@ -23,7 +23,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const { verifyProject, isAuthenticated, setCustomUserClaims } = require('./lib/auth');
+const { verifyProject, isAuthenticated, setCustomUserClaims, authzCheck } = require('./lib/auth');
 const config = require('./lib/config');
 
 const legacyApiVersion = "v1alpha";
@@ -196,7 +196,8 @@ router.all(
     cors(corsOptions),
     isAuthenticated,
     verifyProject,
-    setCustomUserClaims);
+    setCustomUserClaims,
+    authzCheck);
 
 /**
  * @swagger
