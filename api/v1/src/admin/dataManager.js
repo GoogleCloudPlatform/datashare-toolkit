@@ -419,6 +419,7 @@ async function listApplicationUsers() {
             const user = record.toJSON();
             let r = {
                 uid: user.uid,
+                displayName: user.displayName,
                 email: user.email,
                 emailVerified: user.emailVerified,
                 disabled: user.disabled,

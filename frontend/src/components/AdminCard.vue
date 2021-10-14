@@ -157,6 +157,11 @@ export default {
         tooltip: 'The IDP uid'
       },
       {
+        text: 'Name',
+        value: 'displayName',
+        tooltip: 'The display name of the account'
+      },
+      {
         text: 'Email',
         value: 'email',
         tooltip: 'The account email address'
