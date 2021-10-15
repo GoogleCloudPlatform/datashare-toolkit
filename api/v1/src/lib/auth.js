@@ -110,9 +110,8 @@ async function setCustomUserClaims(req, res, next) {
 }
 
 async function authzCheck(req, res, next) {
-    const { uid, role } = res.locals;    
+    const { uid, role } = res.locals;
     const projectId = await runtimeConfig.getCurrentProjectId();
-    console.debug(`Account '${uid}' authorization check for method '${req.method}' and path '${req.path}'`);
     const consumerAccess = {
         'GET': [
             '/products',
@@ -143,6 +142,7 @@ async function authzCheck(req, res, next) {
     }
 
     if (role === 'admin') {
+        console.debug(`Access granted for admin account '${uid}' authorization check for method '${req.method}' and path '${req.path}'`);
         return next();
     } else if (role === 'consumer') {
         if (req.method in consumerAccess) {
@@ -155,10 +155,12 @@ async function authzCheck(req, res, next) {
                 }
             });
             if (found) {
+                console.debug(`Access granted for consumer account '${uid}' authorization check for method '${req.method}' and path '${req.path}'`);
                 return next();
             }
         }
     }
+    console.warn(`Access denied for account '${uid}' authorization check for method '${req.method}' and path '${req.path}'`);
     return res.status(401).send({ message: 'Unauthorized' });
 }
 
