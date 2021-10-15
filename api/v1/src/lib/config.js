@@ -82,6 +82,17 @@ config.gcpMarketplaceTokenCookieName = 'gmt';
 
 if (process.env.MANAGED_PROJECTS && commonUtil.isJsonString(process.env.MANAGED_PROJECTS)) {
     config.managedProjects = JSON.parse(process.env.MANAGED_PROJECTS);
+} else {
+    let m = {};
+    m[process.env.PROJECT_ID] = {
+        "MARKETPLACE_INTEGRATION_ENABLED": false,
+        "labels": {
+            "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT": "",
+            "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT": "",
+            "VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL": ""
+        }
+    };
+    config.managedProjects = m;
 }
 
 // Datashare subscriber IAM roles
