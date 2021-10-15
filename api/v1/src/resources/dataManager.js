@@ -33,10 +33,9 @@ const fbAdmin = require('firebase-admin');
 
 /**
  * @param  {} projectId
- * @param  {} token
  * @param  {} role
  */
-async function getConfiguration(projectId, token, role) {
+async function getConfiguration(projectId, role) {
     let dict = {};
     const commerce = await runtimeConfig.marketplaceIntegration(projectId);
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
