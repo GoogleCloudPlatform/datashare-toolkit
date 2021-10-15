@@ -73,11 +73,7 @@ const store = new Vuex.Store({
       return false;
     },
     isDataProducer: state => {
-      if (
-        state.project &&
-        state.project.data &&
-        state.project.data.isDataProducer
-      ) {
+      if (state.user && state.user.data && state.user.data.isDataProducer) {
         return state.project.data.isDataProducer === true;
       }
       return false;

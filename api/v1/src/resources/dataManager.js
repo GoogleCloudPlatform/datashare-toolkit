@@ -44,8 +44,7 @@ async function getConfiguration(projectId, role) {
     } else {
         dict.projectId = currentProjectId;
     }
-
-    dict.isDataProducer = role === 'admin';
+    
     dict.isMarketplaceEnabled = commerce;
 
     // Append UI labels

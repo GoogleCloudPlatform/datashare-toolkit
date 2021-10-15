@@ -143,10 +143,12 @@ class AuthManager {
   async onAuthSuccess(googleUser, reloadProjectConfigurationOnly) {
     console.debug('auth success called');
     if (googleUser) {
+      const claims = (await this.currentUser().getIdTokenResult()).claims;
       const user = {
         displayName: googleUser.displayName,
         email: googleUser.email,
-        photoURL: googleUser.photoURL
+        photoURL: googleUser.photoURL,
+        isDataProducer: claims.role === 'admin'
       };
       return store.dispatch('fetchUser', user).then(() => {
         if (reloadProjectConfigurationOnly === true) {
