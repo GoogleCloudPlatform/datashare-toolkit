@@ -186,6 +186,7 @@ var router = express.Router();
 // methods that require multiple routes
 var routes = [];
 
+// https://stackoverflow.com/questions/37897523/axios-get-access-to-response-header-fields
 const corsOptions = {
     exposedHeaders: 'x-gcp-needs-token-refresh',
 };

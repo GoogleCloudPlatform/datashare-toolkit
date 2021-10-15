@@ -105,16 +105,9 @@ async function setCustomUserClaims(req, res, next) {
             return;
         }
     }
-    // https://stackoverflow.com/questions/37897523/axios-get-access-to-response-header-fields
     // console.debug(`User ${uid} claims are up-to-date`);
     next();
 }
-
-// https://expressjs.com/en/guide/using-middleware.html
-// https://www.toptal.com/firebase/role-based-firebase-authentication
-
-// https://hightekk.com/articles/firebase-custom-claims-script
-// https://firebase.google.com/docs/auth/admin/custom-claims
 function isAuthorized(opts) {
     return (req, res, next) => {
         const { role, email, uid } = res.locals
