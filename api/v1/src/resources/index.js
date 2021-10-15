@@ -304,7 +304,8 @@ resources.get('/resources/configuration', async (req, res) => {
         if (token === undefined) {
             return res.status(401).json({ code: 401, success: false, errors: [{ message: "Authorization Header is required"}] });
         }
-        const c = await dataManager.getConfiguration(projectId, token);
+        const { role } = res.locals;
+        const c = await dataManager.getConfiguration(projectId, role);
         const data = { success: true, configuration: c };
         const code = 200;
         res.status(code).json({

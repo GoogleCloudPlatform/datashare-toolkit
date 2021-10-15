@@ -34,11 +34,11 @@ const fbAdmin = require('firebase-admin');
 /**
  * @param  {} projectId
  * @param  {} token
+ * @param  {} role
  */
-async function getConfiguration(projectId, token) {
+async function getConfiguration(projectId, token, role) {
     let dict = {};
     const commerce = await runtimeConfig.marketplaceIntegration(projectId);
-    const dataProducer = await isDataProducer(token);
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
     dict.apiProjectId = currentProjectId;
 
@@ -49,7 +49,7 @@ async function getConfiguration(projectId, token) {
         dict.projectId = currentProjectId;
     }
 
-    dict.isDataProducer = dataProducer;
+    dict.isDataProducer = role === 'admin';
     dict.isMarketplaceEnabled = commerce;
 
     // Append UI labels
@@ -67,34 +67,6 @@ async function getConfiguration(projectId, token) {
     }
 
     return dict;
-}
-
-/**
- * @param  {} token
- */
-async function isDataProducer(token) {
-    if (!config.dataProducers) {
-        console.error('DATA_PRODUCERS environmental variable is not defined');
-        return false;
-    }
-
-    const result = await fbAdmin.auth().verifyIdToken(token);
-    const userid = result.email;
-
-    let isProducer = false;
-    for (const p of config.dataProducers) {
-        if (p.toLowerCase() === userid.toLowerCase()) {
-            isProducer = true;
-            break;
-        }
-        else if (p.includes('*') || p.includes('?')) {
-            if (commonUtil.wildTest(p.toLowerCase(), userid.toLowerCase())) {
-                isProducer = true;
-                break;
-            }
-        }
-    }
-    return isProducer;
 }
 
 /**
