@@ -74,7 +74,7 @@ const store = new Vuex.Store({
     },
     isDataProducer: state => {
       if (state.user && state.user.data && state.user.data.isDataProducer) {
-        return state.project.data.isDataProducer === true;
+        return state.user.data.isDataProducer === true;
       }
       return false;
     },
@@ -104,7 +104,8 @@ const store = new Vuex.Store({
         commit('setUser', {
           displayName: user.displayName,
           email: user.email,
-          photoURL: user.photoURL
+          photoURL: user.photoURL,
+          isDataProducer: user.isDataProducer
         });
       } else {
         commit('setUser', null);
