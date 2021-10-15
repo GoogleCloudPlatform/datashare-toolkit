@@ -332,17 +332,6 @@ const store = new Vuex.Store({
       });
     },
     // eslint-disable-next-line no-unused-vars
-    isDataProducer({ commit }) {
-      return client
-        .isDataProducer()
-        .then(result => {
-          return result.code && result.code === 200;
-        })
-        .catch(error => {
-          return false;
-        });
-    },
-    // eslint-disable-next-line no-unused-vars
     getManagedProjects({ commit }, payload) {
       return client.getManagedProjects().catch(error => {
         notify(error);

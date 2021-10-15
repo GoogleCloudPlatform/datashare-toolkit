@@ -327,11 +327,6 @@ export default {
       })
       .then(response => response);
   },
-  isDataProducer() {
-    return axios
-      .post(this._apiBaseUrl() + '/auth:isDataProducer')
-      .then(response => response);
-  },
   getManagedProjects() {
     return axios
       .get(this._apiBaseUrl() + '/resources/projects')
