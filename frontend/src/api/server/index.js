@@ -51,10 +51,6 @@ axios.interceptors.request.use(async function(reqConfig) {
     reqConfig.headers['x-gcp-project-id'] = projectId;
   }
   if (authManager.isSignedIn()) {
-    const account = authManager.currentUser().email;
-    if (account) {
-      reqConfig.headers['x-gcp-account'] = account;
-    }
     const token = await authManager.getIdToken(forceTokenRefresh);
     forceTokenRefresh = false;
     reqConfig.headers.Authorization = `Bearer ${token}`;

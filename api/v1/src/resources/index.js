@@ -91,10 +91,6 @@ var resources = express.Router();
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *     - in: header
- *       name: x-gcp-account
- *       type: string
- *       required: true
  *     produces:
  *       - application/json
  *     responses:
@@ -132,7 +128,7 @@ var resources = express.Router();
  resources.get('/resources/dashboard', async (req, res) => {
     try {
         const projectId = req.header('x-gcp-project-id');
-        const email = req.header('x-gcp-account')
+        const email = res.locals.email
         const code = 200;
         const { role } = res.locals;
         const list = await dataManager.getDashboardCounts(projectId, email, role);
@@ -304,7 +300,7 @@ resources.get('/resources/configuration', async (req, res) => {
         if (token === undefined) {
             return res.status(401).json({ code: 401, success: false, errors: [{ message: "Authorization Header is required"}] });
         }
-        const { role } = res.locals;
+        const role = res.locals.role;
         const c = await dataManager.getConfiguration(projectId, role);
         const data = { success: true, configuration: c };
         const code = 200;

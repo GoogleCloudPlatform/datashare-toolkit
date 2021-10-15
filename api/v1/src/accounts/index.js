@@ -180,11 +180,6 @@ accounts.get('/accounts', async (req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *     - in: header
- *       name: x-gcp-account
- *       type: string
- *       required: true
- *       description: GCP account name of the calling user
  *     - in: body
  *       name: account
  *       description: Request parameters for Account
@@ -235,7 +230,7 @@ accounts.post('/accounts', async (req, res) => {
         email: req.body.email,
         emailType: req.body.emailType,
         accountType: req.body.accountType,
-        createdBy: req.header('x-gcp-account'),
+        createdBy: res.locals.email,
         policies: req.body.policies,
         marketplace: req.body.marketplace
     };
@@ -353,11 +348,6 @@ accounts.get('/accounts/:accountId', async (req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *     - in: header
- *       name: x-gcp-account
- *       type: string
- *       required: true
- *       description: GCP account name of the calling user
  *     - in: body
  *       name: account
  *       description: Request parameters for Account
@@ -412,7 +402,7 @@ accounts.put('/accounts/:accountId', async (req, res) => {
         email: req.body.email,
         emailType: req.body.emailType,
         accountType: req.body.accountType,
-        createdBy: req.header('x-gcp-account'),
+        createdBy: res.locals.email,
         policies: req.body.policies,
         marketplace: req.body.marketplace
     };
@@ -449,11 +439,6 @@ accounts.put('/accounts/:accountId', async (req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *     - in: header
- *       name: x-gcp-account
- *       type: string
- *       required: true
- *       description: GCP account name of the calling user
  *     - in: body
  *       name: account
  *       description: Request parameters for Account
@@ -491,7 +476,7 @@ accounts.delete('/accounts/:accountId', async (req, res) => {
     const accountId = req.params.accountId;
     const values = {
         rowId: req.body.rowId,
-        createdBy: req.header('x-gcp-account')
+        createdBy: res.locals.email
     };
     const data = await dataManager.deleteAccount(projectId, accountId, values);
     var code;

@@ -112,7 +112,7 @@ async function setCustomUserClaims(req, res, next) {
 async function authzCheck(req, res, next) {
     const { uid, role } = res.locals;    
     const projectId = await runtimeConfig.getCurrentProjectId();
-    console.debug(`User ${uid} AuthZ check for method ${req.method} and path ${req.path}`);
+    console.debug(`Account '${uid}' authorization check for method '${req.method}' and path '${req.path}'`);
     const consumerAccess = {
         'GET': [
             '/products',
