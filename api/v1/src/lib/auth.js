@@ -108,26 +108,11 @@ async function setCustomUserClaims(req, res, next) {
     // console.debug(`User ${uid} claims are up-to-date`);
     next();
 }
-function isAuthorized(opts) {
-    return (req, res, next) => {
-        const { role, email, uid } = res.locals
-        if (!role) {
-            return res.status(403).send();
-        }
-        if (opts.hasRole.includes(role)) {
-            return next();
-        }
-        return res.status(403).send();
-    }
-}
 
 async function authzCheck(req, res, next) {
-    const { role } = res.locals;    
+    const { uid, role } = res.locals;    
     const projectId = await runtimeConfig.getCurrentProjectId();
-    const method = req.method;
-    const path = req.path;
-    // console.log(`AuthZ check for method ${method} and path ${path}`);
-    // console.log(role);
+    console.debug(`User ${uid} AuthZ check for method ${req.method} and path ${req.path}`);
     const consumerAccess = {
         'GET': [
             '/products',

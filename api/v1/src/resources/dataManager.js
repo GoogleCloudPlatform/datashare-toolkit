@@ -20,8 +20,6 @@ const config = require('../lib/config');
 const NodeCache = require("node-cache");
 const dsCache = new NodeCache();
 const dashboardCacheKey = 'dashboardCounts';
-const { CommonUtil } = require('cds-shared');
-const commonUtil = CommonUtil;
 const runtimeConfig = require('../lib/runtimeConfig');
 const datasetManager = require('../datasets/dataManager');
 const pubsubManager = require('../pubsub/dataManager');
@@ -29,7 +27,6 @@ const storageManager = require('../storage/dataManager');
 const accountManager = require('../accounts/dataManager');
 const policyManager = require('../policies/dataManager');
 const procurementManager = require('../procurements/dataManager');
-const fbAdmin = require('firebase-admin');
 
 /**
  * @param  {} projectId
