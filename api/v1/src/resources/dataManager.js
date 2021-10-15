@@ -30,9 +30,8 @@ const procurementManager = require('../procurements/dataManager');
 
 /**
  * @param  {} projectId
- * @param  {} role
  */
-async function getConfiguration(projectId, role) {
+async function getConfiguration(projectId) {
     let dict = {};
     const commerce = await runtimeConfig.marketplaceIntegration(projectId);
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
@@ -44,7 +43,7 @@ async function getConfiguration(projectId, role) {
     } else {
         dict.projectId = currentProjectId;
     }
-    
+
     dict.isMarketplaceEnabled = commerce;
 
     // Append UI labels
