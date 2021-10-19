@@ -2,4 +2,6 @@
   "VUE_APP_API_BASE_URL": "http://localhost:5555/v1",
   "VUE_APP_API_KEY": "",
   "VUE_APP_AUTH_DOMAIN": ""
+  "VUE_APP_AUTH_DOMAIN": "",
+  "VUE_APP_TENANT_ID": ""
 }

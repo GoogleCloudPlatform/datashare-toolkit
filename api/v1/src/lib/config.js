@@ -108,4 +108,6 @@ config.idpConfiguration = {
     projectId: process.env.PROJECT_ID
 };
 
+config.tenantId = process.env.TENANT_ID;
+
 module.exports = config;

@@ -16,7 +16,6 @@
 
 'use strict';
 
-import Vue from 'vue';
 import authManager from './mixins/authManager';
 import store from './store';
 
@@ -117,6 +116,10 @@ class Config {
 
   get authDomain() {
     return this.getConfigValue('VUE_APP_AUTH_DOMAIN');
+  }
+
+  get tenantId() {
+    return this.getConfigValue('VUE_APP_TENANT_ID');
   }
 
   get myProductsMoreInformationText() {

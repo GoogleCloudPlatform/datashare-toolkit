@@ -63,7 +63,7 @@ async function isAuthenticated(req, res, next) {
     const token = split[1];
 
     try {
-        const decodedToken = await fbAdmin.auth().verifyIdToken(token);
+        const decodedToken = await fbAdmin.auth().tenantManager().authForTenant(config.tenantId).verifyIdToken(token);
         // console.debug("decodedToken", JSON.stringify(decodedToken))
         res.locals = { ...res.locals, uid: decodedToken.uid, role: decodedToken.role, email: decodedToken.email }
         return next();
@@ -86,24 +86,23 @@ async function setCustomUserClaims(req, res, next) {
     if (config.dataProducers.map(u => u.toLowerCase()).includes(email.toLowerCase())) {
         if (role !== adminRole) {
             console.debug(`User ${uid} is an admin, updating claims to be admin`);
-            await fbAdmin.auth().setCustomUserClaims(uid, { role: adminRole }).then(() => {
+            await fbAdmin.auth().tenantManager().authForTenant(config.tenantId).setCustomUserClaims(uid, { role: adminRole }).then(() => {
                 console.debug(`claims set for user ${uid}`);
             }).catch(err => {
                 console.error(`${err.code} -  ${err.message}`);
                 return res.status(401).send({ message: 'Unauthorized' });
             });
             res.set(forceTokenRefreshHeader, true);
-            next();
-            return;
         }
+        res.locals.role = adminRole;
     } else {
+        const consumerRole = 'consumer';
         if (role === adminRole) {
             console.debug(`User ${uid} is no longer an admin, updating claims to remove admin`);
-            await fbAdmin.auth().setCustomUserClaims(uid, { role: 'consumer' });
+            await fbAdmin.auth().tenantManager().authForTenant(config.tenantId).setCustomUserClaims(uid, { role: consumerRole });
             res.set(forceTokenRefreshHeader, true);
-            next();
-            return;
         }
+        res.locals.role = consumerRole;
     }
     // console.debug(`User ${uid} claims are up-to-date`);
     next();

@@ -100,6 +100,7 @@ class AuthManager {
 
   async login() {
     const auth = getAuth();
+    auth.tenantId = config.tenantId;
     if (auth.currentUser) {
       return true;
     }
