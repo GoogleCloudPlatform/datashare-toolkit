@@ -28,7 +28,9 @@ import {
   signOut,
   GoogleAuthProvider
 } from 'firebase/auth';
+
 const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: 'select_account' });
 
 // https://firebase.google.com/docs/auth/web/google-signin#web-version-9
 
