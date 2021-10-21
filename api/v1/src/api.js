@@ -24,10 +24,19 @@ const cors = require('cors')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const { verifyProject } = require('./lib/auth');
+const config = require('./lib/config');
 
 const legacyApiVersion = "v1alpha";
 const apiVersion = "v1";
 const PORT = process.env.PORT || 5555;
+
+const fbAdmin = require('firebase-admin');
+
+// Initialize the default app
+let idpConfig = config.idpConfiguration;
+idpConfig.credential = fbAdmin.credential.applicationDefault();
+fbAdmin.initializeApp(idpConfig);
+
 /************************************************************
   OpenAPI Definition
  ************************************************************/

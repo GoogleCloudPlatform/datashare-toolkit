@@ -22,7 +22,9 @@ import router from '../router';
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
-  signInWithPopup,
+  // signInWithPopup,
+  signInWithRedirect,
+  // getRedirectResult,
   signOut,
   GoogleAuthProvider
 } from 'firebase/auth';
@@ -41,6 +43,27 @@ class AuthManager {
     const app = initializeApp(idpConfig);
     const auth = getAuth();
     const _vm = this;
+
+    /*getRedirectResult(auth)
+      .then(result => {
+        // This gives you a Google Access Token. You can use it to access Google APIs.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+
+        // The signed-in user info.
+        const user = result.user;
+      })
+      .catch(error => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
+      });*/
+
     // Wait for the initial auth state to become available before calling back and initializing the app
     // This ensures that the auth context is pre-set for already authenticated users when the Vue app is loaded
     // in order that API calls can retrieve a userId and idToken.
@@ -80,7 +103,8 @@ class AuthManager {
     if (auth.currentUser) {
       return true;
     }
-    return signInWithPopup(auth, provider)
+    return signInWithRedirect(auth, provider);
+    /*return signInWithPopup(auth, provider)
       .then(result => {
         // This gives you a Google Access Token. You can use it to access the Google API.
         const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -99,7 +123,7 @@ class AuthManager {
         // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
         return this.onAuthFailure(error);
-      });
+      });*/
   }
 
   async logout() {

@@ -401,6 +401,12 @@ const store = new Vuex.Store({
       return client.getDashboard().catch(error => {
         notify(error);
       });
+    },
+    // eslint-disable-next-line no-unused-vars
+    getApplicationUsers({ commit }, payload) {
+      return client.getApplicationUsers().catch(error => {
+        notify(error);
+      });
     }
   }
 });

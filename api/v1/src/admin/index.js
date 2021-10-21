@@ -46,6 +46,15 @@ var admin = express.Router();
  *       type:
  *         $ref: '#/definitions/SyncronizeResourcesType'
  *
+ *   ApplicationUserResource:
+ *     type: object
+ *     description: User Resource object
+ *     properties:
+ *       projectId:
+ *         type: string
+ *         readOnly: true
+ *         description: Project ID
+ *
  *   Error:
  *     type: object
  *     description: Error object
@@ -221,6 +230,76 @@ admin.post('/admin::custom', async (req, res) => {
                 ...data
             });
         }
+    }
+});
+
+/**
+ * @swagger
+ *
+ * /admin/applicationUsers:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsGetApplicationUsers
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   get:
+ *     summary: Get Application User Resources
+ *     description: Returns the Application Users Resource response
+ *     operationId: getApplicationUsers
+ *     tags:
+ *       - resources
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Application Users Resource
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               default: 200
+ *               description: HTTP status code
+ *             data:
+ *               $ref: '#/definitions/ApplicationUserResource'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
+
+admin.get('/admin/applicationUsers', async (req, res) => {
+    try {
+        const code = 200;
+        const list = await dataManager.listApplicationUsers();
+        const data = { success: true, data: list };
+        res.status(code).json({
+            ...data
+        });
+    } catch (err) {
+        console.error(err);
+        const data = { success: false, code: 500, errors: ['Unable to retrieve application users.'] };
+        res.status(500).json(data);
     }
 });
 
