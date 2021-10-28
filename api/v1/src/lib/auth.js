@@ -146,14 +146,14 @@ async function authzCheck(req, res, next) {
     } else if (role === 'consumer') {
         if (req.method in consumerAccess) {
             const available = consumerAccess[req.method];
-            const found = available.filter(i => {
+            const found = available.some(i => {
                 if (i.endsWith('*')) {
                     return req.path.startsWith(i.slice(0, -1));
                 } else {
                     return i === req.path
                 }
             });
-            if (found) {
+            if (found === true) {
                 console.debug(`Access granted for consumer account '${uid}' authorization check for method '${req.method}' and path '${req.path}'`);
                 return next();
             }
