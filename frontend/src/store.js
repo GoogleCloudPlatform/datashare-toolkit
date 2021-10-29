@@ -73,12 +73,8 @@ const store = new Vuex.Store({
       return false;
     },
     isDataProducer: state => {
-      if (
-        state.project &&
-        state.project.data &&
-        state.project.data.isDataProducer
-      ) {
-        return state.project.data.isDataProducer === true;
+      if (state.user && state.user.data && state.user.data.isDataProducer) {
+        return state.user.data.isDataProducer === true;
       }
       return false;
     },
@@ -108,7 +104,8 @@ const store = new Vuex.Store({
         commit('setUser', {
           displayName: user.displayName,
           email: user.email,
-          photoURL: user.photoURL
+          photoURL: user.photoURL,
+          isDataProducer: user.isDataProducer
         });
       } else {
         commit('setUser', null);
@@ -330,17 +327,6 @@ const store = new Vuex.Store({
       return client.syncResources(payload.type).catch(error => {
         notify(error);
       });
-    },
-    // eslint-disable-next-line no-unused-vars
-    isDataProducer({ commit }) {
-      return client
-        .isDataProducer()
-        .then(result => {
-          return result.code && result.code === 200;
-        })
-        .catch(error => {
-          return false;
-        });
     },
     // eslint-disable-next-line no-unused-vars
     getManagedProjects({ commit }, payload) {

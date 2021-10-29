@@ -26,6 +26,7 @@ const procurementManager = require('../procurements/dataManager');
 const fs = require('fs');
 const retry = require('async-retry');
 const fbAdmin = require('firebase-admin');
+const config = require('../lib/config');
 
 require.extensions['.sql'] = function (module, filename) {
     module.exports = fs.readFileSync(filename, 'utf8');
@@ -414,11 +415,12 @@ async function initializePubSubListener() {
  * Gets list of authenticated application users
  */
 async function listApplicationUsers() {
-    const result = await fbAdmin.auth().listUsers().then(result => {
+    const result = await fbAdmin.auth().tenantManager().authForTenant(config.tenantId).listUsers().then(result => {
         return result.users.map(record => {
             const user = record.toJSON();
             let r = {
                 uid: user.uid,
+                displayName: user.displayName,
                 email: user.email,
                 emailVerified: user.emailVerified,
                 disabled: user.disabled,

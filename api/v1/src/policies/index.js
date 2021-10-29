@@ -221,7 +221,7 @@ policies.get('/policies', async(req, res) => {
  */
 policies.get('/products', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
-    const email = req.header('x-gcp-account')
+    const email = res.locals.email
     const data = await dataManager.listUserPolicies(projectId, email);
     var code;
     if (data && data.success === false) {
@@ -246,11 +246,6 @@ policies.get('/products', async(req, res) => {
  *     tags:
  *       - policies
  *     parameters:
- *     - in: header
- *       name: x-gcp-account
- *       type: string
- *       required: true
- *       description: GCP account name of the calling user
  *     - in: header
  *       name: x-gcp-project-id
  *       type: string
@@ -322,7 +317,7 @@ policies.post('/policies', async(req, res) => {
         name: req.body.name,
         description: req.body.description,
         isTableBased: req.body.isTableBased,
-        createdBy: req.header('x-gcp-account'),
+        createdBy: res.locals.email,
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags,
         marketplace: req.body.marketplace,
@@ -444,11 +439,6 @@ policies.get('/policies/:policyId', async(req, res) => {
  *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
- *     - in: header
- *       name: x-gcp-account
- *       type: string
- *       required: true
- *       description: GCP account name of the calling user
  *     - in: body
  *       name: policy
  *       description: Request parameters for Policy
@@ -518,7 +508,7 @@ policies.put('/policies/:policyId', async(req, res) => {
         name: req.body.name,
         description: req.body.description,
         isTableBased: req.body.isTableBased,
-        createdBy: req.header('x-gcp-account'),
+        createdBy: res.locals.email,
         datasets: req.body.datasets,
         rowAccessTags: req.body.rowAccessTags,
         marketplace: req.body.marketplace,
@@ -557,11 +547,6 @@ policies.put('/policies/:policyId', async(req, res) => {
  *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
- *     - in: header
- *       name: x-gcp-account
- *       type: string
- *       required: true
- *       description: GCP account name of the calling user
  *     - in: header
  *       name: x-gcp-project-id
  *       type: string
@@ -603,7 +588,7 @@ policies.delete('/policies/:policyId', async(req, res) => {
     const policyId = req.params.policyId;
     const values = {
         rowId: req.body.rowId,
-        createdBy: req.header('x-gcp-account')
+        createdBy: res.locals.email
     };
     const data = await dataManager.deletePolicy(projectId, policyId, values);
     var code;

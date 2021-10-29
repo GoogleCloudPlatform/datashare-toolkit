@@ -146,11 +146,6 @@ datasets.get('/datasets', async(req, res) => {
  *     tags:
  *       - datasets
  *     parameters:
- *     - in: header
- *       name: x-gcp-account
- *       type: string
- *       required: true
- *       description: GCP account name of the calling user
  *     - in: body
  *       name: dataset
  *       description: Request parameters for Dataset
@@ -219,11 +214,6 @@ datasets.post('/datasets', async(req, res) => {
  *     tags:
  *       - datasets
  *     parameters:
- *     - in: header
- *       name: x-gcp-account
- *       type: string
- *       required: true
- *       description: GCP account name of the calling user
  *     - in: header
  *       name: x-gcp-project-id
  *       type: string
@@ -378,11 +368,6 @@ datasets.get('/datasets/:datasetId', async(req, res) => {
  *       required: true
  *       description: Dataset Id of the Dataset request
  *     - in: header
- *       name: x-gcp-account
- *       type: string
- *       required: true
- *       description: GCP account name of the calling user
- *     - in: header
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
@@ -421,7 +406,7 @@ datasets.get('/datasets/:datasetId', async(req, res) => {
 datasets.delete('/datasets/:datasetId', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
-    const createdBy = req.header('x-gcp-account');
+    const createdBy = res.locals.email;
     const data = await dataManager.deleteDataset(projectId, datasetId, createdBy);
     var code;
     if (data && data.success === false) {
@@ -999,7 +984,7 @@ datasets.post('/datasets/:datasetId/views', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
     const view = req.body;
-    const createdBy = req.header('x-gcp-account');
+    const createdBy = res.locals.email;
     const data = await dataManager.createOrUpdateDatasetView(projectId, datasetId, null, view, createdBy);
     var code;
     if (data && data.success === false) {
@@ -1061,7 +1046,7 @@ datasets.put('/datasets/:datasetId/views/:viewId', async(req, res) => {
     const datasetId = req.params.datasetId;
     const viewId = req.params.viewId;
     const view = req.body;
-    const createdBy = req.header('x-gcp-account');
+    const createdBy = res.locals.email;
     const data = await dataManager.createOrUpdateDatasetView(projectId, datasetId, viewId, view, createdBy);
     var code;
     if (data && data.success === false) {
@@ -1136,7 +1121,7 @@ datasets.delete('/datasets/:datasetId/views/:viewId', async(req, res) => {
     }
     const values = {
         rowId: req.body.rowId,
-        createdBy: req.header('x-gcp-account')
+        createdBy: res.locals.email
     };
     const data = await dataManager.deleteDatasetView(projectId, datasetId, viewId, values);
     var code;

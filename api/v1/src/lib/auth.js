@@ -15,8 +15,10 @@
  */
 
 const runtimeConfig = require('../lib/runtimeConfig');
+const fbAdmin = require('firebase-admin');
+const config = require('./config');
 
-const verifyProject = async (req, res, next) => {
+async function verifyProject(req, res, next) {
     const projectId = req.header('x-gcp-project-id');
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
     if (projectId) {
@@ -35,8 +37,135 @@ const verifyProject = async (req, res, next) => {
         }
     }
     return next();
-};
+}
+
+/**
+ * @param  {} req
+ * @param  {} res
+ * @param  {} next
+ */
+async function isAuthenticated(req, res, next) {
+    const { authorization } = req.headers
+
+    if (!authorization) {
+        return res.status(401).send({ message: 'Unauthorized' });
+    }
+
+    if (!authorization.startsWith('Bearer')) {
+        return res.status(401).send({ message: 'Unauthorized' });
+    }
+
+    const split = authorization.split('Bearer ')
+    if (split.length !== 2) {
+        return res.status(401).send({ message: 'Unauthorized' });
+    }
+
+    const token = split[1];
+
+    try {
+        const decodedToken = await fbAdmin.auth().tenantManager().authForTenant(config.tenantId).verifyIdToken(token);
+        // console.debug("decodedToken", JSON.stringify(decodedToken))
+        res.locals = { ...res.locals, uid: decodedToken.uid, role: decodedToken.role, email: decodedToken.email }
+        return next();
+    }
+    catch (err) {
+        console.error(`${err.code} -  ${err.message}`);
+        return res.status(401).send({ message: 'Unauthorized' });
+    }
+}
+
+/**
+ * @param  {} req
+ * @param  {} res
+ * @param  {} next
+ */
+async function setCustomUserClaims(req, res, next) {
+    const adminRole = 'admin';
+    const forceTokenRefreshHeader = 'x-gcp-needs-token-refresh';
+    const { role, email, uid } = res.locals;
+    if (config.dataProducers.map(u => u.toLowerCase()).includes(email.toLowerCase())) {
+        if (role !== adminRole) {
+            console.debug(`User ${uid} is an admin, updating claims to be admin`);
+            await fbAdmin.auth().tenantManager().authForTenant(config.tenantId).setCustomUserClaims(uid, { role: adminRole }).then(() => {
+                console.debug(`claims set for user ${uid}`);
+            }).catch(err => {
+                console.error(`${err.code} -  ${err.message}`);
+                return res.status(401).send({ message: 'Unauthorized' });
+            });
+            res.set(forceTokenRefreshHeader, true);
+        }
+        res.locals.role = adminRole;
+    } else {
+        const consumerRole = 'consumer';
+        if (role === adminRole) {
+            console.debug(`User ${uid} is no longer an admin, updating claims to remove admin`);
+            await fbAdmin.auth().tenantManager().authForTenant(config.tenantId).setCustomUserClaims(uid, { role: consumerRole });
+            res.set(forceTokenRefreshHeader, true);
+        }
+        res.locals.role = consumerRole;
+    }
+    // console.debug(`User ${uid} claims are up-to-date`);
+    next();
+}
+
+async function authzCheck(req, res, next) {
+    const { uid, role } = res.locals;
+    const projectId = await runtimeConfig.getCurrentProjectId();
+    const consumerAccess = {
+        'GET': [
+            '/products',
+            '/resources/configuration',
+            '/resources/dashboard',
+            '/resources/projects',
+            '/accounts:activate',
+            // BEGIN: Backwards compatibility for marketplace
+            `/projects/${projectId}/procurements:myProducts`,
+            `/projects/${projectId}/procurements:myProducts?*`,
+            // END: Backwards compatibility for marketplace
+            '/procurements:myProducts',
+            '/procurements:myProducts?*'
+        ],
+        'POST': [
+            '/accounts:activate',
+            // BEGIN: Backwards compatibility for marketplace
+            `/projects/${projectId}/accounts:register`,
+            `/projects/${projectId}/accounts:register?*`,
+            `/projects/${projectId}/procurements:myProducts`,
+            `/projects/${projectId}/procurements:myProducts?*`,
+            // END: Backwards compatibility for marketplace
+            '/accounts:register',
+            '/accounts:register?*',
+            '/procurements:myProducts',
+            '/procurements:myProducts?*'
+        ]
+    }
+
+    if (role === 'admin') {
+        console.debug(`Access granted for admin account '${uid}' authorization check for method '${req.method}' and path '${req.path}'`);
+        return next();
+    } else if (role === 'consumer') {
+        if (req.method in consumerAccess) {
+            const available = consumerAccess[req.method];
+            const found = available.some(i => {
+                if (i.endsWith('*')) {
+                    return req.path.startsWith(i.slice(0, -1));
+                } else {
+                    return i === req.path
+                }
+            });
+            if (found === true) {
+                console.debug(`Access granted for consumer account '${uid}' authorization check for method '${req.method}' and path '${req.path}'`);
+                return next();
+            }
+        }
+    }
+    console.warn(`Access denied for account '${uid}' authorization check for method '${req.method}' and path '${req.path}'`);
+    return res.status(401).send({ message: 'Unauthorized' });
+}
 
 module.exports = {
-    verifyProject: verifyProject
+    verifyProject,
+    isAuthenticated,
+    setCustomUserClaims,
+    authzCheck
 };

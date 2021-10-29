@@ -33,6 +33,9 @@ const validContentTypes = [
   'application/json; charset=utf-8'
 ];
 
+const forceTokenRefreshHeader = 'x-gcp-needs-token-refresh';
+let forceTokenRefresh = false;
+
 axios.interceptors.request.use(async function(reqConfig) {
   const projectId = config.projectId;
   if (projectId) {
@@ -48,11 +51,8 @@ axios.interceptors.request.use(async function(reqConfig) {
     reqConfig.headers['x-gcp-project-id'] = projectId;
   }
   if (authManager.isSignedIn()) {
-    const account = authManager.currentUser().email;
-    if (account) {
-      reqConfig.headers['x-gcp-account'] = account;
-    }
-    const token = await authManager.getIdToken();
+    const token = await authManager.getIdToken(forceTokenRefresh);
+    forceTokenRefresh = false;
     reqConfig.headers.Authorization = `Bearer ${token}`;
     return reqConfig;
   } else {
@@ -63,6 +63,10 @@ axios.interceptors.request.use(async function(reqConfig) {
 // reject anything that is not application/json
 axios.interceptors.response.use(
   response => {
+    if (response.headers[forceTokenRefreshHeader]) {
+      forceTokenRefresh = true;
+      console.debug('Id Token refresh is required');
+    }
     return validContentTypes.includes(response.headers['content-type'])
       ? response.data
       : Promise.reject('Content-Type: application/json is required');
@@ -317,11 +321,6 @@ export default {
       .post(this._apiBaseUrl() + `/admin:syncResources`, {
         type: type
       })
-      .then(response => response);
-  },
-  isDataProducer() {
-    return axios
-      .post(this._apiBaseUrl() + '/auth:isDataProducer')
       .then(response => response);
   },
   getManagedProjects() {

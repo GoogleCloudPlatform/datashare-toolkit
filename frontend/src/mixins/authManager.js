@@ -28,7 +28,9 @@ import {
   signOut,
   GoogleAuthProvider
 } from 'firebase/auth';
+
 const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: 'select_account' });
 
 // https://firebase.google.com/docs/auth/web/google-signin#web-version-9
 
@@ -94,12 +96,13 @@ class AuthManager {
     return auth.currentUser;
   }
 
-  async getIdToken() {
-    return this.currentUser().getIdToken();
+  async getIdToken(forceRefresh) {
+    return this.currentUser().getIdToken(forceRefresh);
   }
 
   async login() {
     const auth = getAuth();
+    auth.tenantId = config.tenantId;
     if (auth.currentUser) {
       return true;
     }
@@ -143,10 +146,12 @@ class AuthManager {
   async onAuthSuccess(googleUser, reloadProjectConfigurationOnly) {
     console.debug('auth success called');
     if (googleUser) {
+      const claims = (await this.currentUser().getIdTokenResult()).claims;
       const user = {
         displayName: googleUser.displayName,
         email: googleUser.email,
-        photoURL: googleUser.photoURL
+        photoURL: googleUser.photoURL,
+        isDataProducer: claims.role === 'admin'
       };
       return store.dispatch('fetchUser', user).then(() => {
         if (reloadProjectConfigurationOnly === true) {

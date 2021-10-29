@@ -112,7 +112,7 @@
       </template>
       <template v-slot:[`item.photoURL`]="{ item }">
         <v-avatar color="primary" size="40" rounded>
-          <v-img :src="item.photoURL"></v-img>
+          <v-img :src="item.photoURL" referrerpolicy="no-referrer"></v-img>
         </v-avatar>
       </template>
       <template v-slot:[`item.customClaims`]="{ item }">
@@ -155,6 +155,11 @@ export default {
         text: 'UID',
         value: 'uid',
         tooltip: 'The IDP uid'
+      },
+      {
+        text: 'Name',
+        value: 'displayName',
+        tooltip: 'The display name of the account'
       },
       {
         text: 'Email',

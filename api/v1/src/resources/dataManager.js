@@ -20,8 +20,6 @@ const config = require('../lib/config');
 const NodeCache = require("node-cache");
 const dsCache = new NodeCache();
 const dashboardCacheKey = 'dashboardCounts';
-const { CommonUtil } = require('cds-shared');
-const commonUtil = CommonUtil;
 const runtimeConfig = require('../lib/runtimeConfig');
 const datasetManager = require('../datasets/dataManager');
 const pubsubManager = require('../pubsub/dataManager');
@@ -29,16 +27,13 @@ const storageManager = require('../storage/dataManager');
 const accountManager = require('../accounts/dataManager');
 const policyManager = require('../policies/dataManager');
 const procurementManager = require('../procurements/dataManager');
-const fbAdmin = require('firebase-admin');
 
 /**
  * @param  {} projectId
- * @param  {} token
  */
-async function getConfiguration(projectId, token) {
+async function getConfiguration(projectId) {
     let dict = {};
     const commerce = await runtimeConfig.marketplaceIntegration(projectId);
-    const dataProducer = await isDataProducer(token);
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
     dict.apiProjectId = currentProjectId;
 
@@ -49,7 +44,6 @@ async function getConfiguration(projectId, token) {
         dict.projectId = currentProjectId;
     }
 
-    dict.isDataProducer = dataProducer;
     dict.isMarketplaceEnabled = commerce;
 
     // Append UI labels
@@ -70,83 +64,62 @@ async function getConfiguration(projectId, token) {
 }
 
 /**
- * @param  {} token
- */
-async function isDataProducer(token) {
-    if (!config.dataProducers) {
-        console.error('DATA_PRODUCERS environmental variable is not defined');
-        return false;
-    }
-
-    const result = await fbAdmin.auth().verifyIdToken(token);
-    const userid = result.email;
-
-    let isProducer = false;
-    for (const p of config.dataProducers) {
-        if (p.toLowerCase() === userid.toLowerCase()) {
-            isProducer = true;
-            break;
-        }
-        else if (p.includes('*') || p.includes('?')) {
-            if (commonUtil.wildTest(p.toLowerCase(), userid.toLowerCase())) {
-                isProducer = true;
-                break;
-            }
-        }
-    }
-    return isProducer;
-}
-
-/**
  * @param  {} projectId
  * @param  {} email
+ * @param  {} role
  */
-async function getDashboardCounts(projectId, email) {
+async function getDashboardCounts(projectId, email, role) {
     let counts = dsCache.get(dashboardCacheKey);
     if (counts == undefined) {
         counts = {};
-        await datasetManager.listDatasets(projectId).then(result => {
-            if (result.success === true) {
-                counts.datasets = result.data.length;
-            }
-        });
-        await datasetManager.listDatasetViews(projectId).then(result => {
-            if (result.success === true) {
-                counts.views = result.data.length;
-            }
-        });
-        await pubsubManager.listTopics(projectId).then(result => {
-            if (result.success === true) {
-                counts.topics = result.data.length;
-            }
-        });
-        await storageManager.listBuckets(projectId).then(result => {
-            if (result.success === true) {
-                counts.buckets = result.data.length;
-            }
-        });
-        await accountManager.listAccounts(projectId).then(result => {
-            if (result.success === true) {
-                counts.accounts = result.data.length;
-            }
-        });
-        await policyManager.listPolicies(projectId).then(result => {
-            if (result.success === true) {
-                counts.policies = result.data.length;
-            }
-        });
-
-        if (await runtimeConfig.marketplaceIntegration(projectId) === true) {
-            await procurementManager.listProcurements(projectId, ['ENTITLEMENT_ACTIVATION_REQUESTED']).then(result => {
+        if (role === 'admin') {
+            await datasetManager.listDatasets(projectId).then(result => {
                 if (result.success === true) {
-                    counts.procurements = result.data.length;
+                    counts.datasets = result.data.length;
                 }
             });
-        }
+            await datasetManager.listDatasetViews(projectId).then(result => {
+                if (result.success === true) {
+                    counts.views = result.data.length;
+                }
+            });
+            await pubsubManager.listTopics(projectId).then(result => {
+                if (result.success === true) {
+                    counts.topics = result.data.length;
+                }
+            });
+            await storageManager.listBuckets(projectId).then(result => {
+                if (result.success === true) {
+                    counts.buckets = result.data.length;
+                }
+            });
+            await accountManager.listAccounts(projectId).then(result => {
+                if (result.success === true) {
+                    counts.accounts = result.data.length;
+                }
+            });
+            await policyManager.listPolicies(projectId).then(result => {
+                if (result.success === true) {
+                    counts.policies = result.data.length;
+                }
+            });
 
-        if (counts) {
-            dsCache.set(dashboardCacheKey, counts, 60);
+            if (await runtimeConfig.marketplaceIntegration(projectId) === true) {
+                await procurementManager.listProcurements(projectId, ['ENTITLEMENT_ACTIVATION_REQUESTED']).then(result => {
+                    if (result.success === true) {
+                        counts.procurements = result.data.length;
+                    }
+                });
+            }
+
+            if (counts) {
+                dsCache.set(dashboardCacheKey, counts, 60);
+            }
         }
+    }
+
+    if (counts == undefined) {
+        counts = {};
     }
 
     if (await runtimeConfig.marketplaceIntegration(projectId) === true) {
