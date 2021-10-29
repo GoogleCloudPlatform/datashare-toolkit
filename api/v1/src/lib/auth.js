@@ -17,6 +17,8 @@
 const runtimeConfig = require('../lib/runtimeConfig');
 const fbAdmin = require('firebase-admin');
 const config = require('./config');
+const { CommonUtil } = require('cds-shared');
+const commonUtil = CommonUtil;
 
 async function verifyProject(req, res, next) {
     const projectId = req.header('x-gcp-project-id');
@@ -101,7 +103,24 @@ async function setCustomUserClaims(req, res, next) {
     const adminRole = 'admin';
     const forceTokenRefreshHeader = 'x-gcp-needs-token-refresh';
     const { role, email, uid } = res.locals;
-    if (config.dataProducers.map(u => u.toLowerCase()).includes(email.toLowerCase())) {
+
+    let isProducer = false;
+    if (config.dataProducers) {
+        for (const p of config.dataProducers) {
+            if (p.toLowerCase() === email.toLowerCase()) {
+                isProducer = true;
+                break;
+            }
+            else if (p.includes('*') || p.includes('?')) {
+                if (commonUtil.wildTest(p.toLowerCase(), email.toLowerCase())) {
+                    isProducer = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (isProducer === true) {
         if (role !== adminRole) {
             console.debug(`User ${uid} is an admin, updating claims to be admin`);
             await fbAdmin.auth().tenantManager().authForTenant(config.tenantId).setCustomUserClaims(uid, { role: adminRole }).then(() => {
