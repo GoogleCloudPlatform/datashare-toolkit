@@ -46,6 +46,10 @@ async function verifyProject(req, res, next) {
  */
 async function isAuthenticated(req, res, next) {
     const { authorization } = req.headers
+    
+    if (req.path === '/docs/openapi_spec') {
+        return next();
+    }
 
     if (!authorization) {
         return res.status(401).send({ message: 'Unauthorized' });
@@ -80,6 +84,10 @@ async function isAuthenticated(req, res, next) {
  * @param  {} next
  */
 async function setCustomUserClaims(req, res, next) {
+    if (req.path === '/docs/openapi_spec') {
+        return next();
+    }
+
     const adminRole = 'admin';
     const forceTokenRefreshHeader = 'x-gcp-needs-token-refresh';
     const { role, email, uid } = res.locals;
@@ -109,6 +117,10 @@ async function setCustomUserClaims(req, res, next) {
 }
 
 async function authzCheck(req, res, next) {
+    if (req.path === '/docs/openapi_spec') {
+        return next();
+    }
+    
     const { uid, role } = res.locals;
     const projectId = await runtimeConfig.getCurrentProjectId();
     const consumerAccess = {
