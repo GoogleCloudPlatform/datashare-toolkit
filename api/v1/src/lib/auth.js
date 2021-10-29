@@ -55,7 +55,6 @@ async function isAuthenticated(req, res, next) {
     // 'X-Forwarded-Authorization' takes precedence over 'Authorization'
     for (let name of ['X-Forwarded-Authorization', 'Authorization']) {
         if (req.header(name) !== undefined) {
-            console.log(`Using auth header: '${name}'`);
             authorization = req.header(name);
             break;
         }
