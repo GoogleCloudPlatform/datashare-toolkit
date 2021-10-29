@@ -70,7 +70,7 @@ gcloud run deploy ds-api \
     --no-allow-unauthenticated \
     --platform managed \
     --service-account ${SERVICE_ACCOUNT_NAME} \
-    --update-env-vars=API_KEY="${API_KEY}",AUTH_DOMAIN="${AUTH_DOMAIN}",DATA_PRODUCERS="${DATA_PRODUCERS}" \
+    --update-env-vars=^---^API_KEY="${API_KEY}"---AUTH_DOMAIN="${AUTH_DOMAIN}"---DATA_PRODUCERS="${DATA_PRODUCERS}" \
     --remove-env-vars=PROJECT_ID,MARKETPLACE_INTEGRATION,OAUTH_CLIENT_ID
 
 if ! gcloud run services describe ds-api --region=$REGION --platform managed | grep -q MANAGED_PROJECTS; then
