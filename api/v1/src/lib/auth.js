@@ -45,11 +45,20 @@ async function verifyProject(req, res, next) {
  * @param  {} next
  */
 async function isAuthenticated(req, res, next) {
-    const { authorization } = req.headers
-    
+
     // TODO: REMOVE
     if (req.path === '/docs/openapi_spec') {
         return next();
+    }
+
+    let authorization;
+    // 'X-Forwarded-Authorization' takes precedence over 'Authorization'
+    for (let name of ['X-Forwarded-Authorization', 'Authorization']) {
+        if (req.header(name) !== undefined) {
+            console.log(`Using auth header: '${name}'`);
+            authorization = req.header(name);
+            break;
+        }
     }
 
     if (!authorization) {
