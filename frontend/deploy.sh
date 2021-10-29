@@ -34,6 +34,11 @@ if [[ -z "${AUTH_DOMAIN:=}" ]]; then
     echo "Defaulted AUTH_DOMAIN to '${AUTH_DOMAIN}'"
 fi
 
+if [[ -z "${TENANT_ID:=}" ]]; then
+    export TENANT_ID="[change-me]"
+    echo "Defaulted TENANT_ID to '${TENANT_ID}'"
+fi
+
 export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
 
 gcloud builds submit --config cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
@@ -44,7 +49,7 @@ gcloud run deploy ds-frontend-ui \
   --allow-unauthenticated \
   --platform managed \
   --max-instances 10 \
-  --update-env-vars=VUE_APP_API_BASE_URL="https://${FQDN}/v1",VUE_APP_API_KEY="${API_KEY}",VUE_APP_AUTH_DOMAIN="${AUTH_DOMAIN}" \
+  --update-env-vars=VUE_APP_API_BASE_URL="https://${FQDN}/v1",VUE_APP_API_KEY="${API_KEY}",VUE_APP_AUTH_DOMAIN="${AUTH_DOMAIN}",VUE_APP_TENANT_ID="${TENANT_ID}" \
   --remove-env-vars=VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT,VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT,VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL,VUE_APP_PROJECT_ID,VUE_APP_MARKETPLACE_INTEGRATION,VUE_APP_GOOGLE_APP_CLIENT_ID
 
 # Delete old revisions

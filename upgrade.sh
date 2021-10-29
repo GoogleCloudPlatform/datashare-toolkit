@@ -48,6 +48,10 @@ for i in "$@"; do
         export AUTH_DOMAIN="${i#*=}"
         shift # past argument=value
         ;;
+    --tenant-id=*)
+        export TENANT_ID="${i#*=}"
+        shift # past argument=value
+        ;;
     --fqdn=*)
         export FQDN="${i#*=}"
         shift # past argument=value
@@ -101,14 +105,19 @@ if [ -z "$AUTH_DOMAIN" ]; then
     exit 4
 fi
 
+if [[ -z "${TENANT_ID:=}" ]]; then
+    echo "--tenant-id must be supplied"
+    exit 5
+fi
+
 if [ -z "$FQDN" ]; then
     echo "--fqdn must be supplied"
-    exit 5
+    exit 6
 fi
 
 if [ -z "$DATA_PRODUCERS" ]; then
     echo "--data-producers must be supplied"
-    exit 6
+    exit 7
 fi
 
 cd api/v1
