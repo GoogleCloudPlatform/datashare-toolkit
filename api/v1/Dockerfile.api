@@ -16,7 +16,7 @@
 
 ## ---- Base Node ----
 # Using official node runtime base apline image
-FROM node:12.6-alpine as base
+FROM node:16-alpine as base
 
 # Set the file maintainers
 LABEL org.opencontainers.image.authors="Chris Page <chrispage@google.com>, Mark Servidio <mservidio@google.com"
@@ -51,7 +51,7 @@ COPY shared/*.js /shared/
 COPY api/v1/src/ /app/
 
 # --- Release with Alpine ----
-FROM node:12.6-alpine as release
+FROM node:16-alpine as release
 WORKDIR /app
 # Install the shared dependencies next
 COPY --from=dependencies /shared/package.json /shared/
