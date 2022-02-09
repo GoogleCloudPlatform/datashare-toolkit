@@ -144,7 +144,7 @@ else
         sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' ../../batch/package.json
     fi
 
-    gcloud functions deploy ${FUNCTION_NAME:-processUpload} --region=${FUNCTION_REGION} --memory=256MB --source=../../batch --runtime=nodejs10 --entry-point=processEvent --timeout=540s --trigger-event=providers/cloud.storage/eventTypes/object.change --trigger-resource="${BUCKET_NAME}" --quiet --set-env-vars=VERBOSE_MODE=true,ARCHIVE_FILES=false
+    gcloud functions deploy ${FUNCTION_NAME:-processUpload} --region=${FUNCTION_REGION} --memory=256MB --source=../../batch --runtime=nodejs16 --entry-point=processEvent --timeout=540s --trigger-event=providers/cloud.storage/eventTypes/object.change --trigger-resource="${BUCKET_NAME}" --quiet --set-env-vars=VERBOSE_MODE=true,ARCHIVE_FILES=false
 
     echo "Restoring original package.json"
     mv -f ../package.json.bak ../package.json

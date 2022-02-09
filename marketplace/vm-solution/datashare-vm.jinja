@@ -128,7 +128,7 @@ resources:
       codeBucketObject: {{ cloudFunctionSourceZipFileName }}
       location: {{ cloudFunctionRegion }}
       timeout: 60s
-      runtime: nodejs10
+      runtime: nodejs16
       availableMemoryMb: 256
       entryPoint: processEvent
       useRuntimeConfigWaiter: {{ useRuntimeConfigWaiterValue }}
