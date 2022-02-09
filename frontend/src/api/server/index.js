@@ -66,6 +66,7 @@ axios.interceptors.response.use(
     if (response.headers[forceTokenRefreshHeader]) {
       forceTokenRefresh = true;
       console.debug('Id Token refresh is required');
+      authManager.refreshClaims();
     }
     return validContentTypes.includes(response.headers['content-type'])
       ? response.data

@@ -191,7 +191,7 @@ class Config {
   }
 
   async reloadManagedProjects() {
-    if ((await authManager.isSignedIn()) === false) {
+    if (authManager.isSignedIn() === false) {
       console.debug('cannot reload configuration, user not logged in');
       return store.dispatch('setProjectConfiguration', null);
     }

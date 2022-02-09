@@ -143,6 +143,23 @@ class AuthManager {
       });
   }
 
+  async refreshClaims() {
+    setTimeout(() => {
+      let currentUser = this.currentUser();
+      if (currentUser) {
+        currentUser.getIdTokenResult(true).then(result => {
+          const user = {
+            displayName: currentUser.displayName,
+            email: currentUser.email,
+            photoURL: currentUser.photoURL,
+            isDataProducer: result.claims.role === 'admin'
+          };
+          store.dispatch('fetchUser', user);
+        });
+      }
+    }, 3000);
+  }
+
   async onAuthSuccess(googleUser, reloadProjectConfigurationOnly) {
     console.debug('auth success called');
     if (googleUser) {
