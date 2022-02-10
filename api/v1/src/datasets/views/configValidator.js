@@ -188,7 +188,7 @@ class ConfigValidator {
         let _validTableName = false;
 
         // Using source
-        if (view.hasOwnProperty('source')) {
+        if (Object.prototype.hasOwnProperty.call(view, 'source')) {
             let source = view.source;
 
             if (!source.datasetId) {
@@ -212,7 +212,7 @@ class ConfigValidator {
 
             this.findDuplicates(source.visibleColumns, `duplicate visible column in view '${view.name}'`, 'source.visibleColumns');
 
-            if (source.hasOwnProperty('visibleColumns')) {
+            if (Object.prototype.hasOwnProperty.call(source, 'visibleColumns')) {
                 // Validate that the column names are valid.
                 if (_tableExists === true) {
                     await this.areAllColumnsAvailable(source.visibleColumns, source.datasetId, source.tableId, `View '${view.name}' has a visibleColumn defined that is not available in source table '${source.datasetId}.${source.tableId}'`, 'source.visibleColumns');
@@ -222,12 +222,12 @@ class ConfigValidator {
                 }
             }
 
-            if (source.hasOwnProperty('publicAccess')) {
+            if (Object.prototype.hasOwnProperty.call(source, 'publicAccess')) {
                 let publicAccess = source.publicAccess;
 
                 // If publicAccess.enabled is true, than publicAccess.queryFilter must be provided.
                 if (publicAccess.enabled && publicAccess.enabled === true) {
-                    if (!publicAccess.hasOwnProperty('queryFilter')) {
+                    if (!Object.prototype.hasOwnProperty.call(publicAccess, 'queryFilter')) {
                         this.logIssue(IssueType.ERROR, `'publicAccess.queryFilter' not provided for view '${view.name}'`, 'source.publicAccess.queryFilter');
                     }
                     else if (publicAccess.queryFilter.length === 0) {
@@ -243,12 +243,12 @@ class ConfigValidator {
                         }
                     }
                 }
-                else if (publicAccess.hasOwnProperty('queryFilter')) {
+                else if (Object.prototype.hasOwnProperty.call(publicAccess, 'queryFilter')) {
                     this.logIssue(IssueType.INFORMATION, `'publicAccess.queryFilter' provided for view '${view.name}' is not used`, 'source.publicAccess.queryFilter');
                 }
             }
 
-            if (view.hasOwnProperty('custom')) {
+            if (Object.prototype.hasOwnProperty.call(view, 'custom')) {
                 this.logIssue(IssueType.ERROR, `'custom' should not be provided for view '${view.name}' when 'source' is defined`);
             }
 
@@ -278,10 +278,10 @@ class ConfigValidator {
             }
         }*/
 
-        if (view.hasOwnProperty('custom')) {
+        if (Object.prototype.hasOwnProperty.call(view, 'custom')) {
             let custom = view.custom;
 
-            if (!custom.hasOwnProperty('query')) {
+            if (!Object.prototype.hasOwnProperty.call(custom, 'query')) {
                 this.logIssue(IssueType.ERROR, `'query' not provided in 'custom' for view '${view.name}'`, 'custom.query');
             }
             else if (!custom.query || custom.query.trim().length === 0) {
@@ -299,7 +299,7 @@ class ConfigValidator {
                 }
             }
 
-            if (view.hasOwnProperty('source')) {
+            if (Object.prototype.hasOwnProperty.call(view, 'source')) {
                 this.logIssue(IssueType.ERROR, `'source' should not be provided for view '${view.name}' when 'custom' is defined`);
             }
         }

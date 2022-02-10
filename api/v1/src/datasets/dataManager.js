@@ -487,7 +487,7 @@ async function createOrUpdateDatasetView(projectId, datasetId, viewId, view, cre
         if (view.expiration.time) {
             data.expiration.time = new Date(view.expiration.time);
         }
-        if (!view.expiration.hasOwnProperty('delete')) {
+        if (!Object.prototype.hasOwnProperty.call(view.expiration, 'delete')) {
             data.expiration.delete = false;
         }
     }
@@ -566,7 +566,7 @@ async function createView(view, overrideSql) {
 
         let viewCreated = createViewResult && createViewResult.success;
         console.log("Authorizing view objects for access from other datasets");
-        if (view.hasOwnProperty('source') && view.source !== null) {
+        if (Object.prototype.hasOwnProperty.call(view, 'source') && view.source !== null) {
             let source = view.source;
             // https://github.com/GoogleCloudPlatform/datashare-toolkit/pull/409
             // Before table-level access was allowed, it wasn't valid to authorize a view within the same dataset, as if you have
@@ -579,7 +579,7 @@ async function createView(view, overrideSql) {
                 await bigqueryUtil.shareAuthorizeView(cfg.cdsDatasetId, view.projectId, view.datasetId, view.name, viewCreated);
             }
         }
-        else if (view.hasOwnProperty('custom') && view.custom !== null) {
+        else if (Object.prototype.hasOwnProperty.call(view, 'custom') && view.custom !== null) {
             // Custom sql
             let custom = view.custom;
             if (custom.authorizeFromDatasetIds && custom.authorizeFromDatasetIds.length > 0) {

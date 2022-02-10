@@ -22,7 +22,7 @@
  */
 function isPublicAccessEnabled(view) {
     let source = view.source;
-    if (source.hasOwnProperty('publicAccess')) {
+    if (Object.prototype.hasOwnProperty.call(source, 'publicAccess')) {
         let publicAccess = source.publicAccess;
         if (publicAccess.enabled && publicAccess.queryFilter && publicAccess.queryFilter.trim().length > 0) {
             return true;
