@@ -8,7 +8,7 @@
 
 ## ---- Base Node ----
 # Using official node runtime base apline image
-FROM node:12.6-alpine as base
+FROM node:16-alpine as base
 
 # Set the file maintainer (your name - the file's author)
 LABEL maintainer="Chris Page <chrispage@google.com>, Mark Servidio <mservidio@google.com>"

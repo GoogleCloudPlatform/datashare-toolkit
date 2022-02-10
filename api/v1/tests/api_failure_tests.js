@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var app = require('../src/index.js');
+var app = require('../src/api.js');
 var chai = require('chai');
 var request = require('supertest');
 

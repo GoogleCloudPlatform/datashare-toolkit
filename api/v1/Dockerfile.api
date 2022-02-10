@@ -1,5 +1,5 @@
 #
-# Copyright 2020 Google LLC
+# Copyright 2020-2022 Google LLC
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 ## ---- Base Node ----
 # Using official node runtime base apline image
-FROM node:12.6-alpine as base
+FROM node:16.14-alpine as base
 
 # Set the file maintainers
 LABEL org.opencontainers.image.authors="Chris Page <chrispage@google.com>, Mark Servidio <mservidio@google.com"
@@ -25,7 +25,10 @@ LABEL org.opencontainers.image.authors="Chris Page <chrispage@google.com>, Mark 
 RUN mkdir -p /app
 WORKDIR /app
 
-# Create the shared depdendency directory
+# Create the api directory
+RUN mkdir -p /api/v1
+
+# Create the shared dependency directory
 RUN mkdir -p /shared
 
 ## ---- Dependencies ----
@@ -37,7 +40,8 @@ FROM base as dependencies
 COPY shared/package*.json /shared/
 RUN cd /shared && npm install && cd -
 
-COPY api/v1/package*.json ./
+COPY api/v1/package*.json ./api/v1/
+WORKDIR /app/api/v1/
 # install app dependencies including 'devDependencies'
 RUN npm install
 
@@ -48,10 +52,10 @@ WORKDIR /app
 # Bundle shared dep
 COPY shared/*.js /shared/
 # Bundle app source
-COPY api/v1/src/ /app/
+COPY api/v1/src/ /app/api/v1/
 
 # --- Release with Alpine ----
-FROM node:12.6-alpine as release
+FROM node:16.14-alpine as release
 WORKDIR /app
 # Install the shared dependencies next
 COPY --from=dependencies /shared/package.json /shared/
@@ -59,8 +63,8 @@ RUN cd /shared && npm install --only=production && cd -
 COPY --from=build /shared /shared
 
 # Install app dependencies
-COPY --from=dependencies /app/package.json ./
+COPY --from=dependencies /app/api/v1/package.json ./
 RUN npm install --only=production
-COPY --from=build /app ./
+COPY --from=build /app/api/v1 ./
 EXPOSE 5555
 CMD ["node", "api.js"]

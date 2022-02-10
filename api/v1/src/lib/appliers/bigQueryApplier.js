@@ -69,12 +69,7 @@ async function performDatasetMetadataUpdate(projectId, datasetId, accounts) {
     const accessTypes = ["userByEmail", "groupByEmail"];
 
     // Get metadata
-    let metadata;
-    try {
-        metadata = await bigqueryUtil.getDatasetMetadata(datasetId);
-    } catch (err) {
-        throw err;
-    }
+    let metadata = await bigqueryUtil.getDatasetMetadata(datasetId);
 
     // Check for and remove any non-existing authorized views
     let i = metadata.access.length;

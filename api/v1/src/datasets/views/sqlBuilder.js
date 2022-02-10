@@ -25,7 +25,7 @@ const cfg = require('../../lib/config');
  */
 async function generateSql(view) {
     let sql;
-    if (view.hasOwnProperty('custom')) {
+    if (Object.prototype.hasOwnProperty.call(view, 'custom')) {
         console.log(`Generating query using custom SQL for view '${view.name}'`);
         sql = view.custom.query;
 
@@ -60,7 +60,7 @@ async function generateSql(view) {
 
     // http://b/139288516 Add support time-based entitlements
     // If expiration is specified and delete is non-existant or false
-    if (view.hasOwnProperty('expiration') && view.expiration && !view.expiration.delete) {
+    if (Object.prototype.hasOwnProperty.call(view, 'expiration') && view.expiration && !view.expiration.delete) {
         const paddedSql = await prependLines(sql.trim(), "\t", 1);
         const expirySql = `SELECT * FROM (\n${paddedSql}\n)\nWHERE TIMESTAMP_MILLIS(${view.expiration.time}) > CURRENT_TIMESTAMP()`;
         return expirySql.trim();

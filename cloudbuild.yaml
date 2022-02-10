@@ -1,23 +1,23 @@
 steps:
-- name: 'node:12.11.1'
+- name: 'node:16'
   dir: 'shared'
   entrypoint: 'npm'
   args: ['install']
   env:
   - 'PROJECT_ID=$PROJECT_ID'
-- name: 'node:10.20.1'
+- name: 'node:16'
   dir: 'ingestion/batch'
   entrypoint: 'npm'
   args: ['install']
   env:
   - 'PROJECT_ID=$PROJECT_ID'
-- name: 'node:12.11.1'
+- name: 'node:16'
   dir: 'shared'
   entrypoint: 'npm'
   args: ['run', 'cloudtest']
   env:
   - 'PROJECT_ID=$PROJECT_ID'
-- name: 'node:10.20.1'
+- name: 'node:16'
   dir: 'ingestion/batch'
   entrypoint: 'npm'
   args: ['run', 'cloudtest']
