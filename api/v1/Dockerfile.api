@@ -25,7 +25,10 @@ LABEL org.opencontainers.image.authors="Chris Page <chrispage@google.com>, Mark 
 RUN mkdir -p /app
 WORKDIR /app
 
-# Create the shared depdendency directory
+# Create the api directory
+RUN mkdir -p /api/v1
+
+# Create the shared dependency directory
 RUN mkdir -p /shared
 
 ## ---- Dependencies ----
@@ -37,9 +40,10 @@ FROM base as dependencies
 COPY shared/package*.json /shared/
 RUN cd /shared && npm install && cd -
 
-COPY api/v1/package*.json ./
+COPY api/v1/package*.json ./api/v1/
+WORKDIR /app/api/v1/
 # install app dependencies including 'devDependencies'
-RUN npm install
+RUN npm install --loglevel verbose
 
 ## ---- Copy Files/Build ----
 FROM dependencies AS build
@@ -48,7 +52,7 @@ WORKDIR /app
 # Bundle shared dep
 COPY shared/*.js /shared/
 # Bundle app source
-COPY api/v1/src/ /app/
+COPY api/v1/src/ /app/api/v1/
 
 # --- Release with Alpine ----
 FROM node:16.14-alpine as release
@@ -59,8 +63,8 @@ RUN cd /shared && npm install --only=production && cd -
 COPY --from=build /shared /shared
 
 # Install app dependencies
-COPY --from=dependencies /app/package.json ./
+COPY --from=dependencies /app/api/v1/package.json ./
 RUN npm install --only=production
-COPY --from=build /app ./
+COPY --from=build /app/api/v1 ./
 EXPOSE 5555
 CMD ["node", "api.js"]
