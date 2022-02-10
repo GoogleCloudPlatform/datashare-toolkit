@@ -12,16 +12,16 @@
     "coverage": "nyc report --reporter=html"
   },
   "dependencies": {
-    "@google-cloud/bigquery": "^5.5.0",
-    "@google-cloud/functions-framework": "^1.7.1",
-    "@google-cloud/pubsub": "^2.10.0",
-    "@google-cloud/storage": "^5.8.3",
+    "@google-cloud/bigquery": "^5.10.0",
+    "@google-cloud/functions-framework": "^1.10.0",
+    "@google-cloud/pubsub": "^2.18.5",
+    "@google-cloud/storage": "^5.18.1",
     "googleapis": "^71.0.0",
-    "jsonschema": "^1.2.4",
+    "jsonschema": "^1.4.0",
     "minimist": "^1.2.5",
-    "underscore": "^1.12.1",
+    "underscore": "^1.13.2",
     "uuid": "^3.3.3",
-    "yaml": "^1.7.2"
+    "yaml": "^1.10.2"
   },
   "devDependencies": {
     "chai": "^4.3.6",
