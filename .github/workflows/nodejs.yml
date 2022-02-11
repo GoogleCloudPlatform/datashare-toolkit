@@ -80,6 +80,7 @@ jobs:
         cd $GITHUB_WORKSPACE/api/v1
         npm install
         npm run lint
+        npm audit --only=prod
       env:
         CI: true
   ui:
