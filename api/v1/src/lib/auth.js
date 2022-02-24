@@ -53,6 +53,11 @@ async function isAuthenticated(req, res, next) {
         return next();
     }
 
+    if (req.path === '/v1/accounts:register') {
+        console.debug('register call made, bypassing fb auth check');
+        return next();
+    }
+
     let authorization;
     // 'X-Forwarded-Authorization' takes precedence over 'Authorization'
     for (let name of ['X-Forwarded-Authorization', 'Authorization']) {
