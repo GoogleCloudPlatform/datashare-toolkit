@@ -55,7 +55,10 @@ async function isAuthenticated(req, res, next) {
     }
 
     if (req.path === '/accounts:register') {
-        console.debug('register call made, bypassing fb auth check');
+        return next();
+    }
+
+    if (req.path === '/procurements:myProducts') {
         return next();
     }
 
@@ -107,7 +110,10 @@ async function setCustomUserClaims(req, res, next) {
     }
 
     if (req.path === '/accounts:register') {
-        console.debug('register call made, bypassing fb auth check');
+        return next();
+    }
+
+    if (req.path === '/procurements:myProducts') {
         return next();
     }
 
@@ -163,7 +169,10 @@ async function authzCheck(req, res, next) {
     }
 
     if (req.path === '/accounts:register') {
-        console.debug('register call made, bypassing fb auth check');
+        return next();
+    }
+
+    if (req.path === '/procurements:myProducts') {
         return next();
     }
 
