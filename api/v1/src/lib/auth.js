@@ -105,6 +105,11 @@ async function setCustomUserClaims(req, res, next) {
         return next();
     }
 
+    if (req.path === '/v1/accounts:register') {
+        console.debug('register call made, bypassing fb auth check');
+        return next();
+    }
+
     const adminRole = 'admin';
     const forceTokenRefreshHeader = 'x-gcp-needs-token-refresh';
     const { role, email, uid } = res.locals;
@@ -153,6 +158,11 @@ async function setCustomUserClaims(req, res, next) {
 async function authzCheck(req, res, next) {
     // TODO: REMOVE
     if (req.path === '/docs/openapi_spec') {
+        return next();
+    }
+
+    if (req.path === '/v1/accounts:register') {
+        console.debug('register call made, bypassing fb auth check');
         return next();
     }
 
