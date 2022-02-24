@@ -682,7 +682,186 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
     }
 });
 
-// Backwards compatibility for marketplace
+/**
+ * @swagger
+ *
+ * /accounts:register:
+ *   post:
+ *     summary: Register a marketplace account based off request body
+ *     description: Returns a redirect response
+ *     operationId: registerAccount
+ *     tags:
+ *       - accounts
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: account
+ *       description: Request parameters for Account
+ *       schema:
+ *         $ref: '#/definitions/Account'
+ *     responses:
+ *       201:
+ *         description: Account
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                 $ref: '#/definitions/Account'
+ *       404:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
+/**
+ * @swagger
+ *
+ * /accounts:activate:
+ *   post:
+ *     summary: Activates a marketplace account based off request body
+ *     description: Returns a redirect response
+ *     operationId: activateAccount
+ *     tags:
+ *       - accounts
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: account
+ *       description: Request parameters for Account
+ *       schema:
+ *         $ref: '#/definitions/Account'
+ *     responses:
+ *       201:
+ *         description: Account
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                 $ref: '#/definitions/Account'
+ *       404:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
+/**
+ * @swagger
+ *
+ * /accounts:reset:
+ *   post:
+ *     summary: Resets a marketplace account based off request body
+ *     description: Returns a redirect response
+ *     operationId: resetAccount
+ *     tags:
+ *       - accounts
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: account
+ *       description: Request parameters for Account
+ *       schema:
+ *         $ref: '#/definitions/Account'
+ *     responses:
+ *       201:
+ *         description: Account
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                 $ref: '#/definitions/Account'
+ *       404:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
+/**
+ * @swagger
+ *
+ * /accounts:syncMarketplace:
+ *   post:
+ *     summary: Syncs a marketplace account permissions based off request body
+ *     description: Returns a redirect response
+ *     operationId: resetAccount
+ *     tags:
+ *       - accounts
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: account
+ *       description: Request parameters for Account
+ *       schema:
+ *         $ref: '#/definitions/Account'
+ *     responses:
+ *       201:
+ *         description: Account
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                 $ref: '#/definitions/Account'
+ *       404:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
 accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], async (req, res) => {
     let projectId = req.params.projectId || req.header('x-gcp-project-id');
     const host = commonUtil.extractHostname(req.headers.host);
