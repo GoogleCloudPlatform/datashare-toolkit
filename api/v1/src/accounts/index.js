@@ -824,7 +824,7 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *   post:
  *     summary: Syncs a marketplace account permissions based off request body
  *     description: Returns a redirect response
- *     operationId: resetAccount
+ *     operationId: syncMarketplaceAccount
  *     tags:
  *       - accounts
  *     parameters:
