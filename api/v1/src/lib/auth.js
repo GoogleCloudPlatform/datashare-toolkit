@@ -47,13 +47,14 @@ async function verifyProject(req, res, next) {
  * @param  {} next
  */
 async function isAuthenticated(req, res, next) {
+    console.debug(`Request path isAuthenticated: ${req.path}`);
 
     // TODO: REMOVE
     if (req.path === '/docs/openapi_spec') {
         return next();
     }
 
-    if (req.path === '/v1/accounts:register') {
+    if (req.path === '/accounts:register') {
         console.debug('register call made, bypassing fb auth check');
         return next();
     }
@@ -105,7 +106,7 @@ async function setCustomUserClaims(req, res, next) {
         return next();
     }
 
-    if (req.path === '/v1/accounts:register') {
+    if (req.path === '/accounts:register') {
         console.debug('register call made, bypassing fb auth check');
         return next();
     }
@@ -161,7 +162,7 @@ async function authzCheck(req, res, next) {
         return next();
     }
 
-    if (req.path === '/v1/accounts:register') {
+    if (req.path === '/accounts:register') {
         console.debug('register call made, bypassing fb auth check');
         return next();
     }
