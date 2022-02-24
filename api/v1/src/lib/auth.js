@@ -49,7 +49,6 @@ async function verifyProject(req, res, next) {
 async function isAuthenticated(req, res, next) {
     console.debug(`Request path isAuthenticated: ${req.path}`);
 
-    // TODO: REMOVE
     if (req.path === '/docs/openapi_spec') {
         return next();
     }
@@ -104,7 +103,6 @@ async function isAuthenticated(req, res, next) {
  * @param  {} next
  */
 async function setCustomUserClaims(req, res, next) {
-    // TODO: REMOVE
     if (req.path === '/docs/openapi_spec') {
         return next();
     }
@@ -163,7 +161,6 @@ async function setCustomUserClaims(req, res, next) {
 }
 
 async function authzCheck(req, res, next) {
-    // TODO: REMOVE
     if (req.path === '/docs/openapi_spec') {
         return next();
     }
