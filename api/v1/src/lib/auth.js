@@ -176,21 +176,11 @@ async function authzCheck(req, res, next) {
             '/resources/dashboard',
             '/resources/projects',
             '/accounts:activate',
-            // BEGIN: Backwards compatibility for marketplace
-            `/projects/${projectId}/procurements:myProducts`,
-            `/projects/${projectId}/procurements:myProducts?*`,
-            // END: Backwards compatibility for marketplace
             '/procurements:myProducts',
             '/procurements:myProducts?*'
         ],
         'POST': [
             '/accounts:activate',
-            // BEGIN: Backwards compatibility for marketplace
-            `/projects/${projectId}/accounts:register`,
-            `/projects/${projectId}/accounts:register?*`,
-            `/projects/${projectId}/procurements:myProducts`,
-            `/projects/${projectId}/procurements:myProducts?*`,
-            // END: Backwards compatibility for marketplace
             '/accounts:register',
             '/accounts:register?*',
             '/procurements:myProducts',

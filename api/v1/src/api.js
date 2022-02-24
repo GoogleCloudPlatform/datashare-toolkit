@@ -26,7 +26,6 @@ const swaggerUi = require('swagger-ui-express');
 const { verifyProject, isAuthenticated, setCustomUserClaims, authzCheck } = require('./lib/auth');
 const config = require('./lib/config');
 
-const legacyApiVersion = "v1alpha";
 const apiVersion = "v1";
 const PORT = process.env.PORT || 5555;
 
@@ -424,9 +423,6 @@ router.get('*', function (req, res) {
 
 // All of the API routes will be prefixed with /apiVersion
 app.use('/' + apiVersion, router);
-
-// For backwards compability supporting marketplace solution entries configured with 'v1alpha'
-app.use('/' + legacyApiVersion, router);
 
 // default app route redirects to current API version for now
 app.get('/', function (req, res) {
