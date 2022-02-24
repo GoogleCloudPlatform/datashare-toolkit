@@ -513,10 +513,10 @@ async function deleteAccount(projectId, accountId, data) {
 }
 
 /**
- * @param  {} host
+ * @param  {} audience
  * @param  {} token
  */
-async function register(host, token) {
+async function register(audience, token) {
     // https://cloud.google.com/marketplace/docs/partners/integrated-saas/frontend-integration#verify-jwt
     const jwt = require('jsonwebtoken');
 
@@ -534,7 +534,7 @@ async function register(host, token) {
         // TODO: Should be passed in dynamically from solution configuration.
         // Host or referrer in the header
         // req.header.host
-        audience: host,
+        audience: audience,
 
         issuer: cfg.procurementIssuer,
         ignoreExpiration: false,

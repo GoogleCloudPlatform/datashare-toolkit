@@ -996,7 +996,7 @@ accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], as
     let projectId = req.params.projectId || req.header('x-gcp-project-id');
     console.debug(`Host is: ${req.headers.host}`);
     console.debug(JSON.stringify(req.headers));
-    const host = commonUtil.extractHostname(req.headers.host);
+    const host = cfg.apiCustomDomain || commonUtil.extractHostname(req.headers.host);
     console.log(`Host is: ${host}`);
     switch (req.params.custom) {
         case "register": {

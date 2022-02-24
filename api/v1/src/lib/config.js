@@ -75,6 +75,8 @@ config.procurementIssuer = process.env.PROCUREMENT_ISSUER || 'https://www.google
 
 config.uiBaseUrl = process.env.UI_BASE_URL || 'http://localhost:8080';
 
+config.apiCustomDomain = process.env.API_CUSTOM_DOMAIN;
+
 // Only to be consumed by runtimeConfig, do not use this directly from anywhere else
 config.projectId = process.env.PROJECT_ID;
 
