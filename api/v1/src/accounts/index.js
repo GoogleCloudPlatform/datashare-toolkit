@@ -653,8 +653,68 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
     });
 });
 
-// Temporary for development
-// Backwards compatibility for marketplace
+/**
+ * @swagger
+ *
+ * /accounts:register:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsRegisterAccountGet
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   get:
+ *     summary: Register a marketplace account based off request body
+ *     description: Returns a redirect response
+ *     operationId: registerAccountGet
+ *     tags:
+ *       - accounts
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: account
+ *       description: Request parameters for Account
+ *       schema:
+ *         $ref: '#/definitions/Account'
+ *     responses:
+ *       201:
+ *         description: Account
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                 $ref: '#/definitions/Account'
+ *       404:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
 accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], async (req, res) => {
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
     let projectId = req.params.projectId || currentProjectId;
@@ -686,6 +746,23 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  * @swagger
  *
  * /accounts:register:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsRegisterAccount
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   post:
  *     summary: Register a marketplace account based off request body
  *     description: Returns a redirect response
