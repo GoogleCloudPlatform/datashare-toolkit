@@ -3,9 +3,9 @@
 # Overview
 If you want to configure the Datashare API to have a custom URL, you must configure a load balancer.
 
-For further information see:
-https://cloud.google.com/api-gateway/docs/using-custom-domains
-https://cloud.google.com/api-gateway/docs/gateway-serverless-neg
+For further information see the following:
+- https://cloud.google.com/api-gateway/docs/using-custom-domains
+- https://cloud.google.com/api-gateway/docs/gateway-serverless-neg
 
 Example setup for the domain: api.datashare-demo-2.fsi.joonix.net
 ```
