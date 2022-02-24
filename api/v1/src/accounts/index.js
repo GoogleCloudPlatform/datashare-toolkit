@@ -678,6 +678,7 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
  *     summary: Register a marketplace account based off request body
  *     description: Returns a redirect response
  *     operationId: registerAccountGet
+ *     security: [] # no security for Swagger docs
  *     tags:
  *       - accounts
  *     parameters:
@@ -767,6 +768,7 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *     summary: Register a marketplace account based off request body
  *     description: Returns a redirect response
  *     operationId: registerAccount
+ *     security: [] # no security for Swagger docs
  *     tags:
  *       - accounts
  *     parameters:
