@@ -44,7 +44,7 @@ const options = {
         swagger: '2.0', // Specification (optional, defaults to swagger: '2.0')
         info: {
             description: 'This is the Datashare API service that provides data producers the ability to expose subsets of their datasets programatically.',
-            title: 'Datashare API Service', // Title (required)
+            title: 'Datashare Service', // Title (required)
             version: '1.0.0', // Version (required)
             contact: {
                 email: 'no-reply@google.com'
