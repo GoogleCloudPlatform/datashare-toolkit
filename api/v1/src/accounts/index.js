@@ -747,6 +747,23 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  * @swagger
  *
  * /accounts:register:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsRegisterAccount
+ *     security: [] # no security for Swagger docs
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   post:
  *     summary: Register a marketplace account based off request body
  *     description: Returns a redirect response
