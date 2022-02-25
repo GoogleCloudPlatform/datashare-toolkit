@@ -867,9 +867,6 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *         description: Error
  *         schema:
  *           $ref: '#/definitions/Error'
- *     x-google-backend:
- *       address: https://DS_API_FQDN
- *       deadline: 30 
  */
 /**
  * @swagger
@@ -932,9 +929,6 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *         description: Error
  *         schema:
  *           $ref: '#/definitions/Error'
- *     x-google-backend:
- *       address: https://DS_API_FQDN
- *       deadline: 30 
  */
 /**
  * @swagger
@@ -1038,7 +1032,7 @@ accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], as
 
             const data = await dataManager.activate(projectId, host, token, reason, email);
             console.log(`Data: ${JSON.stringify(data)}`);
-            
+
             let code;
             if (data && data.success === false) {
                 code = (data.code === undefined) ? 500 : data.code;
