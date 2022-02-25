@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 #
-# Copyright 2020-2021 Google LLC
+# Copyright 2020-2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -138,9 +138,6 @@ gcloud api-gateway gateways update api-gw-ds-api --api=api-gw-ds-api --api-confi
 if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
     gcloud builds submit --config api/v1/listener-cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
-    # TODO: Switch to Managed Cloud Run when this issue is resolved
-    # --no-cpu-throttling is not working through gcloud alpha
-    # ERROR: (gcloud.alpha.run.services.update) The annotation run.googleapis.com/cpu-throttling is not available
     gcloud run deploy "ds-listener-${PROJECT_ID}" \
          --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
          --region=${REGION} \
@@ -152,16 +149,6 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
          --cpu 1 \
          --memory 2Gi \
          --no-cpu-throttling
-
-    # gcloud run deploy "ds-listener" \
-    #     --cluster $CLUSTER \
-    #     --cluster-location $ZONE \
-    #     --min-instances 1 \
-    #     --max-instances 1 \
-    #     --namespace $NAMESPACE \
-    #     --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
-    #     --platform gke \
-    #     --service-account ${SERVICE_ACCOUNT_NAME}
 
     # Delete old revisions
     DELETE_REVISIONS=`gcloud run revisions list \
