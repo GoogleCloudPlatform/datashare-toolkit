@@ -827,8 +827,6 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *             type: "string"
  *           Access-Control-Allow-Origin:
  *             type: "string"
- *     x-google-backend:
- *       deadline: 30 
  *   post:
  *     summary: Activates a marketplace account based off request body
  *     description: Returns a redirect response
