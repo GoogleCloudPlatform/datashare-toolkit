@@ -917,6 +917,23 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  * @swagger
  *
  * /accounts:syncMarketplace:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsSyncMarketplace
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
  *   post:
  *     summary: Syncs a marketplace account permissions based off request body
  *     description: Returns a redirect response
