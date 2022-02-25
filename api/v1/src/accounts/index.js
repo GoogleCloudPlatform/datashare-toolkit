@@ -797,6 +797,7 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *     summary: Activates a marketplace account based off request body
  *     description: Returns a redirect response
  *     operationId: activateAccount
+ *     security: [] # no security for Swagger docs
  *     tags:
  *       - accounts
  *     parameters:
@@ -838,27 +839,11 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  * @swagger
  *
  * /accounts:reset:
- *   options:
- *     summary: CORS support
- *     description: Enable CORS by returning correct headers
- *     operationId: optionsResetAccount
- *     security: [] # no security for preflight requests
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: Default response for CORS method
- *         headers:
- *           Access-Control-Allow-Headers:
- *             type: "string"
- *           Access-Control-Allow-Methods:
- *             type: "string"
- *           Access-Control-Allow-Origin:
- *             type: "string"
  *   post:
  *     summary: Resets a marketplace account based off request body
  *     description: Returns a redirect response
  *     operationId: resetAccount
+ *     security: [] # no security for Swagger docs
  *     tags:
  *       - accounts
  *     parameters:
