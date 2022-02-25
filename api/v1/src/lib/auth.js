@@ -49,7 +49,7 @@ async function verifyProject(req, res, next) {
 async function isAuthenticated(req, res, next) {
     console.debug(`Request path isAuthenticated: ${req.path}`);
 
-    if (req.path === '/docs/openapi_spec') {
+    if (req.path.startsWith('/docs/')) {
         return next();
     }
 
@@ -103,7 +103,7 @@ async function isAuthenticated(req, res, next) {
  * @param  {} next
  */
 async function setCustomUserClaims(req, res, next) {
-    if (req.path === '/docs/openapi_spec') {
+    if (req.path.startsWith('/docs/')) {
         return next();
     }
 
@@ -161,7 +161,7 @@ async function setCustomUserClaims(req, res, next) {
 }
 
 async function authzCheck(req, res, next) {
-    if (req.path === '/docs/openapi_spec') {
+    if (req.path.startsWith('/docs/')) {
         return next();
     }
 
