@@ -206,7 +206,7 @@ datasets.post('/datasets', async(req, res) => {
 /**
  * @swagger
  *
- * /datasets:
+ * /datasets/{datasetId}:
  *   put:
  *     summary: Update Dataset based off request body
  *     description: Returns the Dataset response
