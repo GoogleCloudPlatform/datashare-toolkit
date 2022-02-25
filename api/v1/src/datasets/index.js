@@ -218,6 +218,11 @@ datasets.post('/datasets', async(req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
+ *     - in: path
+ *       name: datasetId
+ *       type: string
+ *       required: true
+ *       description: Dataset Id of the Dataset request
  *     - in: body
  *       name: dataset
  *       description: Request parameters for Dataset
