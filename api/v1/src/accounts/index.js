@@ -926,9 +926,7 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  */
 accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], async (req, res) => {
     let projectId = req.params.projectId || req.header('x-gcp-project-id');
-    console.debug(`Host is: ${req.headers.host}`);
     const host = cfg.apiCustomDomain || commonUtil.extractHostname(req.headers.host);
-    console.debug(`Set host is: ${host}`);
     switch (req.params.custom) {
         case "register": {
             // Check if override for projectId is set
