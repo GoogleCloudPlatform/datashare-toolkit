@@ -1006,7 +1006,7 @@ datasets.post('/datasets/:datasetId/views', async(req, res) => {
 /**
  * @swagger
  *
- * /datasets/{datasetId}/views:
+ * /datasets/{datasetId}/views/{viewId}:
  *   put:
  *     summary: Update Dataset View based off datasetId
  *     description: Returns the Datset Views response
@@ -1018,7 +1018,12 @@ datasets.post('/datasets/:datasetId/views', async(req, res) => {
  *       name: datasetId
  *       type: string
  *       required: true
- *       description: Dataset Id of the Dataset request
+ *       description: Dataset Id of the update request
+ *     - in: path
+ *       name: viewId
+ *       type: string
+ *       required: true
+ *       description: View Id of the update request
  *     - in: header
  *       name: x-gcp-project-id
  *       type: string
