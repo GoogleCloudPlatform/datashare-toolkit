@@ -716,7 +716,7 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
  *         schema:
  *           $ref: '#/definitions/Error'
  */
-accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], async (req, res) => {
+accounts.get('/accounts:register', async (req, res) => {
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
     let projectId = req.params.projectId || currentProjectId;
 
@@ -975,7 +975,7 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *         schema:
  *           $ref: '#/definitions/Error'
  */
-accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], async (req, res) => {
+accounts.post('/accounts::custom', async (req, res) => {
     let projectId = req.params.projectId || req.header('x-gcp-project-id');
     const host = cfg.apiCustomDomain || commonUtil.extractHostname(req.headers.host);
     switch (req.params.custom) {

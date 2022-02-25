@@ -242,7 +242,7 @@ procurements.post('/procurements/approve', async (req, res) => {
  *         description: Redirect to My Products URL
  */
 // Backwards compatibility for marketplace
-procurements.get(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], productsRedirectionHandler);
+procurements.get('/procurements:myProducts', productsRedirectionHandler);
 
 /**
  * @param  {} req
