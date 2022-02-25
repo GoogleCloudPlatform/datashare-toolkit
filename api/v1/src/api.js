@@ -107,6 +107,8 @@ const options = {
                 'x-google-audiences': 'PROJECT_ID'
             },
             // ## Marketplace Identity Provider
+            // Parsing from custom header or request variable
+            // https://cloud.google.com/endpoints/docs/openapi/openapi-extensions#x-google-jwt-locations
             'marketplace': {
                 'type': 'oauth2',
                 'flow': 'application',
