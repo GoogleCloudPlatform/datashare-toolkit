@@ -661,7 +661,7 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsRegisterAccountGet
- *     security: [] # no security for Swagger docs
+ *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
  *     responses:
@@ -678,7 +678,7 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
  *     summary: Register a marketplace account based off request body
  *     description: Returns a redirect response
  *     operationId: registerAccountGet
- *     security: [] # no security for Swagger docs
+ *     security: [] # no security for preflight requests
  *     tags:
  *       - accounts
  *     parameters:
@@ -751,7 +751,7 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsRegisterAccount
- *     security: [] # no security for Swagger docs
+ *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
  *     responses:
@@ -768,7 +768,7 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *     summary: Register a marketplace account based off request body
  *     description: Returns a redirect response
  *     operationId: registerAccount
- *     security: [] # no security for Swagger docs
+ *     security: [] # no security for preflight requests
  *     tags:
  *       - accounts
  *     parameters:
@@ -995,10 +995,8 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
 accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], async (req, res) => {
     let projectId = req.params.projectId || req.header('x-gcp-project-id');
     console.debug(`Host is: ${req.headers.host}`);
-    console.debug(JSON.stringify(req.headers));
     const host = cfg.apiCustomDomain || commonUtil.extractHostname(req.headers.host);
     console.debug(`Set host is: ${host}`);
-    console.debug(`Custom param is: ${req.params.custom}`);
     switch (req.params.custom) {
         case "register": {
             // Check if override for projectId is set
