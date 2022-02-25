@@ -217,7 +217,8 @@ procurements.post('/procurements/approve', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsRedirectMyProducts
- *     security: ["marketplace"] # Only marketplace can call register
+ *     security:
+ *       - marketplace: []
  *     produces:
  *       - application/json
  *     responses:
@@ -234,7 +235,8 @@ procurements.post('/procurements/approve', async (req, res) => {
  *     summary: Performs redirect to the Datashare My Products UI page.
  *     description: Returns a 301 redirect response
  *     operationId: redirectMyProducts
- *     security: ["marketplace"] # Only marketplace can call register
+ *     security:
+ *       - marketplace: []
  *     tags:
  *       - procurements
  *     responses:
