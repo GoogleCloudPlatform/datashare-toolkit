@@ -174,7 +174,6 @@ async function authzCheck(req, res, next) {
     }
 
     const { uid, role } = res.locals;
-    const projectId = await runtimeConfig.getCurrentProjectId();
     const consumerAccess = {
         'GET': [
             '/products',
