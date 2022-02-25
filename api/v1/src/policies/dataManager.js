@@ -437,7 +437,8 @@ async function deletePolicy(projectId, policyId, data) {
     }
 
     let fields = [...cfg.cdsPolicyTableFields];
-    let values = ['@rowId', 'policyId', 'name', 'description', 'isTableBased', 'datasets', 'rowAccessTags', 'marketplace', '@createdBy', 'current_timestamp()', 'true'];
+    let values = ['@rowId', 'policyId', 'name', 'description', 'bigQueryEnabled', 'pubsubEnabled', 'storageEnabled',
+    'buckets', 'topics', 'isTableBased', 'datasets', 'rowAccessTags', 'marketplace', '@createdBy', 'current_timestamp()', 'true'];
     fields = Array.from(fields).join();
     values = Array.from(values).join();
 
