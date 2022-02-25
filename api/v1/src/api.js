@@ -65,7 +65,7 @@ const options = {
         // API GW Integration
         'x-google-backend': {
             address: 'https://' + 'DS_API_FQDN',
-            deadline: 60
+            deadline: 120
         },
         security: [{
             // ## OAuth scopes are currenty ignored by API Gateway [here](https://cloud.google.com/endpoints/docs/openapi/openapi-limitations#scopes_ignored)
