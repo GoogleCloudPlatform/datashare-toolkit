@@ -217,7 +217,7 @@ procurements.post('/procurements/approve', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsRedirectMyProducts
- *     security: [] # no security for preflight requests
+ *     security: [] # no security for Swagger docs
  *     produces:
  *       - application/json
  *     responses:
@@ -234,7 +234,7 @@ procurements.post('/procurements/approve', async (req, res) => {
  *     summary: Performs redirect to the Datashare My Products UI page.
  *     description: Returns a 301 redirect response
  *     operationId: redirectMyProducts
- *     security: [] # no security for preflight requests
+ *     security: [] # no security for Swagger docs
  *     tags:
  *       - procurements
  *     responses:
