@@ -827,9 +827,6 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *             type: "string"
  *           Access-Control-Allow-Origin:
  *             type: "string"
- *     x-google-backend:
- *       address: https://DS_API_FQDN
- *       deadline: 30 
  *   post:
  *     summary: Activates a marketplace account based off request body
  *     description: Returns a redirect response
@@ -870,6 +867,9 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *         description: Error
  *         schema:
  *           $ref: '#/definitions/Error'
+ *     x-google-backend:
+ *       address: https://DS_API_FQDN
+ *       deadline: 30 
  */
 /**
  * @swagger
@@ -932,6 +932,9 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *         description: Error
  *         schema:
  *           $ref: '#/definitions/Error'
+ *     x-google-backend:
+ *       address: https://DS_API_FQDN
+ *       deadline: 30 
  */
 /**
  * @swagger
