@@ -1003,7 +1003,8 @@ accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], as
     console.debug(`Host is: ${req.headers.host}`);
     console.debug(JSON.stringify(req.headers));
     const host = cfg.apiCustomDomain || commonUtil.extractHostname(req.headers.host);
-    console.log(`Host is: ${host}`);
+    console.debug(`Set host is: ${host}`);
+    console.debug(`Custom param is: ${req.params.custom}`);
     switch (req.params.custom) {
         case "register": {
             // Check if override for projectId is set
@@ -1037,8 +1038,7 @@ accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], as
 
             const data = await dataManager.activate(projectId, host, token, reason, email);
             console.log(`Data: ${JSON.stringify(data)}`);
-
-            // TODO: Perform redirects
+            
             let code;
             if (data && data.success === false) {
                 code = (data.code === undefined) ? 500 : data.code;
