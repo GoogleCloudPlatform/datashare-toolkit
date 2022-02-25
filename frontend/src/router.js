@@ -301,6 +301,8 @@ let router = new Router({
 
 // https://github.com/christiannwamba/vuex-auth-jwt/blob/master/src/router.js
 router.beforeEach((to, from, next) => {
+  console.log(to);
+  console.log(from);
   if (to.matched.length === 0) {
     next({ path: '/404' });
     return;
