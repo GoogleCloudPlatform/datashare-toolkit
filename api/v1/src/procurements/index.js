@@ -234,6 +234,7 @@ procurements.post('/procurements/approve', async (req, res) => {
  *     summary: Performs redirect to the Datashare My Products UI page.
  *     description: Returns a 301 redirect response
  *     operationId: redirectMyProducts
+ *     security: [] # no security for get user may not be logged in after marketplace redirect
  *     tags:
  *       - procurements
  *     responses:
