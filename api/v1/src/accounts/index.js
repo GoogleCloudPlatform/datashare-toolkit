@@ -678,6 +678,7 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
  *     summary: Register a marketplace account based off request body
  *     description: Returns a redirect response
  *     operationId: registerAccountGet
+ *     security: [] # no security for marketplace register get request
  *     tags:
  *       - accounts
  *     parameters:
