@@ -304,12 +304,6 @@ router.beforeEach((to, from, next) => {
   if (to.matched.length === 0) {
     next({ path: '/404' });
     return;
-  } else if (
-    to.matched.some(record => record.meta.requiresMarketplaceIntegration) &&
-    config.marketplaceIntegrationEnabled === false
-  ) {
-    next({ path: '/restricted' });
-    return;
   } else if (to.matched.some(record => record.meta.requiresDataProducer)) {
     if (store.getters.isLoggedIn && store.getters.isDataProducer) {
       next();
@@ -329,13 +323,19 @@ router.beforeEach((to, from, next) => {
       next({ path: '/restricted' });
       return;
     }
+  } else if (
+    to.matched.some(record => record.meta.requiresMarketplaceIntegration) &&
+    config.marketplaceIntegrationEnabled === false
+  ) {
+    next({ path: '/restricted' });
+    return;
   } else {
     next();
     return;
   }
 });
 
-Router.prototype.canAccessRoute = function(name) {
+Router.prototype.canAccessRoute = function (name) {
   let routes = this.options.routes;
   let route = routes.filter(item => {
     if (name === item.name) {
@@ -355,7 +355,7 @@ Router.prototype.canAccessRoute = function(name) {
   }
 };
 
-Router.prototype.userNavigableRoutes = function() {
+Router.prototype.userNavigableRoutes = function () {
   let routes = this.options.routes;
   let list = routes.filter(route => {
     if (route.meta) {
@@ -372,11 +372,11 @@ Router.prototype.userNavigableRoutes = function() {
   return list;
 };
 
-Router.prototype.userMenuItems = function() {
+Router.prototype.userMenuItems = function () {
   let filtered = this.userNavigableRoutes().filter(route => {
     return route.meta && route.meta.menu && route.meta.menu.order;
   });
-  let sorted = underscore.sortBy(filtered, function(route) {
+  let sorted = underscore.sortBy(filtered, function (route) {
     return route.meta.menu.order;
   });
   let items = sorted.map(route => {
@@ -391,12 +391,12 @@ Router.prototype.userMenuItems = function() {
   return items;
 };
 
-Router.prototype.userDashboardCards = function() {
+Router.prototype.userDashboardCards = function () {
   let routes = this.userNavigableRoutes();
   let filtered = routes.filter(route => {
     return route.meta && route.meta.dashboard && route.meta.dashboard.order;
   });
-  let sorted = underscore.sortBy(filtered, function(route) {
+  let sorted = underscore.sortBy(filtered, function (route) {
     return route.meta.dashboard.order;
   });
   let items = sorted.map(route => {
