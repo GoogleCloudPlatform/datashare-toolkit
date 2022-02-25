@@ -661,8 +661,7 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsRegisterAccountGet
- *     security:
- *       - marketplace: []
+ *     security: [] # no security for Swagger docs
  *     produces:
  *       - application/json
  *     responses:
@@ -679,8 +678,7 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
  *     summary: Register a marketplace account based off request body
  *     description: Returns a redirect response
  *     operationId: registerAccountGet
- *     security:
- *       - marketplace: []
+ *     security: [] # no security for Swagger docs
  *     tags:
  *       - accounts
  *     parameters:
@@ -753,8 +751,7 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsRegisterAccount
- *     security:
- *       - marketplace: []
+ *     security: [] # no security for Swagger docs
  *     produces:
  *       - application/json
  *     responses:
@@ -771,8 +768,7 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *     summary: Register a marketplace account based off request body
  *     description: Returns a redirect response
  *     operationId: registerAccount
- *     security:
- *       - marketplace: []
+ *     security: [] # no security for Swagger docs
  *     tags:
  *       - accounts
  *     parameters:
