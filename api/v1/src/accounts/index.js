@@ -768,7 +768,6 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
  *     summary: Register a marketplace account based off request body
  *     description: Returns a redirect response
  *     operationId: registerAccount
- *     security: [] # no security for preflight requests
  *     tags:
  *       - accounts
  *     parameters:
