@@ -145,6 +145,7 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
          --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
          --region=${REGION} \
          --platform managed \
+         --min-instances 1 \
          --max-instances 1 \
          --service-account ${SERVICE_ACCOUNT_NAME} \
          --no-allow-unauthenticated \
