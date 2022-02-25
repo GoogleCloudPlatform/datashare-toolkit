@@ -141,34 +141,32 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
     # TODO: Switch to Managed Cloud Run when this issue is resolved
     # --no-cpu-throttling is not working through gcloud alpha
     # ERROR: (gcloud.alpha.run.services.update) The annotation run.googleapis.com/cpu-throttling is not available
-    # gcloud alpha run deploy "ds-listener-${PROJECT_ID}" \
-    #     --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
-    #     --region=${REGION} \
-    #     --platform managed \
-    #     --max-instances 1 \
-    #     --service-account ${SERVICE_ACCOUNT_NAME} \
-    #     --no-allow-unauthenticated \
-    #     --cpu 1 \
-    #     --memory 2Gi \
-    #     --no-cpu-throttling
+    gcloud run deploy "ds-listener-${PROJECT_ID}" \
+         --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
+         --region=${REGION} \
+         --platform managed \
+         --max-instances 1 \
+         --service-account ${SERVICE_ACCOUNT_NAME} \
+         --no-allow-unauthenticated \
+         --cpu 1 \
+         --memory 2Gi \
+         --no-cpu-throttling
 
-    gcloud run deploy "ds-listener" \
-        --cluster $CLUSTER \
-        --cluster-location $ZONE \
-        --min-instances 1 \
-        --max-instances 1 \
-        --namespace $NAMESPACE \
-        --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
-        --platform gke \
-        --service-account ${SERVICE_ACCOUNT_NAME}
+    # gcloud run deploy "ds-listener" \
+    #     --cluster $CLUSTER \
+    #     --cluster-location $ZONE \
+    #     --min-instances 1 \
+    #     --max-instances 1 \
+    #     --namespace $NAMESPACE \
+    #     --image gcr.io/${PROJECT_ID}/ds-listener:${TAG} \
+    #     --platform gke \
+    #     --service-account ${SERVICE_ACCOUNT_NAME}
 
     # Delete old revisions
     DELETE_REVISIONS=`gcloud run revisions list \
         --service ds-listener \
-        --cluster $CLUSTER \
-        --cluster-location $ZONE \
-        --namespace $NAMESPACE \
-        --platform gke \
+        --region=${REGION} \
+        --platform managed \
         | grep REVISION: \
         | awk 'NR > 4 {print $2}'`;
 
@@ -176,10 +174,8 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
         for revision in $DELETE_REVISIONS
         do
             gcloud run revisions delete $revision \
-                --cluster $CLUSTER \
-                --cluster-location $ZONE \
-                --namespace $NAMESPACE \
-                --platform gke \
+                --region=${REGION} \
+                --platform managed \
                 --async \
                 --quiet
         done
