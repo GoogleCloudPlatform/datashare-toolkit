@@ -234,7 +234,6 @@ procurements.post('/procurements/approve', async (req, res) => {
  *     summary: Performs redirect to the Datashare My Products UI page.
  *     description: Returns a 301 redirect response
  *     operationId: redirectMyProducts
- *     security: [] # no security for preflight requests
  *     tags:
  *       - procurements
  *     responses:
