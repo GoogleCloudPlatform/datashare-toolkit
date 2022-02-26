@@ -39,6 +39,11 @@ if [[ -z "${TENANT_ID:=}" ]]; then
     echo "Defaulted TENANT_ID to '${TENANT_ID}'"
 fi
 
+if [[ -z "${FQDN:=}" ]]; then
+    export FQDN="[change-me]"
+    echo "Defaulted FQDN to '${FQDN}'"
+fi
+
 export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID
 
 gcloud builds submit --config cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
