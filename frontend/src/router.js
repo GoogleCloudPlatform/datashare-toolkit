@@ -301,8 +301,6 @@ let router = new Router({
 
 // https://github.com/christiannwamba/vuex-auth-jwt/blob/master/src/router.js
 router.beforeEach((to, from, next) => {
-  console.log(to);
-  console.log(from);
   if (to.matched.length === 0) {
     next({ path: '/404' });
     return;
@@ -315,6 +313,8 @@ router.beforeEach((to, from, next) => {
       return;
     }
   } else if (to.matched.some(record => record.meta.requiresAuth)) {
+    // This if statement block must take precedence over the following else if as
+    // the config.marketplaceIntegrationEnabled property is only set upon a user login.
     if (store.getters.isLoggedIn) {
       next();
       return;
