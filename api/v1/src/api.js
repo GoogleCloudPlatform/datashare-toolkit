@@ -81,6 +81,7 @@ const options = {
                 'in': 'header'
             },
             // ## Google Identity Provider
+            // Used when debugging and generating tokens via cmd line IE: `gcloud auth print-identity-token`
             'google': {
                 'type': 'oauth2',
                 'authorizationUrl': 'https://accounts.google.com/o/oauth2/v2/auth',
@@ -94,6 +95,7 @@ const options = {
                 'x-google-audiences': 'OAUTH_CLIENT_ID'
             },
             // ## Firebase Identity Provider
+            // Used by UI
             'firebase': {
                 'type': 'oauth2',
                 'flow': 'application',
