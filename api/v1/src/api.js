@@ -65,6 +65,7 @@ const options = {
         // API GW Integration
         'x-google-backend': {
             address: 'https://' + 'DS_API_FQDN',
+            // Request timeout
             deadline: 120
         },
         security: [{
