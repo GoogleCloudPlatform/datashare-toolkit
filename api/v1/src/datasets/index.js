@@ -93,6 +93,13 @@ var datasets = express.Router();
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
+ *       description: The GCP projectId for the target project.
+ *     - in: query
+ *       name: includeAll
+ *       schema:
+ *         type: boolean
+ *         default: false
+ *       description: Indicates if all datasets including non-Datashare managed datasets should be returned. Default is false.
  *     tags:
  *       - datasets
  *     produces:

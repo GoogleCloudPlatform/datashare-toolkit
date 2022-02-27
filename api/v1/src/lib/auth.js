@@ -42,6 +42,25 @@ async function verifyProject(req, res, next) {
 }
 
 /**
+ * @param  {} path
+ */
+function isExcludedPath(path) {
+    if (path.startsWith('/welcome')) {
+        return true;
+    }
+    else if (path.startsWith('/docs/')) {
+        return true;
+    }
+    else if (path === '/accounts:register') {
+        return true;
+    }
+    else if (path === '/procurements:myProducts') {
+        return true;
+    }
+    return false;
+}
+
+/**
  * @param  {} req
  * @param  {} res
  * @param  {} next
@@ -49,15 +68,7 @@ async function verifyProject(req, res, next) {
 async function isAuthenticated(req, res, next) {
     console.debug(`Request path isAuthenticated: ${req.path}`);
 
-    if (req.path.startsWith('/docs/')) {
-        return next();
-    }
-
-    if (req.path === '/accounts:register') {
-        return next();
-    }
-
-    if (req.path === '/procurements:myProducts') {
+    if (isExcludedPath(req.path) === true) {
         return next();
     }
 
@@ -103,15 +114,7 @@ async function isAuthenticated(req, res, next) {
  * @param  {} next
  */
 async function setCustomUserClaims(req, res, next) {
-    if (req.path.startsWith('/docs/')) {
-        return next();
-    }
-
-    if (req.path === '/accounts:register') {
-        return next();
-    }
-
-    if (req.path === '/procurements:myProducts') {
+    if (isExcludedPath(req.path) === true) {
         return next();
     }
 
@@ -161,15 +164,7 @@ async function setCustomUserClaims(req, res, next) {
 }
 
 async function authzCheck(req, res, next) {
-    if (req.path.startsWith('/docs/')) {
-        return next();
-    }
-
-    if (req.path === '/accounts:register') {
-        return next();
-    }
-
-    if (req.path === '/procurements:myProducts') {
+    if (isExcludedPath(req.path) === true) {
         return next();
     }
 
