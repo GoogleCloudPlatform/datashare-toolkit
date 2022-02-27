@@ -38,7 +38,34 @@ var datasets = express.Router();
  *     properties:
  *       datasetId:
  *         type: string
- *         description: Dataset ID
+ *         description: The BigQuery datasetId.
+ *       description:
+ *         type: string
+ *         description: Description of the dataset.
+ *       modifiedAt:
+ *         type: integer
+ *         description: The last modified timestamp.
+ *       accounts:
+ *         type: array
+ *         description: Accounts with access to the dataset.
+ *         items:
+ *           $ref: '#/definitions/Accounts'
+ *       labels:
+ *         type: object
+ *         properties:
+ *           key:
+ *             type: string
+ *             description: The label.
+ *   Accounts:
+ *     type: object
+ *     description: Table object
+ *     properties:
+ *       email:
+ *         type: string
+ *         description: Email address for the account
+ *       type:
+ *         type: string
+ *         description: The account type
  *   Table:
  *     type: object
  *     description: Table object
