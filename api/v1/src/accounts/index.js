@@ -186,6 +186,17 @@ var accounts = express.Router();
  *       createdAt:
  *         type: integer
  *         description: Created at time
+ * 
+ *   ActivateAccountRequest:
+ *     type: object
+ *     description: Account object
+ *     properties:
+ *       email:
+ *         type: string
+ *         description: Email account for approval
+ *       reason:
+ *         type: string
+ *         description: Procurement approval reason
  */
 
 /**
@@ -915,10 +926,10 @@ accounts.get('/accounts:register', async (req, res) => {
  *       type: string
  *       required: true
  *     - in: body
- *       name: account
+ *       name: data
  *       description: Request parameters for Account
  *       schema:
- *         $ref: '#/definitions/Account'
+ *         $ref: '#/definitions/ActivateAccountRequest'
  *     responses:
  *       201:
  *         description: Account
