@@ -209,28 +209,32 @@ router.all(
  * @swagger
  *
  * tags:
+ *   - name: default
+ *     description: The default routes for the Datashare API
  *   - name: welcome
  *     description: The welcome message for the Datashare API
+ *   - name: accounts
+ *     description: The Datashare API Account Services
+ *   - name: admin
+ *     description: The Datashare API Admin Services
  *   - name: datasets
  *     description: The Datashare API Dataset Services
+ *   - name: docs
+ *     description: The OpenAPI specification documents for the Datashare API services
  *   - name: policies
  *     description: The Datashare API Policy Services
  *   - name: procurements
  *     description: The Datashare API Procurements Services
  *   - name: products
  *     description: The Datashare API Products Services
- *   - name: accounts
- *     description: The Datashare API Account Services
- *   - name: spots
- *     description: The Datashare API Spot Services
- *   - name: admin
- *     description: The Datashare API Admin Services
+ *   - name: pubsub
+ *     description: The Datashare API PubSub Services
  *   - name: resources
  *     description: The Datashare API Resources Services
- *   - name: docs
- *     description: The OpenAPI specification documents for the Datashare API services
- *   - name: default
- *     description: The default routes for the Datashare API
+ *   - name: spots
+ *     description: The Datashare API Spot Services
+ *   - name: storage
+ *     description: The Datashare API Cloud Storage Services
  *
  * definitions:
  *   Error:
@@ -240,6 +244,7 @@ router.all(
  *       success:
  *         type: boolean
  *         description: Success of the request
+ *         default: false
  *       code:
  *         type: integer
  *         description: HTTP status code
@@ -262,6 +267,8 @@ router.all(
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsWelcome
+ *     tags:
+ *       - welcome
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json

@@ -102,6 +102,8 @@ var accounts = express.Router();
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsAccounts
+ *     tags:
+ *       - accounts
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -255,6 +257,8 @@ accounts.post('/accounts', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsAccountByAccountId
+ *     tags:
+ *       - accounts
  *     security: [] # no security for preflight requests
  *     parameters:
  *     - in: path
@@ -499,6 +503,8 @@ accounts.delete('/accounts/:accountId', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsAccountByPolicyId
+ *     tags:
+ *       - policies
  *     security: [] # no security for preflight requests
  *     parameters:
  *     - in: path
@@ -579,6 +585,8 @@ accounts.get('/policies/:policyId/accounts', async (req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsAccountByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -661,6 +669,8 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsRegisterAccountGet
+ *     tags:
+ *       - accounts
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -797,6 +807,8 @@ accounts.get('/accounts:register', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsActivateAccount
+ *     tags:
+ *       - accounts
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -859,6 +871,8 @@ accounts.get('/accounts:register', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsResetAccount
+ *     tags:
+ *       - accounts
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -921,6 +935,8 @@ accounts.get('/accounts:register', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsSyncMarketplace
+ *     tags:
+ *       - accounts
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json

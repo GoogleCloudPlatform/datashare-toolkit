@@ -72,6 +72,8 @@ var procurements = express.Router();
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsProcurements
+ *     tags:
+ *       - procurements
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -147,6 +149,8 @@ procurements.get('/procurements', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsApproveProcument
+ *     tags:
+ *       - procurements
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -217,6 +221,8 @@ procurements.post('/procurements/approve', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsRedirectMyProducts
+ *     tags:
+ *       - procurements
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json

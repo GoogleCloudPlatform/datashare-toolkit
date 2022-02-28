@@ -100,6 +100,8 @@ var policies = express.Router();
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsPolicies
+ *     tags:
+ *       - policies
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -171,6 +173,8 @@ policies.get('/policies', async(req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsListProducts
+ *     tags:
+ *       - products
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -348,6 +352,8 @@ policies.post('/policies', async(req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsPolicyByPolicyId
+ *     tags:
+ *       - policies
  *     security: [] # no security for preflight requests
  *     parameters:
  *     - in: path
@@ -611,6 +617,8 @@ policies.delete('/policies/:policyId', async(req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsPolicyByAccountId
+ *     tags:
+ *       - accounts
  *     security: [] # no security for preflight requests
  *     parameters:
  *     - in: path
@@ -695,6 +703,8 @@ policies.get('/accounts/:accountId/policies', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsPolicyByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId

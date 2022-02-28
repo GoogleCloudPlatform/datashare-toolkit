@@ -99,6 +99,8 @@ var datasets = express.Router();
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsDatasets
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     produces:
  *       - application/json
  *     responses:
@@ -137,13 +139,13 @@ var datasets = express.Router();
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:
@@ -316,6 +318,8 @@ datasets.put('/datasets/:datasetId', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsGetDatasetByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -399,7 +403,7 @@ datasets.get('/datasets/:datasetId', async(req, res) => {
  *     description: Returns the Account response
  *     operationId: deleteDatasetByDatasetId
  *     tags:
- *       - accounts
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -468,6 +472,8 @@ datasets.delete('/datasets/:datasetId', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsListDatasetTablesByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -551,6 +557,8 @@ datasets.get('/datasets/:datasetId/tables', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsListDatasetTableColumnssByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -645,6 +653,8 @@ datasets.get('/datasets/:datasetId/tables/:tableId/columns', async(req, res) => 
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsListViews
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     produces:
  *       - application/json
  *     responses:
@@ -716,6 +726,8 @@ datasets.get('/views', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsListDatasetViewsByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -799,6 +811,8 @@ datasets.get('/datasets/:datasetId/views', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsGetDatasetViewByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -891,6 +905,8 @@ datasets.get('/datasets/:datasetId/views/:viewId', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsValidateDatasetViewByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId

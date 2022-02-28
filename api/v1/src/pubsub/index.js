@@ -52,6 +52,8 @@ var router = express.Router();
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsPubSubTopics
+ *     tags:
+ *       - pubsub
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -194,6 +196,8 @@ router.post('/pubsub/topics', async(req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsDeletePubSubTopicByName
+ *     tags:
+ *       - pubsub
  *     security: [] # no security for preflight requests
  *     parameters:
  *     - in: path
