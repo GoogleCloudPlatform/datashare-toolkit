@@ -154,6 +154,8 @@ var spots = express.Router();
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsSpotsConfig
+ *     tags:
+ *       - spots
  *     security: [] # no security for preflight requests
  *     responses:
  *       200:
@@ -201,6 +203,8 @@ var spots = express.Router();
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsGetSpotOptions
+ *     tags:
+ *       - spots
  *     security: [] # no security for preflight requests
  *     responses:
  *       200:

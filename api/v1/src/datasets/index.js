@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2020-2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,34 @@ var datasets = express.Router();
  *     properties:
  *       datasetId:
  *         type: string
- *         description: Dataset ID
+ *         description: The BigQuery datasetId.
+ *       description:
+ *         type: string
+ *         description: Description of the dataset.
+ *       modifiedAt:
+ *         type: integer
+ *         description: The last modified timestamp.
+ *       accounts:
+ *         type: array
+ *         description: Accounts with access to the dataset.
+ *         items:
+ *           $ref: '#/definitions/Accounts'
+ *       labels:
+ *         type: object
+ *         properties:
+ *           key:
+ *             type: string
+ *             description: The label.
+ *   Accounts:
+ *     type: object
+ *     description: Table object
+ *     properties:
+ *       email:
+ *         type: string
+ *         description: Email address for the account
+ *       type:
+ *         type: string
+ *         description: The account type
  *   Table:
  *     type: object
  *     description: Table object
@@ -72,6 +99,8 @@ var datasets = express.Router();
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsDatasets
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     produces:
  *       - application/json
  *     responses:
@@ -93,6 +122,12 @@ var datasets = express.Router();
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
+ *       description: The GCP projectId for the target project.
+ *     - in: query
+ *       name: includeAll
+ *       type: boolean
+ *       default: false
+ *       description: Indicates if all datasets including non-Datashare managed datasets should be returned. Default is false.
  *     tags:
  *       - datasets
  *     produces:
@@ -103,13 +138,13 @@ var datasets = express.Router();
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:
@@ -206,7 +241,7 @@ datasets.post('/datasets', async(req, res) => {
 /**
  * @swagger
  *
- * /datasets:
+ * /datasets/{datasetId}:
  *   put:
  *     summary: Update Dataset based off request body
  *     description: Returns the Dataset response
@@ -218,6 +253,11 @@ datasets.post('/datasets', async(req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
+ *     - in: path
+ *       name: datasetId
+ *       type: string
+ *       required: true
+ *       description: Dataset Id of the Dataset request
  *     - in: body
  *       name: dataset
  *       description: Request parameters for Dataset
@@ -277,6 +317,8 @@ datasets.put('/datasets/:datasetId', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsGetDatasetByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -360,7 +402,7 @@ datasets.get('/datasets/:datasetId', async(req, res) => {
  *     description: Returns the Account response
  *     operationId: deleteDatasetByDatasetId
  *     tags:
- *       - accounts
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -429,6 +471,8 @@ datasets.delete('/datasets/:datasetId', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsListDatasetTablesByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -512,6 +556,8 @@ datasets.get('/datasets/:datasetId/tables', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsListDatasetTableColumnssByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -606,6 +652,8 @@ datasets.get('/datasets/:datasetId/tables/:tableId/columns', async(req, res) => 
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsListViews
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     produces:
  *       - application/json
  *     responses:
@@ -677,6 +725,8 @@ datasets.get('/views', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsListDatasetViewsByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -760,6 +810,8 @@ datasets.get('/datasets/:datasetId/views', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsGetDatasetViewByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -852,6 +904,8 @@ datasets.get('/datasets/:datasetId/views/:viewId', async(req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsValidateDatasetViewByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -1001,7 +1055,7 @@ datasets.post('/datasets/:datasetId/views', async(req, res) => {
 /**
  * @swagger
  *
- * /datasets/{datasetId}/views:
+ * /datasets/{datasetId}/views/{viewId}:
  *   put:
  *     summary: Update Dataset View based off datasetId
  *     description: Returns the Datset Views response
@@ -1013,7 +1067,12 @@ datasets.post('/datasets/:datasetId/views', async(req, res) => {
  *       name: datasetId
  *       type: string
  *       required: true
- *       description: Dataset Id of the Dataset request
+ *       description: Dataset Id of the update request
+ *     - in: path
+ *       name: viewId
+ *       type: string
+ *       required: true
+ *       description: View Id of the update request
  *     - in: header
  *       name: x-gcp-project-id
  *       type: string

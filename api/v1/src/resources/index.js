@@ -67,6 +67,8 @@ var resources = express.Router();
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsGetResourceDashboard
+ *     tags:
+ *       - resources
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -151,6 +153,8 @@ var resources = express.Router();
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsGetResourceProjects
+ *     tags:
+ *       - resources
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -233,6 +237,8 @@ resources.get('/resources/projects', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsGetResourceConfiguration
+ *     tags:
+ *       - resources
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json

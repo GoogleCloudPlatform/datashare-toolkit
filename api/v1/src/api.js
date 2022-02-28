@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2020-2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ const swaggerUi = require('swagger-ui-express');
 const { verifyProject, isAuthenticated, setCustomUserClaims, authzCheck } = require('./lib/auth');
 const config = require('./lib/config');
 
-const legacyApiVersion = "v1alpha";
 const apiVersion = "v1";
 const PORT = process.env.PORT || 5555;
 
@@ -65,7 +64,9 @@ const options = {
         },
         // API GW Integration
         'x-google-backend': {
-            address: 'https://' + 'DS_API_FQDN'
+            address: 'https://' + 'DS_API_FQDN',
+            // Request timeout
+            deadline: 120
         },
         security: [{
             // ## OAuth scopes are currenty ignored by API Gateway [here](https://cloud.google.com/endpoints/docs/openapi/openapi-limitations#scopes_ignored)
@@ -81,6 +82,7 @@ const options = {
                 'in': 'header'
             },
             // ## Google Identity Provider
+            // Used when debugging and generating tokens via cmd line IE: `gcloud auth print-identity-token`
             'google': {
                 'type': 'oauth2',
                 'authorizationUrl': 'https://accounts.google.com/o/oauth2/v2/auth',
@@ -94,6 +96,7 @@ const options = {
                 'x-google-audiences': 'OAUTH_CLIENT_ID'
             },
             // ## Firebase Identity Provider
+            // Used by UI
             'firebase': {
                 'type': 'oauth2',
                 'flow': 'application',
@@ -107,6 +110,8 @@ const options = {
                 'x-google-audiences': 'PROJECT_ID'
             },
             // ## Marketplace Identity Provider
+            // Parsing from custom header or request variable
+            // https://cloud.google.com/endpoints/docs/openapi/openapi-extensions#x-google-jwt-locations
             'marketplace': {
                 'type': 'oauth2',
                 'flow': 'application',
@@ -204,28 +209,32 @@ router.all(
  * @swagger
  *
  * tags:
+ *   - name: default
+ *     description: The default routes for the Datashare API
  *   - name: welcome
  *     description: The welcome message for the Datashare API
+ *   - name: accounts
+ *     description: The Datashare API Account Services
+ *   - name: admin
+ *     description: The Datashare API Admin Services
  *   - name: datasets
  *     description: The Datashare API Dataset Services
+ *   - name: docs
+ *     description: The OpenAPI specification documents for the Datashare API services
  *   - name: policies
  *     description: The Datashare API Policy Services
  *   - name: procurements
  *     description: The Datashare API Procurements Services
  *   - name: products
  *     description: The Datashare API Products Services
- *   - name: accounts
- *     description: The Datashare API Account Services
- *   - name: spots
- *     description: The Datashare API Spot Services
- *   - name: admin
- *     description: The Datashare API Admin Services
+ *   - name: pubsub
+ *     description: The Datashare API PubSub Services
  *   - name: resources
  *     description: The Datashare API Resources Services
- *   - name: docs
- *     description: The OpenAPI specification documents for the Datashare API services
- *   - name: default
- *     description: The default routes for the Datashare API
+ *   - name: spots
+ *     description: The Datashare API Spot Services
+ *   - name: storage
+ *     description: The Datashare API Cloud Storage Services
  *
  * definitions:
  *   Error:
@@ -235,6 +244,7 @@ router.all(
  *       success:
  *         type: boolean
  *         description: Success of the request
+ *         default: false
  *       code:
  *         type: integer
  *         description: HTTP status code
@@ -257,6 +267,8 @@ router.all(
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsWelcome
+ *     tags:
+ *       - welcome
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -424,9 +436,6 @@ router.get('*', function (req, res) {
 
 // All of the API routes will be prefixed with /apiVersion
 app.use('/' + apiVersion, router);
-
-// For backwards compability supporting marketplace solution entries configured with 'v1alpha'
-app.use('/' + legacyApiVersion, router);
 
 // default app route redirects to current API version for now
 app.get('/', function (req, res) {

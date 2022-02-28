@@ -52,6 +52,8 @@ var router = express.Router();
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsStorageBuckets
+ *     tags:
+ *       - storage
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -195,6 +197,8 @@ router.post('/storage/buckets', async(req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsDeleteStorageBucketByName
+ *     tags:
+ *       - storage
  *     security: [] # no security for preflight requests
  *     parameters:
  *     - in: path

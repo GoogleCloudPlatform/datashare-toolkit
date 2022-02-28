@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 #
-# Copyright 2020-2021 Google LLC
+# Copyright 2020-2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,6 +37,11 @@ fi
 if [[ -z "${TENANT_ID:=}" ]]; then
     export TENANT_ID="[change-me]"
     echo "Defaulted TENANT_ID to '${TENANT_ID}'"
+fi
+
+if [[ -z "${FQDN:=}" ]]; then
+    export FQDN="[change-me]"
+    echo "Defaulted FQDN to '${FQDN}'"
 fi
 
 export PROJECT_ID=`gcloud config list --format 'value(core.project)'`; echo $PROJECT_ID

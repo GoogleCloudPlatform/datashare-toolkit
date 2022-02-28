@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2020-2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,8 @@ var procurements = express.Router();
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsProcurements
+ *     tags:
+ *       - procurements
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -147,6 +149,8 @@ procurements.get('/procurements', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsApproveProcument
+ *     tags:
+ *       - procurements
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -217,6 +221,8 @@ procurements.post('/procurements/approve', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsRedirectMyProducts
+ *     tags:
+ *       - procurements
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -234,6 +240,7 @@ procurements.post('/procurements/approve', async (req, res) => {
  *     summary: Performs redirect to the Datashare My Products UI page.
  *     description: Returns a 301 redirect response
  *     operationId: redirectMyProducts
+ *     security: [] # no security for get as not token is passed along with marketplace redirect
  *     tags:
  *       - procurements
  *     responses:
@@ -241,7 +248,7 @@ procurements.post('/procurements/approve', async (req, res) => {
  *         description: Redirect to My Products URL
  */
 // Backwards compatibility for marketplace
-procurements.get(['/projects/:projectId/procurements:myProducts', '/procurements:myProducts'], productsRedirectionHandler);
+procurements.get('/procurements:myProducts', productsRedirectionHandler);
 
 /**
  * @param  {} req
