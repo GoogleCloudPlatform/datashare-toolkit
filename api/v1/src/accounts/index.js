@@ -873,8 +873,12 @@ accounts.get('/accounts:register', async (req, res) => {
  *       description: The projectId
  *       required: false
  *     - in: body
- *       name: x-gcp-marketplace-token
- *       description: JWT token provided by marketplace  
+ *       description: Request parameters for register account
+ *       schema:
+ *         type: object
+ *         properties:
+ *           x-gcp-marketplace-token:
+ *             type: string
  *     responses:
  *       301:
  *         description: Account
@@ -926,7 +930,6 @@ accounts.get('/accounts:register', async (req, res) => {
  *       type: string
  *       required: true
  *     - in: body
- *       name: data
  *       description: Request parameters for Account
  *       schema:
  *         $ref: '#/definitions/ActivateAccountRequest'
