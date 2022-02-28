@@ -931,7 +931,7 @@ accounts.get('/accounts:register', async (req, res) => {
  *       schema:
  *         $ref: '#/definitions/ActivateAccountRequest'
  *     responses:
- *       201:
+ *       200:
  *         description: Account
  *         schema:
  *           type: object
@@ -946,10 +946,6 @@ accounts.get('/accounts:register', async (req, res) => {
  *               type: object
  *               items:
  *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
