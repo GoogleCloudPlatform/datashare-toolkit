@@ -323,6 +323,10 @@ accounts.post('/accounts', async (req, res) => {
  *     tags:
  *       - accounts
  *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     - in: path
  *       name: accountId
  *       type: string
@@ -336,18 +340,16 @@ accounts.post('/accounts', async (req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
- *               type: object
- *               items:
- *                  $ref: '#/definitions/Account'
- *       500:
+ *               $ref: '#/definitions/Account'
+ *       404:
  *         description: Error
  *         schema:
  *           $ref: '#/definitions/Error'
@@ -738,8 +740,6 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
  *       name: projectId
  *       description: The projectId
  *       required: false
- *       schema:
- *         $ref: '#/definitions/Account'
  *     - in: query
  *       name: x-gcp-marketplace-token
  *       description: JWT token provided by marketplace    
@@ -802,35 +802,28 @@ accounts.get('/accounts:register', async (req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
+ *     - in: query
+ *       name: projectId
+ *       description: The projectId
+ *       required: false
  *     - in: body
- *       name: account
- *       description: Request parameters for Account
- *       schema:
- *         $ref: '#/definitions/Account'
+ *       name: x-gcp-marketplace-token
+ *       description: JWT token provided by marketplace  
  *     responses:
- *       201:
+ *       301:
  *         description: Account
- *         schema:
- *           type: object
- *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
- *             code:
- *               type: integer
- *               description: HTTP status code
- *             data:
- *               type: object
- *               items:
- *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
- *       500:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
+ *         headers:
+ *           Set-Cookie:
+ *             type: string
+ *             description: "Example: gmt=jwt_token"
+ *           location:
+ *             description: Activate page redirect
+ *             schema:
+ *               oneOf:
+ *                 - type: string
+ *                   description: If activation success, will redirect to activation page
+ *                 - type: string
+ *                   description: If activation fails, will redirect to activation error page
  */
 /**
  * @swagger

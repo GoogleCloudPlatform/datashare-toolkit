@@ -36,35 +36,63 @@ var policies = express.Router();
  *     type: object
  *     description: Policy object
  *     properties:
- *       policyId:
- *         type: string
- *         readOnly: true
- *         description: Policy ID
  *       rowId:
  *         type: string
  *         readOnly: true
  *         description: Policy Row ID
+ *       policyId:
+ *         type: string
+ *         readOnly: true
+ *         description: Policy ID
  *       name:
  *         type: string
  *         description: Policy display name
  *       description:
  *         type: string
  *         description: Policy decsription
- *       createdBy:
- *         type: string
- *         description: Policy created by email
+ *       bigQueryEnabled:
+ *         type: boolean
+ *         description: Flag indicating if BigQuery is enabled for the policy
+ *       pubsubEnabled:
+ *         type: boolean
+ *         description: Flag indicating if Pub/Sub is enabled for the policy
+ *       storageEnabled:
+ *         type: boolean
+ *         description: Flag indicating if Cloud Storage is enabled for the policy
+ *       buckets:
+ *         type: array
+ *         description: Policy buckets
+ *         items:
+ *           $ref: '#/definitions/Bucket'
+ *       topics:
+ *         type: array
+ *         description: Policy topics
+ *         items:
+ *           $ref: '#/definitions/Topic'
+ *       isTableBased:
+ *         type: boolean
+ *         description: Indicates if policy is table-based if not than dataset-based.
  *       datasets:
  *         type: array
  *         description: Policy datasets
  *         items:
- *           $ref: '#/definitions/Dataset'
+ *           $ref: '#/definitions/PolicyDataset'
  *       rowAccessTags:
  *         type: array
  *         description: Policy row access tags
  *         items:
  *           $ref: '#/definitions/RowAccessTag'
  *       marketplace:
- *         $ref: '#/definitions/Marketplace'
+ *         $ref: '#/definitions/PolicyMarketplace'
+ *       createdBy:
+ *         type: string
+ *         description: Policy created by email
+ *       createdAt:
+ *         type: integer
+ *         description: Policy created at time
+ *       version:
+ *         type: integer
+ *         description: Policy version
  *     required:
  *       - name
  *
@@ -76,7 +104,44 @@ var policies = express.Router();
  *         type: string
  *         description: Row Access Tag
  *
- *   Marketplace2:
+ *   Bucket:
+ *     type: object
+ *     description: Policy bucket object
+ *     properties:
+ *       bucketName:
+ *         type: string
+ *         description: The Cloud Storage bucket name
+ *
+ *   Topic:
+ *     type: object
+ *     description: Policy topic object
+ *     properties:
+ *       topicId:
+ *         type: string
+ *         description: The Pub/Sub topic name
+ * 
+ *   PolicyDataset:
+ *     type: object
+ *     description: Policy dataset object
+ *     properties:
+ *       datasetId:
+ *         type: string
+ *         description: The dataset Id
+ *       tables:
+ *         type: array
+ *         description: Policy dataset table
+ *         items:
+ *           $ref: '#/definitions/PolicyDatasetTable'
+ * 
+ *   PolicyDatasetTable:
+ *     type: object
+ *     description: Policy dataset table object
+ *     properties:
+ *       tableId:
+ *         type: string
+ *         description: The BigQuery tableId
+ *  
+ *   PolicyMarketplace:
  *     type: object
  *     description: Marketplace object
  *     properties:
@@ -645,15 +710,15 @@ policies.delete('/policies/:policyId', async(req, res) => {
  *     tags:
  *       - accounts
  *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     - in: path
  *       name: accountId
  *       type: string
  *       required: true
  *       description: Account Id of the Policy request
- *     - in: header
- *       name: x-gcp-project-id
- *       type: string
- *       required: true
  *     produces:
  *       - application/json
  *     responses:
@@ -662,13 +727,13 @@ policies.delete('/policies/:policyId', async(req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:
