@@ -80,6 +80,8 @@ var admin = express.Router();
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsInitSchema
+ *     tags:
+ *       - admin
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -137,6 +139,8 @@ var admin = express.Router();
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsSyncResources
+ *     tags:
+ *       - admin
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -242,6 +246,8 @@ admin.post('/admin::custom', async (req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsGetApplicationUsers
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - admin
  *     produces:
  *       - application/json
  *     responses:
@@ -259,7 +265,7 @@ admin.post('/admin::custom', async (req, res) => {
  *     description: Returns the Application Users Resource response
  *     operationId: getApplicationUsers
  *     tags:
- *       - resources
+ *       - admin
  *     parameters:
  *     - in: header
  *       name: x-gcp-project-id

@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2020-2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -437,7 +437,8 @@ async function deletePolicy(projectId, policyId, data) {
     }
 
     let fields = [...cfg.cdsPolicyTableFields];
-    let values = ['@rowId', 'policyId', 'name', 'description', 'isTableBased', 'datasets', 'rowAccessTags', 'marketplace', '@createdBy', 'current_timestamp()', 'true'];
+    let values = ['@rowId', 'policyId', 'name', 'description', 'bigQueryEnabled', 'pubsubEnabled', 'storageEnabled',
+    'buckets', 'topics', 'isTableBased', 'datasets', 'rowAccessTags', 'marketplace', '@createdBy', 'current_timestamp()', 'true'];
     fields = Array.from(fields).join();
     values = Array.from(values).join();
 

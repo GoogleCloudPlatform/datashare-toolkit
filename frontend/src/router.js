@@ -1,5 +1,5 @@
 /**
- * Copyright 2020-2021 Google LLC
+ * Copyright 2020-2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -304,12 +304,6 @@ router.beforeEach((to, from, next) => {
   if (to.matched.length === 0) {
     next({ path: '/404' });
     return;
-  } else if (
-    to.matched.some(record => record.meta.requiresMarketplaceIntegration) &&
-    config.marketplaceIntegrationEnabled === false
-  ) {
-    next({ path: '/restricted' });
-    return;
   } else if (to.matched.some(record => record.meta.requiresDataProducer)) {
     if (store.getters.isLoggedIn && store.getters.isDataProducer) {
       next();
@@ -319,6 +313,8 @@ router.beforeEach((to, from, next) => {
       return;
     }
   } else if (to.matched.some(record => record.meta.requiresAuth)) {
+    // This if statement block must take precedence over the following else if as
+    // the config.marketplaceIntegrationEnabled property is only set upon a user login.
     if (store.getters.isLoggedIn) {
       next();
       return;
@@ -329,6 +325,12 @@ router.beforeEach((to, from, next) => {
       next({ path: '/restricted' });
       return;
     }
+  } else if (
+    to.matched.some(record => record.meta.requiresMarketplaceIntegration) &&
+    config.marketplaceIntegrationEnabled === false
+  ) {
+    next({ path: '/restricted' });
+    return;
   } else {
     next();
     return;

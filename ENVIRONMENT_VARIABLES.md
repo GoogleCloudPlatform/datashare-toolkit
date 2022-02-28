@@ -19,7 +19,8 @@ After changing environmental variables, you may have to re-apply the ISTIO polic
 | AUTH_DOMAIN | Yes | The auth domain for IDP. | cds-demo-2.firebaseapp.com |
 | TENANT_ID | Yes | The tenant Id for IDP authentication | Datashare-ajr0j |
 | PROJECT_ID | Yes | The deployed to GCP projectId | cds-demo-2 |
-| UI_BASE_URL | Yes (If marketplace integration is enabled) | The base url for the ui. | https://datashare-demo-2.fsi.joonix.net |
+| UI_BASE_URL | Yes (if marketplace integration is enabled) | The base url for the ui. | https://datashare-demo-2.fsi.joonix.net |
+| API_CUSTOM_DOMAIN | Yes (if marketplace integration is enabled) | Custom domain for API GCP load balancer | api.datashare-demo-2.fsi.joonix.net |
 
 # Next
 [Apply ISTIO Policies](./APPLY_ISTIO_POLICIES.md)

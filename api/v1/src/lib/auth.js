@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2021-2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,14 +42,33 @@ async function verifyProject(req, res, next) {
 }
 
 /**
+ * @param  {} path
+ */
+function isExcludedPath(path) {
+    if (path.startsWith('/welcome')) {
+        return true;
+    }
+    else if (path.startsWith('/docs/')) {
+        return true;
+    }
+    else if (path === '/accounts:register') {
+        return true;
+    }
+    else if (path === '/procurements:myProducts') {
+        return true;
+    }
+    return false;
+}
+
+/**
  * @param  {} req
  * @param  {} res
  * @param  {} next
  */
 async function isAuthenticated(req, res, next) {
+    console.debug(`Request path isAuthenticated: ${req.path}`);
 
-    // TODO: REMOVE
-    if (req.path === '/docs/openapi_spec') {
+    if (isExcludedPath(req.path) === true) {
         return next();
     }
 
@@ -95,8 +114,7 @@ async function isAuthenticated(req, res, next) {
  * @param  {} next
  */
 async function setCustomUserClaims(req, res, next) {
-    // TODO: REMOVE
-    if (req.path === '/docs/openapi_spec') {
+    if (isExcludedPath(req.path) === true) {
         return next();
     }
 
@@ -146,13 +164,11 @@ async function setCustomUserClaims(req, res, next) {
 }
 
 async function authzCheck(req, res, next) {
-    // TODO: REMOVE
-    if (req.path === '/docs/openapi_spec') {
+    if (isExcludedPath(req.path) === true) {
         return next();
     }
 
     const { uid, role } = res.locals;
-    const projectId = await runtimeConfig.getCurrentProjectId();
     const consumerAccess = {
         'GET': [
             '/products',
@@ -160,21 +176,11 @@ async function authzCheck(req, res, next) {
             '/resources/dashboard',
             '/resources/projects',
             '/accounts:activate',
-            // BEGIN: Backwards compatibility for marketplace
-            `/projects/${projectId}/procurements:myProducts`,
-            `/projects/${projectId}/procurements:myProducts?*`,
-            // END: Backwards compatibility for marketplace
             '/procurements:myProducts',
             '/procurements:myProducts?*'
         ],
         'POST': [
             '/accounts:activate',
-            // BEGIN: Backwards compatibility for marketplace
-            `/projects/${projectId}/accounts:register`,
-            `/projects/${projectId}/accounts:register?*`,
-            `/projects/${projectId}/procurements:myProducts`,
-            `/projects/${projectId}/procurements:myProducts?*`,
-            // END: Backwards compatibility for marketplace
             '/accounts:register',
             '/accounts:register?*',
             '/procurements:myProducts',

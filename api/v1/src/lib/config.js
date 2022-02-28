@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2020-2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,8 @@ config.procurementJwksUri = process.env.PROCUREMENT_JWKS_URI || 'https://www.goo
 config.procurementIssuer = process.env.PROCUREMENT_ISSUER || 'https://www.googleapis.com/robot/v1/metadata/x509/cloud-commerce-partner@system.gserviceaccount.com';
 
 config.uiBaseUrl = process.env.UI_BASE_URL || 'http://localhost:8080';
+
+config.apiCustomDomain = process.env.API_CUSTOM_DOMAIN;
 
 // Only to be consumed by runtimeConfig, do not use this directly from anywhere else
 config.projectId = process.env.PROJECT_ID;

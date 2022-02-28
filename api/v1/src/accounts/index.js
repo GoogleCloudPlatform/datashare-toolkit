@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2020-2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,6 +102,8 @@ var accounts = express.Router();
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsAccounts
+ *     tags:
+ *       - accounts
  *     security: [] # no security for preflight requests
  *     produces:
  *       - application/json
@@ -255,6 +257,8 @@ accounts.post('/accounts', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsAccountByAccountId
+ *     tags:
+ *       - accounts
  *     security: [] # no security for preflight requests
  *     parameters:
  *     - in: path
@@ -499,6 +503,8 @@ accounts.delete('/accounts/:accountId', async (req, res) => {
  *     summary: CORS support
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsAccountByPolicyId
+ *     tags:
+ *       - policies
  *     security: [] # no security for preflight requests
  *     parameters:
  *     - in: path
@@ -579,6 +585,8 @@ accounts.get('/policies/:policyId/accounts', async (req, res) => {
  *     description: Enable CORS by returning correct headers
  *     operationId: optionsAccountByDatasetId
  *     security: [] # no security for preflight requests
+ *     tags:
+ *       - datasets
  *     parameters:
  *     - in: path
  *       name: datasetId
@@ -653,9 +661,72 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
     });
 });
 
-// Temporary for development
-// Backwards compatibility for marketplace
-accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], async (req, res) => {
+/**
+ * @swagger
+ *
+ * /accounts:register:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsRegisterAccountGet
+ *     tags:
+ *       - accounts
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   get:
+ *     summary: Register a marketplace account based off request body
+ *     description: Returns a redirect response
+ *     operationId: registerAccountGet
+ *     security: [] # no security for marketplace register get request
+ *     tags:
+ *       - accounts
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: account
+ *       description: Request parameters for Account
+ *       schema:
+ *         $ref: '#/definitions/Account'
+ *     responses:
+ *       201:
+ *         description: Account
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                 $ref: '#/definitions/Account'
+ *       404:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
+accounts.get('/accounts:register', async (req, res) => {
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
     let projectId = req.params.projectId || currentProjectId;
 
@@ -682,11 +753,247 @@ accounts.get(['/projects/:projectId/accounts:register', '/accounts:register'], a
     }
 });
 
-// Backwards compatibility for marketplace
-accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], async (req, res) => {
+/**
+ * @swagger
+ *
+ * /accounts:register:
+ *   post:
+ *     summary: Register a marketplace account based off request body
+ *     description: Returns a redirect response
+ *     operationId: registerAccount
+ *     security: [] # no security for marketplace register post request
+ *     tags:
+ *       - accounts
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: account
+ *       description: Request parameters for Account
+ *       schema:
+ *         $ref: '#/definitions/Account'
+ *     responses:
+ *       201:
+ *         description: Account
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                 $ref: '#/definitions/Account'
+ *       404:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
+/**
+ * @swagger
+ *
+ * /accounts:activate:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsActivateAccount
+ *     tags:
+ *       - accounts
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   post:
+ *     summary: Activates a marketplace account based off request body
+ *     description: Returns a redirect response
+ *     operationId: activateAccount
+ *     tags:
+ *       - accounts
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: account
+ *       description: Request parameters for Account
+ *       schema:
+ *         $ref: '#/definitions/Account'
+ *     responses:
+ *       201:
+ *         description: Account
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                 $ref: '#/definitions/Account'
+ *       404:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
+/**
+ * @swagger
+ *
+ * /accounts:reset:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsResetAccount
+ *     tags:
+ *       - accounts
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   post:
+ *     summary: Resets a marketplace account based off request body
+ *     description: Returns a redirect response
+ *     operationId: resetAccount
+ *     tags:
+ *       - accounts
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: account
+ *       description: Request parameters for Account
+ *       schema:
+ *         $ref: '#/definitions/Account'
+ *     responses:
+ *       201:
+ *         description: Account
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                 $ref: '#/definitions/Account'
+ *       404:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
+/**
+ * @swagger
+ *
+ * /accounts:syncMarketplace:
+ *   options:
+ *     summary: CORS support
+ *     description: Enable CORS by returning correct headers
+ *     operationId: optionsSyncMarketplace
+ *     tags:
+ *       - accounts
+ *     security: [] # no security for preflight requests
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Default response for CORS method
+ *         headers:
+ *           Access-Control-Allow-Headers:
+ *             type: "string"
+ *           Access-Control-Allow-Methods:
+ *             type: "string"
+ *           Access-Control-Allow-Origin:
+ *             type: "string"
+ *   post:
+ *     summary: Syncs a marketplace account permissions based off request body
+ *     description: Returns a redirect response
+ *     operationId: syncMarketplaceAccount
+ *     tags:
+ *       - accounts
+ *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: account
+ *       description: Request parameters for Account
+ *       schema:
+ *         $ref: '#/definitions/Account'
+ *     responses:
+ *       201:
+ *         description: Account
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
+ *             code:
+ *               type: integer
+ *               description: HTTP status code
+ *             data:
+ *               type: object
+ *               items:
+ *                 $ref: '#/definitions/Account'
+ *       404:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ *       500:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
+ */
+accounts.post('/accounts::custom', async (req, res) => {
     let projectId = req.params.projectId || req.header('x-gcp-project-id');
-    const host = commonUtil.extractHostname(req.headers.host);
-    console.log(`Host is: ${host}`);
+    const host = cfg.apiCustomDomain || commonUtil.extractHostname(req.headers.host);
     switch (req.params.custom) {
         case "register": {
             // Check if override for projectId is set
@@ -721,7 +1028,6 @@ accounts.post(['/projects/:projectId/accounts::custom', '/accounts::custom'], as
             const data = await dataManager.activate(projectId, host, token, reason, email);
             console.log(`Data: ${JSON.stringify(data)}`);
 
-            // TODO: Perform redirects
             let code;
             if (data && data.success === false) {
                 code = (data.code === undefined) ? 500 : data.code;
