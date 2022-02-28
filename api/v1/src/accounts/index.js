@@ -86,7 +86,7 @@ var accounts = express.Router();
  *       - email
  *       - emailType
  *       - accountType
- *
+ * 
  *   PolicyID:
  *     type: object
  *     description: Policy ID object
@@ -128,7 +128,64 @@ var accounts = express.Router();
  *     properties:
  *       accountName:
  *         type: string
- *         description: The associated marketplace account name.
+ *         description: The associated marketplace account name
+ * 
+ *   CreateAccount:
+ *     type: object
+ *     description: Account object
+ *     properties:
+ *       email:
+ *         type: string
+ *         description: Account email address
+ *       emailType:
+ *         $ref: '#/definitions/EmailType'
+ *       policies:
+ *         type: array
+ *         items:
+ *           type: string
+ *           description: Policy Id
+ * 
+ *   CreateAccountPolicyID:
+ *     type: object
+ *     description: Policy ID object
+ *     properties:
+ *       policyId:
+ *         type: string
+ *         description: Policy ID
+ * 
+ *   CreateAccountResponse:
+ *     type: object
+ *     description: Account object
+ *     properties:
+ *       email:
+ *         type: string
+ *         description: Account email address
+ *       emailType:
+ *         $ref: '#/definitions/EmailType'
+ *       accountType:
+ *         $ref: '#/definitions/AccountType'
+ *       createdBy:
+ *         type: string
+ *         description: Account created by email
+ *       policies:
+ *         type: array
+ *         description: Account policy IDs
+ *         items:
+ *           $ref: '#/definitions/CreateAccountPolicyID'
+ *       rowId:
+ *         type: string
+ *         readOnly: true
+ *         description: Account Row ID
+ *       accountId:
+ *         type: string
+ *         readOnly: true
+ *         description: Account ID
+ *       isDeleted:
+ *         type: boolean
+ *         description: Flag indicating deletion status
+ *       createdAt:
+ *         type: integer
+ *         description: Created at time
  */
 
 /**
@@ -224,24 +281,22 @@ accounts.get('/accounts', async (req, res) => {
  *       name: account
  *       description: Request parameters for Account
  *       schema:
- *         $ref: '#/definitions/Account'
+ *         $ref: '#/definitions/CreateAccount'
  *     responses:
  *       201:
  *         description: Account
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
- *               type: object
- *               items:
- *                 $ref: '#/definitions/Account'
- *       404:
+ *               $ref: '#/definitions/CreateAccountResponse'
+ *       400:
  *         description: Error
  *         schema:
  *           $ref: '#/definitions/Error'
