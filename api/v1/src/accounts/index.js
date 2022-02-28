@@ -130,21 +130,6 @@ var accounts = express.Router();
  *         type: string
  *         description: The associated marketplace account name
  * 
- *   CreateAccount:
- *     type: object
- *     description: Account object
- *     properties:
- *       email:
- *         type: string
- *         description: Account email address
- *       emailType:
- *         $ref: '#/definitions/EmailType'
- *       policies:
- *         type: array
- *         items:
- *           type: string
- *           description: Policy Id
- * 
  *   CreateAccountResponse:
  *     type: object
  *     description: Account object
@@ -277,7 +262,19 @@ accounts.get('/accounts', async (req, res) => {
  *       name: account
  *       description: Request parameters for Account
  *       schema:
- *         $ref: '#/definitions/CreateAccount'
+ *         type: object
+ *         description: Account object
+ *         properties:
+ *           email:
+ *             type: string
+ *             description: Account email address
+ *           emailType:
+ *             $ref: '#/definitions/EmailType'
+ *           policies:
+ *             type: array
+ *             items:
+ *               type: string
+ *               description: Policy Id
  *     responses:
  *       201:
  *         description: Account
