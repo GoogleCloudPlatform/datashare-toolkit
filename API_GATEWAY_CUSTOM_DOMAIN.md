@@ -9,6 +9,8 @@ For further information see the following:
 
 Example setup for the domain: api.datashare-demo-2.fsi.joonix.net
 ```
+DOMAIN=api.datashare-demo-2.fsi.joonix.net
+
 gcloud beta compute network-endpoint-groups create api-gateway-serverless-neg \
   --region=us-central1 \
   --network-endpoint-type=serverless \
@@ -27,7 +29,7 @@ gcloud compute url-maps create datashare-api-gateway-url-map \
   --default-service datashare-api-gateway-backend-service
 
 gcloud compute ssl-certificates create datashare-lb-ssl-cert \
-  --domains api.datashare-demo-2.fsi.joonix.net
+  --domains $DOMAIN
 
 gcloud compute target-https-proxies create datashare-target-http-proxy \
   --ssl-certificates=datashare-lb-ssl-cert \
@@ -38,7 +40,6 @@ gcloud compute forwarding-rules create datashare-lb-forwarding-rule \
   --global \
   --ports=443
 
-export DOMAIN=api.datashare-demo-2.fsi.joonix.net
 gcloud domains verify $DOMAIN
 gcloud domains list-user-verified
 ```
