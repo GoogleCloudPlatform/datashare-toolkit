@@ -145,14 +145,6 @@ var accounts = express.Router();
  *           type: string
  *           description: Policy Id
  * 
- *   CreateAccountPolicyID:
- *     type: object
- *     description: Policy ID object
- *     properties:
- *       policyId:
- *         type: string
- *         description: Policy ID
- * 
  *   CreateAccountResponse:
  *     type: object
  *     description: Account object
@@ -171,7 +163,11 @@ var accounts = express.Router();
  *         type: array
  *         description: Account policy IDs
  *         items:
- *           $ref: '#/definitions/CreateAccountPolicyID'
+ *           type: object
+ *           properties:
+ *             policyId:
+ *               type: string
+ *               description: Policy ID
  *       rowId:
  *         type: string
  *         readOnly: true
@@ -186,17 +182,6 @@ var accounts = express.Router();
  *       createdAt:
  *         type: integer
  *         description: Created at time
- * 
- *   ActivateAccountRequest:
- *     type: object
- *     description: Account object
- *     properties:
- *       email:
- *         type: string
- *         description: Email account for approval
- *       reason:
- *         type: string
- *         description: Procurement approval reason
  */
 
 /**
@@ -932,7 +917,15 @@ accounts.get('/accounts:register', async (req, res) => {
  *     - in: body
  *       description: Request parameters for Account
  *       schema:
- *         $ref: '#/definitions/ActivateAccountRequest'
+ *         type: object
+ *         description: Account object
+ *         properties:
+ *           email:
+ *             type: string
+ *             description: Email account for approval
+ *           reason:
+ *             type: string
+ *             description: Procurement approval reason
  *     responses:
  *       200:
  *         description: Account
@@ -989,12 +982,16 @@ accounts.get('/accounts:register', async (req, res) => {
  *       type: string
  *       required: true
  *     - in: body
- *       name: account
  *       description: Request parameters for Account
  *       schema:
- *         $ref: '#/definitions/Account'
+ *         type: object
+ *         description: Account object
+ *         properties:
+ *           accountId:
+ *             type: string
+ *             description: The datashare accountId
  *     responses:
- *       201:
+ *       200:
  *         description: Account
  *         schema:
  *           type: object
@@ -1009,10 +1006,6 @@ accounts.get('/accounts:register', async (req, res) => {
  *               type: object
  *               items:
  *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:

@@ -413,7 +413,6 @@ export default {
     resetAccount() {
       this.$store
         .dispatch('submitProcurementAccountReset', {
-          projectId: this.config.projectId,
           accountId: this.selectedItem.accountId
         })
         .then(result => {
