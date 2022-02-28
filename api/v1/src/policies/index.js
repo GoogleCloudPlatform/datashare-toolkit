@@ -76,7 +76,7 @@ var policies = express.Router();
  *         type: string
  *         description: Row Access Tag
  *
- *   Marketplace:
+ *   Marketplace2:
  *     type: object
  *     description: Marketplace object
  *     properties:

@@ -42,14 +42,14 @@ var accounts = express.Router();
  *     type: object
  *     description: Account object
  *     properties:
- *       accountId:
- *         type: string
- *         readOnly: true
- *         description: Account ID
  *       rowId:
  *         type: string
  *         readOnly: true
  *         description: Account Row ID
+ *       accountId:
+ *         type: string
+ *         readOnly: true
+ *         description: Account ID
  *       email:
  *         type: string
  *         description: Account email address
@@ -60,11 +60,28 @@ var accounts = express.Router();
  *       createdBy:
  *         type: string
  *         description: Account created by email
+ *       marketplace:
+ *         $ref: '#/definitions/Marketplace'
+ *       createdAt:
+ *         type: integer
+ *         description: Created at time
+ *       version:
+ *         type: integer
+ *         description: The object version
+ *       isDeleted:
+ *         type: boolean
+ *         description: Flag indicating deletion status
  *       policies:
  *         type: array
  *         description: Account policy IDs
  *         items:
  *           $ref: '#/definitions/PolicyID'
+ *       marketplaceSynced:
+ *         type: boolean
+ *         description: Indicates if marketplace entitlements are in sync for account
+ *       marketplaceActivated:
+ *         type: boolean
+ *         description: Indicates if account is linked and activated in marketplace
  *     required:
  *       - email
  *       - emailType
@@ -77,6 +94,18 @@ var accounts = express.Router();
  *       policyId:
  *         type: string
  *         description: Policy ID
+ *       name:
+ *         type: string
+ *         description: Policy name
+ *       solutionId:
+ *         type: string
+ *         description: Linked marketplace solution Id
+ *       planId:
+ *         type: string
+ *         description: Linked marketplace plan Id
+ *       marketplaceEntitlementActive:
+ *         type: boolean
+ *         description: Indicates if marketplace entitlements are in sync for policy
  *
  *   EmailType:
  *     type: string
@@ -84,6 +113,7 @@ var accounts = express.Router();
  *     enum:
  *       - user
  *       - group
+ *       - serviceAccount
  *
  *   AccountType:
  *     type: string
@@ -92,6 +122,13 @@ var accounts = express.Router();
  *       - consumer
  *       - producer
  *
+ *   Marketplace:
+ *     type: object
+ *     description: Marketplace object
+ *     properties:
+ *       accountName:
+ *         type: string
+ *         description: The associated marketplace account name.
  */
 
 /**
@@ -128,6 +165,7 @@ var accounts = express.Router();
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
+ *       description: The GCP projectId of the target project.
  *     produces:
  *       - application/json
  *     responses:
@@ -136,13 +174,13 @@ var accounts = express.Router();
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:

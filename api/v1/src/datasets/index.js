@@ -122,7 +122,7 @@ var datasets = express.Router();
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *       description: The GCP projectId for the target project.
+ *       description: The GCP projectId of the target project.
  *     - in: query
  *       name: includeAll
  *       type: boolean
