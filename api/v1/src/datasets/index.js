@@ -365,7 +365,15 @@ datasets.post('/datasets', async(req, res) => {
  *       name: dataset
  *       description: Request parameters for Dataset
  *       schema:
- *         $ref: '#/definitions/Dataset'
+ *         type: object
+ *         description: Dataset object
+ *         properties:
+ *           datasetId:
+ *             type: string
+ *             description: The BigQuery datasetId.
+ *           description:
+ *             type: string
+ *             description: Description of the dataset.
  *     produces:
  *       - application/json
  *     responses:
@@ -384,10 +392,6 @@ datasets.post('/datasets', async(req, res) => {
  *               type: object
  *               items:
  *                 $ref: '#/definitions/Dataset'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
@@ -526,11 +530,6 @@ datasets.get('/datasets/:datasetId', async(req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *     - in: body
- *       name: dataset
- *       description: Request parameters for Dataset
- *       schema:
- *         $ref: '#/definitions/Dataset'
  *     produces:
  *       - application/json
  *     responses:
@@ -549,10 +548,6 @@ datasets.get('/datasets/:datasetId', async(req, res) => {
  *               type: object
  *               items:
  *                 $ref: '#/definitions/Dataset'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
@@ -1259,6 +1254,13 @@ datasets.put('/datasets/:datasetId/views/:viewId', async(req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
+ *     - in: body
+ *       type: object
+ *       required: true
+ *       properties:
+ *         rowId:
+ *           type: string
+ *           description: The view id
  *     produces:
  *       - application/json
  *     responses:
