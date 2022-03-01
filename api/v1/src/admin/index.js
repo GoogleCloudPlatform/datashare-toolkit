@@ -147,10 +147,6 @@ var admin = express.Router();
  *               description: HTTP status code
  *             data:
  *               type: object
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
