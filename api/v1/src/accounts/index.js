@@ -77,6 +77,7 @@ var accounts = express.Router();
  *       createdAt:
  *         type: integer
  *         description: Created at time
+ * 
  *   Account:
  *     type: object
  *     description: Account object
@@ -716,13 +717,13 @@ accounts.get('/policies/:policyId/accounts', async (req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:
