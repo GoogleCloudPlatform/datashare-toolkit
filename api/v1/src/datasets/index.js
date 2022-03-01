@@ -102,7 +102,7 @@ var datasets = express.Router();
  *     properties:
  *       rowId:
  *         type: string
- *         description: The view rowId
+ *         description: The view rowId. Provided only when modifying existing views.
  *       authorizedViewId:
  *         type: string
  *         description: The authorized view Id
