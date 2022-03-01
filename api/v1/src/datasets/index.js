@@ -342,7 +342,7 @@ datasets.put('/datasets/:datasetId', async(req, res) => {
  *             type: "string"
  *   get:
  *     summary: Get Dataset based off datasetId
- *     description: Returns the Datset response
+ *     description: Returns the Dataset response
  *     operationId: getDatasetByDatasetId
  *     tags:
  *       - datasets
@@ -364,22 +364,32 @@ datasets.put('/datasets/:datasetId', async(req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: object
- *               items:
- *                  $ref: '#/definitions/Dataset'
+ *               description: Dataset object
+ *               properties:
+ *                 datasetId:
+ *                   type: string
+ *                   description: The BigQuery datasetId.
+ *                 description:
+ *                   type: string
+ *                   description: Description of the dataset.
+ *                 modifiedAt:
+ *                   type: integer
+ *                   description: The last modified timestamp.
  *       500:
  *         description: Error
  *         schema:
  *           $ref: '#/definitions/Error'
  */
+// TODO: Clean up, not used by front-end.
 datasets.get('/datasets/:datasetId', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
