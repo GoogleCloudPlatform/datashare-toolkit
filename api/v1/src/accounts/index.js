@@ -129,44 +129,6 @@ var accounts = express.Router();
  *       accountName:
  *         type: string
  *         description: The associated marketplace account name
- * 
- *   CreateAccountResponse:
- *     type: object
- *     description: Account object
- *     properties:
- *       email:
- *         type: string
- *         description: Account email address
- *       emailType:
- *         $ref: '#/definitions/EmailType'
- *       accountType:
- *         $ref: '#/definitions/AccountType'
- *       createdBy:
- *         type: string
- *         description: Account created by email
- *       policies:
- *         type: array
- *         description: Account policy IDs
- *         items:
- *           type: object
- *           properties:
- *             policyId:
- *               type: string
- *               description: Policy ID
- *       rowId:
- *         type: string
- *         readOnly: true
- *         description: Account Row ID
- *       accountId:
- *         type: string
- *         readOnly: true
- *         description: Account ID
- *       isDeleted:
- *         type: boolean
- *         description: Flag indicating deletion status
- *       createdAt:
- *         type: integer
- *         description: Created at time
  */
 
 /**
@@ -288,7 +250,42 @@ accounts.get('/accounts', async (req, res) => {
  *               type: boolean
  *               description: Success of the request
  *             data:
- *               $ref: '#/definitions/CreateAccountResponse'
+ *               type: object
+ *               description: Account object
+ *               properties:
+ *                 email:
+ *                   type: string
+ *                   description: Account email address
+ *                 emailType:
+ *                   $ref: '#/definitions/EmailType'
+ *                 accountType:
+ *                   $ref: '#/definitions/AccountType'
+ *                 createdBy:
+ *                   type: string
+ *                   description: Account created by email
+ *                 policies:
+ *                   type: array
+ *                   description: Account policy IDs
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       policyId:
+ *                         type: string
+ *                         description: Policy ID
+ *                 rowId:
+ *                   type: string
+ *                   readOnly: true
+ *                   description: Account Row ID
+ *                 accountId:
+ *                   type: string
+ *                   readOnly: true
+ *                   description: Account ID
+ *                 isDeleted:
+ *                   type: boolean
+ *                   description: Flag indicating deletion status
+ *                 createdAt:
+ *                   type: integer
+ *                   description: Created at time
  *       400:
  *         description: Error
  *         schema:
