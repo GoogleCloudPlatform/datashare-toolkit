@@ -31,21 +31,6 @@ var admin = express.Router();
  *
  *
  * definitions:
- *   SyncronizeResourcesType:
- *     type: string
- *     description: Syncronize Resources Type
- *     enum:
- *       - PERMISSIONS
- *       - VIEWS
- *       - ALL
- *
- *   SyncronizeResourcesRequest:
- *     type: object
- *     description: Syncronize Resources Request object
- *     properties:
- *       type:
- *         $ref: '#/definitions/SyncronizeResourcesType'
- *
  *   ApplicationUserResource:
  *     type: object
  *     description: User Resource object
@@ -187,11 +172,22 @@ var admin = express.Router();
  *       type: string
  *       required: true
  *     - in: body
- *       name: syncronize_resources
+ *       name: syncronize resources
  *       description: Request parameters for Syncronize Resources
  *       schema:
- *         $ref: '#/definitions/SyncronizeResourcesRequest'
- *       required: true
+ *         type: object
+ *         properties:
+ *           type:
+ *             type: string
+ *             description: Syncronize Resources Type
+ *             enum:
+ *               - ALL
+ *               - BIGQUERY_PERMISSIONS
+ *               - BIGQUERY_VIEWS
+ *               - MARKETPLACE
+ *               - STORAGE_BUCKET_PERMISSIONS
+ *               - TOPIC_PERMISSIONS
+ *         required: true
  *     produces:
  *       - application/json
  *     responses:
