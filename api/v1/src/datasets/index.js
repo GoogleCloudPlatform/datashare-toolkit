@@ -55,7 +55,8 @@ var datasets = express.Router();
  *         properties:
  *           key:
  *             type: string
- *             description: The label.
+ *             description: The label
+ * 
  *   Accounts:
  *     type: object
  *     description: Table object
@@ -69,6 +70,7 @@ var datasets = express.Router();
  *         enum:
  *           - userByEmail
  *           - groupByEmail
+ * 
  *   Table:
  *     type: object
  *     description: Table object
@@ -76,6 +78,16 @@ var datasets = express.Router();
  *       datasetId:
  *         type: string
  *         description: Dataset ID
+ *       tableId:
+ *         type: string
+ *         description: Table ID
+ *       type:
+ *         type: string
+ *         description: The BigQuery object type
+ *         enum:
+ *           - TABLE
+ *           - VIEW
+ * 
  *   Column:
  *     type: object
  *     description: Column object
@@ -83,6 +95,7 @@ var datasets = express.Router();
  *       datasetId:
  *         type: string
  *         description: Dataset ID
+ * 
  *   View:
  *     type: object
  *     description: View object
@@ -528,15 +541,15 @@ datasets.delete('/datasets/:datasetId', async(req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
- *               type: object
+ *               type: array
  *               items:
  *                  $ref: '#/definitions/Table'
  *       500:
