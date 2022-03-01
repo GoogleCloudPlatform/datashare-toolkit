@@ -636,17 +636,19 @@ datasets.get('/datasets/:datasetId/tables', async(req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
- *               type: object
+ *               type: array
  *               items:
- *                  $ref: '#/definitions/Table'
+ *                 type: string
+ *                 description: The column name
+ *                   
  *       500:
  *         description: Error
  *         schema:
