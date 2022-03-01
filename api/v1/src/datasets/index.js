@@ -100,9 +100,75 @@ var datasets = express.Router();
  *     type: object
  *     description: View object
  *     properties:
+ *       rowId:
+ *         type: string
+ *         description: The view rowId
+ *       authorizedViewId:
+ *         type: string
+ *         description: The authorized view Id
+ *       name:
+ *         type: string
+ *         description: The view name
+ *       description:
+ *         type: string
+ *         description: The view description
  *       datasetId:
  *         type: string
  *         description: Dataset ID
+ *       source:
+ *         type: object
+ *         properties:
+ *           datasetId:
+ *             type: string
+ *           tableId:
+ *             type: string
+ *           publicAccess:
+ *             type: object
+ *             properties:
+ *               enabled:
+ *                 type: boolean
+ *                 description: Flag indicating if public access is enabled
+ *           visibleColumns:
+ *             type: array
+ *             items:
+ *               column:
+ *                 type: string
+ *           queryFilter:
+ *             type: string
+ *       custom:
+ *         type: object
+ *         properties:
+ *           query:
+ *             type: string
+ *             description: The custom query string
+ *           authorizeFromDatasetIds:
+ *             type: array
+ *             items:
+ *               type: object
+ *               properties:
+ *                 datasetId:
+ *                   type: string
+ *       accessControl:
+ *         type: object
+ *         properties:
+ *           enabled:
+ *             type: boolean
+ *             description: Flag indicating if access control is enabled
+ *       expiration:
+ *         type: object
+ *         properties:
+ *           enabled:
+ *             type: boolean
+ *             description: Flag indicating if expiration is enabled
+ *       createdBy:
+ *         type: string
+ *         description: Created by user
+ *       createdAt:
+ *         type: integer
+ *         description: Created at time
+ *       version:
+ *         type: integer
+ *         description: The view version
  *
  */
 
@@ -805,7 +871,7 @@ datasets.get('/views', async(req, res) => {
  *               default: 200
  *               description: HTTP status code
  *             data:
- *               type: object
+ *               type: array
  *               items:
  *                  $ref: '#/definitions/View'
  *       500:
@@ -874,12 +940,12 @@ datasets.get('/datasets/:datasetId/views', async(req, res) => {
  *       name: datasetId
  *       type: string
  *       required: true
- *       description: Dataset Id of the Dataset request
+ *       description: Dataset Id for the request
  *     - in: path
  *       name: viewId
  *       type: string
  *       required: true
- *       description: Dataset View Id of the Dataset request
+ *       description: Authorized View Id for the request
  *     - in: header
  *       name: x-gcp-project-id
  *       type: string
