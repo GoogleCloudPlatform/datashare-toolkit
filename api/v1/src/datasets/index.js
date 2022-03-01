@@ -269,11 +269,24 @@ datasets.get('/datasets', async(req, res) => {
  *     tags:
  *       - datasets
  *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *       description: The GCP projectId of the target project.
  *     - in: body
  *       name: dataset
  *       description: Request parameters for Dataset
  *       schema:
- *         $ref: '#/definitions/Dataset'
+ *         type: object
+ *         description: Dataset object
+ *         properties:
+ *           datasetId:
+ *             type: string
+ *             description: The BigQuery datasetId.
+ *           description:
+ *             type: string
+ *             description: Description of the dataset.
  *     produces:
  *       - application/json
  *     responses:
@@ -282,16 +295,18 @@ datasets.get('/datasets', async(req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: object
- *               items:
- *                 $ref: '#/definitions/Dataset'
+ *               properties:
+ *                 metadata:
+ *                   type: object
+ *                   description: BigQuery metadata for object
  *       404:
  *         description: Error
  *         schema:
