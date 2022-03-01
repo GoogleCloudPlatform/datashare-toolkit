@@ -31,40 +31,7 @@ var admin = express.Router();
  *
  *
  * definitions:
- *   ApplicationUserResource:
- *     type: object
- *     description: User Resource object
- *     properties:
- *       uid:
- *         type: string
- *         description: IDP uid
- *       displayName:
- *         type: string
- *         description: User display name
- *       email:
- *         type: string
- *         description: User email address
- *       emailVerified:
- *         type: boolean
- *         description: Flag indicating if email address is verified
- *       disabled:
- *         type: boolean
- *         description: Flag indicating if account is disabled
- *       photoURL:
- *         type: string
- *         description: Photo URL for the account
- *       customClaims:
- *          type: object
- *          properties:
- *            role:
- *              type: string
- *       lastSignInTime:
- *         type: string
- *         description: Last sign in time for the account
- *       creationTime:
- *         type: string
- *         description: Creation time for the account
- *
+
  *   Error:
  *     type: object
  *     description: Error object
@@ -302,7 +269,38 @@ admin.post('/admin::custom', async (req, res) => {
  *             data:
  *               type: array
  *               items:
- *                 $ref: '#/definitions/ApplicationUserResource'
+ *                 type: object
+ *                 description: User Resource object
+ *                 properties:
+ *                   uid:
+ *                     type: string
+ *                     description: IDP uid
+ *                   displayName:
+ *                     type: string
+ *                     description: User display name
+ *                   email:
+ *                     type: string
+ *                     description: User email address
+ *                   emailVerified:
+ *                     type: boolean
+ *                     description: Flag indicating if email address is verified
+ *                   disabled:
+ *                     type: boolean
+ *                     description: Flag indicating if account is disabled
+ *                   photoURL:
+ *                     type: string
+ *                     description: Photo URL for the account
+ *                   customClaims:
+ *                      type: object
+ *                      properties:
+ *                        role:
+ *                          type: string
+ *                   lastSignInTime:
+ *                     type: string
+ *                     description: Last sign in time for the account
+ *                   creationTime:
+ *                     type: string
+ *                     description: Creation time for the account
  *       500:
  *         description: Error
  *         schema:
