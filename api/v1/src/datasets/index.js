@@ -154,6 +154,12 @@ var datasets = express.Router();
  *           enabled:
  *             type: boolean
  *             description: Flag indicating if access control is enabled
+ *           labelColumn:
+ *             type: string
+ *             description: The column to use for row access tag filtering
+ *           labelColumnDelimiter:
+ *             type: string
+ *             description: Delimiter to use for splitting labels if multiple existing in the label column
  *       expiration:
  *         type: object
  *         properties:
@@ -779,17 +785,17 @@ datasets.get('/datasets/:datasetId/tables/:tableId/columns', async(req, res) => 
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:
- *                  $ref: '#/definitions/Dataset'
+ *                  $ref: '#/definitions/View'
  *       500:
  *         description: Error
  *         schema:
