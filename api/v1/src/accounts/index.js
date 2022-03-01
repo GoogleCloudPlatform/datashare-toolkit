@@ -38,6 +38,45 @@ var accounts = express.Router();
  *
  *
  * definitions:
+ *   ModifyAccountResponse:
+ *     type: object
+ *     description: Account object
+ *     properties:
+ *       email:
+ *         type: string
+ *         description: Account email address
+ *       emailType:
+ *         $ref: '#/definitions/EmailType'
+ *       accountType:
+ *         $ref: '#/definitions/AccountType'
+ *       createdBy:
+ *         type: string
+ *         description: Account created by email
+ *       policies:
+ *         type: array
+ *         description: Account policy IDs
+ *         items:
+ *           type: object
+ *           properties:
+ *             policyId:
+ *               type: string
+ *               description: Policy ID
+ *       marketplace:
+ *         $ref: '#/definitions/Marketplace'
+ *       rowId:
+ *         type: string
+ *         readOnly: true
+ *         description: Account Row ID
+ *       accountId:
+ *         type: string
+ *         readOnly: true
+ *         description: Account ID
+ *       isDeleted:
+ *         type: boolean
+ *         description: Flag indicating deletion status
+ *       createdAt:
+ *         type: integer
+ *         description: Created at time
  *   Account:
  *     type: object
  *     description: Account object
@@ -237,59 +276,13 @@ accounts.get('/accounts', async (req, res) => {
  *             items:
  *               type: string
  *               description: Policy Id
+ *           marketplace:
+ *             $ref: '#/definitions/Marketplace'
  *     responses:
  *       201:
  *         description: Account
  *         schema:
- *           type: object
- *           properties:
- *             code:
- *               type: integer
- *               description: HTTP status code
- *             success:
- *               type: boolean
- *               description: Success of the request
- *             data:
- *               type: object
- *               description: Account object
- *               properties:
- *                 email:
- *                   type: string
- *                   description: Account email address
- *                 emailType:
- *                   $ref: '#/definitions/EmailType'
- *                 accountType:
- *                   $ref: '#/definitions/AccountType'
- *                 createdBy:
- *                   type: string
- *                   description: Account created by email
- *                 policies:
- *                   type: array
- *                   description: Account policy IDs
- *                   items:
- *                     type: object
- *                     properties:
- *                       policyId:
- *                         type: string
- *                         description: Policy ID
- *                 rowId:
- *                   type: string
- *                   readOnly: true
- *                   description: Account Row ID
- *                 accountId:
- *                   type: string
- *                   readOnly: true
- *                   description: Account ID
- *                 isDeleted:
- *                   type: boolean
- *                   description: Flag indicating deletion status
- *                 createdAt:
- *                   type: integer
- *                   description: Created at time
- *       400:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
+ *           $ref: '#definitions/ModifyAccountResponse'
  *       500:
  *         description: Error
  *         schema:
@@ -441,7 +434,24 @@ accounts.get('/accounts/:accountId', async (req, res) => {
  *       name: account
  *       description: Request parameters for Account
  *       schema:
- *         $ref: '#/definitions/Account'
+ *         type: object
+ *         description: Account object
+ *         properties:
+ *           rowId:
+ *             type: string
+ *             description: The rowId of the modified account
+ *           email:
+ *             type: string
+ *             description: Account email address
+ *           emailType:
+ *             $ref: '#/definitions/EmailType'
+ *           policies:
+ *             type: array
+ *             items:
+ *               type: string
+ *               description: Policy Id
+ *           marketplace:
+ *             $ref: '#/definitions/Marketplace'
  *     produces:
  *       - application/json
  *     responses:
@@ -450,20 +460,14 @@ accounts.get('/accounts/:accountId', async (req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
- *               type: object
- *               items:
- *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
+ *               $ref: '#/definitions/ModifyAccountResponse'
  *       500:
  *         description: Error
  *         schema:
@@ -529,10 +533,12 @@ accounts.put('/accounts/:accountId', async (req, res) => {
  *       type: string
  *       required: true
  *     - in: body
- *       name: account
- *       description: Request parameters for Account
  *       schema:
- *         $ref: '#/definitions/Account'
+ *         type: object
+ *         properties:
+ *           rowId:
+ *             type: string
+ *             description: The rowId of the account to delete
  *     produces:
  *       - application/json
  *     responses:
@@ -551,10 +557,6 @@ accounts.put('/accounts/:accountId', async (req, res) => {
  *               type: object
  *               items:
  *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
