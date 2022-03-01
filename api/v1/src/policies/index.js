@@ -93,6 +93,9 @@ var policies = express.Router();
  *       version:
  *         type: integer
  *         description: Policy version
+ *       isDeleted:
+ *         type: boolean
+ *         description: Flag indicating if policy was deleted
  *     required:
  *       - name
  *
