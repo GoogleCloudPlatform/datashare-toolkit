@@ -66,6 +66,9 @@ var datasets = express.Router();
  *       type:
  *         type: string
  *         description: The account type
+ *         enum:
+ *           - userByEmail
+ *           - groupByEmail
  *   Table:
  *     type: object
  *     description: Table object
