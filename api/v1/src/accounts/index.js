@@ -1040,12 +1040,16 @@ accounts.get('/accounts:register', async (req, res) => {
  *       type: string
  *       required: true
  *     - in: body
- *       name: account
  *       description: Request parameters for Account
  *       schema:
- *         $ref: '#/definitions/Account'
+ *         type: object
+ *         description: Account object
+ *         properties:
+ *           accountId:
+ *             type: string
+ *             description: The datashare accountId
  *     responses:
- *       201:
+ *       200:
  *         description: Account
  *         schema:
  *           type: object
@@ -1056,14 +1060,6 @@ accounts.get('/accounts:register', async (req, res) => {
  *             code:
  *               type: integer
  *               description: HTTP status code
- *             data:
- *               type: object
- *               items:
- *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
