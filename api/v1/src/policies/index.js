@@ -473,9 +473,7 @@ policies.post('/policies', async(req, res) => {
  *               default: 200
  *               description: HTTP status code
  *             data:
- *               type: object
- *               items:
- *                  $ref: '#/definitions/Policy'
+ *               $ref: '#/definitions/Policy'
  *       500:
  *         description: Error
  *         schema:

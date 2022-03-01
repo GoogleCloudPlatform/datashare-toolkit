@@ -624,6 +624,10 @@ accounts.delete('/accounts/:accountId', async (req, res) => {
  *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     produces:
  *       - application/json
  *     responses:
@@ -632,17 +636,36 @@ accounts.delete('/accounts/:accountId', async (req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:
- *                  $ref: '#/definitions/Account'
+ *                 type: object
+ *                 description: Account object
+ *                 properties:
+ *                   email:
+ *                     type: string
+ *                     description: Account email address
+ *                   emailType:
+ *                     $ref: '#/definitions/EmailType'
+ *                   marketplace:
+ *                     $ref: '#/definitions/Marketplace'
+ *                   marketplaceSynced:
+ *                     type: boolean
+ *                     description: Indicates if marketplace entitlements are in sync for account
+ *                   marketplaceActivated:
+ *                     type: boolean
+ *                     description: Indicates if account is linked and activated in marketplace
+ *                 required:
+ *                   - email
+ *                   - emailType
+ *                   - accountType
  *       500:
  *         description: Error
  *         schema:
