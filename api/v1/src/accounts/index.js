@@ -807,10 +807,14 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
  *       name: projectId
  *       description: The projectId
  *       required: false
+ *       schema:
+ *         type: string
  *     - in: query
  *       name: x-gcp-marketplace-token
  *       description: JWT token provided by marketplace    
  *       required: true
+ *       schema:
+ *         type: string
  *     responses:
  *       301:
  *         description: Account
