@@ -353,7 +353,7 @@ export default {
   },
   computed: {
     selectedItemSummary() {
-      return `<b>Product</b>: ${this.selectedItem.productExternalName}<br/>
+      return `<b>Product</b>: ${this.selectedItem.product}<br/>
       <b>Plan</b>: ${this.selectedItem.plan}<br/>
       <b>New Pending Plan</b>: ${this.selectedItem.newPendingPlan}<br/>
       <b>Account</b>: ${this.selectedItem.email ||
