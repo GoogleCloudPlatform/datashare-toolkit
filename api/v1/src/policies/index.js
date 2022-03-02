@@ -616,15 +616,15 @@ policies.put('/policies/:policyId', async(req, res) => {
  *     tags:
  *       - policies
  *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     - in: path
  *       name: policyId
  *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
- *     - in: header
- *       name: x-gcp-project-id
- *       type: string
- *       required: true
  *     - in: body
  *       name: policy
  *       description: Request parameters for Policy
@@ -632,6 +632,7 @@ policies.put('/policies/:policyId', async(req, res) => {
  *          type: object
  *          properties:
  *            rowId:
+ *              description: The rowId for the current policy
  *     produces:
  *       - application/json
  *     responses:
