@@ -139,7 +139,7 @@ var admin = express.Router();
  *       type: string
  *       required: true
  *     - in: body
- *       name: syncronize resources
+ *       name: syncronize_resources
  *       description: Request parameters for Syncronize Resources
  *       schema:
  *         type: object
