@@ -205,7 +205,7 @@ procurements.get('/procurements', async (req, res) => {
  *            status:
  *              description: New approval status
  *            reason:
- *              description: The reason for approval
+ *              description: Free form text string explaining the approval reason
  *     tags:
  *       - procurements
  *     produces:
