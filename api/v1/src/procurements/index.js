@@ -120,31 +120,40 @@ var procurements = express.Router();
  *                 properties:
  *                   name:
  *                     type: string
- *                     description: The entitlement name
+ *                     description: The resource name of the entitlement. Entitlement names have the form providers/{providerId}/entitlements/{entitlement_id}.
  *                   account:
  *                     type: string
- *                     description: Billing accountId of the marketplace consumer
+ *                     description: The resource name of the account that this entitlement is based on, if any.
  *                   provider:
  *                     type: string
- *                     description: The provider
+ *                     description: The identifier of the service provider that this entitlement was created against. Each service provider is assigned a unique provider value when they onboard with Cloud Commerce platform.
  *                   product:
  *                     type: string
- *                     description: The product purchased
+ *                     description: The identifier of the entity that was purchased. This may actually represent a product, quote, or offer.
  *                   plan:
  *                     type: string
- *                     description: The marketplace plan
+ *                     description: The identifier of the plan that was procured. Required if the product has plans.
  *                   state:
  *                     type: string
- *                     description: The entitlement state
+ *                     description: The state of the entitlement
+ *                     enum:
+ *                       - ENTITLEMENT_STATE_UNSPECIFIED
+ *                       - ENTITLEMENT_ACTIVATION_REQUESTED
+ *                       - ENTITLEMENT_ACTIVE
+ *                       - ENTITLEMENT_PENDING_CANCELLATION
+ *                       - ENTITLEMENT_CANCELLED
+ *                       - ENTITLEMENT_PENDING_PLAN_CHANGE
+ *                       - ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL
+ *                       - ENTITLEMENT_SUSPENDED
  *                   updateTime:
  *                     type: string
- *                     description: The update time of the entitlement
+ *                     description: The last update timestamp.
  *                   createTime:
  *                     type: string
- *                     description: The create time of the entitlement
+ *                     description: The creation timestamp.
  *                   productExternalName:
  *                     type: string
- *                     description: The product external name
+ *                     description: The identifier of the product that was procured.
  *                   policy:
  *                     type: object
  *                     properties:
