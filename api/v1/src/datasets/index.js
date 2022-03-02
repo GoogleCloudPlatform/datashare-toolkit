@@ -88,14 +88,6 @@ var datasets = express.Router();
  *           - TABLE
  *           - VIEW
  * 
- *   Column:
- *     type: object
- *     description: Column object
- *     properties:
- *       datasetId:
- *         type: string
- *         description: Dataset ID
- * 
  *   View:
  *     type: object
  *     description: View object
