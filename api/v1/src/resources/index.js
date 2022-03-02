@@ -40,15 +40,6 @@ var resources = express.Router();
  *         readOnly: true
  *         description: Project ID
  *
- *   ConfigurationResource:
- *     type: object
- *     description: Configuration Resource object
- *     properties:
- *       projectId:
- *         type: string
- *         readOnly: true
- *         description: Project ID
- *
  *   DashboardResource:
  *     type: object
  *     description: Dashboard Resource object
@@ -274,12 +265,24 @@ resources.get('/resources/projects', async (req, res) => {
  *             success:
  *               type: boolean
  *               description: Success of the request
- *             code:
- *               type: integer
- *               default: 200
- *               description: HTTP status code
- *             data:
- *               $ref: '#/definitions/ConfigurationResource'
+ *             configuration:
+ *               type: object
+ *               properties:
+ *                 apiProjectId:
+ *                   type: string
+ *                   description: The projectId for the api service
+ *                 projectId:
+ *                   type: string
+ *                   description: The selected projectId
+ *                 isMarketplaceEnabled:
+ *                   type: boolean
+ *                   description: Flag indicating if marketplace integration is enabled
+ *                 labels:
+ *                   type: object
+ *                   description: UI replacement labels
+ *                   properties:
+ *                     key:
+ *                       type: string
  *       500:
  *         description: Error
  *         schema:
