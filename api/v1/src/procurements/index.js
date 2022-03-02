@@ -31,42 +31,6 @@ var procurements = express.Router();
 /**
  * @swagger
  *
- *
- * definitions:
- *   Procurement:
- *     type: object
- *     description: Procurement object
- *     properties:
- *       rowId:
- *         type: string
- *         readOnly: true
- *         description: Procurement Row ID
- *       eventId:
- *         type: string
- *         readOnly: true
- *         description: Marketplace Pub/Sub message eventId
- *       eventType:
- *         type: string
- *         description: Marketplace Pub/Sub message eventType
- *       acknowledged:
- *         type: boolean
- *         description: Indicates if the event was acknowledged.
- *       createdAt:
- *         type: string
- *         description: Record creation time
- *       accountId:
- *         type: string
- *         description: Billing accountId of the consumer
- *       entitlementId:
- *         type: string
- *         description: Entitlement Id of the purchased SKU
- *     required:
- *       - eventType
- */
-
-/**
- * @swagger
- *
  * /procurements:
  *   options:
  *     summary: CORS support
