@@ -29,24 +29,6 @@ var router = express.Router();
 /**
  * @swagger
  *
- *
- * definitions:
- *   PubSubTopic:
- *     type: object
- *     description: PubSub Topic object
- *     properties:
- *       topicName:
- *         type: string
- *         description: Topic Name
- *       topicId:
- *         type: string
- *         description: Topic ID
- *
- */
-
-/**
- * @swagger
- *
  * /pubsub/topics:
  *   options:
  *     summary: CORS support
@@ -96,7 +78,15 @@ var router = express.Router();
  *             data:
  *               type: array
  *               items:
- *                  $ref: '#/definitions/PubSubTopic'
+ *                 type: object
+ *                 description: PubSub Topic object
+ *                 properties:
+ *                   topicName:
+ *                     type: string
+ *                     description: Topic Name
+ *                   topicId:
+ *                     type: string
+ *                     description: Topic ID
  *       500:
  *         description: Error
  *         schema:
@@ -254,10 +244,6 @@ router.post('/pubsub/topics', async(req, res) => {
  *               type: integer
  *               default: 200
  *               description: HTTP status code
- *             data:
- *               type: object
- *               items:
- *                  $ref: '#/definitions/PubSubTopic'
  *       500:
  *         description: Error
  *         schema:
