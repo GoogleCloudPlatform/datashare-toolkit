@@ -877,6 +877,7 @@ accounts.get('/accounts:register', async (req, res) => {
  *         properties:
  *           x-gcp-marketplace-token:
  *             type: string
+ *             description: GCP marketplace JWT
  *     responses:
  *       301:
  *         description: Account

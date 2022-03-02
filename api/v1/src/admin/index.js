@@ -144,7 +144,7 @@ var admin = express.Router();
  *       schema:
  *         type: object
  *         properties:
- *           typeX:
+ *           type:
  *             type: string
  *             description: Syncronize Resources Type
  *             enum:
@@ -154,7 +154,6 @@ var admin = express.Router();
  *               - MARKETPLACE
  *               - STORAGE_BUCKET_PERMISSIONS
  *               - TOPIC_PERMISSIONS
- *             required: true
  *     produces:
  *       - application/json
  *     responses:
