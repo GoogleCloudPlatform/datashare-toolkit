@@ -144,7 +144,7 @@ var admin = express.Router();
  *       schema:
  *         type: object
  *         properties:
- *           type:
+ *           typeX:
  *             type: string
  *             description: Syncronize Resources Type
  *             enum:
@@ -171,6 +171,7 @@ var admin = express.Router();
  *               description: HTTP status code
  *             data:
  *               type: object
+ *               description: Response data
  *       404:
  *         description: Error
  *         schema:
