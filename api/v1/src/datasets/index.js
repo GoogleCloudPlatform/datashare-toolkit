@@ -103,8 +103,10 @@ var datasets = express.Router();
  *           visibleColumns:
  *             type: array
  *             items:
- *               column:
- *                 type: string
+                 type: object
+                 properties:
+ *                 column:
+ *                   type: string
  *           queryFilter:
  *             type: string
  *       custom:
