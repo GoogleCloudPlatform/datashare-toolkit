@@ -819,17 +819,6 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
  *             type: string
  *             description: "Example: gmt=jwt_token"
  */
-
-/*
- *           location:
- *             description: Activate page redirect
- *             schema:
- *               oneOf:
- *                 - type: string
- *                   description: If activation success, will redirect to activation page
- *                 - type: string
- *                   description: If activation fails, will redirect to activation error page
-*/
 accounts.get('/accounts:register', async (req, res) => {
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
     let projectId = req.params.projectId || currentProjectId;
@@ -892,14 +881,6 @@ accounts.get('/accounts:register', async (req, res) => {
  *           Set-Cookie:
  *             type: string
  *             description: "Example: gmt=jwt_token"
- *           location:
- *             description: Activate page redirect
- *             schema:
- *               oneOf:
- *                 - type: string
- *                   description: If activation success, will redirect to activation page
- *                 - type: string
- *                   description: If activation fails, will redirect to activation error page
  */
 /**
  * @swagger
