@@ -552,10 +552,6 @@ accounts.put('/accounts/:accountId', async (req, res) => {
  *             code:
  *               type: integer
  *               description: HTTP status code
- *             data:
- *               type: object
- *               items:
- *                 $ref: '#/definitions/Account'
  *       500:
  *         description: Error
  *         schema:
