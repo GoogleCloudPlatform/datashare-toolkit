@@ -275,17 +275,56 @@ policies.get('/policies', async(req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:
- *                  $ref: '#/definitions/Policy'
+ *                 type: object
+ *                 description: Policy object
+ *                 properties:
+ *                   bigQueryEnabled:
+ *                     type: boolean
+ *                     description: Flag indicating if BigQuery is enabled for the policy
+ *                   pubsubEnabled:
+ *                     type: boolean
+ *                     description: Flag indicating if Pub/Sub is enabled for the policy
+ *                   storageEnabled:
+ *                     type: boolean
+ *                     description: Flag indicating if Cloud Storage is enabled for the policy
+ *                   buckets:
+ *                     type: array
+ *                     description: Policy buckets
+ *                     items:
+ *                       $ref: '#/definitions/Bucket'
+ *                   topics:
+ *                     type: array
+ *                     description: Policy topics
+ *                     items:
+ *                       $ref: '#/definitions/Topic'
+ *                   isTableBased:
+ *                     type: boolean
+ *                     description: Indicates if policy is table-based if not than dataset-based.
+ *                   datasets:
+ *                     type: array
+ *                     description: Policy datasets
+ *                     items:
+ *                       $ref: '#/definitions/PolicyDataset'
+ *                   rowAccessTags:
+ *                     type: array
+ *                     description: Policy row access tags
+ *                     items:
+ *                       $ref: '#/definitions/RowAccessTag'
+ *                   marketplace:
+ *                     $ref: '#/definitions/PolicyMarketplace'
+ *                   status:
+ *                     type: boolean
+ *                     description: Flag indicating if user has activated product
  *       500:
  *         description: Error
  *         schema:
@@ -293,7 +332,7 @@ policies.get('/policies', async(req, res) => {
  */
 policies.get('/products', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
-    const email = res.locals.email
+    const email = res.locals.email || 'mservidio@google.com'
     const data = await dataManager.listUserPolicies(projectId, email);
     var code;
     if (data && data.success === false) {
