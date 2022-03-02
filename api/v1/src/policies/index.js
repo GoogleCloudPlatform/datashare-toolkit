@@ -39,11 +39,11 @@ var policies = express.Router();
  *       rowId:
  *         type: string
  *         readOnly: true
- *         description: Policy Row ID
+ *         description: Policy Row ID, only required for update operations
  *       policyId:
  *         type: string
  *         readOnly: true
- *         description: Policy ID
+ *         description: Policy ID, only required for update operations
  *       name:
  *         type: string
  *         description: Policy display name
@@ -506,6 +506,10 @@ policies.get('/policies/:policyId', async(req, res) => {
  *     tags:
  *       - policies
  *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     - in: path
  *       name: policyId
  *       type: string
@@ -531,10 +535,8 @@ policies.get('/policies/:policyId', async(req, res) => {
  *               type: integer
  *               description: HTTP status code
  *             data:
- *               type: object
- *               items:
- *                 $ref: '#/definitions/Policy'
- *       404:
+ *               $ref: '#/definitions/Policy'
+ *       400:
  *         description: Error
  *         schema:
  *           $ref: '#/definitions/Error'
