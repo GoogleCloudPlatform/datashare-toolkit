@@ -222,6 +222,17 @@ procurements.get('/procurements', async (req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
+ *     - in: body
+ *       name: payload
+ *       schema:
+ *          type: object
+ *          properties:
+ *            name:
+ *              description: Entitlement name to provide action
+ *            status:
+ *              description: New approval status
+ *            reason:
+ *              description: The reason for approval
  *     tags:
  *       - procurements
  *     produces:
