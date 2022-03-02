@@ -38,12 +38,22 @@ var spots = express.Router();
  *     type: object
  *     description: Spot API service config
  *     properties:
- *       bucketName:
- *         type: string
- *         description: Spot API Service Bucket Name
- *       fileName:
- *         type: string
- *         description: Spot API Service Config File Name
+ *       config:
+ *         type: object
+ *         properties:
+ *           bucketName:
+ *             type: string
+ *             description: Spot API Service Bucket Name
+ *           fileName:
+ *             type: string
+ *             description: Spot API Service Config File Name
+ *           destination:
+ *             type: object
+ *             properties:
+ *               projectId:
+ *                 type: string
+ *               datasetId:
+ *                 type: string
  *
  *   SpotOptions:
  *     type: object
