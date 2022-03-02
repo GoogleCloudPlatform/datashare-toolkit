@@ -1244,7 +1244,6 @@ datasets.put('/datasets/:datasetId/views/:viewId', async(req, res) => {
  *       required: true
  *     - in: body
  *       name: view
- *       type: object
  *       required: true
  *       schema:
  *         type: object

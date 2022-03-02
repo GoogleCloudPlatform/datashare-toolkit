@@ -281,7 +281,7 @@ accounts.get('/accounts', async (req, res) => {
  *       201:
  *         description: Account
  *         schema:
- *           $ref: '#definitions/ModifyAccountResponse'
+ *           $ref: '#/definitions/ModifyAccountResponse'
  *       500:
  *         description: Error
  *         schema:
