@@ -874,6 +874,7 @@ accounts.get('/accounts:register', async (req, res) => {
  *       description: The projectId
  *       required: false
  *     - in: body
+ *       name: account
  *       description: Request parameters for register account
  *       schema:
  *         type: object
@@ -931,6 +932,7 @@ accounts.get('/accounts:register', async (req, res) => {
  *       type: string
  *       required: true
  *     - in: body
+ *       name: account
  *       description: Request parameters for Account
  *       schema:
  *         type: object
@@ -998,6 +1000,7 @@ accounts.get('/accounts:register', async (req, res) => {
  *       type: string
  *       required: true
  *     - in: body
+ *       name: account
  *       description: Request parameters for Account
  *       schema:
  *         type: object
@@ -1062,6 +1065,7 @@ accounts.get('/accounts:register', async (req, res) => {
  *       type: string
  *       required: true
  *     - in: body
+ *       name: account
  *       description: Request parameters for Account
  *       schema:
  *         type: object

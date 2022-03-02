@@ -1243,6 +1243,7 @@ datasets.put('/datasets/:datasetId/views/:viewId', async(req, res) => {
  *       type: string
  *       required: true
  *     - in: body
+ *       name: view
  *       type: object
  *       required: true
  *       properties:
