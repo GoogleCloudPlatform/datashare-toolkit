@@ -115,7 +115,24 @@ var accounts = express.Router();
  *         type: array
  *         description: Account policy IDs
  *         items:
- *           $ref: '#/definitions/PolicyID'
+ *           type: object
+ *           description: Policy ID object
+ *           properties:
+ *             policyId:
+ *               type: string
+ *               description: Policy ID
+ *             name:
+ *               type: string
+ *               description: Policy name
+ *             solutionId:
+ *               type: string
+ *               description: Linked marketplace solution Id
+ *             planId:
+ *               type: string
+ *               description: Linked marketplace plan Id
+ *             marketplaceEntitlementActive:
+ *               type: boolean
+ *               description: Indicates if marketplace entitlements are in sync for policy
  *       marketplaceSynced:
  *         type: boolean
  *         description: Indicates if marketplace entitlements are in sync for account
@@ -126,26 +143,7 @@ var accounts = express.Router();
  *       - email
  *       - emailType
  *       - accountType
- * 
- *   PolicyID:
- *     type: object
- *     description: Policy ID object
- *     properties:
- *       policyId:
- *         type: string
- *         description: Policy ID
- *       name:
- *         type: string
- *         description: Policy name
- *       solutionId:
- *         type: string
- *         description: Linked marketplace solution Id
- *       planId:
- *         type: string
- *         description: Linked marketplace plan Id
- *       marketplaceEntitlementActive:
- *         type: boolean
- *         description: Indicates if marketplace entitlements are in sync for policy
+ *
  *
  *   EmailType:
  *     type: string

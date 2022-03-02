@@ -49,45 +49,25 @@ var datasets = express.Router();
  *         type: array
  *         description: Accounts with access to the dataset.
  *         items:
- *           $ref: '#/definitions/Accounts'
+ *           type: object
+ *           description: Table object
+ *           properties:
+ *             email:
+ *               type: string
+ *               description: Email address for the account
+ *             type:
+ *               type: string
+ *               description: The account type
+ *               enum:
+ *                 - userByEmail
+ *                 - groupByEmail
  *       labels:
  *         type: object
  *         properties:
  *           key:
  *             type: string
  *             description: The label
- * 
- *   Accounts:
- *     type: object
- *     description: Table object
- *     properties:
- *       email:
- *         type: string
- *         description: Email address for the account
- *       type:
- *         type: string
- *         description: The account type
- *         enum:
- *           - userByEmail
- *           - groupByEmail
- * 
- *   Table:
- *     type: object
- *     description: Table object
- *     properties:
- *       datasetId:
- *         type: string
- *         description: Dataset ID
- *       tableId:
- *         type: string
- *         description: Table ID
- *       type:
- *         type: string
- *         description: The BigQuery object type
- *         enum:
- *           - TABLE
- *           - VIEW
- * 
+ *
  *   View:
  *     type: object
  *     description: View object
@@ -625,7 +605,21 @@ datasets.delete('/datasets/:datasetId', async(req, res) => {
  *             data:
  *               type: array
  *               items:
- *                  $ref: '#/definitions/Table'
+ *                 type: object
+ *                 description: Table object
+ *                 properties:
+ *                   datasetId:
+ *                     type: string
+ *                     description: Dataset ID
+ *                   tableId:
+ *                     type: string
+ *                     description: Table ID
+ *                   type:
+ *                     type: string
+ *                     description: The BigQuery object type
+ *                     enum:
+ *                       - TABLE
+ *                       - VIEW
  *       500:
  *         description: Error
  *         schema:

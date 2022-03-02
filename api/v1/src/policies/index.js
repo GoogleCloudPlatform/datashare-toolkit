@@ -134,15 +134,12 @@ var policies = express.Router();
  *         type: array
  *         description: Policy dataset table
  *         items:
- *           $ref: '#/definitions/PolicyDatasetTable'
- * 
- *   PolicyDatasetTable:
- *     type: object
- *     description: Policy dataset table object
- *     properties:
- *       tableId:
- *         type: string
- *         description: The BigQuery tableId
+ *           type: object
+ *           description: Policy dataset table object
+ *           properties:
+ *             tableId:
+ *               type: string
+ *               description: The BigQuery tableId
  *  
  *   PolicyMarketplace:
  *     type: object
