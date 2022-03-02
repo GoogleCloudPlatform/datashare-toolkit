@@ -154,7 +154,7 @@ var admin = express.Router();
  *               - MARKETPLACE
  *               - STORAGE_BUCKET_PERMISSIONS
  *               - TOPIC_PERMISSIONS
- *         required: true
+ *             required: true
  *     produces:
  *       - application/json
  *     responses:
