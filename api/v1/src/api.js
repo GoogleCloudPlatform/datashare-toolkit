@@ -142,7 +142,9 @@ const options = {
 };
 
 const swaggerOptions = {
+    // https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/configuration.md
     swaggerOptions: {
+        // defaultModelsExpandDepth: -1,
         operationsSorter: (a, b) => {
             var methodsOrder = ["get", "post", "put", "patch", "delete", "options", "trace"];
             var result = methodsOrder.indexOf(a.get("method")) - methodsOrder.indexOf(b.get("method"));

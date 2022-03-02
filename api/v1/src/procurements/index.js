@@ -31,42 +31,6 @@ var procurements = express.Router();
 /**
  * @swagger
  *
- *
- * definitions:
- *   Procurement:
- *     type: object
- *     description: Procurement object
- *     properties:
- *       rowId:
- *         type: string
- *         readOnly: true
- *         description: Procurement Row ID
- *       eventId:
- *         type: string
- *         readOnly: true
- *         description: Marketplace Pub/Sub message eventId
- *       eventType:
- *         type: string
- *         description: Marketplace Pub/Sub message eventType
- *       acknowledged:
- *         type: boolean
- *         description: Indicates if the event was acknowledged.
- *       createdAt:
- *         type: string
- *         description: Record creation time
- *       accountId:
- *         type: string
- *         description: Billing accountId of the consumer
- *       entitlementId:
- *         type: string
- *         description: Entitlement Id of the purchased SKU
- *     required:
- *       - eventType
- */
-
-/**
- * @swagger
- *
  * /procurements:
  *   options:
  *     summary: CORS support
@@ -106,17 +70,75 @@ var procurements = express.Router();
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:
- *                  $ref: '#/definitions/Procurement'
+ *                 type: object
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                     description: The resource name of the entitlement. Entitlement names have the form providers/{providerId}/entitlements/{entitlement_id}.
+ *                   account:
+ *                     type: string
+ *                     description: The resource name of the account that this entitlement is based on, if any.
+ *                   provider:
+ *                     type: string
+ *                     description: The identifier of the service provider that this entitlement was created against. Each service provider is assigned a unique provider value when they onboard with Cloud Commerce platform.
+ *                   product:
+ *                     type: string
+ *                     description: The identifier of the entity that was purchased. This may actually represent a product, quote, or offer.
+ *                   plan:
+ *                     type: string
+ *                     description: The identifier of the plan that was procured. Required if the product has plans.
+ *                   state:
+ *                     type: string
+ *                     description: The state of the entitlement
+ *                     enum:
+ *                       - ENTITLEMENT_STATE_UNSPECIFIED
+ *                       - ENTITLEMENT_ACTIVATION_REQUESTED
+ *                       - ENTITLEMENT_ACTIVE
+ *                       - ENTITLEMENT_PENDING_CANCELLATION
+ *                       - ENTITLEMENT_CANCELLED
+ *                       - ENTITLEMENT_PENDING_PLAN_CHANGE
+ *                       - ENTITLEMENT_PENDING_PLAN_CHANGE_APPROVAL
+ *                       - ENTITLEMENT_SUSPENDED
+ *                   updateTime:
+ *                     type: string
+ *                     description: The last update timestamp.
+ *                   createTime:
+ *                     type: string
+ *                     description: The creation timestamp.
+ *                   productExternalName:
+ *                     type: string
+ *                     description: The identifier of the product that was procured.
+ *                   policy:
+ *                     type: object
+ *                     properties:
+ *                       policyId:
+ *                         type: string
+ *                         description: The policy Id
+ *                       name:
+ *                         type: string
+ *                         description: The policy name
+ *                       description:
+ *                         type: string
+ *                         description: The policy description
+ *                   activated:
+ *                     type: boolean
+ *                     description: Flag indicating if the user has performed activation
+ *                   email:
+ *                     type: string
+ *                     description: Email address of the activated user
+ *                   accountId:
+ *                     type: string
+ *                     description: Billing accountId of the consumer
  *       500:
  *         description: Error
  *         schema:
@@ -173,6 +195,17 @@ procurements.get('/procurements', async (req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
+ *     - in: body
+ *       name: payload
+ *       schema:
+ *          type: object
+ *          properties:
+ *            name:
+ *              description: Entitlement name to provide action
+ *            status:
+ *              description: New approval status
+ *            reason:
+ *              description: Free form text string explaining the approval reason
  *     tags:
  *       - procurements
  *     produces:

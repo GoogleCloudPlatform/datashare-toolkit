@@ -31,30 +31,7 @@ var admin = express.Router();
  *
  *
  * definitions:
- *   SyncronizeResourcesType:
- *     type: string
- *     description: Syncronize Resources Type
- *     enum:
- *       - PERMISSIONS
- *       - VIEWS
- *       - ALL
- *
- *   SyncronizeResourcesRequest:
- *     type: object
- *     description: Syncronize Resources Request object
- *     properties:
- *       type:
- *         $ref: '#/definitions/SyncronizeResourcesType'
- *
- *   ApplicationUserResource:
- *     type: object
- *     description: User Resource object
- *     properties:
- *       projectId:
- *         type: string
- *         readOnly: true
- *         description: Project ID
- *
+
  *   Error:
  *     type: object
  *     description: Error object
@@ -122,10 +99,6 @@ var admin = express.Router();
  *               description: HTTP status code
  *             data:
  *               type: object
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
@@ -169,8 +142,18 @@ var admin = express.Router();
  *       name: syncronize_resources
  *       description: Request parameters for Syncronize Resources
  *       schema:
- *         $ref: '#/definitions/SyncronizeResourcesRequest'
- *       required: true
+ *         type: object
+ *         properties:
+ *           type:
+ *             type: string
+ *             description: Syncronize Resources Type
+ *             enum:
+ *               - ALL
+ *               - BIGQUERY_PERMISSIONS
+ *               - BIGQUERY_VIEWS
+ *               - MARKETPLACE
+ *               - STORAGE_BUCKET_PERMISSIONS
+ *               - TOPIC_PERMISSIONS
  *     produces:
  *       - application/json
  *     responses:
@@ -187,6 +170,7 @@ var admin = express.Router();
  *               description: HTTP status code
  *             data:
  *               type: object
+ *               description: Response data
  *       404:
  *         description: Error
  *         schema:
@@ -282,18 +266,46 @@ admin.post('/admin::custom', async (req, res) => {
  *             success:
  *               type: boolean
  *               description: Success of the request
- *             code:
- *               type: integer
- *               default: 200
- *               description: HTTP status code
  *             data:
- *               $ref: '#/definitions/ApplicationUserResource'
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 description: User Resource object
+ *                 properties:
+ *                   uid:
+ *                     type: string
+ *                     description: IDP uid
+ *                   displayName:
+ *                     type: string
+ *                     description: User display name
+ *                   email:
+ *                     type: string
+ *                     description: User email address
+ *                   emailVerified:
+ *                     type: boolean
+ *                     description: Flag indicating if email address is verified
+ *                   disabled:
+ *                     type: boolean
+ *                     description: Flag indicating if account is disabled
+ *                   photoURL:
+ *                     type: string
+ *                     description: Photo URL for the account
+ *                   customClaims:
+ *                      type: object
+ *                      properties:
+ *                        role:
+ *                          type: string
+ *                   lastSignInTime:
+ *                     type: string
+ *                     description: Last sign in time for the account
+ *                   creationTime:
+ *                     type: string
+ *                     description: Creation time for the account
  *       500:
  *         description: Error
  *         schema:
  *           $ref: '#/definitions/Error'
  */
-
 admin.get('/admin/applicationUsers', async (req, res) => {
     try {
         const code = 200;

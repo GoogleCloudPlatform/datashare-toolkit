@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2021-2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,24 +25,6 @@ const dataManager = require("./dataManager");
 // Define the routes for the REST API
 var router = express.Router();
 // methods that require multiple routes
-
-/**
- * @swagger
- *
- *
- * definitions:
- *   PubSubTopic:
- *     type: object
- *     description: PubSub Topic object
- *     properties:
- *       topicId:
- *         type: string
- *         description: Topic ID
- *       topicName:
- *         type: string
- *         description: Topic Name
- *
- */
 
 /**
  * @swagger
@@ -86,17 +68,25 @@ var router = express.Router();
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
- *               type: object
+ *               type: array
  *               items:
- *                  $ref: '#/definitions/PubSubTopic'
+ *                 type: object
+ *                 description: PubSub Topic object
+ *                 properties:
+ *                   topicName:
+ *                     type: string
+ *                     description: Topic Name
+ *                   topicId:
+ *                     type: string
+ *                     description: Topic ID
  *       500:
  *         description: Error
  *         schema:
@@ -158,8 +148,14 @@ router.get('/pubsub/topics', async (req, res) => {
  *               description: HTTP status code
  *             data:
  *               type: object
- *               items:
- *                  $ref: '#/definitions/PubSubTopic'
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                   description: PubSub Topic Name
+ *       400:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
@@ -248,10 +244,6 @@ router.post('/pubsub/topics', async(req, res) => {
  *               type: integer
  *               default: 200
  *               description: HTTP status code
- *             data:
- *               type: object
- *               items:
- *                  $ref: '#/definitions/PubSubTopic'
  *       500:
  *         description: Error
  *         schema:

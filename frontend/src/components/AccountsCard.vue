@@ -413,7 +413,6 @@ export default {
     resetAccount() {
       this.$store
         .dispatch('submitProcurementAccountReset', {
-          projectId: this.config.projectId,
           accountId: this.selectedItem.accountId
         })
         .then(result => {
@@ -443,7 +442,6 @@ export default {
     syncMarketplace() {
       this.$store
         .dispatch('syncMarketplaceEntitlements', {
-          projectId: this.config.projectId,
           accountId: this.selectedItem.accountId
         })
         .then(result => {

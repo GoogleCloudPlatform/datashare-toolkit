@@ -36,35 +36,66 @@ var policies = express.Router();
  *     type: object
  *     description: Policy object
  *     properties:
- *       policyId:
- *         type: string
- *         readOnly: true
- *         description: Policy ID
  *       rowId:
  *         type: string
  *         readOnly: true
- *         description: Policy Row ID
+ *         description: Policy Row ID, only required for update operations
+ *       policyId:
+ *         type: string
+ *         readOnly: true
+ *         description: Policy ID, only required for update operations
  *       name:
  *         type: string
  *         description: Policy display name
  *       description:
  *         type: string
  *         description: Policy decsription
- *       createdBy:
- *         type: string
- *         description: Policy created by email
+ *       bigQueryEnabled:
+ *         type: boolean
+ *         description: Flag indicating if BigQuery is enabled for the policy
+ *       pubsubEnabled:
+ *         type: boolean
+ *         description: Flag indicating if Pub/Sub is enabled for the policy
+ *       storageEnabled:
+ *         type: boolean
+ *         description: Flag indicating if Cloud Storage is enabled for the policy
+ *       buckets:
+ *         type: array
+ *         description: Policy buckets
+ *         items:
+ *           $ref: '#/definitions/Bucket'
+ *       topics:
+ *         type: array
+ *         description: Policy topics
+ *         items:
+ *           $ref: '#/definitions/Topic'
+ *       isTableBased:
+ *         type: boolean
+ *         description: Indicates if policy is table-based if not than dataset-based.
  *       datasets:
  *         type: array
  *         description: Policy datasets
  *         items:
- *           $ref: '#/definitions/Dataset'
+ *           $ref: '#/definitions/PolicyDataset'
  *       rowAccessTags:
  *         type: array
  *         description: Policy row access tags
  *         items:
  *           $ref: '#/definitions/RowAccessTag'
  *       marketplace:
- *         $ref: '#/definitions/Marketplace'
+ *         $ref: '#/definitions/PolicyMarketplace'
+ *       createdBy:
+ *         type: string
+ *         description: Policy created by email
+ *       createdAt:
+ *         type: integer
+ *         description: Policy created at time
+ *       version:
+ *         type: integer
+ *         description: Policy version
+ *       isDeleted:
+ *         type: boolean
+ *         description: Flag indicating if policy was deleted
  *     required:
  *       - name
  *
@@ -76,7 +107,41 @@ var policies = express.Router();
  *         type: string
  *         description: Row Access Tag
  *
- *   Marketplace2:
+ *   Bucket:
+ *     type: object
+ *     description: Policy bucket object
+ *     properties:
+ *       bucketName:
+ *         type: string
+ *         description: The Cloud Storage bucket name
+ *
+ *   Topic:
+ *     type: object
+ *     description: Policy topic object
+ *     properties:
+ *       topicId:
+ *         type: string
+ *         description: The Pub/Sub topic name
+ * 
+ *   PolicyDataset:
+ *     type: object
+ *     description: Policy dataset object
+ *     properties:
+ *       datasetId:
+ *         type: string
+ *         description: The dataset Id
+ *       tables:
+ *         type: array
+ *         description: Policy dataset table
+ *         items:
+ *           type: object
+ *           description: Policy dataset table object
+ *           properties:
+ *             tableId:
+ *               type: string
+ *               description: The BigQuery tableId
+ *  
+ *   PolicyMarketplace:
  *     type: object
  *     description: Marketplace object
  *     properties:
@@ -207,17 +272,56 @@ policies.get('/policies', async(req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:
- *                  $ref: '#/definitions/Policy'
+ *                 type: object
+ *                 description: Policy object
+ *                 properties:
+ *                   bigQueryEnabled:
+ *                     type: boolean
+ *                     description: Flag indicating if BigQuery is enabled for the policy
+ *                   pubsubEnabled:
+ *                     type: boolean
+ *                     description: Flag indicating if Pub/Sub is enabled for the policy
+ *                   storageEnabled:
+ *                     type: boolean
+ *                     description: Flag indicating if Cloud Storage is enabled for the policy
+ *                   buckets:
+ *                     type: array
+ *                     description: Policy buckets
+ *                     items:
+ *                       $ref: '#/definitions/Bucket'
+ *                   topics:
+ *                     type: array
+ *                     description: Policy topics
+ *                     items:
+ *                       $ref: '#/definitions/Topic'
+ *                   isTableBased:
+ *                     type: boolean
+ *                     description: Indicates if policy is table-based if not than dataset-based.
+ *                   datasets:
+ *                     type: array
+ *                     description: Policy datasets
+ *                     items:
+ *                       $ref: '#/definitions/PolicyDataset'
+ *                   rowAccessTags:
+ *                     type: array
+ *                     description: Policy row access tags
+ *                     items:
+ *                       $ref: '#/definitions/RowAccessTag'
+ *                   marketplace:
+ *                     $ref: '#/definitions/PolicyMarketplace'
+ *                   status:
+ *                     type: boolean
+ *                     description: Flag indicating if user has activated product
  *       500:
  *         description: Error
  *         schema:
@@ -225,7 +329,7 @@ policies.get('/policies', async(req, res) => {
  */
 policies.get('/products', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
-    const email = res.locals.email
+    const email = res.locals.email;
     const data = await dataManager.listUserPolicies(projectId, email);
     var code;
     if (data && data.success === false) {
@@ -405,9 +509,7 @@ policies.post('/policies', async(req, res) => {
  *               default: 200
  *               description: HTTP status code
  *             data:
- *               type: object
- *               items:
- *                  $ref: '#/definitions/Policy'
+ *               $ref: '#/definitions/Policy'
  *       500:
  *         description: Error
  *         schema:
@@ -440,6 +542,10 @@ policies.get('/policies/:policyId', async(req, res) => {
  *     tags:
  *       - policies
  *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     - in: path
  *       name: policyId
  *       type: string
@@ -465,10 +571,8 @@ policies.get('/policies/:policyId', async(req, res) => {
  *               type: integer
  *               description: HTTP status code
  *             data:
- *               type: object
- *               items:
- *                 $ref: '#/definitions/Policy'
- *       404:
+ *               $ref: '#/definitions/Policy'
+ *       400:
  *         description: Error
  *         schema:
  *           $ref: '#/definitions/Error'
@@ -548,20 +652,23 @@ policies.put('/policies/:policyId', async(req, res) => {
  *     tags:
  *       - policies
  *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     - in: path
  *       name: policyId
  *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
- *     - in: header
- *       name: x-gcp-project-id
- *       type: string
- *       required: true
  *     - in: body
  *       name: policy
  *       description: Request parameters for Policy
  *       schema:
- *         $ref: '#/definitions/Policy'
+ *          type: object
+ *          properties:
+ *            rowId:
+ *              description: The rowId for the current policy
  *     produces:
  *       - application/json
  *     responses:
@@ -580,10 +687,6 @@ policies.put('/policies/:policyId', async(req, res) => {
  *               type: object
  *               items:
  *                 $ref: '#/definitions/Policy'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
@@ -645,15 +748,15 @@ policies.delete('/policies/:policyId', async(req, res) => {
  *     tags:
  *       - accounts
  *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     - in: path
  *       name: accountId
  *       type: string
  *       required: true
  *       description: Account Id of the Policy request
- *     - in: header
- *       name: x-gcp-project-id
- *       type: string
- *       required: true
  *     produces:
  *       - application/json
  *     responses:
@@ -662,13 +765,13 @@ policies.delete('/policies/:policyId', async(req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:

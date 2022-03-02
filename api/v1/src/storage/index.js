@@ -29,24 +29,6 @@ var router = express.Router();
 /**
  * @swagger
  *
- *
- * definitions:
- *   StorageBucket:
- *     type: object
- *     description: Storage Bucket object
- *     properties:
- *       bucketId:
- *         type: string
- *         description: Bucket ID
- *       bucketName:
- *         type: string
- *         description: Bucket Name
- *
- */
-
-/**
- * @swagger
- *
  * /storage/buckets:
  *   options:
  *     summary: CORS support
@@ -94,9 +76,17 @@ var router = express.Router();
  *               default: 200
  *               description: HTTP status code
  *             data:
- *               type: object
+ *               type: array
  *               items:
- *                  $ref: '#/definitions/StorageBucket'
+ *                 type: object
+ *                 description: Storage Bucket object
+ *                 properties:
+ *                   bucketName:
+ *                     type: string
+ *                     description: Bucket Name
+ *                   modifiedAt:
+ *                     type: string
+ *                     description: Modification time
  *       500:
  *         description: Error
  *         schema:
@@ -149,17 +139,23 @@ router.get('/storage/buckets', async (req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: object
- *               items:
- *                  $ref: '#/definitions/StorageBucket'
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                   description: The bucket name
+ *       400:
+ *         description: Error
+ *         schema:
+ *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
@@ -225,15 +221,15 @@ router.post('/storage/buckets', async(req, res) => {
  *     tags:
  *       - storage
  *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     - in: path
  *       name: name
  *       type: string
  *       required: true
  *       description: Storage Bucket Name of the request
- *     - in: header
- *       name: x-gcp-project-id
- *       type: string
- *       required: true
  *     produces:
  *       - application/json
  *     responses:
@@ -249,10 +245,6 @@ router.post('/storage/buckets', async(req, res) => {
  *               type: integer
  *               default: 200
  *               description: HTTP status code
- *             data:
- *               type: object
- *               items:
- *                  $ref: '#/definitions/StorageBucket'
  *       500:
  *         description: Error
  *         schema:

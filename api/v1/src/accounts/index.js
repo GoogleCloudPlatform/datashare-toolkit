@@ -38,6 +38,46 @@ var accounts = express.Router();
  *
  *
  * definitions:
+ *   ModifyAccountResponse:
+ *     type: object
+ *     description: Account object
+ *     properties:
+ *       email:
+ *         type: string
+ *         description: Account email address
+ *       emailType:
+ *         $ref: '#/definitions/EmailType'
+ *       accountType:
+ *         $ref: '#/definitions/AccountType'
+ *       createdBy:
+ *         type: string
+ *         description: Account created by email
+ *       policies:
+ *         type: array
+ *         description: Account policy IDs
+ *         items:
+ *           type: object
+ *           properties:
+ *             policyId:
+ *               type: string
+ *               description: Policy ID
+ *       marketplace:
+ *         $ref: '#/definitions/Marketplace'
+ *       rowId:
+ *         type: string
+ *         readOnly: true
+ *         description: Account Row ID
+ *       accountId:
+ *         type: string
+ *         readOnly: true
+ *         description: Account ID
+ *       isDeleted:
+ *         type: boolean
+ *         description: Flag indicating deletion status
+ *       createdAt:
+ *         type: integer
+ *         description: Created at time
+ * 
  *   Account:
  *     type: object
  *     description: Account object
@@ -75,7 +115,24 @@ var accounts = express.Router();
  *         type: array
  *         description: Account policy IDs
  *         items:
- *           $ref: '#/definitions/PolicyID'
+ *           type: object
+ *           description: Policy ID object
+ *           properties:
+ *             policyId:
+ *               type: string
+ *               description: Policy ID
+ *             name:
+ *               type: string
+ *               description: Policy name
+ *             solutionId:
+ *               type: string
+ *               description: Linked marketplace solution Id
+ *             planId:
+ *               type: string
+ *               description: Linked marketplace plan Id
+ *             marketplaceEntitlementActive:
+ *               type: boolean
+ *               description: Indicates if marketplace entitlements are in sync for policy
  *       marketplaceSynced:
  *         type: boolean
  *         description: Indicates if marketplace entitlements are in sync for account
@@ -87,25 +144,6 @@ var accounts = express.Router();
  *       - emailType
  *       - accountType
  *
- *   PolicyID:
- *     type: object
- *     description: Policy ID object
- *     properties:
- *       policyId:
- *         type: string
- *         description: Policy ID
- *       name:
- *         type: string
- *         description: Policy name
- *       solutionId:
- *         type: string
- *         description: Linked marketplace solution Id
- *       planId:
- *         type: string
- *         description: Linked marketplace plan Id
- *       marketplaceEntitlementActive:
- *         type: boolean
- *         description: Indicates if marketplace entitlements are in sync for policy
  *
  *   EmailType:
  *     type: string
@@ -128,7 +166,7 @@ var accounts = express.Router();
  *     properties:
  *       accountName:
  *         type: string
- *         description: The associated marketplace account name.
+ *         description: The associated marketplace account name
  */
 
 /**
@@ -224,27 +262,26 @@ accounts.get('/accounts', async (req, res) => {
  *       name: account
  *       description: Request parameters for Account
  *       schema:
- *         $ref: '#/definitions/Account'
+ *         type: object
+ *         description: Account object
+ *         properties:
+ *           email:
+ *             type: string
+ *             description: Account email address
+ *           emailType:
+ *             $ref: '#/definitions/EmailType'
+ *           policies:
+ *             type: array
+ *             items:
+ *               type: string
+ *               description: Policy Id
+ *           marketplace:
+ *             $ref: '#/definitions/Marketplace'
  *     responses:
  *       201:
  *         description: Account
  *         schema:
- *           type: object
- *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
- *             code:
- *               type: integer
- *               description: HTTP status code
- *             data:
- *               type: object
- *               items:
- *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
+ *           $ref: '#/definitions/ModifyAccountResponse'
  *       500:
  *         description: Error
  *         schema:
@@ -323,6 +360,10 @@ accounts.post('/accounts', async (req, res) => {
  *     tags:
  *       - accounts
  *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     - in: path
  *       name: accountId
  *       type: string
@@ -336,18 +377,16 @@ accounts.post('/accounts', async (req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
- *               type: object
- *               items:
- *                  $ref: '#/definitions/Account'
- *       500:
+ *               $ref: '#/definitions/Account'
+ *       404:
  *         description: Error
  *         schema:
  *           $ref: '#/definitions/Error'
@@ -394,7 +433,24 @@ accounts.get('/accounts/:accountId', async (req, res) => {
  *       name: account
  *       description: Request parameters for Account
  *       schema:
- *         $ref: '#/definitions/Account'
+ *         type: object
+ *         description: Account object
+ *         properties:
+ *           rowId:
+ *             type: string
+ *             description: The rowId of the modified account
+ *           email:
+ *             type: string
+ *             description: Account email address
+ *           emailType:
+ *             $ref: '#/definitions/EmailType'
+ *           policies:
+ *             type: array
+ *             items:
+ *               type: string
+ *               description: Policy Id
+ *           marketplace:
+ *             $ref: '#/definitions/Marketplace'
  *     produces:
  *       - application/json
  *     responses:
@@ -403,20 +459,14 @@ accounts.get('/accounts/:accountId', async (req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
- *               type: object
- *               items:
- *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
+ *               $ref: '#/definitions/ModifyAccountResponse'
  *       500:
  *         description: Error
  *         schema:
@@ -483,9 +533,13 @@ accounts.put('/accounts/:accountId', async (req, res) => {
  *       required: true
  *     - in: body
  *       name: account
- *       description: Request parameters for Account
+ *       description: Request parameters for Account deletion
  *       schema:
- *         $ref: '#/definitions/Account'
+ *         type: object
+ *         properties:
+ *           rowId:
+ *             type: string
+ *             description: The rowId of the account to delete
  *     produces:
  *       - application/json
  *     responses:
@@ -500,14 +554,6 @@ accounts.put('/accounts/:accountId', async (req, res) => {
  *             code:
  *               type: integer
  *               description: HTTP status code
- *             data:
- *               type: object
- *               items:
- *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
@@ -574,6 +620,10 @@ accounts.delete('/accounts/:accountId', async (req, res) => {
  *       type: string
  *       required: true
  *       description: Policy Id of the Policy request
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
  *     produces:
  *       - application/json
  *     responses:
@@ -582,17 +632,36 @@ accounts.delete('/accounts/:accountId', async (req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:
- *                  $ref: '#/definitions/Account'
+ *                 type: object
+ *                 description: Account object
+ *                 properties:
+ *                   email:
+ *                     type: string
+ *                     description: Account email address
+ *                   emailType:
+ *                     $ref: '#/definitions/EmailType'
+ *                   marketplace:
+ *                     $ref: '#/definitions/Marketplace'
+ *                   marketplaceSynced:
+ *                     type: boolean
+ *                     description: Indicates if marketplace entitlements are in sync for account
+ *                   marketplaceActivated:
+ *                     type: boolean
+ *                     description: Indicates if account is linked and activated in marketplace
+ *                 required:
+ *                   - email
+ *                   - emailType
+ *                   - accountType
  *       500:
  *         description: Error
  *         schema:
@@ -667,13 +736,13 @@ accounts.get('/policies/:policyId/accounts', async (req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:
@@ -734,35 +803,26 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *     - in: body
- *       name: account
- *       description: Request parameters for Account
- *       schema:
- *         $ref: '#/definitions/Account'
+ *     - in: query
+ *       name: projectId
+ *       type: string
+ *       description: The projectId
+ *       required: false
+ *     - in: query
+ *       name: x-gcp-marketplace-token
+ *       type: string
+ *       description: JWT token provided by marketplace    
+ *       required: true
  *     responses:
- *       201:
+ *       301:
  *         description: Account
- *         schema:
- *           type: object
- *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
- *             code:
- *               type: integer
- *               description: HTTP status code
- *             data:
- *               type: object
- *               items:
- *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
- *       500:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
+ *         headers:
+ *           Set-Cookie:
+ *             type: string
+ *             description: "Example: gmt=jwt_token"
+ *           location:
+ *             type: string
+ *             description: If activation success, will redirect to activation page. If activation fails, will redirect to activation error page.
  */
 accounts.get('/accounts:register', async (req, res) => {
     const currentProjectId = await runtimeConfig.getCurrentProjectId();
@@ -807,35 +867,30 @@ accounts.get('/accounts:register', async (req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
+ *     - in: query
+ *       name: projectId
+ *       type: string
+ *       description: The projectId
+ *       required: false
  *     - in: body
  *       name: account
- *       description: Request parameters for Account
+ *       description: Request parameters for register account
  *       schema:
- *         $ref: '#/definitions/Account'
+ *         type: object
+ *         properties:
+ *           x-gcp-marketplace-token:
+ *             type: string
+ *             description: GCP marketplace JWT
  *     responses:
- *       201:
+ *       301:
  *         description: Account
- *         schema:
- *           type: object
- *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
- *             code:
- *               type: integer
- *               description: HTTP status code
- *             data:
- *               type: object
- *               items:
- *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
- *       500:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
+ *         headers:
+ *           Set-Cookie:
+ *             type: string
+ *             description: "Example: gmt=jwt_token"
+ *           location:
+ *             type: string
+ *             description: If activation success, will redirect to activation page. If activation fails, will redirect to activation error page.
  */
 /**
  * @swagger
@@ -875,9 +930,17 @@ accounts.get('/accounts:register', async (req, res) => {
  *       name: account
  *       description: Request parameters for Account
  *       schema:
- *         $ref: '#/definitions/Account'
+ *         type: object
+ *         description: Account object
+ *         properties:
+ *           email:
+ *             type: string
+ *             description: Email account for approval
+ *           reason:
+ *             type: string
+ *             description: Procurement approval reason
  *     responses:
- *       201:
+ *       200:
  *         description: Account
  *         schema:
  *           type: object
@@ -892,10 +955,6 @@ accounts.get('/accounts:register', async (req, res) => {
  *               type: object
  *               items:
  *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
@@ -939,9 +998,14 @@ accounts.get('/accounts:register', async (req, res) => {
  *       name: account
  *       description: Request parameters for Account
  *       schema:
- *         $ref: '#/definitions/Account'
+ *         type: object
+ *         description: Account object
+ *         properties:
+ *           accountId:
+ *             type: string
+ *             description: The datashare accountId
  *     responses:
- *       201:
+ *       200:
  *         description: Account
  *         schema:
  *           type: object
@@ -956,10 +1020,6 @@ accounts.get('/accounts:register', async (req, res) => {
  *               type: object
  *               items:
  *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
@@ -1003,9 +1063,14 @@ accounts.get('/accounts:register', async (req, res) => {
  *       name: account
  *       description: Request parameters for Account
  *       schema:
- *         $ref: '#/definitions/Account'
+ *         type: object
+ *         description: Account object
+ *         properties:
+ *           accountId:
+ *             type: string
+ *             description: The datashare accountId
  *     responses:
- *       201:
+ *       200:
  *         description: Account
  *         schema:
  *           type: object
@@ -1016,14 +1081,6 @@ accounts.get('/accounts:register', async (req, res) => {
  *             code:
  *               type: integer
  *               description: HTTP status code
- *             data:
- *               type: object
- *               items:
- *                 $ref: '#/definitions/Account'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:

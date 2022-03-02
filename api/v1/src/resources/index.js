@@ -30,38 +30,6 @@ var resources = express.Router();
 /**
  * @swagger
  *
- * definitions:
- *   ProjectResource:
- *     type: object
- *     description: Project Resource object
- *     properties:
- *       projectId:
- *         type: string
- *         readOnly: true
- *         description: Project ID
- *
- *   ConfigurationResource:
- *     type: object
- *     description: Configuration Resource object
- *     properties:
- *       projectId:
- *         type: string
- *         readOnly: true
- *         description: Project ID
- *
- *   DashboardResource:
- *     type: object
- *     description: Dashboard Resource object
- *     properties:
- *       projectId:
- *         type: string
- *         readOnly: true
- *         description: Project ID
- */
-
-/**
- * @swagger
- *
  * /resources/dashboard:
  *   options:
  *     summary: CORS support
@@ -104,18 +72,25 @@ var resources = express.Router();
  *             success:
  *               type: boolean
  *               description: Success of the request
- *             code:
- *               type: integer
- *               default: 200
- *               description: HTTP status code
  *             data:
  *               type: object
  *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 projects:
- *                   $ref: '#/definitions/DashboardResource'
+ *                 datasets:
+ *                   type: integer
+ *                 views:
+ *                   type: integer
+ *                 topics:
+ *                   type: integer
+ *                 buckets:
+ *                   type: integer
+ *                 accounts:
+ *                   type: integer
+ *                 policies:
+ *                   type: integer
+ *                 procurements:
+ *                   type: integer
+ *                 myProducts:
+ *                   type: integer
  *       500:
  *         description: Error
  *         schema:
@@ -190,18 +165,11 @@ var resources = express.Router();
  *             success:
  *               type: boolean
  *               description: Success of the request
- *             code:
- *               type: integer
- *               default: 200
- *               description: HTTP status code
- *             data:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 projects:
- *                   $ref: '#/definitions/ProjectResource'
+ *             projects:
+ *               type: array
+ *               description: List of projectId available to be managed by console
+ *               items:
+ *                 type: string
  *       500:
  *         description: Error
  *         schema:
@@ -274,12 +242,24 @@ resources.get('/resources/projects', async (req, res) => {
  *             success:
  *               type: boolean
  *               description: Success of the request
- *             code:
- *               type: integer
- *               default: 200
- *               description: HTTP status code
- *             data:
- *               $ref: '#/definitions/ConfigurationResource'
+ *             configuration:
+ *               type: object
+ *               properties:
+ *                 apiProjectId:
+ *                   type: string
+ *                   description: The projectId for the api service
+ *                 projectId:
+ *                   type: string
+ *                   description: The selected projectId
+ *                 isMarketplaceEnabled:
+ *                   type: boolean
+ *                   description: Flag indicating if marketplace integration is enabled
+ *                 labels:
+ *                   type: object
+ *                   description: UI replacement labels
+ *                   properties:
+ *                     key:
+ *                       type: string
  *       500:
  *         description: Error
  *         schema:

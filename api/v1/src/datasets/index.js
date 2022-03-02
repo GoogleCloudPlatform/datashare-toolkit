@@ -49,44 +49,106 @@ var datasets = express.Router();
  *         type: array
  *         description: Accounts with access to the dataset.
  *         items:
- *           $ref: '#/definitions/Accounts'
+ *           type: object
+ *           description: Table object
+ *           properties:
+ *             email:
+ *               type: string
+ *               description: Email address for the account
+ *             type:
+ *               type: string
+ *               description: The account type
+ *               enum:
+ *                 - userByEmail
+ *                 - groupByEmail
  *       labels:
  *         type: object
  *         properties:
  *           key:
  *             type: string
- *             description: The label.
- *   Accounts:
- *     type: object
- *     description: Table object
- *     properties:
- *       email:
- *         type: string
- *         description: Email address for the account
- *       type:
- *         type: string
- *         description: The account type
- *   Table:
- *     type: object
- *     description: Table object
- *     properties:
- *       datasetId:
- *         type: string
- *         description: Dataset ID
- *   Column:
- *     type: object
- *     description: Column object
- *     properties:
- *       datasetId:
- *         type: string
- *         description: Dataset ID
+ *             description: The label
+ *
  *   View:
  *     type: object
  *     description: View object
  *     properties:
+ *       rowId:
+ *         type: string
+ *         description: The view rowId. Provided only when modifying existing views.
+ *       authorizedViewId:
+ *         type: string
+ *         description: The authorized view Id
+ *       name:
+ *         type: string
+ *         description: The view name
+ *       description:
+ *         type: string
+ *         description: The view description
  *       datasetId:
  *         type: string
  *         description: Dataset ID
+ *       source:
+ *         type: object
+ *         properties:
+ *           datasetId:
+ *             type: string
+ *           tableId:
+ *             type: string
+ *           publicAccess:
+ *             type: object
+ *             properties:
+ *               enabled:
+ *                 type: boolean
+ *                 description: Flag indicating if public access is enabled
+ *           visibleColumns:
+ *             type: array
+ *             items:
+ *               type: object
+ *               properties:
+ *                 column:
+ *                   type: string
+ *           queryFilter:
+ *             type: string
+ *       custom:
+ *         type: object
+ *         properties:
+ *           query:
+ *             type: string
+ *             description: The custom query string
+ *           authorizeFromDatasetIds:
+ *             type: array
+ *             items:
+ *               type: object
+ *               properties:
+ *                 datasetId:
+ *                   type: string
+ *       accessControl:
+ *         type: object
+ *         properties:
+ *           enabled:
+ *             type: boolean
+ *             description: Flag indicating if access control is enabled
+ *           labelColumn:
+ *             type: string
+ *             description: The column to use for row access tag filtering
+ *           labelColumnDelimiter:
+ *             type: string
+ *             description: Delimiter to use for splitting labels if multiple existing in the label column
+ *       expiration:
+ *         type: object
+ *         properties:
+ *           enabled:
+ *             type: boolean
+ *             description: Flag indicating if expiration is enabled
+ *       createdBy:
+ *         type: string
+ *         description: Created by user
+ *       createdAt:
+ *         type: integer
+ *         description: Created at time
+ *       version:
+ *         type: integer
+ *         description: The view version
  *
  */
 
@@ -181,11 +243,24 @@ datasets.get('/datasets', async(req, res) => {
  *     tags:
  *       - datasets
  *     parameters:
+ *     - in: header
+ *       name: x-gcp-project-id
+ *       type: string
+ *       required: true
+ *       description: The GCP projectId of the target project.
  *     - in: body
  *       name: dataset
  *       description: Request parameters for Dataset
  *       schema:
- *         $ref: '#/definitions/Dataset'
+ *         type: object
+ *         description: Dataset object
+ *         properties:
+ *           datasetId:
+ *             type: string
+ *             description: The BigQuery datasetId.
+ *           description:
+ *             type: string
+ *             description: Description of the dataset.
  *     produces:
  *       - application/json
  *     responses:
@@ -194,16 +269,18 @@ datasets.get('/datasets', async(req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: object
- *               items:
- *                 $ref: '#/definitions/Dataset'
+ *               properties:
+ *                 metadata:
+ *                   type: object
+ *                   description: BigQuery metadata for object
  *       404:
  *         description: Error
  *         schema:
@@ -262,7 +339,15 @@ datasets.post('/datasets', async(req, res) => {
  *       name: dataset
  *       description: Request parameters for Dataset
  *       schema:
- *         $ref: '#/definitions/Dataset'
+ *         type: object
+ *         description: Dataset object
+ *         properties:
+ *           datasetId:
+ *             type: string
+ *             description: The BigQuery datasetId.
+ *           description:
+ *             type: string
+ *             description: Description of the dataset.
  *     produces:
  *       - application/json
  *     responses:
@@ -281,10 +366,6 @@ datasets.post('/datasets', async(req, res) => {
  *               type: object
  *               items:
  *                 $ref: '#/definitions/Dataset'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
@@ -339,7 +420,7 @@ datasets.put('/datasets/:datasetId', async(req, res) => {
  *             type: "string"
  *   get:
  *     summary: Get Dataset based off datasetId
- *     description: Returns the Datset response
+ *     description: Returns the Dataset response
  *     operationId: getDatasetByDatasetId
  *     tags:
  *       - datasets
@@ -361,22 +442,32 @@ datasets.put('/datasets/:datasetId', async(req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: object
- *               items:
- *                  $ref: '#/definitions/Dataset'
+ *               description: Dataset object
+ *               properties:
+ *                 datasetId:
+ *                   type: string
+ *                   description: The BigQuery datasetId.
+ *                 description:
+ *                   type: string
+ *                   description: Description of the dataset.
+ *                 modifiedAt:
+ *                   type: integer
+ *                   description: The last modified timestamp.
  *       500:
  *         description: Error
  *         schema:
  *           $ref: '#/definitions/Error'
  */
+// TODO: Clean up, not used by front-end.
 datasets.get('/datasets/:datasetId', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
     const datasetId = req.params.datasetId;
@@ -413,11 +504,6 @@ datasets.get('/datasets/:datasetId', async(req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
- *     - in: body
- *       name: dataset
- *       description: Request parameters for Dataset
- *       schema:
- *         $ref: '#/definitions/Dataset'
  *     produces:
  *       - application/json
  *     responses:
@@ -436,10 +522,6 @@ datasets.get('/datasets/:datasetId', async(req, res) => {
  *               type: object
  *               items:
  *                 $ref: '#/definitions/Dataset'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
@@ -515,17 +597,31 @@ datasets.delete('/datasets/:datasetId', async(req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
- *               type: object
+ *               type: array
  *               items:
- *                  $ref: '#/definitions/Table'
+ *                 type: object
+ *                 description: Table object
+ *                 properties:
+ *                   datasetId:
+ *                     type: string
+ *                     description: Dataset ID
+ *                   tableId:
+ *                     type: string
+ *                     description: Table ID
+ *                   type:
+ *                     type: string
+ *                     description: The BigQuery object type
+ *                     enum:
+ *                       - TABLE
+ *                       - VIEW
  *       500:
  *         description: Error
  *         schema:
@@ -610,17 +706,19 @@ datasets.get('/datasets/:datasetId/tables', async(req, res) => {
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
- *               type: object
+ *               type: array
  *               items:
- *                  $ref: '#/definitions/Table'
+ *                 type: string
+ *                 description: The column name
+ *                   
  *       500:
  *         description: Error
  *         schema:
@@ -685,17 +783,17 @@ datasets.get('/datasets/:datasetId/tables/:tableId/columns', async(req, res) => 
  *         schema:
  *           type: object
  *           properties:
- *             success:
- *               type: boolean
- *               description: Success of the request
  *             code:
  *               type: integer
  *               default: 200
  *               description: HTTP status code
+ *             success:
+ *               type: boolean
+ *               description: Success of the request
  *             data:
  *               type: array
  *               items:
- *                  $ref: '#/definitions/Dataset'
+ *                  $ref: '#/definitions/View'
  *       500:
  *         description: Error
  *         schema:
@@ -777,7 +875,7 @@ datasets.get('/views', async(req, res) => {
  *               default: 200
  *               description: HTTP status code
  *             data:
- *               type: object
+ *               type: array
  *               items:
  *                  $ref: '#/definitions/View'
  *       500:
@@ -846,12 +944,12 @@ datasets.get('/datasets/:datasetId/views', async(req, res) => {
  *       name: datasetId
  *       type: string
  *       required: true
- *       description: Dataset Id of the Dataset request
+ *       description: Dataset Id for the request
  *     - in: path
  *       name: viewId
  *       type: string
  *       required: true
- *       description: Dataset View Id of the Dataset request
+ *       description: Authorized View Id for the request
  *     - in: header
  *       name: x-gcp-project-id
  *       type: string
@@ -1144,6 +1242,15 @@ datasets.put('/datasets/:datasetId/views/:viewId', async(req, res) => {
  *       name: x-gcp-project-id
  *       type: string
  *       required: true
+ *     - in: body
+ *       name: view
+ *       required: true
+ *       schema:
+ *         type: object
+ *         properties:
+ *           rowId:
+ *             type: string
+ *             description: The view id
  *     produces:
  *       - application/json
  *     responses:

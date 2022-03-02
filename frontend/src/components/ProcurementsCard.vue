@@ -264,7 +264,7 @@ export default {
       {
         text: 'Product',
         value: 'product',
-        tooltip: 'The GCP Marketplace Solution Id'
+        tooltip: 'The identifier of the product that was procured'
       },
       {
         text: 'Plan',
