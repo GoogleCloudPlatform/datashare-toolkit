@@ -30,20 +30,6 @@ var resources = express.Router();
 /**
  * @swagger
  *
- * definitions:
- *   ProjectResource:
- *     type: object
- *     description: Project Resource object
- *     properties:
- *       projectId:
- *         type: string
- *         readOnly: true
- *         description: Project ID
- */
-
-/**
- * @swagger
- *
  * /resources/dashboard:
  *   options:
  *     summary: CORS support
@@ -179,18 +165,11 @@ var resources = express.Router();
  *             success:
  *               type: boolean
  *               description: Success of the request
- *             code:
- *               type: integer
- *               default: 200
- *               description: HTTP status code
- *             data:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request
- *                 projects:
- *                   $ref: '#/definitions/ProjectResource'
+ *             projects:
+ *               type: array
+ *               description: List of projectId available to be managed by console
+ *               items:
+ *                 type: string
  *       500:
  *         description: Error
  *         schema:
