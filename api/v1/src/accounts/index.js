@@ -810,6 +810,7 @@ accounts.get('/datasets/:datasetId/accounts', async (req, res) => {
  *     - in: query
  *       name: x-gcp-marketplace-token
  *       description: JWT token provided by marketplace    
+ *       required: false
  *     responses:
  *       301:
  *         description: Account
