@@ -532,7 +532,7 @@ accounts.put('/accounts/:accountId', async (req, res) => {
  *       type: string
  *       required: true
  *     - in: body
- *       name: account_deletion
+ *       name: account
  *       description: Request parameters for Account deletion
  *       schema:
  *         type: object
