@@ -629,7 +629,9 @@ policies.put('/policies/:policyId', async(req, res) => {
  *       name: policy
  *       description: Request parameters for Policy
  *       schema:
- *         $ref: '#/definitions/Policy'
+ *          type: object
+ *          properties:
+ *            rowId:
  *     produces:
  *       - application/json
  *     responses:
@@ -648,10 +650,6 @@ policies.put('/policies/:policyId', async(req, res) => {
  *               type: object
  *               items:
  *                 $ref: '#/definitions/Policy'
- *       404:
- *         description: Error
- *         schema:
- *           $ref: '#/definitions/Error'
  *       500:
  *         description: Error
  *         schema:
