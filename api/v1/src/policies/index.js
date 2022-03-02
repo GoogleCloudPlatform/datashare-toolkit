@@ -332,7 +332,7 @@ policies.get('/policies', async(req, res) => {
  */
 policies.get('/products', async(req, res) => {
     const projectId = req.header('x-gcp-project-id');
-    const email = res.locals.email || 'mservidio@google.com'
+    const email = res.locals.email;
     const data = await dataManager.listUserPolicies(projectId, email);
     var code;
     if (data && data.success === false) {
