@@ -169,14 +169,15 @@ module "custom-role-project-datashare_pubsub_subscriber" {
   members              = []
 }
 
-module "gcloud" {
+/*
+module "gcloud_submit-datashare-api" {
   source  = "terraform-google-modules/gcloud/google"
   version = "~> 2.0"
 
   platform = "linux"
 
   create_cmd_body        = "builds submit ../ --config ../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag}"
-}
+}*/
 
 resource "google_cloud_run_service" "cloud-run-service-ds-api" {
   name     = "ds-api"
@@ -188,6 +189,47 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
         image = "gcr.io/${var.project_id}/ds-api:${var.tag}"
       }
       service_account_name = "ds-api-mgr@${var.project_id}.iam.gserviceaccount.com"
+    }
+    metadata {
+      annotations = {
+        "run.googleapis.com/client-name"        = "terraform"
+      }
+    }
+  }
+
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
+
+  # Waits for the Cloud Run API to be enabled
+  depends_on = [google_project_service.cloud_run_api]
+}
+
+resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
+  name     = "ds-listener-${var.project_id}"
+  location = "us-central1"
+
+  template {
+    spec {
+      containers {
+        image = "gcr.io/${var.project_id}/ds-api:${var.tag}"
+        resources {
+          limits = {
+            cpu = "1"
+            memory = "2Gi"
+          }
+        }
+      }
+      service_account_name = "ds-api-mgr@${var.project_id}.iam.gserviceaccount.com"
+    }
+    metadata {
+      annotations = {
+        "autoscaling.knative.dev/minScale"      = "1"
+        "autoscaling.knative.dev/maxScale"      = "1"
+        "run.googleapis.com/client-name"        = "terraform"
+        "run.googleapis.com/cpu-throttling"     = "false"
+      }
     }
   }
 
