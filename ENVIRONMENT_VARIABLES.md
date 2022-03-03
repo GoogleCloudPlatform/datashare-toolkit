@@ -23,4 +23,3 @@ After changing environmental variables, you may have to re-apply the ISTIO polic
 | API_CUSTOM_DOMAIN | Yes (if marketplace integration is enabled) | Custom domain for API GCP load balancer | api.datashare-demo-2.fsi.joonix.net |
 
 # Next
-[Apply ISTIO Policies](./APPLY_ISTIO_POLICIES.md)
