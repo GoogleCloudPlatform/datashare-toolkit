@@ -1,1 +1,2 @@
-// project = "datashare-demo-4"
+project_id = "datashare-demo-4"
+tag = "DEV"

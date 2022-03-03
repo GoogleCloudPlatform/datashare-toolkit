@@ -1,5 +1,9 @@
+# https://learn.hashicorp.com/tutorials/terraform/google-cloud-platform-build
 # Enable Compute Engine
-# Create SA
+# Create Installation SA
+# https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/api_gateway_api
+# https://registry.terraform.io/modules/terraform-google-modules/cloud-dns/google/latest
+# https://learn.hashicorp.com/tutorials/terraform/google-cloud-platform-variables?in=terraform/gcp-get-started
 
 terraform {
   required_providers {
@@ -15,6 +19,19 @@ provider "google" {
   project     = var.project_id
   region      = "us-central1"
   zone        = "us-central1-a"
+}
+
+# Enables the Cloud Run API
+resource "google_project_service" "enable_compute_api" {
+  service = "run.googleapis.com"
+
+  disable_on_destroy = true
+}
+
+resource "google_project_service" "enable_cloud_build_api" {
+  service = "cloudbuild.googleapis.com"
+
+  disable_on_destroy = true
 }
 
 resource "google_service_account" "service_account" {
@@ -150,4 +167,13 @@ module "custom-role-project-datashare_pubsub_subscriber" {
     "storage.objects.list"
   ]
   members              = []
+}
+
+module "gcloud" {
+  source  = "terraform-google-modules/gcloud/google"
+  version = "~> 2.0"
+
+  platform = "linux"
+
+  create_cmd_body        = "builds submit ../ --config ../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag}"
 }
