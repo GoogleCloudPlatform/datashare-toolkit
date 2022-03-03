@@ -173,16 +173,6 @@ module "custom-role-project-datashare_pubsub_subscriber" {
   members              = []
 }
 
-/*
-module "gcloud_submit-datashare-api" {
-  source  = "terraform-google-modules/gcloud/google"
-  version = "~> 2.0"
-
-  platform = "linux"
-
-  create_cmd_body        = "builds submit ../ --config ../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag}"
-}*/
-
 resource "null_resource" "gcloud_submit-datashare-api" {
   provisioner "local-exec" {
     command = "gcloud builds submit ../ --config ../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag}"
