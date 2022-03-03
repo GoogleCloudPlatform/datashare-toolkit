@@ -22,4 +22,15 @@ variable "project_id" {
 variable "tag" {
   type        = string
   description = "Variable for Project ID."
+  default = "DEV"
+}
+
+variable "region" {
+  type        = string
+  default = "us-central1"
+}
+
+variable "zone" {
+  type        = string
+  default = "us-central1-a"
 }

@@ -17,21 +17,21 @@ terraform {
 provider "google" {
   credentials = file("/Volumes/GoogleDrive/My Drive/servidio-sandbox/service-account/cds-demo-2-911c68dd026e.json")
   project     = var.project_id
-  region      = "us-central1"
-  zone        = "us-central1-a"
+  region      = var.region
+  zone        = var.zone
 }
 
 # Enables the Cloud Run API
 resource "google_project_service" "cloud_run_api" {
   service = "run.googleapis.com"
 
-  disable_on_destroy = true
+  disable_on_destroy = false
 }
 
 resource "google_project_service" "enable_cloud_build_api" {
   service = "cloudbuild.googleapis.com"
 
-  disable_on_destroy = true
+  disable_on_destroy = false
 }
 
 resource "google_service_account" "service_account" {
@@ -179,9 +179,16 @@ module "gcloud_submit-datashare-api" {
   create_cmd_body        = "builds submit ../ --config ../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag}"
 }*/
 
+resource "null_resource" "gcloud_submit-datashare-api" {
+  provisioner "local-exec" {
+    command = "gcloud builds submit ../ --config ../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag}"
+    // interpreter = ["perl", "-e"]
+  }
+}
+
 resource "google_cloud_run_service" "cloud-run-service-ds-api" {
   name     = "ds-api"
-  location = "us-central1"
+  location = var.region
 
   template {
     spec {
@@ -203,12 +210,12 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
   }
 
   # Waits for the Cloud Run API to be enabled
-  depends_on = [google_project_service.cloud_run_api]
+  depends_on = [google_project_service.cloud_run_api, null_resource.gcloud_submit-datashare-api]
 }
 
 resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
   name     = "ds-listener-${var.project_id}"
-  location = "us-central1"
+  location = var.region
 
   template {
     spec {
