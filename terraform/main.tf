@@ -182,7 +182,6 @@ module "gcloud_submit-datashare-api" {
 resource "null_resource" "gcloud_submit-datashare-api" {
   provisioner "local-exec" {
     command = "gcloud builds submit ../ --config ../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag}"
-    // interpreter = ["perl", "-e"]
   }
 }
 
@@ -209,7 +208,6 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
     latest_revision = true
   }
 
-  # Waits for the Cloud Run API to be enabled
   depends_on = [google_project_service.cloud_run_api, null_resource.gcloud_submit-datashare-api]
 }
 
@@ -245,6 +243,5 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
     latest_revision = true
   }
 
-  # Waits for the Cloud Run API to be enabled
-  depends_on = [google_project_service.cloud_run_api]
+  depends_on = [google_project_service.cloud_run_api, null_resource.gcloud_submit-datashare-api]
 }
