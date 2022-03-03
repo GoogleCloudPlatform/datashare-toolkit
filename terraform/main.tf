@@ -187,7 +187,7 @@ resource "null_resource" "gcloud_submit-datashare-api" {
 
 resource "null_resource" "gcloud_submit-ds-frontend-ui" {
   provisioner "local-exec" {
-    command = "gcloud builds submit ../frontend --config cloudbuild.yaml --substitutions=TAG_NAME=${var.tag}"
+    command = "gcloud builds submit ../frontend --config ../frontend/cloudbuild.yaml --substitutions=TAG_NAME=${var.tag}"
   }
 }
 
