@@ -14,7 +14,7 @@ terraform {
   }
 }
 
-provider "google" {
+provider "google-beta" {
   credentials = file("/Volumes/GoogleDrive/My Drive/servidio-sandbox/service-account/cds-demo-2-911c68dd026e.json")
   project     = var.project_id
   region      = var.region
@@ -195,6 +195,7 @@ resource "null_resource" "gcloud_submit-ds-frontend-ui" {
   }
 }
 
+// https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_service
 resource "google_cloud_run_service" "cloud-run-service-ds-api" {
   name     = var.cloud_run_ds_api_service_name
   location = var.region
@@ -301,3 +302,31 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
   policy_data = data.google_iam_policy.noauth.policy_data
 }
 */
+
+// Create API Gateway configuration
+// Create API Gateway
+resource "google_api_gateway_api" "api_cfg" {
+  provider = google-beta
+  api_id = "api-gw-ds-api"
+}
+
+// https://www.terraform.io/language/resources/provisioners/local-exec
+resource "google_api_gateway_api_config" "api_cfg" {
+  provider = google-beta
+  api = google_api_gateway_api.api_cfg.api_id
+  api_config_id = "api-gw-ds-api"
+
+  openapi_documents {
+    document {
+      path = "spec.yaml"
+      contents = filebase64("test-fixtures/apigateway/openapi.yaml")
+    }
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+// Cloud DNS
+
+// OAuth Credential
