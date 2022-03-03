@@ -185,6 +185,12 @@ resource "null_resource" "gcloud_submit-datashare-api" {
   }
 }
 
+resource "null_resource" "gcloud_submit-ds-frontend-ui" {
+  provisioner "local-exec" {
+    command = "gcloud builds submit ../ --config ../frontend/cloudbuild.yaml --substitutions=TAG_NAME=${var.tag}"
+  }
+}
+
 resource "google_cloud_run_service" "cloud-run-service-ds-api" {
   name     = "ds-api"
   location = var.region
@@ -244,4 +250,47 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
   }
 
   depends_on = [google_project_service.cloud_run_api, null_resource.gcloud_submit-datashare-api]
+}
+
+resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
+  name     = "ds-frontend-ui"
+  location = var.region
+
+  template {
+    spec {
+      containers {
+        image = "gcr.io/${var.project_id}/ds-frontend-ui:${var.tag}"
+      }
+    }
+    metadata {
+      annotations = {
+        "run.googleapis.com/client-name"        = "terraform"
+        "autoscaling.knative.dev/maxScale"      = "10"
+      }
+    }
+  }
+
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
+
+  depends_on = [google_project_service.cloud_run_api, null_resource.gcloud_submit-ds-frontend-ui]
+}
+
+data "google_iam_policy" "noauth" {
+  binding {
+    role = "roles/run.invoker"
+    members = [
+      "allUsers",
+    ]
+  }
+}
+
+resource "google_cloud_run_service_iam_policy" "noauth" {
+  location    = google_cloud_run_service.cloud-run-ds-frontend-ui.location
+  project     = google_cloud_run_service.cloud-run-ds-frontend-ui.project
+  service     = google_cloud_run_service.cloud-run-ds-frontend-ui.name
+
+  policy_data = data.google_iam_policy.noauth.policy_data
 }
