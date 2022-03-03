@@ -22,7 +22,7 @@ provider "google" {
 }
 
 # Enables the Cloud Run API
-resource "google_project_service" "enable_compute_api" {
+resource "google_project_service" "cloud_run_api" {
   service = "run.googleapis.com"
 
   disable_on_destroy = true
@@ -176,4 +176,26 @@ module "gcloud" {
   platform = "linux"
 
   create_cmd_body        = "builds submit ../ --config ../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag}"
+}
+
+resource "google_cloud_run_service" "cloud-run-service-ds-api" {
+  name     = "ds-api"
+  location = "us-central1"
+
+  template {
+    spec {
+      containers {
+        image = "gcr.io/${var.project_id}/ds-api:${var.tag}"
+      }
+      service_account_name = "ds-api-mgr@${var.project_id}.iam.gserviceaccount.com"
+    }
+  }
+
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
+
+  # Waits for the Cloud Run API to be enabled
+  depends_on = [google_project_service.cloud_run_api]
 }
