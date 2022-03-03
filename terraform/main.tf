@@ -23,6 +23,7 @@ provider "google-beta" {
 
 locals {
   api_service_account_name = "${var.api_service_account_name}@${var.project_id}.iam.gserviceaccount.com"
+  api_gateway_service_account_name = "${var.api_gateway_service_account_name}@${var.project_id}.iam.gserviceaccount.com"
 }
 
 # Enables the Cloud Run API
@@ -38,9 +39,16 @@ resource "google_project_service" "enable_cloud_build_api" {
   disable_on_destroy = false
 }
 
-resource "google_service_account" "service_account" {
+resource "google_service_account" "api_service_account" {
+  project      = var.project_id
   account_id   = var.api_service_account_name
   display_name = var.api_service_account_description
+}
+
+resource "google_service_account" "api_gateway_service_account" {
+  project      = var.project_id
+  account_id   = var.api_gateway_service_account_name
+  display_name = var.api_gateway_service_account_description
 }
 
 module "custom-role-project-datashare_api_manager" {
@@ -109,6 +117,7 @@ module "custom-role-project-datashare_api_manager" {
     "storage.objects.list"
   ]
   members     = ["serviceAccount:${local.api_service_account_name}"]
+  depends_on  = [google_service_account.api_service_account]
 }
 
 module "custom-role-project-datashare_bigquery_dataViewer" {
@@ -273,6 +282,13 @@ resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
   depends_on = [google_project_service.cloud_run_api, null_resource.gcloud_submit-ds-frontend-ui]
 }
 
+data "google_iam_policy" "api_gateway_binding" {
+  binding {
+    role = "roles/run.invoker"
+    members = ["serviceAccount:${local.api_gateway_service_account_name}"]
+  }
+}
+
 /*
 Won't work without project exception
 data "google_iam_policy" "noauth" {
@@ -292,7 +308,7 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
   policy_data = data.google_iam_policy.noauth.policy_data
 }
 */
-
+/*
 // Create API Gateway configuration
 // Create API Gateway
 resource "google_api_gateway_api" "api_cfg" {
@@ -316,6 +332,7 @@ resource "google_api_gateway_api_config" "api_cfg" {
     create_before_destroy = true
   }
 }
+*/
 
 // Cloud DNS
 

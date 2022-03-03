@@ -43,6 +43,14 @@ variable "api_service_account_description" {
   default = "Datashare API Manager Role"
 }
 
+variable "api_gateway_service_account_name" {
+  default = "api-gw-ds-api"
+}
+
+variable "api_gateway_service_account_description" {
+  default = "API GW Datashare API"
+}
+
 variable "cloud_run_ds_api_service_name" {
   default = "ds-api"
 }
