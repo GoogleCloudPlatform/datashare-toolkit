@@ -17,6 +17,11 @@ provider "google" {
   zone        = "us-central1-a"
 }
 
+resource "google_service_account" "service_account" {
+  account_id   = "ds-api-mgr"
+  display_name = "Datashare API Manager Role"
+}
+
 module "custom-role-project-datashare_api_manager" {
   source = "terraform-google-modules/iam/google//modules/custom_role_iam"
 
