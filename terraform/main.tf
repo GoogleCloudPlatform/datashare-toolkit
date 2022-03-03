@@ -21,6 +21,10 @@ provider "google" {
   zone        = var.zone
 }
 
+locals {
+  api_service_account_name = "${var.api_service_account_name}@${var.project_id}.iam.gserviceaccount.com"
+}
+
 # Enables the Cloud Run API
 resource "google_project_service" "cloud_run_api" {
   service = "run.googleapis.com"
@@ -35,8 +39,8 @@ resource "google_project_service" "enable_cloud_build_api" {
 }
 
 resource "google_service_account" "service_account" {
-  account_id   = "ds-api-mgr"
-  display_name = "Datashare API Manager Role"
+  account_id   = var.api_service_account_name
+  display_name = var.api_service_account_description
 }
 
 module "custom-role-project-datashare_api_manager" {
@@ -44,9 +48,9 @@ module "custom-role-project-datashare_api_manager" {
 
   target_level = "project"
   target_id    = var.project_id
-  role_id      = "datashare.api.manager"
-  title        = "Datashare API Manager Role"
-  description  = "Datashare API role to interface with GCP services"
+  role_id      = var.iam_role_ds_api_manager_id
+  title        = var.iam_role_ds_api_manager_title
+  description  = var.iam_role_ds_api_manager_description
   stage        = "GA"
   permissions  = [
     "bigquery.datasets.create",
@@ -104,7 +108,7 @@ module "custom-role-project-datashare_api_manager" {
     "storage.objects.get",
     "storage.objects.list"
   ]
-  members     = ["serviceAccount:ds-api-mgr@${var.project_id}.iam.gserviceaccount.com"]
+  members     = ["serviceAccount:${local.api_service_account_name}"]
 }
 
 module "custom-role-project-datashare_bigquery_dataViewer" {
@@ -112,9 +116,9 @@ module "custom-role-project-datashare_bigquery_dataViewer" {
 
   target_level = "project"
   target_id    = var.project_id
-  role_id      = "datashare.bigquery.dataViewer"
-  title        = "Datashare BigQuery Data Viewer Subscriber"
-  description  = "Datashare role for granting data viewer access to BigQuery objects"
+  role_id      = var.iam_role_ds_bigquery_dataviewer_id
+  title        = var.iam_role_ds_bigquery_dataviewer_title
+  description  = var.iam_role_ds_bigquery_dataviewer_description
   stage        = "GA"
   permissions  = [
     "bigquery.datasets.get",
@@ -140,9 +144,9 @@ module "custom-role-project-datashare_storage_objectViewer" {
 
   target_level = "project"
   target_id    = var.project_id
-  role_id      = "datashare.storage.objectViewer"
-  title        = "Datashare Storage Object Viewer Subscriber"
-  description  = "Datashare role for granting object viewer access to Cloud Storage objects"
+  role_id      = var.iam_role_ds_storage_objectviewer_id
+  title        = var.iam_role_ds_storage_objectviewer_title
+  description  = var.iam_role_ds_storage_objectviewer_description
   stage        = "GA"
   permissions  = [
     "resourcemanager.projects.get",
@@ -157,9 +161,9 @@ module "custom-role-project-datashare_pubsub_subscriber" {
 
   target_level = "project"
   target_id    = var.project_id
-  role_id      = "datashare.pubsub.subscriber"
-  title        = "Datashare Pub/Sub Topic Subscriber"
-  description  = "Datashare role for granting attach subscription access to Pub/Sub topics"
+  role_id      = var.iam_role_ds_pubsub_subscriber_id
+  title        = var.iam_role_ds_pubsub_subscriber_title
+  description  = var.iam_role_ds_pubsub_subscriber_description
   stage        = "GA"
   permissions  = [
     "resourcemanager.projects.get",
@@ -192,7 +196,7 @@ resource "null_resource" "gcloud_submit-ds-frontend-ui" {
 }
 
 resource "google_cloud_run_service" "cloud-run-service-ds-api" {
-  name     = "ds-api"
+  name     = var.cloud_run_ds_api_service_name
   location = var.region
 
   template {
@@ -200,7 +204,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
       containers {
         image = "gcr.io/${var.project_id}/ds-api:${var.tag}"
       }
-      service_account_name = "ds-api-mgr@${var.project_id}.iam.gserviceaccount.com"
+      service_account_name = local.api_service_account_name
     }
     metadata {
       annotations = {
@@ -218,7 +222,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
 }
 
 resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
-  name     = "ds-listener-${var.project_id}"
+  name     = var.cloud_run_ds_listener_service_name
   location = var.region
 
   template {
@@ -232,7 +236,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
           }
         }
       }
-      service_account_name = "ds-api-mgr@${var.project_id}.iam.gserviceaccount.com"
+      service_account_name = local.api_service_account_name
     }
     metadata {
       annotations = {
@@ -253,7 +257,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
 }
 
 resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
-  name     = "ds-frontend-ui"
+  name     = var.cloud_run_ds_frontend_service_name
   location = var.region
 
   template {
@@ -278,6 +282,8 @@ resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
   depends_on = [google_project_service.cloud_run_api, null_resource.gcloud_submit-ds-frontend-ui]
 }
 
+/*
+Won't work without project exception
 data "google_iam_policy" "noauth" {
   binding {
     role = "roles/run.invoker"
@@ -294,3 +300,4 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
 
   policy_data = data.google_iam_policy.noauth.policy_data
 }
+*/
