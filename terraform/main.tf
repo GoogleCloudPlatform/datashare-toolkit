@@ -54,8 +54,8 @@ module "gcloud" {
   platform = "linux"
 
   create_cmd_body        = "config list account --format 'value(core.account)' --project ${var.project_id} > sa_email.txt"
-  destroy_cmd_entrypoint = "rm"
-  destroy_cmd_body       = "sa_email.txt"
+  // destroy_cmd_entrypoint = "rm"
+  // destroy_cmd_body       = "sa_email.txt"
 }
 
 // Point DNS A record to load balancer
