@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 resource "null_resource" "gcloud_submit-datashare-api" {
   provisioner "local-exec" {
     command = "gcloud builds submit ../ --config ../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag}"
@@ -29,6 +29,22 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
     spec {
       containers {
         image = "gcr.io/${var.project_id}/ds-api:${var.tag}"
+        env {
+          name = "API_KEY"
+          value = var.api_key
+        }
+        env {
+          name = "AUTH_DOMAIN"
+          value = var.auth_domain
+        }
+        env {
+          name = "TENANT_ID"
+          value = var.idp_tenant
+        }
+        env {
+          name = "DATA_PRODUCERS"
+          value = var.idp_tenant
+        }
       }
       service_account_name = local.api_service_account_name
     }

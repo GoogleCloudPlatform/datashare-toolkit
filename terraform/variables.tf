@@ -29,11 +29,6 @@ variable "environment_name" {
   description = "Variable for Environment Name."
 }
 
-variable "idp_tenant" {
-  type        = string
-  default     = "datashare"
-}
-
 variable "tag" {
   type        = string
   description = "Variable for Project ID."
@@ -124,4 +119,29 @@ variable "iam_role_ds_pubsub_subscriber_title" {
 
 variable "iam_role_ds_pubsub_subscriber_description" {
   default = "Datashare role for granting attach subscription access to Pub/Sub topics"
+}
+
+variable "idp_tenant" {
+  type        = string
+  default     = "datashare"
+}
+
+variable "api_base_url" {
+  type        = string
+  description = "Base URL of the API"
+}
+
+variable "api_key" {
+  type        = string
+  description = "The API Key"
+}
+
+variable "auth_domain" {
+  type        = string
+  description = "The Auth Domain"
+}
+
+variable "data_producers" {
+  type        = string
+  description = "The data producers list"
 }

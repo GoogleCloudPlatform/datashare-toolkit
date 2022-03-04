@@ -29,12 +29,20 @@ resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
       containers {
         image = "gcr.io/${var.project_id}/ds-frontend-ui:${var.tag}"
         env {
-          name = "SOURCE"
-          value = "remote"
+          name = "VUE_APP_API_BASE_URL"
+          value = var.api_base_url
         }
         env {
-          name = "TARGET"
-          value = "home"
+          name = "VUE_APP_API_KEY"
+          value = var.api_key
+        }
+        env {
+          name = "VUE_APP_AUTH_DOMAIN"
+          value = var.auth_domain
+        }
+        env {
+          name = "VUE_APP_TENANT_ID"
+          value = var.idp_tenant
         }
       }
     }
