@@ -26,7 +26,7 @@ module "lb-http" {
   project = var.project_id
 
   ssl                             = var.ssl
-  managed_ssl_certificate_domains = [var.domain]
+  managed_ssl_certificate_domains = [var.api_domain]
   https_redirect                  = var.ssl
 
   backends = {
@@ -57,24 +57,13 @@ module "lb-http" {
 
 resource "google_compute_region_network_endpoint_group" "serverless_neg" {
   provider              = google-beta
+  project               = var.project_id
   name                  = "serverless-neg"
   network_endpoint_type = "SERVERLESS"
   region                = var.region
-  cloud_run {
-    service = google_cloud_run_service.default.name
-  }
-}
-
-resource "google_cloud_run_service" "default" {
-  name     = "example"
-  location = var.region
-  project  = var.project_id
-
-  template {
-    spec {
-      containers {
-        image = "gcr.io/cloudrun/hello"
-      }
-    }
+  serverless_deployment {
+    platform = "apigateway.googleapis.com"
+    resource  = "api-gw-ds-api"
+    url_mask = google_api_gateway_gateway.gw.default_hostname // google_api_gateway_gateway.gw.gateway_id
   }
 }

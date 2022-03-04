@@ -22,7 +22,6 @@ locals {
 // https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/service_account_id_token
 data "google_service_account_id_token" "oidc" {
   // The audience claim for the id_token
-  // "https://ds-api-3qykj5bz5q-uc.a.run.app/"
   target_audience = "${local.ds-api-cloud_run_url}/"
 
   depends_on = [google_project_service.enable_iam_service, google_project_service.enable_iamcredentials_service]

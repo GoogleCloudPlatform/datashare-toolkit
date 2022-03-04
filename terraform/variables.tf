@@ -145,3 +145,19 @@ variable "data_producers" {
   type        = string
   description = "The data producers list"
 }
+
+variable "ssl" {
+  description = "Run load balancer on HTTPS and provision managed certificate with provided `domain`."
+  type        = bool
+  default     = true
+}
+
+variable "api_domain" {
+  description = "Domain name to run the load balancer on. Used if `ssl` is `true`."
+  type        = string
+}
+
+variable "lb_name" {
+  description = "Name for load balancer and associated resources"
+  default     = "datashare-api-lb"
+}
