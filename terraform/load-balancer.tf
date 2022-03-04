@@ -64,6 +64,6 @@ resource "google_compute_region_network_endpoint_group" "serverless_neg" {
   serverless_deployment {
     platform = "apigateway.googleapis.com"
     resource  = "api-gw-ds-api"
-    url_mask = google_api_gateway_gateway.gw.default_hostname // google_api_gateway_gateway.gw.gateway_id
+    url_mask = "<gateway>-testurl123.uc.gateway.dev/hello" // google_api_gateway_gateway.gw.default_hostname // google_api_gateway_gateway.gw.gateway_id
   }
 }
