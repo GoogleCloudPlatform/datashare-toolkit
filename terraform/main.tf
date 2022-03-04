@@ -1,4 +1,5 @@
 # https://learn.hashicorp.com/tutorials/terraform/google-cloud-platform-build
+# Manually enable Compute
 # Manually enable Identity Platform - https://console.cloud.google.com/marketplace/details/google-cloud-platform/customer-identity
 # You must enable multi-tenancy via the Cloud Console prior to creating tenants.
 # Enable Compute Engine
@@ -16,7 +17,7 @@ terraform {
   }
 }
 
-provider "google" {
+provider "google-beta" {
   credentials = file("/Volumes/GoogleDrive/My Drive/servidio-sandbox/service-account/cds-demo-2-911c68dd026e.json")
   project     = var.project_id
   region      = var.region
@@ -56,6 +57,20 @@ resource "google_project_service" "enable_cloud_build_api" {
 resource "google_project_service" "enable_iap_service" {
   project = var.project_id
   service = "iap.googleapis.com"
+
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "enable_iam_service" {
+  project = var.project_id
+  service = "iam.googleapis.com"
+
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "enable_iamcredentials_service" {
+  project = var.project_id
+  service = "iamcredentials.googleapis.com"
 
   disable_on_destroy = false
 }
@@ -380,15 +395,61 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
   policy_data = data.google_iam_policy.noauth.policy_data
 }
 */
+
+// Load Balancer
+// https://cloud.google.com/load-balancing/docs/https/ext-http-lb-tf-module-examples#with_a_backend
+// https://github.com/terraform-google-modules/terraform-google-lb-http/blob/0da99a24fdaf4c4163039efa52243a500b604d1e/examples/cloudrun/main.tf
+// https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_global_network_endpoint_group
+
+// Point DNS A record to load balancer
+// Cloud DNS
+
+// https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/service_account_access_token
+// https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/service_account_id_token
+
+locals {
+  ds-api-cloud_run_url = google_cloud_run_service.cloud-run-service-ds-api.status[0].url
+  ds-api-open_api_spec_url = "${google_cloud_run_service.cloud-run-service-ds-api.status[0].url}/v1/docs/openapi_spec"
+}
+
+data "google_service_account_id_token" "oidc" {
+  target_audience = local.ds-api-cloud_run_url
+
+  depends_on = [google_project_service.enable_iam_service, google_project_service.enable_iamcredentials_service]
+}
+
 /*
+data "http" "open_api_spec" {
+  url = "${local.ds-api-open_api_spec_url}/"
+
+  # Optional request headers
+  request_headers = {
+    Accept = "application/json"
+    Authorization = "Bearer ${data.google_service_account_id_token.oidc.id_token}"
+  }
+
+  depends_on = [google_cloud_run_service.cloud-run-service-ds-api]
+}
+
+output "cloud_run_response" {
+  value = data.http.open_api_spec.body
+}
+
+locals {
+  open_api_spec_content = yamlencode(jsondecode(data.http.open_api_spec.body))
+}
+
 // Create API Gateway configuration
 // Create API Gateway
+// https://dev.to/uris77/gcp-notes-configure-api-gateway-with-terraform-1pi3
+
+// https://www.terraform.io/language/resources/provisioners/local-exec
+
 resource "google_api_gateway_api" "api_cfg" {
   provider = google-beta
   api_id = "api-gw-ds-api"
 }
 
-// https://www.terraform.io/language/resources/provisioners/local-exec
 resource "google_api_gateway_api_config" "api_cfg" {
   provider = google-beta
   api = google_api_gateway_api.api_cfg.api_id
@@ -397,7 +458,12 @@ resource "google_api_gateway_api_config" "api_cfg" {
   openapi_documents {
     document {
       path = "spec.yaml"
-      contents = filebase64("test-fixtures/apigateway/openapi.yaml")
+      contents = base64encode(local.open_api_spec_content)
+    } 
+  }
+  gateway_config {
+    backend_config {
+      google_service_account = local.api_gateway_service_account_name 
     }
   }
   lifecycle {
@@ -405,7 +471,3 @@ resource "google_api_gateway_api_config" "api_cfg" {
   }
 }
 */
-
-// Cloud DNS
-
-// OAuth Credential
