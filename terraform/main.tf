@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 # https://learn.hashicorp.com/tutorials/terraform/google-cloud-platform-build
 # Manually enable Compute
 # Manually enable Identity Platform - https://console.cloud.google.com/marketplace/details/google-cloud-platform/customer-identity
@@ -53,7 +53,8 @@ module "gcloud" {
   platform = "linux"
 
   create_cmd_body        = "config list account --format 'value(core.account)' --project ${var.project_id} > sa_email.txt"
-  destroy_cmd_body       = "rm sa_email.txt"
+  destroy_cmd_entrypoint = "rm"
+  destroy_cmd_body       = "sa_email.txt"
 }
 
 /*
@@ -128,34 +129,32 @@ locals {
 
 // https://www.terraform.io/language/resources/provisioners/local-exec
 
-resource "google_api_gateway_api" "api_cfg" {
+resource "google_api_gateway_api" "api_gw" {
   project = var.project_id
   provider = google-beta
   api_id = "api-gw-ds-api"
-
-  depends_on = [google_project_service.enable_apigateway_service, google_project_service.enable_servicecontrol_service]
 }
 
-// https://stackoverflow.com/questions/68306138/converting-json-to-yaml-in-terraform
-resource "google_api_gateway_api_config" "api_cfg" {
+resource "google_api_gateway_api_config" "api_gw" {
+  project = var.project_id
   provider = google-beta
-  api = google_api_gateway_api.api_cfg.api_id
-  api_config_id = "api-gw-ds-api"
+  api = google_api_gateway_api.api_gw.api_id
+  api_config_id = "config"
 
   openapi_documents {
     document {
       path = "spec.yaml"
       contents = base64encode(local.open_api_spec_content)
-    } 
-  }
-  gateway_config {
-    backend_config {
-      google_service_account = local.api_gateway_service_account_name 
     }
   }
   lifecycle {
     create_before_destroy = true
   }
+}
 
-  depends_on = [google_project_service.enable_apigateway_service, google_project_service.enable_servicecontrol_service]
+resource "google_api_gateway_gateway" "api_gw" {
+  project = var.project_id
+  provider = google-beta
+  api_config = google_api_gateway_api_config.api_gw.id
+  gateway_id = "api-gw-ds-api"
 }
