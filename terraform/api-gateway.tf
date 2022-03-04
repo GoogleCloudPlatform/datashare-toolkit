@@ -40,14 +40,14 @@ data "http" "open_api_spec" {
   depends_on = [google_cloud_run_service.cloud-run-service-ds-api]
 }
 
-output "cloud_run_response" {
-  value = data.http.open_api_spec.body
-}
-
 locals {
   open_api_spec_content = replace(replace(replace(yamlencode(
     jsondecode(data.http.open_api_spec.body)
   ), "DS_API_FQDN", var.api_base_url), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.project_client.client_id)
+}
+
+output "open_api_spec" {
+  value = local.open_api_spec_content
 }
 
 resource "google_api_gateway_api" "api_gw" {
