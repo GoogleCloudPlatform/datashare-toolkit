@@ -126,6 +126,11 @@ variable "idp_tenant" {
   default = "datashare"
 }
 
+variable "ui_domain" {
+  type        = string
+  description = "Base domain of the UI"
+}
+
 variable "api_base_url" {
   type        = string
   description = "Base URL of the API"

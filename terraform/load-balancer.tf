@@ -67,3 +67,19 @@ resource "google_compute_region_network_endpoint_group" "serverless_neg" {
     url_mask = "<gateway>" //"<gateway>-testurl123.uc.gateway.dev/hello" // google_api_gateway_gateway.gw.default_hostname // google_api_gateway_gateway.gw.gateway_id
   }
 }
+
+/*
+resource "google_dns_record_set" "a" {
+  name         = "backend.${google_dns_managed_zone.prod.dns_name}"
+  managed_zone = google_dns_managed_zone.prod.name
+  type         = "A"
+  ttl          = 300
+
+  // Replace with A value from lb
+  rrdatas = ["8.8.8.8"]
+}
+
+resource "google_dns_managed_zone" "prod" {
+  name     = "prod-zone"
+  dns_name = "${var.ui_domain}."
+}*/
