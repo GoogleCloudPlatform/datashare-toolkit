@@ -45,7 +45,9 @@ output "cloud_run_response" {
 }
 
 locals {
-  open_api_spec_content = yamlencode(jsondecode(data.http.open_api_spec.body))
+  open_api_spec_content = replace(replace(replace(yamlencode(
+    jsondecode(data.http.open_api_spec.body)
+  ), "DS_API_FQDN", var.api_base_url), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.project_client.client_id)
 }
 
 resource "google_api_gateway_api" "api_gw" {
