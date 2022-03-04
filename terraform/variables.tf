@@ -14,9 +14,24 @@
  * limitations under the License.
  */
 
+variable "installation_service_account" {
+  type        = string
+  description = "Variable for Installation Service Account"
+}
+
 variable "project_id" {
   type        = string
   description = "Variable for Project ID."
+}
+
+variable "environment_name" {
+  type        = string
+  description = "Variable for Environment Name."
+}
+
+variable "idp_tenant" {
+  type        = string
+  default     = "datashare"
 }
 
 variable "tag" {

@@ -1,4 +1,6 @@
 # https://learn.hashicorp.com/tutorials/terraform/google-cloud-platform-build
+# Manually enable Identity Platform - https://console.cloud.google.com/marketplace/details/google-cloud-platform/customer-identity
+# You must enable multi-tenancy via the Cloud Console prior to creating tenants.
 # Enable Compute Engine
 # Create Installation SA
 # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/api_gateway_api
@@ -14,7 +16,7 @@ terraform {
   }
 }
 
-provider "google-beta" {
+provider "google" {
   credentials = file("/Volumes/GoogleDrive/My Drive/servidio-sandbox/service-account/cds-demo-2-911c68dd026e.json")
   project     = var.project_id
   region      = var.region
@@ -26,15 +28,48 @@ locals {
   api_gateway_service_account_name = "${var.api_gateway_service_account_name}@${var.project_id}.iam.gserviceaccount.com"
 }
 
-# Enables the Cloud Run API
-resource "google_project_service" "cloud_run_api" {
+// Store email in file and use for support_email
+module "gcloud" {
+  source  = "terraform-google-modules/gcloud/google"
+  version = "~> 2.0"
+
+  platform = "linux"
+
+  create_cmd_body        = "config list account --format 'value(core.account)' --project ${var.project_id} > sa_email.txt"
+  destroy_cmd_body       = "rm sa_email.txt"
+}
+
+resource "google_project_service" "enable_cloud_run_api" {
+  project = var.project_id
   service = "run.googleapis.com"
 
   disable_on_destroy = false
 }
 
 resource "google_project_service" "enable_cloud_build_api" {
+  project = var.project_id
   service = "cloudbuild.googleapis.com"
+
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "enable_iap_service" {
+  project = var.project_id
+  service = "iap.googleapis.com"
+
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "enable_cloudidentity_service" {
+  project = var.project_id
+  service = "cloudidentity.googleapis.com"
+
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "enable_identitytoolkit_service" {
+  project = var.project_id
+  service = "identitytoolkit.googleapis.com"
 
   disable_on_destroy = false
 }
@@ -49,6 +84,35 @@ resource "google_service_account" "api_gateway_service_account" {
   project      = var.project_id
   account_id   = var.api_gateway_service_account_name
   display_name = var.api_gateway_service_account_description
+}
+
+resource "google_iap_brand" "project_brand" {
+  support_email     = var.installation_service_account
+  application_title = var.environment_name
+  project           = var.project_id
+
+  depends_on = [google_project_service.enable_iap_service]
+}
+
+resource "google_iap_client" "project_client" {
+  display_name = "${var.environment_name} Client"
+  brand        =  google_iap_brand.project_brand.name
+
+  depends_on = [google_iap_client.project_client]
+}
+
+resource "google_identity_platform_tenant" "tenant" {
+  display_name          = var.idp_tenant
+
+  depends_on = [google_project_service.enable_cloudidentity_service, google_project_service.enable_identitytoolkit_service]
+}
+
+resource "google_identity_platform_tenant_default_supported_idp_config" "idp_config" {
+  enabled       = true
+  tenant        = google_identity_platform_tenant.tenant.name
+  idp_id        = "google.com"
+  client_id     = google_iap_client.project_client.client_id
+  client_secret = google_iap_client.project_client.secret
 }
 
 module "custom-role-project-datashare_api_manager" {
@@ -218,7 +282,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
     latest_revision = true
   }
 
-  depends_on = [google_project_service.cloud_run_api, null_resource.gcloud_submit-datashare-api]
+  depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-datashare-api]
 }
 
 resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
@@ -253,7 +317,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
     latest_revision = true
   }
 
-  depends_on = [google_project_service.cloud_run_api, null_resource.gcloud_submit-datashare-api]
+  depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-datashare-api]
 }
 
 resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
@@ -264,6 +328,14 @@ resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
     spec {
       containers {
         image = "gcr.io/${var.project_id}/ds-frontend-ui:${var.tag}"
+        env {
+          name = "SOURCE"
+          value = "remote"
+        }
+        env {
+          name = "TARGET"
+          value = "home"
+        }
       }
     }
     metadata {
@@ -279,7 +351,7 @@ resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
     latest_revision = true
   }
 
-  depends_on = [google_project_service.cloud_run_api, null_resource.gcloud_submit-ds-frontend-ui]
+  depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-ds-frontend-ui]
 }
 
 data "google_iam_policy" "api_gateway_binding" {
