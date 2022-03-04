@@ -17,7 +17,7 @@ terraform {
   }
 }
 
-provider "google-beta" {
+provider "google" {
   credentials = file("/Volumes/GoogleDrive/My Drive/servidio-sandbox/service-account/cds-demo-2-911c68dd026e.json")
   project     = var.project_id
   region      = var.region
@@ -421,7 +421,7 @@ data "google_service_account_id_token" "oidc" {
   depends_on = [google_project_service.enable_iam_service, google_project_service.enable_iamcredentials_service]
 }
 
-/*
+// This has issues when run the google-beta provider
 data "http" "open_api_spec" {
   url = "${local.ds-api-open_api_spec_url}/"
 
@@ -449,6 +449,7 @@ locals {
 // https://www.terraform.io/language/resources/provisioners/local-exec
 
 resource "google_api_gateway_api" "api_cfg" {
+  project = var.project_id
   provider = google-beta
   api_id = "api-gw-ds-api"
 }
@@ -474,4 +475,3 @@ resource "google_api_gateway_api_config" "api_cfg" {
     create_before_destroy = true
   }
 }
-*/
