@@ -89,6 +89,13 @@ resource "google_project_service" "enable_identitytoolkit_service" {
   disable_on_destroy = false
 }
 
+resource "google_project_service" "enable_apigateway_service" {
+  project = var.project_id
+  service = "apigateway.googleapis.com"
+
+  disable_on_destroy = false
+}
+
 resource "google_service_account" "api_service_account" {
   project      = var.project_id
   account_id   = var.api_service_account_name
