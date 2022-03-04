@@ -135,7 +135,7 @@ resource "google_api_gateway_api" "api_gw" {
   api_id = "api-gw-ds-api"
 }
 
-resource "google_api_gateway_api_config" "api_gw" {
+resource "google_api_gateway_api_config" "api_cfg" {
   project = var.project_id
   provider = google-beta
   api = google_api_gateway_api.api_gw.api_id
@@ -152,9 +152,11 @@ resource "google_api_gateway_api_config" "api_gw" {
   }
 }
 
-resource "google_api_gateway_gateway" "api_gw" {
-  project = var.project_id
+resource "google_api_gateway_gateway" "gw" {
   provider = google-beta
-  api_config = google_api_gateway_api_config.api_gw.id
+  region = var.region
+  project = var.project_id
+  api_config = google_api_gateway_api_config.api_cfg.id
   gateway_id = "api-gw-ds-api"
+  display_name = "Datashare API Service Gateway"
 }

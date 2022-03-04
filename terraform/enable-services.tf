@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 resource "google_project_service" "enable_cloud_run_api" {
   project = var.project_id
   service = "run.googleapis.com"
@@ -73,6 +73,13 @@ resource "google_project_service" "enable_apigateway_service" {
 resource "google_project_service" "enable_servicecontrol_service" {
   project = var.project_id
   service = "servicecontrol.googleapis.com"
+
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "enable_servicemanagement_service" {
+  project = var.project_id
+  service = "servicemanagement.googleapis.com"
 
   disable_on_destroy = false
 }
