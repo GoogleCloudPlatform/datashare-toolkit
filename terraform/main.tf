@@ -412,8 +412,11 @@ locals {
   ds-api-open_api_spec_url = "${google_cloud_run_service.cloud-run-service-ds-api.status[0].url}/v1/docs/openapi_spec"
 }
 
+// https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/service_account_id_token
 data "google_service_account_id_token" "oidc" {
-  target_audience = local.ds-api-cloud_run_url
+  // The audience claim for the id_token
+  // "https://ds-api-3qykj5bz5q-uc.a.run.app/"
+  target_audience =  "${local.ds-api-cloud_run_url}/"
 
   depends_on = [google_project_service.enable_iam_service, google_project_service.enable_iamcredentials_service]
 }
@@ -450,6 +453,7 @@ resource "google_api_gateway_api" "api_cfg" {
   api_id = "api-gw-ds-api"
 }
 
+// https://stackoverflow.com/questions/68306138/converting-json-to-yaml-in-terraform
 resource "google_api_gateway_api_config" "api_cfg" {
   provider = google-beta
   api = google_api_gateway_api.api_cfg.api_id
