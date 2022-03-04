@@ -19,7 +19,7 @@
 // https://github.com/terraform-google-modules/terraform-google-lb-http/blob/0da99a24fdaf4c4163039efa52243a500b604d1e/examples/cloudrun/main.tf
 // https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_global_network_endpoint_group
 
-https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep
+// https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep
 
 // https://github.com/terraform-google-modules/terraform-google-lb-http/tree/master/modules/serverless_negs
 module "lb-http" {
