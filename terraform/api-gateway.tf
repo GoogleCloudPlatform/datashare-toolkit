@@ -15,7 +15,7 @@
  */
 
 locals {
-  ds-api-cloud_run_url = google_cloud_run_service.cloud-run-service-ds-api.status[0].url
+  ds-api-cloud_run_url     = google_cloud_run_service.cloud-run-service-ds-api.status[0].url
   ds-api-open_api_spec_url = "${google_cloud_run_service.cloud-run-service-ds-api.status[0].url}/v1/docs/openapi_spec"
 }
 
@@ -23,7 +23,7 @@ locals {
 data "google_service_account_id_token" "oidc" {
   // The audience claim for the id_token
   // "https://ds-api-3qykj5bz5q-uc.a.run.app/"
-  target_audience =  "${local.ds-api-cloud_run_url}/"
+  target_audience = "${local.ds-api-cloud_run_url}/"
 
   depends_on = [google_project_service.enable_iam_service, google_project_service.enable_iamcredentials_service]
 }
@@ -34,7 +34,7 @@ data "http" "open_api_spec" {
 
   # Optional request headers
   request_headers = {
-    Accept = "application/json"
+    Accept        = "application/json"
     Authorization = "Bearer ${data.google_service_account_id_token.oidc.id_token}"
   }
 
@@ -50,20 +50,20 @@ locals {
 }
 
 resource "google_api_gateway_api" "api_gw" {
-  project = var.project_id
+  project  = var.project_id
   provider = google-beta
-  api_id = "api-gw-ds-api"
+  api_id   = "api-gw-ds-api"
 }
 
 resource "google_api_gateway_api_config" "api_cfg" {
-  project = var.project_id
-  provider = google-beta
-  api = google_api_gateway_api.api_gw.api_id
+  project       = var.project_id
+  provider      = google-beta
+  api           = google_api_gateway_api.api_gw.api_id
   api_config_id = "config"
 
   openapi_documents {
     document {
-      path = "spec.yaml"
+      path     = "spec.yaml"
       contents = base64encode(local.open_api_spec_content)
     }
   }
@@ -73,10 +73,10 @@ resource "google_api_gateway_api_config" "api_cfg" {
 }
 
 resource "google_api_gateway_gateway" "gw" {
-  provider = google-beta
-  region = var.region
-  project = var.project_id
-  api_config = google_api_gateway_api_config.api_cfg.id
-  gateway_id = "api-gw-ds-api"
+  provider     = google-beta
+  region       = var.region
+  project      = var.project_id
+  api_config   = google_api_gateway_api_config.api_cfg.id
+  gateway_id   = "api-gw-ds-api"
   display_name = "Datashare API Service Gateway"
 }

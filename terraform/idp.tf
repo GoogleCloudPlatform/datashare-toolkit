@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 resource "google_iap_brand" "project_brand" {
   support_email     = var.installation_service_account
   application_title = var.environment_name
@@ -24,13 +24,13 @@ resource "google_iap_brand" "project_brand" {
 
 resource "google_iap_client" "project_client" {
   display_name = "${var.environment_name} Client"
-  brand        =  google_iap_brand.project_brand.name
+  brand        = google_iap_brand.project_brand.name
 
   depends_on = [google_iap_client.project_client]
 }
 
 resource "google_identity_platform_tenant" "tenant" {
-  display_name          = var.idp_tenant
+  display_name = var.idp_tenant
 
   depends_on = [google_project_service.enable_cloudidentity_service, google_project_service.enable_identitytoolkit_service]
 }

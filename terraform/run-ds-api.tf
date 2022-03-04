@@ -30,19 +30,19 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
       containers {
         image = "gcr.io/${var.project_id}/ds-api:${var.tag}"
         env {
-          name = "API_KEY"
+          name  = "API_KEY"
           value = var.api_key
         }
         env {
-          name = "AUTH_DOMAIN"
+          name  = "AUTH_DOMAIN"
           value = var.auth_domain
         }
         env {
-          name = "TENANT_ID"
+          name  = "TENANT_ID"
           value = var.idp_tenant
         }
         env {
-          name = "DATA_PRODUCERS"
+          name  = "DATA_PRODUCERS"
           value = var.idp_tenant
         }
       }
@@ -50,7 +50,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
     }
     metadata {
       annotations = {
-        "run.googleapis.com/client-name"        = "terraform"
+        "run.googleapis.com/client-name" = "terraform"
       }
     }
   }
@@ -73,7 +73,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
         image = "gcr.io/${var.project_id}/ds-api:${var.tag}"
         resources {
           limits = {
-            cpu = "1"
+            cpu    = "1"
             memory = "2Gi"
           }
         }
@@ -82,10 +82,10 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
     }
     metadata {
       annotations = {
-        "autoscaling.knative.dev/minScale"      = "1"
-        "autoscaling.knative.dev/maxScale"      = "1"
-        "run.googleapis.com/client-name"        = "terraform"
-        "run.googleapis.com/cpu-throttling"     = "false"
+        "autoscaling.knative.dev/minScale"  = "1"
+        "autoscaling.knative.dev/maxScale"  = "1"
+        "run.googleapis.com/client-name"    = "terraform"
+        "run.googleapis.com/cpu-throttling" = "false"
       }
     }
   }

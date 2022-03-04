@@ -32,16 +32,16 @@ variable "environment_name" {
 variable "tag" {
   type        = string
   description = "Variable for Project ID."
-  default = "DEV"
+  default     = "DEV"
 }
 
 variable "region" {
-  type        = string
+  type    = string
   default = "us-central1"
 }
 
 variable "zone" {
-  type        = string
+  type    = string
   default = "us-central1-a"
 }
 
@@ -122,8 +122,8 @@ variable "iam_role_ds_pubsub_subscriber_description" {
 }
 
 variable "idp_tenant" {
-  type        = string
-  default     = "datashare"
+  type    = string
+  default = "datashare"
 }
 
 variable "api_base_url" {

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
- resource "null_resource" "gcloud_submit-ds-frontend-ui" {
+
+resource "null_resource" "gcloud_submit-ds-frontend-ui" {
   provisioner "local-exec" {
     command = "gcloud builds submit ../frontend --config ../frontend/cloudbuild.yaml --substitutions=TAG_NAME=${var.tag}"
   }
@@ -29,27 +29,27 @@ resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
       containers {
         image = "gcr.io/${var.project_id}/ds-frontend-ui:${var.tag}"
         env {
-          name = "VUE_APP_API_BASE_URL"
+          name  = "VUE_APP_API_BASE_URL"
           value = var.api_base_url
         }
         env {
-          name = "VUE_APP_API_KEY"
+          name  = "VUE_APP_API_KEY"
           value = var.api_key
         }
         env {
-          name = "VUE_APP_AUTH_DOMAIN"
+          name  = "VUE_APP_AUTH_DOMAIN"
           value = var.auth_domain
         }
         env {
-          name = "VUE_APP_TENANT_ID"
+          name  = "VUE_APP_TENANT_ID"
           value = var.idp_tenant
         }
       }
     }
     metadata {
       annotations = {
-        "run.googleapis.com/client-name"        = "terraform"
-        "autoscaling.knative.dev/maxScale"      = "10"
+        "run.googleapis.com/client-name"   = "terraform"
+        "autoscaling.knative.dev/maxScale" = "10"
       }
     }
   }
@@ -64,7 +64,7 @@ resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
 
 data "google_iam_policy" "api_gateway_binding" {
   binding {
-    role = "roles/run.invoker"
+    role    = "roles/run.invoker"
     members = ["serviceAccount:${local.api_gateway_service_account_name}"]
   }
 }

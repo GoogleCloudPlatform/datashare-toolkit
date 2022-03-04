@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 resource "google_service_account" "api_service_account" {
   project      = var.project_id
   account_id   = var.api_service_account_name
@@ -35,7 +35,7 @@ module "custom-role-project-datashare_api_manager" {
   title        = var.iam_role_ds_api_manager_title
   description  = var.iam_role_ds_api_manager_description
   stage        = "GA"
-  permissions  = [
+  permissions = [
     "bigquery.datasets.create",
     "bigquery.datasets.delete",
     "bigquery.datasets.get",
@@ -91,8 +91,8 @@ module "custom-role-project-datashare_api_manager" {
     "storage.objects.get",
     "storage.objects.list"
   ]
-  members     = ["serviceAccount:${local.api_service_account_name}"]
-  depends_on  = [google_service_account.api_service_account]
+  members    = ["serviceAccount:${local.api_service_account_name}"]
+  depends_on = [google_service_account.api_service_account]
 }
 
 module "custom-role-project-datashare_bigquery_dataViewer" {
@@ -104,7 +104,7 @@ module "custom-role-project-datashare_bigquery_dataViewer" {
   title        = var.iam_role_ds_bigquery_dataviewer_title
   description  = var.iam_role_ds_bigquery_dataviewer_description
   stage        = "GA"
-  permissions  = [
+  permissions = [
     "bigquery.datasets.get",
     "bigquery.datasets.getIamPolicy",
     "bigquery.models.export",
@@ -120,7 +120,7 @@ module "custom-role-project-datashare_bigquery_dataViewer" {
     "bigquery.tables.list",
     "resourcemanager.projects.get"
   ]
-  members              = []
+  members = []
 }
 
 module "custom-role-project-datashare_storage_objectViewer" {
@@ -132,12 +132,12 @@ module "custom-role-project-datashare_storage_objectViewer" {
   title        = var.iam_role_ds_storage_objectviewer_title
   description  = var.iam_role_ds_storage_objectviewer_description
   stage        = "GA"
-  permissions  = [
+  permissions = [
     "resourcemanager.projects.get",
     "storage.objects.get",
     "storage.objects.list"
   ]
-  members              = []
+  members = []
 }
 
 module "custom-role-project-datashare_pubsub_subscriber" {
@@ -149,10 +149,10 @@ module "custom-role-project-datashare_pubsub_subscriber" {
   title        = var.iam_role_ds_pubsub_subscriber_title
   description  = var.iam_role_ds_pubsub_subscriber_description
   stage        = "GA"
-  permissions  = [
+  permissions = [
     "resourcemanager.projects.get",
     "storage.objects.get",
     "storage.objects.list"
   ]
-  members              = []
+  members = []
 }

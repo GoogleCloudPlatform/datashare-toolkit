@@ -22,6 +22,9 @@
     - Manually enable Identity Platform multi-tenancy: https://cloud.google.com/identity-platform/docs/multi-tenancy-quickstart
 */
 
+// TODO:
+// Remote State: https://gmusumeci.medium.com/how-to-configure-the-gcp-backend-for-terraform-7ea24f59760a
+
 terraform {
   required_providers {
     google = {
@@ -39,7 +42,7 @@ provider "google" {
 }
 
 locals {
-  api_service_account_name = "${var.api_service_account_name}@${var.project_id}.iam.gserviceaccount.com"
+  api_service_account_name         = "${var.api_service_account_name}@${var.project_id}.iam.gserviceaccount.com"
   api_gateway_service_account_name = "${var.api_gateway_service_account_name}@${var.project_id}.iam.gserviceaccount.com"
 }
 
@@ -54,11 +57,6 @@ module "gcloud" {
   destroy_cmd_entrypoint = "rm"
   destroy_cmd_body       = "sa_email.txt"
 }
-
-// Load Balancer
-// https://cloud.google.com/load-balancing/docs/https/ext-http-lb-tf-module-examples#with_a_backend
-// https://github.com/terraform-google-modules/terraform-google-lb-http/blob/0da99a24fdaf4c4163039efa52243a500b604d1e/examples/cloudrun/main.tf
-// https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_global_network_endpoint_group
 
 // Point DNS A record to load balancer
 // Cloud DNS
