@@ -96,6 +96,13 @@ resource "google_project_service" "enable_apigateway_service" {
   disable_on_destroy = false
 }
 
+resource "google_project_service" "enable_servicecontrol_service" {
+  project = var.project_id
+  service = "servicecontrol.googleapis.com"
+
+  disable_on_destroy = false
+}
+
 resource "google_service_account" "api_service_account" {
   project      = var.project_id
   account_id   = var.api_service_account_name
@@ -459,6 +466,8 @@ resource "google_api_gateway_api" "api_cfg" {
   project = var.project_id
   provider = google-beta
   api_id = "api-gw-ds-api"
+
+  depends_on = [google_project_service.enable_apigateway_service, google_project_service.enable_servicecontrol_service]
 }
 
 // https://stackoverflow.com/questions/68306138/converting-json-to-yaml-in-terraform
@@ -481,4 +490,6 @@ resource "google_api_gateway_api_config" "api_cfg" {
   lifecycle {
     create_before_destroy = true
   }
+
+  depends_on = [google_project_service.enable_apigateway_service, google_project_service.enable_servicecontrol_service]
 }
