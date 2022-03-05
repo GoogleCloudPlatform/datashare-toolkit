@@ -48,7 +48,7 @@ function isExcludedPath(path) {
     if (path.startsWith('/welcome')) {
         return true;
     }
-    else if (path.startsWith('/docs/')) {
+    else if (path.startsWith('/docs')) {
         return true;
     }
     else if (path === '/accounts:register') {

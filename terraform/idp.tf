@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-// terraform import google_iap_brand.project_brand projects/114619800218/brands/114619800218
-resource "google_iap_brand" "project_brand" {
+data "google_project" "project" {
+}
+
+// terraform import google_iap_brand.default projects/114619800218/brands/114619800218
+// https://github.com/hashicorp/terraform-provider-google/issues/8843
+resource "google_iap_brand" "default" {
   support_email     = var.installation_service_account
   application_title = var.environment_name
-  project           = var.project_id
+  project           = data.google_project.project.number // var.project_id
 
   depends_on = [google_project_service.enable_iap_service]
 
@@ -35,11 +39,11 @@ resource "google_iap_brand" "project_brand" {
 // gcloud alpha iap oauth-brands list
 // https://github.com/hashicorp/terraform-provider-google/issues/8843
 // https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iap_client#import
-// terraform import google_iap_client.project_client projects/114619800218/brands/114619800218/114619800218-6ircb2ahr9q93ounq89c6i28sss1mop0.apps.googleusercontent.com
+// terraform import google_iap_client.default projects/114619800218/brands/114619800218/identityAwareProxyClients/114619800218-6ircb2ahr9q93ounq89c6i28sss1mop0.apps.googleusercontent.com
 // iap_client can only be managed when it's INTERNAL, otherwise it'll fail the pre-condition check (400)
 resource "google_iap_client" "default" {
   display_name = "${var.environment_name} Client"
-  brand        = google_iap_brand.project_brand.name
+  brand        = google_iap_brand.default.name
 }
 
 resource "google_identity_platform_tenant" "tenant" {
