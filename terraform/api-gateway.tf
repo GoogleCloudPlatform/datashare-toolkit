@@ -16,6 +16,7 @@
 
 locals {
   ds-api-cloud_run_url     = google_cloud_run_service.cloud-run-service-ds-api.status[0].url
+  ds-api-cloud_run_domain  = replace(google_cloud_run_service.cloud-run-service-ds-api.status[0].url, "https://", "")
   ds-api-open_api_spec_url = "${google_cloud_run_service.cloud-run-service-ds-api.status[0].url}/v1/docs/openapi_spec"
 }
 
@@ -43,7 +44,7 @@ data "http" "open_api_spec" {
 locals {
   open_api_spec_content = replace(replace(replace(yamlencode(
     jsondecode(data.http.open_api_spec.body)
-  ), "DS_API_FQDN", local.ds-api-cloud_run_url), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.default.client_id)
+  ), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.default.client_id)
 }
 
 output "open_api_spec" {
