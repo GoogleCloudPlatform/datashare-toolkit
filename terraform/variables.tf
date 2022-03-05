@@ -21,18 +21,18 @@ variable "installation_service_account" {
 
 variable "project_id" {
   type        = string
-  description = "Variable for Project ID."
+  description = "Variable for Project ID"
 }
 
 variable "environment_name" {
   type        = string
-  description = "Variable for Environment Name."
+  description = "Variable for Environment Name"
 }
 
 variable "tag" {
   type        = string
-  description = "Variable for Project ID."
-  default     = "DEV"
+  description = "Variable for Image Tag"
+  default     = "dev"
 }
 
 variable "region" {

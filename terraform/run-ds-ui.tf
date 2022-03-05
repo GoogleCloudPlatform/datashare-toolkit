@@ -68,3 +68,21 @@ data "google_iam_policy" "api_gateway_binding" {
     members = ["serviceAccount:${local.api_gateway_service_account_name}"]
   }
 }
+
+// Need project exemption for constraints/iam.allowedPolicyMemberDomains
+data "google_iam_policy" "noauth" {
+  binding {
+    role = "roles/run.invoker"
+    members = [
+      "allUsers",
+    ]
+  }
+}
+
+resource "google_cloud_run_service_iam_policy" "noauth" {
+  location = google_cloud_run_service.cloud-run-ds-frontend-ui.location
+  project  = google_cloud_run_service.cloud-run-ds-frontend-ui.project
+  service  = google_cloud_run_service.cloud-run-ds-frontend-ui.name
+
+  policy_data = data.google_iam_policy.noauth.policy_data
+}

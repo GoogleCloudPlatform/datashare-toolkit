@@ -43,7 +43,7 @@ data "http" "open_api_spec" {
 locals {
   open_api_spec_content = replace(replace(replace(yamlencode(
     jsondecode(data.http.open_api_spec.body)
-  ), "DS_API_FQDN", var.api_base_url), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.project_client.client_id)
+  ), "DS_API_FQDN", var.api_base_url), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.default.client_id)
 }
 
 output "open_api_spec" {

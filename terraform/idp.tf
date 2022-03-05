@@ -14,19 +14,31 @@
  * limitations under the License.
  */
 
+// terraform import google_iap_brand.project_brand projects/114619800218/brands/114619800218
 resource "google_iap_brand" "project_brand" {
   support_email     = var.installation_service_account
   application_title = var.environment_name
   project           = var.project_id
 
   depends_on = [google_project_service.enable_iap_service]
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to tags, e.g. because a management agent
+      # updates these based on some ruleset managed elsewhere.
+      support_email,
+      application_title
+    ]
+  }
 }
 
-resource "google_iap_client" "project_client" {
+// gcloud alpha iap oauth-brands list
+// https://github.com/hashicorp/terraform-provider-google/issues/8843
+// https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iap_client#import
+// terraform import google_iap_client.project_client projects/114619800218/brands/114619800218/114619800218-6ircb2ahr9q93ounq89c6i28sss1mop0.apps.googleusercontent.com
+resource "google_iap_client" "default" {
   display_name = "${var.environment_name} Client"
   brand        = google_iap_brand.project_brand.name
-
-  depends_on = [google_iap_client.project_client]
 }
 
 resource "google_identity_platform_tenant" "tenant" {
@@ -39,6 +51,6 @@ resource "google_identity_platform_tenant_default_supported_idp_config" "idp_con
   enabled       = true
   tenant        = google_identity_platform_tenant.tenant.name
   idp_id        = "google.com"
-  client_id     = google_iap_client.project_client.client_id
-  client_secret = google_iap_client.project_client.secret
+  client_id     = google_iap_client.default.client_id
+  client_secret = google_iap_client.default.secret
 }

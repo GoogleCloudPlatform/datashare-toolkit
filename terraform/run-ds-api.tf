@@ -97,23 +97,3 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
 
   depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-datashare-api]
 }
-
-/*
-Won't work without project exception
-data "google_iam_policy" "noauth" {
-  binding {
-    role = "roles/run.invoker"
-    members = [
-      "allUsers",
-    ]
-  }
-}
-
-resource "google_cloud_run_service_iam_policy" "noauth" {
-  location    = google_cloud_run_service.cloud-run-ds-frontend-ui.location
-  project     = google_cloud_run_service.cloud-run-ds-frontend-ui.project
-  service     = google_cloud_run_service.cloud-run-ds-frontend-ui.name
-
-  policy_data = data.google_iam_policy.noauth.policy_data
-}
-*/
