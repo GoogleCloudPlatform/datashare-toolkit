@@ -36,6 +36,7 @@ resource "google_iap_brand" "default" {
 // https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iap_client#import
 // terraform import google_iap_client.default projects/114619800218/brands/114619800218/identityAwareProxyClients/114619800218-6ircb2ahr9q93ounq89c6i28sss1mop0.apps.googleusercontent.com
 // iap_client can only be managed when it's INTERNAL, otherwise it'll fail the pre-condition check (400)
+// Why can't this client be modified on the console?
 resource "google_iap_client" "default" {
   display_name = "${var.environment_name} Client"
   brand        = google_iap_brand.default.name
