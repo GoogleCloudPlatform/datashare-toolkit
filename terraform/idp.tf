@@ -36,6 +36,7 @@ resource "google_iap_brand" "project_brand" {
 // https://github.com/hashicorp/terraform-provider-google/issues/8843
 // https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iap_client#import
 // terraform import google_iap_client.project_client projects/114619800218/brands/114619800218/114619800218-6ircb2ahr9q93ounq89c6i28sss1mop0.apps.googleusercontent.com
+// iap_client can only be managed when it's INTERNAL, otherwise it'll fail the pre-condition check (400)
 resource "google_iap_client" "default" {
   display_name = "${var.environment_name} Client"
   brand        = google_iap_brand.project_brand.name

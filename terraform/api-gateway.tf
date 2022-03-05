@@ -43,7 +43,7 @@ data "http" "open_api_spec" {
 locals {
   open_api_spec_content = replace(replace(replace(yamlencode(
     jsondecode(data.http.open_api_spec.body)
-  ), "DS_API_FQDN", var.api_base_url), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.default.client_id)
+  ), "DS_API_FQDN", local.ds-api-cloud_run_url), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.default.client_id)
 }
 
 output "open_api_spec" {
@@ -61,11 +61,17 @@ resource "google_api_gateway_api_config" "api_cfg" {
   provider      = google-beta
   api           = google_api_gateway_api.api_gw.api_id
   api_config_id = "config"
+  display_name  = "Datashare API Gateway"
 
   openapi_documents {
     document {
       path     = "spec.yaml"
       contents = base64encode(local.open_api_spec_content)
+    }
+  }
+  gateway_config {
+    backend_config {
+      google_service_account = local.api_gateway_service_account_name
     }
   }
   lifecycle {
