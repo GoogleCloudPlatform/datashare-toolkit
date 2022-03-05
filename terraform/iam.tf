@@ -16,6 +16,7 @@
 
 locals {
   iam_policy_service_account = "serviceAccount:${local.api_service_account_name}"
+  iam_policy_api_gateway_service_account = "serviceAccount:${local.api_gateway_service_account_name}"
 }
 
 resource "google_service_account" "api_service_account" {
@@ -151,4 +152,12 @@ resource "google_project_iam_member" "add_api_service_account_to_role" {
   member  = local.iam_policy_service_account
 
   depends_on = [google_project_iam_custom_role.custom-role-project-datashare_api_manager]
+}
+
+resource "google_project_iam_member" "add_api_gateway_service_account_to_role" {
+  project = var.project_id
+  role    = "roles/run.invoker"
+  member  = local.iam_policy_api_gateway_service_account
+
+  depends_on = [google_service_account.api_gateway_service_account]
 }

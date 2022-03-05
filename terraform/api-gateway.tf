@@ -88,3 +88,12 @@ resource "google_api_gateway_gateway" "gw" {
   gateway_id   = "api-gw-ds-api"
   display_name = "Datashare API Service Gateway"
 }
+
+// Grant API Gateway account run.invoker access on the API service
+resource "google_cloud_run_service_iam_member" "cloud_run_invoker" {
+  location = google_cloud_run_service.cloud-run-service-ds-api.location
+  project  = google_cloud_run_service.cloud-run-service-ds-api.project
+  service  = google_cloud_run_service.cloud-run-service-ds-api.name
+  role = "roles/run.invoker"
+  member = local.iam_policy_api_gateway_service_account
+}
