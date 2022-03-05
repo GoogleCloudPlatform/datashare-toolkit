@@ -15,7 +15,7 @@
  */
 
 locals {
-  iam_policy_service_account = "serviceAccount:${local.api_service_account_name}"
+  iam_policy_service_account             = "serviceAccount:${local.api_service_account_name}"
   iam_policy_api_gateway_service_account = "serviceAccount:${local.api_gateway_service_account_name}"
 }
 

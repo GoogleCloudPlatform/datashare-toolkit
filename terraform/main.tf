@@ -42,20 +42,10 @@ provider "google" {
 }
 
 locals {
-  api_service_account_name         = "${var.api_service_account_name}@${var.project_id}.iam.gserviceaccount.com"
-  api_gateway_service_account_name = "${var.api_gateway_service_account_name}@${var.project_id}.iam.gserviceaccount.com"
-}
-
-// Store email in file and use for support_email
-module "gcloud" {
-  source  = "terraform-google-modules/gcloud/google"
-  version = "~> 2.0"
-
-  platform = "linux"
-
-  create_cmd_body = "config list account --format 'value(core.account)' --project ${var.project_id} > sa_email.txt"
-  // destroy_cmd_entrypoint = "rm"
-  // destroy_cmd_body       = "sa_email.txt"
+  // api_service_account_name         = "${var.api_service_account_name}@${var.project_id}.iam.gserviceaccount.com"
+  // api_gateway_service_account_name = "${var.api_gateway_service_account_name}@${var.project_id}.iam.gserviceaccount.com"
+  api_service_account_name         = google_service_account.api_service_account.email
+  api_gateway_service_account_name = google_service_account.api_gateway_service_account.email
 }
 
 // Point DNS A record to load balancer
