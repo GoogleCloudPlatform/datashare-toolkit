@@ -35,17 +35,18 @@ terraform {
 }
 
 provider "google" {
-  credentials = file("/Volumes/GoogleDrive/My Drive/servidio-sandbox/service-account/cds-demo-2-911c68dd026e.json")
+  credentials = file(var.install_service_account_key)
   project     = var.project_id
   region      = var.region
   zone        = var.zone
 }
 
 locals {
-  // api_service_account_name         = "${var.api_service_account_name}@${var.project_id}.iam.gserviceaccount.com"
-  // api_gateway_service_account_name = "${var.api_gateway_service_account_name}@${var.project_id}.iam.gserviceaccount.com"
   api_service_account_name         = google_service_account.api_service_account.email
   api_gateway_service_account_name = google_service_account.api_gateway_service_account.email
+}
+
+data "google_project" "project" {
 }
 
 // Point DNS A record to load balancer

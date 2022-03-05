@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-data "google_project" "project" {
-}
-
 // terraform import google_iap_brand.default projects/114619800218/brands/114619800218
 // https://github.com/hashicorp/terraform-provider-google/issues/8843
 resource "google_iap_brand" "default" {
   support_email     = google_service_account.api_service_account.email
   application_title = var.environment_name
-  project           = data.google_project.project.number // var.project_id
+  project           = data.google_project.project.number
 
   depends_on = [google_project_service.enable_iap_service]
 
