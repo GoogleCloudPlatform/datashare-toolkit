@@ -16,6 +16,7 @@
 
 // Reverse engineer:
 // https://github.com/GoogleCloudPlatform/terraformer
+// https://github.com/terraform-google-modules/terraform-google-lb-http/blob/master/modules/serverless_negs/main.tf
 
 // Load Balancer
 // https://cloud.google.com/load-balancing/docs/https/ext-http-lb-tf-module-examples#with_a_backend
