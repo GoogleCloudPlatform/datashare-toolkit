@@ -42,6 +42,9 @@ resource "google_iap_client" "default" {
   brand        = google_iap_brand.default.name
 }
 
+// Read existing iap_client manually created
+// https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/iap_client
+
 resource "google_identity_platform_tenant" "tenant" {
   display_name = var.idp_tenant
 
