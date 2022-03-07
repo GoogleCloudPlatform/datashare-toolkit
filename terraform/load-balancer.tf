@@ -26,41 +26,6 @@
 // https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep
 
 // https://github.com/terraform-google-modules/terraform-google-lb-http/tree/master/modules/serverless_negs
-module "lb-http" {
-  source  = "GoogleCloudPlatform/lb-http/google//modules/serverless_negs"
-  version = "~> 6.2.0"
-  name    = var.lb_name
-  project = var.project_id
-
-  ssl                             = var.ssl
-  managed_ssl_certificate_domains = [var.api_domain]
-  // https_redirect                  = var.ssl
-
-  backends = {
-    default = {
-      description = null
-      groups = [
-        {
-          group = google_compute_region_network_endpoint_group.serverless_neg.id
-        }
-      ]
-      enable_cdn              = false
-      security_policy         = null
-      custom_request_headers  = null
-      custom_response_headers = null
-
-      iap_config = {
-        enable               = false
-        oauth2_client_id     = ""
-        oauth2_client_secret = ""
-      }
-      log_config = {
-        enable      = false
-        sample_rate = null
-      }
-    }
-  }
-}
 
 resource "google_compute_region_network_endpoint_group" "serverless_neg" {
   provider              = google-beta
@@ -70,23 +35,65 @@ resource "google_compute_region_network_endpoint_group" "serverless_neg" {
   region                = var.region
   serverless_deployment {
     platform = "apigateway.googleapis.com"
-    // resource = "api-gw-ds-api"
-    url_mask = "<gateway>" //"<gateway>-testurl123.uc.gateway.dev/hello" // google_api_gateway_gateway.gw.default_hostname // google_api_gateway_gateway.gw.gateway_id
+    url_mask = ""
+    resource = google_api_gateway_gateway.gw.gateway_id
   }
 }
 
-/*
+resource "google_compute_backend_service" "default" {
+  provider = google-beta
+  project  = var.project_id
+  name     = "backend-service"
+
+  backend {
+    group = google_compute_region_network_endpoint_group.serverless_neg.id
+  }
+}
+
+resource "google_compute_url_map" "datashare-api-gateway-url-map" {
+  default_service = google_compute_backend_service.default.id
+  name            = "t-datashare-api-gateway-url-map"
+  project         = var.project_id
+}
+
+resource "google_compute_managed_ssl_certificate" "tfer--datashare-lb-ssl-cert" {
+  managed {
+    domains = ["t-${var.api_base_url}"]
+  }
+
+  name    = "t-datashare-lb-ssl-cert"
+  project = var.project_id
+  type    = "MANAGED"
+}
+
+resource "google_compute_target_https_proxy" "t-datashare-target-http-proxy" {
+  name             = "t-datashare-target-http-proxy"
+  project = var.project_id
+  proxy_bind       = "false"
+  quic_override    = "NONE"
+  ssl_certificates = [google_compute_managed_ssl_certificate.tfer--datashare-lb-ssl-cert.id]
+  url_map          = google_compute_url_map.datashare-api-gateway-url-map.id
+}
+
+resource "google_compute_global_forwarding_rule" "t-datashare-lb-forwarding-rule" {
+  ip_protocol           = "TCP"
+  ip_version            = "IPV4"
+  load_balancing_scheme = "EXTERNAL"
+  name                  = "t-datashare-lb-forwarding-rule"
+  port_range            = "443-443"
+  project = var.project_id
+  target                = google_compute_target_https_proxy.t-datashare-target-http-proxy.id
+}
+
+data "google_dns_managed_zone" "env_dns_zone" {
+  name = "demo-1"
+}
+
 resource "google_dns_record_set" "a" {
-  name         = "backend.${google_dns_managed_zone.prod.dns_name}"
-  managed_zone = google_dns_managed_zone.prod.name
+  name         = "t-api.${data.google_dns_managed_zone.env_dns_zone.dns_name}"
+  managed_zone = data.google_dns_managed_zone.env_dns_zone.name
   type         = "A"
   ttl          = 300
 
-  // Replace with A value from lb
-  rrdatas = ["8.8.8.8"]
+  rrdatas = [google_compute_global_forwarding_rule.t-datashare-lb-forwarding-rule.ip_address]
 }
-
-resource "google_dns_managed_zone" "prod" {
-  name     = "prod-zone"
-  dns_name = "${var.ui_domain}."
-}*/
