@@ -30,7 +30,8 @@ data "google_service_account_id_token" "oidc" {
 
 // This has issues when run the google-beta provider
 data "http" "open_api_spec" {
-  url = "${local.ds-api-open_api_spec_url}/"
+  count = var.use_remote_open_api_spec ? 1 : 0
+  url   = "${local.ds-api-open_api_spec_url}/"
 
   # Optional request headers
   request_headers = {
@@ -43,11 +44,12 @@ data "http" "open_api_spec" {
 
 locals {
   open_api_spec_content_local  = replace(replace(replace(file(var.open_api_spec_file), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.default.client_id)
-  open_api_spec_content_remote = replace(replace(replace(yamlencode(jsondecode(data.http.open_api_spec.body)), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.default.client_id)
+  open_api_spec_content_remote = var.use_remote_open_api_spec ? replace(replace(replace(yamlencode(jsondecode(data.http.open_api_spec[0].body)), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.default.client_id) : ""
+  open_api_spec_content        = var.use_remote_open_api_spec == true ? local.open_api_spec_content_remote : local.open_api_spec_content_local
 }
 
 output "open_api_spec" {
-  value = local.open_api_spec_content_remote
+  value = local.open_api_spec_content
 }
 
 resource "google_api_gateway_api" "api_gw" {
@@ -67,7 +69,7 @@ resource "google_api_gateway_api_config" "api_cfg" {
   openapi_documents {
     document {
       path     = "spec.yaml"
-      contents = base64encode(local.open_api_spec_content_remote)
+      contents = base64encode(local.open_api_spec_content)
     }
   }
   gateway_config {
