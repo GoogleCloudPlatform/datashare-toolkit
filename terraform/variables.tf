@@ -166,3 +166,21 @@ variable "lb_name" {
   description = "Name for load balancer and associated resources"
   default     = "datashare-api-lb"
 }
+
+variable "storage_bucket_location" {
+  default     = "US"
+  description = "The location of the Google Cloud storage bucket used for ingestion."
+
+  validation {
+    condition     = var.storage_bucket_location == "US" || var.storage_bucket_location == "EU" || var.storage_bucket_location == "ASIA"
+    error_message = "You can only enter the lastest release of 0.7.2."
+  }
+}
+
+variable "ingestion_storage_bucket_storage_class" {
+  default = "STANDARD"
+}
+
+variable "ingestion_storage_bucket_suffix" {
+  default = "-datashare-ingestion"
+}
