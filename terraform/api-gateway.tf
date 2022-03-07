@@ -42,13 +42,12 @@ data "http" "open_api_spec" {
 }
 
 locals {
-  open_api_spec_content = replace(replace(replace(yamlencode(
-    jsondecode(data.http.open_api_spec.body)
-  ), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.default.client_id)
+  open_api_spec_content_local  = replace(replace(replace(file(var.open_api_spec_file), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.default.client_id)
+  open_api_spec_content_remote = replace(replace(replace(yamlencode(jsondecode(data.http.open_api_spec.body)), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.default.client_id)
 }
 
 output "open_api_spec" {
-  value = local.open_api_spec_content
+  value = local.open_api_spec_content_remote
 }
 
 resource "google_api_gateway_api" "api_gw" {
@@ -58,17 +57,17 @@ resource "google_api_gateway_api" "api_gw" {
 }
 
 resource "google_api_gateway_api_config" "api_cfg" {
-  project       = var.project_id
-  provider      = google-beta
-  api           = google_api_gateway_api.api_gw.api_id
+  project  = var.project_id
+  provider = google-beta
+  api      = google_api_gateway_api.api_gw.api_id
   // api_config_id = "config"
-  display_name  = "Datashare API Config"
+  display_name         = "Datashare API Config"
   api_config_id_prefix = "datashare-api-config-"
 
   openapi_documents {
     document {
       path     = "spec.yaml"
-      contents = base64encode(local.open_api_spec_content)
+      contents = base64encode(local.open_api_spec_content_remote)
     }
   }
   gateway_config {

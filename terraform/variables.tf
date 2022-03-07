@@ -184,3 +184,8 @@ variable "ingestion_storage_bucket_storage_class" {
 variable "ingestion_storage_bucket_suffix" {
   default = "-datashare-ingestion"
 }
+
+variable "open_api_spec_file" {
+  description = "The open api spec local file location"
+  default     = "../api/config/openapi_spec.v2.yaml.tmpl"
+}
