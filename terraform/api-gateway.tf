@@ -59,9 +59,9 @@ resource "google_api_gateway_api" "api_gw" {
 }
 
 resource "google_api_gateway_api_config" "api_cfg" {
-  project  = var.project_id
-  provider = google-beta
-  api      = google_api_gateway_api.api_gw.api_id
+  project              = var.project_id
+  provider             = google-beta
+  api                  = google_api_gateway_api.api_gw.api_id
   display_name         = "Datashare API Config"
   api_config_id_prefix = "datashare-api-config-"
 

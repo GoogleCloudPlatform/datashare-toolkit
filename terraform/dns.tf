@@ -13,3 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+data "google_dns_managed_zone" "env_dns_zone" {
+  name = "demo-1"
+}
+
+resource "google_dns_record_set" "a" {
+  name         = "api.${data.google_dns_managed_zone.env_dns_zone.dns_name}"
+  managed_zone = data.google_dns_managed_zone.env_dns_zone.name
+  type         = "A"
+  ttl          = 300
+
+  rrdatas = [google_compute_global_forwarding_rule.datashare-lb-forwarding-rule.ip_address]
+}

@@ -17,7 +17,7 @@
 resource "google_compute_region_network_endpoint_group" "serverless_neg" {
   provider              = google-beta
   project               = var.project_id
-  name                  = "serverless-neg"
+  name                  = "datashare-serverless-neg"
   network_endpoint_type = "SERVERLESS"
   region                = var.region
   serverless_deployment {
@@ -30,7 +30,7 @@ resource "google_compute_region_network_endpoint_group" "serverless_neg" {
 resource "google_compute_backend_service" "default" {
   provider = google-beta
   project  = var.project_id
-  name     = "backend-service"
+  name     = "datashare-backend-service"
 
   backend {
     group = google_compute_region_network_endpoint_group.serverless_neg.id
@@ -43,7 +43,7 @@ resource "google_compute_url_map" "datashare-api-gateway-url-map" {
   project         = var.project_id
 }
 
-resource "google_compute_managed_ssl_certificate" "tfer--datashare-lb-ssl-cert" {
+resource "google_compute_managed_ssl_certificate" "datashare-lb-ssl-cert" {
   managed {
     domains = [var.api_base_url]
   }
@@ -53,34 +53,21 @@ resource "google_compute_managed_ssl_certificate" "tfer--datashare-lb-ssl-cert" 
   type    = "MANAGED"
 }
 
-resource "google_compute_target_https_proxy" "t-datashare-target-http-proxy" {
+resource "google_compute_target_https_proxy" "datashare-target-http-proxy" {
   name             = "datashare-target-http-proxy"
   project          = var.project_id
   proxy_bind       = "false"
   quic_override    = "NONE"
-  ssl_certificates = [google_compute_managed_ssl_certificate.tfer--datashare-lb-ssl-cert.id]
+  ssl_certificates = [google_compute_managed_ssl_certificate.datashare-lb-ssl-cert.id]
   url_map          = google_compute_url_map.datashare-api-gateway-url-map.id
 }
 
-resource "google_compute_global_forwarding_rule" "t-datashare-lb-forwarding-rule" {
+resource "google_compute_global_forwarding_rule" "datashare-lb-forwarding-rule" {
   ip_protocol           = "TCP"
   ip_version            = "IPV4"
   load_balancing_scheme = "EXTERNAL"
   name                  = "datashare-lb-forwarding-rule"
   port_range            = "443-443"
   project               = var.project_id
-  target                = google_compute_target_https_proxy.t-datashare-target-http-proxy.id
-}
-
-data "google_dns_managed_zone" "env_dns_zone" {
-  name = "demo-1"
-}
-
-resource "google_dns_record_set" "a" {
-  name         = "api.${data.google_dns_managed_zone.env_dns_zone.dns_name}"
-  managed_zone = data.google_dns_managed_zone.env_dns_zone.name
-  type         = "A"
-  ttl          = 300
-
-  rrdatas = [google_compute_global_forwarding_rule.t-datashare-lb-forwarding-rule.ip_address]
+  target                = google_compute_target_https_proxy.datashare-target-http-proxy.id
 }
