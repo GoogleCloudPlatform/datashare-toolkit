@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-// Reverse engineer:
-// https://github.com/GoogleCloudPlatform/terraformer
-// https://github.com/terraform-google-modules/terraform-google-lb-http/blob/master/modules/serverless_negs/main.tf
-
-// Load Balancer
-// https://cloud.google.com/load-balancing/docs/https/ext-http-lb-tf-module-examples#with_a_backend
-// https://github.com/terraform-google-modules/terraform-google-lb-http/blob/0da99a24fdaf4c4163039efa52243a500b604d1e/examples/cloudrun/main.tf
-// https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_global_network_endpoint_group
-
-// https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep
-
-// https://github.com/terraform-google-modules/terraform-google-lb-http/tree/master/modules/serverless_negs
-
 resource "google_compute_region_network_endpoint_group" "serverless_neg" {
   provider              = google-beta
   project               = var.project_id
@@ -52,23 +39,23 @@ resource "google_compute_backend_service" "default" {
 
 resource "google_compute_url_map" "datashare-api-gateway-url-map" {
   default_service = google_compute_backend_service.default.id
-  name            = "t-datashare-api-gateway-url-map"
+  name            = "datashare-api-lb"
   project         = var.project_id
 }
 
 resource "google_compute_managed_ssl_certificate" "tfer--datashare-lb-ssl-cert" {
   managed {
-    domains = ["t-${var.api_base_url}"]
+    domains = [var.api_base_url]
   }
 
-  name    = "t-datashare-lb-ssl-cert"
+  name    = "datashare-lb-ssl-cert"
   project = var.project_id
   type    = "MANAGED"
 }
 
 resource "google_compute_target_https_proxy" "t-datashare-target-http-proxy" {
-  name             = "t-datashare-target-http-proxy"
-  project = var.project_id
+  name             = "datashare-target-http-proxy"
+  project          = var.project_id
   proxy_bind       = "false"
   quic_override    = "NONE"
   ssl_certificates = [google_compute_managed_ssl_certificate.tfer--datashare-lb-ssl-cert.id]
@@ -79,9 +66,9 @@ resource "google_compute_global_forwarding_rule" "t-datashare-lb-forwarding-rule
   ip_protocol           = "TCP"
   ip_version            = "IPV4"
   load_balancing_scheme = "EXTERNAL"
-  name                  = "t-datashare-lb-forwarding-rule"
+  name                  = "datashare-lb-forwarding-rule"
   port_range            = "443-443"
-  project = var.project_id
+  project               = var.project_id
   target                = google_compute_target_https_proxy.t-datashare-target-http-proxy.id
 }
 
@@ -90,7 +77,7 @@ data "google_dns_managed_zone" "env_dns_zone" {
 }
 
 resource "google_dns_record_set" "a" {
-  name         = "t-api.${data.google_dns_managed_zone.env_dns_zone.dns_name}"
+  name         = "api.${data.google_dns_managed_zone.env_dns_zone.dns_name}"
   managed_zone = data.google_dns_managed_zone.env_dns_zone.name
   type         = "A"
   ttl          = 300
