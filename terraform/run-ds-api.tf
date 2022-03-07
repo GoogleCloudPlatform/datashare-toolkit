@@ -49,7 +49,8 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
     }
     metadata {
       annotations = {
-        "run.googleapis.com/client-name" = "terraform"
+        "run.googleapis.com/client-name" = "terraform",
+        "run.googleapis.com/ingress"     = "all"
       }
     }
   }
@@ -84,7 +85,8 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
         "autoscaling.knative.dev/minScale"  = "1"
         "autoscaling.knative.dev/maxScale"  = "1"
         "run.googleapis.com/client-name"    = "terraform"
-        "run.googleapis.com/cpu-throttling" = "false"
+        "run.googleapis.com/cpu-throttling" = "false",
+        "run.googleapis.com/ingress"        = "internal"
       }
     }
   }

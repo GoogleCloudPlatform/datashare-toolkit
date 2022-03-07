@@ -49,7 +49,8 @@ resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
     metadata {
       annotations = {
         "run.googleapis.com/client-name"   = "terraform"
-        "autoscaling.knative.dev/maxScale" = "10"
+        "autoscaling.knative.dev/maxScale" = "10",
+        "run.googleapis.com/ingress"       = "all"
       }
     }
   }
