@@ -71,6 +71,3 @@ resource "google_storage_bucket" "ingestion_bucket" {
   uniform_bucket_level_access = true
   storage_class               = var.ingestion_storage_bucket_storage_class
 }
-
-// Point DNS A record to load balancer
-// Cloud DNS

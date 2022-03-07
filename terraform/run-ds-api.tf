@@ -20,7 +20,6 @@ resource "null_resource" "gcloud_submit-datashare-api" {
   }
 }
 
-// https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_service
 resource "google_cloud_run_service" "cloud-run-service-ds-api" {
   name     = var.cloud_run_ds_api_service_name
   location = var.region
