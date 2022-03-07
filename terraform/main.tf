@@ -24,6 +24,8 @@
 
 // TODO:
 // Remote State: https://gmusumeci.medium.com/how-to-configure-the-gcp-backend-for-terraform-7ea24f59760a
+// https://www.terraform.io/language/settings/backends/gcs
+// https://github.com/hashicorp/terraform/issues/17153
 
 terraform {
   required_providers {
