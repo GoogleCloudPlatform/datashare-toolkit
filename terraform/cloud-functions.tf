@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+/*
 resource "null_resource" "create_cloud_function_zip" {
   triggers = {
     always_run = "${timestamp()}"
@@ -55,4 +56,4 @@ resource "google_cloudfunctions_function" "datashare_cloud_function" {
     VERBOSE_MODE  = "true",
     ARCHIVE_FILES = "false",
   }
-}
+}*/
