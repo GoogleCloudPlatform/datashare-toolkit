@@ -25,6 +25,12 @@ resource "google_service_account" "api_service_account" {
   display_name = var.api_service_account_description
 }
 
+resource "google_service_account" "ui_service_account" {
+  project      = var.project_id
+  account_id   = var.ui_service_account_name
+  display_name = var.ui_service_account_description
+}
+
 resource "google_service_account" "api_gateway_service_account" {
   project      = var.project_id
   account_id   = var.api_gateway_service_account_name

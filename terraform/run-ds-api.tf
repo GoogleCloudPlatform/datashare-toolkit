@@ -27,7 +27,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
   template {
     spec {
       containers {
-        image = "gcr.io/${var.project_id}/ds-api:${var.tag}"
+        image = "gcr.io/${var.project_id}/datashare-api:${var.tag}"
         env {
           name  = "API_KEY"
           value = var.api_key
@@ -70,7 +70,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
   template {
     spec {
       containers {
-        image = "gcr.io/${var.project_id}/ds-api:${var.tag}"
+        image = "gcr.io/${var.project_id}/datashare-api:${var.tag}"
         resources {
           limits = {
             cpu    = "1"

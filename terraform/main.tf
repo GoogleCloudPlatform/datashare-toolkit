@@ -45,6 +45,7 @@ provider "google" {
 
 locals {
   api_service_account_name         = google_service_account.api_service_account.email
+  ui_service_account_name         = google_service_account.ui_service_account.email
   api_gateway_service_account_name = google_service_account.api_gateway_service_account.email
 }
 

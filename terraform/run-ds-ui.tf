@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-resource "null_resource" "gcloud_submit-ds-frontend-ui" {
+resource "null_resource" "gcloud_submit-ds-ui" {
   provisioner "local-exec" {
     command = "gcloud builds submit ../frontend --config ../frontend/cloudbuild.yaml --substitutions=TAG_NAME=${var.tag} --project ${var.project_id}"
   }
 }
 
-resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
-  name     = var.cloud_run_ds_frontend_service_name
+resource "google_cloud_run_service" "cloud-run-ds-ui" {
+  name     = var.cloud_run_ds_ui_service_name
   location = var.region
 
   template {
     spec {
       containers {
-        image = "gcr.io/${var.project_id}/ds-frontend-ui:${var.tag}"
+        image = "gcr.io/${var.project_id}/datashare-ui:${var.tag}"
         env {
           name  = "VUE_APP_API_BASE_URL"
           value = var.api_domain
@@ -45,6 +45,7 @@ resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
           value = var.idp_tenant
         }
       }
+      service_account_name = local.ui_service_account_name
     }
     metadata {
       annotations = {
@@ -60,7 +61,7 @@ resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
     latest_revision = true
   }
 
-  depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-ds-frontend-ui]
+  depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-ds-ui]
 }
 
 data "google_iam_policy" "api_gateway_binding" {
@@ -81,9 +82,9 @@ data "google_iam_policy" "noauth" {
 }
 
 resource "google_cloud_run_service_iam_policy" "noauth" {
-  location = google_cloud_run_service.cloud-run-ds-frontend-ui.location
-  project  = google_cloud_run_service.cloud-run-ds-frontend-ui.project
-  service  = google_cloud_run_service.cloud-run-ds-frontend-ui.name
+  location = google_cloud_run_service.cloud-run-ds-ui.location
+  project  = google_cloud_run_service.cloud-run-ds-ui.project
+  service  = google_cloud_run_service.cloud-run-ds-ui.name
 
   policy_data = data.google_iam_policy.noauth.policy_data
 }

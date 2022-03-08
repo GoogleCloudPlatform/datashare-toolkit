@@ -32,7 +32,7 @@ variable "environment_name" {
 variable "tag" {
   type        = string
   description = "Variable for Image Tag"
-  default     = "dev"
+  default     = "2.0"
 }
 
 variable "region" {
@@ -53,6 +53,14 @@ variable "api_service_account_description" {
   default = "Datashare API Manager Role"
 }
 
+variable "ui_service_account_name" {
+  default = "ds-ui-mgr"
+}
+
+variable "ui_service_account_description" {
+  default = "Datashare UI Manager Role"
+}
+
 variable "api_gateway_service_account_name" {
   default = "api-gw-ds-api"
 }
@@ -65,8 +73,8 @@ variable "cloud_run_ds_api_service_name" {
   default = "ds-api"
 }
 
-variable "cloud_run_ds_frontend_service_name" {
-  default = "ds-frontend-ui"
+variable "cloud_run_ds_ui_service_name" {
+  default = "ds-ui"
 }
 
 variable "cloud_run_ds_listener_service_name" {
