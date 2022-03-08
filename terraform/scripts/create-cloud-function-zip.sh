@@ -1,11 +1,12 @@
 #!/bin/bash
 
 TMP_PATH="tmp"
+
 if [ -d "${TMP_PATH}" ]; then
     rm -R "${TMP_PATH}"
 fi
+
 mkdir -p tmp/ingestion/batch/shared
-# CLOUD_FUNCTION_ZIP_FILE_NAME="../datashare-batch-cloud-function-src.zip"
 FUNCTION_SOURCE="tmp/ingestion/batch"
 FUNCTION_SHARED="tmp/ingestion/batch/shared"
 
@@ -22,6 +23,3 @@ else
     echo 'Running on linux, performing package.json replacement for cds-shared module'
     sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' tmp/ingestion/batch/package.json
 fi
-
-# cd tmp/ingestion/batch
-# zip -r $CLOUD_FUNCTION_ZIP_FILE_NAME .

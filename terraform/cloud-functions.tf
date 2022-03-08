@@ -35,9 +35,7 @@ data "archive_file" "function_package" {
   depends_on = [null_resource.create_cloud_function_zip]
 }
 
-// For Cloud Function source code file
-// Force deployment of cloud function
-// https://github.com/hashicorp/terraform-provider-google/issues/1938
+// Force deployment of cloud function: https://github.com/hashicorp/terraform-provider-google/issues/1938
 resource "google_storage_bucket_object" "cloud_function_source_code" {
   name   = format("%s#%s", var.datashare_ingestion_source_code_filename, data.archive_file.function_package.output_md5)
   bucket = google_storage_bucket.install_bucket.name
@@ -76,6 +74,6 @@ resource "null_resource" "delete_cloud_function_temp_folder" {
   provisioner "local-exec" {
     command = "rm -rf ./tmp || true"
   }
-  
+
   depends_on = [google_storage_bucket_object.cloud_function_source_code]
 }
