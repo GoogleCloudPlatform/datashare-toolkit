@@ -222,3 +222,15 @@ variable "datashare_ingestion_source_code_filename" {
   default     = "datashare-batch-cloud-function-src.zip"
   description = "The ingestion function source zip file path"
 }
+
+variable "create_static_api_ip_address" {
+  type = bool
+  description = "Flag indicating if a static ip should be reserved for the api, otherwise an ephemeral IP address is assigned"
+  default = true
+}
+
+variable "api_ip_address" {
+  type        = string
+  description = "Existing IPv4 address to use (the actual IP address value)"
+  default     = null
+}
