@@ -209,3 +209,7 @@ variable "dns_zone" {
   type        = string
   description = "The Cloud DNS Zone to update if applicable"
 }
+
+variable "datashare_ingestion_source_code_filename" {
+  default = "datashare-batch-cloud-function-src.zip"
+}
