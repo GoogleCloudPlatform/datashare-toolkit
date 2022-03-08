@@ -219,5 +219,6 @@ variable "dns_zone" {
 }
 
 variable "datashare_ingestion_source_code_filename" {
-  default = "datashare-batch-cloud-function-src.zip"
+  default     = "datashare-batch-cloud-function-src.zip"
+  description = "The ingestion function source zip file path"
 }
