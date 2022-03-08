@@ -75,5 +75,5 @@ resource "null_resource" "delete_cloud_function_temp_folder" {
     command = "rm -rf ./tmp || true"
   }
 
-  depends_on = [google_storage_bucket_object.cloud_function_source_code]
+  depends_on = [google_cloudfunctions_function.datashare_cloud_function]
 }

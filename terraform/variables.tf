@@ -224,9 +224,9 @@ variable "datashare_ingestion_source_code_filename" {
 }
 
 variable "create_static_api_ip_address" {
-  type = bool
+  type        = bool
   description = "Flag indicating if a static ip should be reserved for the api, otherwise an ephemeral IP address is assigned"
-  default = true
+  default     = true
 }
 
 variable "api_ip_address" {

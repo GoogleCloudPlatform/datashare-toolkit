@@ -63,7 +63,7 @@ resource "google_compute_target_https_proxy" "datashare-target-http-proxy" {
 }
 
 resource "google_compute_global_address" "default" {
-  count = var.create_static_api_ip_address ? 1 : 0
+  count      = var.create_static_api_ip_address ? 1 : 0
   project    = var.project_id
   name       = "datashare-api-static-ip"
   ip_version = "IPV4"
@@ -72,8 +72,8 @@ resource "google_compute_global_address" "default" {
 // TODO: Reserve an IP address first rather than allow auto-generation
 resource "google_compute_global_forwarding_rule" "datashare-lb-forwarding-rule" {
   ip_protocol           = "TCP"
-  ip_version            = "IPV4"
-  ip_address            = var.create_static_api_ip_address ? google_compute_global_address.default[0].id : var.api_ip_address
+  ip_version            = var.create_static_api_ip_address ? "UNSPECIFIED_VERSION" : "IPV4"
+  ip_address            = var.create_static_api_ip_address ? google_compute_global_address.default[0].address : var.api_ip_address
   load_balancing_scheme = "EXTERNAL"
   name                  = "datashare-lb-forwarding-rule"
   port_range            = "443-443"
