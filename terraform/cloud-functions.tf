@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/*
 resource "null_resource" "create_cloud_function_zip" {
   triggers = {
     always_run = "${timestamp()}"
@@ -24,36 +23,48 @@ resource "null_resource" "create_cloud_function_zip" {
   }
   provisioner "local-exec" {
     when    = destroy
-    command = "echo 'Destroy create_cloud_function_zip provisioner'"
+    command = "rm -rf ./tmp || true"
   }
 }
 
-# For Cloud Function source code file
+data "archive_file" "function_package" {
+  type        = "zip"
+  source_dir  = "tmp/ingestion/batch/"
+  output_path = "tmp/ingestion/${var.datashare_ingestion_source_code_filename}"
+
+  depends_on = [null_resource.create_cloud_function_zip]
+}
+
+// For Cloud Function source code file
+// Force deployment of cloud function
+// https://github.com/hashicorp/terraform-provider-google/issues/1938
 resource "google_storage_bucket_object" "cloud_function_source_code" {
-  name   = var.datashare_ingestion_source_code_filename
+  name   = format("%s#%s", var.datashare_ingestion_source_code_filename, data.archive_file.function_package.output_md5)
   bucket = google_storage_bucket.install_bucket.name
-  source = "./tmp/ingestion/${var.datashare_ingestion_source_code_filename}"
+  source = data.archive_file.function_package.output_path
 
   depends_on = [null_resource.create_cloud_function_zip]
 }
 
 resource "google_cloudfunctions_function" "datashare_cloud_function" {
-  name        = "myProcess"
-  description = "Datashare ingestion function"
-  runtime     = "nodejs16"
-
-  available_memory_mb   = 128
+  region                = var.region
+  name                  = var.ingestion_function_name
+  description           = var.ingestion_function_description
+  runtime               = "nodejs16"
+  available_memory_mb   = 256
   source_archive_bucket = google_storage_bucket.install_bucket.name
   source_archive_object = google_storage_bucket_object.cloud_function_source_code.name
-  trigger_http          = true
-  timeout               = 60
+  timeout               = 540
   entry_point           = "processEvent"
   labels = {
     datashare = "success"
   }
-
+  event_trigger {
+    event_type = "google.storage.object.finalize"
+    resource   = google_storage_bucket.ingestion_bucket.name
+  }
   environment_variables = {
     VERBOSE_MODE  = "true",
     ARCHIVE_FILES = "false",
   }
-}*/
+}

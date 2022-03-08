@@ -188,6 +188,14 @@ variable "ingestion_storage_bucket_suffix" {
   default = "-datashare-ingestion"
 }
 
+variable "ingestion_function_name" {
+  default = "datashare-ingestion"
+}
+
+variable "ingestion_function_description" {
+  default = "Datashare Ingestion Function"
+}
+
 variable "open_api_spec_file" {
   type        = string
   description = "The open api spec local file location"
