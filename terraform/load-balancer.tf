@@ -45,7 +45,7 @@ resource "google_compute_url_map" "datashare-api-gateway-url-map" {
 
 resource "google_compute_managed_ssl_certificate" "datashare-lb-ssl-cert" {
   managed {
-    domains = [var.api_base_url]
+    domains = [var.api_domain]
   }
 
   name    = "datashare-lb-ssl-cert"

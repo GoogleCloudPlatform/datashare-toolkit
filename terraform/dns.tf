@@ -15,11 +15,12 @@
  */
 
 data "google_dns_managed_zone" "env_dns_zone" {
-  name = "demo-1"
+  name = var.dns_zone
 }
 
 resource "google_dns_record_set" "a" {
-  name         = "api.${data.google_dns_managed_zone.env_dns_zone.dns_name}"
+  count        = var.update_cloud_dns == true && var.dns_zone != "" ? 1 : 0
+  name         = "${var.api_domain}."
   managed_zone = data.google_dns_managed_zone.env_dns_zone.name
   type         = "A"
   ttl          = 300

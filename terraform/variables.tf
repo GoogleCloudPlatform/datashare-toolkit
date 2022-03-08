@@ -131,11 +131,6 @@ variable "ui_domain" {
   description = "Base domain of the UI"
 }
 
-variable "api_base_url" {
-  type        = string
-  description = "Base URL of the API"
-}
-
 variable "api_key" {
   type        = string
   description = "The API Key"
@@ -195,4 +190,14 @@ variable "use_remote_open_api_spec" {
   type        = bool
   description = "Flag indicating if remove api spec should be used otherwise local"
   default     = false
+}
+
+variable "update_cloud_dns" {
+  type        = bool
+  description = "Flag indicating if the Cloud DNS zone should have its A record updated"
+}
+
+variable "dns_zone" {
+  type        = string
+  description = "The Cloud DNS Zone to update if applicable"
 }

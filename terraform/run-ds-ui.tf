@@ -30,7 +30,7 @@ resource "google_cloud_run_service" "cloud-run-ds-frontend-ui" {
         image = "gcr.io/${var.project_id}/ds-frontend-ui:${var.tag}"
         env {
           name  = "VUE_APP_API_BASE_URL"
-          value = var.api_base_url
+          value = var.api_domain
         }
         env {
           name  = "VUE_APP_API_KEY"
