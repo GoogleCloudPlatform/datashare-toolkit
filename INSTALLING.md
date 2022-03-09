@@ -28,5 +28,4 @@ Installing Datashare consists of some manual configuration in the GCP console, a
       - https://{UI_DOMAIN}/
       - https://{UI_DOMAIN}/myProducts
       - https://{UI_DOMAIN}/activation
-   7. Click the 'UI_DOMAIN' button.
-   8. **Note down the client ID** from the section titled 'Your Client ID' in the modal dialog.
+   7. Click the 'CREATE' button. **Note down the client ID** from the section titled 'Your Client ID' in the modal dialog.
