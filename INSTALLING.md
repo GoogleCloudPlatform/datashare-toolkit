@@ -81,7 +81,7 @@ data_producers              =
 ```
 
 # Additional Installation Steps
-1. Update the OAuth client to include the Cloud Run generated domain.
+1. Update the OAuth client credential to include the Cloud Run generated domain.
 
    ```
    REGION=us-central1
@@ -95,6 +95,6 @@ data_producers              =
       - {CLOUD_RUN_DS_UI_DOMAIN}/myProducts
       - {CLOUD_RUN_DS_UI_DOMAIN}/activation
 
-2. Add the Cloud Run Generated UI address and the custom UI domain to the list of Authorized Domains in IDP.
+2. Add the Cloud Run Generated UI domain and the custom UI domain to the list of Authorized Domains in IDP.
    1. Go to the 'SECURITY' tab and click 'ADD DOMAIN'.
    2. Add the {CLOUD_RUN_DS_UI_DOMAIN} and {CUSTOM_UI_DOMAIN} to the list and click 'SAVE'.
