@@ -18,7 +18,7 @@ data "google_dns_managed_zone" "env_dns_zone" {
   name = var.dns_zone
 }
 
-resource "google_dns_record_set" "a" {
+resource "google_dns_record_set" "api_a" {
   count        = var.update_cloud_dns == true && var.dns_zone != "" ? 1 : 0
   name         = "${var.api_domain}."
   managed_zone = data.google_dns_managed_zone.env_dns_zone.name
@@ -26,4 +26,27 @@ resource "google_dns_record_set" "a" {
   ttl          = 300
 
   rrdatas = [google_compute_global_forwarding_rule.datashare-lb-forwarding-rule.ip_address]
+}
+
+locals {
+  dns_records = {
+    "A" = [
+      for rr in google_cloud_run_domain_mapping.ui[0].status[0].resource_records :
+      rr.rrdata if rr.type == "A"
+    ]
+    "AAAA" = [
+      for rr in google_cloud_run_domain_mapping.ui[0].status[0].resource_records :
+      rr.rrdata if rr.type == "AAAA"
+    ]
+  }
+}
+
+resource "google_dns_record_set" "ui" {
+  for_each     = local.dns_records
+
+  name         = "${var.ui_domain}."
+  managed_zone = data.google_dns_managed_zone.env_dns_zone.name
+  type         = each.key
+  ttl          = 300
+  rrdatas      = each.value
 }

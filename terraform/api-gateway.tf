@@ -43,8 +43,8 @@ data "http" "open_api_spec" {
 }
 
 locals {
-  open_api_spec_content_local  = replace(replace(replace(file(var.open_api_spec_file), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.default.client_id)
-  open_api_spec_content_remote = var.use_remote_open_api_spec ? replace(replace(replace(yamlencode(jsondecode(data.http.open_api_spec[0].body)), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", google_iap_client.default.client_id) : ""
+  open_api_spec_content_local  = replace(replace(replace(file(var.open_api_spec_file), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", var.oauth_client_id)
+  open_api_spec_content_remote = var.use_remote_open_api_spec ? replace(replace(replace(yamlencode(jsondecode(data.http.open_api_spec[0].body)), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", var.oauth_client_id) : ""
   open_api_spec_content        = var.use_remote_open_api_spec == true ? local.open_api_spec_content_remote : local.open_api_spec_content_local
 }
 

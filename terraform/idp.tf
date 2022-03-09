@@ -42,10 +42,10 @@ resource "google_iap_client" "default" {
   brand        = google_iap_brand.default.name
 }*/
 
-data "google_iap_client" "default" {
-  brand     = "projects/${data.google_project.project.number}/brands/${data.google_project.project.number}"
-  client_id = var.oauth_client_id
-}
+# data "google_iap_client" "default" {
+#   brand     = "projects/${data.google_project.project.number}/brands/${data.google_project.project.number}"
+#   client_id = var.oauth_client_id
+# }
 
 // Read existing iap_client manually created
 // https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/iap_client
@@ -60,6 +60,6 @@ resource "google_identity_platform_tenant_default_supported_idp_config" "idp_con
   enabled       = true
   tenant        = google_identity_platform_tenant.tenant.name
   idp_id        = "google.com"
-  client_id     = google_iap_client.default.client_id
-  client_secret = google_iap_client.default.secret
+  client_id     = var.oauth_client_id
+  client_secret = var.oauth_client_secret
 }

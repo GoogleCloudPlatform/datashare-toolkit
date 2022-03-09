@@ -14,10 +14,10 @@ Installing Datashare consists of some manual configuration in the GCP console, a
    5. Download the service account key by selecting your service account from the [list of accounts](https://console.cloud.google.com/iam-admin/serviceaccounts). Select the 'KEYS' tab. Click the 'ADD KEY' button, select 'Create new key'. Leave the 'Key type' selection on 'JSON'.
    6. Create the key and save it to the file system. **Note down the service account name**.
 4. [Configure OAuth consent](https://console.cloud.google.com/apis/credentials/consent) screen. For more information on enabling IAP see [Enabling Cloud IAP for Compute Engine](https://cloud.google.com/iap/docs/enabling-compute-howto#enabling_iap_console).
-5. Determine the URIs that will be used for the Datashare UI and API Service. Recommended formats are:
+5. Determine the URIs that will be used for the Datashare UI and API Service. It is not necessary to use custom domains, however if you are using marketplace integration it is strongly encouraged. Recommended formats are as follows.
    - UI - datashare.example.com
    - API - api.datashare.example.com
-6. Create an [OAuth client ID](https://console.cloud.google.com/apis/credentials). For more information see [Creating OAuth credentials](https://cloud.google.com/iap/docs/enabling-compute-howto#oauth-credentials).
+6. Create an [OAuth client ID](https://console.cloud.google.com/apis/credentials). For more information see [Creating OAuth credentials](https://cloud.google.com/iap/docs/enabling-compute-howto#oauth-credentials). If you are not using custom domains, skip steps 5 & 6.
    1. Click 'CREATE CREDENTIALS'.
    2. Select the 'OAuth client ID' option.
    3. Select application type 'Web application'.
@@ -28,7 +28,7 @@ Installing Datashare consists of some manual configuration in the GCP console, a
       - https://{UI_DOMAIN}/
       - https://{UI_DOMAIN}/myProducts
       - https://{UI_DOMAIN}/activation
-   7. Click the 'CREATE' button. **Note down the client ID** from the section titled 'Your Client ID' in the modal dialog.
+   7. Click the 'CREATE' button. **Note down the client ID and the client secret** from the section titled 'Your Client ID' in the modal dialog.
 7. [Enable Identity Platform](https://console.cloud.google.com/marketplace/details/google-cloud-platform/customer-identity).
 8. [Enable multi-tenancy(https://console.cloud.google.com/customer-identity/settings)] For more information see [Getting started with multi-tenancy](https://cloud.google.com/identity-platform/docs/multi-tenancy-quickstart).
    1. Go to the 'SECURITY' tab and click 'ALLOW TENANTS'.
@@ -40,7 +40,7 @@ Installing Datashare consists of some manual configuration in the GCP console, a
 At this point, you should have the following:
 - GCP Project ID
 - Service Account Key
-- OAuth Client ID
+- OAuth Client ID and Client Secret
 - IDP apiKey and authDomain
 - Cloud DNS Zone Name (if applicable)
 
@@ -56,8 +56,9 @@ At this point, you should have the following:
 | dns_zone | No | The Cloud DNS Zone to update if applicable | demo-1 |
 | api_domain | Yes | The domain name for the UI | api.datashare.example.com |
 | ui_domain | Yes | The domain name for the API Service | datashare.example.com |
-| api_key | Yes | The apiKey value from the IDP application setup details | AIzaSyASruzvgBtusP8dtyM1e77UZgJSsJdWxG8 |
+| api_key | Yes | The apiKey value from the IDP application setup details | AIzsdSDFKLJDSFdsfjkdkWxG8 |
 | oauth_client_id | Yes | The client ID from the created OAuth client | 245237819806-nnt4fafg024kph1h507o4574eoejirdq.apps.googleusercontent.com |
+| oauth_client_secret | Yes | The client secret from the created OAuth client | GSDFDFD-jdsfndsfksdfklj4kljsdkndsf |
 | auth_domain | Yes | The domain name for the API Service | datashare-demo-1.firebaseapp.com |
 | data_producers | Yes | Comma delimited list of email addresses for datashare administrators | datashare-demo-1.firebaseapp.com |
 

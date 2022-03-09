@@ -64,6 +64,20 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
   depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-ds-ui]
 }
 
+resource "google_cloud_run_domain_mapping" "ui" {
+  location = var.region
+  name     = var.ui_domain
+  count    = var.ui_domain != null ? 1 : 0
+
+  metadata {
+    namespace = data.google_project.project.number
+  }
+
+  spec {
+    route_name = google_cloud_run_service.cloud-run-ds-ui.name
+  }
+}
+
 data "google_iam_policy" "api_gateway_binding" {
   binding {
     role    = "roles/run.invoker"

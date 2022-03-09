@@ -130,18 +130,21 @@ variable "iam_role_ds_pubsub_subscriber_description" {
 }
 
 variable "idp_tenant" {
-  type    = string
-  default = "datashare"
+  type        = string
+  default     = "datashare"
+  description = "IDP Tenant"
 }
 
 variable "ui_domain" {
   type        = string
   description = "The domain name for the UI"
+  default     = null
 }
 
 variable "api_key" {
   type        = string
   description = "The API Key"
+  sensitive   = true
 }
 
 variable "auth_domain" {
@@ -152,6 +155,12 @@ variable "auth_domain" {
 variable "oauth_client_id" {
   type        = string
   description = "The OAuth client ID"
+}
+
+variable "oauth_client_secret" {
+  type        = string
+  description = "The OAuth client secret"
+  sensitive   = true
 }
 
 variable "data_producers" {
