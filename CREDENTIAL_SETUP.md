@@ -58,7 +58,5 @@ If you have not yet configured the [OAuth consent screen](https://console.cloud.
 
 9. Copy the client ID from the section titled 'Your Client ID' in the modal dialog. This will be used later when configuring the VUE_APP_GOOGLE_APP_CLIENT_ID value for the UI.
 
-    <img src="./assets/credentials/oauth_client_created.png" alt="OAuth client created" height="200"/>
-
 # Next
 [Deploy Datashare](./DEPLOY.md)
