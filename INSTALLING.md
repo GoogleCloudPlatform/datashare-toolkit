@@ -47,6 +47,7 @@ At this point, you should have the following:
 
 # Perform Domain Verification
 
+
 # Run Terraform Script
 1. Open the terraform variable file [terraform.tfvars](/terraform/terraform.tfvars) and make the following replacements:
 
