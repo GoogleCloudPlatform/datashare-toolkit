@@ -15,7 +15,7 @@
  */
 
 locals {
-  iam_policy_service_account             = "serviceAccount:${local.api_service_account_name}"
+  iam_policy_api_service_account         = "serviceAccount:${local.api_service_account_name}"
   iam_policy_api_gateway_service_account = "serviceAccount:${local.api_gateway_service_account_name}"
 }
 
@@ -155,15 +155,35 @@ resource "google_project_iam_custom_role" "custom-role-project-datashare_pubsub_
 resource "google_project_iam_member" "add_api_service_account_to_role" {
   project = var.project_id
   role    = "projects/${var.project_id}/roles/${var.iam_role_ds_api_manager_id}"
-  member  = local.iam_policy_service_account
+  member  = local.iam_policy_api_service_account
 
   depends_on = [google_project_iam_custom_role.custom-role-project-datashare_api_manager]
 }
 
-resource "google_project_iam_member" "add_api_gateway_service_account_to_role" {
+// It would be preferable to add this role access at the tenant level, however there's no automated way to do that at the moment
+resource "google_project_iam_member" "add_api_service_account_to_idp_admin_role" {
   project = var.project_id
-  role    = "roles/run.invoker"
-  member  = local.iam_policy_api_gateway_service_account
+  role    = "roles/identityplatform.admin"
+  member  = local.iam_policy_api_service_account
+
+  depends_on = [google_project_iam_custom_role.custom-role-project-datashare_api_manager]
+}
+
+data "google_iam_policy" "api_gateway_invoker" {
+  binding {
+    role = "roles/run.invoker"
+    members = [
+      local.iam_policy_api_gateway_service_account
+    ]
+  }
+}
+
+resource "google_cloud_run_service_iam_policy" "add_api_gateway_service_account_to_role" {
+  location = google_cloud_run_service.cloud-run-service-ds-api.location
+  project  = google_cloud_run_service.cloud-run-service-ds-api.project
+  service  = google_cloud_run_service.cloud-run-service-ds-api.name
+
+  policy_data = data.google_iam_policy.api_gateway_invoker.policy_data
 
   depends_on = [google_service_account.api_gateway_service_account]
 }
