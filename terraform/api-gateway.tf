@@ -15,6 +15,7 @@
  */
 
 locals {
+  ds-ui-cloud_run_url      = google_cloud_run_service.cloud-run-ds-ui.status[0].url
   ds-api-cloud_run_url     = google_cloud_run_service.cloud-run-service-ds-api.status[0].url
   ds-api-cloud_run_domain  = replace(google_cloud_run_service.cloud-run-service-ds-api.status[0].url, "https://", "")
   ds-api-open_api_spec_url = "${google_cloud_run_service.cloud-run-service-ds-api.status[0].url}/v1/docs/openapi_spec"
@@ -97,4 +98,16 @@ resource "google_cloud_run_service_iam_member" "cloud_run_invoker" {
   service  = google_cloud_run_service.cloud-run-service-ds-api.name
   role     = "roles/run.invoker"
   member   = local.iam_policy_api_gateway_service_account
+}
+
+output "ds_ui_cloud_run_url" {
+  value = local.ds-ui-cloud_run_url
+}
+
+output "ds_api_cloud_run_url" {
+  value = local.ds-api-cloud_run_url
+}
+
+output "ds_api_gateway_address" {
+  value = "https://${google_api_gateway_gateway.gw.default_hostname}"
 }
