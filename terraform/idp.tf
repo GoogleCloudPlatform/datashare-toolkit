@@ -16,7 +16,7 @@
 
 // terraform import google_iap_brand.default projects/114619800218/brands/114619800218
 // https://github.com/hashicorp/terraform-provider-google/issues/8843
-resource "google_iap_brand" "default" {
+/*resource "google_iap_brand" "default" {
   support_email     = google_service_account.api_service_account.email
   application_title = var.environment_name
   project           = data.google_project.project.number
@@ -40,6 +40,11 @@ resource "google_iap_brand" "default" {
 resource "google_iap_client" "default" {
   display_name = "${var.environment_name} Client"
   brand        = google_iap_brand.default.name
+}*/
+
+data "google_iap_client" "default" {
+  brand     = "projects/${data.google_project.project.number}/brands/${data.google_project.project.number}"
+  client_id = var.oauth_client_id
 }
 
 // Read existing iap_client manually created

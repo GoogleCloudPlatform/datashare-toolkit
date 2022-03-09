@@ -57,6 +57,7 @@ At this point, you should have the following:
 | api_domain | Yes | The domain name for the UI | api.datashare.example.com |
 | ui_domain | Yes | The domain name for the API Service | datashare.example.com |
 | api_key | Yes | The apiKey value from the IDP application setup details | AIzaSyASruzvgBtusP8dtyM1e77UZgJSsJdWxG8 |
+| oauth_client_id | Yes | The client ID from the created OAuth client | 245237819806-nnt4fafg024kph1h507o4574eoejirdq.apps.googleusercontent.com |
 | auth_domain | Yes | The domain name for the API Service | datashare-demo-1.firebaseapp.com |
 | data_producers | Yes | Comma delimited list of email addresses for datashare administrators | datashare-demo-1.firebaseapp.com |
 
@@ -69,6 +70,7 @@ dns_zone                    =
 api_domain                  = 
 ui_domain                   = 
 api_key                     = 
+oauth_client_id             =
 auth_domain                 = 
 data_producers              = 
 ```

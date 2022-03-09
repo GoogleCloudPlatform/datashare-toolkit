@@ -149,6 +149,11 @@ variable "auth_domain" {
   description = "The Auth Domain"
 }
 
+variable "oauth_client_id" {
+  type        = string
+  description = "The OAuth client ID"
+}
+
 variable "data_producers" {
   type        = string
   description = "The data producers list"
