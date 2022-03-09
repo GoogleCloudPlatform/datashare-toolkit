@@ -49,7 +49,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
           value = var.idp_tenant
         }
         env {
-          name = "MANAGED_PROJECTS"
+          name  = "MANAGED_PROJECTS"
           value = local.managed_projects
         }
       }
@@ -70,11 +70,10 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
 
   lifecycle {
     ignore_changes = [
-      template.spec.containers.env["DATA_PRODUCERS"],
-      template.spec.containers.env["MANAGED_PROJECTS"],
+      template[0].spec[0].containers[0].env
     ]
   }
-  
+
   depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-datashare-api]
 }
 
