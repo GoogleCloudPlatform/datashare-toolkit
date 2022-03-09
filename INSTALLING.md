@@ -64,7 +64,7 @@ At this point, you should have the following:
 | oauth_client_id | Yes | The client ID from the created OAuth client | 245237819806-nnt4fafg024kph1h507o4574eoejirdq.apps.googleusercontent.com |
 | oauth_client_secret | Yes | The client secret from the created OAuth client | GSDFDFD-jdsfndsfksdfklj4kljsdkndsf |
 | auth_domain | Yes | The domain name for the API Service | datashare-demo-1.firebaseapp.com |
-| data_producers | Yes | Comma delimited list of email addresses for datashare administrators | datashare-demo-1.firebaseapp.com |
+| data_producers | Yes | Comma delimited list of email addresses for datashare administrators | cloudysanfrancisco@gmail.com,jeffersonloveshiking@gmail.com |
 
 ## Variable Worksheet
 ```
