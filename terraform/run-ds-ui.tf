@@ -30,7 +30,7 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
         image = "gcr.io/${var.project_id}/datashare-ui:${var.tag}"
         env {
           name  = "VUE_APP_API_BASE_URL"
-          value = "${var.api_domain}/v1"
+          value = "https://${var.api_domain}/v1"
         }
         env {
           name  = "VUE_APP_API_KEY"
