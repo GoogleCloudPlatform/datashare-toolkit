@@ -72,7 +72,7 @@ resource "google_compute_global_address" "default" {
 // TODO: Reserve an IP address first rather than allow auto-generation
 resource "google_compute_global_forwarding_rule" "datashare-lb-forwarding-rule" {
   ip_protocol           = "TCP"
-  ip_version            = var.create_static_api_ip_address ? "UNSPECIFIED_VERSION" : "IPV4"
+  ip_version            = var.create_static_api_ip_address ? null : "IPV4"
   ip_address            = var.create_static_api_ip_address ? google_compute_global_address.default[0].address : var.api_ip_address
   load_balancing_scheme = "EXTERNAL"
   name                  = "datashare-lb-forwarding-rule"
