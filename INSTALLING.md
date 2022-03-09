@@ -59,3 +59,16 @@ At this point, you should have the following:
 | api_key | Yes | The apiKey value from the IDP application setup details | AIzaSyASruzvgBtusP8dtyM1e77UZgJSsJdWxG8 |
 | auth_domain | Yes | The domain name for the API Service | datashare-demo-1.firebaseapp.com |
 | data_producers | Yes | Comma delimited list of email addresses for datashare administrators | datashare-demo-1.firebaseapp.com |
+
+## Variable Worksheet
+```
+project_id                  = 
+environment_name            = 
+update_cloud_dns            = 
+dns_zone                    = 
+api_domain                  = 
+ui_domain                   = 
+api_key                     = 
+auth_domain                 = 
+data_producers              = 
+```
