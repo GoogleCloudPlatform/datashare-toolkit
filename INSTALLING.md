@@ -3,7 +3,7 @@
 # Overview
 Installing Datashare consists of some manual configuration in the GCP console, and executing shell and Terraform scripts. In order to perform the installation you must have roles/owner or roles/editor permission on an GCP Project.
 
-# Steps
+# Installation Steps
 1. Create a GCP Project in the [GCP console](https://console.cloud.google.com/projectcreate) and note down the project Id. If you have an existing project that you plan to use, **note down the project Id**.
 2. Enable Google Compute Engine for the project through the [GCP console](https://console.developers.google.com/apis/library/compute.googleapis.com).
 3. Create a [GCP service account key](https://console.cloud.google.com/apis/credentials/serviceaccountkey). For more information on service account keys, see the [GCP IAM documentation](https://cloud.google.com/iam/docs) on [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
