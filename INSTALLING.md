@@ -13,4 +13,5 @@ Installing Datashare consists of some manual configuration in the GCP console, a
    4. Skip the "Grant users access to this service account" step and click "DONE".
    5. Download the service account key by selecting your service account from the [list of accounts](https://console.cloud.google.com/iam-admin/serviceaccounts). Select the 'KEYS' tab. Click the 'ADD KEY' button, select 'Create new key'. Leave the 'Key type' selection on 'JSON'.
    6. Create the key and save it to the file system.
-4. 
+4. [Configure OAuth consent](https://console.cloud.google.com/apis/credentials/consent) screen. For more information on enabling IAP see [Enabling Cloud IAP for Compute Engine](https://cloud.google.com/iap/docs/enabling-compute-howto#enabling_iap_console).
+5. Create OAuth credentials.
