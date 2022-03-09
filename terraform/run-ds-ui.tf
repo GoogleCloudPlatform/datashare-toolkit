@@ -64,6 +64,7 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
   depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-ds-ui]
 }
 
+// terraform import google_cloud_run_domain_mapping.ui locations/us-central1/namespaces/cds-demo-1-271622/domainmappings/datashare-demo-1.fsi.joonix.net
 resource "google_cloud_run_domain_mapping" "ui" {
   location = var.region
   name     = var.ui_domain
