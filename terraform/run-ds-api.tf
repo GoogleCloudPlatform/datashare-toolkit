@@ -42,11 +42,11 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
         }
         env {
           name  = "TENANT_ID"
-          value = var.idp_tenant
+          value = google_identity_platform_tenant.tenant.name
         }
         env {
           name  = "DATA_PRODUCERS"
-          value = var.idp_tenant
+          value = var.data_producers
         }
         env {
           name  = "MANAGED_PROJECTS"
