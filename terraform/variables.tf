@@ -32,7 +32,7 @@ variable "environment_name" {
 variable "tag" {
   type        = string
   description = "Variable for Image Tag"
-  default     = "2.0"
+  default     = "2.0.0"
 }
 
 variable "region" {
