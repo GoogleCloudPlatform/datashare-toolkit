@@ -32,6 +32,7 @@ Installing Datashare consists of some manual configuration in the GCP console, a
 7. [Enable Identity Platform](https://console.cloud.google.com/marketplace/details/google-cloud-platform/customer-identity).
 8. [Enable multi-tenancy(https://console.cloud.google.com/customer-identity/settings)] For more information see [Getting started with multi-tenancy](https://cloud.google.com/identity-platform/docs/multi-tenancy-quickstart).
    1. Go to the 'SECURITY' tab and click 'ALLOW TENANTS'.
+9. Gather the **apiKey** and **authDomain** values from the 'APPLICATION SETUP DETAILS' button on the [IDP](https://console.cloud.google.com/customer-identity) page.
 9. If you will use Cloud DNS to manage your DNS, [enable the service](https://console.cloud.google.com/marketplace/product/google/dns.googleapis.com).
    1. [Create a DNS zone](https://cloud.google.com/dns/docs/zones?_ga=2.242753410.-1036388681.1645220594#create_managed_zones) and **note down the zone name**.
 
@@ -40,4 +41,21 @@ At this point, you should have the following:
 - GCP Project ID
 - Service Account Key
 - OAuth Client ID
+- IDP apiKey and authDomain
 - Cloud DNS Zone Name (if applicable)
+
+# Run Terraform Script
+1. Open the terraform variable file [terraform.tfvars](/terraform/terraform.tfvars) and make the following replacements:
+
+| Name | Required | Description | Example |
+|-|-|-|-|
+| install_service_account_key | Yes | Path to the service account key that was saved. | /example/path/my-project-123a98ee034f.json |
+| project_id | Yes | The GCP Project Id | my-project |
+| environment_name | Yes | A display name for the environment | Datashare Demo 1 |
+| update_cloud_dns | No | Flag indicating if the Cloud DNS zone should have its A record updated | true |
+| dns_zone | No | The Cloud DNS Zone to update if applicable | demo-1 |
+| api_domain | Yes | The domain name for the UI | api.datashare.example.com |
+| ui_domain | Yes | The domain name for the API Service | datashare.example.com |
+| api_key | Yes | The apiKey value from the IDP application setup details | AIzaSyASruzvgBtusP8dtyM1e77UZgJSsJdWxG8 |
+| auth_domain | Yes | The domain name for the API Service | datashare-demo-1.firebaseapp.com |
+| data_producers | Yes | Comma delimited list of email addresses for datashare administrators | datashare-demo-1.firebaseapp.com |

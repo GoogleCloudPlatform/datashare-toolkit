@@ -136,7 +136,7 @@ variable "idp_tenant" {
 
 variable "ui_domain" {
   type        = string
-  description = "Base domain of the UI"
+  description = "The domain name for the UI"
 }
 
 variable "api_key" {
@@ -161,7 +161,7 @@ variable "ssl" {
 }
 
 variable "api_domain" {
-  description = "Domain name to run the load balancer on. Used if `ssl` is `true`."
+  description = "The domain name for the API Service"
   type        = string
 }
 
