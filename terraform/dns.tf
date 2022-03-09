@@ -42,7 +42,7 @@ locals {
 }
 
 resource "google_dns_record_set" "ui" {
-  for_each     = local.dns_records
+  for_each = local.dns_records
 
   name         = "${var.ui_domain}."
   managed_zone = data.google_dns_managed_zone.env_dns_zone.name

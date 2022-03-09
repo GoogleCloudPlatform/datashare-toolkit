@@ -42,7 +42,7 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
         }
         env {
           name  = "VUE_APP_TENANT_ID"
-          value = var.idp_tenant
+          value = google_identity_platform_tenant.tenant.name
         }
       }
       service_account_name = local.ui_service_account_name

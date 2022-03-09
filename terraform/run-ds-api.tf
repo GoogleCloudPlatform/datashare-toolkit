@@ -20,6 +20,10 @@ resource "null_resource" "gcloud_submit-datashare-api" {
   }
 }
 
+locals {
+  managed_projects = "{ \"${var.project_id}\": { \"MARKETPLACE_INTEGRATION_ENABLED\": false, \"labels\": { \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT\": \"\", \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT\": \"\", \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL\": \"\" } } }"
+}
+
 resource "google_cloud_run_service" "cloud-run-service-ds-api" {
   name     = var.cloud_run_ds_api_service_name
   location = var.region
@@ -44,6 +48,10 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
           name  = "DATA_PRODUCERS"
           value = var.idp_tenant
         }
+        env {
+          name = "MANAGED_PROJECTS"
+          value = local.managed_projects
+        }
       }
       service_account_name = local.api_service_account_name
     }
@@ -60,6 +68,13 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
     latest_revision = true
   }
 
+  lifecycle {
+    ignore_changes = [
+      template.spec.containers.env["DATA_PRODUCERS"],
+      template.spec.containers.env["MANAGED_PROJECTS"],
+    ]
+  }
+  
   depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-datashare-api]
 }
 

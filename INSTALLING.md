@@ -28,12 +28,13 @@ Installing Datashare consists of some manual configuration in the GCP console, a
       - https://{UI_DOMAIN}/
       - https://{UI_DOMAIN}/myProducts
       - https://{UI_DOMAIN}/activation
+      - https://{PROJECT_ID}.firebaseapp.com/__/auth/handler
    7. Click the 'CREATE' button. **Note down the client ID and the client secret** from the section titled 'Your Client ID' in the modal dialog.
 7. [Enable Identity Platform](https://console.cloud.google.com/marketplace/details/google-cloud-platform/customer-identity).
 8. [Enable multi-tenancy(https://console.cloud.google.com/customer-identity/settings)] For more information see [Getting started with multi-tenancy](https://cloud.google.com/identity-platform/docs/multi-tenancy-quickstart).
    1. Go to the 'SECURITY' tab and click 'ALLOW TENANTS'.
 9. Gather the **apiKey** and **authDomain** values from the 'APPLICATION SETUP DETAILS' button on the [IDP](https://console.cloud.google.com/customer-identity) page.
-9. If you will use Cloud DNS to manage your DNS, [enable the service](https://console.cloud.google.com/marketplace/product/google/dns.googleapis.com).
+10. If you will use Cloud DNS to manage your DNS, [enable the service](https://console.cloud.google.com/marketplace/product/google/dns.googleapis.com).
    1. [Create a DNS zone](https://cloud.google.com/dns/docs/zones?_ga=2.242753410.-1036388681.1645220594#create_managed_zones) and **note down the zone name**.
 
 # Review
@@ -72,6 +73,7 @@ api_domain                  =
 ui_domain                   = 
 api_key                     = 
 oauth_client_id             =
+oauth_client_secret         =
 auth_domain                 = 
 data_producers              = 
 ```
