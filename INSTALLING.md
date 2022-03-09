@@ -23,11 +23,11 @@ Installing Datashare consists of some manual configuration in the GCP console, a
    3. Select application type 'Web application'.
    4. Provide a name for the credential. IE: "Datashare Client".
    5. Add the following URIs to the 'Authorized JavaScript origins' by clicking on '+ ADD URI' within the section.
-      - https://{UI_DOMAIN}
+      - https://{CUSTOM_UI_DOMAIN}
    6. Add the following URIs to the 'Authorized redirect URIs' by clicking on '+ ADD URI' within the section.
-      - https://{UI_DOMAIN}/
-      - https://{UI_DOMAIN}/myProducts
-      - https://{UI_DOMAIN}/activation
+      - https://{CUSTOM_UI_DOMAIN}/
+      - https://{CUSTOM_UI_DOMAIN}/myProducts
+      - https://{CUSTOM_UI_DOMAIN}/activation
       - https://{PROJECT_ID}.firebaseapp.com/__/auth/handler
    7. Click the 'CREATE' button. **Note down the client ID and the client secret** from the section titled 'Your Client ID' in the modal dialog.
 7. [Enable Identity Platform](https://console.cloud.google.com/marketplace/details/google-cloud-platform/customer-identity).
@@ -44,6 +44,8 @@ At this point, you should have the following:
 - OAuth Client ID and Client Secret
 - IDP apiKey and authDomain
 - Cloud DNS Zone Name (if applicable)
+
+# Perform Domain Verification
 
 # Run Terraform Script
 1. Open the terraform variable file [terraform.tfvars](/terraform/terraform.tfvars) and make the following replacements:
@@ -77,3 +79,22 @@ oauth_client_secret         =
 auth_domain                 = 
 data_producers              = 
 ```
+
+# Additional Installation Steps
+1. Update the OAuth client to include the Cloud Run generated domain.
+
+   ```
+   REGION=us-central1
+   gcloud run services describe ds-api --platform managed --region $REGION --format="value(status.url)"
+   ```
+
+   1. Add the following URIs to the 'Authorized JavaScript origins' by clicking on '+ ADD URI' within the section.
+      - {CLOUD_RUN_DS_UI_DOMAIN}
+   2. Add the following URIs to the 'Authorized redirect URIs' by clicking on '+ ADD URI' within the section.
+      - {CLOUD_RUN_DS_UI_DOMAIN}/
+      - {CLOUD_RUN_DS_UI_DOMAIN}/myProducts
+      - {CLOUD_RUN_DS_UI_DOMAIN}/activation
+
+2. Add the Cloud Run Generated UI address and the custom UI domain to the list of Authorized Domains in IDP.
+   1. Go to the 'SECURITY' tab and click 'ADD DOMAIN'.
+   2. Add the {CLOUD_RUN_DS_UI_DOMAIN} and {CUSTOM_UI_DOMAIN} to the list and click 'SAVE'.
