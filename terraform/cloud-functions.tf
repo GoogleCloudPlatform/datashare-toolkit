@@ -40,9 +40,13 @@ data "archive_file" "function_package" {
 
 // Force deployment of cloud function: https://github.com/hashicorp/terraform-provider-google/issues/1938
 resource "google_storage_bucket_object" "cloud_function_source_code" {
-  name   = format("%s#%s", var.datashare_ingestion_source_code_filename, data.archive_file.function_package.output_md5)
+  name = var.datashare_ingestion_source_code_filename
+  // name = format("%s#%s", var.datashare_ingestion_source_code_filename, data.archive_file.function_package.output_md5)
   bucket = google_storage_bucket.install_bucket.name
   source = data.archive_file.function_package.output_path
+  metadata = {
+    version = replace(var.tag, ".", "_")
+  }
 }
 
 resource "google_cloudfunctions_function" "datashare_cloud_function" {
