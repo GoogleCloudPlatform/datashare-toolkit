@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+// Variable overrides
+// https://www.terraform.io/language/values/variables#variable-definitions-tfvars-files
+
 /*
   The following pre-requisites:
     - Create installation GCP service account key: https://learn.hashicorp.com/tutorials/terraform/google-cloud-platform-build
