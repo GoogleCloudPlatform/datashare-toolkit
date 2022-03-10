@@ -63,7 +63,10 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
     metadata {
       annotations = {
         "run.googleapis.com/client-name" = "terraform",
-        "run.googleapis.com/ingress"     = "all"
+        "run.googleapis.com/ingress"     = "all",
+
+        // Defaults to 100 after creation
+        "autoscaling.knative.dev/maxScale" = "100",
       }
     }
   }
@@ -75,7 +78,8 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
 
   lifecycle {
     ignore_changes = [
-      template[0].spec[0].containers[0].env
+      template[0].spec[0].containers[0].env,
+      template[0].metadata[0].annotations["run.googleapis.com/ingress"]
     ]
   }
 
@@ -113,6 +117,12 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
   traffic {
     percent         = 100
     latest_revision = true
+  }
+
+  lifecycle {
+    ignore_changes = [
+      template[0].metadata[0].annotations["run.googleapis.com/ingress"]
+    ]
   }
 
   depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-datashare-api]

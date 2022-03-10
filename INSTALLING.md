@@ -3,6 +3,9 @@
 # Overview
 Installing Datashare consists of some manual configuration in the GCP console, and executing shell and Terraform scripts. In order to perform the installation you must have roles/owner or roles/editor permission on an GCP Project.
 
+# Prerequisites
+- [Install Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/gcp-get-started)
+
 # Installation Steps
 1. Create a GCP Project in the [GCP console](https://console.cloud.google.com/projectcreate) and **note down the project Id**. If you have an existing project that you plan to use, **note down the project Id**.
 2. Enable Google Compute Engine for the project through the [GCP console](https://console.developers.google.com/apis/library/compute.googleapis.com).
@@ -46,7 +49,6 @@ At this point, you should have the following:
 - Cloud DNS Zone Name (if applicable)
 
 # Perform Domain Verification
-
 
 # Run Terraform Script
 1. Open the terraform variable file [terraform.tfvars](/terraform/terraform.tfvars) and make the following replacements:

@@ -66,6 +66,12 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
     latest_revision = true
   }
 
+  lifecycle {
+    ignore_changes = [
+      template[0].metadata[0].annotations["run.googleapis.com/ingress"]
+    ]
+  }
+
   depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-ds-ui]
 }
 
