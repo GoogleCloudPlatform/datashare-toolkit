@@ -15,6 +15,11 @@
  */
 
 resource "null_resource" "gcloud_submit-datashare-api" {
+  triggers = {
+    // always_run = "${timestamp()}"
+    always_run = var.tag
+  }
+
   provisioner "local-exec" {
     command = "gcloud builds submit ../ --config ../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag} --project ${var.project_id}"
   }

@@ -16,11 +16,14 @@
 
 resource "null_resource" "create_cloud_function_zip" {
   triggers = {
-    always_run = "${timestamp()}"
+    // always_run = "${timestamp()}"
+    always_run = var.tag
   }
+
   provisioner "local-exec" {
     command = "./scripts/create-cloud-function-zip.sh"
   }
+
   provisioner "local-exec" {
     when    = destroy
     command = "rm -rf ./tmp || true"
@@ -40,8 +43,6 @@ resource "google_storage_bucket_object" "cloud_function_source_code" {
   name   = format("%s#%s", var.datashare_ingestion_source_code_filename, data.archive_file.function_package.output_md5)
   bucket = google_storage_bucket.install_bucket.name
   source = data.archive_file.function_package.output_path
-
-  depends_on = [null_resource.create_cloud_function_zip]
 }
 
 resource "google_cloudfunctions_function" "datashare_cloud_function" {
@@ -55,7 +56,7 @@ resource "google_cloudfunctions_function" "datashare_cloud_function" {
   timeout               = 540
   entry_point           = "processEvent"
   labels = {
-    datashare = "success"
+    version = replace(var.tag, ".", "_")
   }
   event_trigger {
     event_type = "google.storage.object.finalize"
@@ -65,11 +66,14 @@ resource "google_cloudfunctions_function" "datashare_cloud_function" {
     VERBOSE_MODE  = "true",
     ARCHIVE_FILES = "false",
   }
+
+  depends_on = [google_storage_bucket_object.cloud_function_source_code]
 }
 
 resource "null_resource" "delete_cloud_function_temp_folder" {
   triggers = {
-    always_run = "${timestamp()}"
+    always_run = var.tag
+    // always_run = "${timestamp()}"
   }
   provisioner "local-exec" {
     command = "rm -rf ./tmp || true"
