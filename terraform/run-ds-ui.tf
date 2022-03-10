@@ -30,7 +30,7 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
         image = "gcr.io/${var.project_id}/datashare-ui:${var.tag}"
         env {
           name  = "VUE_APP_API_BASE_URL"
-          value = "https://${var.api_domain}/v1"
+          value = "https://${google_api_gateway_gateway.gw.default_hostname}/v1"
         }
         env {
           name  = "VUE_APP_API_KEY"
@@ -71,11 +71,20 @@ resource "google_cloud_run_domain_mapping" "ui" {
   count    = var.ui_domain != null ? 1 : 0
 
   metadata {
-    namespace = data.google_project.project.number
+    namespace = var.project_id // data.google_project.project.number
   }
 
   spec {
     route_name = google_cloud_run_service.cloud-run-ds-ui.name
+  }
+
+  lifecycle {
+    ignore_changes = [
+      // status[0].conditions,
+      // metadata[0].annotations["serving.knative.dev/creator"],
+      // metadata[0].annotations["serving.knative.dev/lastModifier"],
+      // metadata[0].annotations["resource_version"]
+    ]
   }
 }
 
