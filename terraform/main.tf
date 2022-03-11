@@ -85,7 +85,16 @@ module "cloud-functions" {
   tag                         = var.tag
 }
 
+data "google_secret_manager_secret_version" "basic" {
+  secret = "my-secret"
+}
 
 // TODO:
 // https://cloud.google.com/blog/products/devops-sre/terraform-gitops-with-google-cloud-build-and-storage
 // https://cloud.google.com/architecture/managing-infrastructure-as-code
+// https://hub.docker.com/r/hashicorp/terraform
+// https://cloud.google.com/build/docs/build-config-file-schema
+// Use secrets manage for build information
+// https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/secret_manager_secret_version
+// main app for ci vs deploy
+// ci can get secrets from secret manager

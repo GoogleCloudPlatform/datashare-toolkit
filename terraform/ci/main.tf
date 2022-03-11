@@ -14,7 +14,28 @@
  * limitations under the License.
  */
 
-/*
-output "name-test" {
-  value = data.google_secret_manager_secret_version.basic.secret_data
-}*/
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "4.12.0"
+    }
+  }
+  /*backend "gcs" {
+    bucket = "datashare-ci-tfstate"
+    prefix = "env/ci"
+  }*/
+}
+
+provider "google" {
+  credentials = file(var.install_service_account_key)
+  project     = var.project_id
+  region      = var.region
+  zone        = var.zone
+}
+
+// https://www.terraform.io/language/meta-arguments/for_each
+// Iterate over known secret ids and override the values
+data "google_secret_manager_secret_version" "basic" {
+  secret = "my-secret"
+}
