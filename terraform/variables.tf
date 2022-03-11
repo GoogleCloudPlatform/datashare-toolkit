@@ -168,12 +168,6 @@ variable "data_producers" {
   description = "The data producers list"
 }
 
-variable "ssl" {
-  description = "Run load balancer on HTTPS and provision managed certificate with provided `domain`."
-  type        = bool
-  default     = true
-}
-
 variable "api_domain" {
   description = "The domain name for the API Service"
   type        = string
@@ -197,6 +191,11 @@ variable "storage_bucket_location" {
 variable "deploy_datashare_application" {
   default     = true
   description = "Flag indicating if the datashare application should be deployed"
+}
+
+variable "deploy_custom_domains" {
+  default     = false
+  description = "Flag indicating if the custom domains should be deployed"
 }
 
 variable "deploy_ingestion_cloud_function" {
@@ -235,6 +234,7 @@ variable "use_remote_open_api_spec" {
 variable "update_cloud_dns" {
   type        = bool
   description = "Flag indicating if the Cloud DNS zone should have its A record updated"
+  default     = false
 }
 
 variable "dns_zone" {
@@ -250,7 +250,7 @@ variable "datashare_ingestion_source_code_filename" {
 variable "create_static_api_ip_address" {
   type        = bool
   description = "Flag indicating if a static ip should be reserved for the api, otherwise an ephemeral IP address is assigned"
-  default     = true
+  default     = false
 }
 
 variable "api_ip_address" {

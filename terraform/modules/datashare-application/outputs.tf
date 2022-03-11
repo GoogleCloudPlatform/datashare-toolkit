@@ -29,3 +29,11 @@ output "ds_api_gateway_address" {
 output "open_api_spec" {
   value = local.open_api_spec_content
 }
+
+output "cloud_run_ds_ui_name" {
+  value = google_cloud_run_service.cloud-run-ds-ui.name
+}
+
+output "ds_api_gateway_gateway_id" {
+  value = google_api_gateway_gateway.gw.gateway_id
+}

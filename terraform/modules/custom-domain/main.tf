@@ -34,7 +34,7 @@ resource "google_cloud_run_domain_mapping" "ui" {
   }
 
   spec {
-    route_name = google_cloud_run_service.cloud-run-ds-ui.name
+    route_name = var.cloud_run_ds_ui_name
   }
 
   lifecycle {

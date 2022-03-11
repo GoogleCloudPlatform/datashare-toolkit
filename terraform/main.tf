@@ -50,8 +50,9 @@ data "google_project" "project" {
 }
 
 module "datashare-application" {
-  source                      = "./modules/datashare-application"
-  count                       = var.deploy_datashare_application ? 1 : 0
+  source = "./modules/datashare-application"
+  count  = var.deploy_datashare_application ? 1 : 0
+
   install_service_account_key = var.install_service_account_key
   project_id                  = var.project_id
   region                      = var.region
@@ -65,9 +66,27 @@ module "datashare-application" {
   auth_domain                 = var.auth_domain
 }
 
+module "custom-domain" {
+  source = "./modules/custom-domain"
+  count  = var.deploy_custom_domains ? 1 : 0
+
+  project_id                   = var.project_id
+  region                       = var.region
+  dns_zone                     = var.dns_zone
+  create_static_api_ip_address = var.create_static_api_ip_address
+  api_domain                   = var.api_domain
+  ui_domain                    = var.ui_domain
+  cloud_run_ds_ui_name         = module.datashare-application[0].cloud_run_ds_ui_name
+  ds_api_gateway_gateway_id    = module.datashare-application[0].ds_api_gateway_gateway_id
+  update_cloud_dns             = var.update_cloud_dns
+
+  depends_on = [module.datashare-application]
+}
+
 module "cloud-functions" {
-  source                      = "./modules/ingestion-function"
-  count                       = var.deploy_ingestion_cloud_function ? 1 : 0
+  source = "./modules/ingestion-function"
+  count  = var.deploy_ingestion_cloud_function ? 1 : 0
+
   install_service_account_key = var.install_service_account_key
   project_id                  = var.project_id
   region                      = var.region

@@ -23,7 +23,7 @@ resource "google_compute_region_network_endpoint_group" "serverless_neg" {
   serverless_deployment {
     platform = "apigateway.googleapis.com"
     url_mask = ""
-    resource = google_api_gateway_gateway.gw.gateway_id
+    resource = var.ds_api_gateway_gateway_id
   }
 }
 
