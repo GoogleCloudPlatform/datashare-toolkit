@@ -22,3 +22,27 @@ terraform {
     }
   }
 }
+
+// terraform import google_cloud_run_domain_mapping.ui locations/us-central1/namespaces/cds-demo-1-271622/domainmappings/datashare-demo-1.fsi.joonix.net
+resource "google_cloud_run_domain_mapping" "ui" {
+  location = var.region
+  name     = var.ui_domain
+  count    = var.ui_domain != null ? 1 : 0
+
+  metadata {
+    namespace = var.project_id // data.google_project.project.number
+  }
+
+  spec {
+    route_name = google_cloud_run_service.cloud-run-ds-ui.name
+  }
+
+  lifecycle {
+    ignore_changes = [
+      // status[0].conditions,
+      // metadata[0].annotations["serving.knative.dev/creator"],
+      // metadata[0].annotations["serving.knative.dev/lastModifier"],
+      // metadata[0].annotations["resource_version"]
+    ]
+  }
+}

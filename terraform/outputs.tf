@@ -13,19 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-output "ds_ui_cloud_run_url" {
-  value = local.ds-ui-cloud_run_url
-}
-
-output "ds_api_cloud_run_url" {
-  value = local.ds-api-cloud_run_url
-}
-
-output "ds_api_gateway_address" {
-  value = "https://${google_api_gateway_gateway.gw.default_hostname}"
-}
-
-output "open_api_spec" {
-  value = local.open_api_spec_content
-}

@@ -49,10 +49,6 @@ locals {
   open_api_spec_content        = var.use_remote_open_api_spec == true ? local.open_api_spec_content_remote : local.open_api_spec_content_local
 }
 
-output "open_api_spec" {
-  value = local.open_api_spec_content
-}
-
 resource "google_api_gateway_api" "api_gw" {
   project  = var.project_id
   provider = google-beta
@@ -98,16 +94,4 @@ resource "google_cloud_run_service_iam_member" "cloud_run_invoker" {
   service  = google_cloud_run_service.cloud-run-service-ds-api.name
   role     = "roles/run.invoker"
   member   = local.iam_policy_api_gateway_service_account
-}
-
-output "ds_ui_cloud_run_url" {
-  value = local.ds-ui-cloud_run_url
-}
-
-output "ds_api_cloud_run_url" {
-  value = local.ds-api-cloud_run_url
-}
-
-output "ds_api_gateway_address" {
-  value = "https://${google_api_gateway_gateway.gw.default_hostname}"
 }

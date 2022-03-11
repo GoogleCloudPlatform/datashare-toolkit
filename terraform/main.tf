@@ -49,6 +49,22 @@ provider "google" {
 data "google_project" "project" {
 }
 
+module "datashare-application" {
+  source                      = "./modules/datashare-application"
+  count                       = var.deploy_datashare_application ? 1 : 0
+  install_service_account_key = var.install_service_account_key
+  project_id                  = var.project_id
+  region                      = var.region
+  zone                        = var.zone
+  environment_name            = var.environment_name
+  tag                         = var.tag
+  oauth_client_id             = var.oauth_client_id
+  oauth_client_secret         = var.oauth_client_secret
+  data_producers              = var.data_producers
+  api_key                     = var.api_key
+  auth_domain                 = var.auth_domain
+}
+
 module "cloud-functions" {
   source                      = "./modules/ingestion-function"
   count                       = var.deploy_ingestion_cloud_function ? 1 : 0

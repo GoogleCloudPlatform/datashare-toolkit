@@ -15,9 +15,9 @@
  */
 
 locals {
-  api_service_account_name         = google_service_account.api_service_account.email
-  ui_service_account_name          = google_service_account.ui_service_account.email
-  api_gateway_service_account_name = google_service_account.api_gateway_service_account.email
+  api_service_account_name               = google_service_account.api_service_account.email
+  ui_service_account_name                = google_service_account.ui_service_account.email
+  api_gateway_service_account_name       = google_service_account.api_gateway_service_account.email
   iam_policy_api_service_account         = "serviceAccount:${local.api_service_account_name}"
   iam_policy_api_gateway_service_account = "serviceAccount:${local.api_gateway_service_account_name}"
 }
