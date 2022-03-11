@@ -29,7 +29,7 @@ resource "google_dns_record_set" "api_a" {
 }
 
 locals {
-  dns_records = {
+  _dns_records = {
     "A" = [
       for rr in google_cloud_run_domain_mapping.ui[0].status[0].resource_records :
       rr.rrdata if rr.type == "A"
@@ -39,6 +39,7 @@ locals {
       rr.rrdata if rr.type == "AAAA"
     ]
   }
+  dns_records = var.update_cloud_dns ? local._dns_records : {}
 }
 
 resource "google_dns_record_set" "ui" {
