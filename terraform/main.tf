@@ -85,9 +85,10 @@ module "cloud-functions" {
   tag                         = var.tag
 }
 
+/*
 data "google_secret_manager_secret_version" "basic" {
   secret = "my-secret"
-}
+}*/
 
 // TODO:
 // https://cloud.google.com/blog/products/devops-sre/terraform-gitops-with-google-cloud-build-and-storage
