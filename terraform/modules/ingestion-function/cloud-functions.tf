@@ -16,37 +16,39 @@
 
 resource "null_resource" "create_cloud_function_zip" {
   triggers = {
-    // always_run = "${timestamp()}"
-    always_run = var.tag
+    always_run = "${timestamp()}"
   }
 
+  // https://www.terraform.io/language/expressions/references
   provisioner "local-exec" {
-    command = "./scripts/create-cloud-function-zip.sh"
+    command = "${path.module}/scripts/create-cloud-function-zip.sh"
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "rm -rf ./tmp || true"
+    command = "rm -rf ${path.root}/tmp || true"
   }
 }
 
 data "archive_file" "function_package" {
   type        = "zip"
-  source_dir  = "tmp/ingestion/batch/"
-  output_path = "tmp/ingestion/${var.datashare_ingestion_source_code_filename}"
+  source_dir  = "${path.root}/tmp/ingestion/batch/"
+  output_path = "${path.root}/tmp/ingestion/${var.datashare_ingestion_source_code_filename}"
 
   depends_on = [null_resource.create_cloud_function_zip]
 }
 
 // Force deployment of cloud function: https://github.com/hashicorp/terraform-provider-google/issues/1938
 resource "google_storage_bucket_object" "cloud_function_source_code" {
-  name = var.datashare_ingestion_source_code_filename
-  // name = format("%s#%s", var.datashare_ingestion_source_code_filename, data.archive_file.function_package.output_md5)
+  name   = var.datashare_ingestion_source_code_filename
   bucket = google_storage_bucket.install_bucket.name
   source = data.archive_file.function_package.output_path
   metadata = {
-    version = replace(var.tag, ".", "_")
+    version  = replace(var.tag, ".", "_"),
+    md5_hash = data.archive_file.function_package.output_md5
   }
+
+  depends_on = [data.archive_file.function_package]
 }
 
 resource "google_cloudfunctions_function" "datashare_cloud_function" {
@@ -60,7 +62,8 @@ resource "google_cloudfunctions_function" "datashare_cloud_function" {
   timeout               = 540
   entry_point           = "processEvent"
   labels = {
-    version = replace(var.tag, ".", "_")
+    version  = replace(var.tag, ".", "_"),
+    md5_hash = data.archive_file.function_package.output_md5
   }
   event_trigger {
     event_type = "google.storage.object.finalize"
@@ -76,11 +79,10 @@ resource "google_cloudfunctions_function" "datashare_cloud_function" {
 
 resource "null_resource" "delete_cloud_function_temp_folder" {
   triggers = {
-    always_run = var.tag
-    // always_run = "${timestamp()}"
+    always_run = "${timestamp()}"
   }
   provisioner "local-exec" {
-    command = "rm -rf ./tmp || true"
+    command = "rm -rf ${path.root}/tmp || true"
   }
 
   depends_on = [google_cloudfunctions_function.datashare_cloud_function]

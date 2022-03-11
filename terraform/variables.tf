@@ -194,6 +194,11 @@ variable "storage_bucket_location" {
   }
 }
 
+variable "deploy_ingestion_cloud_function" {
+  default     = true
+  description = "Flag indicating if the datashare ingestion function should be deployed"
+}
+
 variable "ingestion_storage_bucket_storage_class" {
   default = "STANDARD"
 }

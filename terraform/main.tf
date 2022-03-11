@@ -46,11 +46,14 @@ provider "google" {
   zone        = var.zone
 }
 
-locals {
-  api_service_account_name         = google_service_account.api_service_account.email
-  ui_service_account_name          = google_service_account.ui_service_account.email
-  api_gateway_service_account_name = google_service_account.api_gateway_service_account.email
+data "google_project" "project" {
 }
 
-data "google_project" "project" {
+module "cloud-functions" {
+  source                      = "./modules/ingestion-function"
+  count                       = var.deploy_ingestion_cloud_function ? 1 : 0
+  install_service_account_key = var.install_service_account_key
+  project_id                  = var.project_id
+  region                      = var.region
+  tag                         = var.tag
 }
