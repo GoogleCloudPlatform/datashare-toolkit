@@ -84,3 +84,8 @@ module "cloud-functions" {
   region                      = var.region
   tag                         = var.tag
 }
+
+
+// TODO:
+// https://cloud.google.com/blog/products/devops-sre/terraform-gitops-with-google-cloud-build-and-storage
+// https://cloud.google.com/architecture/managing-infrastructure-as-code
