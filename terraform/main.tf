@@ -17,14 +17,6 @@
 // Variable overrides
 // https://www.terraform.io/language/values/variables#variable-definitions-tfvars-files
 
-/*
-  The following pre-requisites:
-    - Create installation GCP service account key: https://learn.hashicorp.com/tutorials/terraform/google-cloud-platform-build
-    - Manually enable Google Compute Engine: https://console.developers.google.com/apis/library/compute.googleapis.com
-    - Manually enable Identity Platform: https://console.cloud.google.com/marketplace/details/google-cloud-platform/customer-identity
-    - Manually enable Identity Platform multi-tenancy: https://cloud.google.com/identity-platform/docs/multi-tenancy-quickstart
-*/
-
 // TODO:
 // Remote State: https://gmusumeci.medium.com/how-to-configure-the-gcp-backend-for-terraform-7ea24f59760a
 // https://www.terraform.io/language/settings/backends/gcs
