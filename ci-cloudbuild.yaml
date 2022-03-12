@@ -51,6 +51,7 @@ steps:
   args: 
   - '-c'
   - |
+      ls -la
       chmod 755 ../modules/ingestion-function/scripts/create-cloud-function-zip.sh
       terraform apply -auto-approve
 # [END tf-apply]
