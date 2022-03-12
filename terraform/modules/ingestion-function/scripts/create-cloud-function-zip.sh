@@ -25,6 +25,7 @@ mkdir -p tmp/ingestion/batch/shared
 FUNCTION_SOURCE="tmp/ingestion/batch"
 FUNCTION_SHARED="tmp/ingestion/batch/shared"
 
+ls -la ../../../../
 cp ../../../../ingestion/batch/{config.js,configurationManager.js,index.js,package.json,package-lock.json} "${FUNCTION_SOURCE}/"
 cp ../../../../shared/{bigqueryUtil.js,cloudFunctionUtil.js,commerceProcurementUtil.js,commonUtil.js,index.js,package.json,package-lock.json,pubSubUtil.js,storageUtil.js} "${FUNCTION_SHARED}/"
 
