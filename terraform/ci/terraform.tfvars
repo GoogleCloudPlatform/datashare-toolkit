@@ -29,3 +29,4 @@ oauth_client_secret          = "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"
 auth_domain                  = "cds-demo-1-271622.firebaseapp.com"
 data_producers               = "mservidio@google.com"
 tag                          = "2.0.0.3"
+use_remote_open_api_spec     = false
