@@ -39,7 +39,7 @@ steps:
   - '-c'
   - | 
       cd terraform/ci
-#      terraform plan
+      terraform plan
 # [END tf-plan]
 
 # [START tf-apply]
@@ -49,6 +49,7 @@ steps:
   args: 
   - '-c'
   - | 
+      chmod 755 ci/modules/ingestion-function/scripts/create-cloud-function-zip.sh
       cd terraform/ci
       terraform apply -auto-approve
 # [END tf-apply]
