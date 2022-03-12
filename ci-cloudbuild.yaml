@@ -19,7 +19,7 @@ steps:
   dir: 'terraform/ci'
   args: 
   - '-c'
-  - | 
+  - |
       echo "***********************"
       echo "$BRANCH_NAME"
       echo "***********************"
@@ -39,8 +39,7 @@ steps:
   dir: 'terraform/ci'
   args: 
   - '-c'
-  - | 
-      cd terraform/ci
+  - |
       terraform plan
 # [END tf-plan]
 
@@ -51,7 +50,7 @@ steps:
   dir: 'terraform/ci'
   args: 
   - '-c'
-  - | 
+  - |
       chmod 755 ../modules/ingestion-function/scripts/create-cloud-function-zip.sh
       terraform apply -auto-approve
 # [END tf-apply]
