@@ -141,31 +141,9 @@ variable "ui_domain" {
   default     = null
 }
 
-variable "api_key" {
-  type        = string
-  description = "The API Key"
-  sensitive   = true
-}
-
 variable "auth_domain" {
   type        = string
   description = "The Auth Domain"
-}
-
-variable "oauth_client_id" {
-  type        = string
-  description = "The OAuth client ID"
-}
-
-variable "oauth_client_secret" {
-  type        = string
-  description = "The OAuth client secret"
-  sensitive   = true
-}
-
-variable "data_producers" {
-  type        = string
-  description = "The data producers list"
 }
 
 variable "api_domain" {
