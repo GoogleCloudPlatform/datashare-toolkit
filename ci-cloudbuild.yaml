@@ -50,8 +50,6 @@ steps:
   args: 
   - '-c'
   - |
-      pwd
-      ls -l
       chmod 777 terraform/modules/ingestion-function/scripts/create-cloud-function-zip.sh
       cd terraform/ci
       terraform apply -auto-approve
