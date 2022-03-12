@@ -17,6 +17,7 @@
 variable "install_service_account_key" {
   type        = string
   description = "Variable for installation service account key path"
+  default     = null
 }
 
 variable "project_id" {
@@ -135,25 +136,9 @@ variable "idp_tenant" {
   description = "IDP Tenant"
 }
 
-variable "ui_domain" {
-  type        = string
-  description = "The domain name for the UI"
-  default     = null
-}
-
 variable "auth_domain" {
   type        = string
   description = "The Auth Domain"
-}
-
-variable "api_domain" {
-  description = "The domain name for the API Service"
-  type        = string
-}
-
-variable "lb_name" {
-  description = "Name for load balancer and associated resources"
-  default     = "datashare-api-lb"
 }
 
 variable "storage_bucket_location" {
@@ -207,17 +192,6 @@ variable "use_remote_open_api_spec" {
   type        = bool
   description = "Flag indicating if remove api spec should be used otherwise local"
   default     = false
-}
-
-variable "update_cloud_dns" {
-  type        = bool
-  description = "Flag indicating if the Cloud DNS zone should have its A record updated"
-  default     = false
-}
-
-variable "dns_zone" {
-  type        = string
-  description = "The Cloud DNS Zone to update if applicable"
 }
 
 variable "datashare_ingestion_source_code_filename" {
