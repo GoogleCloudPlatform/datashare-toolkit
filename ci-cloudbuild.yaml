@@ -52,7 +52,7 @@ steps:
   - |
       pwd
       ls -l
-      chmod 777 terraform/modules/ingestion-function/scripts/create-cloud-function-zip.sh
+      chmod 755 terraform/modules/ingestion-function/scripts/create-cloud-function-zip.sh
       cd terraform/ci
       terraform apply -auto-approve
 # [END tf-apply]
