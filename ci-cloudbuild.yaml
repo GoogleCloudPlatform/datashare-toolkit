@@ -30,6 +30,7 @@ steps:
   - "--tag=gcr.io/$PROJECT_ID/datashare-api:$TAG_NAME"
   - "--file=./Dockerfile"
   - .
+  waitFor: ['-']
 
 - id: 'branch name'
   name: 'alpine'
