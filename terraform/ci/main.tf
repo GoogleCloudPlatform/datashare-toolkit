@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+// https://cloud.google.com/architecture/managing-infrastructure-as-code
+
 terraform {
   required_providers {
     google = {
@@ -61,10 +63,10 @@ module "datashare-application" {
   source = "../modules/datashare-application"
   count  = var.deploy_datashare_application ? 1 : 0
 
-  oauth_client_id             = local.oauth_client_id
-  oauth_client_secret         = local.oauth_client_secret
-  data_producers              = local.data_producers
-  api_key                     = local.api_key
+  oauth_client_id     = local.oauth_client_id
+  oauth_client_secret = local.oauth_client_secret
+  data_producers      = local.data_producers
+  api_key             = local.api_key
 
   install_service_account_key = var.install_service_account_key
   project_id                  = var.project_id
