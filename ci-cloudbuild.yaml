@@ -34,6 +34,7 @@ steps:
   - "--tag=gcr.io/$PROJECT_ID/datashare-api:$SHORT_SHA"
   - "--file=./api/v1/Dockerfile.api"
   - .
+  waitFor: ['-']
 
 - id: 'push-api-build'
   name: 'gcr.io/cloud-builders/docker'
