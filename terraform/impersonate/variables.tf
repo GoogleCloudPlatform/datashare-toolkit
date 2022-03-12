@@ -17,6 +17,7 @@
 variable "install_service_account_key" {
   type        = string
   description = "Variable for installation service account key path"
+  default     = null
 }
 
 variable "project_id" {
