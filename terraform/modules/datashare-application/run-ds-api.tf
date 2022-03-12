@@ -19,6 +19,7 @@ resource "null_resource" "gcloud_submit-datashare-api" {
     always_run = var.tag
   }
 
+  // TODO: Remove and make a prerequisite
   provisioner "local-exec" {
     command = "gcloud builds submit ${path.root}/../../ --config ${path.root}/../../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag} --project ${var.project_id}"
   }
