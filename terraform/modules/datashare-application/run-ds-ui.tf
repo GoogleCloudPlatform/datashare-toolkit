@@ -77,7 +77,7 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
 data "google_iam_policy" "api_gateway_binding" {
   binding {
     role    = "roles/run.invoker"
-    members = ["serviceAccount:${local.api_gateway_service_account_name}"]
+    members = [local.iam_policy_api_gateway_service_account]
   }
 }
 

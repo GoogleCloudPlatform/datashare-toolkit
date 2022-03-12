@@ -15,26 +15,26 @@
  */
 
 output "ds_ui_cloud_run_url" {
-  value = local.ds-ui-cloud_run_url
+  value = module.datashare-application[0].ds_ui_cloud_run_url
 }
 
 output "ds_api_cloud_run_url" {
-  value = local.ds-api-cloud_run_url
+  value = module.datashare-application[0].ds_api_cloud_run_url
 }
 
 output "ds_api_gateway_address" {
-  value = "https://${google_api_gateway_gateway.gw.default_hostname}"
+  value = module.datashare-application[0].ds_api_gateway_address
 }
 
 output "open_api_spec" {
-  value     = local.open_api_spec_content
+  value     = module.datashare-application[0].open_api_spec
   sensitive = true
 }
 
 output "cloud_run_ds_ui_name" {
-  value = google_cloud_run_service.cloud-run-ds-ui.name
+  value = module.datashare-application[0].cloud_run_ds_ui_name
 }
 
 output "ds_api_gateway_gateway_id" {
-  value = google_api_gateway_gateway.gw.gateway_id
+  value = module.datashare-application[0].ds_api_gateway_gateway_id
 }

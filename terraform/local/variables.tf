@@ -219,12 +219,6 @@ variable "ingestion_function_description" {
   default = "Datashare Ingestion Function"
 }
 
-variable "open_api_spec_file" {
-  type        = string
-  description = "The open api spec local file location"
-  default     = "../api/config/openapi_spec.v2.yaml.tmpl"
-}
-
 variable "use_remote_open_api_spec" {
   type        = bool
   description = "Flag indicating if remove api spec should be used otherwise local"

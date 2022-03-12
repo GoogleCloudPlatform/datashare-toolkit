@@ -34,11 +34,6 @@ variable "zone" {
   default = "us-central1-a"
 }
 
-variable "environment_name" {
-  type        = string
-  description = "Variable for Environment Name"
-}
-
 variable "tag" {
   type        = string
   description = "Variable for Image Tag"
@@ -165,7 +160,7 @@ variable "data_producers" {
 variable "open_api_spec_file" {
   type        = string
   description = "The open api spec local file location"
-  default     = "../api/config/openapi_spec.v2.yaml.tmpl"
+  default     = "../../api/config/openapi_spec.v2.yaml.tmpl"
 }
 
 variable "use_remote_open_api_spec" {
@@ -184,8 +179,3 @@ variable "deploy_ds_listener_service" {
   description = "Flag indicating if the datashare listener service should be deployed"
   default     = true
 }
-
-/*
-variable "access_token" {
-  type = string
-}*/

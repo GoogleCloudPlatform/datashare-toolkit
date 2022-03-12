@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 
-// Variable overrides
 // https://www.terraform.io/language/values/variables#variable-definitions-tfvars-files
-
-// TODO:
-// Remote State: https://gmusumeci.medium.com/how-to-configure-the-gcp-backend-for-terraform-7ea24f59760a
-// https://www.terraform.io/language/settings/backends/gcs
-// https://github.com/hashicorp/terraform/issues/17153
 
 terraform {
   required_providers {
@@ -29,10 +23,15 @@ terraform {
       version = "4.12.0"
     }
   }
+  backend "gcs" {
+    bucket = "cds-demo-1-271622-tfstate"
+    prefix = "datashare"
+  }
 }
 
 locals {
   terraform_service_account = "cds-demo-1-ui@cds-demo-1-271622.iam.gserviceaccount.com"
+  // terraform_service_account = "cds-cloud-build-mgr@cds-ci.iam.gserviceaccount.com"
 }
 
 provider "google" {
@@ -42,14 +41,12 @@ provider "google" {
   zone    = var.zone
 
   // https://www.terraform.io/language/settings/backends/gcs
+  // https://cloud.google.com/architecture/managing-infrastructure-as-code
   // https://cloud.google.com/sdk/gcloud/reference/auth/application-default
   // https://cloud.google.com/blog/topics/developers-practitioners/using-google-cloud-service-account-impersonation-your-terraform-code
   /*
-    gcloud iam service-accounts add-iam-policy-binding ${API_GW_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com  \
+    gcloud iam service-accounts add-iam-policy-binding ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com  \
     --member user:${ACCOUNT_EMAIL} --role="roles/iam.serviceAccountTokenCreator"
-
-    gcloud iam service-accounts add-iam-policy-binding cds-demo-1-ui@cds-demo-1-271622.iam.gserviceaccount.com  \
-    --member user:mservidio@google.com --role="roles/iam.serviceAccountTokenCreator"
   */
   alias = "impersonation"
   scopes = [
@@ -71,29 +68,25 @@ provider "google" {
   request_timeout = "60s"
 }
 
-data "google_project" "project" {
-}
-
 module "datashare-application" {
-  source = "./modules/datashare-application"
+  source = "../modules/datashare-application"
   count  = var.deploy_datashare_application ? 1 : 0
 
   install_service_account_key = var.install_service_account_key
   project_id                  = var.project_id
   region                      = var.region
   zone                        = var.zone
-  environment_name            = var.environment_name
   tag                         = var.tag
   oauth_client_id             = var.oauth_client_id
   oauth_client_secret         = var.oauth_client_secret
   data_producers              = var.data_producers
   api_key                     = var.api_key
   auth_domain                 = var.auth_domain
-  access_token                = data.google_service_account_access_token.default.access_token
+  // access_token                = data.google_service_account_access_token.default.access_token
 }
 
 module "custom-domain" {
-  source = "./modules/custom-domain"
+  source = "../modules/custom-domain"
   count  = var.deploy_custom_domains ? 1 : 0
 
   project_id                   = var.project_id
@@ -110,21 +103,10 @@ module "custom-domain" {
 }
 
 module "cloud-functions" {
-  source = "./modules/ingestion-function"
+  source = "../modules/ingestion-function"
   count  = var.deploy_ingestion_cloud_function ? 1 : 0
 
-  install_service_account_key = var.install_service_account_key
-  project_id                  = var.project_id
-  region                      = var.region
-  tag                         = var.tag
+  project_id = var.project_id
+  region     = var.region
+  tag        = var.tag
 }
-
-// TODO:
-// https://cloud.google.com/blog/products/devops-sre/terraform-gitops-with-google-cloud-build-and-storage
-// https://cloud.google.com/architecture/managing-infrastructure-as-code
-// https://hub.docker.com/r/hashicorp/terraform
-// https://cloud.google.com/build/docs/build-config-file-schema
-// Use secrets manage for build information
-// https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/secret_manager_secret_version
-// main app for ci vs deploy
-// ci can get secrets from secret manager
