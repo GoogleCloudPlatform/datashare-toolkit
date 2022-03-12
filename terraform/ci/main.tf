@@ -30,7 +30,7 @@ terraform {
 }
 
 provider "google" {
-  // credentials = file(var.install_service_account_key)
+  credentials = var.install_service_account_key != null ? file(var.install_service_account_key) : null
   project     = var.project_id
   region      = var.region
   zone        = var.zone
