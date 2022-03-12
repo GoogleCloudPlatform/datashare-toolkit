@@ -40,7 +40,8 @@ data "http" "open_api_spec" {
   # Optional request headers
   request_headers = {
     Accept        = "application/json"
-    Authorization = "Bearer ${data.google_service_account_id_token.oidc.id_token}"
+    // Authorization = "Bearer ${data.google_service_account_id_token.oidc.id_token}"
+    Authorization = "Bearer "
   }
 
   depends_on = [google_cloud_run_service.cloud-run-service-ds-api]
