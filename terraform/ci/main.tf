@@ -72,7 +72,6 @@ module "datashare-application" {
   project_id                  = var.project_id
   region                      = var.region
   zone                        = var.zone
-  environment_name            = var.environment_name
   tag                         = var.tag
   auth_domain                 = var.auth_domain
   open_api_spec_file          = var.open_api_spec_file
