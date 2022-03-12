@@ -99,9 +99,9 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
         "autoscaling.knative.dev/maxScale"  = "1"
         "run.googleapis.com/client-name"    = "terraform"
         "run.googleapis.com/cpu-throttling" = "false",
-        
+
         // TODO: setting doesn't take
-        "run.googleapis.com/ingress"        = "internal"
+        "run.googleapis.com/ingress" = "internal"
       }
     }
   }
