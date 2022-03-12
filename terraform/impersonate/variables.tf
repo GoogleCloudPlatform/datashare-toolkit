@@ -253,3 +253,9 @@ variable "api_ip_address" {
   description = "Existing IPv4 address to use (the actual IP address value)"
   default     = null
 }
+
+variable "use_impersonation" {
+  type        = bool
+  description = "Flag indicating if impersonation is used"
+  default     = false
+}
