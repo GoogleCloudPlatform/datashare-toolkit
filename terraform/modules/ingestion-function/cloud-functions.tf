@@ -45,6 +45,7 @@ resource "google_storage_bucket_object" "cloud_function_source_code" {
   bucket = google_storage_bucket.install_bucket.name
   source = data.archive_file.function_package.output_path
   metadata = {
+    // Eliminate version here to avoid re-deploying the same code
     version  = replace(var.tag, ".", "_"),
     md5_hash = data.archive_file.function_package.output_md5
   }
