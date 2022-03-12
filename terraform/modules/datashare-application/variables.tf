@@ -179,3 +179,21 @@ variable "deploy_ds_listener_service" {
   description = "Flag indicating if the datashare listener service should be deployed"
   default     = true
 }
+
+variable "access_token" {
+  type        = string
+  description = "Access token for making open api spec request"
+  default     = null
+}
+
+variable "submit_gcloud_builds" {
+  type        = bool
+  description = "Flag indicating if the module should build and submit the api and ui builds"
+  default     = true
+}
+
+variable "use_impersonation" {
+  type        = bool
+  description = "Flag indicating if impersonation is used"
+  default     = false
+}

@@ -19,23 +19,21 @@ locals {
   ds-api-cloud_run_url     = google_cloud_run_service.cloud-run-service-ds-api.status[0].url
   ds-api-cloud_run_domain  = replace(google_cloud_run_service.cloud-run-service-ds-api.status[0].url, "https://", "")
   ds-api-open_api_spec_url = "${google_cloud_run_service.cloud-run-service-ds-api.status[0].url}/v1/docs/openapi_spec"
+  use_remote_open_api_spec = var.use_remote_open_api_spec == true && var.use_impersonation == false
 }
 
 // https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/service_account_id_token
 data "google_service_account_id_token" "oidc" {
-  count = var.use_remote_open_api_spec ? 1 : 0
-  // provider = google.impersonated
-  // target_service_account = "cds-demo-1-ui@cds-demo-1-271622.iam.gserviceaccount.com"
-
+  count = local.use_remote_open_api_spec ? 1 : 0
   // The audience claim for the id_token
   target_audience = "${local.ds-api-cloud_run_url}/"
 
   depends_on = [google_project_service.enable_iam_service, google_project_service.enable_iamcredentials_service]
 }
 
-// This has issues when run the google-beta provider
+// For impersonation tried passing in access_token but getting a 401 even when granting run.invoker role
 data "http" "open_api_spec" {
-  count = var.use_remote_open_api_spec ? 1 : 0
+  count = local.use_remote_open_api_spec ? 1 : 0
   url   = "${local.ds-api-open_api_spec_url}/"
 
   # Optional request headers
@@ -49,8 +47,8 @@ data "http" "open_api_spec" {
 
 locals {
   open_api_spec_content_local  = replace(replace(replace(file(var.open_api_spec_file), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", var.oauth_client_id)
-  open_api_spec_content_remote = var.use_remote_open_api_spec == true ? replace(replace(replace(yamlencode(jsondecode(data.http.open_api_spec[0].body)), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", var.oauth_client_id) : ""
-  open_api_spec_content        = var.use_remote_open_api_spec == true ? local.open_api_spec_content_remote : local.open_api_spec_content_local
+  open_api_spec_content_remote = local.use_remote_open_api_spec == true ? replace(replace(replace(yamlencode(jsondecode(data.http.open_api_spec[0].body)), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", var.oauth_client_id) : ""
+  open_api_spec_content        = local.use_remote_open_api_spec == true ? local.open_api_spec_content_remote : local.open_api_spec_content_local
 }
 
 resource "google_api_gateway_api" "api_gw" {

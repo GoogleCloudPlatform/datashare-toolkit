@@ -31,14 +31,13 @@ terraform {
 
 locals {
   terraform_service_account = "cds-demo-1-ui@cds-demo-1-271622.iam.gserviceaccount.com"
-  // terraform_service_account = "cds-cloud-build-mgr@cds-ci.iam.gserviceaccount.com"
 }
 
 provider "google" {
-  credentials = file(var.install_service_account_key)
-  project     = var.project_id
-  region      = var.region
-  zone        = var.zone
+  // credentials = file(var.install_service_account_key)
+  project = var.project_id
+  region  = var.region
+  zone    = var.zone
 
   // https://www.terraform.io/language/settings/backends/gcs
   // https://cloud.google.com/architecture/managing-infrastructure-as-code
@@ -48,14 +47,13 @@ provider "google" {
     gcloud iam service-accounts add-iam-policy-binding ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com  \
     --member user:${ACCOUNT_EMAIL} --role="roles/iam.serviceAccountTokenCreator"
   */
-  /*alias = "impersonation"
+  alias = "impersonation"
   scopes = [
     "https://www.googleapis.com/auth/cloud-platform",
     "https://www.googleapis.com/auth/userinfo.email",
-  ]*/
+  ]
 }
 
-/*
 data "google_service_account_access_token" "default" {
   provider               = google.impersonation
   target_service_account = local.terraform_service_account
@@ -67,7 +65,7 @@ provider "google" {
   project         = var.project_id
   access_token    = data.google_service_account_access_token.default.access_token
   request_timeout = "60s"
-}*/
+}
 
 module "datashare-application" {
   source = "../modules/datashare-application"
@@ -83,7 +81,8 @@ module "datashare-application" {
   data_producers              = var.data_producers
   api_key                     = var.api_key
   auth_domain                 = var.auth_domain
-  // access_token                = data.google_service_account_access_token.default.access_token
+  use_remote_open_api_spec    = var.use_remote_open_api_spec
+  use_impersonation           = true
 }
 
 module "custom-domain" {
