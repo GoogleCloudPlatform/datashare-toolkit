@@ -14,17 +14,6 @@
  * limitations under the License.
  */
 
-resource "null_resource" "gcloud_submit-ds-ui" {
-  triggers = {
-    always_run = var.tag
-  }
-
-  // TODO: Remove and make a prerequisite
-  provisioner "local-exec" {
-    command = "gcloud builds submit ${path.root}/../../frontend --config ${path.root}/../../frontend/cloudbuild.yaml --substitutions=TAG_NAME=${var.tag} --project ${var.project_id}"
-  }
-}
-
 resource "google_cloud_run_service" "cloud-run-ds-ui" {
   name     = var.cloud_run_ds_ui_service_name
   location = var.region
@@ -72,7 +61,7 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
     ]
   }
 
-  depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-ds-ui]
+  depends_on = [google_project_service.enable_cloud_run_api]
 }
 
 data "google_iam_policy" "api_gateway_binding" {

@@ -14,17 +14,6 @@
  * limitations under the License.
  */
 
-resource "null_resource" "gcloud_submit-datashare-api" {
-  triggers = {
-    always_run = var.tag
-  }
-
-  // TODO: Remove and make a prerequisite
-  provisioner "local-exec" {
-    command = "gcloud builds submit ${path.root}/../../ --config ${path.root}/../../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag} --project ${var.project_id}"
-  }
-}
-
 locals {
   managed_projects = "{ \"${var.project_id}\": { \"MARKETPLACE_INTEGRATION_ENABLED\": false, \"labels\": { \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT\": \"\", \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT\": \"\", \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL\": \"\" } } }"
 }
@@ -83,7 +72,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
     ]
   }
 
-  depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-datashare-api]
+  depends_on = [google_project_service.enable_cloud_run_api]
 }
 
 resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
@@ -128,5 +117,5 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
     ]
   }
 
-  depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-datashare-api]
+  depends_on = [google_project_service.enable_cloud_run_api]
 }
