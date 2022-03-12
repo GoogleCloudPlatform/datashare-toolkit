@@ -23,6 +23,7 @@ locals {
 
 // https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/service_account_id_token
 data "google_service_account_id_token" "oidc" {
+  count = var.use_remote_open_api_spec ? 1 : 0
   // provider = google.impersonated
   // target_service_account = "cds-demo-1-ui@cds-demo-1-271622.iam.gserviceaccount.com"
 
@@ -39,9 +40,8 @@ data "http" "open_api_spec" {
 
   # Optional request headers
   request_headers = {
-    Accept        = "application/json"
-    // Authorization = "Bearer ${data.google_service_account_id_token.oidc.id_token}"
-    Authorization = "Bearer "
+    Accept = "application/json"
+    Authorization = "Bearer ${data.google_service_account_id_token.oidc[0].id_token}"
   }
 
   depends_on = [google_cloud_run_service.cloud-run-service-ds-api]
