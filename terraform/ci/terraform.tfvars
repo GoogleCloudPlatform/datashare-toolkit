@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-install_service_account_key  = "/Volumes/GoogleDrive/My Drive/servidio-sandbox/service-account/cds-demo-2-911c68dd026e.json"
-project_id                   = "cds-ci"
-environment_name             = "Datashare CI"
-auth_domain                  = "cds-ci.firebaseapp.com"
-tag                          = "2.0.0.5"
+project_id                  = "cds-ci"
+environment_name            = "Datashare CI"
+auth_domain                 = "cds-ci.firebaseapp.com"
+tag                         = "2.0.0.5"
