@@ -39,7 +39,7 @@ steps:
   - '-c'
   - | 
       cd terraform/ci
-      terraform plan
+#      terraform plan
 # [END tf-plan]
 
 # [START tf-apply]
