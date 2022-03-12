@@ -77,6 +77,7 @@ module "datashare-application" {
   open_api_spec_file          = var.open_api_spec_file
   cloud_run_ds_ui_set_no_auth = false
   deploy_ds_listener_service  = false
+  submit_gcloud_builds        = false
 }
 
 module "cloud-functions" {
