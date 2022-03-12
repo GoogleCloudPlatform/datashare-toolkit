@@ -18,26 +18,26 @@ steps:
   dir: 'frontend'
   args:
   - build
-  - "--tag=gcr.io/$PROJECT_ID/datashare-ui:$TAG_NAME"
+  - "--tag=gcr.io/$PROJECT_ID/datashare-ui:$SHORT_SHA"
   - "--file=./Dockerfile"
   - .
 
 - id: 'push-ui-build'
   name: 'gcr.io/cloud-builders/docker'
-  args: ['push', "gcr.io/$PROJECT_ID/datashare-ui:$TAG_NAME"]
+  args: ['push', "gcr.io/$PROJECT_ID/datashare-ui:$SHORT_SHA"]
   waitFor: ['ui-build']
 
 - id: 'api-build'
   name: 'gcr.io/cloud-builders/docker'
   args:
   - build
-  - "--tag=gcr.io/$PROJECT_ID/datashare-api:$TAG_NAME"
+  - "--tag=gcr.io/$PROJECT_ID/datashare-api:$SHORT_SHA"
   - "--file=./api/v1/Dockerfile.api"
   - .
 
 - id: 'push-api-build'
   name: 'gcr.io/cloud-builders/docker'
-  args: ['push', "gcr.io/$PROJECT_ID/datashare-api:$TAG_NAME"]
+  args: ['push', "gcr.io/$PROJECT_ID/datashare-api:$SHORT_SHA"]
   waitFor: ['api-build']
 
 - id: 'branch-name'
@@ -67,7 +67,7 @@ steps:
   args: 
   - '-c'
   - |
-      terraform plan -var="tag=$TAG_NAME"
+      terraform plan -var="tag=$SHORT_SHA"
 # [END tf-plan]
 
 # [START tf-apply]
@@ -79,12 +79,12 @@ steps:
   - |
       chmod 777 terraform/modules/ingestion-function/scripts/create-cloud-function-zip.sh
       cd terraform/ci
-      terraform apply -auto-approve -var="tag=$TAG_NAME"
+      terraform apply -auto-approve -var="tag=$SHORT_SHA"
 # [END tf-apply]
 
 options:
  logging: CLOUD_LOGGING_ONLY
 
 images:
-  - "gcr.io/$PROJECT_ID/datashare-ui:$TAG_NAME"
-  - "gcr.io/$PROJECT_ID/datashare-api:$TAG_NAME"
+  - "gcr.io/$PROJECT_ID/datashare-ui:$SHORT_SHA"
+  - "gcr.io/$PROJECT_ID/datashare-api:$SHORT_SHA"

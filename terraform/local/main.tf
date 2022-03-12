@@ -36,9 +36,9 @@ locals {
 
 provider "google" {
   credentials = file(var.install_service_account_key)
-  project = var.project_id
-  region  = var.region
-  zone    = var.zone
+  project     = var.project_id
+  region      = var.region
+  zone        = var.zone
 
   // https://www.terraform.io/language/settings/backends/gcs
   // https://cloud.google.com/architecture/managing-infrastructure-as-code
