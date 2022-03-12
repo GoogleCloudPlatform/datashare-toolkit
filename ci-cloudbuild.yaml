@@ -14,7 +14,7 @@
 
 steps:
 - id: 'ui build'
-  name: "gcr.io/cloud-builders/docker"
+  name: 'gcr.io/cloud-builders/docker'
   dir: 'frontend'
   args:
   - build
@@ -22,13 +22,21 @@ steps:
   - "--file=./Dockerfile"
   - .
 
+- id: 'push ui build'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', "gcr.io/$PROJECT_ID/datashare-ui:$TAG_NAME"]
+
 - id: 'api build'
-  name: "gcr.io/cloud-builders/docker"
+  name: 'gcr.io/cloud-builders/docker'
   args:
   - build
   - "--tag=gcr.io/$PROJECT_ID/datashare-api:$TAG_NAME"
   - "--file=./api/v1/Dockerfile.api"
   - .
+
+- id: 'push api build'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', "gcr.io/$PROJECT_ID/datashare-api:$TAG_NAME"]
   waitFor: ['-']
 
 - id: 'branch name'
