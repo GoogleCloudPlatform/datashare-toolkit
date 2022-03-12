@@ -13,7 +13,7 @@
 # limitations under the License.
 
 steps:
-- id: 'ui build'
+- id: 'ui-build'
   name: 'gcr.io/cloud-builders/docker'
   dir: 'frontend'
   args:
@@ -22,11 +22,12 @@ steps:
   - "--file=./Dockerfile"
   - .
 
-- id: 'push ui build'
+- id: 'push-ui-build'
   name: 'gcr.io/cloud-builders/docker'
   args: ['push', "gcr.io/$PROJECT_ID/datashare-ui:$TAG_NAME"]
+  waitFor: ['ui-build']
 
-- id: 'api build'
+- id: 'api-build'
   name: 'gcr.io/cloud-builders/docker'
   args:
   - build
@@ -34,12 +35,12 @@ steps:
   - "--file=./api/v1/Dockerfile.api"
   - .
 
-- id: 'push api build'
+- id: 'push-api-build'
   name: 'gcr.io/cloud-builders/docker'
   args: ['push', "gcr.io/$PROJECT_ID/datashare-api:$TAG_NAME"]
-  waitFor: ['-']
+  waitFor: ['api-build']
 
-- id: 'branch name'
+- id: 'branch-name'
   name: 'alpine'
   entrypoint: 'sh'  
   dir: 'terraform/ci'
@@ -50,7 +51,7 @@ steps:
       echo "$BRANCH_NAME"
       echo "***********************"
 
-- id: 'tf init'
+- id: 'tf-init'
   name: 'hashicorp/terraform:1.0.0'
   entrypoint: 'sh'
   dir: 'terraform/ci'
@@ -59,7 +60,7 @@ steps:
   - |
       terraform init
 # [START tf-plan]
-- id: 'tf plan'
+- id: 'tf-plan'
   name: 'hashicorp/terraform:1.0.0'
   entrypoint: 'sh'
   dir: 'terraform/ci'
@@ -70,7 +71,7 @@ steps:
 # [END tf-plan]
 
 # [START tf-apply]
-- id: 'tf apply'
+- id: 'tf-apply'
   name: 'hashicorp/terraform:1.0.0'
   entrypoint: 'sh'
   args: 
