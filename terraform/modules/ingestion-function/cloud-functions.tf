@@ -22,7 +22,7 @@ resource "null_resource" "create_cloud_function_zip" {
   // https://www.terraform.io/language/expressions/references
   provisioner "local-exec" {
     working_dir = "${path.module}/scripts/"
-    command     = "pwd; ls -l; sh ./create-cloud-function-zip.sh"
+    command     = "sh ./create-cloud-function-zip.sh"
   }
 
   provisioner "local-exec" {

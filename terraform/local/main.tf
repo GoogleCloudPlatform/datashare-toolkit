@@ -35,7 +35,7 @@ locals {
 }
 
 provider "google" {
-  // credentials = file(var.install_service_account_key)
+  credentials = file(var.install_service_account_key)
   project = var.project_id
   region  = var.region
   zone    = var.zone
@@ -48,13 +48,14 @@ provider "google" {
     gcloud iam service-accounts add-iam-policy-binding ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com  \
     --member user:${ACCOUNT_EMAIL} --role="roles/iam.serviceAccountTokenCreator"
   */
-  alias = "impersonation"
+  /*alias = "impersonation"
   scopes = [
     "https://www.googleapis.com/auth/cloud-platform",
     "https://www.googleapis.com/auth/userinfo.email",
-  ]
+  ]*/
 }
 
+/*
 data "google_service_account_access_token" "default" {
   provider               = google.impersonation
   target_service_account = local.terraform_service_account
@@ -66,7 +67,7 @@ provider "google" {
   project         = var.project_id
   access_token    = data.google_service_account_access_token.default.access_token
   request_timeout = "60s"
-}
+}*/
 
 module "datashare-application" {
   source = "../modules/datashare-application"
