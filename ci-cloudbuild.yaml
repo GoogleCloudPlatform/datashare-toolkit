@@ -14,6 +14,14 @@
 
 steps:
 - id: 'branch name'
+  name: "gcr.io/cloud-builders/docker"
+  dir: 'frontend'
+  args:
+  - build
+  - "--tag=gcr.io/$PROJECT_ID/datashare-ui:$TAG_NAME"
+  - "--file=./Dockerfile"
+  - .
+- id: 'branch name'
   name: 'alpine'
   entrypoint: 'sh'  
   dir: 'terraform/ci'
@@ -56,3 +64,5 @@ steps:
 # [END tf-apply]
 options:
  logging: CLOUD_LOGGING_ONLY
+images:
+  - "gcr.io/$PROJECT_ID/datashare-ui:$TAG_NAME"
