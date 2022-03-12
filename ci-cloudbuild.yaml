@@ -58,7 +58,7 @@ steps:
   args: 
   - '-c'
   - |
-      terraform plan -var="$TAG_NAME"
+      terraform plan -var="tag=$TAG_NAME"
 # [END tf-plan]
 
 # [START tf-apply]
@@ -70,7 +70,7 @@ steps:
   - |
       chmod 777 terraform/modules/ingestion-function/scripts/create-cloud-function-zip.sh
       cd terraform/ci
-      terraform apply -auto-approve -var="$TAG_NAME"
+      terraform apply -auto-approve -var="tag=$TAG_NAME"
 # [END tf-apply]
 
 options:
