@@ -20,7 +20,7 @@ resource "null_resource" "gcloud_submit-datashare-api" {
   }
 
   provisioner "local-exec" {
-    command = "gcloud builds submit ${path.root}/../ --config ${path.root}/../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag} --project ${var.project_id}"
+    command = "gcloud builds submit ${path.root}/../../ --config ${path.root}/../../api/v1/api-cloudbuild.yaml --substitutions=TAG_NAME=${var.tag} --project ${var.project_id}"
   }
 }
 
@@ -86,6 +86,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
 }
 
 resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
+  count    = var.deploy_ds_listener_service ? 1 : 0
   name     = var.cloud_run_ds_listener_service_name
   location = var.region
 

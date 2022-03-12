@@ -20,7 +20,7 @@ resource "null_resource" "gcloud_submit-ds-ui" {
   }
 
   provisioner "local-exec" {
-    command = "gcloud builds submit ${path.root}/../frontend --config ${path.root}/../frontend/cloudbuild.yaml --substitutions=TAG_NAME=${var.tag} --project ${var.project_id}"
+    command = "gcloud builds submit ${path.root}/../../frontend --config ${path.root}/../../frontend/cloudbuild.yaml --substitutions=TAG_NAME=${var.tag} --project ${var.project_id}"
   }
 }
 
@@ -92,6 +92,7 @@ data "google_iam_policy" "noauth" {
 }
 
 resource "google_cloud_run_service_iam_policy" "noauth" {
+  count    = var.cloud_run_ds_ui_set_no_auth ? 1 : 0
   location = google_cloud_run_service.cloud-run-ds-ui.location
   project  = google_cloud_run_service.cloud-run-ds-ui.project
   service  = google_cloud_run_service.cloud-run-ds-ui.name

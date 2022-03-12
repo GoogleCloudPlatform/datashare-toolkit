@@ -23,6 +23,9 @@ locals {
 
 // https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/service_account_id_token
 data "google_service_account_id_token" "oidc" {
+  // provider = google.impersonated
+  // target_service_account = "cds-demo-1-ui@cds-demo-1-271622.iam.gserviceaccount.com"
+
   // The audience claim for the id_token
   target_audience = "${local.ds-api-cloud_run_url}/"
 

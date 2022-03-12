@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-variable "install_service_account_key" {
-  type        = string
-  description = "Variable for installation service account key path"
-}
-
 variable "project_id" {
   type        = string
   description = "Variable for Project ID"
