@@ -40,7 +40,7 @@ data "http" "open_api_spec" {
 
   # Optional request headers
   request_headers = {
-    Accept = "application/json"
+    Accept        = "application/json"
     Authorization = "Bearer ${data.google_service_account_id_token.oidc[0].id_token}"
   }
 

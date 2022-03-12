@@ -21,19 +21,20 @@ resource "null_resource" "create_cloud_function_zip" {
 
   // https://www.terraform.io/language/expressions/references
   provisioner "local-exec" {
-    command = "${path.module}/scripts/create-cloud-function-zip.sh"
+    working_dir = "${path.module}/scripts/"
+    command     = "./create-cloud-function-zip.sh"
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "rm -rf ${path.root}/tmp || true"
+    command = "rm -rf ${path.module}/scripts/tmp || true"
   }
 }
 
 data "archive_file" "function_package" {
   type        = "zip"
-  source_dir  = "${path.root}/tmp/ingestion/batch/"
-  output_path = "${path.root}/tmp/ingestion/${var.datashare_ingestion_source_code_filename}"
+  source_dir  = "${path.module}/scripts/tmp/ingestion/batch/"
+  output_path = "${path.module}/scripts/tmp/ingestion/${var.datashare_ingestion_source_code_filename}"
 
   depends_on = [null_resource.create_cloud_function_zip]
 }
@@ -82,7 +83,7 @@ resource "null_resource" "delete_cloud_function_temp_folder" {
     always_run = "${timestamp()}"
   }
   provisioner "local-exec" {
-    command = "rm -rf ${path.root}/tmp || true"
+    command = "rm -rf ${path.module}/scripts/tmp || true"
   }
 
   depends_on = [google_cloudfunctions_function.datashare_cloud_function]
