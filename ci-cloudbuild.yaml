@@ -16,6 +16,7 @@ steps:
 - id: 'branch name'
   name: 'alpine'
   entrypoint: 'sh'  
+  dir: 'terraform/ci'
   args: 
   - '-c'
   - | 
@@ -26,15 +27,16 @@ steps:
 - id: 'tf init'
   name: 'hashicorp/terraform:1.0.0'
   entrypoint: 'sh'
+  dir: 'terraform/ci'
   args: 
   - '-c'
   - |
-      cd terraform/ci
       terraform init
 # [START tf-plan]
 - id: 'tf plan'
   name: 'hashicorp/terraform:1.0.0'
   entrypoint: 'sh'
+  dir: 'terraform/ci'
   args: 
   - '-c'
   - | 
@@ -46,11 +48,11 @@ steps:
 - id: 'tf apply'
   name: 'hashicorp/terraform:1.0.0'
   entrypoint: 'sh'
+  dir: 'terraform/ci'
   args: 
   - '-c'
   - | 
-      chmod 755 terraform/ci/modules/ingestion-function/scripts/create-cloud-function-zip.sh
-      cd terraform/ci
+      chmod 755 modules/ingestion-function/scripts/create-cloud-function-zip.sh
       terraform apply -auto-approve
 # [END tf-apply]
 options:
