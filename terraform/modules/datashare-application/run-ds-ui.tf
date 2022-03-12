@@ -30,6 +30,8 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
   name     = var.cloud_run_ds_ui_service_name
   location = var.region
 
+  // TODO: Store and use secret manager functionality in Cloud Run to expose as env variables
+  // https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_service#example-usage---cloud-run-service-secret-environment-variables
   template {
     spec {
       containers {
