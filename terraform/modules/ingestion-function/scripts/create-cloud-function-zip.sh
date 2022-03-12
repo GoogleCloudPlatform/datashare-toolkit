@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-pwd
 TMP_PATH="tmp"
 
 if [ -d "${TMP_PATH}" ]; then
@@ -26,8 +25,24 @@ FUNCTION_SOURCE="tmp/ingestion/batch"
 FUNCTION_SHARED="tmp/ingestion/batch/shared"
 
 ls -la ../../../../
-cp ../../../../ingestion/batch/{config.js,configurationManager.js,index.js,package.json,package-lock.json} "${FUNCTION_SOURCE}/"
-cp ../../../../shared/{bigqueryUtil.js,cloudFunctionUtil.js,commerceProcurementUtil.js,commonUtil.js,index.js,package.json,package-lock.json,pubSubUtil.js,storageUtil.js} "${FUNCTION_SHARED}/"
+
+# cp ../../../../ingestion/batch/{config.js,configurationManager.js,index.js,package.json,package-lock.json} "${FUNCTION_SOURCE}/"
+cp ../../../../ingestion/batch/config.js "${FUNCTION_SOURCE}/"
+cp ../../../../ingestion/batch/configurationManager.js "${FUNCTION_SOURCE}/"
+cp ../../../../ingestion/batch/index.js "${FUNCTION_SOURCE}/"
+cp ../../../../ingestion/batch/package.json "${FUNCTION_SOURCE}/"
+cp ../../../../ingestion/batch/package-lock.json "${FUNCTION_SOURCE}/"
+
+# cp ../../../../shared/{bigqueryUtil.js,cloudFunctionUtil.js,commerceProcurementUtil.js,commonUtil.js,index.js,package.json,package-lock.json,pubSubUtil.js,storageUtil.js} "${FUNCTION_SHARED}/"
+cp ../../../../shared/bigqueryUtil.js "${FUNCTION_SHARED}/"
+cp ../../../../shared/cloudFunctionUtil.js "${FUNCTION_SHARED}/"
+cp ../../../../shared/commerceProcurementUtil.js "${FUNCTION_SHARED}/"
+cp ../../../../shared/commonUtil.js "${FUNCTION_SHARED}/"
+cp ../../../../shared/index.js "${FUNCTION_SHARED}/"
+cp ../../../../shared/package.json "${FUNCTION_SHARED}/"
+cp ../../../../shared/package-lock.json "${FUNCTION_SHARED}/"
+cp ../../../../shared/pubSubUtil.js "${FUNCTION_SHARED}/"
+cp ../../../../shared/storageUtil.js "${FUNCTION_SHARED}/"
 
 UNAME=$(uname | awk '{print tolower($0)}')
 if [ "$UNAME" == "darwin" ]; then
