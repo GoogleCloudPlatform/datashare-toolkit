@@ -32,6 +32,7 @@ data "google_service_account_id_token" "oidc" {
 }
 
 // For impersonation tried passing in access_token but getting a 401 even when granting run.invoker role
+// created local.use_remote_open_api_spec to use local open api spec when using impersonation
 data "http" "open_api_spec" {
   count = local.use_remote_open_api_spec ? 1 : 0
   url   = "${local.ds-api-open_api_spec_url}/"
