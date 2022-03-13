@@ -68,7 +68,6 @@ module "datashare-application" {
   data_producers      = local.data_producers
   api_key             = local.api_key
 
-  install_service_account_key = var.install_service_account_key
   project_id                  = var.project_id
   region                      = var.region
   zone                        = var.zone
