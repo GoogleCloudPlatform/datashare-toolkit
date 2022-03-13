@@ -29,10 +29,6 @@ terraform {
   }
 }
 
-locals {
-  terraform_service_account = "cds-demo-1-ui@cds-demo-1-271622.iam.gserviceaccount.com"
-}
-
 // https://www.terraform.io/language/settings/backends/gcs
 // https://cloud.google.com/architecture/managing-infrastructure-as-code
 // https://cloud.google.com/sdk/gcloud/reference/auth/application-default
@@ -49,7 +45,7 @@ provider "google" {
 data "google_service_account_access_token" "default" {
   count                  = var.use_impersonation == true ? 1 : 0
   provider               = google.impersonation
-  target_service_account = local.terraform_service_account
+  target_service_account = var.impersonated_service_account
   scopes                 = ["userinfo-email", "cloud-platform"]
   lifetime               = "1200s"
 }
@@ -64,18 +60,42 @@ provider "google" {
   // request_timeout = "60s"
 }
 
+data "google_secret_manager_secret_version" "secret_api_key" {
+  secret = "${var.secret_name_prefix}_api_key"
+}
+
+data "google_secret_manager_secret_version" "secret_data_producers" {
+  secret = "${var.secret_name_prefix}_data_producers"
+}
+
+data "google_secret_manager_secret_version" "secret_oauth_client_id" {
+  secret = "${var.secret_name_prefix}_oauth_client_id"
+}
+
+data "google_secret_manager_secret_version" "secret_oauth_client_secret" {
+  secret = "${var.secret_name_prefix}_oauth_client_secret"
+}
+
+locals {
+  api_key             = data.google_secret_manager_secret_version.secret_api_key.secret_data
+  data_producers      = data.google_secret_manager_secret_version.secret_data_producers.secret_data
+  oauth_client_id     = data.google_secret_manager_secret_version.secret_oauth_client_id.secret_data
+  oauth_client_secret = data.google_secret_manager_secret_version.secret_oauth_client_secret.secret_data
+}
+
 module "datashare-application" {
   source = "../modules/datashare-application"
   count  = var.deploy_datashare_application ? 1 : 0
+
+  oauth_client_id     = local.oauth_client_id
+  oauth_client_secret = local.oauth_client_secret
+  data_producers      = local.data_producers
+  api_key             = local.api_key
 
   project_id               = var.project_id
   region                   = var.region
   zone                     = var.zone
   tag                      = var.tag
-  oauth_client_id          = var.oauth_client_id
-  oauth_client_secret      = var.oauth_client_secret
-  data_producers           = var.data_producers
-  api_key                  = var.api_key
   auth_domain              = var.auth_domain
   use_remote_open_api_spec = var.use_remote_open_api_spec
   use_impersonation        = var.use_impersonation

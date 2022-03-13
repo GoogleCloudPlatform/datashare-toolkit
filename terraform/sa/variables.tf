@@ -143,31 +143,9 @@ variable "ui_domain" {
   default     = null
 }
 
-variable "api_key" {
-  type        = string
-  description = "The API Key"
-  sensitive   = true
-}
-
 variable "auth_domain" {
   type        = string
   description = "The Auth Domain"
-}
-
-variable "oauth_client_id" {
-  type        = string
-  description = "The OAuth client ID"
-}
-
-variable "oauth_client_secret" {
-  type        = string
-  description = "The OAuth client secret"
-  sensitive   = true
-}
-
-variable "data_producers" {
-  type        = string
-  description = "The data producers list"
 }
 
 variable "api_domain" {
@@ -259,4 +237,15 @@ variable "use_impersonation" {
   type        = bool
   description = "Flag indicating if impersonation is used"
   default     = false
+}
+
+variable "impersonated_service_account" {
+  type        = string
+  description = "The service account to impersonate"
+}
+
+variable "secret_name_prefix" {
+  type        = string
+  description = "The prefix used for the configuration secret names"
+  default     = "datashare"
 }

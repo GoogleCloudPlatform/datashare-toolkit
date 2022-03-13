@@ -25,16 +25,3 @@ output "ds_api_cloud_run_url" {
 output "ds_api_gateway_address" {
   value = module.datashare-application[0].ds_api_gateway_address
 }
-
-output "open_api_spec" {
-  value     = module.datashare-application[0].open_api_spec
-  sensitive = true
-}
-
-output "cloud_run_ds_ui_name" {
-  value = module.datashare-application[0].cloud_run_ds_ui_name
-}
-
-output "ds_api_gateway_gateway_id" {
-  value = module.datashare-application[0].ds_api_gateway_gateway_id
-}
