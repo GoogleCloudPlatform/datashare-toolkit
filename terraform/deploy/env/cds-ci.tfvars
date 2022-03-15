@@ -1,4 +1,4 @@
-use_impersonation            = true
+use_impersonation            = false
 impersonated_service_account = "cds-cloud-build-mgr@cds-ci.iam.gserviceaccount.com"
 project_id                  = "cds-ci"
 environment_name            = "Datashare CI"

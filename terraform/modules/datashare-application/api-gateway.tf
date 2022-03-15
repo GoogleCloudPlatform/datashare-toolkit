@@ -97,4 +97,7 @@ resource "google_cloud_run_service_iam_member" "cloud_run_invoker" {
   service  = google_cloud_run_service.cloud-run-service-ds-api.name
   role     = "roles/run.invoker"
   member   = local.iam_policy_api_gateway_service_account
+
+  // To avoid policy change race condition
+  depends_on = [google_cloud_run_service_iam_policy.add_api_gateway_service_account_to_role]
 }
