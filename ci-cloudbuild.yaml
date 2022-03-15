@@ -44,7 +44,7 @@ steps:
 - id: 'branch-name'
   name: 'alpine'
   entrypoint: 'sh'  
-  dir: 'terraform/ci'
+  dir: 'terraform/sa'
   args: 
   - '-c'
   - |
@@ -55,7 +55,7 @@ steps:
 - id: 'tf-init'
   name: 'hashicorp/terraform:1.0.0'
   entrypoint: 'sh'
-  dir: 'terraform/ci'
+  dir: 'terraform/sa'
   args: 
   - '-c'
   - |
@@ -64,6 +64,7 @@ steps:
 # [START tf-select-workspace]
 - id: 'tf-select-workspace'
   name: 'hashicorp/terraform:1.0.0'
+  dir: 'terraform/sa'
   args: ['workspace', 'select', '${_ENVIRONMENT}']
 # [END tf-select-workspace]
 
@@ -71,7 +72,7 @@ steps:
 - id: 'tf-plan'
   name: 'hashicorp/terraform:1.0.0'
   entrypoint: 'sh'
-  dir: 'terraform/ci'
+  dir: 'terraform/sa'
   args: 
   - '-c'
   - |
@@ -87,7 +88,7 @@ steps:
   - |
       chmod 777 terraform/modules/ingestion-function/scripts/create-cloud-function-zip.sh
       cd terraform/sa
-      terraform apply -auto-approve -var-file="../env/${_ENVIRONMENT}.tfvars" -var="tag=$TAG_NAME"
+      terraform apply -auto-approve -var-file="terraform/env/${_ENVIRONMENT}.tfvars" -var="tag=$TAG_NAME"
 # [END tf-apply]
 
 options:
