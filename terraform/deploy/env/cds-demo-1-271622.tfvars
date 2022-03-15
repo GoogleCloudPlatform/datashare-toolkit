@@ -1,8 +1,6 @@
 use_impersonation            = false
 impersonated_service_account = "cds-demo-1-ui@cds-demo-1-271622.iam.gserviceaccount.com"
 install_service_account_key  = "/Volumes/GoogleDrive/My Drive/servidio-sandbox/service-account/cds-demo-2-911c68dd026e.json"
-
-# Demo 1
 project_id                   = "cds-demo-1-271622"
 environment_name             = "Datashare Demo 1"
 deploy_custom_domains        = true
