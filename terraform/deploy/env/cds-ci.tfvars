@@ -1,3 +1,5 @@
+use_impersonation            = true
+impersonated_service_account = "cds-cloud-build-mgr@cds-ci.iam.gserviceaccount.com"
 project_id                  = "cds-ci"
 environment_name            = "Datashare CI"
 auth_domain                 = "cds-ci.firebaseapp.com"
