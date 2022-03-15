@@ -60,6 +60,13 @@ steps:
   - '-c'
   - |
       terraform init
+
+# [START tf-select-workspace]
+- id: 'tf-select-workspace'
+  name: 'hashicorp/terraform:1.0.0'
+  args: ['workspace', 'select', '${ENVIRONMENT}']
+# [END tf-select-workspace]
+
 # [START tf-plan]
 - id: 'tf-plan'
   name: 'hashicorp/terraform:1.0.0'
@@ -79,8 +86,8 @@ steps:
   - '-c'
   - |
       chmod 777 terraform/modules/ingestion-function/scripts/create-cloud-function-zip.sh
-      cd terraform/ci
-      terraform apply -auto-approve -var="tag=$TAG_NAME"
+      cd terraform/sa
+      terraform apply -auto-approve -var-file="../env/${ENVIRONMENT}.tfvars" -var="tag=$TAG_NAME"
 # [END tf-apply]
 
 options:

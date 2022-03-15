@@ -151,6 +151,8 @@ variable "auth_domain" {
 variable "api_domain" {
   description = "The domain name for the API Service"
   type        = string
+  default     = null
+  nullable    = true
 }
 
 variable "lb_name" {
@@ -214,6 +216,8 @@ variable "update_cloud_dns" {
 variable "dns_zone" {
   type        = string
   description = "The Cloud DNS Zone to update if applicable"
+  default     = null
+  nullable    = true
 }
 
 variable "datashare_ingestion_source_code_filename" {
