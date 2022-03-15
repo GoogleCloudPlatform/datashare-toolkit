@@ -88,7 +88,7 @@ steps:
   - |
       chmod 777 terraform/modules/ingestion-function/scripts/create-cloud-function-zip.sh
       cd terraform/sa
-      terraform apply -auto-approve -var-file="terraform/env/${_ENVIRONMENT}.tfvars" -var="tag=$TAG_NAME"
+      terraform apply -auto-approve -var-file="../env/${_ENVIRONMENT}.tfvars" -var="tag=$TAG_NAME"
 # [END tf-apply]
 
 options:
