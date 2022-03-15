@@ -72,11 +72,11 @@ steps:
 - id: 'tf-plan'
   name: 'hashicorp/terraform:1.1.7'
   entrypoint: 'sh'
-  dir: 'terraform/sa'
   args: 
   - '-c'
   - |
-      terraform plan -var-file="terraform/env/${_ENVIRONMENT}.tfvars" -var="tag=$TAG_NAME"
+      cd terraform/sa
+      terraform plan -var-file="../env/${_ENVIRONMENT}.tfvars" -var="tag=$TAG_NAME"
 # [END tf-plan]
 
 # [START tf-apply]
