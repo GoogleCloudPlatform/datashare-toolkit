@@ -249,3 +249,20 @@ variable "secret_name_prefix" {
   description = "The prefix used for the configuration secret names"
   default     = "datashare"
 }
+
+variable "submit_gcloud_builds" {
+  type        = bool
+  description = "Flag indicating if the module should build and submit the api and ui builds"
+  default     = true
+}
+
+variable "cloud_run_ds_ui_set_no_auth" {
+  type    = bool
+  default = true
+}
+
+variable "deploy_ds_listener_service" {
+  type        = bool
+  description = "Flag indicating if the datashare listener service should be deployed"
+  default     = true
+}
