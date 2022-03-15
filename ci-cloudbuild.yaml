@@ -53,7 +53,7 @@ steps:
       echo "***********************"
 
 - id: 'tf-init'
-  name: 'hashicorp/terraform:1.0.0'
+  name: 'hashicorp/terraform:1.1.7'
   entrypoint: 'sh'
   dir: 'terraform/sa'
   args: 
@@ -63,14 +63,14 @@ steps:
 
 # [START tf-select-workspace]
 - id: 'tf-select-workspace'
-  name: 'hashicorp/terraform:1.0.0'
+  name: 'hashicorp/terraform:1.1.7'
   dir: 'terraform/sa'
   args: ['workspace', 'select', '${_ENVIRONMENT}']
 # [END tf-select-workspace]
 
 # [START tf-plan]
 - id: 'tf-plan'
-  name: 'hashicorp/terraform:1.0.0'
+  name: 'hashicorp/terraform:1.1.7'
   entrypoint: 'sh'
   dir: 'terraform/sa'
   args: 
@@ -81,7 +81,7 @@ steps:
 
 # [START tf-apply]
 - id: 'tf-apply'
-  name: 'hashicorp/terraform:1.0.0'
+  name: 'hashicorp/terraform:1.1.7'
   entrypoint: 'sh'
   args: 
   - '-c'
