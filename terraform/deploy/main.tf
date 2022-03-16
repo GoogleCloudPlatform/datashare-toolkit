@@ -105,9 +105,9 @@ module "datashare-application" {
   use_remote_open_api_spec        = var.use_remote_open_api_spec
   use_impersonation               = var.use_impersonation
   marketplace_integration_enabled = var.marketplace_integration_enabled
-  cloud_run_ds_ui_set_no_auth     = false
-  deploy_ds_listener_service      = false
-  submit_gcloud_builds            = false
+  cloud_run_ds_ui_set_no_auth     = var.cloud_run_ds_ui_set_no_auth
+  deploy_ds_listener_service      = var.deploy_ds_listener_service
+  submit_gcloud_builds            = var.submit_gcloud_builds
 }
 
 module "custom-domain" {
