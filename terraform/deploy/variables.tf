@@ -242,9 +242,9 @@ variable "use_impersonation" {
 }
 
 variable "impersonated_service_account" {
-  type                         = string
-  description                  = "The service account to impersonate"
-  default = null
+  type        = string
+  description = "The service account to impersonate"
+  default     = null
 }
 
 variable "secret_name_prefix" {
