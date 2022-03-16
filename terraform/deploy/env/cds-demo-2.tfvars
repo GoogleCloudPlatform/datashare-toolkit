@@ -11,5 +11,6 @@ ui_domain                       = "datashare-demo-2.fsi.joonix.net"
 auth_domain                     = "cds-demo-2.firebaseapp.com"
 tag                             = "2.0.0.0"
 use_remote_open_api_spec        = false
+submit_gcloud_builds            = false
 secret_name_prefix              = "datashare_demo_2"
 marketplace_integration_enabled = true
