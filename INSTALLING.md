@@ -48,6 +48,18 @@ At this point, you should have the following:
 - IDP apiKey and authDomain
 - Cloud DNS Zone Name (if applicable)
 
+# Set Secret values in Secret Manager
+1. [Enable Secret Manager](https://console.cloud.google.com/marketplace/product/google/secretmanager.googleapis.com).
+2. Determine a prefix for secret names, IE: 'datashare_example'.
+3. Create secrets with the following names and secret data.
+
+| Name | Example Name | Secret Data |
+|-|-|-|
+| ${PREFIX}_api_key | datashare_example_api_key | IDP apiKey
+| ${PREFIX}_data_producers | datashare_example_data_producers | Comma delimited list of data producers
+| ${PREFIX}_oauth_client_id | datashare_example_oauth_client_id | OAuth Client ID
+| ${PREFIX}_oauth_client_secret | datashare_example_oauth_client_secret | OAuth Client Secret
+
 # Perform Domain Verification
 
 # Run Terraform Script
