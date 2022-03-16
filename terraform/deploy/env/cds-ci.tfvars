@@ -1,3 +1,5 @@
+# terraform apply -auto-approve -var-file ./env/cds-ci.tfvars
+
 use_impersonation            = false
 impersonated_service_account = "cds-cloud-build-mgr@cds-ci.iam.gserviceaccount.com"
 project_id                  = "cds-ci"
