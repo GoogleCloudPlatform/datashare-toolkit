@@ -53,12 +53,12 @@ At this point, you should have the following:
 2. Determine a prefix for secret names, IE: 'datashare_example'.
 3. Create secrets with the following names and secret data.
 
-| Name | Example Name | Secret Data |
-|-|-|-|
-| ${PREFIX}_api_key | datashare_example_api_key | IDP apiKey
-| ${PREFIX}_data_producers | datashare_example_data_producers | Comma delimited list of data producers
-| ${PREFIX}_oauth_client_id | datashare_example_oauth_client_id | OAuth Client ID
-| ${PREFIX}_oauth_client_secret | datashare_example_oauth_client_secret | OAuth Client Secret
+| Name | Example Name | Secret Data | Example |
+|-|-|-|-|
+| ${PREFIX}_api_key | datashare_example_api_key | The apiKey value from the IDP application setup details | AIzsdSDFKLJDSFdsfjkdkWxG8 |
+| ${PREFIX}_data_producers | datashare_example_data_producers | Comma delimited list of email addresses for datashare administrators | cloudysanfrancisco@gmail.com,jeffersonloveshiking@gmail.com |
+| ${PREFIX}_oauth_client_id | datashare_example_oauth_client_id | The client ID from the created OAuth client | 245237819806-nnt4fafg024kph1h507o4574eoejirdq.apps.googleusercontent.com |
+| ${PREFIX}_oauth_client_secret | datashare_example_oauth_client_secret | The client secret from the created OAuth client | GSDFDFD-jdsfndsfksdfklj4kljsdkndsf |
 
 # Perform Domain Verification
 
@@ -74,11 +74,7 @@ At this point, you should have the following:
 | dns_zone | No | The Cloud DNS Zone to update if applicable | demo-1 |
 | api_domain | Yes | The domain name for the UI | api.datashare.example.com |
 | ui_domain | Yes | The domain name for the API Service | datashare.example.com |
-| api_key | Yes | The apiKey value from the IDP application setup details | AIzsdSDFKLJDSFdsfjkdkWxG8 |
-| oauth_client_id | Yes | The client ID from the created OAuth client | 245237819806-nnt4fafg024kph1h507o4574eoejirdq.apps.googleusercontent.com |
-| oauth_client_secret | Yes | The client secret from the created OAuth client | GSDFDFD-jdsfndsfksdfklj4kljsdkndsf |
 | auth_domain | Yes | The domain name for the API Service | datashare-demo-1.firebaseapp.com |
-| data_producers | Yes | Comma delimited list of email addresses for datashare administrators | cloudysanfrancisco@gmail.com,jeffersonloveshiking@gmail.com |
 
 ## Variable Worksheet
 ```
