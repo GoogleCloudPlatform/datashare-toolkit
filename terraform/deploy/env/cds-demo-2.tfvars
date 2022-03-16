@@ -14,3 +14,4 @@ use_remote_open_api_spec        = false
 submit_gcloud_builds            = false
 secret_name_prefix              = "datashare_demo_2"
 marketplace_integration_enabled = true
+deploy_ds_listener_service      = true

@@ -267,7 +267,7 @@ variable "cloud_run_ds_ui_set_no_auth" {
 variable "deploy_ds_listener_service" {
   type        = bool
   description = "Flag indicating if the datashare listener service should be deployed"
-  default     = true
+  default     = false
 }
 
 variable "marketplace_integration_enabled" {
