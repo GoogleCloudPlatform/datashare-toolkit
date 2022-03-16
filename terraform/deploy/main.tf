@@ -108,6 +108,7 @@ module "datashare-application" {
   cloud_run_ds_ui_set_no_auth     = var.cloud_run_ds_ui_set_no_auth
   deploy_ds_listener_service      = var.deploy_ds_listener_service
   submit_gcloud_builds            = var.submit_gcloud_builds
+  api_domain                      = var.api_domain
   ui_domain                       = var.ui_domain
 }
 

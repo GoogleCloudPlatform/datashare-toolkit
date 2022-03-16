@@ -28,7 +28,7 @@ resource "null_resource" "gcloud_submit-datashare-api" {
 
 locals {
   _marketplace_integration = var.marketplace_integration_enabled == true ? "true" : "false"
-  managed_projects = "{ \"${var.project_id}\": { \"MARKETPLACE_INTEGRATION_ENABLED\": ${local._marketplace_integration}, \"labels\": { \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT\": \"\", \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT\": \"\", \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL\": \"\" } } }"
+  managed_projects         = "{ \"${var.project_id}\": { \"MARKETPLACE_INTEGRATION_ENABLED\": ${local._marketplace_integration}, \"labels\": { \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_TEXT\": \"\", \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_TEXT\": \"\", \"VUE_APP_MY_PRODUCTS_MORE_INFORMATION_BUTTON_URL\": \"\" } } }"
 }
 
 resource "google_cloud_run_service" "cloud-run-service-ds-api" {
@@ -90,7 +90,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
 
       // Temp until demo 2 account is fixed
       template[0].spec[0].service_account_name,
-      
+
       template[0].metadata[0].annotations["run.googleapis.com/ingress"],
       template[0].metadata[0].annotations["run.googleapis.com/client-name"]
     ]

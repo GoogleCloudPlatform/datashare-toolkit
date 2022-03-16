@@ -199,6 +199,11 @@ variable "marketplace_integration_enabled" {
   default     = false
 }
 
+variable "api_domain" {
+  description = "The domain name for the API Service"
+  type        = string
+}
+
 variable "ui_domain" {
   type        = string
   description = "The domain name for the UI"
