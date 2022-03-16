@@ -10,5 +10,5 @@ api_domain                   = "api.datashare-demo-3.fsi.joonix.net"
 ui_domain                    = "datashare-demo-3.fsi.joonix.net"
 auth_domain                  = "cds-demo-3.firebaseapp.com"
 tag                          = "2.0.0.0"
-use_remote_open_api_spec     = true
+use_remote_open_api_spec     = false
 secret_name_prefix           = "datashare_demo_3"
