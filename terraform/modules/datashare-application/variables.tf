@@ -198,3 +198,9 @@ variable "marketplace_integration_enabled" {
   description = "Flag indicating if marketplace integration for datashare is enabled"
   default     = false
 }
+
+variable "ui_domain" {
+  type        = string
+  description = "The domain name for the UI"
+  default     = null
+}

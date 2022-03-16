@@ -61,6 +61,10 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
           name  = "MANAGED_PROJECTS"
           value = local.managed_projects
         }
+        env {
+          name  = "UI_BASE_URL"
+          value = "https://${var.ui_domain}"
+        }
       }
       service_account_name = local.api_service_account_name
     }
