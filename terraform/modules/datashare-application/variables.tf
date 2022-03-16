@@ -192,3 +192,9 @@ variable "use_impersonation" {
   description = "Flag indicating if impersonation is used"
   default     = false
 }
+
+variable "marketplace_integration_enabled" {
+  type        = bool
+  description = "Flag indicating if marketplace integration for datashare is enabled"
+  default     = false
+}

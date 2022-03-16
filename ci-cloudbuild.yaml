@@ -18,27 +18,27 @@ steps:
   dir: 'frontend'
   args:
   - build
-  - "--tag=gcr.io/$PROJECT_ID/datashare-ui:$TAG_NAME"
+  - "--tag=gcr.io/$_PROJECT_ID/datashare-ui:$TAG_NAME"
   - "--file=./Dockerfile"
   - .
 
 - id: 'push-ui-build'
   name: 'gcr.io/cloud-builders/docker'
-  args: ['push', "gcr.io/$PROJECT_ID/datashare-ui:$TAG_NAME"]
+  args: ['push', "gcr.io/$_PROJECT_ID/datashare-ui:$TAG_NAME"]
   waitFor: ['ui-build']
 
 - id: 'api-build'
   name: 'gcr.io/cloud-builders/docker'
   args:
   - build
-  - "--tag=gcr.io/$PROJECT_ID/datashare-api:$TAG_NAME"
+  - "--tag=gcr.io/$_PROJECT_ID/datashare-api:$TAG_NAME"
   - "--file=./api/v1/Dockerfile.api"
   - .
   waitFor: ['-']
 
 - id: 'push-api-build'
   name: 'gcr.io/cloud-builders/docker'
-  args: ['push', "gcr.io/$PROJECT_ID/datashare-api:$TAG_NAME"]
+  args: ['push', "gcr.io/$_PROJECT_ID/datashare-api:$TAG_NAME"]
   waitFor: ['api-build']
 
 - id: 'branch-name'
@@ -91,11 +91,14 @@ steps:
       terraform apply -auto-approve -var-file="./env/${_ENVIRONMENT}.tfvars" -var="tag=$TAG_NAME"
 # [END tf-apply]
 
+substitutions:
+  _ENVIRONMENT: '${_PROJECT_ID}'
+
 options:
  logging: CLOUD_LOGGING_ONLY
 
 images:
-  - "gcr.io/$PROJECT_ID/datashare-ui:$TAG_NAME"
-  - "gcr.io/$PROJECT_ID/datashare-api:$TAG_NAME"
+  - "gcr.io/$_PROJECT_ID/datashare-ui:$TAG_NAME"
+  - "gcr.io/$_PROJECT_ID/datashare-api:$TAG_NAME"
 
 timeout: 1200s

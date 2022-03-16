@@ -269,3 +269,9 @@ variable "deploy_ds_listener_service" {
   description = "Flag indicating if the datashare listener service should be deployed"
   default     = true
 }
+
+variable "marketplace_integration_enabled" {
+  type        = bool
+  description = "Flag indicating if marketplace integration for datashare is enabled"
+  default     = false
+}

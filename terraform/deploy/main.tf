@@ -97,16 +97,17 @@ module "datashare-application" {
   data_producers      = local.data_producers
   api_key             = local.api_key
 
-  project_id                  = var.project_id
-  region                      = var.region
-  zone                        = var.zone
-  tag                         = var.tag
-  auth_domain                 = var.auth_domain
-  use_remote_open_api_spec    = var.use_remote_open_api_spec
-  use_impersonation           = var.use_impersonation
-  cloud_run_ds_ui_set_no_auth = false
-  deploy_ds_listener_service  = false
-  submit_gcloud_builds        = false
+  project_id                      = var.project_id
+  region                          = var.region
+  zone                            = var.zone
+  tag                             = var.tag
+  auth_domain                     = var.auth_domain
+  use_remote_open_api_spec        = var.use_remote_open_api_spec
+  use_impersonation               = var.use_impersonation
+  marketplace_integration_enabled = var.marketplace_integration_enabled
+  cloud_run_ds_ui_set_no_auth     = false
+  deploy_ds_listener_service      = false
+  submit_gcloud_builds            = false
 }
 
 module "custom-domain" {
