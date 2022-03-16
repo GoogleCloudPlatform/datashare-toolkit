@@ -83,7 +83,12 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
   lifecycle {
     ignore_changes = [
       template[0].spec[0].containers[0].env,
-      template[0].metadata[0].annotations["run.googleapis.com/ingress"]
+
+      // Temp until demo 2 account is fixed
+      template[0].spec[0].service_account_name,
+      
+      template[0].metadata[0].annotations["run.googleapis.com/ingress"],
+      template[0].metadata[0].annotations["run.googleapis.com/client-name"]
     ]
   }
 
