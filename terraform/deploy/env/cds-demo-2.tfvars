@@ -1,5 +1,8 @@
+# terraform workspace select cds-demo-2
 # terraform apply -auto-approve -var-file ./env/cds-demo-2.tfvars
 
+# use_impersonation               = true
+# impersonated_service_account    = "terraform@cds-demo-2.iam.gserviceaccount.com"
 project_id                      = "cds-demo-2"
 environment_name                = "Datashare Demo 2"
 deploy_custom_domains           = true
