@@ -1,6 +1,5 @@
-# terraform apply -auto-approve -var-file ./env/cds-demo-1-271622.tfvars
+# terraform apply -auto-approve -var-file ./env/cds-demo-2.tfvars
 
-use_impersonation               = false
 project_id                      = "cds-demo-2"
 environment_name                = "Datashare Demo 2"
 deploy_custom_domains           = true
