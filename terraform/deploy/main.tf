@@ -65,10 +65,6 @@ provider "google" {
   // request_timeout = "60s"
 }
 
-data "google_secret_manager_secret_version" "secret_api_key" {
-  secret = "${var.secret_name_prefix}_api_key"
-}
-
 data "google_secret_manager_secret_version" "secret_oauth_client_id" {
   secret = "${var.secret_name_prefix}_oauth_client_id"
 }
@@ -78,7 +74,6 @@ data "google_secret_manager_secret_version" "secret_oauth_client_secret" {
 }
 
 locals {
-  api_key             = data.google_secret_manager_secret_version.secret_api_key.secret_data
   oauth_client_id     = data.google_secret_manager_secret_version.secret_oauth_client_id.secret_data
   oauth_client_secret = data.google_secret_manager_secret_version.secret_oauth_client_secret.secret_data
 }
@@ -89,7 +84,6 @@ module "datashare-application" {
 
   oauth_client_id     = local.oauth_client_id
   oauth_client_secret = local.oauth_client_secret
-  api_key             = local.api_key
 
   project_id                      = var.project_id
   region                          = var.region

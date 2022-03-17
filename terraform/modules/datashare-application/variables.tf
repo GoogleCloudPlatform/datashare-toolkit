@@ -125,12 +125,6 @@ variable "idp_tenant" {
   description = "IDP Tenant"
 }
 
-variable "api_key" {
-  type        = string
-  description = "The API Key"
-  sensitive   = true
-}
-
 variable "auth_domain" {
   type        = string
   description = "The Auth Domain"
