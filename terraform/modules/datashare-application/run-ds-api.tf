@@ -73,7 +73,7 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
         }
         env {
           name  = "UI_BASE_URL"
-          value = var.ui_domain != null ? "https://${var.ui_domain}" : local.ds-ui-cloud_run_url
+          value = var.ui_domain != null ? "https://${var.ui_domain}" : null
         }
         env {
           name  = "API_CUSTOM_DOMAIN"
