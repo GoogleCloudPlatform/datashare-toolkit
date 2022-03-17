@@ -47,9 +47,9 @@ data "http" "open_api_spec" {
 }
 
 locals {
-  _api_fqdn                    = coalesce(var.api_domain, local.ds-api-cloud_run_domain)
-  open_api_spec_content_local  = replace(replace(replace(replace(file(var.open_api_spec_file), "DS_API_FQDN", local._api_fqdn), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", var.oauth_client_id), "MARKETPLACE_AUDIENCE", local.ds-api-cloud_run_domain)
-  open_api_spec_content_remote = local.use_remote_open_api_spec == true ? replace(replace(replace(replace(yamlencode(jsondecode(data.http.open_api_spec[0].body)), "DS_API_FQDN", local._api_fqdn), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", var.oauth_client_id), "MARKETPLACE_AUDIENCE", local.ds-api-cloud_run_domain) : ""
+  marketplace_audience         = coalesce(var.api_domain, local.ds-api-cloud_run_domain)
+  open_api_spec_content_local  = replace(replace(replace(replace(file(var.open_api_spec_file), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", var.oauth_client_id), "MARKETPLACE_AUDIENCE", local.marketplace_audience)
+  open_api_spec_content_remote = local.use_remote_open_api_spec == true ? replace(replace(replace(replace(yamlencode(jsondecode(data.http.open_api_spec[0].body)), "DS_API_FQDN", local.ds-api-cloud_run_domain), "PROJECT_ID", var.project_id), "OAUTH_CLIENT_ID", var.oauth_client_id), "MARKETPLACE_AUDIENCE", local.marketplace_audience) : ""
   open_api_spec_content        = local.use_remote_open_api_spec == true ? local.open_api_spec_content_remote : local.open_api_spec_content_local
 }
 
