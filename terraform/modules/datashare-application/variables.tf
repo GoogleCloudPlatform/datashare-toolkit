@@ -147,11 +147,6 @@ variable "oauth_client_secret" {
   sensitive   = true
 }
 
-variable "data_producers" {
-  type        = string
-  description = "The data producers list"
-}
-
 variable "open_api_spec_file" {
   type        = string
   description = "The open api spec local file location"
@@ -208,4 +203,10 @@ variable "ui_domain" {
   type        = string
   description = "The domain name for the UI"
   default     = null
+}
+
+variable "secret_name_prefix" {
+  type        = string
+  description = "The prefix used for the configuration secret names"
+  default     = "datashare"
 }

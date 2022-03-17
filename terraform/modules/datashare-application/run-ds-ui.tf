@@ -41,8 +41,13 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
           value = "https://${google_api_gateway_gateway.gw.default_hostname}/v1"
         }
         env {
-          name  = "VUE_APP_API_KEY"
-          value = var.api_key
+          name = "VUE_APP_API_KEY"
+          value_from {
+            secret_key_ref {
+              name = "${var.secret_name_prefix}_api_key"
+              key  = "latest"
+            }
+          }
         }
         env {
           name  = "VUE_APP_AUTH_DOMAIN"
@@ -68,6 +73,9 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
     percent         = 100
     latest_revision = true
   }
+  
+  // https://github.com/hashicorp/terraform-provider-google/issues/5898
+  autogenerate_revision_name = true
 
   lifecycle {
     ignore_changes = [

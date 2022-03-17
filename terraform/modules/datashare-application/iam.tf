@@ -19,6 +19,7 @@ locals {
   ui_service_account_name                = google_service_account.ui_service_account.email
   api_gateway_service_account_name       = google_service_account.api_gateway_service_account.email
   iam_policy_api_service_account         = "serviceAccount:${local.api_service_account_name}"
+  iam_policy_ui_service_account         = "serviceAccount:${local.ui_service_account_name}"
   iam_policy_api_gateway_service_account = "serviceAccount:${local.api_gateway_service_account_name}"
 }
 
@@ -160,7 +161,7 @@ resource "google_project_iam_member" "add_api_service_account_to_role" {
   role    = "projects/${var.project_id}/roles/${var.iam_role_ds_api_manager_id}"
   member  = local.iam_policy_api_service_account
 
-  depends_on = [google_project_iam_custom_role.custom-role-project-datashare_api_manager]
+  depends_on = [google_service_account.api_service_account, google_project_iam_custom_role.custom-role-project-datashare_api_manager]
 }
 
 // It would be preferable to add this role access at the tenant level, however there's no automated way to do that at the moment
@@ -169,7 +170,23 @@ resource "google_project_iam_member" "add_api_service_account_to_idp_admin_role"
   role    = "roles/identityplatform.admin"
   member  = local.iam_policy_api_service_account
 
-  depends_on = [google_project_iam_custom_role.custom-role-project-datashare_api_manager]
+  depends_on = [google_service_account.api_service_account]
+}
+
+resource "google_project_iam_member" "add_api_service_account_to_secret_accessor_role" {
+  project = var.project_id
+  role    = "roles/secretmanager.secretAccessor"
+  member  = local.iam_policy_api_service_account
+
+  depends_on = [google_service_account.api_service_account]
+}
+
+resource "google_project_iam_member" "add_ui_service_account_to_secret_accessor_role" {
+  project = var.project_id
+  role    = "roles/secretmanager.secretAccessor"
+  member  = local.iam_policy_ui_service_account
+
+  depends_on = [google_service_account.ui_service_account]
 }
 
 data "google_iam_policy" "api_gateway_invoker" {

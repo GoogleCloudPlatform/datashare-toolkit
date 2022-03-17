@@ -69,10 +69,6 @@ data "google_secret_manager_secret_version" "secret_api_key" {
   secret = "${var.secret_name_prefix}_api_key"
 }
 
-data "google_secret_manager_secret_version" "secret_data_producers" {
-  secret = "${var.secret_name_prefix}_data_producers"
-}
-
 data "google_secret_manager_secret_version" "secret_oauth_client_id" {
   secret = "${var.secret_name_prefix}_oauth_client_id"
 }
@@ -83,7 +79,6 @@ data "google_secret_manager_secret_version" "secret_oauth_client_secret" {
 
 locals {
   api_key             = data.google_secret_manager_secret_version.secret_api_key.secret_data
-  data_producers      = data.google_secret_manager_secret_version.secret_data_producers.secret_data
   oauth_client_id     = data.google_secret_manager_secret_version.secret_oauth_client_id.secret_data
   oauth_client_secret = data.google_secret_manager_secret_version.secret_oauth_client_secret.secret_data
 }
@@ -94,7 +89,6 @@ module "datashare-application" {
 
   oauth_client_id     = local.oauth_client_id
   oauth_client_secret = local.oauth_client_secret
-  data_producers      = local.data_producers
   api_key             = local.api_key
 
   project_id                      = var.project_id
@@ -110,6 +104,7 @@ module "datashare-application" {
   submit_gcloud_builds            = var.submit_gcloud_builds
   api_domain                      = var.api_domain
   ui_domain                       = var.ui_domain
+  secret_name_prefix              = var.secret_name_prefix
 }
 
 module "custom-domain" {

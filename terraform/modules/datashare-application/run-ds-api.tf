@@ -42,8 +42,13 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
       containers {
         image = "gcr.io/${var.project_id}/datashare-api:${var.tag}"
         env {
-          name  = "API_KEY"
-          value = var.api_key
+          name = "API_KEY"
+          value_from {
+            secret_key_ref {
+              name = "${var.secret_name_prefix}_api_key"
+              key  = "latest"
+            }
+          }
         }
         env {
           name  = "AUTH_DOMAIN"
@@ -54,8 +59,13 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
           value = google_identity_platform_tenant.tenant.name
         }
         env {
-          name  = "DATA_PRODUCERS"
-          value = var.data_producers
+          name = "DATA_PRODUCERS"
+          value_from {
+            secret_key_ref {
+              name = "${var.secret_name_prefix}_data_producers"
+              key  = "latest"
+            }
+          }
         }
         env {
           name  = "MANAGED_PROJECTS"
@@ -64,6 +74,10 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
         env {
           name  = "UI_BASE_URL"
           value = "https://${var.ui_domain}"
+        }
+        env {
+          name  = "API_CUSTOM_DOMAIN"
+          value = var.api_domain
         }
       }
       service_account_name = local.api_service_account_name
@@ -84,9 +98,12 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
     latest_revision = true
   }
 
+  // https://github.com/hashicorp/terraform-provider-google/issues/5898
+  autogenerate_revision_name = true
+
   lifecycle {
     ignore_changes = [
-      template[0].spec[0].containers[0].env,
+      // template[0].spec[0].containers[0].env,
 
       // Temp until demo 2 account is fixed
       template[0].spec[0].service_account_name,
@@ -135,6 +152,9 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
     latest_revision = true
   }
 
+  // https://github.com/hashicorp/terraform-provider-google/issues/5898
+  autogenerate_revision_name = true
+  
   lifecycle {
     ignore_changes = [
       template[0].metadata[0].annotations["run.googleapis.com/ingress"]
