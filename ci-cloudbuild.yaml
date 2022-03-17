@@ -13,6 +13,20 @@
 # limitations under the License.
 
 steps:
+- id: 'update-versions'
+  name: gcr.io/cloud-builders/gcloud
+  waitFor: ['-']
+  entrypoint: bash
+  args:
+  - -exc
+  - |
+    apt-get update
+    apt-get install jq -y
+    cd frontend
+    jq '.version="${TAG_NAME}"' package.json > package.json.tmp && mv package.json.tmp package.json
+    cd ../api/v1
+    jq '.version="${TAG_NAME}"' package.json > package.json.tmp && mv package.json.tmp package.json
+
 - id: 'ui-build'
   name: 'gcr.io/cloud-builders/docker'
   dir: 'frontend'
