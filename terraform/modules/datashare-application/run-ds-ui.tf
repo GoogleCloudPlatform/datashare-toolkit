@@ -73,7 +73,7 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
     percent         = 100
     latest_revision = true
   }
-  
+
   // https://github.com/hashicorp/terraform-provider-google/issues/5898
   autogenerate_revision_name = true
 
