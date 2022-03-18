@@ -24,6 +24,7 @@ terraform {
     }
   }
   backend "gcs" {
+    // TODO: Configure this through the init command passing through as a param
     bucket = "cds-ci-datashare-tfstate"
   }
 }
