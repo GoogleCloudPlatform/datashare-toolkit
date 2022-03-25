@@ -13,9 +13,11 @@ Installing Datashare consists of some manual configuration in the GCP console, a
    1. Ensure that the necessary project is selected.
    2. Click 'CREATE SERVICE ACCOUNT'.
    3. For the "Grant this service account access to project" step, choose Project > Editor for the role.
-   4. Skip the "Grant users access to this service account" step and click "DONE".
-   5. Download the service account key by selecting your service account from the [list of accounts](https://console.cloud.google.com/iam-admin/serviceaccounts). Select the 'KEYS' tab. Click the 'ADD KEY' button, select 'Create new key'. Leave the 'Key type' selection on 'JSON'.
-   6. Create the key and save it to the file system. **Note down the service account name**.
+   4. There are two options for authenticating access to run the Terraform script as follows:
+      - **Using Service Account Impersonation (Recommended):** If you are unable to download service account keys due to organizational restrictions, grant your account 'Service Account Token Creator' access to the created service account, then when executing the Terraform script you will use [service account impersonation](https://cloud.google.com/iam/docs/impersonating-service-accounts). You will also need to ensure that you have owner role on the project for which you want to install the application.
+      - **Using Service Account Keys:** If you can download a service account key, skip the "Grant users access to this service account" step and click "DONE".
+        1. Download the service account key by selecting your service account from the [list of accounts](https://console.cloud.google.com/iam-admin/serviceaccounts). Select the 'KEYS' tab. Click the 'ADD KEY' button, select 'Create new key'. Leave the 'Key type' selection on 'JSON'.
+        2. Create the key and save it to the file system. **Note down the service account name**.
 4. [Configure OAuth consent](https://console.cloud.google.com/apis/credentials/consent) screen. For more information on enabling IAP see [Enabling Cloud IAP for Compute Engine](https://cloud.google.com/iap/docs/enabling-compute-howto#enabling_iap_console).
 5. Determine the URIs that will be used for the Datashare UI and API Service. It is not necessary to use custom domains, however if you are using marketplace integration it is strongly encouraged. Recommended formats are as follows.
    - UI - datashare.example.com
@@ -34,11 +36,11 @@ Installing Datashare consists of some manual configuration in the GCP console, a
       - https://{PROJECT_ID}.firebaseapp.com/__/auth/handler
    7. Click the 'CREATE' button. **Note down the client ID and the client secret** from the section titled 'Your Client ID' in the modal dialog.
 7. [Enable Identity Platform](https://console.cloud.google.com/marketplace/details/google-cloud-platform/customer-identity).
-8. [Enable multi-tenancy(https://console.cloud.google.com/customer-identity/settings)] For more information see [Getting started with multi-tenancy](https://cloud.google.com/identity-platform/docs/multi-tenancy-quickstart).
+8. [Enable multi-tenancy](https://console.cloud.google.com/customer-identity/settings) For more information see [Getting started with multi-tenancy](https://cloud.google.com/identity-platform/docs/multi-tenancy-quickstart).
    1. Go to the 'SECURITY' tab and click 'ALLOW TENANTS'.
 9. Gather the **apiKey** and **authDomain** values from the 'APPLICATION SETUP DETAILS' button on the [IDP](https://console.cloud.google.com/customer-identity) page.
 10. If you will use Cloud DNS to manage your DNS, [enable the service](https://console.cloud.google.com/marketplace/product/google/dns.googleapis.com).
-   1. [Create a DNS zone](https://cloud.google.com/dns/docs/zones?_ga=2.242753410.-1036388681.1645220594#create_managed_zones) and **note down the zone name**.
+    - [Create a DNS zone](https://cloud.google.com/dns/docs/zones?_ga=2.242753410.-1036388681.1645220594#create_managed_zones) and **note down the zone name**.
 
 # Review
 At this point, you should have the following:
@@ -50,7 +52,7 @@ At this point, you should have the following:
 
 # Set Secret values in Secret Manager
 1. [Enable Secret Manager](https://console.cloud.google.com/marketplace/product/google/secretmanager.googleapis.com).
-2. Determine a prefix for secret names, IE: 'datashare_example'.
+2. Determine a prefix for secret names and **note this down**, IE: 'datashare_example'.
 3. Create secrets with the following names and secret data.
 
 | Name | Example Name | Secret Data | Example |
@@ -67,7 +69,9 @@ At this point, you should have the following:
 
 | Name | Required | Description | Example |
 |-|-|-|-|
-| install_service_account_key | Yes | Path to the service account key that was saved. | /example/path/my-project-123a98ee034f.json |
+| install_service_account_key | Yes, if using a downloaded service account key for authentication | Path to the service account key that was saved. | /example/path/my-project-123a98ee034f.json |
+| use_impersonation | Yes, if using your GCP account with service account impersonation for authentication | Flag indicating if service account impersonation should be used | true |
+| impersonated_service_account | Yes, if using your GCP account with service account impersonation for authentication | Service account to be impersonated | terraform@datashare-demo-1.iam.gserviceaccount.com
 | project_id | Yes | The GCP Project Id | my-project |
 | environment_name | Yes | A display name for the environment | Datashare Demo 1 |
 | update_cloud_dns | No | Flag indicating if the Cloud DNS zone should have its A record updated | true |
@@ -75,20 +79,17 @@ At this point, you should have the following:
 | api_domain | Yes | The domain name for the UI | api.datashare.example.com |
 | ui_domain | Yes | The domain name for the API Service | datashare.example.com |
 | auth_domain | Yes | The domain name for the API Service | datashare-demo-1.firebaseapp.com |
+| secret_name_prefix | Yes | The prefix used for secrets | datashare_demo_1 |
 
 ## Variable Worksheet
 ```
-project_id                  = 
-environment_name            = 
-update_cloud_dns            = 
-dns_zone                    = 
-api_domain                  = 
-ui_domain                   = 
-api_key                     = 
-oauth_client_id             =
-oauth_client_secret         =
-auth_domain                 = 
-data_producers              = 
+use_impersonation              = true
+impersonated_service_account   =
+project_id                     = 
+environment_name               =
+auth_domain                    =
+secret_name_prefix             = "datashare"
+tag                            = "2.0.0.0"
 ```
 
 # Additional Installation Steps
