@@ -63,6 +63,32 @@ At this point, you should have the following:
 | ${PREFIX}_oauth_client_secret | datashare_example_oauth_client_secret | The client secret from the created OAuth client | GSDFDFD-jdsfndsfksdfklj4kljsdkndsf |
 
 # Perform Domain Verification
+If using custom domains, verify the domains with GCP using the following commands:
+
+```
+UI_DOMAIN=datashare.example.com
+API_DOMAIN=api.datashare.example.com
+
+# Execute the below commands and for each click the link to open 'Webmaster Central'.
+gcloud domains verify $UI_DOMAIN
+gcloud domains verify $API_DOMAIN
+
+# Wait at least 5 minutes for the TXT record to propagate. To check to see if the value has propagated, run the command:
+dig $UI_DOMAIN TXT
+
+# Once the dig command returns the TXT record, then proceed to click the 'VERIFY' button on the 'Webmaster Central' domain verification page. Then proceed to map the second domain.
+
+# To view a list of your now verified domains:
+gcloud domains list-user-verified
+```
+
+**If you want the terraform script to automatically set up DNS within the specified DNS zone do the following**
+
+Grant the installation service account access to manage the domains.
+1. Open [Webmaster Central](https://www.google.com/webmasters/verification).
+2. For both the UI and API domains, click the 'Verification details' link.
+3. In the 'Verified owners' section, click 'Add an owner'.
+4. Add the Service Account email address and click 'Continue'.
 
 # Run Terraform Script
 1. Open the terraform variable file [terraform.tfvars](/terraform/terraform.tfvars) and make the following replacements:
@@ -90,6 +116,15 @@ environment_name               =
 auth_domain                    =
 secret_name_prefix             = "datashare"
 tag                            = "2.0.0.0"
+
+## If using Cloud DNS, and you want the Terraform script to create the A records in the defined dns_zone, include the following:
+
+deploy_custom_domains         = true
+update_cloud_dns              = true
+dns_zone                      =
+create_static_api_ip_address  = false
+api_domain                    =
+ui_domain                     =
 ```
 
 # Additional Installation Steps
