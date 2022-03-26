@@ -75,6 +75,7 @@ gcloud domains verify $API_DOMAIN
 
 # Wait at least 5 minutes for the TXT record to propagate. To check to see if the value has propagated, run the command:
 dig $UI_DOMAIN TXT
+dig $API_DOMAIN TXT
 
 # Once the dig command returns the TXT record, then proceed to click the 'VERIFY' button on the 'Webmaster Central' domain verification page. Then proceed to map the second domain.
 
@@ -82,7 +83,7 @@ dig $UI_DOMAIN TXT
 gcloud domains list-user-verified
 ```
 
-**If you want the terraform script to automatically set up DNS within the specified DNS zone do the following**
+**If you want the terraform script to automatically set up DNS within the specified DNS zone grant the service account access to manage the domain**
 
 Grant the installation service account access to manage the domains.
 1. Open [Webmaster Central](https://www.google.com/webmasters/verification).
