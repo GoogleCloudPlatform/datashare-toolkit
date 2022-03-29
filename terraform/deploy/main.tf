@@ -23,10 +23,7 @@ terraform {
       version = "4.12.0"
     }
   }
-  backend "gcs" {
-    // TODO: Configure this through the init command passing through as a param
-    bucket = "cds-ci-datashare-tfstate"
-  }
+  backend "gcs" {}
 }
 
 // https://www.terraform.io/language/settings/backends/gcs
