@@ -1,4 +1,6 @@
+# terraform init -backend-config=./env/config.gcs.tfbackend
 # terraform workspace select cds-demo-2
+# terraform plan -var-file ./env/cds-demo-2.tfvars
 # terraform apply -auto-approve -var-file ./env/cds-demo-2.tfvars
 
 # use_impersonation               = true
