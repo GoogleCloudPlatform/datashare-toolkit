@@ -94,39 +94,60 @@ Grant the installation service account access to manage the domains.
 # Run Terraform Script
 1. Open the terraform variable file [terraform.tfvars](/terraform/terraform.tfvars) and make the following replacements:
 
-| Name | Required | Description | Example |
-|-|-|-|-|
-| install_service_account_key | Yes, if using a downloaded service account key for authentication | Path to the service account key that was saved. | /example/path/my-project-123a98ee034f.json |
-| use_impersonation | Yes, if using your GCP account with service account impersonation for authentication | Flag indicating if service account impersonation should be used | true |
-| impersonated_service_account | Yes, if using your GCP account with service account impersonation for authentication | Service account to be impersonated | terraform@datashare-demo-1.iam.gserviceaccount.com
-| project_id | Yes | The GCP Project Id | my-project |
-| environment_name | Yes | A display name for the environment | Datashare Demo 1 |
-| update_cloud_dns | No | Flag indicating if the Cloud DNS zone should have its A record updated | true |
-| dns_zone | No | The Cloud DNS Zone to update if applicable | demo-1 |
-| api_domain | Yes | The domain name for the UI | api.datashare.example.com |
-| ui_domain | Yes | The domain name for the API Service | datashare.example.com |
-| auth_domain | Yes | The domain name for the API Service | datashare-demo-1.firebaseapp.com |
-| secret_name_prefix | Yes | The prefix used for secrets | datashare_demo_1 |
+   | Name | Required | Description | Example |
+   |-|-|-|-|
+   | install_service_account_key | Yes, if using a downloaded service account key for authentication | Path to the service account key that was saved. | /example/path/my-project-123a98ee034f.json |
+   | use_impersonation | Yes, if using your GCP account with service account impersonation for authentication | Flag indicating if service account impersonation should be used | true |
+   | impersonated_service_account | Yes, if using your GCP account with service account impersonation for authentication | Service account to be impersonated | terraform@datashare-demo-1.iam.gserviceaccount.com
+   | project_id | Yes | The GCP Project Id | my-project |
+   | environment_name | Yes | A display name for the environment | Datashare Demo 1 |
+   | update_cloud_dns | No | Flag indicating if the Cloud DNS zone should have its A record updated | true |
+   | dns_zone | No | The Cloud DNS Zone to update if applicable | demo-1 |
+   | api_domain | Yes | The domain name for the UI | api.datashare.example.com |
+   | ui_domain | Yes | The domain name for the API Service | datashare.example.com |
+   | auth_domain | Yes | The domain name for the API Service | datashare-demo-1.firebaseapp.com |
+   | secret_name_prefix | Yes | The prefix used for secrets | datashare_demo_1 |
 
-## Variable Worksheet
+   ## Variable Worksheet
+   ```
+   use_impersonation              = true
+   impersonated_service_account   =
+   project_id                     = 
+   environment_name               =
+   auth_domain                    =
+   secret_name_prefix             = "datashare"
+   tag                            = "2.0.0.0"
+
+   ## If using Cloud DNS, and you want the Terraform script to create the A records in the defined dns_zone, include the following:
+
+   deploy_custom_domains         = true
+   update_cloud_dns              = true
+   dns_zone                      =
+   create_static_api_ip_address  = false
+   api_domain                    =
+   ui_domain                     =
+   ```
+
+2. Create a Cloud Storage bucket in the project and enable versioning.
+
+   ```
+   cd terraform
+   BUCKET_NAME="datashare-demo-1-tfstate"
+   gsutil mb gs://$BUCKET_NAME
+   gsutil versioning set on gs://$BUCKET_NAME
+   gsutil lifecycle set gcs/bucket_lifecycle.json gs://$BUCKET_NAME
+   ```
+3. Open the terraform backend config file [config.gcs.tfbackend](/terraform/config.gcs.tfbackend) and set the bucket variable to that of your bucket name. IE: "datashare-demo-1-tfstate".
+
+4. Execute the terraform script.
 ```
-use_impersonation              = true
-impersonated_service_account   =
-project_id                     = 
-environment_name               =
-auth_domain                    =
-secret_name_prefix             = "datashare"
-tag                            = "2.0.0.0"
-
-## If using Cloud DNS, and you want the Terraform script to create the A records in the defined dns_zone, include the following:
-
-deploy_custom_domains         = true
-update_cloud_dns              = true
-dns_zone                      =
-create_static_api_ip_address  = false
-api_domain                    =
-ui_domain                     =
+cd terraform/deploy
+terraform init -backend-config=./config.gcs.tfbackend
+terraform plan -var-file ./terraform.tfvars
+terraform apply -var-file ./terraform.tfvars
 ```
+
+If you run into any conflicts if infrastructure had already been created by previously running the installation script, you may have to import resources. See the Terraform [Import](https://www.terraform.io/cli/import) documentation and [Google Cloud Platform Provider](https://registry.terraform.io/providers/hashicorp/google/latest/docs) for more information.
 
 # Additional Installation Steps
 1. Update the OAuth client credential to include the Cloud Run generated domain.
