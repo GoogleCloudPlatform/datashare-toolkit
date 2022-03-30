@@ -23,18 +23,10 @@ The toolkit is open-source. Some supporting infrastructure, such as [storage buc
 ## Getting started with Datashare
 If you plan to use GCP Marketplace integration, the production project that you install and manage Datashare from must follow the required naming convention (punctuation and spaces not allowed): ```[yourcompanyname]-public```.
 
-1. [Setup the Datashare API Manager Service Account](./DATASHARE_API_MGR_SETUP.md)
-2. [Setup your domain](./DOMAIN_SETUP.md)
-3. [Setup OAuth credential](./CREDENTIAL_SETUP.md)
-4. [Deploy Datashare](./DEPLOY.md)
+1. [Install Datashare](./INSTALLING.md)
 5. [Initialize Schema](./frontend/user-guide/ADMIN.md#initialize_schema)
 
 Then get started, see the [User Guide](./frontend/README.md) for usage information.
-
-## Updating Datashare
-- [Perform Datashare version upgrade](./UPGRADE.md) - Update the API and UI software versions.
-- [Update Data Producers](./UPDATE_DATA_PRODUCERS.md) - Modify the administrators for the Datashare UI.
-- [Updating API Gateway Configuration](./api/UPDATE_API_GATEWAY_CONFIG.md) - Modify the API Gateway configuration to apply the latest defined security policies.
 
 ## Requirements
 

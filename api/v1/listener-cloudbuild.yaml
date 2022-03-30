@@ -2,8 +2,8 @@ steps:
 - name: "gcr.io/cloud-builders/docker"
   args:
   - build
-  - "--tag=gcr.io/$PROJECT_ID/ds-listener:$TAG_NAME"
+  - "--tag=gcr.io/$PROJECT_ID/datashare-listener:$TAG_NAME"
   - "--file=./api/v1/Dockerfile.listener"
   - .
 images:
-  - "gcr.io/$PROJECT_ID/ds-listener:$TAG_NAME"
+  - "gcr.io/$PROJECT_ID/datashare-listener:$TAG_NAME"

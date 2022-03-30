@@ -2,9 +2,9 @@ steps:
 - name: "gcr.io/cloud-builders/docker"
   args:
   - build
-  - "--tag=gcr.io/$PROJECT_ID/ds-frontend-ui:$TAG_NAME"
+  - "--tag=gcr.io/$PROJECT_ID/datashare-ui:$TAG_NAME"
   - "--file=./Dockerfile"
   - .
 images:
-  - "gcr.io/$PROJECT_ID/ds-frontend-ui:$TAG_NAME"
+  - "gcr.io/$PROJECT_ID/datashare-ui:$TAG_NAME"
 

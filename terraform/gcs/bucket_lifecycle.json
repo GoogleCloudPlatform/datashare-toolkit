@@ -1,0 +1,9 @@
+{
+    "rule":
+    [
+      {
+        "action": {"type": "Delete"},
+        "condition": {"numNewerVersions": 5}
+      }
+    ]
+  }

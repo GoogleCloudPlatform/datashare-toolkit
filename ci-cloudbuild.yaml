@@ -1,0 +1,118 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+steps:
+- id: 'update-versions'
+  name: gcr.io/cloud-builders/gcloud
+  waitFor: ['-']
+  entrypoint: bash
+  args:
+  - -exc
+  - |
+    apt-get update
+    apt-get install jq -y
+    cd frontend
+    jq '.version="${TAG_NAME}"' package.json > package.json.tmp && mv package.json.tmp package.json
+    cd ../api/v1
+    jq '.version="${TAG_NAME}"' package.json > package.json.tmp && mv package.json.tmp package.json
+
+- id: 'ui-build'
+  name: 'gcr.io/cloud-builders/docker'
+  dir: 'frontend'
+  args:
+  - build
+  - "--tag=gcr.io/$_PROJECT_ID/datashare-ui:$TAG_NAME"
+  - "--file=./Dockerfile"
+  - .
+
+- id: 'push-ui-build'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', "gcr.io/$_PROJECT_ID/datashare-ui:$TAG_NAME"]
+  waitFor: ['ui-build']
+
+- id: 'api-build'
+  name: 'gcr.io/cloud-builders/docker'
+  args:
+  - build
+  - "--tag=gcr.io/$_PROJECT_ID/datashare-api:$TAG_NAME"
+  - "--file=./api/v1/Dockerfile.api"
+  - .
+  waitFor: ['-']
+
+- id: 'push-api-build'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', "gcr.io/$_PROJECT_ID/datashare-api:$TAG_NAME"]
+  waitFor: ['api-build']
+
+- id: 'branch-name'
+  name: 'alpine'
+  entrypoint: 'sh'  
+  dir: 'terraform/deploy'
+  args: 
+  - '-c'
+  - |
+      echo "***********************"
+      echo "$BRANCH_NAME"
+      echo "***********************"
+
+- id: 'tf-init'
+  name: 'hashicorp/terraform:1.1.7'
+  entrypoint: 'sh'
+  dir: 'terraform/deploy'
+  args: 
+  - '-c'
+  - |
+      terraform init
+
+# [START tf-select-workspace]
+- id: 'tf-select-workspace'
+  name: 'hashicorp/terraform:1.1.7'
+  dir: 'terraform/deploy'
+  args: ['workspace', 'select', '${_ENVIRONMENT}']
+# [END tf-select-workspace]
+
+# [START tf-plan]
+- id: 'tf-plan'
+  name: 'hashicorp/terraform:1.1.7'
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |
+      cd terraform/deploy
+      terraform plan -var-file="./env/${_ENVIRONMENT}.tfvars" -var="tag=$TAG_NAME"
+# [END tf-plan]
+
+# [START tf-apply]
+- id: 'tf-apply'
+  name: 'hashicorp/terraform:1.1.7'
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |
+      chmod 777 terraform/modules/ingestion-function/scripts/create-cloud-function-zip.sh
+      cd terraform/deploy
+      terraform apply -auto-approve -var-file="./env/${_ENVIRONMENT}.tfvars" -var="tag=$TAG_NAME"
+# [END tf-apply]
+
+substitutions:
+  _ENVIRONMENT: '${_PROJECT_ID}'
+
+options:
+ logging: CLOUD_LOGGING_ONLY
+
+images:
+  - "gcr.io/$_PROJECT_ID/datashare-ui:$TAG_NAME"
+  - "gcr.io/$_PROJECT_ID/datashare-api:$TAG_NAME"
+
+timeout: 1200s
