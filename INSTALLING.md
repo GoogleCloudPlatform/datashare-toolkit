@@ -137,7 +137,7 @@ Grant the installation service account access to manage the domains.
    gsutil versioning set on gs://$BUCKET_NAME
    gsutil lifecycle set gcs/bucket_lifecycle.json gs://$BUCKET_NAME
    ```
-3. Open the terraform backend config file [config.gcs.tfbackend](/terraform/config.gcs.tfbackend) and set the bucket variable to that of your bucket name. IE: "datashare-demo-1-tfstate".
+3. Open the terraform backend config file [config.gcs.tfbackend](/terraform/deploy/config.gcs.tfbackend) and set the bucket variable to that of your bucket name. IE: "datashare-demo-1-tfstate".
 
 4. Execute the terraform script.
 ```
