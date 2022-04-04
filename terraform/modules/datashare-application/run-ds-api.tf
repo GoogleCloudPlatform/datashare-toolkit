@@ -35,6 +35,12 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
   name     = var.cloud_run_ds_api_service_name
   location = var.region
 
+  metadata {
+    annotations = {
+      "run.googleapis.com/ingress" = "all"
+    }
+  }
+
   // TODO: Store and use secret manager functionality in Cloud Run to expose as env variables
   // https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_service#example-usage---cloud-run-service-secret-environment-variables
   template {
@@ -85,7 +91,6 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
     metadata {
       annotations = {
         "run.googleapis.com/client-name" = "terraform",
-        "run.googleapis.com/ingress"     = "all",
 
         // Defaults to 100 after creation
         "autoscaling.knative.dev/maxScale" = "100",
@@ -108,7 +113,6 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
       // Temp until demo 2 account is fixed
       template[0].spec[0].service_account_name,
 
-      template[0].metadata[0].annotations["run.googleapis.com/ingress"],
       template[0].metadata[0].annotations["run.googleapis.com/client-name"]
     ]
   }
@@ -120,6 +124,12 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
   count    = var.deploy_ds_listener_service ? 1 : 0
   name     = var.cloud_run_ds_listener_service_name
   location = var.region
+
+  metadata {
+    annotations = {
+      "run.googleapis.com/ingress" = "internal"
+    }
+  }
 
   template {
     spec {
@@ -140,9 +150,6 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
         "autoscaling.knative.dev/maxScale"  = "1"
         "run.googleapis.com/client-name"    = "terraform"
         "run.googleapis.com/cpu-throttling" = "false",
-
-        // TODO: setting doesn't take
-        "run.googleapis.com/ingress" = "internal"
       }
     }
   }
@@ -154,12 +161,6 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
 
   // https://github.com/hashicorp/terraform-provider-google/issues/5898
   autogenerate_revision_name = true
-
-  lifecycle {
-    ignore_changes = [
-      template[0].metadata[0].annotations["run.googleapis.com/ingress"]
-    ]
-  }
 
   depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-datashare-api]
 }

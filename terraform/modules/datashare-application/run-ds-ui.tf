@@ -30,6 +30,12 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
   name     = var.cloud_run_ds_ui_service_name
   location = var.region
 
+  metadata {
+    annotations = {
+      "run.googleapis.com/ingress" = "all"
+    }
+  }
+
   // TODO: Store and use secret manager functionality in Cloud Run to expose as env variables
   // https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_service#example-usage---cloud-run-service-secret-environment-variables
   template {
@@ -63,8 +69,7 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
     metadata {
       annotations = {
         "run.googleapis.com/client-name"   = "terraform"
-        "autoscaling.knative.dev/maxScale" = "10",
-        "run.googleapis.com/ingress"       = "all"
+        "autoscaling.knative.dev/maxScale" = "10"
       }
     }
   }
@@ -76,12 +81,6 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
 
   // https://github.com/hashicorp/terraform-provider-google/issues/5898
   autogenerate_revision_name = true
-
-  lifecycle {
-    ignore_changes = [
-      template[0].metadata[0].annotations["run.googleapis.com/ingress"]
-    ]
-  }
 
   depends_on = [google_project_service.enable_cloud_run_api, null_resource.gcloud_submit-ds-ui]
 }
