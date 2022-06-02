@@ -56,6 +56,12 @@ fi
 
 export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 echo $PROJECT_ID
+
+if [[ -z "${SECRET_NAME_PREFIX:=}" ]]; then
+    export SECRET_NAME_PREFIX="[change-me]"
+    echo "Defaulted SECRET_NAME_PREFIX to '${PROJECT_ID}'"
+fi
+
 cd "$(dirname "$0")"
 
 # Up to root
@@ -75,7 +81,8 @@ gcloud run deploy ds-api \
     --no-allow-unauthenticated \
     --platform managed \
     --service-account ${SERVICE_ACCOUNT_NAME} \
-    --update-env-vars=^---^API_KEY="${API_KEY}"---AUTH_DOMAIN="${AUTH_DOMAIN}"---TENANT_ID="${TENANT_ID}"---DATA_PRODUCERS="${DATA_PRODUCERS}" \
+    --update-secrets=API_KEY=${SECRET_NAME_PREFIX}_api_key:latest,DATA_PRODUCERS=${SECRET_NAME_PREFIX}_data_producers:latest \
+    --update-env-vars=^---^AUTH_DOMAIN="${AUTH_DOMAIN}"---TENANT_ID="${TENANT_ID}" \
     --remove-env-vars=PROJECT_ID,MARKETPLACE_INTEGRATION,OAUTH_CLIENT_ID
 
 if ! gcloud run services describe ds-api --region=$REGION --platform managed | grep -q MANAGED_PROJECTS; then
