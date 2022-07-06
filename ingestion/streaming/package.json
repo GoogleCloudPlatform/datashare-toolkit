@@ -8,7 +8,7 @@
     "url": "https://github.com/GoogleCloudPlatform/datashare-toolkit"
   },
   "dependencies": {
-    "@google-cloud/pubsub": "^2.18.5",
+    "@google-cloud/pubsub": "^3.0.1",
     "ws": "~5.2.3"
   },
   "scripts": {
