@@ -76,7 +76,7 @@ for i in "$@"; do
         export MARKETPLACE_INTEGRATION_ENABLED="true"
         shift # past argument=value
         ;;
-    --secret-name-prefix)
+    --secret-name-prefix=*)
         export SECRET_NAME_PREFIX="${i#*=}"
         shift # past argument=value
         ;;
