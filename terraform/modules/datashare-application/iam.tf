@@ -150,9 +150,9 @@ resource "google_project_iam_custom_role" "custom-role-project-datashare_pubsub_
   description = var.iam_role_ds_pubsub_subscriber_description
   stage       = "GA"
   permissions = [
-    "resourcemanager.projects.get",
-    "storage.objects.get",
-    "storage.objects.list"
+    "pubsub.snapshots.seek",
+    "pubsub.subscriptions.consume",
+    "pubsub.topics.attachSubscription"
   ]
 }
 
