@@ -73,7 +73,7 @@ steps:
   args: 
   - '-c'
   - |
-      terraform init
+      terraform init -backend-config=./config.gcs.tfbackend
 
 # [START tf-select-workspace]
 - id: 'tf-select-workspace'
