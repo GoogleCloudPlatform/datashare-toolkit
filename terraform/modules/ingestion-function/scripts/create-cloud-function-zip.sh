@@ -55,6 +55,11 @@ else
     sed -i -E 's/(file:)(\.\.\/\.\.\/)(shared)/\1\3/g' tmp/ingestion/batch/package.json
 fi
 
+cd "${FUNCTION_SHARED}/"
+npm install
+cd "${FUNCTION_SOURCE}/"
+npm install
+
 # CLOUD_FUNCTION_ZIP_FILE_NAME="../datashare-batch-cloud-function-src.zip"
 # cd tmp/ingestion/batch
 # zip -r $CLOUD_FUNCTION_ZIP_FILE_NAME . 
