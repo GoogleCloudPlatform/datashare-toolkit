@@ -15,7 +15,7 @@
 # limitations under the License.
 
 if [ "$#" -lt 7 ]; then
-    echo "Usage: $0 [ --project-id ] [ --oauth-client-id ] [ --fqdn ] [ --data-producers ] [ --region ] [ --zone] [ --tag ] [ --marketplace-enabled ]" >&2
+    echo "Usage: $0 [ --project-id ] [ --oauth-client-id ] [ --fqdn ] [ --data-producers ] [ --region ] [ --zone] [ --tag ] [ --marketplace-enabled ] [ --secret-name-prefix ]" >&2
     exit 1
 fi
 
