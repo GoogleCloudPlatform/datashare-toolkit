@@ -94,6 +94,11 @@ else
     gcloud config set project "$PROJECT_ID"
 fi
 
+if [[ -z "${SECRET_NAME_PREFIX:=}" ]]; then
+    export SECRET_NAME_PREFIX=$PROJECT_ID
+    echo "Defaulted SECRET_NAME_PREFIX to '${PROJECT_ID}'"
+fi
+
 if [ -z "$OAUTH_CLIENT_ID" ]; then
     echo "--oauth-client-id must be supplied"
     exit 2
