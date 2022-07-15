@@ -52,6 +52,8 @@ if [[ -z "${SECRET_NAME_PREFIX:=}" ]]; then
     echo "Defaulted SECRET_NAME_PREFIX to '${PROJECT_ID}'"
 fi
 
+export SERVICE_ACCOUNT_NAME=ds-ui-mgr
+
 gcloud builds submit --config cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 gcloud run deploy ds-frontend-ui \
@@ -59,6 +61,7 @@ gcloud run deploy ds-frontend-ui \
   --region=${REGION} \
   --allow-unauthenticated \
   --platform managed \
+  --service-account ${SERVICE_ACCOUNT_NAME} \
   --max-instances 10 \
   --update-secrets=VUE_APP_API_KEY=${SECRET_NAME_PREFIX}_api_key:latest \
   --update-env-vars=VUE_APP_API_BASE_URL="https://${FQDN}/v1",VUE_APP_AUTH_DOMAIN="${AUTH_DOMAIN}",VUE_APP_TENANT_ID="${TENANT_ID}" \
