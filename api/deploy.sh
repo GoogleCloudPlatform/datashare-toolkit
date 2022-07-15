@@ -58,7 +58,7 @@ export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 echo $PROJECT_ID
 
 if [[ -z "${SECRET_NAME_PREFIX:=}" ]]; then
-    export SECRET_NAME_PREFIX="[change-me]"
+    export SECRET_NAME_PREFIX=$PROJECT_ID
     echo "Defaulted SECRET_NAME_PREFIX to '${PROJECT_ID}'"
 fi
 
