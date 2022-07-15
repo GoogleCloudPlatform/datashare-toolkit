@@ -56,7 +56,7 @@ export SERVICE_ACCOUNT_NAME=ds-ui-mgr
 
 gcloud builds submit --config cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
-gcloud run deploy ds-frontend-ui \
+gcloud run deploy ds-ui \
   --image gcr.io/${PROJECT_ID}/ds-frontend-ui:${TAG} \
   --region=${REGION} \
   --allow-unauthenticated \
@@ -69,7 +69,7 @@ gcloud run deploy ds-frontend-ui \
 
 # Delete old revisions
 DELETE_REVISIONS=`gcloud run revisions list \
-    --service ds-frontend-ui \
+    --service ds-ui \
     --region ${REGION} \
     --platform managed \
     | grep REVISION: \
