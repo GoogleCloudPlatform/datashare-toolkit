@@ -10,8 +10,12 @@ You must have the values for the following variables:
 |-|-|-|-|-|
 | --project-id | No | The GCP Project Id. | Derived from ```gcloud config list --format 'value(core.project)'``` | datashare-demo-1 |
 | --oauth-client-id | Yes | The OAuth Client Id. | | 8xxxxxxxxxx-xxxxxxxxxxx.apps.googleusercontent.com |
+| --api-key | Yes | The API key.|| xxxxxxxxxxxx |
+| --auth-domain | Yes | The auth domain. || datashare-demo-1.firebaseapp.com |
+| --tenant-id | Yes | The IDP tenant Id. || datashare-abcdefg |
 | --fqdn | Yes | The fully qualified domain for the API.|| api.datashare.example.com |
 | --data-producers | Yes | The list of users and or domains that should be admins. || cloudysanfrancisco@gmail.com,jeffersonloveshiking@gmail.com |
+| --secret-name-prefix | Yes | The prefix to use for datashare secrets in secret manager || datashare_demo_1 |
 | --tag | No | The container image tag. | dev | dev |
 | --region | No | The GCP region for the deployments. | us-central1 | us-central1 |
 | --zone | No | The GCP zone for the deployments. | us-central1-a | us-central1-a |
