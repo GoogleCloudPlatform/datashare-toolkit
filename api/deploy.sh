@@ -76,7 +76,7 @@ CLUSTER=datashare
 gcloud config set compute/zone $ZONE
 
 gcloud run deploy ds-api \
-    --image gcr.io/${PROJECT_ID}/ds-api:${TAG} \
+    --image gcr.io/${PROJECT_ID}/datashare-api:${TAG} \
     --region=$REGION \
     --no-allow-unauthenticated \
     --platform managed \
@@ -159,7 +159,7 @@ if [ "${MARKETPLACE_INTEGRATION_ENABLED:=}" = "true" ]; then
 
     # Delete old revisions
     DELETE_REVISIONS=`gcloud run revisions list \
-        --service ds-listener \
+        --service datashare-listener \
         --region=${REGION} \
         --platform managed \
         | grep REVISION: \

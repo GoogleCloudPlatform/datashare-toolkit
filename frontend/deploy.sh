@@ -57,7 +57,7 @@ export SERVICE_ACCOUNT_NAME=ds-ui-mgr
 gcloud builds submit --config cloudbuild.yaml --substitutions=TAG_NAME=${TAG}
 
 gcloud run deploy ds-ui \
-  --image gcr.io/${PROJECT_ID}/ds-frontend-ui:${TAG} \
+  --image gcr.io/${PROJECT_ID}/datashare-ui:${TAG} \
   --region=${REGION} \
   --allow-unauthenticated \
   --platform managed \
