@@ -57,6 +57,10 @@ resource "google_api_gateway_api" "api_gw" {
   project  = var.project_id
   provider = google-beta
   api_id   = "api-gw-ds-api"
+
+  labels = {
+    (var.goog_packaged_solution_key) = var.goog_packaged_solution_value
+  }
 }
 
 resource "google_api_gateway_api_config" "api_cfg" {
@@ -77,6 +81,9 @@ resource "google_api_gateway_api_config" "api_cfg" {
       google_service_account = local.api_gateway_service_account_name
     }
   }
+  labels = {
+    (var.goog_packaged_solution_key) = var.goog_packaged_solution_value
+  }
   lifecycle {
     create_before_destroy = true
   }
@@ -89,6 +96,10 @@ resource "google_api_gateway_gateway" "gw" {
   api_config   = google_api_gateway_api_config.api_cfg.id
   gateway_id   = "api-gw-ds-api"
   display_name = "Datashare API Service Gateway"
+
+  labels = {
+    (var.goog_packaged_solution_key) = var.goog_packaged_solution_value
+  }
 }
 
 // Grant API Gateway account run.invoker access on the API service

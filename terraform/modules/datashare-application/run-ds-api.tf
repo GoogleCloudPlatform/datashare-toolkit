@@ -39,6 +39,9 @@ resource "google_cloud_run_service" "cloud-run-service-ds-api" {
     annotations = {
       "run.googleapis.com/ingress" = "all"
     }
+    labels = {
+      (var.goog_packaged_solution_key) = var.goog_packaged_solution_value
+    }
   }
 
   // TODO: Store and use secret manager functionality in Cloud Run to expose as env variables
@@ -128,6 +131,9 @@ resource "google_cloud_run_service" "cloud-run-service-ds-listener" {
   metadata {
     annotations = {
       "run.googleapis.com/ingress" = "internal"
+    }
+    labels = {
+      (var.goog_packaged_solution_key) = var.goog_packaged_solution_value
     }
   }
 

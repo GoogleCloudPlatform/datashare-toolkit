@@ -69,3 +69,13 @@ variable "update_cloud_dns" {
   type        = bool
   description = "Flag indicating if the Cloud DNS zone should have its A record updated"
 }
+
+variable "goog_packaged_solution_key" {
+  type        = string
+  description = "The packaged solution key"
+}
+
+variable "goog_packaged_solution_value" {
+  type        = string
+  description = "The packaged solution value"
+}
