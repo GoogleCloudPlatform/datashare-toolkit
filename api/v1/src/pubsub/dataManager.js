@@ -45,7 +45,10 @@ async function createTopic(projectId, name) {
     return pubsubUtil.createTopic(name).then(topicResponse => {
         const [topic] = topicResponse;
         let dict = {};
-        dict.labels = { [config.cdsManagedLabelKey]: "true" };
+        dict.labels = { 
+            [config.cdsManagedLabelKey]: "true",
+            [config.googPackagedSolutionKey] : config.googPackagedSolutionValue
+        };
         return topic.setMetadata(dict).then(() => {
             return {
                 success: true,
