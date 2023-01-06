@@ -67,6 +67,11 @@ resource "google_compute_global_address" "default" {
   project    = var.project_id
   name       = "datashare-api-static-ip"
   ip_version = "IPV4"
+
+  // BETA only
+  /*labels = {
+    (var.goog_packaged_solution_key) = var.goog_packaged_solution_value
+  }*/
 }
 
 // TODO: Reserve an IP address first rather than allow auto-generation
@@ -79,4 +84,9 @@ resource "google_compute_global_forwarding_rule" "datashare-lb-forwarding-rule" 
   port_range            = "443-443"
   project               = var.project_id
   target                = google_compute_target_https_proxy.datashare-target-http-proxy.id
+
+  // BETA only
+  /*labels = {
+    (var.goog_packaged_solution_key) = var.goog_packaged_solution_value
+  }*/
 }
