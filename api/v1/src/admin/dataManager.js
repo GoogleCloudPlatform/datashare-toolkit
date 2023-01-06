@@ -210,7 +210,7 @@ async function setupDatasharePrerequisites(projectId) {
 
     if (await bigqueryUtil.tableExists(cfg.cdsDatasetId, cfg.cdsPolicyTableId) === false) {
         console.log("Creating policy table");
-        const options = require('./bq/schema/policy.json');
+        const options = Object.assign(viewOptions, require('./bq/schema/policy.json'));
         await bigqueryUtil.createTable(cfg.cdsDatasetId, cfg.cdsPolicyTableId, options);
     } else {
         // Patch the schema
@@ -229,7 +229,7 @@ async function setupDatasharePrerequisites(projectId) {
 
     if (await bigqueryUtil.tableExists(cfg.cdsDatasetId, cfg.cdsAccountTableId) === false) {
         console.log("Creating account table");
-        const options = require('./bq/schema/account.json');
+        const options = Object.assign(viewOptions, require('./bq/schema/account.json'));
         await bigqueryUtil.createTable(cfg.cdsDatasetId, cfg.cdsAccountTableId, options);
     } else {
         console.log('Account table already exists');
@@ -245,7 +245,7 @@ async function setupDatasharePrerequisites(projectId) {
 
     if (await bigqueryUtil.tableExists(cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId) === false) {
         console.log("Creating authorizedView table");
-        const options = require('./bq/schema/authorizedView.json');
+        const options = Object.assign(viewOptions, require('./bq/schema/authorizedView.json'));
         await bigqueryUtil.createTable(cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId, options);
     } else {
         console.log('Authorized view table already exists');
