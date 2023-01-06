@@ -64,8 +64,9 @@ resource "google_cloudfunctions_function" "datashare_cloud_function" {
   timeout               = 540
   entry_point           = "processEvent"
   labels = {
-    version  = replace(var.tag, ".", "_"),
-    md5_hash = data.archive_file.function_package.output_md5
+    version                          = replace(var.tag, ".", "_"),
+    md5_hash                         = data.archive_file.function_package.output_md5,
+    (var.goog_packaged_solution_key) = var.goog_packaged_solution_value
   }
   event_trigger {
     event_type = "google.storage.object.finalize"

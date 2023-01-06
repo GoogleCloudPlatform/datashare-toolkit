@@ -204,3 +204,13 @@ variable "secret_name_prefix" {
   description = "The prefix used for the configuration secret names"
   default     = "datashare"
 }
+
+variable "goog_packaged_solution_key" {
+  type        = string
+  description = "The packaged solution key"
+}
+
+variable "goog_packaged_solution_value" {
+  type        = string
+  description = "The packaged solution value"
+}

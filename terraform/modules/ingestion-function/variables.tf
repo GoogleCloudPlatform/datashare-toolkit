@@ -64,3 +64,13 @@ variable "datashare_ingestion_source_code_filename" {
   default     = "datashare-batch-cloud-function-src.zip"
   description = "The ingestion function source zip file path"
 }
+
+variable "goog_packaged_solution_key" {
+  type        = string
+  description = "The packaged solution key"
+}
+
+variable "goog_packaged_solution_value" {
+  type        = string
+  description = "The packaged solution value"
+}

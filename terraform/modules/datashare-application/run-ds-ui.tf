@@ -34,6 +34,9 @@ resource "google_cloud_run_service" "cloud-run-ds-ui" {
     annotations = {
       "run.googleapis.com/ingress" = "all"
     }
+    labels = {
+      (var.goog_packaged_solution_key) = var.goog_packaged_solution_value
+    }
   }
 
   // TODO: Store and use secret manager functionality in Cloud Run to expose as env variables

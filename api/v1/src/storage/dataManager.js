@@ -45,7 +45,10 @@ async function createBucket(projectId, name) {
     const storageUtil = new StorageUtil(projectId);
     return storageUtil.createBucket(name).then(bucketResponse => {
         const [bucket] = bucketResponse;
-        let labels = { [config.cdsManagedLabelKey]: "true" };
+        let labels = { 
+            [config.cdsManagedLabelKey]: "true",
+            [config.googPackagedSolutionKey] : config.googPackagedSolutionValue
+        };
         return bucket.setLabels(labels).then(() => {
             return {
                 success: true,

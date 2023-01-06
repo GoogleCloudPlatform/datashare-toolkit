@@ -275,3 +275,15 @@ variable "marketplace_integration_enabled" {
   description = "Flag indicating if marketplace integration for datashare is enabled"
   default     = false
 }
+
+variable "goog_packaged_solution_key" {
+  type        = string
+  description = "The packaged solution key"
+  default     = "goog-packaged-solution"
+}
+
+variable "goog_packaged_solution_value" {
+  type        = string
+  description = "The packaged solution value"
+  default     = "datashare"
+}

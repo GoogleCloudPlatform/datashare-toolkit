@@ -27,6 +27,8 @@ config.productName = 'Datashare';
 // TODO: Update through CI
 config.productVersion = '0.0.1';
 
+config.googPackagedSolutionKey = process.env.GOOG_PACKAGED_SOLUTION_KEY || 'goog_packaged_solution_key';
+config.googPackagedSolutionValue = process.env.GOOG_PACKAGED_SOLUTION_VALUE ||'datashare';
 config.cdsManagedLabelKey = 'datashare_managed';
 config.cdsMetadataLabelKey = 'datashare_metadata';
 config.cdsExclusionLabels = [config.cdsMetadataLabelKey];

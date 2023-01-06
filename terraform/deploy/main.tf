@@ -97,6 +97,8 @@ module "datashare-application" {
   api_domain                      = var.api_domain
   ui_domain                       = var.ui_domain
   secret_name_prefix              = var.secret_name_prefix
+  goog_packaged_solution_key      = var.goog_packaged_solution_key
+  goog_packaged_solution_value    = var.goog_packaged_solution_value
 }
 
 module "custom-domain" {
@@ -112,6 +114,8 @@ module "custom-domain" {
   cloud_run_ds_ui_name         = module.datashare-application[0].cloud_run_ds_ui_name
   ds_api_gateway_gateway_id    = module.datashare-application[0].ds_api_gateway_gateway_id
   update_cloud_dns             = var.update_cloud_dns
+  goog_packaged_solution_key   = var.goog_packaged_solution_key
+  goog_packaged_solution_value = var.goog_packaged_solution_value
 
   depends_on = [module.datashare-application]
 }
@@ -120,7 +124,9 @@ module "cloud-functions" {
   source = "../modules/ingestion-function"
   count  = var.deploy_ingestion_cloud_function ? 1 : 0
 
-  project_id = var.project_id
-  region     = var.region
-  tag        = var.tag
+  project_id                   = var.project_id
+  region                       = var.region
+  tag                          = var.tag
+  goog_packaged_solution_key   = var.goog_packaged_solution_key
+  goog_packaged_solution_value = var.goog_packaged_solution_value
 }

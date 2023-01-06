@@ -21,6 +21,10 @@ resource "google_storage_bucket" "install_bucket" {
   force_destroy               = true
   uniform_bucket_level_access = true
   storage_class               = var.ingestion_storage_bucket_storage_class
+
+  labels = {
+    (var.goog_packaged_solution_key) = var.goog_packaged_solution_value
+  }
 }
 
 // terraform import google_storage_bucket.ingestion_bucket cds-demo-1-271622-datashare-ingestion
@@ -30,4 +34,8 @@ resource "google_storage_bucket" "ingestion_bucket" {
   force_destroy               = true
   uniform_bucket_level_access = true
   storage_class               = var.ingestion_storage_bucket_storage_class
+
+  labels = {
+    (var.goog_packaged_solution_key) = var.goog_packaged_solution_value
+  }
 }
