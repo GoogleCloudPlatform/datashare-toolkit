@@ -187,6 +187,10 @@ function sqlReplacements(projectId, text) {
 async function setupDatasharePrerequisites(projectId) {
     const bigqueryUtil = new BigQueryUtil(projectId);
 
+    const viewOptions = {
+        labels: { [cfg.googPackagedSolutionKey] : cfg.googPackagedSolutionValue }
+    };
+
     if (await bigqueryUtil.datasetExists(cfg.cdsDatasetId) === false) {
         console.log('Creating datashare dataset');
         let labels = { 
@@ -218,7 +222,7 @@ async function setupDatasharePrerequisites(projectId) {
     if (await bigqueryUtil.viewExists(cfg.cdsDatasetId, cfg.cdsPolicyViewId) === false) {
         console.log("Creating latest policies view");
         const sql = sqlReplacements(projectId, require('./bq/view/currentPolicy.sql'));
-        await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsPolicyViewId, sql);
+        await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsPolicyViewId, sql, viewOptions);
     } else {
         console.log('Policies view already exists');
     }
@@ -234,7 +238,7 @@ async function setupDatasharePrerequisites(projectId) {
     if (await bigqueryUtil.viewExists(cfg.cdsDatasetId, cfg.cdsAccountViewId) === false) {
         console.log("Creating latest account view");
         const sql = sqlReplacements(projectId, require('./bq/view/currentAccount.sql'));
-        await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsAccountViewId, sql);
+        await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsAccountViewId, sql, viewOptions);
     } else {
         console.log('Account view already exists');
     }
@@ -250,7 +254,7 @@ async function setupDatasharePrerequisites(projectId) {
     if (await bigqueryUtil.viewExists(cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId) === false) {
         console.log("Creating latest authorizedView view");
         const sql = sqlReplacements(projectId, require('./bq/view/currentAuthorizedView.sql'));
-        await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId, sql);
+        await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId, sql, viewOptions);
     } else {
         console.log('Authorized view view already exists');
     }
@@ -258,7 +262,7 @@ async function setupDatasharePrerequisites(projectId) {
     if (await bigqueryUtil.viewExists(cfg.cdsDatasetId, cfg.cdsCurrentUserPermissionViewId) === false) {
         console.log("Creating latest currentUserPermission view");
         const sql = sqlReplacements(projectId, require('./bq/view/currentUserPermission.sql'));
-        await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsCurrentUserPermissionViewId, sql);
+        await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsCurrentUserPermissionViewId, sql, viewOptions);
     } else {
         console.log('Current user dataset view already exists');
     }
