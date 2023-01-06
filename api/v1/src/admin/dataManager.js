@@ -189,8 +189,11 @@ async function setupDatasharePrerequisites(projectId) {
 
     if (await bigqueryUtil.datasetExists(cfg.cdsDatasetId) === false) {
         console.log('Creating datashare dataset');
-        let labels = {};
-        labels[cfg.cdsMetadataLabelKey] = true;
+        let labels = { 
+            [cfg.cdsMetadataLabelKey]: true,
+            [cfg.googPackagedSolutionKey] : cfg.googPackagedSolutionValue
+        };
+
         const options = { description: 'Datashare Master Dataset', labels: labels };
         await bigqueryUtil.createDataset(cfg.cdsDatasetId, options);
     } else {
@@ -198,6 +201,7 @@ async function setupDatasharePrerequisites(projectId) {
         // Update existing dataset to add the label
         // This can be split out later to an update process if we need to make bigger changes
         await bigqueryUtil.setDatasetLabel(cfg.cdsDatasetId, cfg.cdsMetadataLabelKey, true);
+        await bigqueryUtil.setDatasetLabel(cfg.cdsDatasetId, cfg.googPackagedSolutionKey, cfg.googPackagedSolutionValue);
     }
 
     if (await bigqueryUtil.tableExists(cfg.cdsDatasetId, cfg.cdsPolicyTableId) === false) {
