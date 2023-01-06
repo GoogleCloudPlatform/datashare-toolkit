@@ -216,6 +216,7 @@ async function setupDatasharePrerequisites(projectId) {
         // Patch the schema
         const options = require('./bq/schema/policy.json');
         await bigqueryUtil.patchTableSchema(cfg.cdsDatasetId, cfg.cdsPolicyTableId, options.schema)
+        await bigqueryUtil.setTableLabel(cfg.cdsDatasetId, cfg.cdsPolicyTableId, cfg.googPackagedSolutionKey, cfg.googPackagedSolutionValue)
         console.log('Policy table already exists');
     }
 
@@ -224,6 +225,7 @@ async function setupDatasharePrerequisites(projectId) {
         const sql = sqlReplacements(projectId, require('./bq/view/currentPolicy.sql'));
         await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsPolicyViewId, sql, viewOptions);
     } else {
+        await bigqueryUtil.setTableLabel(cfg.cdsDatasetId, cfg.cdsPolicyViewId, cfg.googPackagedSolutionKey, cfg.googPackagedSolutionValue)
         console.log('Policies view already exists');
     }
 
@@ -232,6 +234,7 @@ async function setupDatasharePrerequisites(projectId) {
         const options = Object.assign(viewOptions, require('./bq/schema/account.json'));
         await bigqueryUtil.createTable(cfg.cdsDatasetId, cfg.cdsAccountTableId, options);
     } else {
+        await bigqueryUtil.setTableLabel(cfg.cdsDatasetId, cfg.cdsAccountTableId, cfg.googPackagedSolutionKey, cfg.googPackagedSolutionValue)
         console.log('Account table already exists');
     }
 
@@ -240,6 +243,7 @@ async function setupDatasharePrerequisites(projectId) {
         const sql = sqlReplacements(projectId, require('./bq/view/currentAccount.sql'));
         await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsAccountViewId, sql, viewOptions);
     } else {
+        await bigqueryUtil.setTableLabel(cfg.cdsDatasetId, cfg.cdsAccountViewId, cfg.googPackagedSolutionKey, cfg.googPackagedSolutionValue)
         console.log('Account view already exists');
     }
 
@@ -248,6 +252,7 @@ async function setupDatasharePrerequisites(projectId) {
         const options = Object.assign(viewOptions, require('./bq/schema/authorizedView.json'));
         await bigqueryUtil.createTable(cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId, options);
     } else {
+        await bigqueryUtil.setTableLabel(cfg.cdsDatasetId, cfg.cdsAuthorizedViewTableId, cfg.googPackagedSolutionKey, cfg.googPackagedSolutionValue)
         console.log('Authorized view table already exists');
     }
 
@@ -256,6 +261,7 @@ async function setupDatasharePrerequisites(projectId) {
         const sql = sqlReplacements(projectId, require('./bq/view/currentAuthorizedView.sql'));
         await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId, sql, viewOptions);
     } else {
+        await bigqueryUtil.setTableLabel(cfg.cdsDatasetId, cfg.cdsAuthorizedViewViewId, cfg.googPackagedSolutionKey, cfg.googPackagedSolutionValue)
         console.log('Authorized view view already exists');
     }
 
@@ -264,6 +270,7 @@ async function setupDatasharePrerequisites(projectId) {
         const sql = sqlReplacements(projectId, require('./bq/view/currentUserPermission.sql'));
         await bigqueryUtil.createView(cfg.cdsDatasetId, cfg.cdsCurrentUserPermissionViewId, sql, viewOptions);
     } else {
+        await bigqueryUtil.setTableLabel(cfg.cdsDatasetId, cfg.cdsCurrentUserPermissionViewId, cfg.googPackagedSolutionKey, cfg.googPackagedSolutionValue)
         console.log('Current user dataset view already exists');
     }
 
