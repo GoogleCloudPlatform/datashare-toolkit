@@ -21,7 +21,7 @@
     "minimist": "^1.2.5",
     "underscore": "^1.13.2",
     "uuid": "^3.3.3",
-    "yaml": "^1.10.2"
+    "yaml": "^2.2.2"
   },
   "devDependencies": {
     "chai": "^4.3.6",
