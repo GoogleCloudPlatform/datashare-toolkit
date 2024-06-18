@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@google-cloud/pubsub": "^3.0.1",
-    "ws": "~5.2.3"
+    "ws": "~5.2.4"
   },
   "scripts": {
     "lint": "eslint ."
