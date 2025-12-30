@@ -111,9 +111,9 @@ resources:
       - DELETE
     properties:
       steps:
-      - name: gcr.io/cloud-builders/gsutil
+      - name: gcr.io/cloud-builders/gcloud
         entrypoint: 'bash'
-        args: ['-c', 'if gsutil stat gs://{{ project }}{{ installStorageBucketSuffix }}/{{ cloudFunctionSourceZipFileName }}; then gsutil -m rm -r gs://{{ project }}{{ installStorageBucketSuffix }}/*; else exit 0; fi']
+        args: ['-c', 'if gcloud storage objects list --stat --fetch-encrypted-object-hashes gs://{{ project }}{{ installStorageBucketSuffix }}/{{ cloudFunctionSourceZipFileName }}; then gcloud storage rm --recursive gs://{{ project }}{{ installStorageBucketSuffix }}/*; else exit 0; fi']
       timeout: 120s
   {% endif %}
 
@@ -411,8 +411,8 @@ resources:
                 gcloud services enable container.googleapis.com containerregistry.googleapis.com #--quiet
 
                 # Upload Cloud Function to Google Cloud storage
-                gsutil cp $CLOUD_FUNCTION_ZIP_FILE_NAME gs://$PROJECT_ID-install-bucket/
-                check_if_command_succeeded $? "gsutil cp $CLOUD_FUNCTION_ZIP_FILE_NAME gs://$PROJECT_ID-install-bucket/"
+                gcloud storage cp $CLOUD_FUNCTION_ZIP_FILE_NAME gs://$PROJECT_ID-install-bucket/
+                check_if_command_succeeded $? "gcloud storage cp $CLOUD_FUNCTION_ZIP_FILE_NAME gs://$PROJECT_ID-install-bucket/"
                 # TODO - we should notify a new Waiter here so that the Cloud Function deployment can start at this point instead of waiting until the end.
 
                 # Update permission on Deployment Manager service account (cloudservices.gserviceaccount.com)
@@ -469,7 +469,7 @@ resources:
                     echo "Istio version is " + $ISTIO_VERSION
 
                     echo "Fetching Istio release."
-                    gsutil -m cp gs://istio-release/releases/${ISTIO_VERSION}/istio-${ISTIO_VERSION}-linux.tar.gz - | tar zx
+                    gcloud storage cp gs://istio-release/releases/${ISTIO_VERSION}/istio-${ISTIO_VERSION}-linux.tar.gz - | tar zx
 
                     if ! helm &> /dev/null
                     then
