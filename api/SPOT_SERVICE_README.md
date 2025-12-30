@@ -79,7 +79,7 @@ Set your **BUCKET_REGION** environment variable:
 
 Create the new storage bucket:
 
-    gsutil mb -l ${BUCKET_REGION} gs://${BUCKET_NAME}/
+    gcloud storage buckets create gs://${BUCKET_NAME}/ --location ${BUCKET_REGION}
 
 ### Create Configuration
 
@@ -87,7 +87,7 @@ The DS API Spot Service configuration definitions are defined [above](#configura
 
 Copy configuration to the storage bucket:
 
-    gsutil cp ../examples/mlb/config/api/config.json gs://${BUCKET_NAME}/cds/api/config.json
+    gcloud storage cp ../examples/mlb/config/api/config.json gs://${BUCKET_NAME}/cds/api/config.json
 
 
 ### Enable APIs
@@ -157,16 +157,19 @@ _Note_ **objectCreator** is required for the destination GCS Bucket for authoriz
 
 Set the Bucket ACL for the service account:
 
-    gsutil iam ch serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com:objectViewer \
-      gs://${BUCKET_NAME};
-    gsutil iam ch serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com:objectCreator \
-      gs://${BUCKET_NAME};
-    gsutil iam ch serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com:legacyBucketReader \
-      gs://${BUCKET_NAME};
+    gcloud storage buckets add-iam-policy-binding gs://${BUCKET_NAME} \
+      --member serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
+      --role roles/storage.objectViewer;
+    gcloud storage buckets add-iam-policy-binding gs://${BUCKET_NAME} \
+      --member serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
+      --role roles/storage.objectCreator;
+    gcloud storage buckets add-iam-policy-binding gs://${BUCKET_NAME} \
+      --member serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
+      --role roles/storage.legacyBucketReader;
 
 View the Bucket IAM permissions:
 
-    gsutil iam get gs://${BUCKET_NAME}
+    gcloud storage buckets get-iam-policy gs://${BUCKET_NAME}
 
 ![alt text](files/images/cds-api-spot-mgr-gcs-bucket-permissions.png)
 

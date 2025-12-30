@@ -11,21 +11,21 @@ This sequence of commands will create a new bucket, deploy the ingestion functio
 
 ```
 BUCKET=$(head -1 /dev/random | md5)
-gsutil mb gs://${BUCKET}
+gcloud storage buckets create gs://${BUCKET}
 cd bq-datashare-toolkit/ingestion/function
 npm run deploy -- --trigger-bucket=gs://${BUCKET}
 cd ../../examples/mlb/config/ingestion
-gsutil cp game_logs.schema.json gs://${BUCKET}/cds/
-gsutil cp game_logs.transform.sql gs://${BUCKET}/cds/
+gcloud storage cp game_logs.schema.json gs://${BUCKET}/cds/
+gcloud storage cp game_logs.transform.sql gs://${BUCKET}/cds/
 cd ../../data
-gsutil cp mlb.game_logs.csv.gz gs://${BUCKET}
+gcloud storage cp mlb.game_logs.csv.gz gs://${BUCKET}
 sleep 60 # wait for ingestion
 echo "SELECT COUNT(*) AS entry_count FROM mlb.game_logs" | bq --quiet --format=json --headless query
 
 # [{"entry_count":"171907"}]
 
 # clean up bucket
-gsutil rm -r -f gs://${BUCKET}
+gcloud storage rm --recursive --continue-on-error gs://${BUCKET}
 
 ```
 
@@ -33,7 +33,7 @@ The output from these commands would resemble:
 
 ```
 host:Code thisuser$ BUCKET=$(head -1 /dev/random | md5)
-host:Code thisuser$ gsutil mb gs://${BUCKET}
+host:Code thisuser$ gcloud storage buckets create gs://${BUCKET}
 Creating gs://713573366abd762a58fce9752b55b610/...
 host:Code thisuser$ cd bq-datashare-toolkit/ingestion/bin
 host:bin thisuser$ ./deploy.sh --trigger-bucket=gs://${BUCKET}
@@ -61,16 +61,16 @@ timeout: 540s
 updateTime: '2019-10-29T17:22:49Z'
 versionId: '21'
 host:bin thisuser$ cd ../../examples/mlb/config/ingestion
-host:ingestion thisuser$ gsutil cp game_logs.schema.json gs://${BUCKET}/cds/
+host:ingestion thisuser$ gcloud storage cp game_logs.schema.json gs://${BUCKET}/cds/
 Copying file://game_logs.schema.json [Content-Type=application/json]...
 / [1 files][ 21.4 KiB/ 21.4 KiB]                                                
 Operation completed over 1 objects/21.4 KiB.                                     
-host:ingestion thisuser$ gsutil cp game_logs.transform.sql gs://${BUCKET}/cds/
+host:ingestion thisuser$ gcloud storage cp game_logs.transform.sql gs://${BUCKET}/cds/
 Copying file://game_logs.transform.sql [Content-Type=application/x-sql]...
 / [1 files][  158.0 B/  158.0 B]                                                
 Operation completed over 1 objects/158.0 B.                                      
 host:ingestion thisuser$ cd ../../data
-host:data thisuser$ gsutil cp mlb.game_logs.csv.gz gs://${BUCKET}
+host:data thisuser$ gcloud storage cp mlb.game_logs.csv.gz gs://${BUCKET}
 Copying file://mlb.game_logs.csv.gz [Content-Type=text/csv]...
 \ [1 files][ 19.5 MiB/ 19.5 MiB]   25.1 MiB/s                                   
 Operation completed over 1 objects/19.5 MiB.                                     
@@ -81,7 +81,7 @@ host:data thisuser$
 host:data thisuser$ # ^^^ [{"entry_count":"171907"}]
 host:data thisuser$ 
 host:data thisuser$ # clean up bucket
-host:data thisuser$ gsutil rm -r -f gs://${BUCKET}
+host:data thisuser$ gcloud storage rm --recursive --continue-on-error gs://${BUCKET}
 Removing gs://713573366abd762a58fce9752b55b610/mlb.game_logs.csv.gz#1572369785409249...
 Removing gs://713573366abd762a58fce9752b55b610/cds/game_logs.schema.json#1572369771326950...
 Removing gs://713573366abd762a58fce9752b55b610/cds/game_logs.transform.sql#1572369772972359...

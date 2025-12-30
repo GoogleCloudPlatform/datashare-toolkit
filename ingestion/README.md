@@ -167,7 +167,7 @@ Configuration files are placed in the
 bucket. They are recognized by the Cloud Function as special, so it
 won't treat them as normal data files to process. They can be copied to the source bucket with this command:
 
-```gsutil cp schema.json transform.sql gs://${BUCKET}/datashare/<dataset-name>/<table-name>/config/```
+```gcloud storage cp schema.json transform.sql gs://${BUCKET}/datashare/<dataset-name>/<table-name>/config/```
 
 ## Transformation options
 
