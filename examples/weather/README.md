@@ -18,7 +18,7 @@ function) column, and the mean temperature that comprises the observation. Datas
 ```
 # create new bucket
 BUCKET=$(head -1 /dev/random | md5)
-gsutil mb gs://${BUCKET}
+gcloud storage buckets create gs://${BUCKET}
 cd ingestion/batch
 
 # deploy ingestion function to bucket
@@ -26,19 +26,19 @@ npm run deploy -- --trigger-bucket=gs://${BUCKET}
 cd ../../examples/weather/observation/config
 
 # deploy configuration files for source data
-gsutil cp schema.json gs://${BUCKET}/datashare/weather/observation/config/schema.json
-gsutil cp transform.sql gs://${BUCKET}/datashare/weather/observation/config/transform.sql
+gcloud storage cp schema.json gs://${BUCKET}/datashare/weather/observation/config/schema.json
+gcloud storage cp transform.sql gs://${BUCKET}/datashare/weather/observation/config/transform.sql
 cd ../data
 
 # copy source data to bucket
-gsutil cp weather.observation.csv gs://${BUCKET}/datashare/weather/observation/data/weather.observation.csv
+gcloud storage cp weather.observation.csv gs://${BUCKET}/datashare/weather/observation/data/weather.observation.csv
 sleep 60 # wait for ingestion
 
 # check the number of records ingested
 echo "SELECT COUNT(*) AS entry_count FROM weather.observation" | bq --quiet --format=json --headless query
 
 # remove bucket
-gsutil rm -r -f gs://${BUCKET}
+gcloud storage rm --recursive --continue-on-error gs://${BUCKET}
 
 ```
 
@@ -131,4 +131,3 @@ using the [ST_GeogPoint](https://cloud.google.com/bigquery/docs/reference/standa
 
 Finally, the observation payload is also copied without
 transformation, aside from renaming the column `mean_temperature`.
-

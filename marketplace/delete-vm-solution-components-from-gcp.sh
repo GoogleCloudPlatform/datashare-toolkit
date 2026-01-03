@@ -30,7 +30,7 @@ if [ ! -z "$1" ]; then
 fi
 
 # Force delete the GCS install bucket first, since the deployment manager can't delete a bucket unless it is empty.
-gsutil rm -r $GCS_INSTALL_BUCKET
+gcloud storage rm --recursive $GCS_INSTALL_BUCKET
 if [ $? -eq 0 ]; then
     echo "Deleted $GCS_INSTALL_BUCKET and all items in that bucket successfully."
 else 
@@ -39,7 +39,7 @@ fi
 
 # Force delete the GCS Ingestion bucket first, since the deployment manager can't delete a bucket unless it is empty.
 # Not sure if we should force delete this bucket yet.  Customer may have files that they uploaded. 
-#gsutil rm -r gs://$PROJECT_ID-cds-bucket
+#gcloud storage rm --recursive gs://$PROJECT_ID-cds-bucket
 #if [ $? -eq 0 ]; then
 #    echo "Deleted $PROJECT_ID-cds-bucket and all items in that bucket successfully."
 #else 

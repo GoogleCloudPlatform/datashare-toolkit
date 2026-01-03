@@ -28,14 +28,13 @@ for day in ${DAYS};
 do
     if [ ${day} -lt $(date +%Y%m%d) ]; then
 	echo Ingest trades for ${day}
-	curl https://s3-eu-west-1.amazonaws.com/public.bitmex.com/data/trade/${day}.csv.gz | gsutil cp - gs://${BUCKET}/bqds/bitmex/trades/data/${day}.csv.gz;
+	curl https://s3-eu-west-1.amazonaws.com/public.bitmex.com/data/trade/${day}.csv.gz | gcloud storage cp - gs://${BUCKET}/bqds/bitmex/trades/data/${day}.csv.gz;
 	echo Ingest quotes for ${day}
-	curl https://s3-eu-west-1.amazonaws.com/public.bitmex.com/data/quote/${day}.csv.gz | gsutil cp - gs://${BUCKET}/bqds/bitmex/quotes/data/${day}.csv.gz;
+	curl https://s3-eu-west-1.amazonaws.com/public.bitmex.com/data/quote/${day}.csv.gz | gcloud storage cp - gs://${BUCKET}/bqds/bitmex/quotes/data/${day}.csv.gz;
     else
 	echo Skipping future day ${day}
     fi
 done;
-
 
 
 

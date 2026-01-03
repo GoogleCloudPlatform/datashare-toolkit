@@ -177,9 +177,9 @@ export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 
 # Upload Cloud Function to Google Cloud storage
 echo "Creating the Google Cloud Storage Bucket."
-gsutil mb gs://$PROJECT_ID-install-bucket/
+gcloud storage buckets create gs://$PROJECT_ID-install-bucket/
 echo "Uploading the Cloud Function to Google Cloud Storage."
-gsutil cp $CLOUD_FUNCTION_ZIP_FILE_NAME gs://$PROJECT_ID-install-bucket/
+gcloud storage cp $CLOUD_FUNCTION_ZIP_FILE_NAME gs://$PROJECT_ID-install-bucket/
 sudo rm $CLOUD_FUNCTION_ZIP_FILE_NAME
 
 # Enable Cloud Run in new project
@@ -216,7 +216,7 @@ if [ "$DEPLOY_API_TO_GKE" = "true" ]; then
 
     echo "Fetching Istio release."
     cd ~
-    gsutil -m cp gs://istio-release/releases/${ISTIO_VERSION}/istio-${ISTIO_VERSION}-linux.tar.gz - | tar zx
+    gcloud storage cp gs://istio-release/releases/${ISTIO_VERSION}/istio-${ISTIO_VERSION}-linux.tar.gz - | tar zx
     
     if ! helm &> /dev/null 
     then
@@ -262,4 +262,3 @@ if [ "$DEPLOY_API_TO_GKE" = "true" ]; then
     kubectl label namespace $NAMESPACE istio-injection=enabled
     echo "GKE setup complete."
 fi
-

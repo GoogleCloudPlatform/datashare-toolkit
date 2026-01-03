@@ -64,7 +64,7 @@ if [[ $BUCKET_NAME != gs://* ]]; then
     echo "Updated --trigger-bucket to '${BUCKET_NAME}'"
 fi
 
-BUCKET_REGION=$(gsutil ls -L -b ${BUCKET_NAME} | grep "Location constraint:" | awk 'END {print tolower($3)}')
+BUCKET_REGION=$(gcloud storage ls --full --buckets ${BUCKET_NAME} | grep "Location constraint:" | awk 'END {print tolower($3)}')
 if [ $? -ne 0 ] || [ -z "$BUCKET_REGION" ]; then
     echo "Failed to find bucket location"
     exit 3
