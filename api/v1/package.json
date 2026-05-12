@@ -14,7 +14,7 @@
         "cookie-parser": "^1.4.5",
         "cors": "^2.8.5",
         "express": "^4.17.1",
-        "firebase-admin": "^11.4.1",
+        "firebase-admin": "^13.9.0",
         "gcp-metadata": "^4.2.1",
         "jsonschema": "^1.2.6",
         "jsonwebtoken": "^9.0.0",
