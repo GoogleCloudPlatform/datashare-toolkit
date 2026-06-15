@@ -22,7 +22,7 @@
         "ms": "^2.1.2",
         "node-cache": "^5.1.2",
         "strip-json-comments": "^3.0.1",
-        "swagger-jsdoc": "^3.4.0",
+        "swagger-jsdoc": "^6.3.0",
         "swagger-ui-express": "^4.1.2",
         "underscore": "^1.12.1",
         "uuid": "^3.3.3"
